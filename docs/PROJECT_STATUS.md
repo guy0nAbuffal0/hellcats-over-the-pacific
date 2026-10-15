@@ -381,10 +381,10 @@ They do not cover rendering, camera motion, keyboard integration, stall and out-
 
 The two sims should stay apart until one change has a single owner. Mission 1 sea/island solids are in place; the headless baseline includes them.
 
-**Recommended milestone:** wire `12840`→`05116` pool, or port `15d20`/`19430` / real `046da` — still without merging integrators.
+**Recommended milestone:** port `FUN_00015d20` / `FUN_00019430`, or real `046da` / `01ba8` grow — still without merging integrators.
 
-1. Wire `FUN_00012840` to call `_call_fun_00005116` then post-spawn writes (drop entity-only bypass when pool ready).
-2. Port `FUN_00015d20` / `FUN_00019430` entry wrappers or post-spawn fields.
+1. Port `FUN_00015d20` entry (`0262e` + `15bf6`) or `FUN_00019430` post-spawn pattern.
+2. Replace mock `046da` with a proven minimal install, or port `01ba8` grow-by-10.
 3. Identify real `FUN_00001d56` (replace `fun_00001d56_scale=0x1000` stand-in).
 4. Only after ownership is explicit, decide whether player motion should move into `SimCore` or whether `SimCore` remains a parity lab.
 

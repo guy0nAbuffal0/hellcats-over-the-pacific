@@ -13,6 +13,12 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Entries
 
+### 2026-10-15 — FUN_00012840 wired through FUN_00005116 pool
+
+- **[RECONSTRUCTED]** When `*(DAT_0001d6fc+0x30)` and slot count > 0: `12840` calls `05116(DAT_00026280, xyz, att, 0)`, then `entity=*(world+8)`, then post-spawn field writes (17551–17571).
+- **[INFERRED]** Without a configured pool, entity-fixture bypass remains (no allocator) for unit harnesses.
+- **Validation:** `_test_fun_00012840_via_05116_pool`; Godot **13 passed, 0 failed**; Python QA green.
+
 ### 2026-10-15 — FUN_00005116 free-slot scan + fill + world gate
 
 - **[RECONSTRUCTED]** `FUN_00005116` (5705–5746): scan `*(DAT_0001d6fc+0x30)` slots of `0x18` for `+0x14==0`; fill `+0/+2/+4/+6` attitudes and `+8/+c/+10` xyz; `046da`; return world at `+0x14` iff `*(world+0x44)!=0` else `051ec`→0.

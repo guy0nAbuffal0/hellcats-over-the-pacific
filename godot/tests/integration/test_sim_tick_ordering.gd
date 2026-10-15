@@ -1039,6 +1039,67 @@ func _test_fun_00005116_pool_scan() -> bool:
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(TABLE + 0x14, -1)), 0, "slot cleared") and ok
 	return ok
 
+## [RECONSTRUCTED] FUN_00012840 → FUN_00005116 pool then *(world+8) writes (17551–17571).
+func _test_fun_00012840_via_05116_pool() -> bool:
+	var sim := SimCoreScript.new(0x12841)
+	sim.mission_phase_a8 = 1
+	sim.mission_flag_ac = 1
+	sim.mission_short_90 = 0
+	const SHOOTER_WORLD := 0x7C60
+	const D6FC := 0x4100
+	const TABLE := 0x6100
+	const SPAWN_WORLD := 0x8100
+	sim.dat_0001d6fc = D6FC
+	sim.dat_0001d6fc_slot_count = 1
+	sim.mem_u32[D6FC + 0x30] = TABLE
+	sim.mem_u32[TABLE + 0x14] = 0
+	sim.dat_00026280 = 0x26280
+	sim.spawn_05116_world_obj = SPAWN_WORLD
+	sim.spawn_05116_world_field_44 = 1
+	sim.spawn_05116_entity_handle = 0xF00D
+	sim.mem_u32[SHOOTER_WORLD + 0x18] = 11
+	sim.mem_u32[SHOOTER_WORLD + 0x1c] = 22
+	sim.mem_u32[SHOOTER_WORLD + 0x20] = 33
+	var spawn := EntityStateScript.new()
+	spawn.set_u16_field("field_61c", 0)
+	sim.spawn_12840_entity = spawn
+	var e := EntityStateScript.new()
+	var tmpl = EntityTemplateScript.new()
+	tmpl.set_s16_field("field_34", 0x200)
+	tmpl.set_s16_field("field_36", 0x600)
+	tmpl.set_s16_field("field_40", 0)
+	tmpl.set_s16_field("field_22", 0)
+	tmpl.set_s16_field("field_24", 0)
+	e.external_template = tmpl
+	e.world_obj_ptr = SHOOTER_WORLD
+	e.set_u8_field("field_63e", 1)
+	e.set_u8_field("field_0b", 0)
+	e.set_s8_field("direction_char_679", 0x2D)
+	e.set_s8_field("field_19d", 1)
+	e.set_s8_field("field_19f", 2)
+	e.set_s16_field("field_18d", 0x40)
+	e.set_u16_field("pos_20", 0x12)
+	e.set_u16_field("attitude_22", 0x34)
+	e.set_s16_field("field_24", 0x56)
+	e.set_field("pos_2e", 50000)
+	e.set_s16_field("movement_626", 0)
+	e.set_s16_field("movement_662", 0)
+	e.set_field("movement_62a", 0x100 << 2)
+	e.set_s8_field("weapon_count_67d", 1)
+	e.set_s16_field("field_18c", 0)
+	sim.entity_array_2.append(e)
+	sim.tick()
+	var ok := Assertions.assert_equal(sim.last_12840_result, 0xF00D, "entity from world+8")
+	ok = Assertions.assert_equal(sim.last_05116_result, SPAWN_WORLD, "05116 ran") and ok
+	ok = Assertions.assert_equal(sim.last_05116_slot_index, 0, "slot0") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(TABLE + 8, -1)), 11, "pool x") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(TABLE + 0xC, -1)), 22, "pool y") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(TABLE + 0x10, -1)), 33, "pool z") and ok
+	ok = Assertions.assert_equal(spawn.get_u16_field("pos_20"), 0x12, "wrote pos_20") and ok
+	ok = Assertions.assert_equal(sim.dat_0001b880, 0xF00D, "player b880") and ok
+	ok = Assertions.assert_equal(spawn.get_u16_field("field_614"), 1, "614 latch") and ok
+	return ok
+
 ## [RECONSTRUCTED] field_676/677 fire gates + stubs (14673–14719).
 func _test_fun_0000e792_weapon_676_677_branch() -> bool:
 	var sim := SimCoreScript.new(0x6761)

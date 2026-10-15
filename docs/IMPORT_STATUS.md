@@ -35,7 +35,7 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 
 | Symbol / cluster | Source (evidence) | Godot / tests | Status | MVP notes |
 |------------------|-------------------|---------------|--------|-----------|
-| **FUN_0000e792** | `Pacific Conflict.c` (~14016+); `docs/contracts/flight_FUN_0000e792_contract.md` | `FlightModelMvp` + `AircraftState`; `SimCore` slices incl. contact early-out | **Partial** | Through `05116` free-slot/fill/gate (046da/grow mocked); `12840` writes; `15d20`/`19430` / real `046da` still open. |
+| **FUN_0000e792** | `Pacific Conflict.c` (~14016+); `docs/contracts/flight_FUN_0000e792_contract.md` | `FlightModelMvp` + `AircraftState`; `SimCore` slices incl. contact early-out | **Partial** | `12840`→`05116` pool wired; 046da/grow mocked; `15d20`/`19430` / real `046da` still open. |
 | **FUN_0000e42a**, **FUN_0000e468**, **FUN_0000e570** | Inside / near **FUN_0000e792** block (~13796–13915) | `hellcats/core/flight_math.gd` | **Done** (helpers) | Used by convergence; not always wired in live tick. |
 | **FUN_00011564** | Overlay table RNG (Pacific Conflict.c:16407–16433) | `rng_overlay_11564.gd`; `SimCore.rng` / `_rng_consume` | **Done** | Paired with **FUN_0001150a** / **FUN_000114ca** init. ID05 on `rng_id05`. |
 | **FUN_0001150a** / **FUN_000114ca** | Init + mul helper (Pacific Conflict.c:16355–16385) | `init_1150a` / `fun_000114ca` / `set_seed` | **Done** | `table[0]` prior value **[UNKNOWN]** (=0). |
