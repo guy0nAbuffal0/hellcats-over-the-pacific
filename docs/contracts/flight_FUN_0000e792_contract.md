@@ -10,9 +10,27 @@ Bind the Godot **Mission-1** flight path to **evidence-backed** motion rules fro
 
 ## Update order (this pass)
 
+**[RECONSTRUCTED]** Contact early-out (Pacific Conflict.c:14083–14104): if `(status_1a1 & 8) != 0`, update `position_velocity_c` from `pos_2e` vs `*(iVar1+0x1c)` where `iVar1 = *param_1`, optional `status\|0x1000` / `DAT_0001b850`, clear `0x669`, then **return**. Godot: `world_obj_ptr` + `mem_u32[ptr+0x1c]`. **[INFERRED]** Call-site `FUN_00011544` ≡ one `FUN_00011564` (`RngOverlay11564.fun_00011544_callsite`). Contact-path attitude writes (`0x61a`/`0x61e` → `param_1+8/+9`) remain **[DEFERRED]**.
+
 **[RECONSTRUCTED]** In the original, the **0x66e / 0x672 / 0x66a** block runs **after** control/status setup and **FUN_0000e42a** / **FUN_0000e468** / **FUN_0000e570** prep (`local_26`, `local_46`, `local_42`), and **only** for **player** or **designated target** (`DAT_0001b738` / `DAT_0001b888`).
 
-**[MVP APPROXIMATION]** In Godot MVP we apply **only** the **smoothed delta accumulation rule** toward **command scalars** derived from **normalized** pitch/roll/yaw inputs (not full `local_46` / `local_42` from airspeed/template math).
+**[RECONSTRUCTED]** `local_46 = (int)(short)(0x5e50 / (short)((sVar15 + 0xa25) >> 5)) * sVar21 * 0x666 >> 5` (Pacific Conflict.c:14183). The `0x666` factor is a **literal constant**, not entity field `movement_666`. Godot: `FlightMath.compute_local_46` / `SimCore._apply_movement_smoothing`.
+
+**[RECONSTRUCTED]** Prep trio (asm `0xE9BE`–`0xE9EA`): `e42a(*(world+0x1c))` → `sVar15`; `e468(world+0x1c − pos_2e, e42a)` → separate slot (`SimCore.last_e468_out`); `e570` / `local_46` keep **raw e42a**. Not entity `pos_1c`.
+
+**[RECONSTRUCTED]** `movement_626` update (Pacific Conflict.c:14248–14304) after the designated-player `0x66e/672/66a` block — applies to **all** entities that reach it. Formula uses `movement_662`, `iVar20=movement_62a>>2`, template `+0x34/+0x36/+0x44`. **`e468` is not in this formula** (drag divisor later at ~14356 / asm `0xEDF8`). Godot: `FlightMath.apply_movement_626_step` / `SimCore._apply_movement_626_step`.
+
+**[RECONSTRUCTED]** Reverse-flight when `field_63e!=0` and `direction_char_679=='-'` (14305–14342), **before** e4a4: `0x626` clamps; designated `local_48` from stashed `local_46`/`local_42`; `DAT_0001b858=0` for player; `attitude_22` (`local_2a`) += `local_48` masked. Godot: `compute_reverse_local_48` / `_apply_movement_626_reverse_clamp`.
+
+**[RECONSTRUCTED]** `FUN_0000e4a4` + e468 drag + `0x636` + `0x63e`/`field_18e` + `local_34`/stall (14344–14433). Godot: `FlightMath.apply_ivar25_stall_step`, `SimCore._apply_e4a4_and_linear_drag` (`field_190`, `dat_0001b868`).
+
+**[RECONSTRUCTED]** `FUN_000025a8` → matrix → `FUN_000028dc` + `field_18c`/`param_1[2..4] >> 6` (2942–2949, 3111–3139, 14438–14445). Godot: `fun_000025a8` / `fun_00001d02` / `apply_position_commit_after_028dc`. Trig: overlay dump at file `0x1ab8c`/`0x1ad8c` (`trig_tables_ab6c_ad6c.json`; Ghidra symbols are 0x20 early).
+
+**[RECONSTRUCTED]** Airborne post-commit (14486–14495): `iVar20 = FUN_0000e372(e²+a²+6²)`; `FUN_00001f22`; clear `field_190` when `==2`. Grounded (14497–14603): `e372(e²+z²)`, `pvc←iVar23−surface`, optional `13452`, `field_0b` switch (`bVar6` / status / early return / clear `b856` / `0x10` soft `11564→uVar13` / `@` two 11544-callsite draws → `field_18c`/`uVar13` + optional `11564` `b854` / player `b854` when `b856≠0`), clamp `local_28`, prestall when `!bVar6`. LAB_0000f47c (14606–14629): clear `63f`, commit `pos_20`/`attitude_22`, yaw-blend `field_24`, write `movement_62a`, player `DAT_0001bc8c` ring. Char epilogue (14631–14647): `67b`/`679` increments + `field_67a|=2` + status `0x2000`/`~0x2000`. Weapons (14648–14719): `19d`/`19f` → `12840` post-spawn writes; `05116` free-slot/fill/gate ported (046da/grow mocked); `676`/`682` → stub `15d20`; `677` → stub `19430` + player `b874`/`d858`. `flags_685&2` ammo tail (14721–14734) via 11544-callsite draws. `bVar6` cleanup (14736–14748): `status_1a2` clamp/clear, `status=(s&0x8000)|0x900`, `state_32=0xe772`, clear `61a`/`61e`. Skipped on `0x10` early return. Godot: `_call_fun_00005116` / `apply_fun_00012840_spawn_fields` / `apply_e792_flags685_bit2_tail` / `apply_e792_bvar6_cleanup`. **[UNKNOWN]** `FUN_00001d56` scale (`fun_00001d56_scale=0x1000`). **[DEFERRED]** real `046da`/`01ba8`; `15d20`/`19430` bodies.
+
+**[RECONSTRUCTED]** Touchdown when `field_63e==0` and altitude crosses surface (14446–14449): `field_63e←1`, `param_1[3]←iVar23−*(world+0x1c)`. Pitch follow-on (14450–14476): hard `attitude_0e*0x10 < -0x168` → `status|0x400` + early return; if `pos_2e==0` call `FUN_00013452(world)` → `FUN_00013346(*(w+0x18/1c/20))` and store low byte to `field_0b` (14456–14458). Else rough if pitch `< -0xd8` or `abs(e40c(uVar13))>0x200` or `e40c(local_28)<-0x100`; gentle player sets `DAT_0001b856=1`; non-hard clears `field_18e` and player `DAT_0001b868=1`. `FUN_0000e40c` folds to ±0x2000. Airborne clear (14479–14484). Godot: `fun_00013452` / `fun_00013346` (empty-list path). **[DEFERRED]** Non-empty `FUN_00013346` object scan.
+
+**[MVP APPROXIMATION]** Mission-1 `FlightModelMvp` still applies the **smoothed delta accumulation rule** toward **command scalars** from normalized pitch/roll/yaw (not the full airspeed/`local_46` chain).
 
 **Order in `flight_model_mvp.step`:**
 

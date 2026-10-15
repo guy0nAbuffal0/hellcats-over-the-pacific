@@ -5,14 +5,19 @@ var objectives: Array[Dictionary] = []
 var _current_index: int = 0
 var _hold_timer: float = 0.0
 var _checkpoint_hits: Dictionary = {}
+## From mission JSON success.complete_all_required_objectives (default true).
+var complete_all_required_objectives: bool = true
 
-func configure(sequence: Array) -> void:
+func configure(sequence: Array, success_rules: Dictionary = {}) -> void:
 	objectives.clear()
 	for item in sequence:
 		objectives.append((item as Dictionary).duplicate(true))
 	_current_index = 0
 	_hold_timer = 0.0
 	_checkpoint_hits.clear()
+	complete_all_required_objectives = bool(
+		success_rules.get("complete_all_required_objectives", true)
+	)
 
 func notify_checkpoint(checkpoint_id: String) -> void:
 	_checkpoint_hits[checkpoint_id] = true
@@ -40,13 +45,19 @@ func step(snapshot: Dictionary, delta: float) -> Dictionary:
 			advanced = true
 			while _current_index < objectives.size() and _is_optional_already_complete(objectives[_current_index], snapshot):
 				_current_index += 1
-	var required_complete := are_required_objectives_complete()
 	return {
 		"advanced": advanced,
 		"completed_id": completed_id,
-		"mission_complete": required_complete,
+		"mission_complete": is_mission_success(),
 		"current_objective": current_objective(),
 	}
+
+## Success policy from mission JSON `success` block.
+func is_mission_success() -> bool:
+	if complete_all_required_objectives:
+		return are_required_objectives_complete()
+	## When false: every objective (including optional) must be past _current_index.
+	return _current_index >= objectives.size()
 
 func are_required_objectives_complete() -> bool:
 	for index in range(objectives.size()):

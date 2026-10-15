@@ -13,6 +13,79 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Entries
 
+### 2026-10-15 — FUN_00005116 free-slot scan + fill + world gate
+
+- **[RECONSTRUCTED]** `FUN_00005116` (5705–5746): scan `*(DAT_0001d6fc+0x30)` slots of `0x18` for `+0x14==0`; fill `+0/+2/+4/+6` attitudes and `+8/+c/+10` xyz; `046da`; return world at `+0x14` iff `*(world+0x44)!=0` else `051ec`→0.
+- **[DEFERRED]** `FUN_00001ba8` grow-by-10 when full; real `FUN_000046da` (mock installs `spawn_05116_world_obj` / `world+8` entity handle).
+- **Godot:** `find_05116_free_slot_index` / `apply_05116_slot_fill` / `apply_05116_world_gate`; `SimCore._call_fun_00005116`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green. `12840` still uses entity fixture for field writes.
+
+### 2026-10-15 — FUN_00012840 post-spawn field writes (05116 deferred)
+
+- **[RECONSTRUCTED]** `FUN_00012840` (17551–17571): `05116(DAT_00026280, xyz, att, 0)` → on success `entity=*(obj+8)`; if `param_2≠0` `field_61c|=0x40`; write `field_610=param_1`, `+0x20/+0x22/+0x24=param_6/7/8`.
+- **[RECONSTRUCTED]** Player fire latch (14655–14658): non-null + player → `DAT_0001b880`, `short*[0x30a]=1` (byte `0x614`), `DAT_0001b846=1`.
+- **[RECONSTRUCTED]** `FUN_00005116` free-slot path — see entry “FUN_00005116 free-slot…”. `01ba8`/`046da` still deferred.
+- **Godot:** `apply_fun_00012840_spawn_fields`; `SimCore._call_fun_00012840`; entity offsets `field_610`/`614`/`61c`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green. Mission 1 unchanged.
+
+### 2026-10-15 — FUN_00011544 call-site alias + flags_685&2 + @ field_18c
+
+- **[RECONSTRUCTED]** Binary `Hellcats/Pacific Conflict`: 17× `LEA.L $11544; JSR (An)` then use D0 as u16 (`&0x7f` / `&0x3f` / …). Bytes at `$11544` are the `1150a` warm-up epilogue (`cursor+=0xd8`; 10000×`BSR $11564`; `MOVEM`; `RTS`). Bytes at `$11564` are the overlay RNG. Zero absolute LEA/JSR to `$11564`.
+- **[INFERRED]** Call-site “FUN_00011544” ≡ one `FUN_00011564` draw (D0 = `sum>>16`). Executing `$11544` literally would be 10k draws + unbalanced MOVEM — not viable per tick. Godot: `RngOverlay11564.fun_00011544_callsite()` → `next()`.
+- **[RECONSTRUCTED]** `flags_685&2` ammo tail (14721–14734): first callsite draw; if `(d0&0x3f)==0` second draw; if `(d1&1)==0` or `67d==0` then `67e--` if nonzero else `67d--`. Godot: `apply_e792_flags685_bit2_tail` / `SimCore._apply_e792_flags685_bit2_tail`.
+- **[RECONSTRUCTED]** Grounded `@` (0x40): two callsite draws → `field_18c += (d0&0x7f)`, `uVar13=(d1&0x7f)-0x40` with speed scale; optional third `11564` for `b854` when player/`b856==0`/speed≥`0x2d1` (14537–14555).
+- **[DEFERRED]** Contact-path `0x61a`/`0x61e` attitude writes via 11544 (bad decomp / separate sites).
+- **Validation:** Godot **13 passed, 0 failed**; `python3 tools/qa/test_regression.py` green. Mission 1 / `FlightModelMvp` unchanged.
+
+### 2026-10-15 — FUN_00011564 overlay RNG fixture (not yet SimCore)
+
+- **[RECONSTRUCTED]** `FUN_00011564` (Pacific Conflict.c:16407–16433): table RNG at `DAT_00026008`…`0x260e4` (56 words **[INFERRED]** from span); `*p4 = *p5 + *p3`; return `sum >> 16`; wrap rules `+4`/`-0xd8`, `+0x17`/`-0x20`, `+0x36`/`-1` words vs limit `0x260e7`.
+- **[RECONSTRUCTED]** Godot: `hellcats/core/rng_overlay_11564.gd` + `godot/tests/unit/test_rng_overlay_11564.gd` fixture sequence.
+- **SimCore wiring:** `_rng_consume()` uses `RngOverlay11564`; ID05 on `rng_id05`.
+- **[RECONSTRUCTED]** `FUN_000114ca` + `FUN_0001150a` fill (`table[1]=param`, `table[i+1]=114ca(0x1df5e0d,table[i])+1` for i=1..0x36), cursor `0x260e4`, then 10000×`11564`. `set_seed` = full `init_1150a`.
+- **[UNKNOWN]** Pre-init value of `table[0]`; treated as 0.
+- **Validation:** fill + warm-up fixtures; suite **12 passed, 0 failed**.
+
+### 2026-10-15 — FUN_0000e792 contact early-out (SimCore)
+
+- **[RECONSTRUCTED]** When `(status_1a1 & 8) != 0` (Pacific Conflict.c:14083–14104): compare `pos_2e` to surface`+(-0x16)`; set `position_velocity_c` to `-0x16` or `pos_2e+template_field_40_adj-surface`; if `field_0b==0x10` OR status `0x1000` and if player set `DAT_0001b850=1`; clear `movement_669`; **return** (skips later e792 slices).
+- **[RECONSTRUCTED]** `iVar1 = *param_1` is a pointer; surface = `*(iVar1+0x1c)` (14084). Same pattern `*DAT_0001b738+0x1c` (7354, 7671). Godot: `EntityState.world_obj_ptr` + `SimCore.mem_u32[ptr+0x1c]`.
+- **[INFERRED]** `field_00` type byte vs word-0 pointer overlay unresolved without a byte-accurate entity image.
+- **[DEFERRED]** `FUN_00011544` RNG updates to `0x61a`/`0x61e` (bad decomp / void return).
+- **Validation:** contact tests use `world_obj_ptr` + `mem_u32`; suite green; Mission 1 not wired.
+
+### 2026-10-15 — FUN_0000528a / FUN_000051ec (SimCore cleanup)
+
+- **[RECONSTRUCTED]** `FUN_0000528a` (Pacific Conflict.c:5784–5798): early-out if `param_1[7]&2`; else if `(field_24==DAT_0001d6fc && b88e<=field_01<=b88c) || type!=2` → `FUN_000051ec`; else type-2 alt `field_04\|=0x42`, `field_3c=DAT_0001b838`.
+- **[RECONSTRUCTED]** `FUN_000051ec` entity writes: `pos_18=1000000000`, `field_04\|=2`, `field_3c=0`; optional `DAT_0001bc64` clear when `field_01!=field_02` and in `[b88e,b88c]`; `DAT_00024cf0++`; clear `DAT_0001b880` when `entity+8` matches.
+- **[RECONSTRUCTED]** Indirect stores via `SimCore.mem_u32`: table poke `*( *(DAT_0001d6fc+0x30) + 0x14 + field_02*0x18 ) = 0` when `field_01!=field_02`; `**(entity+8)=0` when `entity_data_ptr!=0`.
+- **[INFERRED]** Flat `mem_u32` address map stands in for Mac heap; not a full allocator.
+- **Entity offsets added:** `field_01`, `field_02`, `flags_07`, `field_24`, `field_3c`.
+- **Validation:** `_test_fun_0000528a_branches` (incl. indirect); suite **11 passed, 0 failed**; Python QA passed.
+
+### 2026-10-15 — FUN_00005df8 slot clear (SimCore)
+
+- **[RECONSTRUCTED]** `FUN_00005df8` (Pacific Conflict.c:6434–6447): when `DAT_0001b5a0+0xac == 0`, for `i` in `0..6`, if `DAT_0001bc64[i] != 0` call **`FUN_0000528a`** then set the slot to 0.
+- **[RECONSTRUCTED]** Godot: `SimCore.dat_0001bc64` (7 slots), `_call_05df8()`, `last_tick_order.fun_00005df8_*` / `fun_0000528a_calls`.
+- **Validation:** `_test_fun_00005df8_slot_clear`; suite green; Python QA green.
+- **Follow-up:** `FUN_0000528a` / partial `FUN_000051ec` ported in the same-day entry above.
+
+### 2026-10-15 — FUN_00006fb8 post-tick global reset (SimCore)
+
+- **[RECONSTRUCTED]** `FUN_00006fb8` (Pacific Conflict.c:7180–7189) assigns `100000000` to **`DAT_0001d718`**, **`DAT_0001d724`**, **`DAT_0001d714`**, **`DAT_0001d720`**, **`DAT_0001d710`**, **`DAT_0001d71c`** after the four entity passes in **`FUN_000044e8`**.
+- **[RECONSTRUCTED]** Godot: `SimCore._call_06fb8()` writes the same six fields; `last_tick_order.fun_00006fb8_ran` / `fun_00006fb8_globals`; skipped when phase gate closed.
+- **[INFERRED]** Later readers treat some of these as coordinate / distance bases (e.g. uses near Pacific Conflict.c:5413). Exact game names **[UNKNOWN]**.
+- **Validation:** `test_sim_tick_ordering.gd` `_test_fun_00006fb8_reset`; full suite **11 passed, 0 failed**; Python QA passed.
+- **Not claimed:** playable Mission-1 wiring; `FUN_00005df8` still placeholder.
+
+### 2026-10-15 — P0 headless test reliability (class_name + QA paths)
+
+- **[INFERRED]** Fresh `godot --headless --path . --script res://godot/tests/run_all.gd` without a `.godot/` global class cache does not resolve `class_name` identifiers used as type annotations. That broke `EntityState.from_bytes() -> EntityState` (script failed to parse → `preload(...).new()` failed) and logged parse errors for `HudAttitudeStrip` / `MissionCheckpoint`.
+- **[MVP AUTHORING DECISION]** Keep `class_name` declarations for editor convenience, but type cross-script references with base types (`Control`, `Node3D`) or leave returns untyped so headless CI works without an imported project cache.
+- **Files:** `hellcats/core/entity_state.gd`, `hellcats/ui/hud_mvp.gd`, `hellcats/mission/checkpoint_manager.gd`, `hellcats/mission/mission_controller.gd`, `tools/qa/test_regression.py` (`EXPECTED_RUNNER_PATHS` aligned with `run_all.gd`), `hellcats/tests/fixtures/proven_loader_targets.json` (byte-synced to migrated fixture).
+- **Validation:** Godot **11 passed, 0 failed** (exit 0); `python3 tools/qa/test_regression.py` **All deterministic QA regression checks passed** (exit 0).
+- **Not claimed:** visual fidelity, Mission 1 playthrough, or original-flight parity. No gameplay behavior changed.
+
 ### 2026-04-08 — Convergence Loop Mode (batch: mission bridge + RNG draws + FUN_0000435a counts)
 
 - **[INFERRED]** Backlog + loop template: `docs/CONVERGENCE_BACKLOG.md`, `docs/CONVERGENCE_LOOP_TEMPLATE.md`.
@@ -20,6 +93,166 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[RECONSTRUCTED]** **Iteration 2 — RNG timing:** `SimCore._rng_consume()` counts draws per tick; **`last_tick_order.rng_draws_this_tick`**.
 - **[RECONSTRUCTED]** **Iteration 3 — FUN_0000435a / param_2:** **`last_tick_order.param_2_entity_updates`** `{0: n, 1: m}`; contract `docs/contracts/FUN_0000435a_contract.md` (type 0x02 loop gated by `param_2==0` not yet branched in code).
 - **Validation:** `godot/tests/integration/test_sim_tick_ordering.gd` (includes RNG/param2 counts).
+
+### 2026-10-15 — e792 bVar6 cleanup epilogue
+
+- **[RECONSTRUCTED]** End of `FUN_0000e792` (14736–14748): when `bVar6` (rough landing 14462 or grounded `field_0b` switch), clamp/clear `status_1a2`, `status=(status&0x8000)|0x900`, `state_32=0xe772`, clear `movement_61a`/`61e`. Godot: `apply_e792_bvar6_cleanup`; `SimCore.e792_b_var6`.
+- **[RECONSTRUCTED]** `flags_685&2` ammo-decrement tail — see entry “FUN_00011544 call-site alias…”.
+- **Validation:** `test_flight_math.gd` (`_test_e792_bvar6_cleanup`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_bvar6_cleanup`).
+
+### 2026-10-15 — e792 field_676/677 weapon tails
+
+- **[RECONSTRUCTED]** `field_676` (14673–14693): when nonzero, if `676==1` and `field_682>1` and `(flags_685&0x10)==0` → stub `FUN_00015d20`, `682-=2`; then `676++` wrap 2→0. `field_677` (14695–14719): when `677==1` and `(flags_685&1)==0` → stub `FUN_00019430`, `status|=1`, `677←2`; player sets `DAT_0001b874`/`b872`/`d858=9`/`b87a`. Godot: `apply_e792_weapon_676_branch` / `677_branch`.
+- **[DEFERRED]** `FUN_00015d20` / `FUN_00019430` bodies; world+7 bit clear; `FUN_000137da`; `FUN_00006ed6`.
+- **Validation:** `test_flight_math.gd` (`_test_e792_weapon_676_677_branch`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_weapon_676_677_branch`).
+
+### 2026-10-15 — e792 weapon field_19d/19f branch
+
+- **[RECONSTRUCTED]** When `field_19d!=0` and `field_19f!=0` (14648–14671): if `19d==1` call `FUN_00012840`, `19f--`, `field_18d-=0x10` unless `*(DAT_0001b5a0+0x90)==2`; then `19d++` with wrap when pre-value was 4 → 0. Godot: `apply_e792_weapon_19d_branch`; `SimCore.mission_short_90`.
+- **[RECONSTRUCTED]** `FUN_00012840` post-spawn writes + player latch — see entry “FUN_00012840 post-spawn…”. `FUN_00005116` still deferred.
+- **Validation:** `test_flight_math.gd` (`_test_e792_weapon_19d_branch`, `_test_fun_00012840_spawn_fields`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_weapon_19d_branch`, `_test_fun_00012840_spawn_fixture`).
+
+### 2026-10-15 — e792 67b/679 char epilogue
+
+- **[RECONSTRUCTED]** After LAB_0000f47c (14631–14647): `field_67b++` when `(0<c<0x0f)||c<0`; `direction_char_679` mid-range `1..','` with `(flags_685&0x20)==0` → `++`, `field_67a|=2`, `status&=~0x2000`; negative 679 (outer gate) → `++`, `67a|=2`, `status|=0x2000`. `'-'` (0x2d) does not bump. Godot: `apply_e792_char_epilogue`.
+- **Validation:** `test_flight_math.gd` (`_test_e792_char_epilogue`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_char_epilogue`).
+
+### 2026-10-15 — LAB_0000f47c yaw epilogue
+
+- **[RECONSTRUCTED]** LAB_0000f47c (14606–14629): clear `field_63f`; commit `pos_20`/`attitude_22` from `local_28`/`local_2a`; `field_24 = (uVar13 + e40c(local_2a−att22)*scale>>12) & 0x3fff`; `movement_62a = iVar20`; player ring `DAT_0001bc8c[0x78]` / `bc80` / `bc84` with clamp ±`0x1d80`. Godot: `apply_lab_0000f47c`.
+- **[UNKNOWN]** `FUN_00001d56` Ghidra body unusable; `SimCore.fun_00001d56_scale` default `0x1000` (fixed-point 1.0 stand-in).
+- **Validation:** `test_flight_math.gd` (`_test_lab_0000f47c`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_lab_0000f47c`).
+
+### 2026-10-15 — grounded field_0b RNG tails (11564)
+
+- **[RECONSTRUCTED]** `0x10` soft: `FUN_00011564` → `uVar13 = ((draw&0x3f)+(e40c(uVar13)>>1 toward 0)−0x20)` scaled by `(speed>>2)/0x438` (14559–14569). `@` + player + `b856≠0` → `DAT_0001b854=1` + clear `b856` (14537–14540, no draw).
+- **[RECONSTRUCTED]** `@` `field_18c`/`uVar13` via 11544-callsite — see entry “FUN_00011544 call-site alias…”.
+- **Validation:** `test_flight_math.gd` / `test_sim_tick_ordering.gd` field_0b cases (`0x10 soft uVar13`, `@ sets b854`).
+
+### 2026-10-15 — grounded field_0b type switch
+
+- **[RECONSTRUCTED]** Grounded `field_0b` switch (14507–14596): `' '`/`@`/`0`/`P`/`\``/`p` set `bVar6` via `abs(679)!=0x2d` or status&8; `0x10` ORs status `0x1000`/`0x400` with early return; `'P'`/`0x10` soft clear player `DAT_0001b856`; `bVar6` blocks prestall. Godot: `apply_grounded_field_0b_switch`.
+- **Validation:** `test_flight_math.gd` (`_test_grounded_field_0b_switch`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_grounded_field_0b_switch`).
+
+### 2026-10-15 — grounded post-commit speed recommit
+
+- **[RECONSTRUCTED]** Grounded `63e!=0` common prefix: `e372(local_e²+local_6²)` → `movement_62a`, `pvc←iVar23−surface`, optional `13452` when `pos_2e==0`, clamp `local_28>0x2000`, prestall `field_190=1` when `field_63f` (14497–14603).
+- **Validation:** `test_flight_math.gd` (`_test_grounded_speed_recommit`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_grounded_speed_recommit`).
+
+### 2026-10-15 — FUN_00001f22 attitude-from-velocity
+
+- **[RECONSTRUCTED]** `fun_00001e3a` (cos-table acos), `fun_00001ebc` (af6c dump at file `0x1af8c`), `fun_00001f22` → `local_28`/`local_2a` → `pos_20`/`attitude_22` (2516–2632, 14491, 14608–14609).
+- **[INFERRED]** `FUN_00002de8` void decompile treated as `abs` on `local_e`/`local_6`.
+- **Validation:** `test_flight_math.gd` (`_test_fun_00001f22`).
+
+### 2026-10-15 — FUN_0000e372 airborne speed recommit
+
+- **[RECONSTRUCTED]** `fun_0000e372` binary-search floor sqrt (13734–13758). Airborne path: `movement_62a ← e372(local_e²+a²+6²)`; clear `field_190` when 2 (14486–14495, 14613). Skipped on hard-crash early return.
+- **Validation:** `test_flight_math.gd` (`_test_fun_0000e372`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_airborne_speed_recommit`).
+
+### 2026-10-15 — overlay trig table dump
+
+- **[RECONSTRUCTED]** 256-short BE sin/cos tables dumped from `Pacific Conflict` at file `0x1ab8c` / `0x1ad8c` → `hellcats/tests/fixtures/trig_tables_ab6c_ad6c.json`. Ghidra `DAT_0001ab6c`/`ad6c` labels sit **0x20** before the usable bases. Loaded by `FlightMath._ensure_trig_tables`.
+- **Validation:** `test_flight_math.gd` dump spot-checks + `sin(0x1000)==0x1000`.
+
+### 2026-10-15 — FUN_000025a8 attitude matrix
+
+- **[RECONSTRUCTED]** `fun_00001d02` matmul; `fun_000020e6`/`021a0`/`02562`/`025a8` chain; SimCore builds `attitude_matrix_9` before 028dc commit (2942–2949, 14438).
+- **Validation:** `test_flight_math.gd` (`_test_fun_000025a8_identity`).
+
+### 2026-10-15 — FUN_00013452 hard-crash unwrap
+
+- **[RECONSTRUCTED]** `fun_00013452` → `fun_00013346(*(world+0x18/1c/20))`; empty-list returns `*(DAT_0001bda8+0x16)`; SimCore stores result to `field_0b` when hard-crash `pos_2e==0` (14456–14458, 18173–18143).
+- **[DEFERRED]** Non-empty `FUN_00013346` walk (`FUN_00003c00` / `1320a` / `13070`).
+- **Validation:** `test_flight_math.gd` (`_test_fun_00013452_empty_list`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_landing_13452`).
+
+### 2026-10-15 — FUN_0000e40c + gentle DAT_0001b856
+
+- **[RECONSTRUCTED]** `fun_0000e40c` angle fold (13782–13793). Gentle landing gate: `abs(e40c(uVar13))>0x200` or `e40c(local_28)<-0x100` → rough; else player `dat_0001b856=1` (14464–14471). `uVar13=(sVar22+field_24)&0x3fff`; `local_28` from `pos_20` (+0x20).
+- **Validation:** `test_flight_math.gd` (`_test_fun_0000e40c`, `_test_landing_pitch_followon`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_landing_gentle_b856`).
+
+### 2026-10-15 — landing pitch follow-on
+
+- **[RECONSTRUCTED]** `apply_landing_pitch_followon`: hard crash `attitude_0e*0x10 < -0x168` → `status|0x400` + early return; rough/gentle clear `field_18e` + player `dat_0001b868=1` (Pacific Conflict.c:14450–14476).
+- **Validation:** `test_flight_math.gd` (`_test_landing_pitch_followon`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_landing_hard_crash`).
+
+### 2026-10-15 — field_63e landing / airborne clear
+
+- **[RECONSTRUCTED]** Touchdown + leave-ground on `field_63e` after position commit (Pacific Conflict.c:14446–14449, 14479–14484). Surface from `world_obj+0x1c`; `iVar23 = pos_2e + field_40_adj`.
+- **Validation:** `test_flight_math.gd` (`_test_landing_touchdown_63e`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_landing_63e`).
+
+### 2026-10-15 — FUN_000028dc + position commit (identity stub)
+
+- **[RECONSTRUCTED]** `FlightMath.fun_000028dc_one` + `apply_position_commit_after_028dc`; SimCore writes `field_18c=0xffa5` and `param_1[2..4]` (Pacific Conflict.c:14441–14445).
+- **[MVP STUB]** `SimCore.attitude_matrix_9` = identity until `FUN_000025a8` (sin/cos matrix build) is reconstructed.
+- **Validation:** `test_flight_math.gd` (`_test_028dc_position_commit`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_position_commit`).
+
+### 2026-10-15 — local_34 / stall iVar25
+
+- **[RECONSTRUCTED]** `FlightMath.apply_ivar25_stall_step` + SimCore: `field_190==1` penalty, `(local_34<<2)/sVar12` add, stall→`field_190=2` / `dat_0001b868=2` (Pacific Conflict.c:14422–14433).
+- **[DEFERRED]** `FUN_000025a8` position write to `param_1[2–4]`.
+- **Validation:** `test_flight_math.gd` (`_test_ivar25_stall_step`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_stall_ivar25`).
+
+### 2026-10-15 — post-thrust 0x63e / field_18e
+
+- **[RECONSTRUCTED]** `FlightMath.compute_63e_thrust_delta` + `apply_field_18e_update`; SimCore after 0x636 thrust updates `field_18e` and subtracts from `movement_62a` (Pacific Conflict.c:14384–14421).
+- **[DEFERRED]** `FUN_000025a8` position; stall when `iVar25<1` / `param_1+400`.
+- **Validation:** `test_flight_math.gd` (`_test_field_18e_63e`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_field_18e_63e`).
+
+### 2026-10-15 — reverse local_48 / DAT_0001b858 / attitude_22
+
+- **[RECONSTRUCTED]** Designated smoothing stashes `last_local_46`/`last_local_42`; reverse path computes `last_reverse_local_48`, clears `dat_0001b858` for player, updates `attitude_22` (Pacific Conflict.c:14321–14342).
+- **Validation:** `test_flight_math.gd` (`_test_compute_reverse_local_48`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_reverse_local_48`).
+
+### 2026-10-15 — 0x626 reverse-flight clamps
+
+- **[RECONSTRUCTED]** `FlightMath.apply_movement_626_reverse_clamp` + `SimCore._apply_movement_626_reverse_clamp` after 626 step, before e4a4 (Pacific Conflict.c:14305–14319). Gate: `field_63e!=0` and `direction=='-'`.
+- **Validation:** `test_flight_math.gd` (`_test_movement_626_reverse_clamp`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_626_reverse_clamp`).
+
+### 2026-10-15 — quadratic e468 + 0x636 thrust
+
+- **[RECONSTRUCTED]** `FlightMath.apply_e468_quadratic_drag_raw` + `apply_thrust_636_step`; SimCore writes `0x636` and updates `movement_62a` (iVar25) after linear drag (Pacific Conflict.c:14362–14383; asm `0xEE50`).
+- **[DEFERRED]** `0x63e` attitude block / position integration; `0x626` clamps.
+- **Validation:** FlightMath unit cases + `test_sim_tick_ordering.gd` (`_test_fun_0000e792_e4a4_linear_drag` extended).
+
+### 2026-10-15 — e4a4 + e468 linear drag in SimCore
+
+- **[RECONSTRUCTED]** `SimCore._apply_e4a4_and_linear_drag` after `movement_626`: per-entity e468, e4a4 → `0x63a`/`0x19e`, `last_drag_ivar10` (asm `0xEDF8`).
+- **Validation:** `test_sim_tick_ordering.gd` (`_test_fun_0000e792_e4a4_linear_drag`); prior FlightMath unit cases.
+
+### 2026-10-15 — e4a4 + e468 linear drag (FlightMath)
+
+- **[RECONSTRUCTED]** `FlightMath.fun_0000e4a4` + `apply_e468_linear_drag` (Pacific Conflict.c:13832–13872, 14356–14361; asm `0xEDF8` DIVS by e468).
+- **Validation:** `test_flight_math.gd` (`_test_fun_0000e4a4_and_e468_drag`).
+
+### 2026-10-15 — movement_626 speed step
+
+- **[RECONSTRUCTED]** `FlightMath.apply_movement_626_step` + `SimCore._apply_movement_626_step` (Pacific Conflict.c:14248–14304). Runs for every entity past contact early-out (not designated-only). `e468` unused here.
+- **[DEFERRED]** `0x626` clamps / reverse-flight; drag path that DIVs by `last_e468_out` (asm `0xEDF8`).
+- **Validation:** `test_flight_math.gd` (`_test_apply_movement_626_step`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_movement_626_step`).
+
+### 2026-10-15 — e42a from world+0x1c + e468 stash
+
+- **[RECONSTRUCTED]** Designated-player prep: `FUN_0000e42a(*(world_obj+0x1c))` (not entity `pos_1c`); `FUN_0000e468(surface−pos_2e, e42a)` stored as `SimCore.last_e468_out` for later speed math (asm `0xEDF8`); `e570`/`local_46` still use raw e42a.
+- **Validation:** `test_sim_tick_ordering.gd` (`_test_fun_0000e792_e42a_from_world_1c`).
+
+### 2026-10-15 — FUN_00011544 deferral + local_46 literal 0x666
+
+- **[DEFERRED]** `FUN_00011544`: Ghidra body is `1150a` warm-up epilogue (`unaff_D3`, 10k×`11564`); binary at file `0x11544` matches that. Call sites (14× `LEA 0x11544`) treat **D0** as RNG (`& 0x7f`, etc.). **Not proven** ≡ single `FUN_00011564` draw — do not alias overlay `next()` for contact `0x61a`/`0x61e`.
+- **[RECONSTRUCTED]** `local_46` factor is literal **`0x666`**, not field `movement_666` (Pacific Conflict.c:14183). Fixed in `FlightMath.compute_local_46` + `SimCore._apply_movement_smoothing`.
+- **Validation:** `test_flight_math.gd` (`compute_local_46`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_local_46_literal_0666`).
+
+### 2026-10-15 — Mission 1 JSON success / start_mode wiring
+
+- **[MVP AUTHORING DECISION]** `success.complete_all_required_objectives` drives `MissionObjectivesM1.is_mission_success()` (true → required only; false → all steps including optional).
+- **[MVP AUTHORING DECISION]** `start_mode` read by `MissionController`; only `"airborne"` supported; other values warn and fall back.
+- **Validation:** `godot/tests/unit/test_mission_objectives_m1.gd` (both success policies). Godot + Python regression green.
+
+### 2026-10-15 — Mission 1 sea/island MVP solids
+
+- **[MVP AUTHORING DECISION]** `WorldBuilderMvp.impact_reason_at` + `island_aabb()` share sea (`y <= 0.5`) and island AABB volumes with the placeholder meshes; `SeaBody` / `IslandBody` `StaticBody3D` shapes created alongside meshes.
+- **[MVP APPROXIMATION]** `PlayerAircraft` and `MissionController` use that helper for impact / failure; not a port of `FUN_00005df8` / `FUN_00006fb8` / original terrain.
+- **Validation:** `godot/tests/unit/test_world_collision_mvp.gd`; runner 13 scripts. Godot 13/0; `tools/qa/test_regression.py` pass.
 
 ### 2026-04-08 — Entity tick ordering convergence (FUN_000044e8 / FUN_000044a4)
 

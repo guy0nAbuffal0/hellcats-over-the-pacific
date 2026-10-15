@@ -33,10 +33,18 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[MVP APPROXIMATION]**
 | Original | Godot |
 |----------|--------|
 | Phase gate `0 < a8 < 6` | `mission_phase_a8 > 0 && mission_phase_a8 < 6` |
-| Flag `ac == 0` → FUN_00005df8 | `_call_05df8()` |
+| Flag `ac == 0` → FUN_00005df8 | `_call_05df8()` — **[RECONSTRUCTED]** seven-slot clear of `dat_0001bc64` after `_call_0528a` (Pacific Conflict.c:6434–6447); **`FUN_0000528a` body deferred** |
 | Array 1..4 iteration | `entity_array_1` … `entity_array_4` with same **param_2** (0,0,1,1) |
-| FUN_00006fb8 | `_call_06fb8()` |
+| FUN_00006fb8 | `_call_06fb8()` — **[RECONSTRUCTED]** sets `dat_0001d710`…`dat_0001d724` to `100000000` (Pacific Conflict.c:7180–7189); recorded in `last_tick_order.fun_00006fb8_*` |
 | FUN_000044a4 → entity update | `_update_single_entity` (placeholder / ported slices) |
+
+**[RECONSTRUCTED]** `FUN_00006fb8` body (Pacific Conflict.c:7180–7189):
+
+```
+DAT_0001d718 = DAT_0001d724 = DAT_0001d714 = DAT_0001d720 = DAT_0001d710 = DAT_0001d71c = 100000000;
+```
+
+**[INFERRED]** These globals are later read as coordinate / distance bases (e.g. `DAT_0001d724` / `DAT_0001d71c` around Pacific Conflict.c:5413+). Full semantic names remain **[UNKNOWN]**.
 
 **[MVP APPROXIMATION]** Mission-1 **playable** path uses **`PlayerAircraft` + `FlightModelMvp`** on **`_physics_process`**; **`SimCore`** is the **deterministic / parity** bridge and **does not** drive that scene’s frame loop unless explicitly wired later.
 

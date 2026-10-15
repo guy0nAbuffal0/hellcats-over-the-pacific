@@ -6,6 +6,7 @@ signal crashed(reason: String)
 const AircraftStateScript := preload("res://hellcats/flight/aircraft_state.gd")
 const FlightModelScript := preload("res://hellcats/flight/flight_model_mvp.gd")
 const PlayerInputMapScript := preload("res://hellcats/flight/player_input_map.gd")
+const WorldBuilderScript := preload("res://hellcats/world/world_builder_mvp.gd")
 
 var aircraft_state
 var flight_model
@@ -50,10 +51,13 @@ func _physics_process(delta: float) -> void:
 	flight_model.step(aircraft_state, controls, delta)
 	_apply_state_to_transform()
 	_smooth_camera(delta)
-	if aircraft_state.position_m.y <= 0.5 and not aircraft_state.is_crashed:
+	if aircraft_state.is_crashed:
+		return
+	var impact: String = WorldBuilderScript.impact_reason_at(aircraft_state.position_m)
+	if not impact.is_empty():
 		aircraft_state.is_crashed = true
 		active = false
-		crashed.emit("terrain_or_sea_impact")
+		crashed.emit(impact)
 
 func _apply_state_to_transform() -> void:
 	global_position = aircraft_state.position_m

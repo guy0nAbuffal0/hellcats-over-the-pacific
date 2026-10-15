@@ -1,0 +1,4392 @@
+{
+  "generated": "2026-10-15",
+  "total": 731,
+  "functions": [
+    {
+      "file": "ID01.c",
+      "name": "FUN_00000110",
+      "return": "undefined4",
+      "line": 11
+    },
+    {
+      "file": "ID01.c",
+      "name": "FUN_00000130",
+      "return": "undefined8",
+      "line": 24
+    },
+    {
+      "file": "ID01.c",
+      "name": "FUN_00000152",
+      "return": "void",
+      "line": 38
+    },
+    {
+      "file": "ID01.c",
+      "name": "FUN_00000172",
+      "return": "undefined8",
+      "line": 47
+    },
+    {
+      "file": "ID01.c",
+      "name": "FUN_00000194",
+      "return": "uint",
+      "line": 61
+    },
+    {
+      "file": "ID01.c",
+      "name": "FUN_000001c2",
+      "return": "ulonglong",
+      "line": 114
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000001e",
+      "return": "int",
+      "line": 26
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000038",
+      "return": "void",
+      "line": 37
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000066",
+      "return": "void",
+      "line": 49
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000009a",
+      "return": "ushort",
+      "line": 65
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000000b6",
+      "return": "ushort",
+      "line": 75
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000000d2",
+      "return": "byte",
+      "line": 85
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000000ee",
+      "return": "byte",
+      "line": 95
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000010a",
+      "return": "ushort",
+      "line": 105
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000126",
+      "return": "ushort",
+      "line": 115
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000142",
+      "return": "ushort",
+      "line": 125
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000015e",
+      "return": "byte",
+      "line": 135
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000017a",
+      "return": "byte",
+      "line": 145
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000196",
+      "return": "byte",
+      "line": 155
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000001b2",
+      "return": "byte",
+      "line": 165
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000001ce",
+      "return": "ushort",
+      "line": 175
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000200",
+      "return": "ushort",
+      "line": 190
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000232",
+      "return": "void",
+      "line": 205
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000024a",
+      "return": "void",
+      "line": 218
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000002c8",
+      "return": "char *",
+      "line": 254
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000002d8",
+      "return": "char *",
+      "line": 272
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000002ee",
+      "return": "int",
+      "line": 295
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000030c",
+      "return": "char *",
+      "line": 318
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000324",
+      "return": "int",
+      "line": 335
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000033e",
+      "return": "char *",
+      "line": 367
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000035a",
+      "return": "char *",
+      "line": 394
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000370",
+      "return": "int",
+      "line": 413
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000038c",
+      "return": "char *",
+      "line": 440
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000003aa",
+      "return": "char *",
+      "line": 470
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000003f6",
+      "return": "void",
+      "line": 524
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000412",
+      "return": "void",
+      "line": 542
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000045a",
+      "return": "void",
+      "line": 574
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000004c6",
+      "return": "undefined4 *",
+      "line": 583
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000004fc",
+      "return": "void",
+      "line": 615
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000930",
+      "return": "void",
+      "line": 624
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000a42",
+      "return": "void",
+      "line": 640
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000a86",
+      "return": "void",
+      "line": 652
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000ad0",
+      "return": "void",
+      "line": 663
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000c68",
+      "return": "void",
+      "line": 674
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000ca6",
+      "return": "void",
+      "line": 685
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000d24",
+      "return": "void",
+      "line": 699
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000d3a",
+      "return": "void",
+      "line": 710
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000e3e",
+      "return": "void",
+      "line": 749
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000e9e",
+      "return": "void",
+      "line": 761
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000f52",
+      "return": "void",
+      "line": 772
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000f74",
+      "return": "void",
+      "line": 783
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000fa0",
+      "return": "void",
+      "line": 794
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00000fd2",
+      "return": "void",
+      "line": 808
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000010ce",
+      "return": "void",
+      "line": 819
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000011ec",
+      "return": "void",
+      "line": 830
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001308",
+      "return": "void",
+      "line": 841
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000014e6",
+      "return": "void",
+      "line": 856
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000150a",
+      "return": "int",
+      "line": 865
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000015cc",
+      "return": "void",
+      "line": 884
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001632",
+      "return": "void",
+      "line": 901
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001656",
+      "return": "int",
+      "line": 917
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001680",
+      "return": "int",
+      "line": 928
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000016aa",
+      "return": "void",
+      "line": 941
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001876",
+      "return": "void",
+      "line": 964
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000195c",
+      "return": "void",
+      "line": 973
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000197c",
+      "return": "void",
+      "line": 984
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000019a2",
+      "return": "undefined2",
+      "line": 994
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000019e2",
+      "return": "void",
+      "line": 1014
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001a04",
+      "return": "void",
+      "line": 1038
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001a28",
+      "return": "void",
+      "line": 1047
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001a84",
+      "return": "void",
+      "line": 1070
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001aa8",
+      "return": "void",
+      "line": 1079
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001acc",
+      "return": "void",
+      "line": 1088
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001af0",
+      "return": "void",
+      "line": 1097
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001b14",
+      "return": "undefined4",
+      "line": 1106
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001c8a",
+      "return": "char *",
+      "line": 1115
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001d48",
+      "return": "void",
+      "line": 1157
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001dd4",
+      "return": "void",
+      "line": 1181
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001e32",
+      "return": "void",
+      "line": 1197
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001e68",
+      "return": "void",
+      "line": 1206
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001edc",
+      "return": "void",
+      "line": 1245
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00001f8e",
+      "return": "void",
+      "line": 1254
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000020be",
+      "return": "void",
+      "line": 1310
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000212a",
+      "return": "void",
+      "line": 1339
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002192",
+      "return": "void",
+      "line": 1359
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002334",
+      "return": "void",
+      "line": 1370
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000027e4",
+      "return": "void",
+      "line": 1384
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000029f2",
+      "return": "void",
+      "line": 1478
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002a44",
+      "return": "void",
+      "line": 1487
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002bbc",
+      "return": "void",
+      "line": 1552
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002db8",
+      "return": "void",
+      "line": 1570
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002e36",
+      "return": "void",
+      "line": 1581
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002ee4",
+      "return": "void",
+      "line": 1590
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002f1e",
+      "return": "void",
+      "line": 1613
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002fa0",
+      "return": "void",
+      "line": 1624
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00002fd4",
+      "return": "void",
+      "line": 1641
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000309a",
+      "return": "void",
+      "line": 1652
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000030fa",
+      "return": "void",
+      "line": 1667
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003174",
+      "return": "void",
+      "line": 1678
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003590",
+      "return": "void",
+      "line": 1689
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000035bc",
+      "return": "void",
+      "line": 1702
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000035e4",
+      "return": "void",
+      "line": 1718
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000036a2",
+      "return": "void",
+      "line": 1759
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000039a8",
+      "return": "undefined8",
+      "line": 1768
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003aae",
+      "return": "undefined8",
+      "line": 1868
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003bc4",
+      "return": "undefined8",
+      "line": 1990
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003d36",
+      "return": "void",
+      "line": 2108
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003db8",
+      "return": "void",
+      "line": 2154
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00003dd0",
+      "return": "void",
+      "line": 2170
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000412e",
+      "return": "void",
+      "line": 2299
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000041a6",
+      "return": "void",
+      "line": 2321
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004242",
+      "return": "void",
+      "line": 2343
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000042b0",
+      "return": "undefined4",
+      "line": 2360
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004318",
+      "return": "void",
+      "line": 2381
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000435e",
+      "return": "void",
+      "line": 2402
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000442e",
+      "return": "void",
+      "line": 2420
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004582",
+      "return": "void",
+      "line": 2431
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004610",
+      "return": "void",
+      "line": 2442
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000462c",
+      "return": "void",
+      "line": 2458
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000046b4",
+      "return": "void",
+      "line": 2484
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004738",
+      "return": "void",
+      "line": 2520
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_0000488a",
+      "return": "void",
+      "line": 2536
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000048ae",
+      "return": "undefined4",
+      "line": 2547
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_000049fe",
+      "return": "undefined4",
+      "line": 2561
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004c18",
+      "return": "void",
+      "line": 2643
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004d34",
+      "return": "void",
+      "line": 2693
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004d6a",
+      "return": "void",
+      "line": 2704
+    },
+    {
+      "file": "ID02.c",
+      "name": "FUN_00004db0",
+      "return": "void",
+      "line": 2721
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00000006",
+      "return": "void",
+      "line": 12
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00000056",
+      "return": "undefined4",
+      "line": 27
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_0000008a",
+      "return": "int",
+      "line": 45
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000000a6",
+      "return": "short",
+      "line": 55
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000000c8",
+      "return": "int",
+      "line": 68
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000000f4",
+      "return": "short",
+      "line": 82
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000002a8",
+      "return": "void",
+      "line": 148
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_0000033c",
+      "return": "void",
+      "line": 164
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_0000035e",
+      "return": "void",
+      "line": 175
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00000514",
+      "return": "void",
+      "line": 186
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_0000077e",
+      "return": "void",
+      "line": 206
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00000912",
+      "return": "void",
+      "line": 253
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00000a3c",
+      "return": "void",
+      "line": 294
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_0000146a",
+      "return": "void",
+      "line": 305
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00001538",
+      "return": "void",
+      "line": 327
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00001844",
+      "return": "void",
+      "line": 366
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00001876",
+      "return": "void",
+      "line": 379
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00001b48",
+      "return": "void",
+      "line": 394
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00001fee",
+      "return": "void",
+      "line": 427
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000022fe",
+      "return": "void",
+      "line": 458
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00002600",
+      "return": "void",
+      "line": 473
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00002950",
+      "return": "void",
+      "line": 504
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00002d1c",
+      "return": "void",
+      "line": 519
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000032b8",
+      "return": "void",
+      "line": 534
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00003832",
+      "return": "void",
+      "line": 545
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000038fc",
+      "return": "void",
+      "line": 556
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00003c02",
+      "return": "void",
+      "line": 567
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00003f24",
+      "return": "void",
+      "line": 596
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00004110",
+      "return": "void",
+      "line": 613
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00004304",
+      "return": "void",
+      "line": 630
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00004790",
+      "return": "void",
+      "line": 649
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00004b32",
+      "return": "void",
+      "line": 660
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00004c42",
+      "return": "void",
+      "line": 673
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00004ecc",
+      "return": "void",
+      "line": 691
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005158",
+      "return": "void",
+      "line": 709
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_0000532e",
+      "return": "void",
+      "line": 720
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000054fe",
+      "return": "void",
+      "line": 738
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005718",
+      "return": "void",
+      "line": 755
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005860",
+      "return": "void",
+      "line": 798
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005ab6",
+      "return": "void",
+      "line": 852
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005c36",
+      "return": "void",
+      "line": 863
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005cb6",
+      "return": "void",
+      "line": 877
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00005cc4",
+      "return": "void",
+      "line": 888
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_00006c1c",
+      "return": "void",
+      "line": 899
+    },
+    {
+      "file": "ID03.c",
+      "name": "FUN_000071a2",
+      "return": "void",
+      "line": 932
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000006",
+      "return": "void",
+      "line": 15
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000002e",
+      "return": "void",
+      "line": 26
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000054",
+      "return": "void",
+      "line": 37
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000078",
+      "return": "void",
+      "line": 48
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000009c",
+      "return": "void",
+      "line": 59
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000000c4",
+      "return": "void",
+      "line": 70
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000000ec",
+      "return": "void",
+      "line": 81
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000120",
+      "return": "void",
+      "line": 92
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000016e",
+      "return": "void",
+      "line": 103
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000001f2",
+      "return": "void",
+      "line": 114
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000220",
+      "return": "void",
+      "line": 125
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000002c0",
+      "return": "void",
+      "line": 134
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000362",
+      "return": "undefined4",
+      "line": 150
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000003c2",
+      "return": "void",
+      "line": 164
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000044e",
+      "return": "void",
+      "line": 183
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000478",
+      "return": "void",
+      "line": 194
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000004f0",
+      "return": "void",
+      "line": 205
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000516",
+      "return": "undefined4",
+      "line": 219
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000560",
+      "return": "void",
+      "line": 247
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000588",
+      "return": "int",
+      "line": 259
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000005e4",
+      "return": "void",
+      "line": 278
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000009ee",
+      "return": "void",
+      "line": 293
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000a8e",
+      "return": "undefined4",
+      "line": 302
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000bda",
+      "return": "void",
+      "line": 321
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000e48",
+      "return": "void",
+      "line": 338
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00000f4e",
+      "return": "void",
+      "line": 355
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001106",
+      "return": "void",
+      "line": 427
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000116a",
+      "return": "void",
+      "line": 450
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001200",
+      "return": "void",
+      "line": 484
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000014a0",
+      "return": "void",
+      "line": 499
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000014f2",
+      "return": "void",
+      "line": 508
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000150e",
+      "return": "void",
+      "line": 524
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001562",
+      "return": "void",
+      "line": 535
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000158c",
+      "return": "void",
+      "line": 546
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001638",
+      "return": "void",
+      "line": 559
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000016c4",
+      "return": "void",
+      "line": 584
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000017e6",
+      "return": "void",
+      "line": 612
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000189c",
+      "return": "void",
+      "line": 623
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000018b0",
+      "return": "void",
+      "line": 634
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000018e0",
+      "return": "undefined4",
+      "line": 646
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_0000192e",
+      "return": "void",
+      "line": 674
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001a0e",
+      "return": "void",
+      "line": 699
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001bc8",
+      "return": "void",
+      "line": 728
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001d9e",
+      "return": "void",
+      "line": 740
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00001f5e",
+      "return": "void",
+      "line": 760
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000020e8",
+      "return": "void",
+      "line": 770
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00002d86",
+      "return": "void",
+      "line": 784
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00002de6",
+      "return": "undefined2",
+      "line": 809
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003124",
+      "return": "void",
+      "line": 828
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003178",
+      "return": "void",
+      "line": 843
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000031aa",
+      "return": "undefined4",
+      "line": 864
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003260",
+      "return": "void",
+      "line": 898
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003352",
+      "return": "void",
+      "line": 909
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000033d6",
+      "return": "void",
+      "line": 923
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_000035f8",
+      "return": "void",
+      "line": 936
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003902",
+      "return": "void",
+      "line": 952
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003a56",
+      "return": "void",
+      "line": 967
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003a8c",
+      "return": "void",
+      "line": 978
+    },
+    {
+      "file": "ID04.c",
+      "name": "FUN_00003d42",
+      "return": "undefined4",
+      "line": 993
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000006",
+      "return": "void",
+      "line": 14
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000000c8",
+      "return": "void",
+      "line": 25
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000160",
+      "return": "void",
+      "line": 51
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000001bc",
+      "return": "void",
+      "line": 64
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000214",
+      "return": "void",
+      "line": 75
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000270",
+      "return": "void",
+      "line": 88
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000002c8",
+      "return": "void",
+      "line": 99
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000004e4",
+      "return": "void",
+      "line": 110
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000560",
+      "return": "void",
+      "line": 121
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000728",
+      "return": "uint",
+      "line": 130
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000746",
+      "return": "void",
+      "line": 141
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000754",
+      "return": "int",
+      "line": 152
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000007a8",
+      "return": "int",
+      "line": 172
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000007f6",
+      "return": "void",
+      "line": 191
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_0000085e",
+      "return": "void",
+      "line": 211
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_000008d6",
+      "return": "void",
+      "line": 244
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000934",
+      "return": "undefined4",
+      "line": 261
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000a62",
+      "return": "uint",
+      "line": 278
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000a90",
+      "return": "int",
+      "line": 291
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000b10",
+      "return": "void",
+      "line": 310
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000b84",
+      "return": "int",
+      "line": 327
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000ba8",
+      "return": "int",
+      "line": 338
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000bc2",
+      "return": "int",
+      "line": 349
+    },
+    {
+      "file": "ID05.c",
+      "name": "FUN_00000bde",
+      "return": "int",
+      "line": 360
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000004",
+      "return": "undefined4",
+      "line": 26
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000000b0",
+      "return": "undefined4",
+      "line": 63
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000000f4",
+      "return": "undefined4",
+      "line": 90
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000116",
+      "return": "int",
+      "line": 108
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_0000017c",
+      "return": "undefined4",
+      "line": 121
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000001a2",
+      "return": "undefined4",
+      "line": 136
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000001dc",
+      "return": "uint",
+      "line": 159
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_0000024c",
+      "return": "bool",
+      "line": 195
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_0000026c",
+      "return": "undefined4",
+      "line": 208
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000318",
+      "return": "void",
+      "line": 236
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000512",
+      "return": "void",
+      "line": 382
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000598",
+      "return": "undefined4",
+      "line": 405
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000666",
+      "return": "undefined4",
+      "line": 443
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000007b0",
+      "return": "undefined4",
+      "line": 494
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_0000087a",
+      "return": "void",
+      "line": 541
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000008a2",
+      "return": "void",
+      "line": 554
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000916",
+      "return": "bool",
+      "line": 572
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000942",
+      "return": "undefined4",
+      "line": 588
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_0000096e",
+      "return": "void",
+      "line": 609
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_000009d8",
+      "return": "bool",
+      "line": 635
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000d02",
+      "return": "void",
+      "line": 779
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000d84",
+      "return": "void",
+      "line": 808
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000dca",
+      "return": "void",
+      "line": 825
+    },
+    {
+      "file": "ID06.c",
+      "name": "FUN_00000e10",
+      "return": "void",
+      "line": 842
+    },
+    {
+      "file": "ID07.c",
+      "name": "FUN_00000006",
+      "return": "void",
+      "line": 11
+    },
+    {
+      "file": "ID07.c",
+      "name": "FUN_00000190",
+      "return": "void",
+      "line": 20
+    },
+    {
+      "file": "ID08.c",
+      "name": "FUN_00000006",
+      "return": "undefined4",
+      "line": 11
+    },
+    {
+      "file": "ID08.c",
+      "name": "FUN_00000338",
+      "return": "void",
+      "line": 240
+    },
+    {
+      "file": "ID08.c",
+      "name": "FUN_00000348",
+      "return": "undefined2",
+      "line": 249
+    },
+    {
+      "file": "ID08.c",
+      "name": "FUN_0000039c",
+      "return": "void",
+      "line": 275
+    },
+    {
+      "file": "ID09.c",
+      "name": "FUN_00000048",
+      "return": "void",
+      "line": 26
+    },
+    {
+      "file": "ID09.c",
+      "name": "FUN_000002a6",
+      "return": "void",
+      "line": 109
+    },
+    {
+      "file": "ID09.c",
+      "name": "FUN_000003c2",
+      "return": "void",
+      "line": 120
+    },
+    {
+      "file": "ID09.c",
+      "name": "FUN_00000432",
+      "return": "byte *",
+      "line": 129
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000020",
+      "return": "void",
+      "line": 739
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000032",
+      "return": "undefined4 *",
+      "line": 749
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000054",
+      "return": "void",
+      "line": 758
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000334",
+      "return": "undefined4",
+      "line": 886
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000354",
+      "return": "undefined4",
+      "line": 903
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000003fa",
+      "return": "void",
+      "line": 945
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000488",
+      "return": "void",
+      "line": 975
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000004f8",
+      "return": "void",
+      "line": 995
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000005fa",
+      "return": "void",
+      "line": 1046
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000006a6",
+      "return": "void",
+      "line": 1083
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000006ec",
+      "return": "void",
+      "line": 1097
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000954",
+      "return": "void",
+      "line": 1182
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000aba",
+      "return": "void",
+      "line": 1258
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000bea",
+      "return": "undefined4",
+      "line": 1304
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000c4c",
+      "return": "void",
+      "line": 1329
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000d6a",
+      "return": "void",
+      "line": 1380
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000db0",
+      "return": "bool",
+      "line": 1410
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000e0a",
+      "return": "void",
+      "line": 1432
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000e32",
+      "return": "void",
+      "line": 1442
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000e5a",
+      "return": "void",
+      "line": 1452
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000ea0",
+      "return": "void",
+      "line": 1466
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00000f92",
+      "return": "void",
+      "line": 1514
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001094",
+      "return": "void",
+      "line": 1557
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001112",
+      "return": "void",
+      "line": 1588
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000011e6",
+      "return": "undefined1 *",
+      "line": 1624
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001254",
+      "return": "void",
+      "line": 1657
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001294",
+      "return": "void",
+      "line": 1672
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001300",
+      "return": "void",
+      "line": 1706
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000131c",
+      "return": "void",
+      "line": 1717
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000147a",
+      "return": "void",
+      "line": 1776
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001548",
+      "return": "uint",
+      "line": 1833
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000159e",
+      "return": "undefined4",
+      "line": 1862
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000016e2",
+      "return": "void",
+      "line": 1917
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000018d6",
+      "return": "void",
+      "line": 1989
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001958",
+      "return": "int",
+      "line": 2013
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001974",
+      "return": "undefined1 *",
+      "line": 2025
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000199a",
+      "return": "undefined4",
+      "line": 2043
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000019b0",
+      "return": "undefined4",
+      "line": 2064
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000019d0",
+      "return": "void",
+      "line": 2086
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001a48",
+      "return": "void",
+      "line": 2128
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001a68",
+      "return": "uint *",
+      "line": 2139
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001b38",
+      "return": "void",
+      "line": 2197
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001b4c",
+      "return": "void",
+      "line": 2214
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001b6c",
+      "return": "uint *",
+      "line": 2226
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001b84",
+      "return": "uint *",
+      "line": 2238
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001ba8",
+      "return": "uint *",
+      "line": 2252
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001be4",
+      "return": "void",
+      "line": 2275
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001c04",
+      "return": "void",
+      "line": 2289
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001c5c",
+      "return": "void",
+      "line": 2313
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001cac",
+      "return": "void",
+      "line": 2335
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001d02",
+      "return": "short *",
+      "line": 2357
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001d56",
+      "return": "short *",
+      "line": 2389
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001d76",
+      "return": "int",
+      "line": 2435
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001db8",
+      "return": "int",
+      "line": 2466
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001dd8",
+      "return": "int",
+      "line": 2485
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001e3a",
+      "return": "int",
+      "line": 2516
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001ebc",
+      "return": "ushort",
+      "line": 2554
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00001f22",
+      "return": "void",
+      "line": 2586
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000202a",
+      "return": "void",
+      "line": 2637
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000020a0",
+      "return": "void",
+      "line": 2663
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000020e6",
+      "return": "void",
+      "line": 2681
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000021a0",
+      "return": "void",
+      "line": 2716
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000021e0",
+      "return": "void",
+      "line": 2733
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002220",
+      "return": "void",
+      "line": 2750
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000229e",
+      "return": "void",
+      "line": 2776
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002428",
+      "return": "void",
+      "line": 2857
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002464",
+      "return": "void",
+      "line": 2870
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002488",
+      "return": "void",
+      "line": 2880
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000024d6",
+      "return": "void",
+      "line": 2895
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000024f8",
+      "return": "void",
+      "line": 2905
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000253e",
+      "return": "void",
+      "line": 2919
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002562",
+      "return": "void",
+      "line": 2929
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000025a8",
+      "return": "void",
+      "line": 2942
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000025d6",
+      "return": "void",
+      "line": 2954
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000262e",
+      "return": "void",
+      "line": 2970
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002654",
+      "return": "void",
+      "line": 2980
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000026cc",
+      "return": "void",
+      "line": 2999
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002700",
+      "return": "void",
+      "line": 3011
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000276e",
+      "return": "void",
+      "line": 3029
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000027a2",
+      "return": "void",
+      "line": 3041
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000027cc",
+      "return": "void",
+      "line": 3054
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002802",
+      "return": "void",
+      "line": 3069
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000028a6",
+      "return": "void",
+      "line": 3099
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000028dc",
+      "return": "void",
+      "line": 3111
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002976",
+      "return": "void",
+      "line": 3144
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002a0e",
+      "return": "void",
+      "line": 3174
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002aba",
+      "return": "void",
+      "line": 3220
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002ada",
+      "return": "short *",
+      "line": 3269
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002bd8",
+      "return": "void",
+      "line": 3325
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002d10",
+      "return": "void",
+      "line": 3387
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002de8",
+      "return": "void",
+      "line": 3444
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002e08",
+      "return": "int",
+      "line": 3461
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002e12",
+      "return": "void",
+      "line": 3472
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00002e14",
+      "return": "void",
+      "line": 3480
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003266",
+      "return": "void",
+      "line": 3859
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000032ba",
+      "return": "void",
+      "line": 3876
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003412",
+      "return": "void",
+      "line": 4001
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003466",
+      "return": "void",
+      "line": 4018
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000035b4",
+      "return": "void",
+      "line": 4139
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003608",
+      "return": "void",
+      "line": 4156
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003732",
+      "return": "void",
+      "line": 4277
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003734",
+      "return": "void",
+      "line": 4285
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000037b4",
+      "return": "void",
+      "line": 4323
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000038f4",
+      "return": "void",
+      "line": 4419
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003ac4",
+      "return": "void",
+      "line": 4494
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003b98",
+      "return": "void",
+      "line": 4522
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003be0",
+      "return": "void",
+      "line": 4549
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003c00",
+      "return": "int",
+      "line": 4569
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003c48",
+      "return": "int",
+      "line": 4595
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003c68",
+      "return": "int",
+      "line": 4613
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003cca",
+      "return": "int",
+      "line": 4639
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003da8",
+      "return": "undefined4",
+      "line": 4675
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003e02",
+      "return": "undefined4",
+      "line": 4702
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003e5c",
+      "return": "void",
+      "line": 4729
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00003ea0",
+      "return": "void",
+      "line": 4755
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000041ec",
+      "return": "void",
+      "line": 4921
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004210",
+      "return": "void",
+      "line": 4933
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000435a",
+      "return": "void",
+      "line": 5008
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000044a4",
+      "return": "void",
+      "line": 5079
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000044e8",
+      "return": "void",
+      "line": 5096
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000045ba",
+      "return": "uint *",
+      "line": 5149
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004690",
+      "return": "uint *",
+      "line": 5195
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000046da",
+      "return": "void",
+      "line": 5215
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004808",
+      "return": "void",
+      "line": 5267
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004916",
+      "return": "void",
+      "line": 5319
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004958",
+      "return": "void",
+      "line": 5342
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004e06",
+      "return": "void",
+      "line": 5554
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004e4e",
+      "return": "void",
+      "line": 5574
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00004e6e",
+      "return": "void",
+      "line": 5587
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00005116",
+      "return": "int",
+      "line": 5705
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000051ec",
+      "return": "void",
+      "line": 5751
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000528a",
+      "return": "void",
+      "line": 5784
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000052dc",
+      "return": "void",
+      "line": 5803
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000053f8",
+      "return": "void",
+      "line": 5867
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000555a",
+      "return": "void",
+      "line": 5933
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00005832",
+      "return": "void",
+      "line": 6088
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000058ec",
+      "return": "void",
+      "line": 6151
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00005a14",
+      "return": "void",
+      "line": 6227
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00005df8",
+      "return": "void",
+      "line": 6434
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00005e28",
+      "return": "void",
+      "line": 6458
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000640c",
+      "return": "void",
+      "line": 6680
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00006598",
+      "return": "void",
+      "line": 6752
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00006e74",
+      "return": "void",
+      "line": 7099
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00006ece",
+      "return": "void",
+      "line": 7130
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00006ed6",
+      "return": "void",
+      "line": 7141
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00006fb8",
+      "return": "void",
+      "line": 7180
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00006ff6",
+      "return": "void",
+      "line": 7196
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00007310",
+      "return": "void",
+      "line": 7326
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000739a",
+      "return": "void",
+      "line": 7350
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000740a",
+      "return": "uint",
+      "line": 7368
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000823e",
+      "return": "uint",
+      "line": 8173
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00008784",
+      "return": "void",
+      "line": 8207
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000879e",
+      "return": "uint",
+      "line": 8223
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000088a0",
+      "return": "void",
+      "line": 8278
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00008972",
+      "return": "uint",
+      "line": 8311
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00008abe",
+      "return": "void",
+      "line": 8376
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00008c30",
+      "return": "int",
+      "line": 8427
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00008ff4",
+      "return": "void",
+      "line": 8552
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000923e",
+      "return": "void",
+      "line": 8628
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000092e4",
+      "return": "void",
+      "line": 8657
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000947c",
+      "return": "void",
+      "line": 8769
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000094d2",
+      "return": "void",
+      "line": 8800
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009550",
+      "return": "void",
+      "line": 8845
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000095ac",
+      "return": "void",
+      "line": 8866
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000096ae",
+      "return": "void",
+      "line": 8942
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000096f4",
+      "return": "void",
+      "line": 8956
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009ae0",
+      "return": "byte",
+      "line": 9129
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009b8c",
+      "return": "void",
+      "line": 9149
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009d34",
+      "return": "void",
+      "line": 9242
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009da6",
+      "return": "void",
+      "line": 9270
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009ef8",
+      "return": "void",
+      "line": 9352
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00009fc4",
+      "return": "void",
+      "line": 9408
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a07e",
+      "return": "undefined4",
+      "line": 9462
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a16e",
+      "return": "undefined4",
+      "line": 9533
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a220",
+      "return": "undefined4",
+      "line": 9561
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a2f2",
+      "return": "void",
+      "line": 9593
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a512",
+      "return": "void",
+      "line": 9711
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a676",
+      "return": "void",
+      "line": 9776
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000a75e",
+      "return": "undefined4",
+      "line": 9824
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000ac72",
+      "return": "void",
+      "line": 10039
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b028",
+      "return": "undefined2",
+      "line": 10239
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b190",
+      "return": "int",
+      "line": 10308
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b242",
+      "return": "int",
+      "line": 10371
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b2f4",
+      "return": "int",
+      "line": 10434
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b3aa",
+      "return": "int",
+      "line": 10488
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b460",
+      "return": "void",
+      "line": 10542
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b49e",
+      "return": "void",
+      "line": 10565
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000b4b6",
+      "return": "uint",
+      "line": 10579
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000ba2a",
+      "return": "void",
+      "line": 10797
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000bca8",
+      "return": "uint",
+      "line": 10956
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000bfb0",
+      "return": "uint",
+      "line": 11186
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c11e",
+      "return": "void",
+      "line": 11330
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c17e",
+      "return": "void",
+      "line": 11348
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c1aa",
+      "return": "uint",
+      "line": 11361
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c572",
+      "return": "undefined4",
+      "line": 11565
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c664",
+      "return": "void",
+      "line": 11596
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c80c",
+      "return": "void",
+      "line": 11640
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c8d6",
+      "return": "void",
+      "line": 11676
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c948",
+      "return": "void",
+      "line": 11699
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000c9c2",
+      "return": "void",
+      "line": 11722
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000ca44",
+      "return": "void",
+      "line": 11745
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000cac6",
+      "return": "void",
+      "line": 11770
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000cb62",
+      "return": "void",
+      "line": 11799
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000cc12",
+      "return": "void",
+      "line": 11826
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000ccca",
+      "return": "void",
+      "line": 11855
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000ce1c",
+      "return": "void",
+      "line": 11896
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000cec4",
+      "return": "void",
+      "line": 11924
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d00c",
+      "return": "void",
+      "line": 11959
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d27c",
+      "return": "void",
+      "line": 12097
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d298",
+      "return": "void",
+      "line": 12109
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d34c",
+      "return": "void",
+      "line": 12144
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d3bc",
+      "return": "void",
+      "line": 12162
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d5b0",
+      "return": "void",
+      "line": 12486
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000d91a",
+      "return": "void",
+      "line": 12788
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000db60",
+      "return": "void",
+      "line": 13161
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000df5e",
+      "return": "void",
+      "line": 13504
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000df98",
+      "return": "void",
+      "line": 13523
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000dfd2",
+      "return": "void",
+      "line": 13542
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000dff0",
+      "return": "uint *",
+      "line": 13557
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e0a4",
+      "return": "void",
+      "line": 13591
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e0ce",
+      "return": "uint *",
+      "line": 13608
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e1e6",
+      "return": "uint *",
+      "line": 13651
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e2a4",
+      "return": "uint *",
+      "line": 13693
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e340",
+      "return": "uint *",
+      "line": 13720
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e372",
+      "return": "int",
+      "line": 13734
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e3b2",
+      "return": "int",
+      "line": 13763
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e40c",
+      "return": "int",
+      "line": 13782
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e42a",
+      "return": "int",
+      "line": 13798
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e468",
+      "return": "int",
+      "line": 13815
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e4a4",
+      "return": "int",
+      "line": 13832
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e512",
+      "return": "int",
+      "line": 13877
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e570",
+      "return": "void",
+      "line": 13912
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e5aa",
+      "return": "void",
+      "line": 13922
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000e792",
+      "return": "short *",
+      "line": 14018
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000f810",
+      "return": "void",
+      "line": 14754
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000fb2a",
+      "return": "undefined4",
+      "line": 14936
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000fe0a",
+      "return": "void",
+      "line": 15054
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0000fe96",
+      "return": "void",
+      "line": 15080
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000100bc",
+      "return": "void",
+      "line": 15203
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000100d4",
+      "return": "uint",
+      "line": 15218
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000102d6",
+      "return": "ushort",
+      "line": 15333
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010558",
+      "return": "void",
+      "line": 15462
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010650",
+      "return": "int *",
+      "line": 15539
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000109ba",
+      "return": "void",
+      "line": 15714
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010b2e",
+      "return": "void",
+      "line": 15785
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010b84",
+      "return": "bool",
+      "line": 15800
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010c2c",
+      "return": "void",
+      "line": 15840
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010cb2",
+      "return": "void",
+      "line": 15875
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010cd8",
+      "return": "void",
+      "line": 15888
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010ce8",
+      "return": "void",
+      "line": 15899
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010d68",
+      "return": "void",
+      "line": 15932
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010da8",
+      "return": "void",
+      "line": 15948
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010de8",
+      "return": "void",
+      "line": 15964
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010e28",
+      "return": "undefined4",
+      "line": 15980
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010ecc",
+      "return": "void",
+      "line": 16011
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00010f68",
+      "return": "void",
+      "line": 16040
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000110f4",
+      "return": "void",
+      "line": 16131
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011182",
+      "return": "void",
+      "line": 16165
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000111ae",
+      "return": "void",
+      "line": 16179
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000111da",
+      "return": "void",
+      "line": 16193
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000112e0",
+      "return": "void",
+      "line": 16249
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011486",
+      "return": "void",
+      "line": 16331
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000114b4",
+      "return": "void",
+      "line": 16345
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000114ca",
+      "return": "int",
+      "line": 16354
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001150a",
+      "return": "void",
+      "line": 16363
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011544",
+      "return": "void",
+      "line": 16390
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011564",
+      "return": "uint",
+      "line": 16407
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000115b0",
+      "return": "void",
+      "line": 16437
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000115da",
+      "return": "undefined4",
+      "line": 16451
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000115fc",
+      "return": "int",
+      "line": 16461
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011670",
+      "return": "void",
+      "line": 16484
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000116e8",
+      "return": "void",
+      "line": 16513
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000116fc",
+      "return": "void",
+      "line": 16527
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011796",
+      "return": "undefined4",
+      "line": 16563
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011940",
+      "return": "undefined4",
+      "line": 16654
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011a90",
+      "return": "void",
+      "line": 16703
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011aae",
+      "return": "void",
+      "line": 16717
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011ae6",
+      "return": "undefined4",
+      "line": 16731
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011afe",
+      "return": "uint *",
+      "line": 16740
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011b48",
+      "return": "undefined4",
+      "line": 16757
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011b96",
+      "return": "void",
+      "line": 16778
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011c2c",
+      "return": "void",
+      "line": 16803
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011c58",
+      "return": "int",
+      "line": 16813
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011db4",
+      "return": "bool",
+      "line": 16869
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00011efc",
+      "return": "void",
+      "line": 16963
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001203a",
+      "return": "void",
+      "line": 17031
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000120ca",
+      "return": "void",
+      "line": 17070
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001217e",
+      "return": "void",
+      "line": 17107
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012296",
+      "return": "undefined4",
+      "line": 17165
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000123ce",
+      "return": "undefined4",
+      "line": 17233
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012466",
+      "return": "undefined4",
+      "line": 17283
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012486",
+      "return": "undefined4",
+      "line": 17322
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012528",
+      "return": "undefined4",
+      "line": 17373
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012738",
+      "return": "undefined4",
+      "line": 17486
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012768",
+      "return": "void",
+      "line": 17496
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000127aa",
+      "return": "void",
+      "line": 17516
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000127c6",
+      "return": "uint *",
+      "line": 17525
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001281e",
+      "return": "undefined4",
+      "line": 17541
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012840",
+      "return": "int",
+      "line": 17551
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000128b6",
+      "return": "void",
+      "line": 17576
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012a2a",
+      "return": "void",
+      "line": 17636
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012b66",
+      "return": "void",
+      "line": 17699
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012d34",
+      "return": "void",
+      "line": 17797
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012f52",
+      "return": "void",
+      "line": 17869
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012f92",
+      "return": "void",
+      "line": 17887
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00012fd2",
+      "return": "byte",
+      "line": 17899
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013070",
+      "return": "byte",
+      "line": 17940
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001310e",
+      "return": "byte",
+      "line": 17981
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000131ac",
+      "return": "void",
+      "line": 18022
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001320a",
+      "return": "void",
+      "line": 18046
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013268",
+      "return": "void",
+      "line": 18070
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000132c8",
+      "return": "void",
+      "line": 18094
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013346",
+      "return": "int",
+      "line": 18118
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013452",
+      "return": "void",
+      "line": 18173
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001346c",
+      "return": "undefined4",
+      "line": 18182
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001358c",
+      "return": "byte",
+      "line": 18241
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000135a0",
+      "return": "int *",
+      "line": 18249
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000135e8",
+      "return": "uint *",
+      "line": 18275
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001377a",
+      "return": "void",
+      "line": 18370
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000137da",
+      "return": "void",
+      "line": 18403
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001383c",
+      "return": "uint *",
+      "line": 18430
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013980",
+      "return": "int",
+      "line": 18500
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013cdc",
+      "return": "void",
+      "line": 18640
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013e4e",
+      "return": "void",
+      "line": 18708
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013eae",
+      "return": "void",
+      "line": 18725
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00013ee0",
+      "return": "uint *",
+      "line": 18736
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014198",
+      "return": "void",
+      "line": 18841
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001429c",
+      "return": "void",
+      "line": 18893
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014348",
+      "return": "void",
+      "line": 18922
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001443a",
+      "return": "void",
+      "line": 18990
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014830",
+      "return": "int",
+      "line": 19194
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014af2",
+      "return": "void",
+      "line": 19313
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014bea",
+      "return": "uint",
+      "line": 19381
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014d86",
+      "return": "void",
+      "line": 19463
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00014f48",
+      "return": "void",
+      "line": 19533
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000150c8",
+      "return": "uint *",
+      "line": 19611
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001530e",
+      "return": "void",
+      "line": 19633
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015356",
+      "return": "void",
+      "line": 19650
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015580",
+      "return": "void",
+      "line": 19762
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000155d8",
+      "return": "void",
+      "line": 19780
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000155ec",
+      "return": "void",
+      "line": 19791
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001562e",
+      "return": "undefined2",
+      "line": 19807
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015762",
+      "return": "undefined2",
+      "line": 19876
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015b92",
+      "return": "void",
+      "line": 20063
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015bd4",
+      "return": "undefined4",
+      "line": 20078
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015bf6",
+      "return": "int",
+      "line": 20088
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015d20",
+      "return": "void",
+      "line": 20133
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015d78",
+      "return": "void",
+      "line": 20146
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015dc8",
+      "return": "void",
+      "line": 20159
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015e62",
+      "return": "undefined4",
+      "line": 20206
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015ebe",
+      "return": "void",
+      "line": 20225
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015f3e",
+      "return": "void",
+      "line": 20260
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00015fb8",
+      "return": "void",
+      "line": 20295
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016128",
+      "return": "void",
+      "line": 20349
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016230",
+      "return": "void",
+      "line": 20412
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000162ba",
+      "return": "void",
+      "line": 20436
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001665a",
+      "return": "uint",
+      "line": 20601
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016724",
+      "return": "uint",
+      "line": 20639
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000167f4",
+      "return": "uint",
+      "line": 20698
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000168ae",
+      "return": "uint",
+      "line": 20725
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000168d2",
+      "return": "uint *",
+      "line": 20741
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001691c",
+      "return": "uint *",
+      "line": 20754
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016966",
+      "return": "int *",
+      "line": 20767
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016a3a",
+      "return": "void",
+      "line": 20803
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016a78",
+      "return": "undefined4",
+      "line": 20818
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016ac4",
+      "return": "void",
+      "line": 20839
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016ad6",
+      "return": "void",
+      "line": 20849
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016ae8",
+      "return": "int",
+      "line": 20859
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016b4c",
+      "return": "int *",
+      "line": 20879
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016b9e",
+      "return": "int *",
+      "line": 20901
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016c24",
+      "return": "void",
+      "line": 20930
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016c6a",
+      "return": "undefined2",
+      "line": 20953
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00016e06",
+      "return": "undefined2",
+      "line": 21060
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001702a",
+      "return": "void",
+      "line": 21208
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001706a",
+      "return": "void",
+      "line": 21228
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017098",
+      "return": "undefined4",
+      "line": 21243
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000170ba",
+      "return": "int",
+      "line": 21253
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017102",
+      "return": "int *",
+      "line": 21272
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001713c",
+      "return": "void",
+      "line": 21290
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017150",
+      "return": "undefined2",
+      "line": 21304
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017380",
+      "return": "void",
+      "line": 21431
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000173a2",
+      "return": "void",
+      "line": 21445
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000173dc",
+      "return": "undefined4",
+      "line": 21459
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000173fe",
+      "return": "int",
+      "line": 21469
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000174c4",
+      "return": "void",
+      "line": 21501
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017566",
+      "return": "void",
+      "line": 21529
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001759e",
+      "return": "undefined4",
+      "line": 21543
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000175c0",
+      "return": "void",
+      "line": 21553
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000175de",
+      "return": "undefined4",
+      "line": 21564
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000176b2",
+      "return": "void",
+      "line": 21605
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001771a",
+      "return": "void",
+      "line": 21632
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017736",
+      "return": "void",
+      "line": 21643
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001776a",
+      "return": "void",
+      "line": 21665
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017780",
+      "return": "void",
+      "line": 21676
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017868",
+      "return": "undefined4",
+      "line": 21711
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017948",
+      "return": "void",
+      "line": 21769
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017a34",
+      "return": "void",
+      "line": 21821
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017a60",
+      "return": "void",
+      "line": 21830
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017a8c",
+      "return": "void",
+      "line": 21841
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017b68",
+      "return": "void",
+      "line": 21878
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017d16",
+      "return": "uint *",
+      "line": 21956
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017db8",
+      "return": "void",
+      "line": 21993
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017dd4",
+      "return": "void",
+      "line": 22014
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00017ffe",
+      "return": "void",
+      "line": 22115
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018040",
+      "return": "int *",
+      "line": 22138
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000180c8",
+      "return": "void",
+      "line": 22163
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001820a",
+      "return": "void",
+      "line": 22210
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000188ba",
+      "return": "void",
+      "line": 22468
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000188f4",
+      "return": "undefined4",
+      "line": 22482
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018942",
+      "return": "void",
+      "line": 22503
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018956",
+      "return": "int",
+      "line": 22517
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000189d0",
+      "return": "void",
+      "line": 22542
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018a34",
+      "return": "undefined4",
+      "line": 22568
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018b52",
+      "return": "void",
+      "line": 22632
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018b98",
+      "return": "void",
+      "line": 22648
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018bba",
+      "return": "uint",
+      "line": 22666
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00018c96",
+      "return": "void",
+      "line": 22722
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000190c0",
+      "return": "uint *",
+      "line": 22889
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001910e",
+      "return": "undefined4",
+      "line": 22907
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019130",
+      "return": "int",
+      "line": 22917
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001917c",
+      "return": "void",
+      "line": 22939
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019394",
+      "return": "undefined4",
+      "line": 23040
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_000193b6",
+      "return": "uint *",
+      "line": 23051
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001940e",
+      "return": "undefined4",
+      "line": 23067
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019430",
+      "return": "int",
+      "line": 23077
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001951a",
+      "return": "void",
+      "line": 23119
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001952e",
+      "return": "void",
+      "line": 23130
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019938",
+      "return": "void",
+      "line": 23289
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019a1a",
+      "return": "void",
+      "line": 23335
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019a54",
+      "return": "undefined4",
+      "line": 23349
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019aa2",
+      "return": "int",
+      "line": 23370
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019b30",
+      "return": "void",
+      "line": 23396
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019b82",
+      "return": "void",
+      "line": 23415
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019bbc",
+      "return": "void",
+      "line": 23429
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019c26",
+      "return": "void",
+      "line": 23445
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019c5e",
+      "return": "undefined4",
+      "line": 23458
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_00019fba",
+      "return": "undefined4",
+      "line": 23619
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001a1a6",
+      "return": "void",
+      "line": 23693
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001a63e",
+      "return": "undefined4 *",
+      "line": 23890
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001a716",
+      "return": "undefined4",
+      "line": 24014
+    },
+    {
+      "file": "Pacific Conflict.c",
+      "name": "FUN_0001a75e",
+      "return": "char *",
+      "line": 24059
+    }
+  ]
+}

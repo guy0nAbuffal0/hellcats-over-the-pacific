@@ -21,10 +21,15 @@ RUNNER_PATH = GODOT_TESTS / "run_all.gd"
 
 EXPECTED_RUNNER_PATHS = [
     "res://godot/tests/unit/test_rng.gd",
+    "res://godot/tests/unit/test_rng_overlay_11564.gd",
     "res://godot/tests/unit/test_flight_math.gd",
     "res://godot/tests/unit/test_loader_metadata.gd",
     "res://godot/tests/unit/test_mission_objectives_m1.gd",
+    "res://godot/tests/unit/test_player_input_frame.gd",
+    "res://godot/tests/unit/test_flight_model_mvp.gd",
+    "res://godot/tests/unit/test_world_collision_mvp.gd",
     "res://godot/tests/integration/test_sim_loader_bridge.gd",
+    "res://godot/tests/integration/test_sim_tick_ordering.gd",
     "res://godot/tests/integration/test_replay.gd",
     "res://godot/tests/integration/test_mission_scene_load.gd",
     "res://godot/tests/integration/test_hud_mvp_scene.gd",

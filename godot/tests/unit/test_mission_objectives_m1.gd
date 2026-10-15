@@ -5,6 +5,12 @@ const MissionObjectivesScript := preload("res://hellcats/mission/mission_objecti
 
 func run() -> bool:
 	var ok := true
+	ok = _test_success_on_required_default() and ok
+	ok = _test_success_requires_all_when_flag_false() and ok
+	return ok
+
+func _test_success_on_required_default() -> bool:
+	var ok := true
 	var objectives = MissionObjectivesScript.new()
 	objectives.configure([
 		{
@@ -26,7 +32,7 @@ func run() -> bool:
 			"checkpoint_id": "cp_01",
 			"optional": true,
 		},
-	])
+	], {"complete_all_required_objectives": true})
 
 	var result := objectives.step({"altitude_m": 1180.0, "bank_deg": 0.0}, 0.1)
 	ok = Assertions.assert_true(not bool(result.get("mission_complete", false)), "required objective not complete yet") and ok
@@ -38,4 +44,29 @@ func run() -> bool:
 	objectives.notify_checkpoint("cp_01")
 	result = objectives.step({"altitude_m": 1190.0, "bank_deg": 0.0}, 0.1)
 	ok = Assertions.assert_equal(String(result.get("completed_id", "")), "checkpoint_pass", "optional checkpoint can complete") and ok
+	return ok
+
+func _test_success_requires_all_when_flag_false() -> bool:
+	var ok := true
+	var objectives = MissionObjectivesScript.new()
+	objectives.configure([
+		{
+			"id": "turn_left",
+			"type": "reach_bank",
+			"min_bank_deg": 20.0,
+			"direction": "left",
+		},
+		{
+			"id": "checkpoint_pass",
+			"type": "checkpoint_pass",
+			"checkpoint_id": "cp_01",
+			"optional": true,
+		},
+	], {"complete_all_required_objectives": false})
+	var result := objectives.step({"altitude_m": 1000.0, "bank_deg": -25.0}, 0.1)
+	ok = Assertions.assert_equal(String(result.get("completed_id", "")), "turn_left", "required step completes") and ok
+	ok = Assertions.assert_true(not bool(result.get("mission_complete", false)), "flag false blocks success until optional done") and ok
+	objectives.notify_checkpoint("cp_01")
+	result = objectives.step({"altitude_m": 1000.0, "bank_deg": 0.0}, 0.1)
+	ok = Assertions.assert_true(bool(result.get("mission_complete", false)), "all objectives yield success when flag false") and ok
 	return ok

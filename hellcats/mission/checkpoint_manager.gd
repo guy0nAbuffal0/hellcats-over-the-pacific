@@ -24,17 +24,18 @@ func check_player_position(world_position: Vector3) -> void:
 			return
 
 ## Next checkpoint for HUD compass / range ([MVP AUTHORING DECISION]).
-func get_next_nav_checkpoint() -> MissionCheckpoint:
-	var best: MissionCheckpoint = null
+## Returns Node3D so headless loads without a global class_name cache for MissionCheckpoint.
+func get_next_nav_checkpoint() -> Node3D:
+	var best: Node3D = null
 	var best_order: int = 999999
 	for checkpoint in checkpoints:
-		if checkpoint is MissionCheckpoint:
-			var cp: MissionCheckpoint = checkpoint
-			if cp.is_passed():
-				continue
-			if cp.order < best_order:
-				best_order = cp.order
-				best = cp
+		if checkpoint == null or not checkpoint.has_method("is_passed"):
+			continue
+		if checkpoint.is_passed():
+			continue
+		if int(checkpoint.order) < best_order:
+			best_order = int(checkpoint.order)
+			best = checkpoint
 	return best
 
 func _on_checkpoint_passed(checkpoint_id: String) -> void:

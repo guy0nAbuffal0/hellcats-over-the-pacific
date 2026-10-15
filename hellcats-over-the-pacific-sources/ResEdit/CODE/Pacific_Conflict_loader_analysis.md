@@ -26,7 +26,7 @@
 **Candidate interpretations:**
 
 - **H1 — Segment lengths (code, then data/other)**  
-  - u32[0] = 263 = count of something (e.g. entries), or reserved.  
+  - u32[0] = 263 = count of something (e.g. entries), or reserved.  ù
   - u32[1] = 0x1a75c = length of first segment. If first segment starts at `0x20`, it ends at `0x20 + 0x1a73c = 0x1a75c`.  
   - Bytes at file offset `0x1a75c` are `4e75 4e56...` (code), so segment 1 is code; segment 2 would start at `0x1a75c`.  
   - u32[2], u32[3] could be lengths of further segments.  

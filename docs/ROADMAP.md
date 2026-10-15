@@ -15,8 +15,8 @@ Every statement is tagged: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]**.
 | RNG (LCG, 0x41c64e6d, 0x3039) | Done | [RECONSTRUCTED] ID05; Rng68k in godot. |
 | Entity state layout (proven offsets) | Skeleton | [RECONSTRUCTED] FUN_0000e792 (Pacific Conflict.c:14016+). EntityState has keys; from_bytes TODO. |
 | Trace format + TraceWriter + ReplayRunner | Done | [INFERRED] docs/TRACE.md, trace_diff.py, TraceWriter, ReplayRunner. |
-| FUN_00005df8 | Placeholder | [RECONSTRUCTED] Called when mission_flag_ac == 0 (Pacific Conflict.c:5102). [UNKNOWN] behavior. |
-| FUN_00006fb8 | Placeholder | [RECONSTRUCTED] Called after four arrays (Pacific Conflict.c:5139). [UNKNOWN] behavior. |
+| FUN_00005df8 | Done (loop/clear) | [RECONSTRUCTED] When mission_flag_ac == 0: for i in 0..6, if DAT_0001bc64[i] != 0 call FUN_0000528a then clear (6434–6447). FUN_0000528a body deferred. |
+| FUN_00006fb8 | Done (side effect) | [RECONSTRUCTED] Called after four arrays (Pacific Conflict.c:5139). Body resets DAT_0001d710…d724 to 100000000 (7180–7189). [INFERRED] distance/sentinel role. |
 | FUN_000044a4 / per-entity update | Partial | [RECONSTRUCTED] `FUN_000044a4` → `_update_single_entity`; **`param_2`** passed through (5035a path not fully ported). [RECONSTRUCTED] Minimal slices: `flags_685` RNG, gates, movement smoothing, etc. [RECONSTRUCTED] **Helper trio** in `flight_math.gd`. [RECONSTRUCTED] Designated player/target for 0x66e/0x672/0x66a. **MVP:** `flight_model_mvp.gd` for Mission-1 aircraft; **Next:** full **FUN_0000435a** branch parity by `param_2`. |
 
 **Acceptance (Phase A):** [INFERRED] Same seed + same inputs ⇒ identical trace (see docs/TRACE.md). **[UNKNOWN]** Until entity/mission logic is ported, traces will only reflect phase/flag/input/RNG.
@@ -33,8 +33,8 @@ Every statement is tagged: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]**.
 | FUN_000044e8 pass ordering + `last_tick_order` | Done | [RECONSTRUCTED] Four passes + `param_2` pattern; `docs/contracts/tick_FUN_000044e8_contract.md`; `test_sim_tick_ordering.gd`. |
 | Key code → param_1 mapping | Partial | [RECONSTRUCTED] Brief + Godot `ACTIONS`; [UNKNOWN] full Mac table vs all branches. |
 | DAT_0001d858 state machine | Not started | [RECONSTRUCTED] Values 1, 7, 8, 9 in code. [UNKNOWN] full FSM. |
-| FUN_00005df8 behavior | Not started | [RECONSTRUCTED] Called when flag_ac == 0. [UNKNOWN] logic. |
-| FUN_00006fb8 behavior | Not started | [RECONSTRUCTED] Post-entity tick. [UNKNOWN] logic. |
+| FUN_00005df8 behavior | Done (loop/clear) | [RECONSTRUCTED] Clears seven DAT_0001bc64 slots after FUN_0000528a. FUN_0000528a body still deferred. |
+| FUN_00006fb8 behavior | Done (side effect) | [RECONSTRUCTED] Post-entity tick resets six globals to 100000000. [INFERRED] later used as distance bases. |
 
 **Acceptance (Phase B):** [INFERRED] Replay of a captured input sequence produces a trace that matches the original (same seed). **[UNKNOWN]** Depends on Phase A entity/mission placeholders being implemented.
 

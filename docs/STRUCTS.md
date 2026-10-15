@@ -85,7 +85,7 @@ See `docs/contracts/input_godot_contract.md`.
 
 | Offset (hex) | Access | Source (Pacific Conflict.c) |
 |--------------|--------|-----------------------------|
-| 0x00 | *(byte) type | [INFERRED] entity_data_ptr / type elsewhere |
+| 0x00 | *(int*) world/surface object ptr | [RECONSTRUCTED] `iVar1 = *param_1`; `*(iVar1+0x1c)` surface height (e792 14061/14084; also `*DAT_0001b738+0x1c` at 7354). Type byte at +0 for FUN_0000528a is **[INFERRED]** overlay/BE — Godot keeps `field_00` separate until byte buffer. |
 | 0x04 | *(uint) | FUN_000045ba and others (not in 0e792 excerpt) |
 | 0x08 | *(uint) ptr | param_1[2] → *param_1; entity_data_ptr |
 | 0x0c | position/velocity | *param_1+0xc in 1351-1353 |

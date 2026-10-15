@@ -63,11 +63,16 @@ rm -f godot/tests/.run_one_tmp.gd
 ### Run all Godot tests
 
 ```bash
-godot --headless --path . --script res://godot/tests/run_all.gd
+# Prefer the absolute Godot binary if `godot` is not on PATH (see root README.md).
+HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://godot/tests/run_all.gd
 ```
+
+Headless runs without an imported `.godot/` class cache must not rely on other scripts' `class_name` types in annotations. Prefer `preload(...)`, base types (`Node3D`, `Control`), or untyped returns. See `docs/NOTES.md` entry 2026-10-15.
 
 ### Run Python QA validation
 
 ```bash
 python3 tools/qa/test_regression.py
 ```
+
+Keep `EXPECTED_RUNNER_PATHS` in `tools/qa/test_regression.py` identical to `TEST_PATHS` in `godot/tests/run_all.gd`.

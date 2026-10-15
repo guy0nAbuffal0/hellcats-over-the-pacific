@@ -7,7 +7,8 @@ extends CanvasLayer
 @onready var _telemetry_label: Label = $RootMargin/VBox/TelemetryLabel
 @onready var _nav_label: Label = $RootMargin/VBox/NavLabel
 @onready var _status_label: Label = $RootMargin/VBox/StatusLabel
-@onready var _attitude_strip: HudAttitudeStrip = $RootMargin/VBox/AttitudeStrip as HudAttitudeStrip
+## Typed as Control so headless loads without a global class_name cache for HudAttitudeStrip.
+@onready var _attitude_strip: Control = $RootMargin/VBox/AttitudeStrip
 
 var _stall_warn_s: float = 2.0
 var _last_objective_text: String = ""
@@ -48,8 +49,8 @@ func update_telemetry(snapshot: Dictionary) -> void:
 		+ "PCH %+04.1f°   BNK %+04.1f°"
 	) % [spd, vsi, alt, hdg, thr, pitch, bank]
 
-	if _attitude_strip:
-		_attitude_strip.set_attitude(pitch, bank)
+	if _attitude_strip and _attitude_strip.has_method("set_attitude"):
+		_attitude_strip.call("set_attitude", pitch, bank)
 
 	var warn_parts: PackedStringArray = PackedStringArray()
 	if stall_s >= _stall_warn_s:

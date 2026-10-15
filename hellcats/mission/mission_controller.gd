@@ -4,6 +4,7 @@ extends Node
 const MissionLoaderScript := preload("res://hellcats/mission/mission_loader.gd")
 const MissionObjectivesScript := preload("res://hellcats/mission/mission_objectives_m1.gd")
 const PlayerInputMapScript := preload("res://hellcats/flight/player_input_map.gd")
+const WorldBuilderScript := preload("res://hellcats/world/world_builder_mvp.gd")
 
 @export_file("*.json") var mission_data_path := "res://godot/data/mission_01/mission_01_training.json"
 @export_file("*.json") var aircraft_data_path := "res://godot/data/mission_01/aircraft_mvp.json"
@@ -19,6 +20,9 @@ var mission_state: String = "boot"
 ## [MVP APPROXIMATION] Exposed for SimCore bridge / convergence; Mission-1 scene loop does not call SimCore.tick() yet.
 var mission_phase_a8: int = 0
 var mission_flag_ac: int = 0
+
+## From mission JSON start_mode. Only "airborne" is implemented for Mission 1 MVP.
+var start_mode: String = "airborne"
 
 var _mission_loader
 var _objectives
@@ -66,9 +70,18 @@ func _load_and_start() -> void:
 	var mission: Dictionary = mission_bundle.get("mission", {})
 	if mission.has("bounds_radius_m"):
 		bounds_radius_m = float(mission.get("bounds_radius_m"))
+	start_mode = String(mission.get("start_mode", "airborne"))
+	if start_mode != "airborne":
+		push_warning(
+			"Mission start_mode '%s' is not implemented; Mission 1 MVP applies airborne spawn." % start_mode
+		)
+		start_mode = "airborne"
 	var aircraft: Dictionary = mission_bundle.get("aircraft", {})
 	var checkpoints: Dictionary = mission_bundle.get("checkpoints", {})
-	_objectives.configure(mission.get("objective_sequence", []))
+	_objectives.configure(
+		mission.get("objective_sequence", []),
+		mission.get("success", {}) as Dictionary
+	)
 	_player.setup_mission(aircraft, mission)
 	_checkpoints.configure(checkpoints)
 	_hud.set_brief_title(String(mission.get("ui", {}).get("brief_title", "Flight School")))
@@ -92,9 +105,11 @@ func get_mission_sim_bridge_state() -> Dictionary:
 func _check_failure(snapshot: Dictionary, delta: float) -> void:
 	var mission: Dictionary = mission_bundle.get("mission", {})
 	var failure_data: Dictionary = mission.get("failure", {})
-	if bool(failure_data.get("terrain_or_sea_impact", true)) and float(snapshot.get("altitude_m", 0.0)) <= 0.5:
-		_set_terminal_state("Mission failed: impact", false)
-		return
+	if bool(failure_data.get("terrain_or_sea_impact", true)):
+		var impact: String = WorldBuilderScript.impact_reason_at(snapshot.get("position_m", Vector3.ZERO))
+		if not impact.is_empty():
+			_set_terminal_state("Mission failed: impact", false)
+			return
 	var horizontal_pos: Vector3 = snapshot.get("position_m", Vector3.ZERO)
 	var horizontal_distance := Vector2(horizontal_pos.x, horizontal_pos.z).length()
 	if horizontal_distance > bounds_radius_m:
@@ -131,7 +146,7 @@ func _merge_nav_into_snapshot(snapshot: Dictionary) -> void:
 	var pos: Vector3 = snapshot.get("position_m", Vector3.ZERO)
 	var horizontal_distance := Vector2(pos.x, pos.z).length()
 	snapshot["distance_to_bounds_m"] = maxf(0.0, bounds_radius_m - horizontal_distance)
-	var cp: MissionCheckpoint = _checkpoints.get_next_nav_checkpoint()
+	var cp: Node3D = _checkpoints.get_next_nav_checkpoint()
 	if cp == null:
 		snapshot["nav_target_distance_m"] = -1.0
 		return
@@ -145,4 +160,4 @@ func _merge_nav_into_snapshot(snapshot: Dictionary) -> void:
 	snapshot["nav_target_distance_m"] = hdist
 	snapshot["nav_target_bearing_deg"] = bearing
 	snapshot["nav_relative_bearing_deg"] = rel
-	snapshot["nav_checkpoint_id"] = cp.checkpoint_id
+	snapshot["nav_checkpoint_id"] = cp.get("checkpoint_id")

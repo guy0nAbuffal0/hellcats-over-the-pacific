@@ -1,6 +1,24 @@
 class_name WorldBuilderMvp
 extends Node3D
 
+## [MVP AUTHORING DECISION] Solid volumes match the placeholder meshes below.
+const SEA_SURFACE_Y: float = 0.0
+const SEA_IMPACT_Y: float = 0.5
+const ISLAND_CENTER: Vector3 = Vector3(0.0, -24.0, 2600.0)
+const ISLAND_SIZE: Vector3 = Vector3(1200.0, 50.0, 1200.0)
+
+## Axis-aligned island solid (same as BoxMesh at ISLAND_CENTER / ISLAND_SIZE).
+static func island_aabb() -> AABB:
+	return AABB(ISLAND_CENTER - ISLAND_SIZE * 0.5, ISLAND_SIZE)
+
+## Empty string = no impact; otherwise a failure reason for Mission 1.
+static func impact_reason_at(world_position: Vector3) -> String:
+	if island_aabb().has_point(world_position):
+		return "island_impact"
+	if world_position.y <= SEA_IMPACT_Y:
+		return "terrain_or_sea_impact"
+	return ""
+
 func _ready() -> void:
 	_ensure_environment()
 	_ensure_light()
@@ -59,7 +77,25 @@ func _ensure_sea() -> void:
 	material.roughness = 0.12
 	material.metallic = 0.02
 	sea.set_surface_override_material(0, material)
-	sea.position = Vector3(0.0, 0.0, 0.0)
+	sea.position = Vector3(0.0, SEA_SURFACE_Y, 0.0)
+	_ensure_sea_body()
+
+func _ensure_sea_body() -> void:
+	var body: StaticBody3D = get_node_or_null("SeaBody")
+	if body == null:
+		body = StaticBody3D.new()
+		body.name = "SeaBody"
+		add_child(body)
+	var shape_node: CollisionShape3D = body.get_node_or_null("CollisionShape3D")
+	if shape_node == null:
+		shape_node = CollisionShape3D.new()
+		shape_node.name = "CollisionShape3D"
+		body.add_child(shape_node)
+	## Thin box under the sea plane so kinematic queries can hit open water.
+	var box := BoxShape3D.new()
+	box.size = Vector3(20000.0, 2.0, 20000.0)
+	shape_node.shape = box
+	body.position = Vector3(0.0, SEA_SURFACE_Y - 1.0, 0.0)
 
 func _ensure_island() -> void:
 	var island: MeshInstance3D = get_node_or_null("Island")
@@ -68,13 +104,30 @@ func _ensure_island() -> void:
 		island.name = "Island"
 		add_child(island)
 	var mesh := BoxMesh.new()
-	mesh.size = Vector3(1200.0, 50.0, 1200.0)
+	mesh.size = ISLAND_SIZE
 	island.mesh = mesh
-	island.position = Vector3(0.0, -24.0, 2600.0)
+	island.position = ISLAND_CENTER
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Color(0.34, 0.48, 0.24)
 	material.roughness = 0.95
 	island.set_surface_override_material(0, material)
+	_ensure_island_body()
+
+func _ensure_island_body() -> void:
+	var body: StaticBody3D = get_node_or_null("IslandBody")
+	if body == null:
+		body = StaticBody3D.new()
+		body.name = "IslandBody"
+		add_child(body)
+	var shape_node: CollisionShape3D = body.get_node_or_null("CollisionShape3D")
+	if shape_node == null:
+		shape_node = CollisionShape3D.new()
+		shape_node.name = "CollisionShape3D"
+		body.add_child(shape_node)
+	var box := BoxShape3D.new()
+	box.size = ISLAND_SIZE
+	shape_node.shape = box
+	body.position = ISLAND_CENTER
 
 func _ensure_sun_disk() -> void:
 	var disk: MeshInstance3D = get_node_or_null("SunDisk")
