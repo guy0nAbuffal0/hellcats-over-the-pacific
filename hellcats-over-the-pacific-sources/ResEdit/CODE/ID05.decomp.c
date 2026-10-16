@@ -284,7 +284,8 @@ void get_dialog_item_text_upper /* Original: FUN_000004e4 */ (void)
  *     *a = decode_code_to_long_b(get_dialog_item_text_upper(dlg, 4));
  *     ok = matcher@0x964(w1, w2, w3, get_dialog_item_text_upper(dlg, 3));
  *     if (!ok) { ParamText(c2pstr(text of item 3), nil, nil, nil);
- *                center_template_rect_on_screen('ALRT', 1001); StopAlert(1001, nil) $A985; }
+ *                center_template_rect_on_screen('ALRT', 1001); Alert(1001, nil) $A985; }
+ *   (iteration 138 correction: $A985 is _Alert, not StopAlert = $A986)
  *   } while (!ok);
  *   DisposDialog(dlg) $A983;
  *   if (record_code_index_equals(*a, outB + 6)) write_TEXT128_pair(*a, *b);

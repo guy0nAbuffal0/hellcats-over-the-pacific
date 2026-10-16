@@ -25,6 +25,29 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000046b4` (ID02) | `rebuild_all_palette_index_maps` | STRONG INFERENCE | Iter 131: rebuild map for each device slot 1..3 (or B&W path). |
 | `FUN_00004738` (ID02) | `configure_palette_entries` | STRONG INFERENCE | Iter 131: depth-4 / depth-8 Palette Manager entry usage + colours. |
 | `FUN_0000488a` (ID02) | `clear_ctab_size_callback` | STRONG INFERENCE | Iter 131: A5 from CurrentA5; (*A5−0x14b2)+6 = 0. |
+| `FUN_000049fe` (ID02) | `lookup_palette_index_for_rgb_level` | STRONG INFERENCE | Iter 132: (r,g,b) levels ×64→16-bit; search A5−0x350[8] then *(A5−0x14a6); +200 at 8-bit. |
+| `FUN_00000d24` (ID02) | `close_and_dispose_port` | STRONG INFERENCE | Iter 133: ClosePort(p); DisposPtr(p). Used on A5−0x103a. |
+| `FUN_00000d3a` (ID02) | `blit_offscreen_frame_to_window` | STRONG INFERENCE | Iter 134: (base, top, rows, mode) → offscreen PixMap port A5−0x103a, CopyBits to thePort. JT $322; ID06 0xf18; address taken at ID02 0x1b6a. |
+| `FUN_00001b14` (ID02) | `freemem_a5safe` | STRONG INFERENCE | Iter 135: CurrentA5 wrapper around ID09 FreeMem glue; service slot A5−0x10a6. |
+| `FUN_00001a04` / `1a84` / `1aa8` / `1acc` / `1af0` (ID02) | `dispose_handle_a5safe` / `hlock_a5safe` / `hunlock_a5safe` / `hpurge_a5safe` / `hnopurge_a5safe` | STRONG INFERENCE | Iter 136: CurrentA5 thunks → ID09 $A023/$A029/$A02A/$A049/$A04A glue; service slots. |
+| `FUN_00001a28` (ID02) | `realloc_and_clear_handle_a5safe` | STRONG INFERENCE | Iter 136: ReallocHandle + MemError check + zero-fill via FUN_000002b0. |
+| `FUN_000019a2` (ID02) | `new_handle_clear_or_die_a5safe` | STRONG INFERENCE | Iter 137: NewHandleClear + MemError → fatal; service slot A5−0x10c2. |
+| `FUN_000019e2` (ID02) | `fatal_memory_error_exit` | STRONG INFERENCE | Iter 137: dispose overlay, FUN_00004318, show STR#129[93] via FUN_00001d48, ExitToShell. |
+| `FUN_00001d48` (ID02) | `show_caution_alert_with_number` | STRONG INFERENCE | Iter 138: ParamText(msg, number) + CautionAlert(258). JT $4ba. |
+| `FUN_00001c8a` (ID02) | `format_int_decimal_pstring` | STRONG INFERENCE | Iter 138: signed decimal → Pascal string in 10-byte buffer. |
+| `FUN_00004318` (ID02) | `shutdown_sound` | STRONG INFERENCE | Iter 138: stop 3 channels, restore $0196, SndDisposeChannel(A5−0x356). |
+| `FUN_00004242` (ID02) | `silence_sound_channel` | STRONG INFERENCE | Iter 139: ch 0..1 → FUN_00003d50(ch, A5−0xc26, 0, 370, 0) into channel record. |
+| `FUN_00003d36` (ID02) | `clear_sound_buffer_to_silence` | STRONG INFERENCE | Iter 139: SoundBase ($0266) 370 words ← 0x80. |
+| `FUN_00003d50` (ID02) | `alloc_sound_buffer_node` | STRONG INFERENCE | Iter 140: node from channel free list; {+0 cursor, +8 buffer, +0xc start, +0x10 end, +0x14 next, +0x18 continuation}. |
+| `FUN_00003dd0` (ID02) | `init_sound_system` | STRONG INFERENCE | Iter 140: builds channel queues, silence buffer, installs routine into low-memory $0196 (saved in A5−0xc36). |
+| `FUN_000039a8` / `FUN_00003aae` / `FUN_00003bc4` (ID02) | `vbl_sound_handler_ch0_unrolled` / `vbl_sound_handler_ch0_variant` / `vbl_sound_handler_two_channel` | STRONG INFERENCE | Iter 141: Lvl1DT[1] VBL hooks; in-code A5 cache; RTS-chain to previous vector; resample into SoundBase. |
+| `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | STRONG INFERENCE | Iter 141: arg == 1 → $0196 = A5−0x35c. |
+| low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
+| A5−0x7d0 | sound channel records [2] × 0x238 bytes | STRONG INFERENCE | Indexed by silence_sound_channel / FUN_00003d50. |
+| ID02 file 0x1b42 (unexported) | `install_overlay_service_table` (proposed) | STRONG INFERENCE | Iter 135: 34 JT addresses → A5 table; A5−0x1040 work buffer. See OVERLAY_SERVICE_TABLE.md. |
+| A5−0x1040 | overlay work buffer (HYPOTHESIS name) | PROVEN allocation | NewPtrClear(320400 or 220400) by FreeMem > 1 MB. |
+| A5−0x103a | offscreen GrafPort pointer (HYPOTHESIS name) | STRONG INFERENCE | Disposed by close_and_dispose_port; created by FUN_00000d3a when 0. |
+| `FUN_00004b62` (ID02, not decompiled) | `init_standard_colour_indices` (proposed) | STRONG INFERENCE | Iter 132: 9 grey-level lookups → A5 colour-index words (−0x11ae … −0x11f8). |
 | A5−0x136e | device table [4] × 0x16 bytes (slots 1..3 used) | STRONG INFERENCE | +0 GDevice handle (SetGDevice in FUN_000048ae), +4 stored word array. |
 | `FUN_00000728` (ID05) | `ansi_rand` | PROVEN | Iter 118: seed A5−0x6c ×0x41c64e6d +0x3039; returns (seed<<1)>>17. |
 | `FUN_00000746` (ID05) | `ansi_srand` | STRONG INFERENCE | Stores arg to A5−0x6c. Caller: ID05 0x8c0 (init_protection_table, seeded by TickCount). |
@@ -48,7 +71,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00000006` (ID05) | `center_template_rect_on_screen` | STRONG INFERENCE | Iter 124: GetResource(type,id) rect centred horizontally, top at mbar + 1/3 of remaining height. |
 | `FUN_000000c8` (ID05) | `get_machine_screen_fingerprint` | STRONG INFERENCE | Iter 124: machineType, screen width/height, depth (GDevice or screenBits), 0. |
 | `FUN_000004e4` (ID05) | `get_dialog_item_text_upper` | STRONG INFERENCE | Iter 125: GetIText → C string → upper (ctype A5−0x1608 bit 7 → ID02 0x1ce). |
-| `FUN_00000560` (ID05) | `run_protection_dialog` | STRONG INFERENCE | Iter 125: DLOG 1000 challenge/response loop; ALRT 1001; called from ID08 0x298 (JT $572). |
+| `FUN_00000560` (ID05) | `run_protection_dialog` | STRONG INFERENCE | Iter 125: DLOG 1000 challenge/response loop; Alert 1001 ($A985, corrected iter 138); called from ID08 0x298 (JT $572). |
 | `FUN_000008d6` (ID05) | `pick_random_protection_challenge` | STRONG INFERENCE | Iter 125: random entry of table *(A5−0xba)[A5−0xb6] → 3 words. |
 | `FUN_000008b8` (ID05, not decompiled) | `init_protection_table` (proposed) | STRONG INFERENCE | Iter 126: ansi_srand(arg3); A5−0xba = arg1; A5−0xb6 = arg2; called from ID08 0x25c (JT $542) with (A5−0x1cc4, 56, TickCount). |
 | A5−0x1cc4 | protection challenge table (56 × 12 bytes) | STRONG INFERENCE | Passed to init_protection_table; entries {ptr, len, w1, w2, w3}. See COPY_PROTECTION_FLOW.md. |

@@ -603,7 +603,7 @@ undefined4 * FUN_000004c6(void)
   if (*(short *)(unaff_A5 + -0x12ee) != 0) {
     *(undefined4 *)((int)ppuVar2 + -4) = 0;
     *(undefined4 *)((int)ppuVar2 + -8) = 0x4f6;
-    puVar1 = (undefined4 *)FUN_00003dd0(*(int *)((int)ppuVar2 + -4));
+    puVar1 = (undefined4 *)init_sound_system(*(int *)((int)ppuVar2 + -4));
   }
   return puVar1;
 }
@@ -696,7 +696,19 @@ void FUN_00000ca6(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000d24(void)
+/*
+ * Original: FUN_00000d24; source: ID02.c:697-704.
+ * Recovered name: close_and_dispose_port [STRONG INFERENCE] (iteration 133).
+ * Status: RENAMED; Ghidra truncated at A-line $A87D. Bytes file 0xd24..0xd38
+ * [PROVEN]: arg GrafPtr port [8(A6)]; ClosePort(port) $A87D;
+ * JT $23a(port) = ID09 file 0x218 DisposPtr glue ($A01F). Ghidra lost the arg.
+ * Callers: rebuild_all_palette_index_maps (port = long A5-0x103a, then cleared);
+ * ID03 file 0x3828 via JT $392.
+ * [STRONG INFERENCE] A5-0x103a is a pointer-allocated GrafPort; the following
+ * routine FUN_00000d3a (re)creates it when A5-0x103a == 0 (offscreen bitmap
+ * with rowBytes = ((width * depth + 15) >> 4) * 2) - to be confirmed next.
+ */
+void close_and_dispose_port /* Original: FUN_00000d24 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -707,7 +719,29 @@ void FUN_00000d24(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000d3a(undefined4 param_1,short param_2,short param_3,int param_4)
+/*
+ * Original: FUN_00000d3a; source: ID02.c:708-741.
+ * Recovered name: blit_offscreen_frame_to_window [STRONG INFERENCE] (iteration 134).
+ * Status: RENAMED. Exported C kept; Ghidra truncated the tail at $A862.
+ * Args: param_1 = pixel base address, param_2 = destination top, param_3 =
+ * row count, param_4 = mode (long). A5 is reloaded from CurrentA5 ($0904)
+ * (Ghidra: DAT_00000904), so it is callable from overlay/foreign context.
+ * First call (A5-0x103a == 0): srcRect A5-0x14f2 = (0, 0, A5-0x1370, A5-0x1372)
+ * [top, left, bottom, right], dstRect A5-0x14ea = srcRect; rowBytes =
+ * ((A5-0x1372 * A5-0x137a + 15) >> 4) * 2 | 0x8000 (PixMap flag; bytes
+ * 0xd6e..0xd7e, the 0x8000 OR is not shown by Ghidra); port =
+ * FUN_00000ca6(rowBytes, base, bounds) -> A5-0x103a.
+ * Each call: (**port->portPixMap).baseAddr = param_1; src.bottom = height;
+ * dst.top = top; dst.bottom = top + height; dst.left/right = src.left/right;
+ * mode 2 -> dst.left/right -= word A5-0x137e; mode 3 -> += A5-0x137e.
+ * Tail [PROVEN bytes 0xe0a..0xe3c]: ForeColor(33 blackColor) $A862;
+ * BackColor(30 whiteColor) $A863; CopyBits(&off->portBits (+2),
+ * &thePort->portBits (+2), &src, &dst, 0 srcCopy, nil) $A8EC.
+ * Callers / references [PROVEN bytes]: JT A5+0x322; ID06 file 0xf18 JSR;
+ * ID02 file 0x1b6a LEA $322(A5) (address taken - likely handed to the
+ * overlay as a callback [HYPOTHESIS]).
+ */
+void blit_offscreen_frame_to_window /* Original: FUN_00000d3a */ (undefined4 param_1,short param_2,short param_3,int param_4)
 
 {
   int iVar1;
@@ -991,7 +1025,16 @@ void FUN_0000197c(void)
 
 
 
-undefined2 FUN_000019a2(undefined2 param_1)
+/*
+ * Original: FUN_000019a2; source: ID02.c:994-1008.
+ * Recovered name: new_handle_clear_or_die_a5safe [STRONG INFERENCE] (iteration 137).
+ * Bytes file 0x19a2..0x19e0 [PROVEN]: CurrentA5 thunk; h = NewHandleClear(size
+ * long [8(A6)]) via JT $252 (ID09 0x242, $A322); if (MemError() (JT $29a,
+ * word $0220) != 0) fatal_memory_error_exit(); returns h (long in D0).
+ * Ghidra errors: return type/value (it returns param_1, bytes return h) and the
+ * MemError result (sVar2 always 0). Expressions kept. Service slot A5-0x10c2.
+ */
+undefined2 new_handle_clear_or_die_a5safe /* Original: FUN_000019a2 */ (undefined2 param_1)
 
 {
   int iVar1;
@@ -1002,7 +1045,7 @@ undefined2 FUN_000019a2(undefined2 param_1)
   sVar2 = 0;
   (**(code **)(iVar1 + 0x29a))();
   if (sVar2 != 0) {
-    FUN_000019e2();
+    fatal_memory_error_exit(); /* Original: FUN_000019e2 */
   }
   return param_1;
 }
@@ -1011,7 +1054,21 @@ undefined2 FUN_000019a2(undefined2 param_1)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000019e2(void)
+/*
+ * Original: FUN_000019e2; source: ID02.c:1014-1031.
+ * Recovered name: fatal_memory_error_exit [STRONG INFERENCE] (iteration 137).
+ * Bytes file 0x19e2..0x1a02 [PROVEN] (no LINK; uses the caller's A5, which
+ * every caller has already set from CurrentA5):
+ *   if (A5-0x1006 overlay image) DisposPtr(A5-0x1006) (JT $23a, ID09 0x218);
+ *   shutdown_sound();  show_caution_alert_with_number(str129 slot 93 = long A5-0xdd2, 0);
+ *   ExitToShell ($A9F4).
+ * A5-0xdd2 = A5-0xf46 + 93*4, i.e. string 93 of STR# 129 loaded by ID07
+ * load_str129_string_table [PROVEN arithmetic]; presumably the out-of-memory
+ * message shown by FUN_00001d48 [HYPOTHESIS]. Ghidra's register0x0000003c
+ * stack modelling is an artifact (kept verbatim).
+ * Callers: new_handle_clear_or_die_a5safe, realloc_and_clear_handle_a5safe.
+ */
+void fatal_memory_error_exit /* Original: FUN_000019e2 */ (void)
 
 {
   int unaff_A5;
@@ -1023,11 +1080,11 @@ void FUN_000019e2(void)
     (**(code **)(unaff_A5 + 0x23a))();
   }
   *(undefined4 *)((int)register0x0000003c + -4) = 0x19f4;
-  FUN_00004318();
+  shutdown_sound(); /* Original: FUN_00004318 */
   *(undefined2 *)((int)register0x0000003c + -2) = 0;
   *(undefined4 *)((int)register0x0000003c + -6) = *(undefined4 *)(unaff_A5 + -0xdd2);
   *(undefined4 *)((int)register0x0000003c + -10) = 0x19fe;
-  FUN_00001d48(*(int *)((int)register0x0000003c + -6),*(undefined4 *)((int)register0x0000003c + -2))
+  show_caution_alert_with_number(*(int *)((int)register0x0000003c + -6),*(undefined4 *)((int)register0x0000003c + -2))
   ;
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -1035,7 +1092,14 @@ void FUN_000019e2(void)
 
 
 
-void FUN_00001a04(undefined4 param_1)
+/*
+ * Original: FUN_00001a04; source: ID02.c:1038-1043.
+ * Recovered name: dispose_handle_a5safe [STRONG INFERENCE] (iteration 136).
+ * CurrentA5 thunk: saves A5/D2, A5 = ($0904), JSR $25a(A5) = ID09 file 0x24e
+ * ($A023 DisposHandle glue) with the handle argument, restores A5/D2. Ghidra shows the
+ * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10be.
+ */
+void dispose_handle_a5safe /* Original: FUN_00001a04 */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_00000904 + 0x25a))(param_1);
@@ -1044,7 +1108,21 @@ void FUN_00001a04(undefined4 param_1)
 
 
 
-void FUN_00001a28(undefined4 *param_1,undefined4 param_2)
+/*
+ * Original: FUN_00001a28; source: ID02.c:1047-1066.
+ * Recovered name: realloc_and_clear_handle_a5safe [STRONG INFERENCE] (iteration 136).
+ * Bytes file 0x1a28..0x1a82 [PROVEN]; CurrentA5 thunk. Args: Handle h [8],
+ * long size [$c].
+ *   ReallocHandle(h, size) (JT $26a = ID09 0x264, $A027);
+ *   if (MemError() (JT $29a = ID09 0x29e: word $0220 MemErr) != 0)
+ *       fatal_memory_error_exit() (FUN_000019e2);
+ *   HLock(h) (JT $272); FUN_000002b0(*h, 0, size) (BSR 0x2b0; Ghidra could not
+ *   decompile it - memset-like [HYPOTHESIS]); HUnlock(h) (JT $27a).
+ * Ghidra error: it did not model the MemError result, so sVar3 is always 0 and
+ * the FUN_000019e2 branch looks dead in the exported C. Expression kept.
+ * Overlay service slot A5-0x10ba (JT $40a).
+ */
+void realloc_and_clear_handle_a5safe /* Original: FUN_00001a28 */ (undefined4 *param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -1056,7 +1134,7 @@ void FUN_00001a28(undefined4 *param_1,undefined4 param_2)
   sVar3 = 0;
   (**(code **)(iVar1 + 0x29a))();
   if (sVar3 != 0) {
-    FUN_000019e2();
+    fatal_memory_error_exit(); /* Original: FUN_000019e2 */
   }
   puVar2 = param_1;
   (**(code **)(iVar1 + 0x272))((short)param_1);
@@ -1067,7 +1145,14 @@ void FUN_00001a28(undefined4 *param_1,undefined4 param_2)
 
 
 
-void FUN_00001a84(undefined4 param_1)
+/*
+ * Original: FUN_00001a84; source: ID02.c:1070-1075.
+ * Recovered name: hlock_a5safe [STRONG INFERENCE] (iteration 136).
+ * CurrentA5 thunk: saves A5/D2, A5 = ($0904), JSR $272(A5) = ID09 file 0x270
+ * ($A029 HLock glue) with the handle argument, restores A5/D2. Ghidra shows the
+ * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10b6.
+ */
+void hlock_a5safe /* Original: FUN_00001a84 */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_00000904 + 0x272))(param_1);
@@ -1076,7 +1161,14 @@ void FUN_00001a84(undefined4 param_1)
 
 
 
-void FUN_00001aa8(undefined4 param_1)
+/*
+ * Original: FUN_00001aa8; source: ID02.c:1079-1084.
+ * Recovered name: hunlock_a5safe [STRONG INFERENCE] (iteration 136).
+ * CurrentA5 thunk: saves A5/D2, A5 = ($0904), JSR $27a(A5) = ID09 file 0x27a
+ * ($A02A HUnlock glue) with the handle argument, restores A5/D2. Ghidra shows the
+ * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10b2.
+ */
+void hunlock_a5safe /* Original: FUN_00001aa8 */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_00000904 + 0x27a))(param_1);
@@ -1085,7 +1177,14 @@ void FUN_00001aa8(undefined4 param_1)
 
 
 
-void FUN_00001acc(undefined4 param_1)
+/*
+ * Original: FUN_00001acc; source: ID02.c:1088-1093.
+ * Recovered name: hpurge_a5safe [STRONG INFERENCE] (iteration 136).
+ * CurrentA5 thunk: saves A5/D2, A5 = ($0904), JSR $282(A5) = ID09 file 0x284
+ * ($A049 HPurge glue) with the handle argument, restores A5/D2. Ghidra shows the
+ * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10ae.
+ */
+void hpurge_a5safe /* Original: FUN_00001acc */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_00000904 + 0x282))(param_1);
@@ -1094,7 +1193,14 @@ void FUN_00001acc(undefined4 param_1)
 
 
 
-void FUN_00001af0(undefined4 param_1)
+/*
+ * Original: FUN_00001af0; source: ID02.c:1097-1102.
+ * Recovered name: hnopurge_a5safe [STRONG INFERENCE] (iteration 136).
+ * CurrentA5 thunk: saves A5/D2, A5 = ($0904), JSR $28a(A5) = ID09 file 0x28e
+ * ($A04A HNoPurge glue) with the handle argument, restores A5/D2. Ghidra shows the
+ * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10aa.
+ */
+void hnopurge_a5safe /* Original: FUN_00001af0 */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_00000904 + 0x28a))(param_1);
@@ -1103,7 +1209,30 @@ void FUN_00001af0(undefined4 param_1)
 
 
 
-undefined4 FUN_00001b14(void)
+/*
+ * Original: FUN_00001b14; source: ID02.c:1106-1111.
+ * Recovered name: freemem_a5safe [STRONG INFERENCE] (iteration 135).
+ * Bytes file 0x1b14..0x1b3e [PROVEN]: saves A5/D2, A5 = CurrentA5 ($0904),
+ * result = JT $212() = ID09 file 0x1b2 FreeMem glue ($A01C), restores, returns
+ * the FreeMem long in D0. Ghidra's "return 0" is a decompiler error (it lost
+ * the D0 value); expression kept unchanged, as required. Exported to the
+ * overlay as service-table slot A5-0x10a6 (JT $38a), see below.
+ *
+ * Unexported routine at file 0x1b42..0x1c88 (main's BSR 0x1b42):
+ * proposed name install_overlay_service_table [STRONG INFERENCE].
+ * Stores JT entry addresses (LEA d16(A5)) into an A5 table, then allocates
+ * the large overlay work buffer:
+ *   A5-0x1122..-0x10a6 (32 slots, step 4; -0x10e6/-0x10e2 not written) and
+ *   A5-0x1310..-0x1304 (4 slots -> segment 6 routines);
+ *   full slot list with targets in docs/OVERLAY_SERVICE_TABLE.md.
+ *   if (FreeMem() > 0x100000) A5-0x1040 = NewPtrClear(0x4e390 = 320400)
+ *   else                      A5-0x1040 = NewPtrClear(0x35cf0 = 220400)
+ *   (JT $232 = ID09 0x20c NewPtrClear glue). No NULL check.
+ * The callback slots A5-0x1092 / -0x104e / -0x1096 / -0x109e / -0x10a2 used by
+ * ID02 lie outside this table: they are presumably filled by the overlay
+ * itself (overlay -> app direction) [STRONG INFERENCE].
+ */
+undefined4 freemem_a5safe /* Original: FUN_00001b14 */ (void)
 
 {
   (**(code **)(DAT_00000904 + 0x212))();
@@ -1112,7 +1241,15 @@ undefined4 FUN_00001b14(void)
 
 
 
-char * FUN_00001c8a(int param_1,char *param_2)
+/*
+ * Original: FUN_00001c8a; source: ID02.c:1115-1150.
+ * Recovered name: format_int_decimal_pstring [STRONG INFERENCE] (iteration 138).
+ * Exported C [complete]: writes |n| in decimal backwards from buf+10, prefixes
+ * '-' for negative n, stores the length byte, returns the Pascal string start.
+ * INT_MIN negation overflow preserved as exported. Caller:
+ * show_caution_alert_with_number.
+ */
+char * format_int_decimal_pstring /* Original: FUN_00001c8a */ (int param_1,char *param_2)
 
 {
   char *pcVar1;
@@ -1154,7 +1291,22 @@ char * FUN_00001c8a(int param_1,char *param_2)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001d48(int param_1,undefined4 param_2)
+/*
+ * Original: FUN_00001d48; source: ID02.c:1157-1174.
+ * Recovered name: show_caution_alert_with_number [STRONG INFERENCE] (iteration 138).
+ * Bytes file 0x1d48..0x1dd2 [PROVEN]; JT $4ba (used by ID08 error paths).
+ * Args: char *msg [8(A6)] (C string, may be 0), word num [$c(A6)].
+ *   c2pstr(msg) (JT $302, ID09 0x416);
+ *   if (num == 0) ParamText(msg, A5-0xd0a, A5-0xd0c, A5-0xd0e) $A98B
+ *   else { s = format_int_decimal_pstring(num, buf);
+ *          if (msg) ParamText(msg, s, A5-0xd06, A5-0xd08)
+ *          else     ParamText(msg, s, A5-0xd02, A5-0xd04) }
+ *     (the A5 words appear to be empty Pascal strings [HYPOTHESIS]);
+ *   FUN_0000442e(0x102) [likely centres ALRT 258, cf. ID05 0x06];
+ *   CautionAlert(258, nil) $A988; p2cstr(msg) (JT $2fa).
+ * Callers: fatal_memory_error_exit (STR# 129[93], 0); ID02.c:1542; ID08 via JT $4ba.
+ */
+void show_caution_alert_with_number /* Original: FUN_00001d48 */ (int param_1,undefined4 param_2)
 
 {
   int unaff_A5;
@@ -1165,7 +1317,7 @@ void FUN_00001d48(int param_1,undefined4 param_2)
                     // WARNING: Bad instruction - Truncating control flow here
     halt_baddata();
   }
-  FUN_00001c8a((int)param_2._0_2_,acStack_e);
+  format_int_decimal_pstring((int)param_2._0_2_,acStack_e);
   if (param_1 != 0) {
                     // WARNING: Bad instruction - Truncating control flow here
     halt_baddata();
@@ -1410,7 +1562,7 @@ void FUN_000027e4(void)
                     // WARNING: Bad instruction - Truncating control flow here
       halt_baddata();
     }
-    FUN_00001d48(*(int *)(unaff_A5 + -0xd76),(uint)uVar8);
+    show_caution_alert_with_number(*(int *)(unaff_A5 + -0xd76),(uint)uVar8);
     FUN_00002192();
     *(short *)(unaff_A5 + -0x137a) = sVar5;
     sVar5 = *(short *)(**(int **)(**(int **)(unaff_A5 + -0x1036) + 0x16) + 0x20);
@@ -1806,7 +1958,8 @@ void poll_and_dispatch_event /* Original: FUN_00002fd4 */ (void)
  *   UnloadSeg(JT $a2  = seg 4 entry)
  *   JSR $21a(A5)(&local_a): seg9 file 0x1bc = MaxMem glue ($A11D): result
  *        discarded, grow size stored to local_a [heap compaction]
- *   BSR file 0x1b42                                  [UNKNOWN helper]
+ *   BSR file 0x1b42  install_overlay_service_table (unexported; see
+ *                    freemem_a5safe header) - fills A5 service table, allocates A5-0x1040
  *   word A5-0x14c4 = 1
  *   ok = JSR $1e2(A5) -> seg 8 file 0x6 = ID08 load_overlay_from_resource
  *   UnloadSeg(JT $1ea = seg 8 entry); UnloadSeg(JT $56a = seg 5 entry)
@@ -1989,7 +2142,28 @@ void do_menu_command /* Original: FUN_000036a2 */ (void)
 
 
 
-undefined8 FUN_000039a8(void)
+/*
+ * Original: FUN_000039a8; source: ID02.c:1768.
+ * Recovered name: vbl_sound_handler_ch0_unrolled [STRONG INFERENCE] (iteration 141).
+ * Exported C kept verbatim (Ghidra cannot model the register-chaining tail).
+ * Interrupt-hook pattern [PROVEN, bytes]: CLR.L -(A7) reserves a return slot;
+ * MOVEM saves D0-D7/A0-A6; A5 is taken from a long stored inside the code
+ * (PC-relative, +0x1c from entry). If that cache is 0 (first call, made by
+ * init_sound_system with the application A5) it stores CurrentA5 ($0904) there
+ * and returns - priming only. Otherwise it writes the saved previous vector
+ * (long A5-0xc36) into the reserved slot, does its work, restores registers
+ * and RTS-chains to the previous handler.
+ * Installed into low-memory $0196 = Lvl1DT[1], the VIA CA1 vertical-blanking
+ * level-1 interrupt vector [STRONG INFERENCE: Lvl1DT at $0192 per Inside
+ * Macintosh; consistent with per-VBL refill of the 370-sample sound buffer].
+ * Self-modifying code: the in-code A5 cache is written at run time.
+ * JT A5+0x41a; selected by init_sound_system(param == 0).
+ * Body: channel 0 node (head long A5-0x7d0): d0 cursor, d1 fraction, a0 buffer,
+ * d4 end; step d2:d3 = A5-0xc32 / A5-0xc2e (32.32 fixed point via ADD/ADDX);
+ * writes samples MOVE.B (A0,D0.L) into every other byte from SoundBase ($0266)
+ * + 4, loop unrolled x8; end-of-buffer handling compares with A5-0xc2a.
+ */
+undefined8 vbl_sound_handler_ch0_unrolled /* Original: FUN_000039a8 */ (void)
 
 {
   int iVar1;
@@ -2089,7 +2263,26 @@ undefined8 FUN_000039a8(void)
 
 
 
-undefined8 FUN_00003aae(void)
+/*
+ * Original: FUN_00003aae; source: ID02.c:1868.
+ * Recovered name: vbl_sound_handler_ch0_variant [STRONG INFERENCE] (iteration 141).
+ * Exported C kept verbatim (Ghidra cannot model the register-chaining tail).
+ * Interrupt-hook pattern [PROVEN, bytes]: CLR.L -(A7) reserves a return slot;
+ * MOVEM saves D0-D7/A0-A6; A5 is taken from a long stored inside the code
+ * (PC-relative, +0x1c from entry). If that cache is 0 (first call, made by
+ * init_sound_system with the application A5) it stores CurrentA5 ($0904) there
+ * and returns - priming only. Otherwise it writes the saved previous vector
+ * (long A5-0xc36) into the reserved slot, does its work, restores registers
+ * and RTS-chains to the previous handler.
+ * Installed into low-memory $0196 = Lvl1DT[1], the VIA CA1 vertical-blanking
+ * level-1 interrupt vector [STRONG INFERENCE: Lvl1DT at $0192 per Inside
+ * Macintosh; consistent with per-VBL refill of the 370-sample sound buffer].
+ * Self-modifying code: the in-code A5 cache is written at run time.
+ * JT A5+0x412; selected by init_sound_system(param != 0).
+ * Body: same channel-0 resampling as vbl_sound_handler_ch0_unrolled with a
+ * shorter (x2) inner loop [exact difference not yet analysed].
+ */
+undefined8 vbl_sound_handler_ch0_variant /* Original: FUN_00003aae */ (void)
 
 {
   int iVar1;
@@ -2211,7 +2404,27 @@ undefined8 FUN_00003aae(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-undefined8 FUN_00003bc4(void)
+/*
+ * Original: FUN_00003bc4; source: ID02.c:1990.
+ * Recovered name: vbl_sound_handler_two_channel [STRONG INFERENCE] (iteration 141).
+ * Exported C kept verbatim (Ghidra cannot model the register-chaining tail).
+ * Interrupt-hook pattern [PROVEN, bytes]: CLR.L -(A7) reserves a return slot;
+ * MOVEM saves D0-D7/A0-A6; A5 is taken from a long stored inside the code
+ * (PC-relative, +0x1c from entry). If that cache is 0 (first call, made by
+ * init_sound_system with the application A5) it stores CurrentA5 ($0904) there
+ * and returns - priming only. Otherwise it writes the saved previous vector
+ * (long A5-0xc36) into the reserved slot, does its work, restores registers
+ * and RTS-chains to the previous handler.
+ * Installed into low-memory $0196 = Lvl1DT[1], the VIA CA1 vertical-blanking
+ * level-1 interrupt vector [STRONG INFERENCE: Lvl1DT at $0192 per Inside
+ * Macintosh; consistent with per-VBL refill of the 370-sample sound buffer].
+ * Self-modifying code: the in-code A5 cache is written at run time.
+ * JT A5+0x422 (A5-0x35c); installed by select_two_channel_sound_handler(1).
+ * Body: mixes channel 1 (record A5-0x598 = A5-0x7d0 + 0x238; a1 buffer) with
+ * channel 0 (a0) into SoundBase; also writes $0196 itself (likely restores
+ * the single-channel handler when channel 1 ends) [HYPOTHESIS].
+ */
+undefined8 vbl_sound_handler_two_channel /* Original: FUN_00003bc4 */ (void)
 
 {
   int iVar1;
@@ -2329,7 +2542,19 @@ undefined8 FUN_00003bc4(void)
 
 
 
-void FUN_00003d36(void)
+/*
+ * Original: FUN_00003d36; source: ID02.c:2108.
+ * Recovered name: clear_sound_buffer_to_silence [STRONG INFERENCE] (iteration 139).
+ * Bytes file 0x3d36..0x3d4e [PROVEN]: MOVEA.L $0266.w,A0 (low-memory SoundBase,
+ * Inside Macintosh); 370 iterations (DBRA from 0x171) of MOVE.B #$80,(A0);
+ * ADDQ.L #2,A0 - writes the unsigned-8-bit midpoint into the high byte of
+ * each word of the 370-word hardware sound buffer.
+ * Ghidra error: it replaced the runtime pointer load with the constant
+ * &DAT_66fa4e75 (bytes from the file, cf. ID09 selector artifact). Exported
+ * expression kept unchanged.
+ * Callers: shutdown_sound, FUN_00003dd0.
+ */
+void clear_sound_buffer_to_silence /* Original: FUN_00003d36 */ (void)
 
 {
   short sVar1;
@@ -2347,8 +2572,21 @@ void FUN_00003d36(void)
 
 
 
+/*
+ * Original: FUN_00003d50; source: ID02.c:2124-2148.
+ * Recovered name: alloc_sound_buffer_node [STRONG INFERENCE] (iteration 140).
+ * Exported C complete; bytes 0x3d50..0x3db6 agree [PROVEN].
+ * Args: ch, buffer ptr, start, end (longs), word repeat/link flag.
+ * Pops a node from channel ch's free list (record A5-0x7d0 + ch*0x238, +4 =
+ * free head; node +0x14 = next) and fills it: +0 = start (cursor), +4 = 0,
+ * +8 = buffer, +0xc = start, +0x10 = end, +0x18 = flag ? node->next : node
+ * (flag 0 makes the node loop on itself) [field roles STRONG INFERENCE].
+ * No empty-list check. Returns the node.
+ * Callers: init_sound_system (2x), silence_sound_channel, and further ID02 sites
+ * (14 call sites renamed in total).
+ */
 undefined4 *
-FUN_00003d50(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5
+alloc_sound_buffer_node /* Original: FUN_00003d50 */ (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5
             )
 
 {
@@ -2375,7 +2613,14 @@ FUN_00003d50(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00003db8(int param_1)
+/*
+ * Original: FUN_00003db8; source: ID02.c:2154-2163.
+ * Recovered name: select_two_channel_sound_handler [STRONG INFERENCE] (iteration 141).
+ * If param == 1: low-memory $0196 (Lvl1DT[1] VBL vector) = A5-0x35c
+ * (vbl_sound_handler_two_channel). Otherwise no change. Bytes 0x3db8..0x3dce
+ * match the C.
+ */
+void select_two_channel_sound_handler /* Original: FUN_00003db8 */ (int param_1)
 
 {
   int unaff_A5;
@@ -2391,7 +2636,27 @@ void FUN_00003db8(int param_1)
 // WARNING: Control flow encountered bad instruction data
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00003dd0(int param_1)
+/*
+ * Original: FUN_00003dd0; source: ID02.c:2170-2230.
+ * Recovered name: init_sound_system [STRONG INFERENCE] (iteration 140).
+ * Exported C kept (truncated at the end); bytes 0x3dd0.. [PROVEN].
+ *   if (sound active A5-0xc38) shutdown_sound();
+ *   for ch in 0..1: record = A5-0x7d0 + ch*0x238; head (+0), free (+4) and
+ *     tail (+0x230) = record+8; 20 nodes of 0x1c bytes from +8, linked via +0x14;
+ *   A5-0xc26[0x456] = 0x80 (1110 bytes = 3 x 370 silent samples);
+ *   clear_sound_buffer_to_silence();
+ *   A5-0xc32 = 1, A5-0xc2e = 0, A5-0xc2a = 0x172 (370);
+ *   alloc_sound_buffer_node(0 and 1, A5-0xc26, 0, 0x172, 0)  (looping silence);
+ *   A5-0x360 = param ? JT A5+0x412 : JT A5+0x41a;  A5-0x35c = JT A5+0x422;
+ *   first time (word A5-0x352 == 0): set it, FUN_00003aae, FUN_000039a8,
+ *     FUN_00003bc4;
+ *   A5-0xc36 = low-memory long $0196 (saved; restored by shutdown_sound);
+ *   $0196 = A5-0x360 (install the selected routine; $0196 = Lvl1DT[1], VBL
+ *   level-1 interrupt vector, identified iteration 141);
+ *   A5-0x356 = 0; ... (rest truncated by Ghidra).
+ * Caller: ID02.c:606 (via a computed stack argument).
+ */
+void init_sound_system /* Original: FUN_00003dd0 */ (int param_1)
 
 {
   undefined4 unaff_D5;
@@ -2404,7 +2669,7 @@ void FUN_00003dd0(int param_1)
   
   uVar5 = (ushort)((uint)unaff_D5 >> 0x10);
   if (*(short *)(unaff_A5 + -0xc38) != 0) {
-    FUN_00004318();
+    shutdown_sound(); /* Original: FUN_00004318 */
   }
   for (iVar2 = 0; iVar2 < 2; iVar2 = iVar2 + 1) {
     iVar3 = iVar2 * 0x238 + unaff_A5 + -0x7c8;
@@ -2423,12 +2688,12 @@ void FUN_00003dd0(int param_1)
     puVar4 = puVar4 + 1;
     sVar1 = sVar1 + -1;
   }
-  FUN_00003d36();
+  clear_sound_buffer_to_silence(); /* Original: FUN_00003d36 */
   *(undefined4 *)(unaff_A5 + -0xc32) = 1;
   *(undefined4 *)(unaff_A5 + -0xc2e) = 0;
   *(undefined4 *)(unaff_A5 + -0xc2a) = 0x172;
-  FUN_00003d50(0,unaff_A5 + -0xc26,0,0x172,(uint)uVar5);
-  FUN_00003d50(1,unaff_A5 + -0xc26,0,0x172,(uint)uVar5);
+  alloc_sound_buffer_node(0,unaff_A5 + -0xc26,0,0x172,(uint)uVar5);
+  alloc_sound_buffer_node(1,unaff_A5 + -0xc26,0,0x172,(uint)uVar5);
   if (param_1 == 0) {
     iVar2 = unaff_A5 + 0x41a;
   }
@@ -2439,9 +2704,9 @@ void FUN_00003dd0(int param_1)
   *(int *)(unaff_A5 + -0x35c) = unaff_A5 + 0x422;
   if (*(short *)(unaff_A5 + -0x352) == 0) {
     *(undefined2 *)(unaff_A5 + -0x352) = 1;
-    FUN_00003aae();
-    FUN_000039a8();
-    FUN_00003bc4();
+    vbl_sound_handler_ch0_variant();
+    vbl_sound_handler_ch0_unrolled();
+    vbl_sound_handler_two_channel();
   }
   *(undefined4 *)(unaff_A5 + -0xc36) = _FUN_00000196;
   _FUN_00000196 = *(undefined4 *)(unaff_A5 + -0x360);
@@ -2470,15 +2735,15 @@ FUN_00003f54(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
   }
   else {
     if (param_5 < param_6) {
-      local_8 = FUN_00003d50(param_1,param_2,param_3,param_5,CONCAT22(1,uVar3));
-      FUN_00003d50(param_1,param_2,param_5,param_6,(uint)uVar3);
-      FUN_00003d50(param_1,param_2,param_6,param_4,CONCAT22(1,uVar3));
+      local_8 = alloc_sound_buffer_node(param_1,param_2,param_3,param_5,CONCAT22(1,uVar3));
+      alloc_sound_buffer_node(param_1,param_2,param_5,param_6,(uint)uVar3);
+      alloc_sound_buffer_node(param_1,param_2,param_6,param_4,CONCAT22(1,uVar3));
     }
     else {
-      local_8 = FUN_00003d50(param_1,param_2,param_3,param_4,CONCAT22(1,uVar3));
-      FUN_00003d50(param_1,iVar1 + -0xc26,0,0x172,(uint)uVar3);
+      local_8 = alloc_sound_buffer_node(param_1,param_2,param_3,param_4,CONCAT22(1,uVar3));
+      alloc_sound_buffer_node(param_1,iVar1 + -0xc26,0,0x172,(uint)uVar3);
     }
-    FUN_00003db8(param_1);
+    select_two_channel_sound_handler(param_1);
     *(undefined4 **)(param_1 * 0x238 + iVar1 + -2000) = local_8;
     uVar2 = 1;
   }
@@ -2504,15 +2769,15 @@ FUN_00004050(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
   }
   else {
     if (param_5 < param_6) {
-      FUN_00003d50(param_1,param_2,param_3,param_5,CONCAT22(1,uVar3));
-      FUN_00003d50(param_1,param_2,param_5,param_6,(uint)uVar3);
-      FUN_00003d50(param_1,param_2,param_6,param_4,CONCAT22(1,uVar3));
+      alloc_sound_buffer_node(param_1,param_2,param_3,param_5,CONCAT22(1,uVar3));
+      alloc_sound_buffer_node(param_1,param_2,param_5,param_6,(uint)uVar3);
+      alloc_sound_buffer_node(param_1,param_2,param_6,param_4,CONCAT22(1,uVar3));
     }
     else {
-      FUN_00003d50(param_1,param_2,param_3,param_4,CONCAT22(1,uVar3));
-      FUN_00003d50(param_1,iVar1 + -0xc26,0,0x172,(uint)uVar3);
+      alloc_sound_buffer_node(param_1,param_2,param_3,param_4,CONCAT22(1,uVar3));
+      alloc_sound_buffer_node(param_1,iVar1 + -0xc26,0,0x172,(uint)uVar3);
     }
-    FUN_00003db8(param_1);
+    select_two_channel_sound_handler(param_1);
     uVar2 = 1;
   }
   return uVar2;
@@ -2552,7 +2817,7 @@ void FUN_000041a6(int param_1)
   
   iVar1 = DAT_00000904;
   if (((*(short *)(DAT_00000904 + -0xc38) != 0) && (-1 < param_1)) && (param_1 < 2)) {
-    puVar2 = FUN_00003d50(param_1,DAT_00000904 + -0xc26,0,0x172,unaff_A3 >> 0x10);
+    puVar2 = alloc_sound_buffer_node(param_1,DAT_00000904 + -0xc26,0,0x172,unaff_A3 >> 0x10);
     *(undefined4 *)(param_1 * 0x238 + iVar1 + -0x7cc) = puVar2[5];
     for (puVar3 = *(undefined4 **)(param_1 * 0x238 + iVar1 + -2000); puVar3 != puVar2;
         puVar3 = (undefined4 *)puVar3[5]) {
@@ -2564,7 +2829,17 @@ void FUN_000041a6(int param_1)
 
 
 
-void FUN_00004242(int param_1)
+/*
+ * Original: FUN_00004242; source: ID02.c:2343.
+ * Recovered name: silence_sound_channel [STRONG INFERENCE] (iteration 139).
+ * Bytes file 0x4242..0x42ae match the C [PROVEN]: CurrentA5 thunk; if (sound
+ * active word A5-0xc38 && 0 <= ch < 2) channel_record[ch] (0x238 bytes each at
+ * A5-0x7d0) +0 = FUN_00003d50(ch, A5-0xc26, 0, 0x172, 0) - queues a 370-sample
+ * buffer from A5-0xc26 (silence [HYPOTHESIS]). Ghidra's unaff_A4 argument is
+ * the word 0 pushed by CLR.W (artifact). shutdown_sound also passes ch = 2,
+ * which the bounds check ignores. Service slot A5-0x10ca (JT $432).
+ */
+void silence_sound_channel /* Original: FUN_00004242 */ (int param_1)
 
 {
   int iVar1;
@@ -2573,7 +2848,7 @@ void FUN_00004242(int param_1)
   
   iVar1 = DAT_00000904;
   if (((*(short *)(DAT_00000904 + -0xc38) != 0) && (-1 < param_1)) && (param_1 < 2)) {
-    puVar2 = FUN_00003d50(param_1,DAT_00000904 + -0xc26,0,0x172,unaff_A4 >> 0x10);
+    puVar2 = alloc_sound_buffer_node(param_1,DAT_00000904 + -0xc26,0,0x172,unaff_A4 >> 0x10);
     *(undefined4 **)(param_1 * 0x238 + iVar1 + -2000) = puVar2;
   }
   return;
@@ -2602,17 +2877,28 @@ undefined4 FUN_000042b0(int param_1)
 // WARNING: Control flow encountered bad instruction data
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00004318(void)
+/*
+ * Original: FUN_00004318; source: ID02.c:2381-2394.
+ * Recovered name: shutdown_sound [STRONG INFERENCE] (iteration 138).
+ * Bytes file 0x4318..0x435c [PROVEN]: if (word A5-0xc38 sound active) {
+ *   silence_sound_channel(0/1/2) (FUN_00004242) [service slot -0x10ca;
+ *   per-channel stop, HYPOTHESIS]; long low-memory $0196 = A5-0xc36 (restore
+ *   a saved value; Ghidra: _FUN_00000196); clear_sound_buffer_to_silence() (FUN_00003d36);
+ *   SndDisposeChannel(A5-0x356, true) ($A801; result discarded); A5-0xc38 = 0 }.
+ * Callers: fatal_memory_error_exit, ID02.c:2537. Low-memory $0196 = Lvl1DT[1]
+ * (VBL interrupt vector) restored to the pre-game handler.
+ */
+void shutdown_sound /* Original: FUN_00004318 */ (void)
 
 {
   int unaff_A5;
   
   if (*(short *)(unaff_A5 + -0xc38) != 0) {
-    FUN_00004242(0);
-    FUN_00004242(1);
-    FUN_00004242(2);
+    silence_sound_channel( /* Original: FUN_00004242 */ 0);
+    silence_sound_channel( /* Original: FUN_00004242 */ 1);
+    silence_sound_channel( /* Original: FUN_00004242 */ 2);
     _FUN_00000196 = *(undefined4 *)(unaff_A5 + -0xc36);
-    FUN_00003d36();
+    clear_sound_buffer_to_silence(); /* Original: FUN_00003d36 */
                     // WARNING: Bad instruction - Truncating control flow here
     halt_baddata();
   }
@@ -2710,7 +2996,7 @@ void FUN_0000462c(void)
  * Recovered name: rebuild_all_palette_index_maps [STRONG INFERENCE] (iteration 131).
  * Bytes file 0x46b4..0x4736 match the C [PROVEN]: clears collision flag
  * A5-0x102a; B&W (A5-0x137a == 1) -> FUN_00004b62(); else if depth word
- * A5-0x2cc != 0: if long A5-0x103a, FUN_00000d24(A5-0x103a) and clear it;
+ * A5-0x2cc != 0: if long A5-0x103a, close_and_dispose_port(A5-0x103a) and clear it;
  * for slot 1..3 used: build_palette_index_map(slot, &start, slot.stored (+4),
  * scratch -$204(A6)). Ghidra's CONCAT22 call lost the last three arguments.
  * Called from the stub at file 0x4d24 (with 0x462c and callback A5-0x10a2).
@@ -2728,7 +3014,7 @@ void rebuild_all_palette_index_maps /* Original: FUN_000046b4 */ (void)
   }
   else if (*(short *)(unaff_A5 + -0x2cc) != 0) {
     if (*(int *)(unaff_A5 + -0x103a) != 0) {
-      FUN_00000d24();
+      close_and_dispose_port(); /* Original: FUN_00000d24 */
       *(undefined4 *)(unaff_A5 + -0x103a) = 0;
     }
     for (local_6 = 1; local_6 < 4; local_6 = local_6 + 1) {
@@ -2845,7 +3131,22 @@ undefined4 build_palette_index_map /* Original: FUN_000048ae */ (undefined4 para
 
 
 
-undefined4 FUN_000049fe(undefined4 param_1,undefined4 param_2)
+/*
+ * Original: FUN_000049fe; source: ID02.c:2561-2632.
+ * Recovered name: lookup_palette_index_for_rgb_level [STRONG INFERENCE] (iteration 132).
+ * Status: RENAMED. Exported C kept verbatim (bytes file 0x49fe.. agree for the
+ * scaling prologue). Args: three words r, g, b at 8/$a/$c(A6) (Ghidra packs
+ * them as param_1 hi/lo and param_2 hi).
+ * Each level is scaled: v = level << 6, 0x100 clamped to 0xff, then << 8
+ * (16-bit RGB component; levels 0..4 -> 0x0000, 0x4000, 0x8000, 0xc000, 0xff00).
+ * Search 1: 8 RGBColor entries at A5-0x350 (6 bytes each) -> index 0..7.
+ * Search 2: table *(long A5-0x14a6), count word A5-0x14a2 -> index 8 + n.
+ * Not found: -1. Result by mode word A5-0x137a: 1 or 4 -> index;
+ * 8 -> index + 200 (the 0xc8+ palette entries set by configure_palette_entries);
+ * other modes return the leftover register value (preserved, UNKNOWN).
+ * Callers: FUN_00004b62 (9 calls; not decompiled by Ghidra, see note below it).
+ */
+undefined4 lookup_palette_index_for_rgb_level /* Original: FUN_000049fe */ (undefined4 param_1,undefined4 param_2)
 
 {
   short sVar1;
@@ -2920,6 +3221,18 @@ undefined4 FUN_000049fe(undefined4 param_1,undefined4 param_2)
 }
 
 
+/*
+ * FUN_00004b62 (iteration 132): proposed name init_standard_colour_indices
+ * [STRONG INFERENCE]. Not decompiled by Ghidra, not in the inventory; no C
+ * body. Bytes file 0x4b62..0x4c16 [PROVEN]: nine calls
+ * lookup_palette_index_for_rgb_level(l, l, l) storing the word result:
+ *   (3,3,3) -> A5-0x11ae   (0,0,0) -> A5-0x11ac   (0,0,0) -> A5-0x118c
+ *   (3,3,3) -> A5-0x1188   (2,2,2) -> A5-0x118a   (3,3,3) -> A5-0x117c
+ *   (0,0,0) -> A5-0x117e   (3,3,3) -> A5-0x11fa   (1,1,1) -> A5-0x11f8
+ * i.e. grey levels 0xc000 / black / 0x8000 / 0x4000 resolved to palette indices
+ * for UI drawing. Callers: rebuild_all_palette_index_maps and
+ * check_device_color_state_changed (B&W / mode-1 path).
+ */
 /*
 Unable to decompile 'FUN_00004b62'
 Cause: 

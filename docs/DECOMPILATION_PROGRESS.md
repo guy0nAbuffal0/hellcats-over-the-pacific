@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 131
+**Last iteration:** 141
 **Last iteration date:** 2026-10-16
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,7 +11,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 112 | 0 | 0 | 13 | 0 | 0 |
+| ID02.c | 125 | 89 | 0 | 0 | 36 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **577** | **0** | **0** | **153** | **0** | **6** |
+| **TOTAL** | **736** | **554** | **0** | **0** | **176** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 577 NOT_STARTED + 6 BLOCKED (iteration 131);
-153 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 554 NOT_STARTED + 6 BLOCKED (iteration 141);
+176 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -193,6 +193,29 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_000046b4` (ID02) | `rebuild_all_palette_index_maps` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2484-2506` | `ID02.decomp.c` | build_palette_index_map; FUN_00004b62; FUN_00000d24 | A5−0x103a role | 131 (2026-10-16) | C matches bytes; token diff = renames |
 | `FUN_00004738` (ID02) | `configure_palette_entries` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2520-2532` | `ID02.decomp.c` | SetEntryUsage/SetEntryColor; palettes A5−0x14ae/−0x14aa; RGB tables A5−0x350/−0x320/−0x302 | Callers | 131 (2026-10-16) | Capstone (Ghidra truncated) |
 | `FUN_0000488a` (ID02) | `clear_ctab_size_callback` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2536-2545` | `ID02.decomp.c` | CurrentA5 $904; A5−0x14b2 block | +6 field meaning | 131 (2026-10-16) | Bytes match C |
+| `FUN_000049fe` (ID02) | `lookup_palette_index_for_rgb_level` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2561-2632` | `ID02.decomp.c` | RGB tables A5−0x350 / *(A5−0x14a6)[A5−0x14a2]; mode A5−0x137a | Behaviour for modes ≠ 1/4/8 | 132 (2026-10-16) | C + prologue bytes; token diff = renames |
+| `FUN_00000d24` (ID02) | `close_and_dispose_port` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:697-704` | `ID02.decomp.c` (+1 call site) | ClosePort $A87D; ID09 DisposPtr glue | — | 133 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00000d3a` (ID02) | `blit_offscreen_frame_to_window` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:708-741` | `ID02.decomp.c` | CurrentA5; FUN_00000ca6; CopyBits; rects A5−0x14f2/−0x14ea; JT $322 | Who receives LEA $322(A5) at ID02 0x1b6a; mode 2/3 meaning | 134 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00001b14` (ID02) | `freemem_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1106-1111` | `ID02.decomp.c` (header also documents unexported 0x1b42 table installer) | CurrentA5; ID09 FreeMem glue | Ghidra return-value error noted | 135 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00001a04` (ID02) | `dispose_handle_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | CurrentA5; ID09 DisposHandle glue | — | 136 (2026-10-16) | Capstone + JT; token diff = renames |
+| `FUN_00001a28` (ID02) | `realloc_and_clear_handle_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | CurrentA5; ID09 ReallocHandle/MemError/HLock/clear/HUnlock glue | — | 136 (2026-10-16) | Capstone + JT; token diff = renames |
+| `FUN_00001a84` (ID02) | `hlock_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | CurrentA5; ID09 HLock glue | — | 136 (2026-10-16) | Capstone + JT; token diff = renames |
+| `FUN_00001aa8` (ID02) | `hunlock_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | CurrentA5; ID09 HUnlock glue | — | 136 (2026-10-16) | Capstone + JT; token diff = renames |
+| `FUN_00001acc` (ID02) | `hpurge_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | CurrentA5; ID09 HPurge glue | — | 136 (2026-10-16) | Capstone + JT; token diff = renames |
+| `FUN_00001af0` (ID02) | `hnopurge_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | CurrentA5; ID09 HNoPurge glue | — | 136 (2026-10-16) | Capstone + JT; token diff = renames |
+| `FUN_000019a2` (ID02) | `new_handle_clear_or_die_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:994-1008` | `ID02.decomp.c` | NewHandleClear; MemError; fatal_memory_error_exit | Ghidra return error noted | 137 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_000019e2` (ID02) | `fatal_memory_error_exit` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1014-1031` | `ID02.decomp.c` (+2 call sites) | DisposPtr overlay; FUN_00004318; FUN_00001d48(str 93); ExitToShell | FUN_00004318 / FUN_00001d48 roles | 137 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00001d48` (ID02) | `show_caution_alert_with_number` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1157-1174` | `ID02.decomp.c` (+2 call sites) | c2pstr/p2cstr; ParamText; FUN_0000442e; CautionAlert 258; JT $4ba | A5 empty-string words; FUN_0000442e | 138 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00001c8a` (ID02) | `format_int_decimal_pstring` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1115-1150` | `ID02.decomp.c` (+1 call site) | — | — | 138 (2026-10-16) | C complete |
+| `FUN_00004318` (ID02) | `shutdown_sound` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2381-2394` | `ID02.decomp.c` (+2 call sites) | FUN_00004242 ×3; low-mem $0196; FUN_00003d36; SndDisposeChannel | $0196 identity | 138 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00004242` (ID02) | `silence_sound_channel` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2343` | `ID02.decomp.c` (+3 calls) | FUN_00003d50; channel records A5−0x7d0 (0x238 each); A5−0xc26 | Buffer content at A5−0xc26 | 139 (2026-10-16) | Bytes match C |
+| `FUN_00003d36` (ID02) | `clear_sound_buffer_to_silence` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2108` | `ID02.decomp.c` (+2 calls) | low-mem SoundBase $0266 | — | 139 (2026-10-16) | Capstone; Ghidra constant error noted |
+| `FUN_00003d50` (ID02) | `alloc_sound_buffer_node` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2124-2148` | `ID02.decomp.c` (14 call sites) | channel free list (+4), node 0x1c bytes | Node field semantics | 140 (2026-10-16) | C + bytes; token diff = renames |
+| `FUN_00003dd0` (ID02) | `init_sound_system` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2170-2230` | `ID02.decomp.c` (+1 call) | channel records; silence buffer; JT 0x412/0x41a/0x422; low-mem $0196; FUN_00003aae/39a8/3bc4 | $0196 vector identity; truncated tail | 140 (2026-10-16) | C + bytes |
+| `FUN_000039a8` (ID02) | `vbl_sound_handler_ch0_unrolled` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1768` | `ID02.decomp.c` | JT 0x41a; ch0 resample ×8; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
+| `FUN_00003aae` (ID02) | `vbl_sound_handler_ch0_variant` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1868` | `ID02.decomp.c` | JT 0x412; ch0 resample ×2; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
+| `FUN_00003bc4` (ID02) | `vbl_sound_handler_two_channel` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1990` | `ID02.decomp.c` | JT 0x422; ch0+ch1 mix; writes $0196; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
+| `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2154` | `ID02.decomp.c` | $0196 = A5−0x35c if arg == 1; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1118,8 +1141,134 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   clear_ctab_size_callback (CurrentA5-safe; installed via JT 0x46a).
 - Validation: token diff = renames only; protected hashes OK.
 
-**Next iteration target:** `ID02.c` / `FUN_00004b62` (B&W path used by both
-rebuild_all_palette_index_maps and check_device_color_state_changed).
+### Iteration 132 — 2026-10-16
+
+- Working tree was clean at start: the user committed iterations 101-131
+  (HEAD e92a20d). Verified 32 protected hashes; edits intact.
+- `FUN_000049fe` = RGB grey-level (0..4) → palette index lookup in base table
+  A5−0x350 then extended table *(A5−0x14a6); +200 in 8-bit mode. Renamed
+  `lookup_palette_index_for_rgb_level`.
+- `FUN_00004b62` (Ghidra "Unable to decompile", not inventoried) documented
+  from bytes as init_standard_colour_indices: nine grey/black lookups stored to
+  A5−0x11ae, −0x11ac, −0x118c, −0x1188, −0x118a, −0x117c, −0x117e, −0x11fa, −0x11f8.
+- QA: an edit briefly dropped a quote from Ghidra's original comment line;
+  restored, and a check confirms every original WARNING / "Unable to
+  decompile" line is present verbatim.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 133 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iteration 132 preserved.
+- `FUN_00000d24` = ClosePort($A87D) + DisposPtr (JT $23a → ID09 0x218);
+  renamed `close_and_dispose_port` with its call site. A5−0x103a therefore
+  holds a pointer-allocated GrafPort.
+- Noted `FUN_00000d3a` (CurrentA5-safe; builds a port when A5−0x103a == 0,
+  rowBytes = ((width*depth + 15) >> 4) * 2) as next target.
+- Validation: token diff = renames only; Ghidra comment lines intact; hashes OK.
+
+### Iteration 134 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-133 preserved.
+- `FUN_00000d3a` = blit a pixel buffer to the main window: lazily creates the
+  offscreen port A5−0x103a via FUN_00000ca6 (rowBytes from width × depth,
+  0x8000 PixMap flag), sets its baseAddr to the argument, computes src/dst
+  rects (mode 2/3 shift by ∓A5−0x137e), then ForeColor black, BackColor
+  white, CopyBits srcCopy. CurrentA5-safe. Renamed
+  `blit_offscreen_frame_to_window`.
+- References: JT $322; ID06 0xf18 JSR; ID02 0x1b6a LEA $322(A5) — address
+  taken, candidate for the indirect overlay-callback installation (iteration 117).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 135 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-134 preserved.
+- ID02 0x1b42 (unexported; main's helper) installs the overlay service table:
+  34 JT entry addresses into A5−0x1122..−0x10a6 and A5−0x1310..−0x1304
+  (incl. blit_offscreen_frame_to_window and several CurrentA5
+  thunks), then allocates the overlay work buffer A5−0x1040 (320400 or
+  220400 bytes by FreeMem). Wrote `docs/OVERLAY_SERVICE_TABLE.md` (generated
+  from bytes + JT resolution). The A5−0x1092/−0x104e/−0x1096/−0x109e/−0x10a2
+  callbacks are outside this table → overlay-written.
+- Renamed `FUN_00001b14` → `freemem_a5safe` (Ghidra "return 0" is a
+  decompiler error; kept). main's header updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 136 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-135 preserved.
+- Renamed six CurrentA5 service thunks (slots −0x10be..−0x10aa) by their ID09
+  glue targets: dispose_handle / realloc_and_clear_handle / hlock / hunlock /
+  hpurge / hnopurge `_a5safe`. realloc_and_clear_handle: ReallocHandle,
+  MemError ($0220) → FUN_000019e2, HLock, FUN_000002b0(*h, 0, size), HUnlock;
+  Ghidra dropped the MemError value (dead-looking branch) - noted, kept.
+- OVERLAY_SERVICE_TABLE.md names updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 137 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-136 preserved.
+- `FUN_000019a2` = NewHandleClear(size) + MemError → fatal; returns handle
+  (Ghidra return value wrong). Renamed `new_handle_clear_or_die_a5safe`.
+- `FUN_000019e2` = fatal out-of-memory exit: dispose overlay image,
+  FUN_00004318, FUN_00001d48(STR# 129 string 93 at A5−0xdd2, 0), ExitToShell.
+  Renamed `fatal_memory_error_exit` (+2 call sites).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 138 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-137 preserved.
+- Renamed `FUN_00001d48` → show_caution_alert_with_number (ParamText +
+  CautionAlert 258; JT $4ba for ID08 errors), `FUN_00001c8a` →
+  format_int_decimal_pstring, `FUN_00004318` → shutdown_sound (3× FUN_00004242,
+  restore low-mem $0196, FUN_00003d36, SndDisposeChannel). 5 call sites renamed.
+- Correction: ID05 run_protection_dialog header labelled $A985 as StopAlert;
+  $A985 is _Alert ($A986 StopAlert, $A987 NoteAlert, $A988 CautionAlert).
+  Fixed in ID05.decomp.c with a dated note.
+- QA: first scripted pass aborted on an assertion (substring overlap) before
+  writing ID02; re-run cleanly. Token diffs = renames only; Ghidra comment
+  lines intact in ID02/ID05; hashes OK.
+
+### Iteration 139 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-138 preserved.
+- `FUN_00003d36` = clear_sound_buffer_to_silence: 0x80 into the 370-word
+  hardware buffer at low-memory SoundBase ($0266). Ghidra replaced the pointer
+  load with constant &DAT_66fa4e75 (decompiler error; expression kept).
+- `FUN_00004242` = silence_sound_channel(ch 0..1): queue 370 samples from
+  A5−0xc26 via FUN_00003d50 into channel record A5−0x7d0 + ch*0x238.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 140 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-139 preserved.
+- `FUN_00003d50` = alloc_sound_buffer_node (pop from channel free list,
+  fill {cursor, 0, buffer, start, end, next, continuation}); 14 call sites.
+- `FUN_00003dd0` = init_sound_system (two 0x238-byte channel records with
+  20 × 0x1c nodes, 1110-byte silence buffer, looping silence on both
+  channels, routine pointers A5−0x360/−0x35c, one-time FUN_00003aae/39a8/3bc4,
+  saves and replaces low-memory vector $0196).
+- `FUN_00003db8` (if arg == 1, $0196 = A5−0x35c) left unnamed pending the
+  $0196 identity.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 141 — 2026-10-16
+
+- Verified 32 protected hashes; uncommitted iterations 132-140 preserved.
+- Low-memory $0196 = Lvl1DT[1] (VIA CA1 vertical-blanking level-1 interrupt
+  vector; Lvl1DT at $0192 per Inside Macintosh) [STRONG INFERENCE]. The game
+  replaces it with its own sound-refill handler and restores it in shutdown_sound.
+- Decoded the three handlers (JT 0x412/0x41a/0x422 → ID02 0x3aae/0x39a8/
+  0x3bc4): reserved return slot + full register save, in-code A5 cache primed
+  by a first call from init_sound_system (self-modifying), then RTS-chain to
+  the previous vector; bodies resample channel 0 (and channel 1 for 0x3bc4)
+  with a 32.32 step into SoundBase. Renamed vbl_sound_handler_ch0_unrolled /
+  _ch0_variant / _two_channel, and FUN_00003db8 →
+  select_two_channel_sound_handler.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** write `docs/SOUND_SYSTEM.md` (channel records, node
+layout, silence buffer, VBL hook chain, shutdown) from iterations 138-141, then
+continue ID02 with callers of alloc_sound_buffer_node (play-sample API).
 
 ## Resuming the five-minute workflow
 
