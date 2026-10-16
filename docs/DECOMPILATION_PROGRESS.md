@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 151
+**Last iteration:** 153
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,16 +11,16 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 66 | 0 | 0 | 59 | 0 | 0 |
+| ID02.c | 125 | 65 | 0 | 0 | 60 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
-| ID06.c | 24 | 24 | 0 | 0 | 0 | 0 | 0 |
+| ID06.c | 24 | 19 | 0 | 0 | 5 | 0 | 0 |
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **531** | **0** | **0** | **199** | **0** | **6** |
+| **TOTAL** | **736** | **525** | **0** | **0** | **205** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 531 NOT_STARTED + 6 BLOCKED (iteration 151);
-199 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 525 NOT_STARTED + 6 BLOCKED (iteration 153);
+205 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -44,7 +44,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `ID03.c` | `ID03.decomp.c` | seeded (copy) |
 | `ID04.c` | `ID04.decomp.c` | seeded (copy) |
 | `ID05.c` | `ID05.decomp.c` | seeded + iter 118 (all 24 functions renamed, iterations 118-125) |
-| `ID06.c` | `ID06.decomp.c` | seeded (copy) |
+| `ID06.c` | `ID06.decomp.c` | seeded + iter 153 (raster target / row table / edge pool) |
 | `ID07.c` | `ID07.decomp.c` | seeded + iter 109-110 (both functions renamed) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
 | `ID09.c` | `ID09.decomp.c` | preserved + iterations 100-104 helper and initializer annotations |
@@ -239,6 +239,12 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_000014e6` (ID02) | `swap_mmu_mode_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:856` | `ID02.decomp.c` | ID09 swapmmumode_glue on A5−0x1000; slot −0x10c6 | — | 150 (2026-10-17) | C + bytes |
 | `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | ID02 | RENAMED | STRONG INFERENCE mechanics / UNKNOWN purpose | `ID02.c:830` | `ID02.decomp.c` | build_notched_frame_poly ×2 (rect A5−0x119c); grey indices; slot −0x10ea | Shape meaning | 151 (2026-10-17) | Capstone |
 | `FUN_000010ce` (ID02) | `build_notched_frame_poly` | ID02 | RENAMED | STRONG INFERENCE mechanics | `ID02.c:819` | `ID02.decomp.c` | OpenPoly; pnSize; Line/LineTo | Tail not fully listed | 151 (2026-10-17) | Capstone |
+| `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | ID02 | RENAMED | STRONG INFERENCE mechanics / HYPOTHESIS purpose | `ID02.c:841` | `ID02.decomp.c` | FillRect QD patterns; TextFace/CharWidth/DrawString/DrawText; GetPen/Move columns A5−0x14d2/−0x14d0/−0x14ce; slot −0x110e | Arg layout | 152 (2026-10-17) | Condensed Capstone reading |
+| `FUN_000007b0` (ID06) | `init_raster_target` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:494` | `ID06.decomp.c` | target record A5−0x1cce; centre A5−0x1cca/−0x1cc8 | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000598` (ID06) | `alloc_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:405` | `ID06.decomp.c` | A5−0x1cd2 + n×12 row entries | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000666` (ID06) | `init_edge_pool` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:443` | `ID06.decomp.c` | A5−0x1cd6 0x5e9c pool, sentinels | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000512` (ID06) | `free_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:382` | `ID06.decomp.c` | frees A5−0x1cd2 buffers | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
+| `FUN_0000087a` (ID06) | `set_raster_target_base` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:541` | `ID06.decomp.c` | target +0 = base | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1401,7 +1407,31 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   INVESTIGATING count back to 0.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID02 `FUN_00001308` (slot −0x110e).
+### Iteration 152 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 148-151); 32
+  protected hashes verified.
+- `FUN_00001308` = draw_text_in_columns_a5safe (FillRect with QD black/white
+  patterns, TextFace/CharWidth, DrawString segments aligned with GetPen/Move to
+  column origins A5−0x14d2/−0x14d0/−0x14ce; DrawText path when arg $18 == 0).
+  Identified QD globals: white A5−0x1614, black A5−0x161c (below thePort
+  A5−0x160c).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 153 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 152 preserved.
+- ID06 identified as a self-contained rasterizer module with three A5
+  structures: target record A5−0x1cce (base, width +8, height +0xa; centre
+  A5−0x1cca/−0x1cc8), row table A5−0x1cd2 (one 12-byte entry per row),
+  node pool A5−0x1cd6 (0x5e9c bytes, two linked sentinels).
+- Renamed the set-up functions first (needed to read the service entries):
+  init_raster_target, alloc_row_table, init_edge_pool, free_row_table,
+  set_raster_target_base (+5 call sites). ID06.decomp.c was an unmodified seed.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID06 service functions `FUN_000008a2` (−0x1304),
+`FUN_0000096e` (−0x1310), `FUN_000009d8` (−0x130c), `FUN_00000e10` (−0x1308).
 
 ## Resuming the five-minute workflow
 

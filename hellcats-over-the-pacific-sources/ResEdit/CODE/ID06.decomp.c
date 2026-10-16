@@ -379,7 +379,14 @@ void FUN_00000318(undefined4 param_1,uint *param_2,int param_3)
 
 
 
-void FUN_00000512(void)
+/*
+ * Original: FUN_00000512; source: ID06.c:382.
+ * Recovered name: free_row_table [STRONG INFERENCE] (iteration 153).
+ * Exported C complete. Frees (FUN_0000024c) the row-entry array (+4), the
+ * buffers at +0x1c and +0x20, then the 0x24-byte row-table record at
+ * long A5-0x1cd2, and clears A5-0x1cd2.
+ */
+void free_row_table /* Original: FUN_00000512 */ (void)
 
 {
   int unaff_A5;
@@ -402,7 +409,17 @@ void FUN_00000512(void)
 
 
 
-undefined4 FUN_00000598(undefined4 param_1)
+/*
+ * Original: FUN_00000598; source: ID06.c:405.
+ * Recovered name: alloc_row_table [STRONG INFERENCE] (iteration 153).
+ * Exported C complete. Requires the target record (A5-0x1cce). n = low word of
+ * param_1 (the target height when called from init_raster_target). If an
+ * existing table has fewer than n entries (+0xe), it is freed; otherwise
+ * reused. Allocates (FUN_000001dc) the 0x24-byte record -> A5-0x1cd2 and
+ * n * 12 bytes of entries -> record+4, clears every entry, then returns
+ * FUN_0000026c(param_1). One 12-byte entry per raster row [STRONG INFERENCE].
+ */
+undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
 
 {
   uint uVar1;
@@ -415,7 +432,7 @@ undefined4 FUN_00000598(undefined4 param_1)
   }
   if ((*(int *)(unaff_A5 + -0x1cd2) != 0) &&
      (*(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe) < param_1._2_2_)) {
-    FUN_00000512();
+    free_row_table();
   }
   if (*(int *)(unaff_A5 + -0x1cd2) == 0) {
     uVar1 = FUN_000001dc(0x24);
@@ -440,7 +457,18 @@ undefined4 FUN_00000598(undefined4 param_1)
 
 
 
-undefined4 FUN_00000666(void)
+/*
+ * Original: FUN_00000666; source: ID06.c:443.
+ * Recovered name: init_edge_pool [STRONG INFERENCE] (iteration 153).
+ * Exported C complete. Requires A5-0x1cd2. Allocates once a 0x5e9c-byte block
+ * -> A5-0x1cd6; head sentinel +0x898 -> block+0x8ac, tail sentinel +0x89c ->
+ * block+0x5e74, linked to each other through +0x10 / +0x14; sentinel fields
+ * +0x1c/+0x1e = row-table word +8, +0x22 = -10; tail +0 = target word +8 <<
+ * (row-table +0x10 + row-table word +0xa); block+0 = head; free cursor
+ * +0x8a0 = +0x8a4 = block+0x8d4; +0x8a8 = block+0x5b7c. Returns 1.
+ * [HYPOTHESIS] Edge / span node pool for the rasterizer.
+ */
+undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
 
 {
   undefined4 uVar1;
@@ -491,7 +519,17 @@ undefined4 FUN_00000666(void)
 
 
 
-undefined4 FUN_000007b0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/*
+ * Original: FUN_000007b0; source: ID06.c:494.
+ * Recovered name: init_raster_target [STRONG INFERENCE] (iteration 153).
+ * Exported C complete. If FUN_000000b0() != 0: allocate (once) the 16-byte
+ * target record -> A5-0x1cce: +0 = param_1 (pixel base), +4 = param_2 high
+ * word, +6 = 1, +8 = param_3 high word (width), +0xa = param_3 low word
+ * (height), +0xc = FUN_000000f4(); alloc_row_table(param_2 low, height);
+ * init_edge_pool(); A5-0x1cca = width >> 1, A5-0x1cc8 = height >> 1 (centre).
+ * Returns 1 on success, 0 on any failure.
+ */
+undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 uVar1;
@@ -517,12 +555,12 @@ undefined4 FUN_000007b0(undefined4 param_1,undefined4 param_2,undefined4 param_3
     *(short *)(*(int *)(unaff_A5 + -0x1cce) + 10) = param_3._2_2_;
     uVar1 = FUN_000000f4();
     *(undefined4 *)(*(int *)(unaff_A5 + -0x1cce) + 0xc) = uVar1;
-    uVar1 = FUN_00000598(CONCAT22(param_2._2_2_,param_3._2_2_));
+    uVar1 = alloc_row_table(CONCAT22(param_2._2_2_,param_3._2_2_));
     if ((short)uVar1 == 0) {
       uVar1 = 0;
     }
     else {
-      uVar1 = FUN_00000666();
+      uVar1 = init_edge_pool();
       if ((short)uVar1 == 0) {
         uVar1 = 0;
       }
@@ -538,7 +576,13 @@ undefined4 FUN_000007b0(undefined4 param_1,undefined4 param_2,undefined4 param_3
 
 
 
-void FUN_0000087a(undefined4 param_1)
+/*
+ * Original: FUN_0000087a; source: ID06.c:541.
+ * Recovered name: set_raster_target_base [STRONG INFERENCE] (iteration 153).
+ * Exported C complete: if target record exists, its +0 (pixel base) =
+ * param_1. Used to retarget rendering to another buffer [STRONG INFERENCE].
+ */
+void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -591,12 +635,12 @@ undefined4 FUN_00000942(undefined4 param_1)
   undefined4 uVar1;
   int unaff_A5;
   
-  uVar1 = FUN_00000598(CONCAT22(param_1._0_2_,*(undefined2 *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe)));
+  uVar1 = alloc_row_table(CONCAT22(param_1._0_2_,*(undefined2 *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe)));
   if ((short)uVar1 == 0) {
     uVar1 = 0;
   }
   else {
-    uVar1 = FUN_00000666();
+    uVar1 = init_edge_pool();
     if ((short)uVar1 == 0) {
       uVar1 = 0;
     }

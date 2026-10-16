@@ -1042,7 +1042,25 @@ void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001308(void)
+/*
+ * Original: FUN_00001308; source: ID02.c:841.
+ * Recovered name: draw_text_in_columns_a5safe [STRONG INFERENCE mechanics /
+ * HYPOTHESIS purpose] (iteration 152). Overlay service slot A5-0x110e (JT $362).
+ * Exported C is only two truncated branches (on in_stack_00000014 = long
+ * arg $18(A6)). Bytes 0x1308..0x14e4 [PROVEN, condensed reading]:
+ *   CurrentA5 thunk; ForeColor(black) / BackColor(white);
+ *   if ($18 != 0): FillRect(r, QD black pattern A5-0x161c) $A8A5 and
+ *     FillRect(r', QD white pattern A5-0x1614); MoveTo; TextFace $A888;
+ *     CharWidth $A88D; then three DrawString $A884 segments, each followed by
+ *     GetPen $A89A and Move $A894 to column x = base + k*w (k = 5, 3, 4 with
+ *     column origins A5-0x14d2 / -0x14d0 / -0x14ce); a fourth segment when
+ *     long $1c(A6) == 0;
+ *   else: white FillRect, TextFace, MoveTo, DrawText $A885 (single string).
+ * QD globals: thePort A5-0x160c, white A5-0x1614, black A5-0x161c (standard
+ * QuickDraw global order). Argument layout and column meaning UNKNOWN
+ * (status / score line HYPOTHESIS).
+ */
+void draw_text_in_columns_a5safe /* Original: FUN_00001308 */ (void)
 
 {
   int in_stack_00000014;

@@ -63,6 +63,9 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000014e6` (ID02) | `swap_mmu_mode_a5safe` | STRONG INFERENCE | Iter 150: SwapMMUMode(&A5−0x1000) via ID09 glue; slot −0x10c6. |
 | `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | STRONG INFERENCE mechanics | Iter 151: two notched frames (pen 2/1) from rect A5−0x119c, drawn twice. |
 | `FUN_000010ce` (ID02) | `build_notched_frame_poly` | STRONG INFERENCE mechanics | Iter 151: notched/chamfered frame polygon from a Rect. |
+| `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | STRONG INFERENCE mechanics | Iter 152: columned DrawString output with FillRect backgrounds; slot −0x110e. |
+| `FUN_000007b0` / `00000598` / `00000666` / `00000512` / `0000087a` (ID06) | `init_raster_target` / `alloc_row_table` / `init_edge_pool` / `free_row_table` / `set_raster_target_base` | STRONG INFERENCE | Iter 153: ID06 rasterizer set-up; structures A5−0x1cce / −0x1cd2 / −0x1cd6. |
+| A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
 | A5−0x7d0 | sound channel records [2] × 0x238 bytes | STRONG INFERENCE | Indexed by silence_sound_channel / FUN_00003d50. |
 | ID02 file 0x1b42 (unexported) | `install_overlay_service_table` (proposed) | STRONG INFERENCE | Iter 135: 34 JT addresses → A5 table; A5−0x1040 work buffer. See OVERLAY_SERVICE_TABLE.md. |

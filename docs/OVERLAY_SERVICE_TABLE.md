@@ -22,7 +22,7 @@ consistent with being called from overlay context.
 | A5-0x111a | 0x1b4a | $3aa | ID02 0x195c | `blit_image_clipped_to_region_a5safe` |
 | A5-0x1116 | 0x1b5a | $3fa | ID02 0xa42 | `draw_thick_line_pixel_index_a5safe` |
 | A5-0x1112 | 0x1b62 | $32a | ID02 0xa86 | `draw_thick_xor_line_a5safe` |
-| A5-0x110e | 0x1baa | $362 | ID02 0x1308 | not yet named |
+| A5-0x110e | 0x1baa | $362 | ID02 0x1308 | `draw_text_in_columns_a5safe` |
 | A5-0x110a | 0x1bb2 | $3ea | ID02 0xad0 | `paint_view_horizon_bands_a5safe` |
 | A5-0x1106 | 0x1b82 | $3d2 | ID02 0xe9e | `open_offscreen_cport_a5safe` |
 | A5-0x1102 | 0x1b92 | $352 | ID02 0xf74 | `swap_port_a5safe` |
