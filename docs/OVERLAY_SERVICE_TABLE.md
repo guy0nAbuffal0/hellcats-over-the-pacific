@@ -13,10 +13,10 @@ consistent with being called from overlay context.
 
 | Slot | Store at | JT | Target segment / file | Recovered name |
 |---|---|---|---|---|
-| A5-0x1310 | 0x1bf2 | $1ba | ID06 0x96e | not yet named |
-| A5-0x130c | 0x1bfa | $1c2 | ID06 0x9d8 | not yet named |
-| A5-0x1308 | 0x1c02 | $19a | ID06 0xe10 | not yet named |
-| A5-0x1304 | 0x1c0a | $1a2 | ID06 0x8a2 | not yet named |
+| A5-0x1310 | 0x1bf2 | $1ba | ID06 0x96e | `reset_edge_table` |
+| A5-0x130c | 0x1bfa | $1c2 | ID06 0x9d8 | `add_polygon_edges` |
+| A5-0x1308 | 0x1c02 | $19a | ID06 0xe10 | `rasterize_and_present` |
+| A5-0x1304 | 0x1c0a | $1a2 | ID06 0x8a2 | `set_active_row_count` |
 | A5-0x1122 | 0x1b42 | $33a | ID02 0xc68 | `apply_pending_color_entries_a5safe` |
 | A5-0x111e | 0x1b52 | $372 | ID02 0x197c | `run_segment3_entry_and_unload_a5safe` |
 | A5-0x111a | 0x1b4a | $3aa | ID02 0x195c | `blit_image_clipped_to_region_a5safe` |

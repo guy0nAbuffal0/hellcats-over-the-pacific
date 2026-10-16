@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 153
+**Last iteration:** 158
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -15,12 +15,12 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
-| ID06.c | 24 | 19 | 0 | 0 | 5 | 0 | 0 |
+| ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **525** | **0** | **0** | **205** | **0** | **6** |
+| **TOTAL** | **736** | **506** | **0** | **0** | **224** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 525 NOT_STARTED + 6 BLOCKED (iteration 153);
-205 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 506 NOT_STARTED + 6 BLOCKED (iteration 158);
+224 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -44,7 +44,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `ID03.c` | `ID03.decomp.c` | seeded (copy) |
 | `ID04.c` | `ID04.decomp.c` | seeded (copy) |
 | `ID05.c` | `ID05.decomp.c` | seeded + iter 118 (all 24 functions renamed, iterations 118-125) |
-| `ID06.c` | `ID06.decomp.c` | seeded + iter 153 (raster target / row table / edge pool) |
+| `ID06.c` | `ID06.decomp.c` | seeded + iter 153-158 (all 24 functions renamed) |
 | `ID07.c` | `ID07.decomp.c` | seeded + iter 109-110 (both functions renamed) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
 | `ID09.c` | `ID09.decomp.c` | preserved + iterations 100-104 helper and initializer annotations |
@@ -245,6 +245,24 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00000666` (ID06) | `init_edge_pool` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:443` | `ID06.decomp.c` | A5−0x1cd6 0x5e9c pool, sentinels | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000512` (ID06) | `free_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:382` | `ID06.decomp.c` | frees A5−0x1cd2 buffers | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_0000087a` (ID06) | `set_raster_target_base` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:541` | `ID06.decomp.c` | target +0 = base | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000008a2` (ID06) | `set_active_row_count` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | clamp to height; slot −0x1304 | Node/attribute semantics | 154 (2026-10-17) | C complete; JT confirmed; token diff = renames |
+| `FUN_0000096e` (ID06) | `reset_edge_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | clear buckets, reset pool, toggle +0x14; slot −0x1310 | Node/attribute semantics | 154 (2026-10-17) | C complete; JT confirmed; token diff = renames |
+| `FUN_000009d8` (ID06) | `add_polygon_edges` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | clip + slope + 0x28-byte nodes into row buckets; slot −0x130c | Node/attribute semantics | 154 (2026-10-17) | C complete; JT confirmed; token diff = renames |
+| `FUN_00000e10` (ID06) | `rasterize_and_present` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | renderer callback JT $192 (ID06 0x318) + banded blit via JT $322; slot −0x1308 | Node/attribute semantics | 154 (2026-10-17) | C complete; JT confirmed; token diff = renames |
+| `FUN_0000026c` (ID06) | `init_row_table_fields` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | callback, shift 11, stride, 8-row table pointers | Node/attribute semantics | 154 (2026-10-17) | C complete; JT confirmed; token diff = renames |
+| `FUN_00000318` (ID06) | `render_scanline_spans` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:236` | `ID06.decomp.c` | active edge list, parity/priority polygon list, pattern longs; in-code state 0x39e..0x3e1 | Pattern/colour index details | 155 (2026-10-17) | C + bytes (BRA over data) |
+| `FUN_00000d84` / `FUN_00000dca` (ID06) | `rebase_edge_rows_for_band` / `restore_edge_rows_after_band` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:808/825` | `ID06.decomp.c` | node +0x22 rebasing per band | — | 155 (2026-10-17) | C complete |
+| `FUN_000001dc` (ID06) | `alloc_aligned_clear` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | FreeMem/MaxMem/NewPtrClear, 4-byte aligned + header | — | 157 (2026-10-17) | C complete; token diff = renames |
+| `FUN_0000024c` (ID06) | `free_aligned` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | DisposPtr(header) | — | 157 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000116` (ID06) | `rgb_to_bw_pattern` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | luma 19/38/7 → 64-level pattern A5−0x1ed6 | — | 157 (2026-10-17) | C complete; token diff = renames |
+| `FUN_0000017c` (ID06) | `lookup_colour_map` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | table *(A5−0x1ede)[i] | — | 157 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000001a2` (ID06) | `reverse_lookup_colour_map` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | inverse search | — | 157 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000004` (ID06) | `init_pattern_tables` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | masks + 64 patterns + grey map | — | 158 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000000b0` (ID06) | `alloc_pattern_tables` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | alloc 0xc00 / 0x200 then init | — | 158 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000000f4` (ID06) | `get_pattern_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | ensure + return A5−0x1eda | — | 158 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000916` (ID06) | `get_raster_target_size` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | width/height out-params | — | 158 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000942` (ID06) | `realloc_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | row table + edge pool rebuild | — | 158 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000d02` (ID06) | `add_rect_polygon` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | 4-point polygon via add_polygon_edges | — | 158 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1430,8 +1448,62 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   set_raster_target_base (+5 call sites). ID06.decomp.c was an unmodified seed.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID06 service functions `FUN_000008a2` (−0x1304),
-`FUN_0000096e` (−0x1310), `FUN_000009d8` (−0x130c), `FUN_00000e10` (−0x1308).
+### Iteration 154 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 152-153); 32
+  protected hashes verified.
+- Renamed the four ID06 service entries plus a set-up helper:
+  set_active_row_count (−0x1304), reset_edge_table (−0x1310),
+  add_polygon_edges (−0x130c; scanline edge-table insertion with clipping and
+  fixed-point slopes), rasterize_and_present (−0x1308; renderer callback JT
+  $192 = ID06 FUN_00000318, banded output through ID02
+  blit_offscreen_frame_to_window), init_row_table_fields.
+- **All 34 overlay service-table slots are now named.**
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 155 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 154 preserved.
+- `FUN_00000318` = render_scanline_spans: per row, insert bucket edges into a
+  sorted active list, retire finished edges, toggle polygon parity and keep a
+  priority-ordered open-polygon list, fill longs from the row pattern table
+  with the topmost colour, step x by slope. Its state (Ghidra DAT_0000039e..)
+  is a 0x44-byte zero block inside the code, skipped by BRA.B at 0x39c
+  [PROVEN] (self-modifying data, persists across bands).
+- `FUN_00000d84` / `FUN_00000dca` = rebase_edge_rows_for_band /
+  restore_edge_rows_after_band.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 156 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iterations 154-155 preserved.
+- Wrote `docs/RASTERIZER.md`: ID06 global structures, row-entry and
+  edge-node layouts, API table with service slots, frame flow, in-code
+  span-renderer state, open questions. Documentation only; no code changes.
+
+### Iteration 157 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iterations 154-156 preserved.
+- Renamed five ID06 helpers (complete C): alloc_aligned_clear (FreeMem <
+  500000 → MaxMem; NewPtrClear(size+12) aligned to 4 with size/raw-pointer
+  header; 7 call sites), free_aligned (4), rgb_to_bw_pattern (luma
+  19/38/7 → 64 inverse-brightness patterns at A5−0x1ed6), lookup_colour_map
+  (2) / reverse_lookup_colour_map (256-word table at *A5−0x1ede).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 158 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iterations 154-157 preserved.
+- Renamed the last six ID06 functions: init_pattern_tables (32 edge masks,
+  64 replicated 8-row patterns from A5−0x1ed6, 16-level grey map at
+  *A5−0x1ede), alloc_pattern_tables, get_pattern_table,
+  get_raster_target_size, realloc_row_table, add_rect_polygon.
+  **ID06 is fully RENAMED (24/24).** RASTERIZER.md updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID03 (45 functions, all NOT_STARTED): inventory
+and start with JT-exported entries (e.g. ID03 0x3788 / 0x3828 call sites of
+new_offscreen_cport / close_and_dispose_port).
 
 ## Resuming the five-minute workflow
 

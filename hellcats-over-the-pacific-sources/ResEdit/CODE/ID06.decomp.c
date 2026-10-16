@@ -23,7 +23,19 @@ uint *DAT_000003ca;
 int *DAT_000003ce;
 int DAT_00000904;
 
-undefined4 FUN_00000004(void)
+/*
+ * Original: FUN_00000004; source: ID06.c:26.
+ * Recovered name: init_pattern_tables [STRONG INFERENCE] (iteration 158).
+ * Exported C complete. Fills the 0xc00-byte table at *(long A5-0x1eda):
+ *   bytes 0x000..0x3ff: 32 left masks (0, 0x80000000, 0xc0000000, ... each
+ *     written to 8 consecutive longs) - partial-word masks indexed by the span
+ *     renderer with (x >> 6) & 0x3e0;
+ *   bytes 0x400..0xbff: 64 patterns x 8 rows from the 8-byte patterns at
+ *     A5-0x1ed6, each byte replicated into a long;
+ * and the 256-word map at *(long A5-0x1ede): map[i] = ((i >> 4) * -4 + 0x3f)
+ *   * 0x20 + 0x400 (16 grey levels -> pattern offsets). Returns 1.
+ */
+undefined4 init_pattern_tables /* Original: FUN_00000004 */ (void)
 
 {
   undefined1 uVar1;
@@ -60,7 +72,14 @@ undefined4 FUN_00000004(void)
 
 
 
-undefined4 FUN_000000b0(void)
+/*
+ * Original: FUN_000000b0; source: ID06.c:63.
+ * Recovered name: alloc_pattern_tables [STRONG INFERENCE] (iteration 158).
+ * Exported C complete: allocates (once) A5-0x1eda = alloc_aligned_clear(0xc00)
+ * and A5-0x1ede = alloc_aligned_clear(0x200); returns init_pattern_tables()
+ * or 0 on failure. Called first by init_raster_target.
+ */
+undefined4 alloc_pattern_tables /* Original: FUN_000000b0 */ (void)
 
 {
   uint uVar1;
@@ -68,33 +87,39 @@ undefined4 FUN_000000b0(void)
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1eda) == 0) {
-    uVar1 = FUN_000001dc(0xc00);
+    uVar1 = alloc_aligned_clear(0xc00);
     *(uint *)(unaff_A5 + -0x1eda) = uVar1;
     if (uVar1 == 0) {
       return 0;
     }
   }
   if (*(int *)(unaff_A5 + -0x1ede) == 0) {
-    uVar1 = FUN_000001dc(0x200);
+    uVar1 = alloc_aligned_clear(0x200);
     *(uint *)(unaff_A5 + -0x1ede) = uVar1;
     if (uVar1 == 0) {
       return 0;
     }
   }
-  uVar2 = FUN_00000004();
+  uVar2 = init_pattern_tables();
   return uVar2;
 }
 
 
 
-undefined4 FUN_000000f4(void)
+/*
+ * Original: FUN_000000f4; source: ID06.c:90.
+ * Recovered name: get_pattern_table [STRONG INFERENCE] (iteration 158).
+ * Exported C complete: ensures A5-0x1eda is allocated and returns it (stored
+ * as raster target +0xc by init_raster_target).
+ */
+undefined4 get_pattern_table /* Original: FUN_000000f4 */ (void)
 
 {
   uint uVar1;
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1eda) == 0) {
-    uVar1 = FUN_000001dc(0xc00);
+    uVar1 = alloc_aligned_clear(0xc00);
     *(uint *)(unaff_A5 + -0x1eda) = uVar1;
     if (uVar1 == 0) {
       return 0;
@@ -105,7 +130,17 @@ undefined4 FUN_000000f4(void)
 
 
 
-int FUN_00000116(undefined4 param_1,undefined4 param_2)
+/*
+ * Original: FUN_00000116; source: ID06.c:108.
+ * Recovered name: rgb_to_bw_pattern [STRONG INFERENCE] (iteration 157).
+ * Exported C complete. Words r = param_1 high, g = param_1 low, b = param_2
+ * high (16-bit components; only their high bytes are used).
+ * luma = ((r>>8)*0x13 + (g>>8)*0x26 + (b>>8)*7) >> 6  (19/38/7 out of 64:
+ * the usual 0.30/0.59/0.11 weights); returns A5-0x1ed6 + (0x3f - (luma>>2)) * 8,
+ * i.e. an 8-byte pattern chosen by inverse brightness (64 levels) for 1-bit
+ * output [STRONG INFERENCE].
+ */
+int rgb_to_bw_pattern /* Original: FUN_00000116 */ (undefined4 param_1,undefined4 param_2)
 
 {
   int unaff_A5;
@@ -118,7 +153,14 @@ int FUN_00000116(undefined4 param_1,undefined4 param_2)
 
 
 
-undefined4 FUN_0000017c(undefined4 param_1)
+/*
+ * Original: FUN_0000017c; source: ID06.c:121.
+ * Recovered name: lookup_colour_map [STRONG INFERENCE] (iteration 157).
+ * Exported C complete: i = min(word param, 0xff); returns word table
+ * (*(long A5-0x1ede))[i] (low word of result; high word is pointer residue).
+ * Used by init_row_table_fields for row table +8.
+ */
+undefined4 lookup_colour_map /* Original: FUN_0000017c */ (undefined4 param_1)
 
 {
   undefined2 *puVar1;
@@ -133,7 +175,13 @@ undefined4 FUN_0000017c(undefined4 param_1)
 
 
 
-undefined4 FUN_000001a2(undefined4 param_1)
+/*
+ * Original: FUN_000001a2; source: ID06.c:136.
+ * Recovered name: reverse_lookup_colour_map [STRONG INFERENCE] (iteration 157).
+ * Exported C complete: first i in 0..255 with table[i] == word param, else 0.
+ * Inverse of lookup_colour_map.
+ */
+undefined4 reverse_lookup_colour_map /* Original: FUN_000001a2 */ (undefined4 param_1)
 
 {
   short *psVar1;
@@ -156,7 +204,16 @@ undefined4 FUN_000001a2(undefined4 param_1)
 
 // WARNING: Type propagation algorithm not settling
 
-uint FUN_000001dc(int param_1)
+/*
+ * Original: FUN_000001dc; source: ID06.c:159.
+ * Recovered name: alloc_aligned_clear [STRONG INFERENCE] (iteration 157).
+ * Exported C complete. If FreeMem (JT $212) < 500000, MaxMem (JT $21a) to
+ * compact; p = NewPtrClear(size + 12) (JT $232); returns 0 on failure, else
+ * a = (p + 12) & ~3 with *(a-4) = size and *(a-8) = p (header for free_aligned).
+ * 4-byte-aligned zeroed allocation [STRONG INFERENCE]. Ghidra's piVar3 stack
+ * modelling is an artifact.
+ */
+uint alloc_aligned_clear /* Original: FUN_000001dc */ (int param_1)
 
 {
   int iVar1;
@@ -192,7 +249,13 @@ uint FUN_000001dc(int param_1)
 
 
 
-bool FUN_0000024c(int param_1)
+/*
+ * Original: FUN_0000024c; source: ID06.c:195.
+ * Recovered name: free_aligned [STRONG INFERENCE] (iteration 157).
+ * Exported C complete: if p != 0, DisposPtr(*(p - 8)) (JT $23a); returns p != 0.
+ * Frees a block from alloc_aligned_clear.
+ */
+bool free_aligned /* Original: FUN_0000024c */ (int param_1)
 
 {
   int unaff_A5;
@@ -205,7 +268,17 @@ bool FUN_0000024c(int param_1)
 
 
 
-undefined4 FUN_0000026c(undefined4 param_1)
+/*
+ * Original: FUN_0000026c; source: ID06.c:208.
+ * Recovered name: init_row_table_fields [STRONG INFERENCE] (iteration 154).
+ * Overlay service slot (not in service table).
+ * Exported C complete. Row table +0 = JT A5+0x192 (renderer callback);
+ * +8 = FUN_0000017c(...); +0xa = 11 (fixed-point shift); +0xc = target +4 -
+ * width * target +6 / 8 (row stride remainder); row entry +8 = target +0xc +
+ * (row % 8) * 4 (8-row repeating table: dither pattern [HYPOTHESIS]);
+ * +0xe = rows; +0x10 = +0x14 = 0. Returns 1. Caller: alloc_row_table.
+ */
+undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 param_1)
 
 {
   undefined4 uVar1;
@@ -214,7 +287,7 @@ undefined4 FUN_0000026c(undefined4 param_1)
   int unaff_A5;
   
   **(int **)(unaff_A5 + -0x1cd2) = unaff_A5 + 0x192;
-  uVar1 = FUN_0000017c(CONCAT22(param_1._0_2_,(short)((uint)unaff_D7 >> 0x10)));
+  uVar1 = lookup_colour_map(CONCAT22(param_1._0_2_,(short)((uint)unaff_D7 >> 0x10)));
   *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 8) = (short)uVar1;
   *(undefined2 *)(*(int *)(unaff_A5 + -0x1cd2) + 10) = 0xb;
   *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xc) =
@@ -233,7 +306,31 @@ undefined4 FUN_0000026c(undefined4 param_1)
 
 
 
-void FUN_00000318(undefined4 param_1,uint *param_2,int param_3)
+/*
+ * Original: FUN_00000318; source: ID06.c:236.
+ * Recovered name: render_scanline_spans [STRONG INFERENCE] (iteration 155).
+ * Renderer callback installed by init_row_table_fields (JT A5+0x192); called by
+ * rasterize_and_present. Args: param_1 = (word continue_flag, word rows),
+ * uint *dest, long stride (added after each row).
+ * In-code state [PROVEN, bytes]: BRA.B at file 0x39c skips a 0x44-byte
+ * zero-filled block 0x39e..0x3e1; Ghidra's DAT_0000039e..DAT_000003d2 are
+ * these PC-relative cells (self-modifying data kept across band calls). The
+ * first band (continue_flag == 0) initialises them.
+ * Per row [STRONG INFERENCE from the exported C]:
+ *   1. insert the row bucket's new edge nodes into the active edge array
+ *      (insertion sort on x, node +0);
+ *   2. drop edges whose remaining-row counter (+0x22) equals the row;
+ *   3. walk edges left to right: each crossing complements the owning
+ *      polygon's parity word (first node +0x20) and inserts/removes the polygon
+ *      in a priority-ordered open list (+0x24 key, links +0x10/+0x14 between the
+ *      pool sentinels); the topmost polygon's colour (+0x1c -> +0x1e) selects a
+ *      long from the row's pattern table (row entry +8), and longs are stored
+ *      to dest between crossings, with mask merging (uVar7 & ~uVar3 | ...) for
+ *      partial words;
+ *   4. advance each edge x by its slope (+4) and re-sort.
+ * Painter-style priority span fill of the polygons from add_polygon_edges.
+ */
+void render_scanline_spans /* Original: FUN_00000318 */ (undefined4 param_1,uint *param_2,int param_3)
 
 {
   uint uVar1;
@@ -382,7 +479,7 @@ void FUN_00000318(undefined4 param_1,uint *param_2,int param_3)
 /*
  * Original: FUN_00000512; source: ID06.c:382.
  * Recovered name: free_row_table [STRONG INFERENCE] (iteration 153).
- * Exported C complete. Frees (FUN_0000024c) the row-entry array (+4), the
+ * Exported C complete. Frees (free_aligned) the row-entry array (+4), the
  * buffers at +0x1c and +0x20, then the 0x24-byte row-table record at
  * long A5-0x1cd2, and clears A5-0x1cd2.
  */
@@ -392,16 +489,16 @@ void free_row_table /* Original: FUN_00000512 */ (void)
   int unaff_A5;
   
   if ((*(int *)(unaff_A5 + -0x1cd2) != 0) && (*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) != 0)) {
-    FUN_0000024c(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4));
+    free_aligned(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4));
   }
   if ((*(int *)(unaff_A5 + -0x1cd2) != 0) && (*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 0x1c) != 0)) {
-    FUN_0000024c(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 0x1c));
+    free_aligned(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 0x1c));
   }
   if ((*(int *)(unaff_A5 + -0x1cd2) != 0) && (*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 0x20) != 0)) {
-    FUN_0000024c(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 0x20));
+    free_aligned(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 0x20));
   }
   if (*(int *)(unaff_A5 + -0x1cd2) != 0) {
-    FUN_0000024c(*(int *)(unaff_A5 + -0x1cd2));
+    free_aligned(*(int *)(unaff_A5 + -0x1cd2));
   }
   *(undefined4 *)(unaff_A5 + -0x1cd2) = 0;
   return;
@@ -415,7 +512,7 @@ void free_row_table /* Original: FUN_00000512 */ (void)
  * Exported C complete. Requires the target record (A5-0x1cce). n = low word of
  * param_1 (the target height when called from init_raster_target). If an
  * existing table has fewer than n entries (+0xe), it is freed; otherwise
- * reused. Allocates (FUN_000001dc) the 0x24-byte record -> A5-0x1cd2 and
+ * reused. Allocates (alloc_aligned_clear) the 0x24-byte record -> A5-0x1cd2 and
  * n * 12 bytes of entries -> record+4, clears every entry, then returns
  * FUN_0000026c(param_1). One 12-byte entry per raster row [STRONG INFERENCE].
  */
@@ -435,12 +532,12 @@ undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
     free_row_table();
   }
   if (*(int *)(unaff_A5 + -0x1cd2) == 0) {
-    uVar1 = FUN_000001dc(0x24);
+    uVar1 = alloc_aligned_clear(0x24);
     *(uint *)(unaff_A5 + -0x1cd2) = uVar1;
     if (uVar1 == 0) {
       return 0;
     }
-    uVar1 = FUN_000001dc(param_1._2_2_ * 0xc);
+    uVar1 = alloc_aligned_clear(param_1._2_2_ * 0xc);
     *(uint *)(*(int *)(unaff_A5 + -0x1cd2) + 4) = uVar1;
     if (uVar1 == 0) {
       return 0;
@@ -451,7 +548,7 @@ undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
     *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + sVar3 * 0xc + 4) = 0;
     *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + sVar3 * 0xc + 8) = 0;
   }
-  uVar2 = FUN_0000026c(param_1);
+  uVar2 = init_row_table_fields(param_1);
   return uVar2;
 }
 
@@ -480,7 +577,7 @@ undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
   }
   else {
     if (*(int *)(unaff_A5 + -0x1cd6) == 0) {
-      uVar2 = FUN_000001dc(0x5e9c);
+      uVar2 = alloc_aligned_clear(0x5e9c);
       *(uint *)(unaff_A5 + -0x1cd6) = uVar2;
       if (uVar2 == 0) {
         return 0;
@@ -536,13 +633,13 @@ undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,u
   uint uVar2;
   int unaff_A5;
   
-  uVar1 = FUN_000000b0();
+  uVar1 = alloc_pattern_tables();
   if ((short)uVar1 == 0) {
     uVar1 = 0;
   }
   else {
     if (*(int *)(unaff_A5 + -0x1cce) == 0) {
-      uVar2 = FUN_000001dc(0x10);
+      uVar2 = alloc_aligned_clear(0x10);
       *(uint *)(unaff_A5 + -0x1cce) = uVar2;
       if (uVar2 == 0) {
         return 0;
@@ -553,7 +650,7 @@ undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,u
     *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 6) = 1;
     *(short *)(*(int *)(unaff_A5 + -0x1cce) + 8) = param_3._0_2_;
     *(short *)(*(int *)(unaff_A5 + -0x1cce) + 10) = param_3._2_2_;
-    uVar1 = FUN_000000f4();
+    uVar1 = get_pattern_table();
     *(undefined4 *)(*(int *)(unaff_A5 + -0x1cce) + 0xc) = uVar1;
     uVar1 = alloc_row_table(CONCAT22(param_2._2_2_,param_3._2_2_));
     if ((short)uVar1 == 0) {
@@ -595,7 +692,15 @@ void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 param_1)
 
 
 
-void FUN_000008a2(int param_1)
+/*
+ * Original: FUN_000008a2; source: ID06.c:554.
+ * Recovered name: set_active_row_count [STRONG INFERENCE] (iteration 154).
+ * Overlay service slot A5-0x1304 (JT $1a2).
+ * Exported C complete; CurrentA5 routine. If target and row table exist,
+ * n = param_1 clamped to [1, target height (+0xa)] (out-of-range -> height);
+ * row table +0xe = n (rows processed). A5-0x1cc6 = row table +0xe.
+ */
+void set_active_row_count /* Original: FUN_000008a2 */ (int param_1)
 
 {
   int iVar1;
@@ -613,7 +718,13 @@ void FUN_000008a2(int param_1)
 
 
 
-bool FUN_00000916(undefined2 *param_1,undefined2 *param_2)
+/*
+ * Original: FUN_00000916; source: ID06.c:572.
+ * Recovered name: get_raster_target_size [STRONG INFERENCE] (iteration 158).
+ * Exported C complete: if the target exists, *param_1 = width (+8),
+ * *param_2 = height (+0xa); returns whether it exists.
+ */
+bool get_raster_target_size /* Original: FUN_00000916 */ (undefined2 *param_1,undefined2 *param_2)
 
 {
   int unaff_A5;
@@ -629,7 +740,14 @@ bool FUN_00000916(undefined2 *param_1,undefined2 *param_2)
 
 
 
-undefined4 FUN_00000942(undefined4 param_1)
+/*
+ * Original: FUN_00000942; source: ID06.c:588.
+ * Recovered name: realloc_row_table [STRONG INFERENCE] (iteration 158).
+ * Exported C complete: alloc_row_table((word param, current active rows))
+ * then init_edge_pool(); returns 0 on failure. Rebuilds the row table and node
+ * pool [STRONG INFERENCE: param word is passed as row-table word +8 source].
+ */
+undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 param_1)
 
 {
   undefined4 uVar1;
@@ -650,7 +768,16 @@ undefined4 FUN_00000942(undefined4 param_1)
 
 
 
-void FUN_0000096e(void)
+/*
+ * Original: FUN_0000096e; source: ID06.c:609.
+ * Recovered name: reset_edge_table [STRONG INFERENCE] (iteration 154).
+ * Overlay service slot A5-0x1310 (JT $1ba).
+ * Exported C complete; CurrentA5 routine. Clears the first two longs of each
+ * active row entry (bucket head, end flag), resets the node-pool cursor
+ * (+0x8a4 = +0x8a0), toggles row table +0x14 between 0 and 1, A5-0x1cc6 = 0.
+ * Per-frame reset of the edge table [STRONG INFERENCE].
+ */
+void reset_edge_table /* Original: FUN_0000096e */ (void)
 
 {
   int iVar1;
@@ -676,7 +803,24 @@ void FUN_0000096e(void)
 
 
 
-bool FUN_000009d8(int param_1,undefined2 param_2,undefined2 param_3,int *param_4)
+/*
+ * Original: FUN_000009d8; source: ID06.c:635.
+ * Recovered name: add_polygon_edges [STRONG INFERENCE] (iteration 154).
+ * Overlay service slot A5-0x130c (JT $1c2).
+ * Exported C complete; CurrentA5 routine. Args: n points, attribute words a/b
+ * (stored at node +0x1c / +0x24), int *pts = n pairs {x, y} relative to the
+ * centre (A5-0x1cca / A5-0x1cc8).
+ * Rejects the polygon if all x lie outside [0, width). For each edge (from the
+ * previous point), orders by y, clips to rows [0, active rows) and x [0, width)
+ * with 64-bit products / divides, computes slope (1 << rowtable+0xa) * dx / dy
+ * << rowtable+0x12, and allocates 0x28-byte nodes from the pool (cursor
+ * +0x8a4, limit +0x8a8): +4 slope, +8 x << shift, +0xc next in row bucket,
+ * +0x18 polygon's first node, +0x22 remaining rows; pushes the node on the
+ * bucket of its start row (row entry +0) and sets the end row's flag (+4).
+ * Returns true if any node was added. Scanline polygon edge-table insertion
+ * [STRONG INFERENCE].
+ */
+bool add_polygon_edges /* Original: FUN_000009d8 */ (int param_1,undefined2 param_2,undefined2 param_3,int *param_4)
 
 {
   uint uVar1;
@@ -820,7 +964,16 @@ bool FUN_000009d8(int param_1,undefined2 param_2,undefined2 param_3,int *param_4
 
 
 
-void FUN_00000d02(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00000d02; source: ID06.c:779.
+ * Recovered name: add_rect_polygon [STRONG INFERENCE] (iteration 158).
+ * Exported C complete. Words: colour = param_1 high, x0 = param_1 low,
+ * y0 = param_2 high, x1 = param_2 low, y1 = param_3 high. Builds points
+ * (x0,y0), (x1,y0), (x1,y1), (x0,y1) and calls
+ * add_polygon_edges(4, lookup_colour_map(colour), 0, pts). Ghidra's unaff_A4
+ * half is register residue.
+ */
+void add_rect_polygon /* Original: FUN_00000d02 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 uVar1;
@@ -842,14 +995,21 @@ void FUN_00000d02(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   local_20 = (int)param_3._0_2_;
   local_1c = (int)param_1._2_2_;
   local_18 = (int)param_3._0_2_;
-  uVar1 = FUN_0000017c(CONCAT22(param_1._0_2_,(short)((uint)unaff_A4 >> 0x10)));
-  FUN_000009d8(4,(short)uVar1,0,&local_34);
+  uVar1 = lookup_colour_map(CONCAT22(param_1._0_2_,(short)((uint)unaff_A4 >> 0x10)));
+  add_polygon_edges(4,(short)uVar1,0,&local_34);
   return;
 }
 
 
 
-void FUN_00000d84(undefined4 param_1)
+/*
+ * Original: FUN_00000d84; source: ID06.c:808.
+ * Recovered name: rebase_edge_rows_for_band [STRONG INFERENCE] (iteration 155).
+ * Exported C complete: for every allocated node (pool +0x8a0 .. cursor +0x8a4,
+ * stride 0x28): +0x22 += band_offset - active rows (row table +0xe). Called by
+ * rasterize_and_present before each band.
+ */
+void rebase_edge_rows_for_band /* Original: FUN_00000d84 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -866,7 +1026,13 @@ void FUN_00000d84(undefined4 param_1)
 
 
 
-void FUN_00000dca(undefined4 param_1)
+/*
+ * Original: FUN_00000dca; source: ID06.c:825.
+ * Recovered name: restore_edge_rows_after_band [STRONG INFERENCE] (iteration 155).
+ * Exported C complete: inverse of rebase_edge_rows_for_band
+ * (+0x22 += active rows - band_offset) after each band.
+ */
+void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -883,7 +1049,19 @@ void FUN_00000dca(undefined4 param_1)
 
 
 
-void FUN_00000e10(int param_1,int param_2,undefined2 param_3)
+/*
+ * Original: FUN_00000e10; source: ID06.c:842.
+ * Recovered name: rasterize_and_present [STRONG INFERENCE] (iteration 154).
+ * Overlay service slot A5-0x1308 (JT $19a).
+ * Exported C complete; CurrentA5 routine. Args: dest (0 = render only),
+ * band_rows, mode. Links head/tail sentinels (empty active edge list). If
+ * dest == 0: (*rowtable+0)(rows, target base, rowtable+0xc). Else, per band
+ * of band_rows: rebase_edge_rows_for_band; (*rowtable+0)(band, dest, row
+ * stride) = render_scanline_spans; restore_edge_rows_after_band; JT $322 = ID02 blit_offscreen_frame_to_window(dest, top, rows,
+ * mode). Rasterises the edge table and presents it in bands [STRONG INFERENCE].
+ * The renderer callback is JT A5+0x192 (installed by init_row_table_fields).
+ */
+void rasterize_and_present /* Original: FUN_00000e10 */ (int param_1,int param_2,undefined2 param_3)
 
 {
   short sVar1;
@@ -926,12 +1104,12 @@ void FUN_00000e10(int param_1,int param_2,undefined2 param_3)
           local_6 = local_e._2_2_;
         }
         sVar6 = *(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe) - (local_e._2_2_ - local_6);
-        FUN_00000d84(CONCAT22(sVar6,uVar7));
+        rebase_edge_rows_for_band(CONCAT22(sVar6,uVar7));
         (*(code *)**(undefined4 **)(iVar5 + -0x1cd2))
                   (CONCAT22(local_8,local_6),(short)param_1,
                    ((short)(sVar1 * sVar2 + 0xf) >> 4) * 2 - (short)(sVar3 * sVar4) / 8);
         local_8 = 1;
-        FUN_00000dca(CONCAT22(sVar6,uVar7));
+        restore_edge_rows_after_band(CONCAT22(sVar6,uVar7));
         (**(code **)(iVar5 + 0x322))
                   (param_1,*(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe) - local_e,local_6,param_3);
         local_e = local_e - local_6;
