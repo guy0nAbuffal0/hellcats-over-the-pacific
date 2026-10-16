@@ -6,9 +6,35 @@ typedef unsigned char    byte;
 
 
 
-// WARNING: Control flow encountered bad instruction data
-
-undefined4 FUN_00000006(void)
+/*
+ * Original: FUN_00000006
+ * Proposed name: load_overlay_from_resource
+ * Confidence: [STRONG INFERENCE] role; [PROVEN] A5 trap sequence
+ *
+ * CODE resource 8 entry (ID08.bin @0x0006 after 6-byte stub @0x0–0x5).
+ * Best-documented candidate for loading the Pacific Conflict overlay blob
+ * (LOADER_CHAIN.md §2). Heavy A5 jump-table use (not overlay-local calls):
+ *   $2a2 — resource open/get (twice on failure-retry path)
+ *   $4d2 / $fa — error string path → return 0
+ *   $23a — dispose prior buffer at A5-0x1006
+ *   $2b2 — read resource data into sized buffer
+ *   $232 — NewPtr-style alloc (size from A5-0x101a/1e/22)
+ *   $2aa — release resource
+ *   $53a+ — reloc/fix helpers on loaded image
+ *   $2ba / $2fa / $51a — post-load setup; success returns 1
+ *
+ * Capstone @0x0006–0x0336: LINK A6,#$FDD6 … UNLK/RTS; success MOVEQ #1,D0.
+ * Ghidra body is stack-confused (unaff_A5) and has halt_baddata artifacts
+ * near Mac traps $A986/$A9F4 — preserve expressions; do not “fix” traps.
+ *
+ * Callee: alloc_and_read_resource_payload (FUN_00000348). Globals: A5-0x13ac
+ * type/name block; A5-0x1006 loaded-image pointer.
+ *
+ * Evidence: Capstone ID08.bin; docs/LOADER_CHAIN.md §2; ID08.c Ghidra.
+ * Unknown: exact Toolbox trap names for each A5 slot; which resource ID is
+ * the 255360-byte overlay.
+ */
+undefined4 load_overlay_from_resource(void) /* Original: FUN_00000006 */
 
 {
   int iVar1;
@@ -158,7 +184,7 @@ undefined4 FUN_00000006(void)
       }
       *(undefined2 *)(puVar11 + -2) = local_e;
       *(undefined4 *)(puVar11 + -6) = 0x21e;
-      FUN_00000348(*(undefined4 *)(puVar11 + -2));
+      alloc_and_read_resource_payload( /* Original: FUN_00000348 */*(undefined4 *)(puVar11 + -2));
       *(undefined4 *)(puVar11 + -4) = 0x224;
       (**(code **)(unaff_A5 + 0x4c2))();
       goto LAB_0000022a;
@@ -235,18 +261,50 @@ LAB_0000022a:
 
 
 
-// WARNING: Control flow encountered bad instruction data
-
-void FUN_00000338(void)
+/*
+ * Original: FUN_00000338
+ * Proposed name: sysbeep_and_exit_to_shell
+ * Confidence: [PROVEN]
+ *
+ * Capstone @0x0338–0x0346 (Ghidra emitted halt_baddata for the traps):
+ *   LINK A6,#$FFF2
+ *   MOVE.W #$64,-(A7)     ; duration = 100 ticks
+ *   DC.W $A9C8            ; _SysBeep
+ *   DC.W $A9F4            ; _ExitToShell
+ *   UNLK A6 / RTS         ; unreachable after ExitToShell
+ *
+ * Fatal-error exit helper. No in-segment BSR/JSR found in ID08.bin.
+ *
+ * Evidence: Capstone bytes; Inside Macintosh trap numbers A9C8/A9F4.
+ */
+void sysbeep_and_exit_to_shell(void) /* Original: FUN_00000338 */
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  /* Reconstructed from Capstone — Ghidra could not decode A-line traps */
+  /* SysBeep(100); ExitToShell(); */
+  return;
 }
 
 
 
-undefined2 FUN_00000348(undefined4 param_1)
+/*
+ * Original: FUN_00000348
+ * Proposed name: alloc_and_read_resource_payload
+ * Confidence: [PROVEN] sequence; [STRONG INFERENCE] trap roles
+ *
+ * Capstone @0x0348–0x039A (arg = resource ref word at $8(A6)):
+ *   1. JSR A5+$2ca → store start offset at local
+ *   2. JSR A5+$2c2 → store end offset at local
+ *   3. size = end − start
+ *   4. JSR A5+$22a(size) → alloc; pointer → A5-0x12fc
+ *   5. JSR A5+$2b2(ptr, &size, ref) → read payload into buffer
+ *
+ * Called from load_overlay_from_resource after the main resource is open.
+ * Ghidra lost A5 and mangled the stack args — binary order above is authoritative.
+ *
+ * Evidence: Capstone ID08.bin; sole caller in load_overlay_from_resource.
+ */
+undefined2 alloc_and_read_resource_payload(undefined4 param_1) /* Original: FUN_00000348 */
 
 {
   int unaff_A5;
@@ -256,6 +314,7 @@ undefined2 FUN_00000348(undefined4 param_1)
   int local_c;
   int local_8;
   
+  /* Binary: GetStart/GetEnd-style pair then NewPtr then read — see header */
   (**(code **)(unaff_A5 + 0x2ca))(&local_c,0);
   (**(code **)(unaff_A5 + 0x2c2))((short)&local_8);
   local_8 = local_8 - local_c;
@@ -270,13 +329,31 @@ undefined2 FUN_00000348(undefined4 param_1)
 
 
 
-// WARNING: Control flow encountered bad instruction data
-
-void FUN_0000039c(void)
+/*
+ * Original: FUN_0000039c
+ * Proposed name: bootstrap_window_and_load_overlay
+ * Confidence: [PROVEN] call to loader; [STRONG INFERENCE] window/port traps
+ *
+ * Capstone @0x039C–0x0446 (Ghidra halt_baddata — A-line traps):
+ *   1. A-line $A97C (window create; args include #$F060 / $FFFF) → window ptr
+ *   2. JSR A5+$48a(window)
+ *   3. Cache window fields +$10/+ $12; save/restore port via $A870/$A873
+ *   4. A-line $A982(window)
+ *   5. Local fourcc 'HELL' ($48454C4C); JSR A5+$30a (signature/check)
+ *   6. On success: A5+$4d2 string copy from A5-0x13ac+0x2a; write +0x28;
+ *      set A5-0x138a = 1; JSR (d16,PC) → load_overlay_from_resource @0x0006
+ *
+ * Completes the ID08 bootstrap: UI/port setup then overlay load.
+ *
+ * Evidence: Capstone; JSR target 0x6 proven (disp $FBC4); 'HELL' immediate.
+ * Unknown: exact Toolbox names for $A97C/$A982; meaning of 'HELL' check.
+ */
+void bootstrap_window_and_load_overlay(void) /* Original: FUN_0000039c */
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  /* Body omitted in Ghidra (A-line traps). See Capstone summary in header.
+   * Terminal call: load_overlay_from_resource (ID08 @0x0006). */
+  return;
 }
 
 

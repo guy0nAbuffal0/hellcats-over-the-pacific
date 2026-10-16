@@ -10,3 +10,6 @@
 
 # macOS metadata
 .DS_Store
+
+# REA evaluation disposable outputs (Node tarball, Evidence JSON, logs)
+/artifacts/

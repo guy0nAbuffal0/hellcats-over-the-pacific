@@ -810,14 +810,14 @@ void overlay_patch_template_u16_pair(undefined2 config_u16) /* Original: FUN_000
  *   src  — source buffer (param_2)
  *   nbytes — byte count (param_3); callers pass small immediates (0x4A, 0x1A, 0x1C, 0x20)
  * Outputs / side effects:
- *   Copies nbytes from src to dst via FUN_0001a63e; returns dst.
+ *   Copies nbytes from src to dst via memmove_block; returns dst.
  *
  * Known callers:
  *   - FUN_00000054 (many sites): alloc via FUN_00001a48, then copy static template
  *     records into the allocated block and stash the pointer in DAT_0001b524-slot tables.
  *
  * Callees:
- *   - FUN_0001a63e(src, dst, nbytes) — overlap-safe block move [HYPOTHESIS: memmove]
+ *   - memmove_block(src, dst, nbytes) — overlap-safe block move [PROVEN]
  *     Argument order is swapped relative to this wrapper.
  *
  * 68k (PROVEN from Hellcats/Pacific Conflict @ file offset 0x32):
@@ -827,19 +827,15 @@ void overlay_patch_template_u16_pair(undefined2 config_u16) /* Original: FUN_000
  *   MOVE.L  16(A7),-(A7)      ; push nbytes
  *   MOVE.L  D2,-(A7)          ; push dst
  *   MOVE.L  D0,-(A7)          ; push src  → call(src, dst, nbytes)
- *   BSR.L   FUN_0001a63e
+ *   BSR.L   memmove_block (FUN_0001a63e)
  *   MOVE.L  D2,D0             ; return dst
  *   ADDA.W  #0x0C,A7          ; pop 3 args
  *   MOVE.L  (A7)+,D2          ; restore D2
  *   RTS
- *
- * Unknown:
- *   - Full semantics of FUN_0001a63e (forward/backward paths, alignment) not yet
- *     annotated; treat as opaque overlap-capable copy for now.
  */
 undefined4 * copy_block_return_dst(undefined4 *dst, undefined4 *src, undefined4 *nbytes) /* Original: FUN_00000032 */
 {
-  FUN_0001a63e(src, dst, nbytes); /* callee arg order: src, dst, nbytes */
+  memmove_block( /* Original: FUN_0001a63e */src, dst, nbytes); /* callee arg order: src, dst, nbytes */
   return dst;
 }
 
@@ -1219,7 +1215,7 @@ void FUN_000004f8(int *param_1,short param_2,int param_3,undefined4 *param_4,und
   while (param_2 = param_2 + -1, param_2 != -1) {
     local_26 = local_26 + -1;
     iVar1 = *local_26;
-    FUN_0000253e((int)*(short *)(iVar1 + 2),(int)*(short *)(iVar1 + 4),(int)*(short *)(iVar1 + 6),
+    build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar1 + 2),(int)*(short *)(iVar1 + 4),(int)*(short *)(iVar1 + 6),
                  (int)auStack_22);
     FUN_00002aba();
     (*(code *)&LAB_00001c3a_2)
@@ -1343,7 +1339,7 @@ void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,shor
   }
   else {
     FUN_000004f8(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
-    FUN_00001c5c((int)*(short *)(param_2 + 0x1a),local_694,local_694,-*(int *)(iVar5 + 0x18),0,
+    translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(param_2 + 0x1a),local_694,local_694,-*(int *)(iVar5 + 0x18),0,
                  -*(int *)(iVar5 + 0x20));
     sVar4 = 0;
     if (0 < *(short *)(param_2 + 0x1a)) {
@@ -1510,7 +1506,7 @@ undefined4 FUN_00000bea(int *param_1)
   int iVar1;
   undefined4 uVar2;
   
-  iVar1 = FUN_00003c00();
+  iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
   if (iVar1 < 0x33900) {
 LAB_00000c46:
     uVar2 = 1;
@@ -1519,7 +1515,7 @@ LAB_00000c46:
     *param_1 = 1000000000;
     FUN_000006a6(FUN_00000aba,param_1);
     if (*param_1 != 1000000000) {
-      iVar1 = FUN_00003c00();
+      iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
       if (iVar1 < 0x40741) goto LAB_00000c46;
     }
     uVar2 = 0;
@@ -2201,11 +2197,11 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
   }
   else {
     DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x44); /* child[2] */
-    FUN_00004e6e(DAT_0001bdac);
+    activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001bdac);
   }
   DAT_0001bda8 = *(undefined4 *)(DAT_0001bdac + 0x48);
   DAT_0001bda4 = *(char **)(DAT_0001d6fc[0xc] + 0x74); /* child[4] */
-  FUN_00004e6e(DAT_0001bda4);
+  activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001bda4);
   FUN_00001c04((int)DAT_0001bda4);
   DAT_0001b734 = 0;
   /* Index window around *(short*)(root+0x2C): publish three neighboring child objs. */
@@ -2225,7 +2221,7 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
 void FUN_000018d6(undefined4 param_1)
 
 {
-  FUN_0001150a(param_1);
+  overlay_rng_init(param_1); /* Original: FUN_0001150a */
   DAT_0001d864 = &DAT_0001d96c;
   DAT_0001d860 = &DAT_0001d86c;
   FUN_00003734();
@@ -2535,8 +2531,15 @@ uint * heap_alloc_cleared(int nbytes) /* Original: FUN_00001b6c */
 
 
 
-uint * FUN_00001b84(int param_1,int param_2)
-
+/*
+ * Original: FUN_00001b84
+ * Proposed name: heap_calloc
+ * Confidence: [STRONG INFERENCE]
+ *
+ * heap_alloc(param_1 * param_2) then heap_zero_payload if non-null.
+ * Used by heap_realloc_grow_only as (nbytes, 1).
+ */
+uint * heap_calloc(int param_1,int param_2) /* Original: FUN_00001b84 */
 {
   uint *puVar1;
   
@@ -2549,8 +2552,20 @@ uint * FUN_00001b84(int param_1,int param_2)
 
 
 
-uint * FUN_00001ba8(uint *param_1,undefined4 *param_2)
-
+/*
+ * Original: FUN_00001ba8
+ * Proposed name: heap_realloc_grow_only
+ * Confidence: [PROVEN] grow-only realloc semantics
+ *
+ * Inputs: param_1 = existing heap payload; param_2 = requested byte capacity
+ * (often cast from int). Reads current capacity from heap header just before
+ * payload: if header byte == 0xFF → (hdr_u32-1)*8 else (1<<size_class)-4.
+ * If capacity >= request, return same pointer. Else heap_calloc(request,1),
+ * memmove_block old→new of *old* capacity bytes, heap_free_coalesce old.
+ * Never shrinks. Used by spawn_mission_pool_object to grow table by 10 slots.
+ * Evidence: NOTES grow-by-10 in 05116.
+ */
+uint * heap_realloc_grow_only(uint *param_1,undefined4 *param_2) /* Original: FUN_00001ba8 */
 {
   uint *puVar1;
   undefined4 *puVar2;
@@ -2562,8 +2577,8 @@ uint * FUN_00001ba8(uint *param_1,undefined4 *param_2)
     puVar2 = (undefined4 *)((1 << (*(byte *)(param_1 + -1) & 0x3f)) + -4);
   }
   if (puVar2 < param_2) {
-    puVar1 = FUN_00001b84((int)param_2,1);
-    FUN_0001a63e(param_1,puVar1,puVar2);
+    puVar1 = heap_calloc((int)param_2,1); /* Original: FUN_00001b84 */
+    memmove_block( /* Original: FUN_0001a63e */param_1,puVar1,puVar2);
     heap_free_coalesce((int)param_1);
     param_1 = puVar1;
   }
@@ -2579,7 +2594,7 @@ void FUN_00001be4(void)
   undefined4 *unaff_D3;
   undefined4 *unaff_A2;
   
-  FUN_0001a63e(unaff_A2,unaff_D2,unaff_D3);
+  memmove_block( /* Original: FUN_0001a63e */unaff_A2,unaff_D2,unaff_D3);
   heap_free_coalesce((int)unaff_A2);
   return;
 }
@@ -2610,8 +2625,23 @@ void FUN_00001c04(int param_1)
 
 
 
-void FUN_00001c5c(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6)
-
+/*
+ * Original: FUN_00001c5c
+ * Proposed name: translate_int3_vecs
+ * Confidence: [PROVEN]
+ *
+ * For count=param_1 (low word; high word extends large counts via DBRA wrap):
+ * each int[3] at param_2 → param_3 as (x+dx, y+dy, z+dz) with
+ * (param_4, param_5, param_6). Src/dst may alias. Stride 0xC.
+ *
+ * Used after transform_int3_vecs_by_matrix3 in template-chain xforms (slot
+ * translation +8/+c/+10; mesh path may shift by obj+0x34). Also camera-relative
+ * offsets (e.g. −d838/−d834/−d830).
+ *
+ * Sibling scale_int3_vecs multiplies components instead of adding.
+ * Evidence: Capstone @0x1C5C–0x1CAA ADD.L loop.
+ */
+void translate_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6) /* Original: FUN_00001c5c */
 {
   ushort uVar1;
   short sVar2;
@@ -2632,8 +2662,18 @@ void FUN_00001c5c(uint param_1,int *param_2,int *param_3,int param_4,int param_5
 
 
 
-void FUN_00001cac(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6)
-
+/*
+ * Original: FUN_00001cac
+ * Proposed name: scale_int3_vecs
+ * Confidence: [PROVEN] body; [UNKNOWN] callers
+ *
+ * Sibling of translate_int3_vecs: same DBRA count / int[3] stride, but
+ * dst = (x*sx, y*sy, z*sz) via MULS.L (param_4/5/6). Capstone @0x1CAC–0x1D00.
+ *
+ * No BSR/JSR/LEA absolute references to $1CAC found in the Pacific Conflict
+ * overlay — may be dead, reached only via computed pointer, or reserved API.
+ */
+void scale_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6) /* Original: FUN_00001cac */
 {
   ushort uVar1;
   short sVar2;
@@ -2654,8 +2694,22 @@ void FUN_00001cac(uint param_1,int *param_2,int *param_3,int param_4,int param_5
 
 
 
-short * FUN_00001d02(int param_1,short *param_2,int param_3)
-
+/*
+ * Original: FUN_00001d02
+ * Proposed name: matmul3x3_s16
+ * Confidence: [PROVEN]
+ *
+ * 3×3 fixed-point matrix product: out = left × right, all s16 row-major
+ * (9 shorts, row stride 6 bytes). Each element is a 3-term MULS.W dot >> 12
+ * (no +0x800 rounding). Args: (left, right, out).
+ *
+ * Used heavily by finalize_attitude_matrix_3ang / finalize_attitude_matrix_4ang / 025d6 paths
+ * composing basis tables at $1d78c…$1d7d4 into the output matrix.
+ *
+ * Capstone @0x1D02–0x1D74. False sin entry FUN_00001d56 is the ASR.L at
+ * @0x1D56 inside this loop (+0x20 before real sin_fixed14).
+ */
+short * matmul3x3_s16(int param_1,short *param_2,int param_3) /* Original: FUN_00001d02 */
 {
   int iVar1;
   int iVar2;
@@ -2686,8 +2740,13 @@ short * FUN_00001d02(int param_1,short *param_2,int param_3)
 
 
 
-short * FUN_00001d56(void)
-
+/*
+ * Original: FUN_00001d56
+ * Bytes: epilogue of FUN_00001d02 (matrix mul) — NOT sin
+ * Call-site alias: sin_fixed14 [INFERRED] (LEA $1D56; real sin @ $1D76 = +0x20)
+ * Status: BLOCKED (same false-entry pattern as FUN_00002de8 / $1A48)
+ */
+short * FUN_00001d56(void) /* Original: FUN_00001d56 — false entry; see header */
 {
   int in_D0;
   int unaff_D2;
@@ -2732,8 +2791,21 @@ short * FUN_00001d56(void)
 
 
 
-int FUN_00001d76(uint param_1)
-
+/*
+ * Original: FUN_00001d76
+ * Proposed name: sin_fixed14
+ * Confidence: [PROVEN]
+ *
+ * Piecewise-linear sin from 256-entry s16 table at DAT_0001ab6c (Ghidra label;
+ * usable sample base file offset 0x1ab8c is +0x20 — see NOTES trig dump).
+ * Angle: signed; index = angle>>6; frac = angle & 0x3F (with +0x3F bias when
+ * negative before shifts). Lerp between table[i] and table[(i+1)&0xff],
+ * scale frac, add. Returns sign-extended s16 in D0.
+ *
+ * load_attitude_angle_sincos JSRs here via PC-relative $1D76. Some sites
+ * LEA $1D56 (false) instead — treat those as this function [INFERRED].
+ */
+int sin_fixed14(uint param_1) /* Original: FUN_00001d76 */
 {
   uint uVar1;
   uint uVar2;
@@ -2763,8 +2835,13 @@ int FUN_00001d76(uint param_1)
 
 
 
-int FUN_00001db8(void)
-
+/*
+ * Original: FUN_00001db8
+ * Bytes: mid-body / tail of sin_fixed14 — NOT cos
+ * Call-site alias: cos_fixed14 [INFERRED] (LEA $1DB8; real cos @ $1DD8 = +0x20)
+ * Status: BLOCKED
+ */
+int FUN_00001db8(void) /* Original: FUN_00001db8 — false entry; see header */
 {
   int in_D0;
   int iVar1;
@@ -2782,8 +2859,16 @@ int FUN_00001db8(void)
 
 
 
-int FUN_00001dd8(uint param_1)
-
+/*
+ * Original: FUN_00001dd8
+ * Proposed name: cos_fixed14
+ * Confidence: [PROVEN]
+ *
+ * Cosine twin of sin_fixed14 using table DAT_0001ad6c (usable base +0x20 at
+ * file 0x1ad8c). Same >>6 index / 0x3F-frac lerp. Paired with sin in
+ * load_attitude_angle_sincos. False LEA target $1DB8 → treat as this [INFERRED].
+ */
+int cos_fixed14(uint param_1) /* Original: FUN_00001dd8 */
 {
   uint uVar1;
   uint uVar2;
@@ -2813,8 +2898,20 @@ int FUN_00001dd8(uint param_1)
 
 
 
-int FUN_00001e3a(int param_1)
-
+/*
+ * Original: FUN_00001e3a
+ * Proposed name: acos_fixed14
+ * Confidence: [PROVEN] table+search; [STRONG INFERENCE] “acos” label
+ *
+ * Inverse of cos_fixed14: clamp input to ±0x1000, binary-search cos table
+ * DAT_0001ad6c (indices 0..0x80), then lerp to a 14-bit-style angle
+ * (index<<6 + fraction). Capstone @0x1E3A–0x1EBA.
+ *
+ * Callers: attitude_from_velocity path (@0x1FE8/@0x2008), acos_scaled_dot3.
+ *
+ * Evidence: same DAT_0001ad6c as cos_fixed14; search compares table[mid] to x.
+ */
+int acos_fixed14(int param_1) /* Original: FUN_00001e3a */
 {
   short sVar1;
   short sVar2;
@@ -2851,8 +2948,24 @@ int FUN_00001e3a(int param_1)
 
 
 
-ushort FUN_00001ebc(int param_1)
-
+/*
+ * Original: FUN_00001ebc
+ * Proposed name: atan_fixed14
+ * Confidence: [PROVEN] table+search; [STRONG INFERENCE] “atan” label
+ *
+ * Inverse lookup on 32-bit table DAT_0001af6c (indices 0..0x7f): binary
+ * search then lerp. Output is ((index − 0x3f) << 6) + fraction, masked
+ * 0x3fff — zero near table midpoint (signed ratio domain).
+ *
+ * Callers: attitude_from_velocity (@0x1F6A/@0x1F98) for heading from
+ * velocity ratios with 0x1000/0x2000 quadrant fixups; also @0x10310/@0x1033C.
+ *
+ * Evidence: Capstone @0x1EBC–0x1F20; LEA $1af6c; distinct from acos_fixed14
+ * (cos shorts at 1ad6c). Table nearly ascending signed longs (tan-like).
+ *
+ * Unknown: exact fixed-point scale of table entries.
+ */
+ushort atan_fixed14(int param_1) /* Original: FUN_00001ebc */
 {
   short sVar1;
   short sVar2;
@@ -2883,9 +2996,19 @@ ushort FUN_00001ebc(int param_1)
 
 
 
-void FUN_00001f22(short param_1,short param_2,short param_3,int param_4,int param_5,ushort *param_6,
-                 ushort *param_7)
-
+/*
+ * Original: FUN_00001f22
+ * Proposed name: attitude_from_velocity
+ * Confidence: [STRONG INFERENCE] role; [PROVEN] outputs
+ *
+ * From velocity components (p1,p2,p3), speed p4, speed² p5: write attitude
+ * angles to *param_7 and *param_6 (14-bit). Calls FUN_00002de8 via LEA+JSR
+ * after pushing components — call-site ≡ abs_int [INFERRED]; bytes @0x2DE8
+ * are a false epilogue entry (BLOCKED). Also atan_fixed14 / acos_fixed14;
+ * may call isqrt_floor. In e792 airborne: local_28/local_2a → pos_20/attitude_22.
+ */
+void attitude_from_velocity(short param_1,short param_2,short param_3,int param_4,int param_5,
+                 ushort *param_6,ushort *param_7) /* Original: FUN_00001f22 */
 {
   short sVar2;
   short sVar3;
@@ -2895,7 +3018,7 @@ void FUN_00001f22(short param_1,short param_2,short param_3,int param_4,int para
   sVar2 = FUN_00002de8();
   sVar3 = FUN_00002de8();
   if (sVar3 < sVar2) {
-    uVar4 = FUN_00001ebc(((int)param_3 << 0xc) / (int)sVar2);
+    uVar4 = atan_fixed14( /* Original: FUN_00001ebc */((int)param_3 << 0xc) / (int)sVar2);
     uVar4 = 0x1000 - uVar4;
     if (0 < param_1) {
       uVar4 = -uVar4;
@@ -2905,7 +3028,7 @@ LAB_00001faa:
   }
   else {
     if (param_3 == 0) goto LAB_00001fb0;
-    uVar4 = FUN_00001ebc((param_1 * -0x1000) / (int)sVar3);
+    uVar4 = atan_fixed14( /* Original: FUN_00001ebc */(param_1 * -0x1000) / (int)sVar3);
     if (param_3 < 0) {
       uVar4 = 0x2000 - uVar4;
       goto LAB_00001faa;
@@ -2914,17 +3037,17 @@ LAB_00001faa:
   *param_7 = uVar4;
 LAB_00001fb0:
   if (param_4 != 0) {
-    iVar1 = FUN_00002e08((int)param_2);
+    iVar1 = abs_int( /* Original: FUN_00002e08 */(int)param_2);
     if ((int)sVar3 + (int)sVar2 < iVar1) {
-      iVar1 = FUN_0000e372(param_5 - (int)param_2 * (int)param_2);
-      iVar1 = FUN_00001e3a(((int)(short)iVar1 << 0xc) / param_4);
+      iVar1 = isqrt_floor(param_5 - (int)param_2 * (int)param_2); /* Original: FUN_0000e372 */
+      iVar1 = acos_fixed14( /* Original: FUN_00001e3a */((int)(short)iVar1 << 0xc) / param_4);
       uVar4 = (ushort)iVar1;
       if (param_2 < 0) {
         uVar4 = -uVar4 & 0x3fff;
       }
     }
     else {
-      iVar1 = FUN_00001e3a(((int)param_2 << 0xc) / param_4);
+      iVar1 = acos_fixed14( /* Original: FUN_00001e3a */((int)param_2 << 0xc) / param_4);
       uVar4 = 0x1000U - (short)iVar1 & 0x3fff;
     }
     *param_6 = uVar4;
@@ -2934,53 +3057,100 @@ LAB_00001fb0:
 
 
 
-void FUN_0000202a(uint param_1,uint param_2,uint param_3,uint param_4)
-
+/*
+ * Original: FUN_0000202a
+ * Proposed name: load_attitude_angle_sincos
+ * Confidence: [PROVEN]
+ *
+ * For each of four angles (param_1..4), store cos then sin into adjacent
+ * scratch words used by later 020e6 / 01d02 attitude composition:
+ *   p1 → DAT_0001d7fa (cos), 1d7fc (sin)   via FUN_00001dd8 / FUN_00001d76
+ *   p2 → 1d7f6 / 1d7f8
+ *   p3 → 1d7f2 / 1d7f4
+ *   p4 → 1d7ee / 1d7f0
+ *
+ * Capstone @0x202A: PC-relative JSR to real cos@$1DD8 and sin@$1D76 (not the
+ * false mid-labels $1DB8/$1D56). build_attitude_matrix* and
+ * build_attitude_matrix_3ang (4th angle 0) all start here.
+ *
+ * Evidence: Capstone store map; Ghidra body matches 8 trig calls.
+ */
+void load_attitude_angle_sincos(uint param_1,uint param_2,uint param_3,uint param_4) /* Original: FUN_0000202a */
 {
   int iVar1;
   
-  iVar1 = FUN_00001dd8(param_1);
+  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_1);
   DAT_0001d7fa = (short)iVar1;
-  iVar1 = FUN_00001d76(param_1);
+  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_1);
   DAT_0001d7fc = (short)iVar1;
-  iVar1 = FUN_00001dd8(param_2);
+  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_2);
   DAT_0001d7f6 = (short)iVar1;
-  iVar1 = FUN_00001d76(param_2);
+  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_2);
   DAT_0001d7f8 = (short)iVar1;
-  iVar1 = FUN_00001dd8(param_3);
+  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_3);
   DAT_0001d7f2 = (short)iVar1;
-  iVar1 = FUN_00001d76(param_3);
+  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_3);
   DAT_0001d7f4 = (short)iVar1;
-  iVar1 = FUN_00001dd8(param_4);
+  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_4);
   DAT_0001d7ee = (short)iVar1;
-  iVar1 = FUN_00001d76(param_4);
+  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_4);
   DAT_0001d7f0 = (short)iVar1;
   return;
 }
 
 
 
-void FUN_000020a0(uint param_1,uint param_2)
-
+/*
+ * Original: FUN_000020a0
+ * Proposed name: load_attitude_angle_sincos_5_6
+ * Confidence: [PROVEN]
+ *
+ * Companion to load_attitude_angle_sincos for the 6-angle attitude path.
+ * Stores cos/sin of two extra angles into scratch used by
+ * fill_attitude_rotation_bases_5_6:
+ *   p5 → DAT_0001d7ea (cos), 1d7ec (sin)
+ *   p6 → DAT_0001d7e6 / 1d7e8
+ *
+ * Capstone @0x20A0: PC-relative JSR to cos@$1DD8 / sin@$1D76 (same as 0202a).
+ * Callers: build_attitude_matrix_6ang / build_attitude_matrix_6ang_alt (6-angle build wrappers).
+ *
+ * Evidence: Capstone store map; Ghidra body matches 4 trig calls.
+ */
+void load_attitude_angle_sincos_5_6(uint param_1,uint param_2) /* Original: FUN_000020a0 */
 {
   int iVar1;
   
-  iVar1 = FUN_00001dd8(param_1);
+  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_1);
   DAT_0001d7ea = (short)iVar1;
-  iVar1 = FUN_00001d76(param_1);
+  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_1);
   DAT_0001d7ec = (short)iVar1;
-  iVar1 = FUN_00001dd8(param_2);
+  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_2);
   DAT_0001d7e6 = (short)iVar1;
-  iVar1 = FUN_00001d76(param_2);
+  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_2);
   DAT_0001d7e8 = (short)iVar1;
   return;
 }
 
 
 
-void FUN_000020e6(void)
-
+/*
+ * Original: FUN_000020e6
+ * Proposed name: fill_attitude_rotation_bases
+ * Confidence: [PROVEN] layout; [STRONG INFERENCE] axis labels (X/Y/Z)
+ *
+ * After load_attitude_angle_sincos, expand the first three (cos,sin) pairs
+ * into three 3×3 s16 bases (0x1000 = 1.0). Capstone @0x20E6–0x219E:
+ *
+ *   DAT_0001d7d4 ← angle1 (1d7fa/fc): [[1,0,0],[0,c,-s],[0,s,c]]   ~Rx
+ *   DAT_0001d7bc ← angle2 (1d7f6/f8): [[c,0,s],[0,1,0],[-s,0,c]]   ~Ry
+ *   DAT_0001d7a4 ← angle3 (1d7f2/f4): [[c,s,0],[-s,c,0],[0,0,1]]   ~Rz
+ *
+ * fill_attitude_rotation_basis_4 similarly fills DAT_0001d78c from angle4.
+ * Downstream matmul3x3_s16 chains these into the final attitude matrix.
+ */
+void fill_attitude_rotation_bases(void) /* Original: FUN_000020e6 */
 {
+  /* ~Rx from angle1 cos/sin */
   DAT_0001d7d4 = 0x1000;
   DAT_0001d7d6 = 0;
   DAT_0001d7d8 = 0;
@@ -2990,6 +3160,7 @@ void FUN_000020e6(void)
   DAT_0001d7e0 = 0;
   DAT_0001d7e2 = DAT_0001d7fc;
   DAT_0001d7e4 = DAT_0001d7fa;
+  /* ~Ry from angle2 */
   DAT_0001d7bc = DAT_0001d7f6;
   DAT_0001d7be = 0;
   DAT_0001d7c0 = DAT_0001d7f8;
@@ -2999,6 +3170,7 @@ void FUN_000020e6(void)
   DAT_0001d7c8 = -DAT_0001d7f8;
   DAT_0001d7ca = 0;
   DAT_0001d7cc = DAT_0001d7f6;
+  /* ~Rz from angle3 */
   DAT_0001d7a4 = DAT_0001d7f2;
   DAT_0001d7a6 = DAT_0001d7f4;
   DAT_0001d7a8 = 0;
@@ -3013,8 +3185,24 @@ void FUN_000020e6(void)
 
 
 
-void FUN_000021a0(void)
-
+/*
+ * Original: FUN_000021a0
+ * Proposed name: fill_attitude_rotation_basis_4
+ * Confidence: [PROVEN] layout; [STRONG INFERENCE] ~Ry form
+ *
+ * Expand angle4 sincos (DAT_0001d7ee/f0 from load_attitude_angle_sincos) into
+ * the 3×3 basis at DAT_0001d78c:
+ *   [[c,0,s],[0,1,0],[-s,0,c]]  (same pattern as angle2/~Ry in
+ *   fill_attitude_rotation_bases).
+ *
+ * Used by build_attitude_matrix after fill_attitude_rotation_bases, before
+ * finalize_attitude_matrix_4ang matmul chain. Sibling
+ * fill_attitude_rotation_basis_4_rx writes ~Rx form into the same DAT_0001d78c
+ * slot (X-axis attitude path).
+ *
+ * Evidence: Capstone @0x21A0–0x21DE; sole direct caller build_attitude_matrix.
+ */
+void fill_attitude_rotation_basis_4(void) /* Original: FUN_000021a0 */
 {
   DAT_0001d78c = DAT_0001d7ee;
   DAT_0001d78e = 0;
@@ -3030,8 +3218,20 @@ void FUN_000021a0(void)
 
 
 
-void FUN_000021e0(void)
-
+/*
+ * Original: FUN_000021e0
+ * Proposed name: fill_attitude_rotation_basis_4_rx
+ * Confidence: [PROVEN] layout; [STRONG INFERENCE] ~Rx form
+ *
+ * Expand angle4 sincos (DAT_0001d7ee/f0) into DAT_0001d78c as ≈Rx:
+ *   [[1,0,0],[0,c,-s],[0,s,c]]
+ * Same slot as fill_attitude_rotation_basis_4 (~Ry). Used by the X-axis
+ * attitude path (compose_attitude_matrix_x / build_attitude_matrix_x) instead of ~Ry.
+ *
+ * Evidence: Capstone @0x21E0–0x221E; mirrors angle1/~Rx layout in
+ * fill_attitude_rotation_bases.
+ */
+void fill_attitude_rotation_basis_4_rx(void) /* Original: FUN_000021e0 */
 {
   DAT_0001d78c = 0x1000;
   DAT_0001d78e = 0;
@@ -3047,8 +3247,23 @@ void FUN_000021e0(void)
 
 
 
-void FUN_00002220(void)
-
+/*
+ * Original: FUN_00002220
+ * Proposed name: fill_attitude_rotation_bases_5_6
+ * Confidence: [PROVEN] layout; [STRONG INFERENCE] ~Rx/~Ry axis forms
+ *
+ * After load_attitude_angle_sincos_5_6 has stored two extra (cos,sin) pairs at
+ * DAT_0001d7ea/ec and DAT_0001d7e6/e8, expand them into two 3×3 bases:
+ *   DAT_0001d774 ← ≈Rx from angle5 (1d7ea/ec)  — same pattern as
+ *     fill_attitude_rotation_basis_4_rx
+ *   DAT_0001d75c ← ≈Ry from angle6 (1d7e6/e8)  — same pattern as
+ *     fill_attitude_rotation_basis_4
+ *
+ * Used by compose_attitude_matrix_6ang and compose_attitude_matrix_6ang_alt.
+ *
+ * Evidence: Capstone @0x2220–0x229C; BSR.W from @0x2672 and @0x2714.
+ */
+void fill_attitude_rotation_bases_5_6(void) /* Original: FUN_00002220 */
 {
   DAT_0001d774 = 0x1000;
   DAT_0001d776 = 0;
@@ -3073,8 +3288,30 @@ void FUN_00002220(void)
 
 
 
-void FUN_0000229e(int param_1,int param_2,int param_3,uint param_4,int param_5,int param_6)
-
+/*
+ * Original: FUN_0000229e
+ * Proposed name: build_attitude_matrix_from_dir_roll
+ * Confidence: [PROVEN] math; [STRONG INFERENCE] “look/dir+roll” role
+ *
+ * Build a 3×3 attitude into param_5 from direction (param_1,2,3)= (x,y,z) and
+ * roll angle param_4. Writes the usual sincos scratch (same slots as
+ * load_attitude_angle_sincos angles 1–3), builds three local bases, then two
+ * matmul3x3_s16. param_6≠0 forces yaw-pair (1d7f6/f8) to (0x1000, 0).
+ *
+ * Capstone @0x229E–0x2426:
+ *   horiz = isqrt(x²+z²);  full = isqrt(x²+y²+z²);   // LEA $E352 ≡ isqrt_floor
+ *   1d7fa = (horiz<<12)/full;  1d7fc = (−y<<12)/full;
+ *   1d7f6/f8 = (z<<12)/horiz, (x<<12)/horiz  (or identity if param_6);
+ *   1d7f2/f4 = cos/sin(roll);
+ *   out ← (basis_yaw × basis_pitch) × basis_roll.
+ *
+ * Contains DAT_00020ce4 tag landing $2408 at the first matmul PEA (@0x2408) —
+ * mid-body only; not a supported public entry. No direct overlay BSR/JSR to
+ * @0x229E found (may be reached from another CODE or via the tag only).
+ *
+ * Evidence: Capstone full body; Ghidra matches; isqrt via false mid $E352.
+ */
+void build_attitude_matrix_from_dir_roll(int param_1,int param_2,int param_3,uint param_4,int param_5,int param_6) /* Original: FUN_0000229e */
 {
   short sVar1;
   int iVar2;
@@ -3103,6 +3340,7 @@ void FUN_0000229e(int param_1,int param_2,int param_3,uint param_4,int param_5,i
   short local_8;
   undefined2 local_6;
   
+  /* Ghidra LAB_0000e350_2: LEA $E352 = isqrt_floor @0xE372 − 0x20 [INFERRED] */
   sVar1 = (*(code *)&LAB_0000e350_2)(param_1 * param_1 + param_3 * param_3);
   iVar2 = (int)sVar1;
   sVar1 = (*(code *)&LAB_0000e350_2)(param_2 * param_2 + param_1 * param_1 + param_3 * param_3);
@@ -3116,9 +3354,9 @@ void FUN_0000229e(int param_1,int param_2,int param_3,uint param_4,int param_5,i
     DAT_0001d7f6 = 0x1000;
     DAT_0001d7f8 = 0;
   }
-  iVar2 = FUN_00001dd8(param_4);
+  iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */param_4);
   DAT_0001d7f2 = (short)iVar2;
-  iVar2 = FUN_00001d76(param_4);
+  iVar2 = sin_fixed14( /* Original: FUN_00001d76 */param_4);
   DAT_0001d7f4 = (short)iVar2;
   local_16[0] = 0x1000;
   local_16[1] = 0;
@@ -3147,199 +3385,429 @@ void FUN_0000229e(int param_1,int param_2,int param_3,uint param_4,int param_5,i
   local_2c = 0;
   local_2a = 0x1000;
   local_38 = DAT_0001d7f4;
-  FUN_00001d02((int)&local_28,local_16,(int)auStack_4c);
-  FUN_00001d02((int)auStack_4c,&local_3a,param_5);
+  /* $2408 tag lands at the next PEA — matmul-only continuation mid-frame */
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)&local_28,local_16,(int)auStack_4c);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_4c,&local_3a,param_5);
   return;
 }
 
 
 
-void FUN_00002428(int param_1)
-
+/*
+ * Original: FUN_00002428
+ * Proposed name: finalize_attitude_matrix_3ang_alt
+ * Confidence: [PROVEN] composition; [STRONG INFERENCE] “alt” vs tagged 3ang
+ *
+ * Twin of finalize_attitude_matrix_3ang without the DAT_00020ce4=$2408 tag,
+ * and with swapped middle/last bases in the two matmuls:
+ *   temp ← mul($1d7bc, $1d7d4);  out ← mul(temp, $1d7a4)
+ * (vs tagged path: temp ← mul($1d7a4,$1d7d4); out ← mul(temp,$1d7bc)).
+ *
+ * Sole caller: build_attitude_matrix_3ang_alt (3-angle load + this finalize;
+ * mirror of build_attitude_matrix_3ang → finalize_attitude_matrix_3ang).
+ *
+ * Evidence: Capstone @0x2428–0x2462; single BSR.B from @0x247E.
+ */
+void finalize_attitude_matrix_3ang_alt(int param_1) /* Original: FUN_00002428 */
 {
   undefined1 auStack_16 [18];
   
-  FUN_000020e6();
-  FUN_00001d02(0x1d7bc,&DAT_0001d7d4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d7a4,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&DAT_0001d7d4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7a4,param_1);
   return;
 }
 
 
 
-void FUN_00002464(uint param_1,uint param_2,uint param_3,int param_4)
-
+/*
+ * Original: FUN_00002464
+ * Proposed name: build_attitude_matrix_3ang_alt
+ * Confidence: [PROVEN] chain
+ *
+ * Same entry as build_attitude_matrix_3ang: load_attitude_angle_sincos(a,b,c,0)
+ * then finalize — but finishes via finalize_attitude_matrix_3ang_alt (untagged,
+ * alternate matmul order) instead of finalize_attitude_matrix_3ang ($2408 tag).
+ *
+ * Callers (2): @0x104CC, @0x1848C — both pass negated entity attitude shorts
+ * masked to 14 bits.
+ *
+ * Evidence: Capstone @0x2464–0x2486 mirrors @0x253E–0x2560 except BSR target.
+ */
+void build_attitude_matrix_3ang_alt(uint param_1,uint param_2,uint param_3,int param_4) /* Original: FUN_00002464 */
 {
-  FUN_0000202a(param_1,param_2,param_3,0);
-  FUN_00002428(param_4);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,0);
+  finalize_attitude_matrix_3ang_alt( /* Original: FUN_00002428 */param_4);
   return;
 }
 
 
 
-void FUN_00002488(int param_1)
-
+/*
+ * Original: FUN_00002488
+ * Proposed name: compose_attitude_matrix_x_alt
+ * Confidence: [PROVEN] composition; [STRONG INFERENCE] “alt” vs tagged X path
+ *
+ * Twin of compose_attitude_matrix_x without DAT_00020ce4=$2468, and with an
+ * alternate three-matmul association after filling bases + Rx (021e0):
+ *   out ← mul($1d7bc, $1d7d4);
+ *   temp ← mul(out, $1d7a4);
+ *   out ← mul(temp, $1d78c)
+ * (tagged X path: temp←mul($1d78c,$1d7a4); then ×$1d7d4; then ×$1d7bc).
+ *
+ * Sole caller: build_attitude_matrix_x_alt (4-angle load + this compose).
+ *
+ * Evidence: Capstone @0x2488–0x24D4; single BSR.B from @0x24F2.
+ */
+void compose_attitude_matrix_x_alt(int param_1) /* Original: FUN_00002488 */
 {
   undefined1 auStack_16 [18];
   
-  FUN_000020e6();
-  FUN_000021e0();
-  FUN_00001d02(0x1d7bc,&DAT_0001d7d4,param_1);
-  FUN_00001d02(param_1,&DAT_0001d7a4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d78c,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&DAT_0001d7d4,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7a4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d78c,param_1);
   return;
 }
 
 
 
-void FUN_000024d6(uint param_1,uint param_2,uint param_3,uint param_4,int param_5)
-
+/*
+ * Original: FUN_000024d6
+ * Proposed name: build_attitude_matrix_x_alt
+ * Confidence: [PROVEN] chain
+ *
+ * Four-angle attitude build via load_attitude_angle_sincos then
+ * compose_attitude_matrix_x_alt. Sibling of build_attitude_matrix_x, which
+ * reorders args into 0202a and finishes via tagged compose_attitude_matrix_x.
+ * This path passes angles in stack order and uses the untagged alt compose.
+ *
+ * Callers (2): @0x6746 / @0x68B6 — camera/view globals DAT_0001d810…1d808.
+ *
+ * Evidence: Capstone @0x24D6–0x24F6; mirrors 0262e except BSR→02488 and no
+ * arg shuffle.
+ */
+void build_attitude_matrix_x_alt(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_000024d6 */
 {
-  FUN_0000202a(param_1,param_2,param_3,param_4);
-  FUN_00002488(param_5);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,param_4);
+  compose_attitude_matrix_x_alt( /* Original: FUN_00002488 */param_5);
   return;
 }
 
 
 
-void FUN_000024f8(int param_1)
-
+/*
+ * Original: FUN_000024f8
+ * Proposed name: finalize_attitude_matrix_3ang
+ * Confidence: [PROVEN] composition; [STRONG INFERENCE] role label
+ *
+ * Finish a 3-angle attitude matrix into param_1 after FUN_0000202a has loaded
+ * angle bases. Sets scratch tag DAT_00020ce4 = 0x2408, runs FUN_000020e6
+ * (basis fill), then two FUN_00001d02 matmuls:
+ *   temp ← mul($1d7a4, $1d7d4);  out ← mul(temp, $1d7bc).
+ *
+ * Sole caller: build_attitude_matrix_3ang. Sibling finalize_attitude_matrix_4ang (used by
+ * build_attitude_matrix) does three matmuls without the 0x2408 tag.
+ *
+ * Evidence: Capstone @0x24F8–0x253C; single BSR from @0x2558.
+ */
+void finalize_attitude_matrix_3ang(int param_1) /* Original: FUN_000024f8 */
 {
   undefined1 auStack_16 [18];
   
   DAT_00020ce4 = 0x2408;
-  FUN_000020e6();
-  FUN_00001d02(0x1d7a4,&DAT_0001d7d4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d7bc,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7a4,&DAT_0001d7d4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
   return;
 }
 
 
 
-void FUN_0000253e(uint param_1,uint param_2,uint param_3,int param_4)
-
+/*
+ * Original: FUN_0000253e
+ * Proposed name: build_attitude_matrix_3ang
+ * Confidence: [PROVEN] composition chain
+ *
+ * Build a 3×3 attitude/rotation matrix into param_4 from three 14-bit-style
+ * angles. Calls load_attitude_angle_sincos( /* Original: FUN_0000202a */a,b,c,0) — fourth angle forced to 0 — then
+ * finalize_attitude_matrix_3ang (sets DAT_00020ce4=0x2408; 020e6 + two 01d02).
+ *
+ * Contrast:
+ *   build_attitude_matrix (025a8): four angles, arg reorder, 020e6→021a0→02562
+ *   build_attitude_matrix_x (0262e): four angles via 025d6
+ *   build_attitude_matrix_3ang_alt (FUN_00002464): same 3ang+0 setup but finishes via alt finalize
+ *
+ * Heavy use from apply_template_chain_xform{,_always} (slot +2/+4/+6) and
+ * ordnance/camera helpers (e.g. FUN_00015d78).
+ *
+ * Evidence: Capstone @0x253E–0x2560; body is two calls only.
+ */
+void build_attitude_matrix_3ang(uint param_1,uint param_2,uint param_3,int param_4) /* Original: FUN_0000253e */
 {
-  FUN_0000202a(param_1,param_2,param_3,0);
-  FUN_000024f8(param_4);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,0);
+  finalize_attitude_matrix_3ang( /* Original: FUN_000024f8 */param_4);
   return;
 }
 
 
 
-void FUN_00002562(int param_1)
-
+/*
+ * Original: FUN_00002562
+ * Proposed name: finalize_attitude_matrix_4ang
+ * Confidence: [PROVEN] composition
+ *
+ * Compose the final 3×3 attitude into param_1 from the four bases filled by
+ * fill_attitude_rotation_bases + fill_attitude_rotation_basis_4:
+ *   out  ← matmul3x3_s16(DAT_0001d78c, DAT_0001d7a4)   // R4 × Rz
+ *   temp ← matmul3x3_s16(out, DAT_0001d7d4)            // × Rx
+ *   out  ← matmul3x3_s16(temp, DAT_0001d7bc)           // × Ry
+ *
+ * Sole caller: build_attitude_matrix. Sibling finalize_attitude_matrix_3ang
+ * does two matmuls (Rz×Rx then ×Ry) without the R4 factor.
+ *
+ * Evidence: Capstone @0x2562–0x25A6; Ghidra body matches three 01d02 calls.
+ */
+void finalize_attitude_matrix_4ang(int param_1) /* Original: FUN_00002562 */
 {
   undefined1 auStack_16 [18];
   
-  FUN_00001d02(0x1d78c,&DAT_0001d7a4,param_1);
-  FUN_00001d02(param_1,&DAT_0001d7d4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d7bc,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d78c,&DAT_0001d7a4,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7d4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
   return;
 }
 
 
 
-void FUN_000025a8(uint param_1,uint param_2,uint param_3,uint param_4,int param_5)
-
+/*
+ * Original: FUN_000025a8
+ * Proposed name: build_attitude_matrix
+ * Confidence: [PROVEN] composition chain; [STRONG INFERENCE] axis order
+ *
+ * Builds a 3×3 attitude matrix into param_5 via FUN_0000202a (angle setup) →
+ * fill_attitude_rotation_bases → fill_attitude_rotation_basis_4 → finalize_attitude_matrix_4ang. Args are 14-bit angles
+ * (&0x3fff). In e792: (local_48, local_28/pos_20, local_2a/att22, yaw_blend,
+ * asStack_22). Sibling FUN_0000262e uses compose_attitude_matrix_x instead of 021a0/finalize_attitude_matrix_4ang.
+ * Evidence: NOTES attitude-matrix entry; flight contract.
+ */
+void build_attitude_matrix(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_000025a8 */
 {
-  FUN_0000202a(param_2,param_3,param_4,param_1);
-  FUN_000020e6();
-  FUN_000021a0();
-  FUN_00002562(param_5);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_2,param_3,param_4,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  fill_attitude_rotation_basis_4( /* Original: FUN_000021a0 */);
+  finalize_attitude_matrix_4ang( /* Original: FUN_00002562 */param_5);
   return;
 }
 
 
 
-void FUN_000025d6(int param_1)
-
+/*
+ * Original: FUN_000025d6
+ * Proposed name: compose_attitude_matrix_x
+ * Confidence: [PROVEN]
+ *
+ * X-axis attitude compose after load_attitude_angle_sincos:
+ *   DAT_00020ce4 = 0x2468;
+ *   fill_attitude_rotation_bases;
+ *   fill_attitude_rotation_basis_4_rx;   // ~Rx into 1d78c (not ~Ry)
+ *   then same three matmul3x3_s16 as finalize_attitude_matrix_4ang
+ *     (R4×Rz × Rx × Ry) into param_1.
+ *
+ * Called by build_attitude_matrix_x. Contrast build_attitude_matrix which
+ * uses fill_attitude_rotation_basis_4 (~Ry) + finalize_attitude_matrix_4ang
+ * separately (no 0x2468 tag here on that path).
+ *
+ * Evidence: Capstone @0x25D6–0x262C.
+ */
+void compose_attitude_matrix_x(int param_1) /* Original: FUN_000025d6 */
 {
   undefined1 auStack_16 [18];
   
   DAT_00020ce4 = 0x2468;
-  FUN_000020e6();
-  FUN_000021e0();
-  FUN_00001d02(0x1d78c,&DAT_0001d7a4,param_1);
-  FUN_00001d02(param_1,&DAT_0001d7d4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d7bc,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d78c,&DAT_0001d7a4,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7d4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
   return;
 }
 
 
 
-void FUN_0000262e(uint param_1,uint param_2,uint param_3,uint param_4,int param_5)
-
+/*
+ * Original: FUN_0000262e
+ * Proposed name: build_attitude_matrix_x
+ * Confidence: [PROVEN] composition; sibling of build_attitude_matrix
+ *
+ * Same angle setup as build_attitude_matrix but finishes via
+ * compose_attitude_matrix_x (fill bases + Rx basis_4 + three matmuls, tag
+ * 0x2468) instead of ~Ry basis_4 + finalize_attitude_matrix_4ang.
+ * Used by spawn_ordnance_oriented before scatter spawn.
+ */
+void build_attitude_matrix_x(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_0000262e */
 {
-  FUN_0000202a(param_2,param_3,param_4,param_1);
-  FUN_000025d6(param_5);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_2,param_3,param_4,param_1);
+  compose_attitude_matrix_x( /* Original: FUN_000025d6 */param_5);
   return;
 }
 
 
 
-void FUN_00002654(int param_1)
-
+/*
+ * Original: FUN_00002654
+ * Proposed name: compose_attitude_matrix_6ang
+ * Confidence: [PROVEN] composition; [STRONG INFERENCE] “6ang” (4+2 loads)
+ *
+ * Extended attitude compose: sets DAT_00020ce4=$26e0, fills the usual three
+ * bases + Rx (021e0), then fill_attitude_rotation_bases_5_6 which builds two extra bases at
+ * DAT_0001d774 (~Rx from 1d7ea/ec) and DAT_0001d75c (~Ry from 1d7e6/e8).
+ * Five matmuls:
+ *   out ← (((((1d774×1d75c)×1d78c)×1d7a4)×1d7d4)×1d7bc)
+ *
+ * Sole caller: build_attitude_matrix_6ang (0202a + load_attitude_angle_sincos_5_6 + this).
+ * Untagged twin: compose_attitude_matrix_6ang_alt (alt matmul order).
+ *
+ * Evidence: Capstone @0x2654–0x26CA; BSR.W from @0x26F4.
+ */
+void compose_attitude_matrix_6ang(int param_1) /* Original: FUN_00002654 */
 {
   undefined1 auStack_16 [18];
   
   DAT_00020ce4 = 0x26e0;
-  FUN_000020e6();
-  FUN_000021e0();
-  FUN_00002220();
-  FUN_00001d02(0x1d774,&DAT_0001d75c,param_1);
-  FUN_00001d02(param_1,&DAT_0001d78c,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d7a4,param_1);
-  FUN_00001d02(param_1,&DAT_0001d7d4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d7bc,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
+  fill_attitude_rotation_bases_5_6( /* Original: FUN_00002220 */); /* fills 1d774 + 1d75c from extra sincos */
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d774,&DAT_0001d75c,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d78c,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7a4,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7d4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
   return;
 }
 
 
 
-void FUN_000026cc(uint param_1,uint param_2,uint param_3,uint param_4,uint param_5,uint param_6,
-                 int param_7)
-
+/*
+ * Original: FUN_000026cc
+ * Proposed name: build_attitude_matrix_6ang
+ * Confidence: [PROVEN] chain
+ *
+ * Six-angle attitude build:
+ *   load_attitude_angle_sincos(a,b,c,d)
+ *   load_attitude_angle_sincos_5_6(e,f)
+ *   compose_attitude_matrix_6ang(out)   // tag $26e0
+ *
+ * Sole overlay caller @0x66B4 (camera/view path with negated globals).
+ * Alt twin: build_attitude_matrix_6ang_alt → compose_attitude_matrix_6ang_alt.
+ *
+ * Evidence: Capstone @0x26CC–0x26FE.
+ */
+void build_attitude_matrix_6ang(uint param_1,uint param_2,uint param_3,uint param_4,uint param_5,
+                 uint param_6,int param_7) /* Original: FUN_000026cc */
 {
-  FUN_0000202a(param_1,param_2,param_3,param_4);
-  FUN_000020a0(param_5,param_6);
-  FUN_00002654(param_7);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,param_4);
+  load_attitude_angle_sincos_5_6( /* Original: FUN_000020a0 */param_5,param_6);
+  compose_attitude_matrix_6ang( /* Original: FUN_00002654 */param_7);
   return;
 }
 
 
 
-void FUN_00002700(int param_1)
-
+/*
+ * Original: FUN_00002700
+ * Proposed name: compose_attitude_matrix_6ang_alt
+ * Confidence: [PROVEN] composition; [STRONG INFERENCE] “alt” vs tagged 6ang
+ *
+ * Twin of compose_attitude_matrix_6ang without DAT_00020ce4=$26e0, and with
+ * reversed matmul association after the same three fill helpers:
+ *   out ← (((((1d7bc×1d7d4)×1d7a4)×1d78c)×1d75c)×1d774)
+ * (tagged: (((((1d774×1d75c)×1d78c)×1d7a4)×1d7d4)×1d7bc)).
+ *
+ * Sole caller: build_attitude_matrix_6ang_alt (6-angle load + this compose).
+ *
+ * Evidence: Capstone @0x2700–0x276C; BSR.W from @0x2796.
+ */
+void compose_attitude_matrix_6ang_alt(int param_1) /* Original: FUN_00002700 */
 {
   undefined1 auStack_16 [18];
   
-  FUN_000020e6();
-  FUN_000021e0();
-  FUN_00002220();
-  FUN_00001d02(0x1d7bc,&DAT_0001d7d4,param_1);
-  FUN_00001d02(param_1,&DAT_0001d7a4,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d78c,param_1);
-  FUN_00001d02(param_1,&DAT_0001d75c,(int)auStack_16);
-  FUN_00001d02((int)auStack_16,&DAT_0001d774,param_1);
+  fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
+  fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
+  fill_attitude_rotation_bases_5_6( /* Original: FUN_00002220 */);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&DAT_0001d7d4,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7a4,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d78c,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d75c,(int)auStack_16);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d774,param_1);
   return;
 }
 
 
 
-void FUN_0000276e(uint param_1,uint param_2,uint param_3,uint param_4,uint param_5,uint param_6,
-                 int param_7)
-
+/*
+ * Original: FUN_0000276e
+ * Proposed name: build_attitude_matrix_6ang_alt
+ * Confidence: [PROVEN] chain
+ *
+ * Six-angle attitude build via the untagged alt compose:
+ *   load_attitude_angle_sincos(a,b,c,d)
+ *   load_attitude_angle_sincos_5_6(e,f)
+ *   compose_attitude_matrix_6ang_alt(out)
+ *
+ * Sibling of build_attitude_matrix_6ang (tagged $26e0 path). Sole overlay
+ * caller @0x6886 (camera/view globals DAT_0001d810…1d804).
+ *
+ * Evidence: Capstone @0x276E–0x27A0; mirrors 026cc except BSR→02700.
+ */
+void build_attitude_matrix_6ang_alt(uint param_1,uint param_2,uint param_3,uint param_4,uint param_5,
+                 uint param_6,int param_7) /* Original: FUN_0000276e */
 {
-  FUN_0000202a(param_1,param_2,param_3,param_4);
-  FUN_000020a0(param_5,param_6);
-  FUN_00002700(param_7);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,param_4);
+  load_attitude_angle_sincos_5_6( /* Original: FUN_000020a0 */param_5,param_6);
+  compose_attitude_matrix_6ang_alt( /* Original: FUN_00002700 */param_7);
   return;
 }
 
 
 
-void FUN_000027a2(undefined4 param_1)
-
+/*
+ * Original: FUN_000027a2
+ * Proposed name: invoke_tagged_attitude_compose_neg_sins4
+ * Confidence: [PROVEN] negates+JSR; [STRONG INFERENCE] role vs mirror/reflect
+ *
+ * Negate the four sin scratch words from load_attitude_angle_sincos
+ * (DAT_0001d7fc/f8/f4/f0 = sins of angles 1–4), then JSR through
+ * DAT_00020ce4 with out-matrix arg. That global is set to a code address by
+ * tagged compose paths:
+ *   finalize_attitude_matrix_3ang → $2408
+ *   compose_attitude_matrix_x     → $2468
+ *   compose_attitude_matrix_6ang  → $26e0
+ *
+ * Sibling invoke_tagged_attitude_compose_neg_sins6 also negates angle5/6 sins
+ * (1d7ec/e8) before the same indirect call.
+ *
+ * Evidence: Capstone @0x27A2–0x27CA; MOVE.L #imm,$20CE4 writers @0x2500/25E2/2660;
+ * sole BSR.L from @0xA890.
+ *
+ * Tag landings [PROVEN Capstone]:
+ *   $2468 = build_attitude_matrix_3ang_alt+4 (skip LINK; needs live A6)
+ *   $26e0 = build_attitude_matrix_6ang+$14 (at BSR 0202a; needs prior angle pushes)
+ *   $2408 = mid build_attitude_matrix_from_dir_roll (matmul PEA)
+ *           also == finalize_attitude_matrix_3ang_alt@2428 − 0x20 [PROVEN arithmetic]
+ *
+ * Callsite @0xA890 [PROVEN]:
+ *   A6 live from LINK @0xA75E (not 0229e); after build_attitude_matrix_3ang
+ *   (sets tag $2408) + matmul into $1d72c; invoke($1d72c) negates angle1–4 sins
+ *   then JSR tag. Foreign A6 ⇒ literal mid-0229e entry is not viable.
+ *   [STRONG INFERENCE] intended tag target is finalize_attitude_matrix_3ang_alt
+ *   (@2428), matching the +0x20 false-address family ($E352 etc.).
+ *
+ * Unknown: exact geometric meaning of sin negation; whether runtime reloc
+ * ever fixes #$2408 → $2428.
+ */
+void invoke_tagged_attitude_compose_neg_sins4(undefined4 param_1) /* Original: FUN_000027a2 */
 {
   DAT_0001d7fc = -DAT_0001d7fc;
   DAT_0001d7f8 = -DAT_0001d7f8;
@@ -3351,8 +3819,19 @@ void FUN_000027a2(undefined4 param_1)
 
 
 
-void FUN_000027cc(undefined4 param_1)
-
+/*
+ * Original: FUN_000027cc
+ * Proposed name: invoke_tagged_attitude_compose_neg_sins6
+ * Confidence: [PROVEN] negates+JSR; [STRONG INFERENCE] 6-angle counterpart
+ *
+ * Same as invoke_tagged_attitude_compose_neg_sins4, plus negate the two extra
+ * sin words from load_attitude_angle_sincos_5_6 (DAT_0001d7ec / 1d7e8), then
+ * JSR through DAT_00020ce4. Intended for the 6-angle tagged path ($26e0).
+ *
+ * Evidence: Capstone @0x27CC–0x2800; sole BSR.L from @0x66F6 (near
+ * build_attitude_matrix_6ang caller region).
+ */
+void invoke_tagged_attitude_compose_neg_sins6(undefined4 param_1) /* Original: FUN_000027cc */
 {
   DAT_0001d7fc = -DAT_0001d7fc;
   DAT_0001d7f8 = -DAT_0001d7f8;
@@ -3366,8 +3845,26 @@ void FUN_000027cc(undefined4 param_1)
 
 
 
-void FUN_00002802(uint param_1,int *param_2,int *param_3,uint param_4)
-
+/*
+ * Original: FUN_00002802
+ * Proposed name: transform_int3_vecs_asr_by_1d744
+ * Confidence: [PROVEN]
+ *
+ * For count=param_1 (DBRA + high-word extend, same pattern as
+ * transform_vecs12_by_matrix3): each int32×3 at param_2 is arithmetic-shifted
+ * right by param_4, then multiplied by the fixed 3×3 s16 matrix at
+ * DAT_0001d744…1d754 (+0x800>>12), written as int32×3 to param_3 (may alias).
+ *
+ * Capstone @0x2802–0x28A4: LEA $1d744; ASR.L shift; three MULS.W columns;
+ * ADDA #$C per vec. Sibling of transform_vecs12_by_matrix3 (explicit matrix,
+ * packed s16 lanes) and transform_int3_vecs_by_matrix3 (explicit matrix, no ASR).
+ *
+ * Sole overlay caller @0x5908: count=DAT_0001c1d0, in-place on DAT_0001c43c, shift=0.
+ * DAT_0001d744 is the camera/view attitude scratch filled by build_attitude_matrix_*_alt.
+ *
+ * Evidence: Capstone body; matrix layout matches 1d744 row/column use in siblings.
+ */
+void transform_int3_vecs_asr_by_1d744(uint param_1,int *param_2,int *param_3,uint param_4) /* Original: FUN_00002802 */
 {
   short sVar1;
   short sVar2;
@@ -3396,20 +3893,44 @@ void FUN_00002802(uint param_1,int *param_2,int *param_3,uint param_4)
 
 
 
-void FUN_000028a6(uint param_1,uint param_2,uint param_3,int param_4,int *param_5,uint *param_6)
-
+/*
+ * Original: FUN_000028a6
+ * Proposed name: rotate_int3_vecs_by_3ang
+ * Confidence: [PROVEN] chain
+ *
+ * Thin wrapper: build_attitude_matrix_3ang(a,b,c → stack matrix) then
+ * transform_int3_vecs_by_matrix3(count, src, dst, matrix).
+ *
+ * Capstone @0x28A6–0x28DA: local matrix at A6-0x12; BSR $253E then $2ADA.
+ * No direct overlay BSR/JSR found (may be reached from another CODE or
+ * via absolute table).
+ *
+ * Evidence: Capstone two-call body; Ghidra matches.
+ */
+void rotate_int3_vecs_by_3ang(uint param_1,uint param_2,uint param_3,int param_4,int *param_5,uint *param_6) /* Original: FUN_000028a6 */
 {
   undefined1 auStack_16 [18];
   
-  FUN_0000253e(param_1,param_2,param_3,(int)auStack_16);
-  FUN_00002ada(param_4,param_5,param_6,(int)auStack_16);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */param_1,param_2,param_3,(int)auStack_16);
+  transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */param_4,param_5,param_6,(int)auStack_16);
   return;
 }
 
 
 
-void FUN_000028dc(uint param_1,int param_2,int param_3,short *param_4)
-
+/*
+ * Original: FUN_000028dc
+ * Proposed name: transform_vecs12_by_matrix3
+ * Confidence: [PROVEN]
+ *
+ * For count=param_1 (low word; high word extends large counts): each 0xC-byte
+ * record at param_2 has shorts at +2/+6/+10 transformed by 3×3 matrix param_4
+ * (row-major shorts [0..8], +0x800>>12 rounding) into param_3 (may alias src).
+ * In e792: count=1, in-place on auStack_10 using asStack_22 from build_attitude_matrix.
+ * Sibling transform_vecs12_to_int3_by_matrix3 writes int[3] results instead of
+ * packed shorts.
+ */
+void transform_vecs12_by_matrix3(uint param_1,int param_2,int param_3,short *param_4) /* Original: FUN_000028dc */
 {
   short sVar1;
   short sVar2;
@@ -3441,8 +3962,19 @@ void FUN_000028dc(uint param_1,int param_2,int param_3,short *param_4)
 
 
 
-void FUN_00002976(uint param_1,int param_2,int *param_3,short *param_4)
-
+/*
+ * Original: FUN_00002976
+ * Proposed name: transform_vecs12_to_int3_by_matrix3
+ * Confidence: [PROVEN]
+ *
+ * Same input layout as transform_vecs12_by_matrix3 (0xC-byte records, s16 at
+ * +2/+6/+10 × explicit 3×3, +0x800>>12) but writes int32×3 to param_3
+ * (dst += 3 ints per record; src += 0xC).
+ *
+ * Evidence: Capstone @0x2976–0x2A0C mirrors 028dc except MOVE.L stores;
+ * 4 overlay call sites.
+ */
+void transform_vecs12_to_int3_by_matrix3(uint param_1,int param_2,int *param_3,short *param_4) /* Original: FUN_00002976 */
 {
   short sVar1;
   short sVar2;
@@ -3471,8 +4003,25 @@ void FUN_00002976(uint param_1,int param_2,int *param_3,short *param_4)
 
 
 
-void FUN_00002a0e(void)
-
+/*
+ * Original: FUN_00002a0e
+ * Proposed name: transform_listed_object_vecs12_by_1d744
+ * Confidence: [PROVEN] loop+math; [STRONG INFERENCE] object-list role
+ *
+ * For each object pointer in the slice
+ *   DAT_0001c9dc[DAT_0001bdb8 .. DAT_0001c1d6)
+ * read vertex buffer `obj+0x4c`, count `obj+0x36`, shift `obj+0x32`.
+ * Each int32×3 is ASR'd by shift, multiplied by DAT_0001d744 (+0x800>>12),
+ * and written back as packed s16 at +2/+6/+10 of the same 0xC records
+ * (vecs12 layout — same store pattern as transform_vecs12_by_matrix3).
+ *
+ * Capstone @0x2A0E–0x2AD8. Ghidra split mid-loop as FUN_00002aba (@0x2ABA).
+ * No direct overlay BSR/JSR found.
+ *
+ * Evidence: Capstone; matrix ≡ transform_int3_vecs_asr_by_1d744; fields match
+ * build_object_poly_buffers consumers.
+ */
+void transform_listed_object_vecs12_by_1d744(void) /* Original: FUN_00002a0e */
 {
   int iVar1;
   short sVar2;
@@ -3517,7 +4066,15 @@ void FUN_00002a0e(void)
 
 
 
-void FUN_00002aba(void)
+/*
+ * Original: FUN_00002aba
+ * Proposed name: *(false mid-label of transform_listed_object_vecs12_by_1d744)*
+ * Confidence: [PROVEN] bytes
+ *
+ * Capstone @0x2ABA is `move.w d0, $a(a1)` inside the per-vertex store loop of
+ * @0x2A0E — not a callable entry. Ghidra unaffiliated-register artifact.
+ */
+void FUN_00002aba(void) /* false mid-label; do not rename call sites */
 
 {
   int iVar1;
@@ -3566,8 +4123,26 @@ void FUN_00002aba(void)
 
 
 
-short * FUN_00002ada(int param_1,int *param_2,uint *param_3,int param_4)
-
+/*
+ * Original: FUN_00002ada
+ * Proposed name: transform_int3_vecs_by_matrix3
+ * Confidence: [PROVEN]
+ *
+ * Transform count (param_1) int[3] vectors at param_2 into param_3 (may alias)
+ * by 3×3 matrix of shorts at param_4 (row-major, 9×s16 → sign-extended locals).
+ *
+ * Fixed-point [PROVEN Capstone @0x2B20–0x2BBA]: each out component is a 64-bit
+ * MULS.L dot product reassembled as (hi<<0x14)|(lo>>0xc) — i.e. product>>12
+ * without the +0x800 rounding used by transform_vecs12_by_matrix3.
+ *
+ * Contrast transform_vecs12_by_matrix3 (028dc): packed shorts at +2/+6/+10 in
+ * 0xC records, +0x800>>12. This routine is the int-triple path used by
+ * apply_template_chain_xform{,_always} after build_attitude_matrix_3ang.
+ *
+ * Evidence: Capstone load-9-shorts then count loop; call sites pass matrix
+ * from build_attitude_matrix_3ang stack buffer.
+ */
+short * transform_int3_vecs_by_matrix3(int param_1,int *param_2,uint *param_3,int param_4) /* Original: FUN_00002ada */
 {
   int iVar1;
   longlong lVar2;
@@ -3585,6 +4160,7 @@ short * FUN_00002ada(int param_1,int *param_2,uint *param_3,int param_4)
   int local_c;
   int local_8;
   
+  /* Expand 3×3 s16 matrix into int locals */
   local_2c = param_1;
   iVar7 = 0;
   do {
@@ -3622,8 +4198,33 @@ short * FUN_00002ada(int param_1,int *param_2,uint *param_3,int param_4)
 
 
 
-void FUN_00002bd8(int param_1,uint param_2,uint *param_3,uint *param_4)
-
+/*
+ * Original: FUN_00002bd8
+ * Proposed name: apply_template_chain_xform
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Walk template linked list from obj+0x24. For each node, select the 0x18 slot
+ * at *(node+0x30) + obj[+2]*0x18. If slot angles (+2/+4/+6) non-zero, build a
+ * rotation via FUN_0000253e into a temp matrix, then FUN_00002ada; always apply
+ * translation FUN_00001c5c from slot +8/+c/+10.
+ *
+ * Dual output modes:
+ *   - param_3==0 or param_4==0: mutate stacked copy of obj+0x18/1c/20 (count=1).
+ *     If BOTH null at end → commit locals back to those fields [PROVEN].
+ *     Does not write +0x44.
+ *   - both non-null: xform param_2 vertices from param_3 into param_4 (mesh path
+ *     used by activate_near_range_object with mesh_base and obj+0x44). Translation
+ *     components shifted by obj+0x34.
+ *
+ * Sibling apply_template_chain_xform_always always builds rotation (no
+ * zero-angle skip). Empty +0x24 chain → identity commit when null-aux.
+ *
+ * Evidence: Capstone @0x2BD8–0x2D0E; NOTES null-aux commit; 04e6e args
+ * (obj, 36+3a, mesh, +0x44).
+ *
+ * Unknown: precise 0253e/02ada/01c5c math; slot schema beyond angles+xyz.
+ */
+void apply_template_chain_xform(int param_1,uint param_2,uint *param_3,uint *param_4) /* Original: FUN_00002bd8 */
 {
   byte bVar1;
   bool bVar2;
@@ -3649,23 +4250,25 @@ void FUN_00002bd8(int param_1,uint param_2,uint *param_3,uint *param_4)
         bVar2 = true;
       }
       if (bVar2) {
-        FUN_0000253e((int)*(short *)(iVar4 + 2),(int)*(short *)(iVar4 + 4),
+        build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar4 + 2),(int)*(short *)(iVar4 + 4),
                      (int)*(short *)(iVar4 + 6),(int)auStack_16);
       }
       if ((param_3 == (uint *)0x0) || (param_4 == (uint *)0x0)) {
+        /* Null-aux: transform local xyz trio */
         if (bVar2) {
-          FUN_00002ada(1,&local_22,(uint *)&local_22,(int)auStack_16);
+          transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,&local_22,(uint *)&local_22,(int)auStack_16);
         }
-        FUN_00001c5c(1,&local_22,&local_22,*(int *)(iVar4 + 8),*(int *)(iVar4 + 0xc),
+        translate_int3_vecs( /* Original: FUN_00001c5c */1,&local_22,&local_22,*(int *)(iVar4 + 8),*(int *)(iVar4 + 0xc),
                      *(int *)(iVar4 + 0x10));
       }
       else {
+        /* Mesh path: rotate/translate param_2 verts param_3 → param_4 */
         if (bVar2) {
-          FUN_00002ada(param_2,(int *)param_3,param_4,(int)auStack_16);
+          transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */param_2,(int *)param_3,param_4,(int)auStack_16);
           param_3 = param_4;
         }
         uVar3 = (uint)*(short *)(param_1 + 0x34);
-        FUN_00001c5c(param_2,(int *)param_3,(int *)param_4,*(int *)(iVar4 + 8) << (uVar3 & 0x3f),
+        translate_int3_vecs( /* Original: FUN_00001c5c */param_2,(int *)param_3,(int *)param_4,*(int *)(iVar4 + 8) << (uVar3 & 0x3f),
                      *(int *)(iVar4 + 0xc) << (uVar3 & 0x3f),
                      *(int *)(iVar4 + 0x10) << (uVar3 & 0x3f));
         param_3 = param_4;
@@ -3675,6 +4278,7 @@ void FUN_00002bd8(int param_1,uint param_2,uint *param_3,uint *param_4)
     } while (iVar5 != 0);
   }
   if ((param_3 == (uint *)0x0) && (param_4 == (uint *)0x0)) {
+    /* Commit stacked xyz only on fully null-aux calls */
     *(int *)(param_1 + 0x18) = local_22;
     *(undefined4 *)(param_1 + 0x1c) = local_1e;
     *(undefined4 *)(param_1 + 0x20) = local_1a;
@@ -3684,8 +4288,26 @@ void FUN_00002bd8(int param_1,uint param_2,uint *param_3,uint *param_4)
 
 
 
-void FUN_00002d10(int param_1,uint param_2,uint *param_3,uint *param_4)
-
+/*
+ * Original: FUN_00002d10
+ * Proposed name: apply_template_chain_xform_always
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Sibling of apply_template_chain_xform. Same +0x24 chain walk and null-aux
+ * xyz commit, but ALWAYS builds rotation via FUN_0000253e (no zero-angle skip)
+ * and always FUN_00002ada before FUN_00001c5c.
+ *
+ * Differences vs apply_template_chain_xform [PROVEN Capstone @0x2D10]:
+ *   - No TST on slot +2/+4/+6 before 0253e
+ *   - Translation not shifted by obj+0x34
+ *   - Mesh 01c5c uses same buffer for src and dst after 02ada
+ *
+ * Call site: FUN_000168d2 allocates vertex buffer then xforms param_3 count
+ * verts into it. False entry FUN_00002de8 is this function's epilogue tail.
+ *
+ * Evidence: Capstone @0x2D10–0x2E04; structural twin of 02bd8.
+ */
+void apply_template_chain_xform_always(int param_1,uint param_2,uint *param_3,uint *param_4) /* Original: FUN_00002d10 */
 {
   byte bVar1;
   int iVar2;
@@ -3707,10 +4329,11 @@ void FUN_00002d10(int param_1,uint param_2,uint *param_3,uint *param_4)
   if (iVar3 != 0) {
     do {
       iVar2 = *(int *)(iVar3 + 0x30) + (uint)bVar1 * 0x18;
-      FUN_0000253e((int)*(short *)(iVar2 + 2),(int)*(short *)(iVar2 + 4),(int)*(short *)(iVar2 + 6),
+      /* Always rotate — unlike apply_template_chain_xform */
+      build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar2 + 2),(int)*(short *)(iVar2 + 4),(int)*(short *)(iVar2 + 6),
                    (int)auStack_16);
       if ((param_3 == (uint *)0x0) || (param_4 == (uint *)0x0)) {
-        FUN_00002ada(1,(int *)&local_22,&local_22,(int)auStack_16);
+        transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,(int *)&local_22,&local_22,(int)auStack_16);
         iVar7 = *(int *)(iVar2 + 0x10);
         iVar6 = *(int *)(iVar2 + 0xc);
         iVar2 = *(int *)(iVar2 + 8);
@@ -3718,7 +4341,7 @@ void FUN_00002d10(int param_1,uint param_2,uint *param_3,uint *param_4)
         puVar5 = &local_22;
       }
       else {
-        FUN_00002ada(param_2,(int *)param_3,param_4,(int)auStack_16);
+        transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */param_2,(int *)param_3,param_4,(int)auStack_16);
         iVar7 = *(int *)(iVar2 + 0x10);
         iVar6 = *(int *)(iVar2 + 0xc);
         iVar2 = *(int *)(iVar2 + 8);
@@ -3726,7 +4349,7 @@ void FUN_00002d10(int param_1,uint param_2,uint *param_3,uint *param_4)
         uVar4 = param_2;
         puVar5 = param_4;
       }
-      FUN_00001c5c(uVar4,(int *)puVar5,(int *)puVar5,iVar2,iVar6,iVar7);
+      translate_int3_vecs( /* Original: FUN_00001c5c */uVar4,(int *)puVar5,(int *)puVar5,iVar2,iVar6,iVar7);
       bVar1 = *(byte *)(iVar3 + 2);
       iVar3 = *(int *)(iVar3 + 0x24);
     } while (iVar3 != 0);
@@ -3741,13 +4364,44 @@ void FUN_00002d10(int param_1,uint param_2,uint *param_3,uint *param_4)
 
 
 
-void FUN_00002de8(void)
-
+/*
+ * Original: FUN_00002de8
+ * Bytes identity: epilogue tail of FUN_00002d10 (NOT a real entry)
+ * Call-site alias: abs_int [INFERRED] — see below
+ * Confidence: bytes [PROVEN]; call-site semantics [STRONG INFERENCE]
+ * Status: BLOCKED (dual identity unresolved)
+ *
+ * Binary @0x2DE8 (Pacific Conflict CODE resource):
+ *   2DE2 TST.L D3 / BNE 2DFC
+ *   2DE6 TST.L D4 / BNE 2DFC          ← Ghidra labeled THIS word as FUN start
+ *   2DEA MOVE.L -0x1E(A6),0x18(A4)    ; commit stacked xyz
+ *   2DF0 MOVE.L -0x1A(A6),0x1C(A4)
+ *   2DF6 MOVE.L -0x16(A6),0x20(A4)
+ *   2DFC MOVEM restore / UNLK / RTS   ; end of FUN_00002d10
+ *
+ * Matches Ghidra's FUN_00002d10 close:
+ *   if (param_3==0 && param_4==0) write local xyz back to entity+0x18/1c/20.
+ * D3/D4 are loaded from 0x10(A6)/0x14(A6) at 02d10 prologue.
+ *
+ * Call sites (19× LEA.L $2DE8,A2 then JSR (A2)):
+ *   push a long, JSR via A2, consume D0 as magnitude — stack ABI like abs_int
+ *   @0x2E08 (MOVE.L 4(A7),D0 / BGE / NEG.L / RTS). Example: attitude_from_velocity
+ *   @0x1F42; distance helpers @0x3BAC. Zero BSR/JSR land on 0x2DE8; ~49 BSR.L → 0x2E08.
+ *
+ * Evidence conflict:
+ * - Bytes are mid-function epilogue (no abs, no D0 write).
+ * - Callers behave as abs_int (Godot flight_math.gd same inference).
+ * - Do NOT rewrite call sites to abs_int until reloc/thunk proves LEA target wrong.
+ *
+ * Unknown: why LEA absolute is 0x2DE8 rather than 0x2E08 (delta 0x20).
+ */
+void FUN_00002de8(void) /* Original: FUN_00002de8 — false entry; see header */
 {
   int unaff_A4;
   int unaff_A6;
   bool in_ZF;
   
+  /* Ghidra: ZF stands in for (D3==0 && D4==0) after the preceding TSTs in 02d10. */
   if (in_ZF) {
     *(undefined4 *)(unaff_A4 + 0x18) = *(undefined4 *)(unaff_A6 + -0x1e);
     *(undefined4 *)(unaff_A4 + 0x1c) = *(undefined4 *)(unaff_A6 + -0x1a);
@@ -3758,8 +4412,24 @@ void FUN_00002de8(void)
 
 
 
-int FUN_00002e08(int param_1)
-
+/*
+ * Original: FUN_00002e08
+ * Proposed name: abs_int
+ * Confidence: [PROVEN]
+ *
+ * Signed 32-bit absolute value: if param_1 < 0 return -param_1, else param_1.
+ * Ubiquitous magnitude helper (flight clamps, attitude deltas, distance gates).
+ *
+ * Evidence:
+ * - Body is a single signed compare + negate (Pacific Conflict.c:3461).
+ * - Call sites compare the return against thresholds (0x200, 0x1001, etc.).
+ *
+ * Unknown / caveats:
+ * - Negating INT_MIN is undefined in ISO C; preserves Ghidra/68k NEG.L behavior.
+ * - FUN_00002de8 call sites also behave as abs [INFERRED] but bytes @0x2DE8 are
+ *   FUN_00002d10's epilogue (BLOCKED dual identity) — not this routine.
+ */
+int abs_int(int param_1) /* Original: FUN_00002e08 */
 {
   if (param_1 < 0) {
     param_1 = -param_1;
@@ -4770,7 +5440,7 @@ void FUN_000038f4(void)
     _DAT_0001b872 = 0;
     DAT_0001b86c = 0;
     if ((DAT_0001b87c != (int *)0x0) && (*DAT_0001b87c != 0)) {
-      FUN_0000528a((char *)*DAT_0001b87c);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)*DAT_0001b87c);
       DAT_0001b87c = (int *)0x0;
     }
     *(uint *)(iVar1 + 4) = *(uint *)(iVar1 + 4) & 0xfffffffd;
@@ -4782,7 +5452,7 @@ void FUN_000038f4(void)
       *puVar2 = *puVar2 | 0x40;
     }
     FUN_000137da(*DAT_0001b738);
-    FUN_00006fb8();
+    reset_distance_base_globals();
   }
   return;
 }
@@ -4806,8 +5476,8 @@ void FUN_00003ac4(int param_1)
   _DAT_0001d856 = 1;
   _DAT_0001b73c = 1;
   DAT_0001d824 = 1000000000;
-  FUN_00006fb8();
-  FUN_00004e6e(DAT_0001d700);
+  reset_distance_base_globals();
+  activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001d700);
   DAT_0001b838 = DAT_0001b838 + 0x4b;
   FUN_0000df98(DAT_0001b738 + 0x36,*(undefined2 *)(DAT_0001b738 + 0x20),
                *(undefined2 *)(DAT_0001b738 + 0x22),*(undefined2 *)(DAT_0001b738 + 0x24));
@@ -4819,15 +5489,33 @@ void FUN_00003ac4(int param_1)
 
 
 
-void FUN_00003b98(int param_1)
-
+/*
+ * Original: FUN_00003b98
+ * Proposed name: update_object_camera_metric
+ * Confidence: [PROVEN] axes+combine; Ghidra void omits D0 return
+ *
+ * Camera-relative distance metric for a world object:
+ *   a = abs_int(*(obj+0x18) − DAT_0001d838)
+ *   b = abs_int(*(obj+0x1c) − DAT_0001d834)
+ *   c = abs_int(*(obj+0x20) − DAT_0001d830)
+ *   metric = max(a,b,c) + ((sum of the other two) >> 2)
+ *   *(obj+0x10) = metric; D0 = metric (callers use return).
+ *
+ * Capstone @0x3B98: three LEA $2DE8 + JSR (false abs entry; ≡ abs_int @0x2E08).
+ * Twin compute_camera_abs_metric (FUN_00003c00) returns the same combine without writing +0x10.
+ * Used by activate_near_range_object epilogue and 046da distance gate.
+ *
+ * Evidence: NOTES camera-abs axes + metric combine; Capstone sort+ASR#2.
+ */
+void update_object_camera_metric(int param_1) /* Original: FUN_00003b98 */
 {
   int iVar1;
   int iVar2;
   int iVar3;
   int iVar4;
   
-  iVar1 = FUN_00002de8();
+  /* Ghidra lost stack args; binary pushes (pos − camera) then abs_int */
+  iVar1 = FUN_00002de8(); /* callsite≡abs_int [INFERRED]; LEA $2DE8 */
   iVar2 = FUN_00002de8();
   iVar3 = FUN_00002de8();
   iVar4 = iVar1;
@@ -4846,8 +5534,18 @@ void FUN_00003b98(int param_1)
 
 
 
-void FUN_00003be0(void)
-
+/*
+ * Original: FUN_00003be0
+ * Proposed name: *(false mid-label of update_object_camera_metric)*
+ * Confidence: [PROVEN] bytes; call-site ABI [UNKNOWN]
+ *
+ * Capstone @0x3BE0 is inside update_object_camera_metric (@0x3B98), at the
+ * first axis-swap after CMP D2,D3 — not a callable entry. Ghidra split it
+ * as a separate function with unaffiliated registers.
+ *
+ * Call sites that JSR/LEA here need binary verification before retargeting.
+ */
+void FUN_00003be0(void) /* false mid-label; do not rename call sites yet */
 {
   int in_D0;
   int in_D1;
@@ -4866,15 +5564,31 @@ void FUN_00003be0(void)
 
 
 
-int FUN_00003c00(void)
-
+/*
+ * Original: FUN_00003c00
+ * Proposed name: compute_camera_abs_metric
+ * Confidence: [PROVEN]
+ *
+ * Same metric as update_object_camera_metric, but on three stack args
+ * (world X/Y/Z) instead of an object record:
+ *   a = abs_int(x − DAT_0001d838)
+ *   b = abs_int(y − DAT_0001d834)
+ *   c = abs_int(z − DAT_0001d830)
+ *   return max(a,b,c) + ((sum of other two) >> 2)
+ * Does not write obj+0x10.
+ *
+ * Evidence: Capstone @0x3C00–0x3C66 LINK frame; args $8/$c/$10(A6);
+ * LEA $2DE8 abs; identical sort+ASR#2; RTS with D0=metric.
+ */
+int compute_camera_abs_metric(void) /* Original: FUN_00003c00; args lost by Ghidra */
 {
   int iVar1;
   int iVar2;
   int iVar3;
   int iVar4;
   
-  iVar1 = FUN_00002de8();
+  /* Binary: abs(arg0−d838), abs(arg1−d834), abs(arg2−d830) */
+  iVar1 = FUN_00002de8(); /* callsite≡abs_int [INFERRED]; LEA $2DE8 */
   iVar2 = FUN_00002de8();
   iVar3 = FUN_00002de8();
   iVar4 = iVar1;
@@ -5305,54 +6019,76 @@ LAB_00004340:
 
 
 
-void FUN_0000435a(char *param_1,int param_2)
-
+/*
+ * Original: FUN_0000435a
+ * Source: Pacific Conflict.c:5008 / binary @0x435A
+ * Proposed name: apply_entity_mission_rates
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Inputs:
+ *   entity — live object (kind at [0], index at [1], flags at [5]/[7], …)
+ *   path   — pass discriminator from run_simulation_tick (0 for arrays 1–2, 1 for 3–4)
+ *
+ * Side effects (when bit1 of entity[7] clear and mission phase +0xA8 in 1..5):
+ *   - Resolve mission table row via parent(+0x24) child slot entity[1]
+ *   - Scale factor: phase-1, or forced 1 if entity[5] bit1 set
+ *   - Write entity+0xC from table[+0xE] × scale (halve if scale==0), unless sentinel
+ *     1000000000; clamp kind-2 values above 0x42B209 to that constant when flag clear
+ *   - If kind==2 AND path==0: walk sub-records and write scaled table[+0xA] into
+ *     slots at *(entity+0x48)+0x1C (special ×5 when entity+8 == DAT_0001b738)
+ *
+ * Unknown: exact meaning of entity+0xC and the +0x48 sub-table values.
+ */
+void apply_entity_mission_rates(char *entity, int path) /* Original: FUN_0000435a */
 {
   bool bVar1;
   int iVar2;
   int iVar3;
-  int iVar4;
-  int iVar5;
+  int iVar4; /* scale */
+  int iVar5; /* mission table cursor */
   int *piVar6;
   
-  if ((((param_1[7] & 2U) == 0) && (0 < *(short *)(DAT_0001b5a0 + 0xa8))) &&
+  if ((((entity[7] & 2U) == 0) && (0 < *(short *)(DAT_0001b5a0 + 0xa8))) &&
      (*(short *)(DAT_0001b5a0 + 0xa8) < 6)) {
+    /* Mission base + relocated child-record field → rate table row. */
     iVar5 = *(int *)(DAT_0001b5a0 + 0x8c) +
-            *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
-                    (uint)(byte)param_1[1] * 0x18);
-    if ((param_1[5] & 2U) == 0) {
-      iVar4 = *(short *)(DAT_0001b5a0 + 0xa8) + -1;
+            *(int *)(*(int *)(*(int *)(entity + 0x24) + 0x28) + 0x2e +
+                    (uint)(byte)entity[1] * 0x18);
+    if ((entity[5] & 2U) == 0) {
+      iVar4 = *(short *)(DAT_0001b5a0 + 0xa8) + -1; /* phase-based scale */
     }
     else {
       iVar4 = 1;
     }
-    if (*(int *)(param_1 + 0xc) != 1000000000) {
+    if (*(int *)(entity + 0xc) != 1000000000) {
       if (iVar4 == 0) {
         iVar3 = *(int *)(iVar5 + 0xe);
         if (iVar3 < 0) {
           iVar3 = iVar3 + 1;
         }
-        *(int *)(param_1 + 0xc) = iVar3 >> 1;
+        *(int *)(entity + 0xc) = iVar3 >> 1;
       }
       else {
-        *(int *)(param_1 + 0xc) = *(int *)(iVar5 + 0xe) * iVar4;
+        *(int *)(entity + 0xc) = *(int *)(iVar5 + 0xe) * iVar4;
       }
-      if (((*param_1 == '\x02') && (0x42b209 < *(int *)(param_1 + 0xc))) &&
-         ((param_1[6] & 0x10U) == 0)) {
-        param_1[0xc] = '\0';
-        param_1[0xd] = 'B';
-        param_1[0xe] = -0x4e;
-        param_1[0xf] = '\t';
+      /* Kind-2 clamp to 0x0042B209 when over threshold and flag bit4 clear. */
+      if (((*entity == '\x02') && (0x42b209 < *(int *)(entity + 0xc))) &&
+         ((entity[6] & 0x10U) == 0)) {
+        entity[0xc] = '\0';
+        entity[0xd] = 'B';
+        entity[0xe] = -0x4e;
+        entity[0xf] = '\t';
       }
     }
-    if ((*param_1 == '\x02') && (param_2 == 0)) {
+    /* Path-0 only: refresh kind-2 sub-slot rates (skipped on tick passes 3–4). */
+    if ((*entity == '\x02') && (path == 0)) {
       iVar5 = iVar5 + 0x22 + *(short *)(iVar5 + 0x1a) * 0xc + *(short *)(iVar5 + 0x1e) * 0xc;
       bVar1 = false;
-      if ((*(int *)(param_1 + 8) != 0) && (DAT_0001b738 == *(int *)(param_1 + 8))) {
-        bVar1 = true;
+      if ((*(int *)(entity + 8) != 0) && (DAT_0001b738 == *(int *)(entity + 8))) {
+        bVar1 = true; /* linked to DAT_0001b738 — use ×5 scale of table[+0xA] */
       }
-      piVar6 = (int *)(*(int *)(param_1 + 0x48) + 0x1c);
-      for (iVar3 = 0; iVar3 < *(short *)(param_1 + 0x3a); iVar3 = iVar3 + 1) {
+      piVar6 = (int *)(*(int *)(entity + 0x48) + 0x1c);
+      for (iVar3 = 0; iVar3 < *(short *)(entity + 0x3a); iVar3 = iVar3 + 1) {
         if (bVar1) {
           *piVar6 = *(int *)(iVar5 + 10) + *(int *)(iVar5 + 10) * 4;
         }
@@ -5376,16 +6112,29 @@ void FUN_0000435a(char *param_1,int param_2)
 
 
 
-void FUN_000044a4(char *param_1,int param_2)
-
+/*
+ * Original: FUN_000044a4
+ * Source: Pacific Conflict.c:5079 / binary @0x44A4
+ * Proposed name: dispatch_entity_tick
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Per-entity entry from run_simulation_tick:
+ *   1) apply_entity_mission_rates(entity, path)
+ *   2) If entity+8 points at an object whose *(obj+4) word == 5, set/clear
+ *      entity+4 bit 0x40 from mission flag DAT_0001b5a0+0xB0 (0→set, else clear).
+ *
+ * 68k [PROVEN]: BSR apply_entity_mission_rates; TST entity+8; follow +4→cmpi #5;
+ *   ORI/ANDI #0x40 on entity+4.
+ */
+void dispatch_entity_tick(char *entity, int path) /* Original: FUN_000044a4 */
 {
-  FUN_0000435a(param_1,param_2);
-  if ((*(int *)(param_1 + 8) != 0) && (**(short **)(*(int *)(param_1 + 8) + 4) == 5)) {
+  apply_entity_mission_rates(entity, path); /* Original: FUN_0000435a */
+  if ((*(int *)(entity + 8) != 0) && (**(short **)(*(int *)(entity + 8) + 4) == 5)) {
     if (*(short *)(DAT_0001b5a0 + 0xb0) == 0) {
-      *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x40;
+      *(uint *)(entity + 4) = *(uint *)(entity + 4) | 0x40;
     }
     else {
-      *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) & 0xffffffbf;
+      *(uint *)(entity + 4) = *(uint *)(entity + 4) & 0xffffffbf;
     }
   }
   return;
@@ -5402,13 +6151,13 @@ void FUN_000044a4(char *param_1,int param_2)
  * Main simulation tick dispatcher. See docs/contracts/tick_FUN_000044e8_contract.md.
  *
  * Inputs: none (reads DAT_0001b5a0 mission block + four entity-pointer arrays).
- * Side effects: optional FUN_00005df8; per-entity FUN_000044a4; FUN_00006fb8.
+ * Side effects: optional clear_pending_entity_slots; per-entity FUN_000044a4; reset_distance_base_globals.
  *
  * Known callers: none in this overlay C export [UNKNOWN external/JSR site].
  *
  * Gate [PROVEN]:
- *   1) If *(short*)(DAT_0001b5a0+0xac)==0 → FUN_00005df8()
- *   2) If 0 < *(short*)(DAT_0001b5a0+0xa8) < 6 → four entity passes then FUN_00006fb8
+ *   1) If *(short*)(DAT_0001b5a0+0xac)==0 → clear_pending_entity_slots()
+ *   2) If 0 < *(short*)(DAT_0001b5a0+0xa8) < 6 → four entity passes then reset_distance_base_globals
  *
  * Passes [PROVEN] (array base / count / FUN_000044a4 path arg):
  *   1. DAT_0001d4a4 / DAT_0001c1e0 / path=0
@@ -5426,7 +6175,7 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
   
   /* Mission flag +0xAC: zero triggers pre-pass hook. */
   if (*(short *)(DAT_0001b5a0 + 0xac) == 0) {
-    FUN_00005df8();
+    clear_pending_entity_slots();
   }
   /* Mission phase +0xA8 must be in 1..5 to run entity passes. */
   if ((0 < *(short *)(DAT_0001b5a0 + 0xa8)) && (*(short *)(DAT_0001b5a0 + 0xa8) < 6)) {
@@ -5435,7 +6184,7 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
     if (0 < DAT_0001c1e0) {
       puVar2 = &DAT_0001d4a4;
       do {
-        FUN_000044a4((char *)*puVar2,0);
+        dispatch_entity_tick((char *)*puVar2,0);
         iVar1 = iVar1 + 1;
         puVar2 = puVar2 + 1;
       } while (iVar1 < DAT_0001c1e0);
@@ -5445,7 +6194,7 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
     if (0 < DAT_0001b734) {
       puVar2 = &DAT_0001b5a4;
       do {
-        FUN_000044a4((char *)*puVar2,0);
+        dispatch_entity_tick((char *)*puVar2,0);
         iVar1 = iVar1 + 1;
         puVar2 = puVar2 + 1;
       } while (iVar1 < DAT_0001b734);
@@ -5455,7 +6204,7 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
     if (0 < DAT_0001c1dc) {
       puVar2 = &DAT_0001d0e4;
       do {
-        FUN_000044a4((char *)*puVar2,1);
+        dispatch_entity_tick((char *)*puVar2,1);
         iVar1 = iVar1 + 1;
         puVar2 = puVar2 + 1;
       } while (iVar1 < DAT_0001c1dc);
@@ -5465,12 +6214,12 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
     if (0 < DAT_0001c1d8) {
       puVar2 = &DAT_0001cbe4;
       do {
-        FUN_000044a4((char *)*puVar2,1);
+        dispatch_entity_tick((char *)*puVar2,1);
         iVar1 = iVar1 + 1;
         puVar2 = puVar2 + 1;
       } while (iVar1 < DAT_0001c1d8);
     }
-    FUN_00006fb8(); /* post-pass: reset distance/base globals to 100000000 */
+    reset_distance_base_globals(); /* post-pass: reset distance/base globals to 100000000 */
   }
   return;
 }
@@ -5573,8 +6322,29 @@ uint * instantiate_object_from_desc(char *desc) /* Original: FUN_00004690 */
 
 
 
-void FUN_000046da(uint param_1,int param_2,int param_3)
-
+/*
+ * Original: FUN_000046da
+ * Proposed name: instantiate_mission_pool_slot
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Called after spawn_mission_pool_object fills slot xyz/att. Args:
+ *   param_1 = mission root (DAT_0001d6fc); param_2 = template/type index;
+ *   param_3 = slot index in *(root+0x30) child table.
+ * Flow [PROVEN structure]:
+ *   1) Resolve desc via DAT_0001b5a0+0x8c + root+0x28[type].+0x2e
+ *   2) alloc_object_from_desc → publish at slot+0x14
+ *   3) Identity: obj+0x24=root, +1=type, +2=slot; +3++ if type==slot;
+ *      flags|1 if type < root+0x2c
+ *   4) FUN_00002bd8; optional template factory at DAT_0001b524[kind]+6 →
+ *      obj+8 with attitude from slot
+ *   5) apply_entity_mission_rates; FUN_00003b98 distance metric
+ *   6) If (metric − obj+0xc) < 0x19C80 → FUN_00004e6e else queue on
+ *      DAT_0001d0e4[DAT_0001c1dc++]
+ * Note: +0x44 gate used by spawn_mission_pool_object is written in 04e6e
+ * path (heap_roving_cursor_store still BLOCKED), not in this body.
+ * Evidence: NOTES identity stores / 04e6e gate.
+ */
+void instantiate_mission_pool_slot(uint param_1,int param_2,int param_3) /* Original: FUN_000046da */
 {
   uint *puVar1;
   undefined4 *puVar2;
@@ -5583,9 +6353,9 @@ void FUN_000046da(uint param_1,int param_2,int param_3)
   
   pcVar4 = (char *)(*(int *)(DAT_0001b5a0 + 0x8c) +
                    *(int *)(*(int *)(param_1 + 0x28) + param_2 * 0x18 + 0x2e));
-  puVar1 = alloc_object_from_desc(pcVar4);
+  puVar1 = alloc_object_from_desc(pcVar4); /* Original: FUN_000045ba */
   *(uint **)(*(int *)(param_1 + 0x30) + 0x14 + param_3 * 0x18) = puVar1;
-  puVar1[9] = param_1;
+  puVar1[9] = param_1; /* +0x24 = mission root */
   *(char *)((int)puVar1 + 1) = (char)param_2;
   *(char *)((int)puVar1 + 2) = (char)param_3;
   if (param_3 == param_2) {
@@ -5594,13 +6364,13 @@ void FUN_000046da(uint param_1,int param_2,int param_3)
   if (param_2 < *(short *)(param_1 + 0x2c)) {
     puVar1[1] = puVar1[1] | 1;
   }
-  FUN_00002bd8((int)puVar1,1,(uint *)0x0,(uint *)0x0);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)puVar1,1,(uint *)0x0,(uint *)0x0);
   if (pcVar4[1] != '\0') {
     puVar2 = (undefined4 *)
              (**(code **)(*(int *)(&DAT_0001b524 + pcVar4[1] * 4) + 6))
                        (puVar1,(int)pcVar4[1],
                         (int)*(short *)(*(int *)(param_1 + 0x30) + param_3 * 0x18));
-    puVar1[2] = (uint)puVar2;
+    puVar1[2] = (uint)puVar2; /* entity handle at +8 */
     iVar3 = *(int *)(param_1 + 0x30) + param_3 * 0x18;
     if (puVar2 != (undefined4 *)0x0) {
       *puVar2 = 0;
@@ -5609,10 +6379,10 @@ void FUN_000046da(uint param_1,int param_2,int param_3)
       *(undefined2 *)(puVar1[2] + 0x24) = *(undefined2 *)(iVar3 + 6);
     }
   }
-  FUN_0000435a((char *)puVar1,1);
-  iVar3 = FUN_00003b98((int)puVar1);
+  apply_entity_mission_rates((char *)puVar1,1); /* Original: FUN_0000435a */
+  iVar3 = update_object_camera_metric( /* Original: FUN_00003b98 */(int)puVar1);
   if ((int)(iVar3 - puVar1[3]) < 0x19c80) {
-    FUN_00004e6e((char *)puVar1);
+    activate_near_range_object( /* Original: FUN_00004e6e */(char *)puVar1);
   }
   else {
     (&DAT_0001d0e4)[DAT_0001c1dc] = puVar1;
@@ -5625,8 +6395,35 @@ void FUN_000046da(uint param_1,int param_2,int param_3)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00004808(int param_1,uint *param_2)
-
+/*
+ * Original: FUN_00004808
+ * Proposed name: build_object_poly_buffers
+ * Confidence: [PROVEN] sizing/record/index layout; [STRONG INFERENCE] “poly” label
+ *
+ * Build per-object polygon table at obj+0x48 from a packed descriptor stream
+ * (param_2). Called from activate_near_range_object kind-2 after +0x44/+0x4c alloc.
+ *
+ * Buffer size [PROVEN Capstone @0x4814–0x483A]:
+ *   bytes = s16(obj+0x3a) * 0x20;
+ *   if (obj+6)&2: += s16(+0x3a)*6 + s16(+0x38)*2;
+ *   heap_alloc → obj+0x48.
+ *
+ * Each poly record stride 0x20 [PROVEN @0x4858–0x4898]:
+ *   +0x08 = 0; +0x0C ← u32@stream+0; +0x10..13 ← bytes@4..7;
+ *   +0x14 ← u16(byte@8)  [= index count];
+ *   +0x16 ← byte9&0xF0; +0x17 ← byte9&0x0F; +0x1C ← u32@0xA.
+ *
+ * Index words [PROVEN @0x48A2–0x48CE]:
+ *   heap_alloc(count<<1) → poly+0x18; copy count u16 from stream+0x0E;
+ *   stream advances 0x0E + count*2.
+ *
+ * If (obj+6)&2: trailer after polys writes 0..field_38-1 as u16 indices.
+ * Sets DAT_0001daa2 = 1.
+ *
+ * Unknown: exact meaning of record flag nibbles at +0x16/+0x17; multi-poly
+ * consumers beyond 02bd8/04958.
+ */
+void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004808 */
 {
   uint *puVar1;
   uint *puVar2;
@@ -5635,13 +6432,14 @@ void FUN_00004808(int param_1,uint *param_2)
   undefined2 *puVar5;
   uint *puVar6;
   
+  /* Size primary poly table; optional flag-bit1 trailer space */
   iVar4 = *(short *)(param_1 + 0x3a) * 0x20;
   if ((*(byte *)(param_1 + 6) & 2) != 0) {
     iVar4 = *(short *)(param_1 + 0x3a) * 6 + *(short *)(param_1 + 0x38) * 2 + iVar4;
   }
-  puVar1 = heap_alloc(iVar4);
+  puVar1 = heap_alloc(iVar4); /* Original: FUN_00001a68 */
   *(uint **)(param_1 + 0x48) = puVar1;
-  puVar6 = puVar1 + 5;
+  puVar6 = puVar1 + 5; /* → record +0x14 (index count) */
   for (iVar4 = 0; iVar4 < *(short *)(param_1 + 0x3a); iVar4 = iVar4 + 1) {
     puVar1[2] = 0;
     puVar1[3] = *param_2;
@@ -5654,17 +6452,18 @@ void FUN_00004808(int param_1,uint *param_2)
     *(byte *)((int)puVar1 + 0x17) = *(byte *)((int)param_2 + 9) & 0xf;
     puVar1[7] = *(uint *)((int)param_2 + 10);
     puVar2 = heap_alloc((int)*(short *)puVar6 << 1);
-    puVar1[6] = (uint)puVar2;
+    puVar1[6] = (uint)puVar2; /* poly +0x18 index array */
     puVar5 = (undefined2 *)((int)param_2 + 0xe);
     for (iVar3 = 0; iVar3 < *(short *)puVar6; iVar3 = iVar3 + 1) {
       *(undefined2 *)(puVar1[6] + iVar3 * 2) = *puVar5;
       puVar5 = puVar5 + 1;
     }
     param_2 = (uint *)((undefined2 *)((int)param_2 + 0xe) + *(short *)puVar6);
-    puVar6 = puVar6 + 8;
+    puVar6 = puVar6 + 8; /* +0x20 */
     puVar1 = puVar1 + 8;
   }
   if ((*(byte *)(param_1 + 6) & 2) != 0) {
+    /* Trailer: sequential u16 0..field_38-1 after poly records */
     puVar5 = (undefined2 *)(*(int *)(param_1 + 0x48) + *(short *)(param_1 + 0x3a) * 0x20);
     for (iVar4 = 0; iVar4 < *(short *)(param_1 + 0x38); iVar4 = iVar4 + 1) {
       *puVar5 = (short)iVar4;
@@ -5754,7 +6553,7 @@ void FUN_00004958(int param_1,undefined4 param_2,short param_3,short param_4)
   }
   local_1bf0 = (uint *)(iVar19 + 0x22) +
                *(short *)(iVar19 + 0x1a) * 3 + *(short *)(iVar19 + 0x1e) * 3;
-  FUN_00002bd8(param_1,(int)*(short *)(iVar19 + 0x1a),(uint *)(iVar19 + 0x22),auStack_15e4);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */param_1,(int)*(short *)(iVar19 + 0x1a),(uint *)(iVar19 + 0x22),auStack_15e4);
   sVar14 = 0;
   sVar12 = *(short *)(DAT_0001b5a0 + 0xa8);
   sVar13 = 0;
@@ -5824,7 +6623,7 @@ LAB_00004aee:
       else {
         *(short *)(iVar19 + 0x14) = sVar9;
         *(byte *)(iVar19 + 0x13) = *(byte *)(iVar19 + 0x13) & 0xfd;
-        puVar6 = FUN_00001ba8(*(uint **)(iVar19 + 0x18),(undefined4 *)((int)sVar9 << 1));
+        puVar6 = heap_realloc_grow_only( /* Original: FUN_00001ba8 */*(uint **)(iVar19 + 0x18),(undefined4 *)((int)sVar9 << 1));
         *(uint **)(iVar19 + 0x18) = puVar6;
         sVar10 = 0;
         if (0 < sVar9) {
@@ -5898,7 +6697,7 @@ LAB_00004cb8:
   *(int *)(param_1 + 0x18) = DAT_0001d724;
   *(int *)(param_1 + 0x20) = DAT_0001d71c;
   *(undefined4 *)(param_1 + 0x14) = param_2;
-  FUN_00003b98(param_1);
+  update_object_camera_metric( /* Original: FUN_00003b98 */param_1);
   sVar12 = 0;
   for (uVar11 = *(int *)(param_1 + 0x14) +
                 *(int *)(param_1 + 0x10) + (*(int *)(param_1 + 0x10) >> 2) <<
@@ -5925,7 +6724,7 @@ void FUN_00004e06(int param_1)
     *(undefined4 *)(param_1 + 0x1c) = *(undefined4 *)(iVar1 + 6);
     *(undefined4 *)(param_1 + 0x20) = *(undefined4 *)(iVar1 + 10);
     *(undefined4 *)(param_1 + 0x14) = *(undefined4 *)(iVar1 + 0x12);
-    FUN_00002bd8(param_1,1,(uint *)0x0,(uint *)0x0);
+    apply_template_chain_xform( /* Original: FUN_00002bd8 */param_1,1,(uint *)0x0,(uint *)0x0);
   }
   return;
 }
@@ -5939,14 +6738,37 @@ void FUN_00004e4e(void)
   int unaff_A3;
   
   *(undefined4 *)(unaff_A3 + 0x14) = *(undefined4 *)(in_A0 + 0x12);
-  FUN_00002bd8(unaff_A3,1,(uint *)0x0,(uint *)0x0);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */unaff_A3,1,(uint *)0x0,(uint *)0x0);
   return;
 }
 
 
 
-void FUN_00004e6e(char *param_1)
-
+/*
+ * Original: FUN_00004e6e
+ * Proposed name: activate_near_range_object
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Bring a world object into the near/active set after the 046da distance gate
+ * ((metric − obj+0xC) < 0x19C80). Kind byte *obj selects the path.
+ *
+ * Kind 2 [PROVEN Capstone @0x4E8E+]:
+ *   - (obj+7)&1 → publish on DAT_0001d4a4[c1e0++]; else DAT_0001b5a4[b734++]
+ *   - size = (s16(+0x36)+s16(+0x3a))*0xC; two JSR $1A48 → obj+0x4c then +0x44
+ *     (Ghidra shows heap_roving_cursor_store() with no size — $1A48 still BLOCKED)
+ *   - build_object_poly_buffers mesh/index setup; optional factory back-link at +8
+ *   - Flag gate: 02bd8 only if bit4 clear on +5/+6/+7; else 01c5c / rates / 15762…
+ *   - Ends with FUN_00003b98 metric refresh
+ *
+ * Kind 3: publish on d4a4[]; alloc count×0x18 child table at +0x30; copy from
+ *   desc; relocate +0x14 by DAT_0001b5a0+0x8c; instantiate_mission_pool_slot each.
+ *
+ * Side effect: writes +0x44 used as non-null gate by spawn_mission_pool_object.
+ *
+ * Evidence: NOTES 04e6e kind2/02bd8; Capstone @0x4E6E–0x4F4A; callers from
+ * instantiate_mission_pool_slot and mission init.
+ */
+void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
 {
   int *piVar1;
   char cVar2;
@@ -5964,6 +6786,7 @@ void FUN_00004e6e(char *param_1)
   cVar2 = *param_1;
   if (cVar2 != '\x02') {
     if (('\x02' < cVar2) && (cVar2 == '\x03')) {
+      /* Kind 3: deferred/near list + child slot table */
       (&DAT_0001d4a4)[DAT_0001c1e0] = param_1;
       DAT_0001c1e0 = DAT_0001c1e0 + 1;
       puVar8 = (undefined4 *)(*(int *)(param_1 + 0x28) + 0x1a);
@@ -5984,11 +6807,12 @@ void FUN_00004e6e(char *param_1)
         iVar5 = iVar5 + 0x18;
       }
       for (iVar5 = 0; iVar5 < *(short *)(param_1 + 0x2e); iVar5 = iVar5 + 1) {
-        FUN_000046da((uint)param_1,iVar5,iVar5);
+        instantiate_mission_pool_slot( /* Original: FUN_000046da */(uint)param_1,iVar5,iVar5);
       }
     }
     goto LAB_00005108;
   }
+  /* Kind 2: near-list publish */
   if ((param_1[7] & 1U) == 0) {
     (&DAT_0001b5a4)[DAT_0001b734] = param_1;
     DAT_0001b734 = DAT_0001b734 + 1;
@@ -5998,14 +6822,15 @@ void FUN_00004e6e(char *param_1)
     DAT_0001c1e0 = DAT_0001c1e0 + 1;
   }
   sVar12 = *(short *)(param_1 + 0x3a) + *(short *)(param_1 + 0x36);
-  uVar3 = heap_roving_cursor_store();
+  /* Capstone: push (sVar12 * 0xC), JSR $1A48 → D0; Ghidra dropped the size arg. */
+  uVar3 = heap_roving_cursor_store(); /* callsite≡alloc [INFERRED]; $1A48 BLOCKED */
   *(undefined4 *)(param_1 + 0x4c) = uVar3;
-  uVar3 = heap_roving_cursor_store();
+  uVar3 = heap_roving_cursor_store(); /* same size → +0x44 (spawn gate) */
   *(undefined4 *)(param_1 + 0x44) = uVar3;
   puVar4 = (uint *)(*(int *)(DAT_0001b5a0 + 0x8c) +
                     *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
                             (uint)(byte)param_1[1] * 0x18) + 0x22);
-  FUN_00004808((int)param_1,puVar4 + sVar12 * 3);
+  build_object_poly_buffers( /* Original: FUN_00004808 */(int)param_1,puVar4 + sVar12 * 3);
   if (*(int *)(param_1 + 8) != 0) {
     **(undefined4 **)(param_1 + 8) = param_1;
     (&DAT_0001c25c)[DAT_0001c1cc] = *(undefined4 *)(param_1 + 8);
@@ -6014,18 +6839,18 @@ void FUN_00004e6e(char *param_1)
   if ((param_1[6] & 0x10U) == 0) {
     if ((param_1[7] & 0x10U) == 0) {
       if ((param_1[5] & 0x10U) == 0) {
-        FUN_00002bd8((int)param_1,(int)sVar12,puVar4,*(uint **)(param_1 + 0x44));
-        FUN_0000435a(param_1,0);
+        apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)param_1,(int)sVar12,puVar4,*(uint **)(param_1 + 0x44));
+        apply_entity_mission_rates(param_1,0);
         FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
         goto LAB_00005056;
       }
-      FUN_00001c5c((int)sVar12,(int *)puVar4,*(int **)(param_1 + 0x44),0,0,0);
-      FUN_0000435a(param_1,0);
+      translate_int3_vecs( /* Original: FUN_00001c5c */(int)sVar12,(int *)puVar4,*(int **)(param_1 + 0x44),0,0,0);
+      apply_entity_mission_rates(param_1,0);
       FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
       FUN_00003ea0(param_1);
     }
     else {
-      FUN_0000435a(param_1,0);
+      apply_entity_mission_rates(param_1,0);
       FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
       iVar5 = *(int *)(param_1 + 8);
       if (((iVar5 == 0) || (**(short **)(iVar5 + 4) < 0x15)) || (0x19 < **(short **)(iVar5 + 4))) {
@@ -6057,15 +6882,26 @@ LAB_00005056:
     *(ushort *)(param_1 + 6) = *(ushort *)(param_1 + 6) | 0x800;
   }
 LAB_00005108:
-  FUN_00003b98((int)param_1);
+  update_object_camera_metric( /* Original: FUN_00003b98 */(int)param_1);
   return;
 }
 
 
 
-int FUN_00005116(int param_1,uint param_2,uint param_3,uint param_4,undefined2 param_5,
-                undefined2 param_6,undefined2 param_7,undefined2 param_8)
-
+/*
+ * Original: FUN_00005116
+ * Proposed name: spawn_mission_pool_object
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Scan mission child table *(DAT_0001d6fc+0x30) for free 0x18 slot (+0x14==0);
+ * grow by 10 via heap_realloc_grow_only if full. Fill xyz
+ * (param_2..4) and attitude words (param_5..8); instantiate_mission_pool_slot.
+ * Return world at slot+0x14, or retire_entity→0 if *(world+0x44)==0.
+ * param_1 is a template/desc whose byte[+1] selects type for 046da.
+ * Evidence: NOTES free-slot scan; many weapon/object spawn wrappers.
+ */
+int spawn_mission_pool_object(int param_1,uint param_2,uint param_3,uint param_4,undefined2 param_5,
+                undefined2 param_6,undefined2 param_7,undefined2 param_8) /* Original: FUN_00005116 */
 {
   uint uVar1;
   int iVar2;
@@ -6085,7 +6921,7 @@ int FUN_00005116(int param_1,uint param_2,uint param_3,uint param_4,undefined2 p
     } while (iVar5 < iVar4);
   }
   if (iVar4 == iVar5) {
-    puVar3 = FUN_00001ba8(puVar3,(undefined4 *)((iVar4 + 10) * 0x18));
+    puVar3 = heap_realloc_grow_only( /* Original: FUN_00001ba8 */puVar3,(undefined4 *)((iVar4 + 10) * 0x18));
     uVar1 = DAT_0001d6fc;
     *(uint **)(DAT_0001d6fc + 0x30) = puVar3;
     *(short *)(uVar1 + 0x2e) = *(short *)(uVar1 + 0x2e) + 10;
@@ -6098,10 +6934,10 @@ int FUN_00005116(int param_1,uint param_2,uint param_3,uint param_4,undefined2 p
   *(undefined2 *)((int)puVar3 + 2) = param_5;
   *(undefined2 *)(puVar3 + 1) = param_6;
   *(undefined2 *)((int)puVar3 + 6) = param_7;
-  FUN_000046da(DAT_0001d6fc,(uint)*(byte *)(param_1 + 1),iVar5);
+  instantiate_mission_pool_slot( /* Original: FUN_000046da */DAT_0001d6fc,(uint)*(byte *)(param_1 + 1),iVar5);
   iVar4 = *(int *)(*(int *)(DAT_0001d6fc + 0x30) + iVar5 * 0x18 + 0x14);
   if (*(int *)(iVar4 + 0x44) == 0) {
-    FUN_000051ec(iVar4);
+    retire_entity( /* Original: FUN_000051ec */iVar4);
     iVar4 = 0;
   }
   return iVar4;
@@ -6109,8 +6945,19 @@ int FUN_00005116(int param_1,uint param_2,uint param_3,uint param_4,undefined2 p
 
 
 
-void FUN_000051ec(int param_1)
-
+/*
+ * Original: FUN_000051ec
+ * Proposed name: retire_entity
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Full entity retirement: clear DAT_0001b880 if entity+8 matches; if
+ * field_01!=field_02 null mission-table slot at
+ * *(DAT_0001d6fc+0x30)+0x14+field_02*0x18 and scrub matching DAT_0001bc64[7]
+ * when field_01 in [b88e,b88c]; set +0x18=1e9, flags|+2, +0x3c=0;
+ * **(entity+8)=0; DAT_00024cf0++.
+ * Evidence: NOTES FUN_0000528a/051ec; IMPORT_STATUS.
+ */
+void retire_entity(int param_1) /* Original: FUN_000051ec */
 {
   short sVar1;
   
@@ -6142,14 +6989,24 @@ void FUN_000051ec(int param_1)
 
 
 
-void FUN_0000528a(char *param_1)
-
+/*
+ * Original: FUN_0000528a
+ * Proposed name: dispatch_entity_cleanup
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Pending-slot / entity cleanup gate used by clear_pending_entity_slots and
+ * many free paths. Early-out if flags_07 bit1 set. Else: if
+ * (field_24==DAT_0001d6fc && id in [b88e,b88c]) OR type!=2 → retire_entity;
+ * else type-2 soft path: flags|+0x42, field_3c=DAT_0001b838.
+ * Evidence: NOTES; Pacific Conflict.c:5784–5798.
+ */
+void dispatch_entity_cleanup(char *param_1) /* Original: FUN_0000528a */
 {
   if ((param_1[7] & 2U) == 0) {
     if ((((*(int *)(param_1 + 0x24) == DAT_0001d6fc) &&
          (DAT_0001b88e <= (short)(ushort)(byte)param_1[1])) &&
         ((short)(ushort)(byte)param_1[1] <= DAT_0001b88c)) || (*param_1 != '\x02')) {
-      FUN_000051ec((int)param_1);
+      retire_entity((int)param_1); /* Original: FUN_000051ec */
     }
     else {
       *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x42;
@@ -6190,7 +7047,7 @@ void FUN_000052dc(char *param_1)
       **(undefined4 **)(param_1 + 8) = 0;
     }
     if (param_1[1] != param_1[2]) {
-      FUN_0000528a(param_1);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */param_1);
     }
     if (*(int *)(param_1 + 0x2c) != 0) {
       FUN_00014af2((int)param_1);
@@ -6279,7 +7136,7 @@ LAB_00005532:
     if (*pcVar1 == '\x02') {
       if (DAT_0001b838 - *(int *)(pcVar1 + 0x3c) < 0x4c) goto LAB_00005532;
       if (*(int *)(pcVar1 + 0x3c) != 0) {
-        FUN_000051ec((int)pcVar1);
+        retire_entity( /* Original: FUN_000051ec */(int)pcVar1);
       }
     }
     FUN_000052dc(pcVar1);
@@ -6435,7 +7292,7 @@ LAB_00005800:
     goto LAB_000056ac;
     if (DAT_0001b838 - *(int *)(pcVar1 + 0x3c) < 0x4c) goto LAB_00005800;
     if (*(int *)(pcVar1 + 0x3c) != 0) {
-      FUN_000051ec((int)pcVar1);
+      retire_entity( /* Original: FUN_000051ec */(int)pcVar1);
     }
     FUN_000052dc(pcVar1);
     (&DAT_0001d0e4)[DAT_0001c1dc] = pcVar1;
@@ -6525,7 +7382,7 @@ void FUN_000058ec(void)
   int *piVar11;
   int *local_8;
   
-  FUN_00002802(DAT_0001c1d0,&DAT_0001c43c,&DAT_0001c43c,0);
+  transform_int3_vecs_asr_by_1d744( /* Original: FUN_00002802 */DAT_0001c1d0,&DAT_0001c43c,&DAT_0001c43c,0);
   piVar9 = &DAT_0001c9dc;
   local_8 = &DAT_0001c9dc;
   piVar8 = &DAT_0001c43c;
@@ -6548,8 +7405,8 @@ void FUN_000058ec(void)
         else {
           piVar10 = piVar9;
           if (0 < *piVar11) {
-            iVar4 = FUN_00002e08(*piVar8);
-            iVar5 = FUN_00002e08(piVar8[1]);
+            iVar4 = abs_int( /* Original: FUN_00002e08 */*piVar8);
+            iVar5 = abs_int( /* Original: FUN_00002e08 */piVar8[1]);
             sVar3 = (short)(*(int *)(iVar1 + 0x14) >> (*(ushort *)(iVar1 + 0x32) & 0x3f));
             if ((short)iVar5 < (short)iVar4) {
               sVar2 = (short)iVar4 - sVar3;
@@ -6638,7 +7495,7 @@ void FUN_00005a14(void)
   } while (iVar10 < 4);
   *(int *)(*(int *)(DAT_0001bdb0 + 0x44) + 100) = iVar4;
   *(int *)(*(int *)(iVar7 + 0x44) + 0x70) = iVar4;
-  iVar3 = FUN_00003c00();
+  iVar3 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
   iVar3 = (iVar3 >> 3) + iVar3;
   if (0xce40 < iVar3) {
     bVar2 = true;
@@ -6646,7 +7503,7 @@ void FUN_00005a14(void)
     DAT_0001d720 = DAT_0001d834;
     DAT_0001d71c = DAT_0001d830;
   }
-  iVar4 = FUN_00003c00();
+  iVar4 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
   iVar4 = (iVar4 >> 3) + iVar4;
   if (0x80e80 < iVar4) {
     bVar2 = true;
@@ -6695,7 +7552,7 @@ void FUN_00005a14(void)
         do {
           iVar9 = *piVar12;
           if ((*(byte *)(iVar9 + 7) & 2) == 0) {
-            iVar9 = FUN_00003b98(*piVar12);
+            iVar9 = update_object_camera_metric( /* Original: FUN_00003b98 */*piVar12);
             if (iVar9 - *(int *)(*piVar12 + 0xc) < 0x80e80) {
               (&DAT_0001d0e4)[iVar3] = *piVar12;
               iVar3 = iVar3 + 1;
@@ -6735,11 +7592,11 @@ void FUN_00005a14(void)
       do {
         iVar4 = *piVar12;
         if ((*(byte *)(iVar4 + 7) & 2) == 0) {
-          iVar4 = FUN_00003b98(*piVar12);
+          iVar4 = update_object_camera_metric( /* Original: FUN_00003b98 */*piVar12);
           iVar4 = iVar4 - *(int *)(*piVar12 + 0xc);
           if (iVar4 < 0x80e80) {
             if (0xce3f < iVar4) goto LAB_00005d94;
-            FUN_00004e6e((char *)*piVar12);
+            activate_near_range_object( /* Original: FUN_00004e6e */(char *)*piVar12);
           }
           else {
             (&DAT_0001cbe4)[DAT_0001c1d8] = *piVar12;
@@ -6792,15 +7649,26 @@ LAB_00005d94:
 
 
 
-void FUN_00005df8(void)
-
+/*
+ * Original: FUN_00005df8
+ * Source: Pacific Conflict.c:6434 / binary @0x5DF8
+ * Proposed name: clear_pending_entity_slots
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Called from run_simulation_tick when mission flag DAT_0001b5a0+0xAC == 0.
+ * Walks seven pointer slots at DAT_0001bc64[0..6]: for each non-null entry,
+ * call dispatch_entity_cleanup then store NULL [PROVEN].
+ *
+ * Unknown: exact high-level role of the DAT_0001bc64 pending queue.
+ */
+void clear_pending_entity_slots(void) /* Original: FUN_00005df8 */
 {
   short sVar1;
   
   sVar1 = 0;
   do {
     if ((&DAT_0001bc64)[sVar1] != 0) {
-      FUN_0000528a((char *)(&DAT_0001bc64)[sVar1]);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)(&DAT_0001bc64)[sVar1]);
       (&DAT_0001bc64)[sVar1] = 0;
     }
     sVar1 = sVar1 + 1;
@@ -6875,22 +7743,22 @@ void FUN_00005e28(void)
         iVar3 = FUN_00002de8();
         if ((0x4d58 < iVar3) || (iVar3 = FUN_00002de8(), 0x4d58 < iVar3)) {
           if ((DAT_0001d858 < 6) && (_DAT_0001d856 == 0)) {
-            uVar4 = FUN_00011564();
+            uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
             uVar4 = (ushort)((*(short *)(DAT_0001b738 + 0x22) +
                              (short)((int)((uint)((ushort)uVar4 & 0xfff) * 0xc00) >> 0xc)) - 0x600)
                     & 0x3fff;
-            iVar3 = FUN_00001d76(uVar4);
-            iVar5 = FUN_00001dd8(uVar4);
+            iVar3 = sin_fixed14( /* Original: FUN_00001d76 */uVar4);
+            iVar5 = cos_fixed14( /* Original: FUN_00001dd8 */uVar4);
             *piVar11 = DAT_0001d838 + ((short)iVar3 * -0x4d58 >> 0xc);
             piVar11[1] = 0;
             piVar11[2] = DAT_0001d830 + ((short)iVar5 * 0x4d58 >> 0xc);
           }
           else {
-            uVar4 = FUN_00011564();
+            uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
             *piVar11 = DAT_0001d838 + -0x4d58 +
                        ((int)((uint)((ushort)uVar4 & 0xfff) * 0x9ab0) >> 0xc);
             piVar11[1] = 0;
-            uVar4 = FUN_00011564();
+            uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
             piVar11[2] = DAT_0001d830 + -0x4d58 +
                          ((int)((uint)((ushort)uVar4 & 0xfff) * 0x9ab0) >> 0xc);
           }
@@ -6907,8 +7775,8 @@ void FUN_00005e28(void)
         sVar13 = sVar13 + 1;
       } while (sVar13 < 0x40);
       piVar11 = aiStack_304;
-      FUN_00001c5c(0x40,&DAT_0001b924,piVar11,-DAT_0001d838,-iVar6,-DAT_0001d830);
-      FUN_000028dc(0x40,(int)piVar11,(int)piVar11,&DAT_0001d744);
+      translate_int3_vecs( /* Original: FUN_00001c5c */0x40,&DAT_0001b924,piVar11,-DAT_0001d838,-iVar6,-DAT_0001d830);
+      transform_vecs12_by_matrix3(0x40,(int)piVar11,(int)piVar11,&DAT_0001d744);
       sVar13 = 0;
       sVar14 = 0;
       psVar9 = local_2fa;
@@ -6962,11 +7830,11 @@ joined_r0x000061c6:
               uVar8 = 0x540;
             }
             else {
-              uVar4 = FUN_00011564();
+              uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
               uVar8 = (undefined2)((int)((uint)((ushort)uVar4 & 0xfff) * 0x40) >> 4);
             }
             if (pcVar1 == (char *)0x0) {
-              iVar6 = FUN_00005116(iVar3,*puVar12,(&DAT_0001b928)[iVar6 * 3],
+              iVar6 = spawn_mission_pool_object( /* Original: FUN_00005116 */iVar3,*puVar12,(&DAT_0001b928)[iVar6 * 3],
                                    (&DAT_0001b92c)[iVar6 * 3],0,uVar8,0,0);
               (&DAT_0001bc64)[(short)uVar15] = iVar6;
             }
@@ -6986,21 +7854,21 @@ joined_r0x000061c6:
               *(undefined4 *)(pcVar1 + 0x1c) = *(undefined4 *)(iVar3 + 6);
               *(int *)(pcVar1 + 0x20) = *(int *)(iVar3 + 10) + (&DAT_0001b92c)[iVar6 * 3];
               if ((pcVar1[5] & 0x10U) == 0) {
-                FUN_00002bd8((int)pcVar1,
+                apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)pcVar1,
                              (int)*(short *)(pcVar1 + 0x3a) + (int)*(short *)(pcVar1 + 0x36),
                              (uint *)(iVar3 + 0x22),*(uint **)(pcVar1 + 0x44));
               }
               else {
-                FUN_00001c5c((int)*(short *)(pcVar1 + 0x3a) + (int)*(short *)(pcVar1 + 0x36),
+                translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(pcVar1 + 0x3a) + (int)*(short *)(pcVar1 + 0x36),
                              (int *)(iVar3 + 0x22),*(int **)(pcVar1 + 0x44),0,0,0);
               }
-              FUN_00003b98((int)pcVar1);
+              update_object_camera_metric( /* Original: FUN_00003b98 */(int)pcVar1);
               FUN_00003da8((int)pcVar1,*(int *)(pcVar1 + 0x10));
               FUN_00003ea0(pcVar1);
             }
             else {
-              FUN_0000528a(pcVar1);
-              iVar6 = FUN_00005116(iVar3,*puVar12,(&DAT_0001b928)[iVar6 * 3],
+              dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
+              iVar6 = spawn_mission_pool_object( /* Original: FUN_00005116 */iVar3,*puVar12,(&DAT_0001b928)[iVar6 * 3],
                                    (&DAT_0001b92c)[iVar6 * 3],0,uVar8,0,0);
               (&DAT_0001bc64)[(short)uVar15] = iVar6;
             }
@@ -7030,7 +7898,7 @@ LAB_000063f0:
     if (_DAT_00024cec == 0) {
       return;
     }
-    FUN_00005df8();
+    clear_pending_entity_slots();
   }
   _DAT_00024cec = 0;
   return;
@@ -7058,22 +7926,22 @@ void FUN_0000640c(void)
     for (sVar8 = 0; sVar8 < DAT_0001c1e0; sVar8 = sVar8 + 1) {
       iVar3 = *(int *)((&DAT_0001d4a4)[sVar8] + 8);
       if ((iVar3 != 0) && (**(short **)(iVar3 + 4) == 0x1d)) {
-        FUN_000051ec((&DAT_0001d4a4)[sVar8]);
+        retire_entity( /* Original: FUN_000051ec */(&DAT_0001d4a4)[sVar8]);
       }
     }
   }
   else {
     sVar8 = 0;
     do {
-      uVar1 = FUN_00011564();
+      uVar1 = overlay_rng_next( /* Original: FUN_00011564 */);
       do {
-        uVar2 = FUN_00011564();
+        uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
         sVar10 = 0;
         sVar9 = (short)((uVar2 & 0xff) << 6);
         if (0 < sVar8) {
           do {
-            iVar3 = FUN_0000e40c(sVar9 - local_18[sVar10]);
-            iVar3 = FUN_00002e08((int)(short)iVar3);
+            iVar3 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */sVar9 - local_18[sVar10]);
+            iVar3 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar3);
             if (iVar3 < 0x280) break;
             sVar10 = sVar10 + 1;
           } while (sVar10 < sVar8);
@@ -7082,19 +7950,19 @@ void FUN_0000640c(void)
       local_18[sVar8] = sVar9;
       sVar10 = (short)((uVar1 & 0xffff) % 5);
       if (sVar10 == 4) {
-        uVar1 = FUN_00011544();
+        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         sVar7 = (short)((uVar1 & 0xffff) % 10) + 0xf;
-        uVar6 = FUN_00011544();
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         iVar3 = (uint)(uVar6 & 0xfff) * 10 + 300000;
       }
       else {
-        uVar1 = FUN_00011544();
+        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         sVar7 = (short)((uVar1 & 0xffff) % 10) + 0x23;
-        uVar1 = FUN_00011544();
+        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         iVar3 = (uVar1 & 0xffff) % 1000 + 0xcc4c;
       }
-      iVar4 = FUN_00001d76((int)sVar9);
-      iVar5 = FUN_00001dd8((int)sVar9);
+      iVar4 = sin_fixed14( /* Original: FUN_00001d76 */(int)sVar9);
+      iVar5 = cos_fixed14( /* Original: FUN_00001dd8 */(int)sVar9);
       if (sVar10 == 4) {
         sVar9 = 0;
       }
@@ -7154,7 +8022,7 @@ void FUN_00006598(int param_1,int param_2)
          *(char *)((int)DAT_0001da8a + (int)DAT_0001d864) + '\x01';
   }
   if (0x13 < DAT_00024cf0) {
-    FUN_00006fb8();
+    reset_distance_base_globals();
     DAT_00024cf0 = 0;
   }
   FUN_00005a14();
@@ -7165,20 +8033,20 @@ void FUN_00006598(int param_1,int param_2)
     DAT_0001daa0 = *(undefined2 *)(DAT_0001d85c + 0x10);
   }
   if (DAT_0001d858 == 2) {
-    FUN_000026cc(-(int)DAT_0001d810 & 0x3fff,0,-(int)DAT_0001d80c & 0x3fff,-DAT_0001d808 & 0x3fff,
+    build_attitude_matrix_6ang( /* Original: FUN_000026cc */-(int)DAT_0001d810 & 0x3fff,0,-(int)DAT_0001d80c & 0x3fff,-DAT_0001d808 & 0x3fff,
                  -DAT_0001d804 & 0x3fff,-DAT_0001d800 & 0x3fff,(int)asStack_22);
     local_a = 0;
     local_e = 0;
     local_6 = 0x1000;
-    FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+    transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
     DAT_0001d7f8 = local_e;
     DAT_0001d7f6 = local_6;
-    FUN_000027cc(&DAT_0001d744);
+    invoke_tagged_attitude_compose_neg_sins6( /* Original: FUN_000027cc */&DAT_0001d744);
   }
   else {
-    iVar14 = FUN_0000e40c((short)DAT_0001d808);
-    iVar5 = FUN_00001d76((int)DAT_0001d80c);
-    FUN_000024d6((int)DAT_0001d810,(int)(short)iVar14 * (int)(short)iVar5 >> 0xc & 0x3fff,
+    iVar14 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)DAT_0001d808);
+    iVar5 = sin_fixed14( /* Original: FUN_00001d76 */(int)DAT_0001d80c);
+    build_attitude_matrix_x_alt( /* Original: FUN_000024d6 */(int)DAT_0001d810,(int)(short)iVar14 * (int)(short)iVar5 >> 0xc & 0x3fff,
                  (int)DAT_0001d80c,DAT_0001d808,0x1d744);
   }
   if (*(short *)(DAT_0001b5a0 + 0xaa) == 0) {
@@ -7192,7 +8060,7 @@ void FUN_00006598(int param_1,int param_2)
     iVar14 = DAT_0001bdb0;
     DAT_0001c1d4 = DAT_0001c1d4 + 1;
     *(uint *)(DAT_0001bdb0 + 4) = *(uint *)(DAT_0001bdb0 + 4) | 4;
-    FUN_000028dc((int)*(short *)(iVar14 + 0x36),*(int *)(iVar14 + 0x44),*(int *)(iVar14 + 0x4c),
+    transform_vecs12_by_matrix3((int)*(short *)(iVar14 + 0x36),*(int *)(iVar14 + 0x44),*(int *)(iVar14 + 0x4c),
                  &DAT_0001d744);
     iVar14 = FUN_00003da8((int)DAT_0001bdac,DAT_0001d834 << 1);
     if (iVar14 != 0) {
@@ -7203,19 +8071,19 @@ void FUN_00006598(int param_1,int param_2)
   pcVar2 = DAT_0001bdac;
   DAT_0001c1d4 = DAT_0001c1d4 + 1;
   *(uint *)(DAT_0001bdac + 4) = *(uint *)(DAT_0001bdac + 4) | 4;
-  FUN_000028dc((int)*(short *)(pcVar2 + 0x36),*(int *)(pcVar2 + 0x44),*(int *)(pcVar2 + 0x4c),
+  transform_vecs12_by_matrix3((int)*(short *)(pcVar2 + 0x36),*(int *)(pcVar2 + 0x44),*(int *)(pcVar2 + 0x4c),
                &DAT_0001d744);
   if (DAT_0001d858 == 2) {
-    FUN_0000276e((int)DAT_0001d810,(int)DAT_0001d80e,(int)DAT_0001d80c,DAT_0001d808,DAT_0001d804,
+    build_attitude_matrix_6ang_alt( /* Original: FUN_0000276e */(int)DAT_0001d810,(int)DAT_0001d80e,(int)DAT_0001d80c,DAT_0001d808,DAT_0001d804,
                  DAT_0001d800,0x1d744);
   }
   else {
-    FUN_000024d6((int)DAT_0001d810,(int)DAT_0001d80e,(int)DAT_0001d80c,DAT_0001d808,0x1d744);
+    build_attitude_matrix_x_alt( /* Original: FUN_000024d6 */(int)DAT_0001d810,(int)DAT_0001d80e,(int)DAT_0001d80c,DAT_0001d808,0x1d744);
   }
   piVar10 = &DAT_0001d4a4;
   iVar14 = DAT_0001c1e0;
   while (iVar14 = iVar14 + -1, iVar14 != -1) {
-    FUN_00003b98(*piVar10);
+    update_object_camera_metric( /* Original: FUN_00003b98 */*piVar10);
     piVar10 = piVar10 + 1;
   }
   FUN_00005e28();
@@ -7225,7 +8093,7 @@ void FUN_00006598(int param_1,int param_2)
     if (0 < DAT_0001b734) {
       do {
         iVar5 = (&DAT_0001b5a4)[iVar14];
-        iVar6 = FUN_00003b98(iVar5);
+        iVar6 = update_object_camera_metric( /* Original: FUN_00003b98 */iVar5);
         iVar7 = iVar14 + -1;
         if (-1 < iVar7) {
           piVar10 = &DAT_0001b5a4 + iVar7;
@@ -7248,7 +8116,7 @@ void FUN_00006598(int param_1,int param_2)
     if (0 < DAT_0001b734) {
       piVar10 = &DAT_0001b5a4;
       do {
-        FUN_00003b98(*piVar10);
+        update_object_camera_metric( /* Original: FUN_00003b98 */*piVar10);
         iVar14 = iVar14 + 1;
         piVar10 = piVar10 + 1;
       } while (iVar14 < DAT_0001b734);
@@ -7538,8 +8406,21 @@ void FUN_00006ed6(void)
 
 
 
-void FUN_00006fb8(void)
-
+/*
+ * Original: FUN_00006fb8
+ * Source: Pacific Conflict.c:7180 / binary @0x6FB8
+ * Proposed name: reset_distance_base_globals
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Post-pass hook at end of run_simulation_tick (when phase gate passes).
+ * Writes 100000000 (0x05F5E100) into six globals [PROVEN]:
+ *   DAT_0001d718, DAT_0001d724, DAT_0001d714,
+ *   DAT_0001d720, DAT_0001d710, DAT_0001d71c
+ *
+ * [HYPOTHESIS] Large sentinels / distance bases (later reads near e.g. 0x5413+).
+ * Exact semantic names remain UNKNOWN.
+ */
+void reset_distance_base_globals(void) /* Original: FUN_00006fb8 */
 {
   DAT_0001d718 = 100000000;
   DAT_0001d724 = 100000000;
@@ -7795,8 +8676,8 @@ LAB_0000744c:
       local_a = 0x183;
       local_e = -0x2ee;
       local_6 = -0x513;
-      FUN_0000253e(0,(int)*(short *)((int)DAT_0001b738 + 0x22),0,(int)asStack_22);
-      FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+      build_attitude_matrix_3ang( /* Original: FUN_0000253e */0,(int)*(short *)((int)DAT_0001b738 + 0x22),0,(int)asStack_22);
+      transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
       DAT_0001d838 = *(int *)(*DAT_0001b738 + 0x18) + (int)local_e;
       DAT_0001d834 = *(int *)(*DAT_0001b738 + 0x1c) + (int)local_a;
       DAT_0001d830 = *(int *)(*DAT_0001b738 + 0x20) + (int)local_6;
@@ -8145,7 +9026,7 @@ LAB_00007ba8:
   }
 switchD_00007684_caseD_a:
   if (DAT_00024cf6 != 0) {
-    iVar5 = FUN_00002e08((int)DAT_00024cf6);
+    iVar5 = abs_int( /* Original: FUN_00002e08 */(int)DAT_00024cf6);
     piVar14 = DAT_0001b738;
     if (iVar5 == 1) {
       if ((*(byte *)(DAT_0001b738 + 0x1a1) & 0x40) == 0) {
@@ -8181,7 +9062,7 @@ switchD_00007684_caseD_a:
     sVar10 = DAT_00020b2a - *(short *)(DAT_0001b5a0 + 0x33e);
     sVar13 = *(short *)(DAT_0001b5a0 + 0x340) - DAT_00020b2c;
     if (_DAT_00024d2e == 0) {
-      iVar5 = FUN_00002e08((int)sVar10);
+      iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar10);
       sVar12 = sVar10;
       if (0x1e < iVar5) {
         if (0 < sVar10) goto LAB_00007eb8;
@@ -8196,7 +9077,7 @@ LAB_00007ebc:
 LAB_00007eb8:
       sVar12 = 0x1e;
     }
-    iVar5 = FUN_00002e08((int)sVar10);
+    iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar10);
     if (0xd5 < iVar5) {
       if (sVar10 < 1) {
         sVar10 = DAT_00020b2a + 0xd5;
@@ -8209,7 +9090,7 @@ LAB_00007eb8:
     DAT_00024d32 = *(short *)(DAT_0001b5a0 + 0x33e) + sVar12;
     *(short *)(DAT_0001b5a0 + 0x33e) = DAT_00024d32;
     if (_DAT_00024d2c == 0) {
-      iVar5 = FUN_00002e08((int)sVar13);
+      iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar13);
       if (0x18 < iVar5) {
         if (0 < sVar13) goto LAB_00007f3a;
         goto LAB_00007f20;
@@ -8224,7 +9105,7 @@ LAB_00007f3a:
 LAB_00007f20:
       sVar10 = 0x18;
     }
-    iVar5 = FUN_00002e08((int)sVar13);
+    iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar13);
     if (0xab < iVar5) {
       if (sVar13 < 1) {
         sVar13 = DAT_00020b2c + -0xab;
@@ -8268,13 +9149,13 @@ LAB_00008000:
     }
     else if ((uVar6 & 0x100) == 0) {
       if ((uVar6 & 0x200) != 0) {
-        uVar7 = FUN_00011564();
+        uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
         uVar7 = uVar7 & 7;
         goto joined_r0x000080c4;
       }
-      uVar7 = FUN_00011564();
+      uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
       if ((uVar7 & 3) != 0) {
-        uVar7 = FUN_00011564();
+        uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
         if ((uVar7 & 3) == 0) goto LAB_000080ee;
         goto LAB_000080fa;
       }
@@ -8282,13 +9163,13 @@ LAB_000080d4:
       *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 1;
     }
     else {
-      uVar7 = FUN_00011564();
+      uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
       if ((uVar7 & 1) == 0) {
 LAB_000080ee:
         *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
       }
       else {
-        uVar7 = FUN_00011564();
+        uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
         uVar7 = uVar7 & 3;
 joined_r0x000080c4:
         if (uVar7 == 0) goto LAB_000080d4;
@@ -8323,13 +9204,13 @@ LAB_000080fa:
             (*(char *)((int)DAT_0001b738 + 0x67e) == '\0')))) {
           if ((uVar6 & 0x100) == 0) {
             if ((uVar6 & 0x200) != 0) {
-              uVar7 = FUN_00011564();
+              uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
               uVar7 = uVar7 & 7;
               goto joined_r0x00008216;
             }
-            uVar7 = FUN_00011564();
+            uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
             if ((uVar7 & 3) != 0) {
-              uVar7 = FUN_00011564();
+              uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
               if ((uVar7 & 3) == 0) goto LAB_00008240;
               goto LAB_0000824c;
             }
@@ -8337,13 +9218,13 @@ LAB_00008226:
             *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 5;
           }
           else {
-            uVar7 = FUN_00011564();
+            uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
             if ((uVar7 & 1) == 0) {
 LAB_00008240:
               *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
             }
             else {
-              uVar7 = FUN_00011564();
+              uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
               uVar7 = uVar7 & 3;
 joined_r0x00008216:
               if (uVar7 == 0) goto LAB_00008226;
@@ -8354,7 +9235,7 @@ LAB_0000824c:
           goto switchD_0000833a_caseD_3;
         }
         if (uVar6 == 0x100) {
-          uVar7 = FUN_00011564();
+          uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
           if ((uVar7 & 3) == 0) {
             *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
           }
@@ -8402,13 +9283,13 @@ LAB_00008324:
         DAT_0001d800 = DAT_00024cfc;
       }
       else {
-        iVar5 = FUN_0000e40c((short)DAT_00024cf8 - (short)DAT_0001d804);
+        iVar5 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)DAT_00024cf8 - (short)DAT_0001d804);
         sVar10 = (short)iVar5;
         if (sVar10 < 0) {
           sVar10 = sVar10 + 3;
         }
         DAT_0001d804 = DAT_0001d804 + (int)(sVar10 >> 2) & 0x3fff;
-        iVar5 = FUN_0000e40c((short)DAT_00024cfc - (short)DAT_0001d800);
+        iVar5 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)DAT_00024cfc - (short)DAT_0001d800);
         sVar10 = (short)iVar5;
         if (sVar10 < 0) {
           sVar10 = sVar10 + 3;
@@ -8444,7 +9325,7 @@ LAB_00008324:
     goto LAB_000086fe;
   case 6:
     iVar5 = *DAT_0001b738;
-    iVar8 = FUN_00003b98(iVar5);
+    iVar8 = update_object_camera_metric( /* Original: FUN_00003b98 */iVar5);
     iVar11 = 0;
     for (uVar7 = *(int *)(iVar5 + 0x14) + iVar8; (uVar7 & 0xffff8000) != 0; uVar7 = (int)uVar7 >> 1)
     {
@@ -8455,8 +9336,8 @@ LAB_00008324:
     iVar8 = *(int *)(iVar5 + 0x1c) - DAT_0001d834 >> (uVar7 & 0x3f);
     iVar3 = *(int *)(iVar5 + 0x20) - DAT_0001d830 >> (uVar7 & 0x3f);
     iVar5 = iVar3 * iVar3 + iVar8 * iVar8 + iVar11 * iVar11;
-    iVar9 = FUN_0000e372(iVar5);
-    FUN_00001f22((short)iVar11,(short)iVar8,(short)iVar3,(int)(short)iVar9,iVar5,&uStack_24,
+    iVar9 = isqrt_floor( /* Original: FUN_0000e372 */iVar5);
+    attitude_from_velocity( /* Original: FUN_00001f22 */(short)iVar11,(short)iVar8,(short)iVar3,(int)(short)iVar9,iVar5,&uStack_24,
                  &uStack_26);
     sVar10 = (*(code *)&LAB_0000e3e8_4)((int)(short)uStack_24 - DAT_00024d00);
     iVar5 = (int)sVar10;
@@ -8602,25 +9483,25 @@ uint FUN_0000879e(void)
   if (*(short *)(DAT_0001b5a0 + 0xd4) != 0) goto LAB_00008866;
   if ((uVar3 & 0x100) == 0) {
     if ((uVar3 & 0x200) != 0) {
-      uVar2 = FUN_00011564();
+      uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
       uVar2 = uVar2 & 7;
       goto joined_r0x00008830;
     }
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     if ((uVar2 & 3) != 0) {
-      uVar2 = FUN_00011564();
+      uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
       if ((uVar2 & 3) != 0) goto LAB_00008866;
       goto LAB_0000885a;
     }
   }
   else {
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     if ((uVar2 & 1) == 0) {
 LAB_0000885a:
       *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
       goto LAB_00008866;
     }
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     uVar2 = uVar2 & 3;
 joined_r0x00008830:
     if (uVar2 != 0) goto LAB_00008866;
@@ -8628,7 +9509,7 @@ joined_r0x00008830:
   *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 1;
 LAB_00008866:
   if (DAT_0001b87c != (int *)0x0) {
-    FUN_0000528a((char *)*DAT_0001b87c);
+    dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)*DAT_0001b87c);
   }
   if ((_DAT_0001b87a != 0) && (*(short *)(DAT_0001b5a0 + 0xd4) == 0)) {
     *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 4;
@@ -8651,7 +9532,7 @@ void FUN_000088a0(int param_1,int param_2,int param_3,int param_4,short param_5)
   sVar3 = (short)(*(int *)(param_1 + 0x18) - param_2 >> (uVar1 & 0x3f));
   sVar4 = (short)(*(int *)(param_1 + 0x1c) - param_3 >> (uVar1 & 0x3f));
   sVar5 = (short)(*(int *)(param_1 + 0x20) - param_4 >> (uVar1 & 0x3f));
-  iVar2 = FUN_0000e372((int)sVar4 * (int)sVar4 + (int)sVar3 * (int)sVar3 + (int)sVar5 * (int)sVar5);
+  iVar2 = isqrt_floor( /* Original: FUN_0000e372 */(int)sVar4 * (int)sVar4 + (int)sVar3 * (int)sVar3 + (int)sVar5 * (int)sVar5);
   if ((short)iVar2 == 0) {
     DAT_0001d838 = param_2;
     DAT_0001d834 = param_3;
@@ -8749,7 +9630,7 @@ void FUN_00008abe(int param_1,int param_2,int param_3)
   ushort local_8;
   ushort local_6;
   
-  uVar2 = FUN_00003c00();
+  uVar2 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
   sVar5 = 0;
   for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
     sVar5 = sVar5 + 1;
@@ -8759,8 +9640,8 @@ void FUN_00008abe(int param_1,int param_2,int param_3)
   iVar4 = param_2 - DAT_0001d834 >> (uVar2 & 0x3f);
   iVar1 = param_3 - DAT_0001d830 >> (uVar2 & 0x3f);
   iVar6 = iVar1 * iVar1 + iVar4 * iVar4 + iVar7 * iVar7;
-  iVar3 = FUN_0000e372(iVar6);
-  FUN_00001f22((short)iVar7,(short)iVar4,(short)iVar1,(int)(short)iVar3,iVar6,&local_6,&local_8);
+  iVar3 = isqrt_floor( /* Original: FUN_0000e372 */iVar6);
+  attitude_from_velocity( /* Original: FUN_00001f22 */(short)iVar7,(short)iVar4,(short)iVar1,(int)(short)iVar3,iVar6,&local_6,&local_8);
   sVar5 = (*(code *)&LAB_0000e3e8_4)((int)(short)local_6 - (int)(short)DAT_00024d1a);
   iVar6 = (int)sVar5;
   sVar5 = (*(code *)&LAB_0000e3e8_4)((int)(short)local_8 - (int)(short)DAT_00024d18);
@@ -8838,22 +9719,22 @@ int FUN_00008c30(void)
           for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
             sVar5 = sVar5 + 1;
           }
-          iVar3 = FUN_0000e40c(*(short *)((int)DAT_0001b884 + 0x22) -
+          iVar3 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)((int)DAT_0001b884 + 0x22) -
                                *(short *)((int)DAT_0001b738 + 0x22));
           iVar9 = iVar8;
           if ((DAT_0001b888 != (int *)0x0) &&
-             (iVar3 = FUN_00002e08((int)(short)iVar3), iVar3 < 0x1001)) {
+             (iVar3 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar3), iVar3 < 0x1001)) {
             local_e = 0;
             local_a = 0;
             local_6 = 0x4000;
-            FUN_0000253e((int)*(short *)(DAT_0001b738 + 8),(int)*(short *)((int)DAT_0001b738 + 0x22)
+            build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b738 + 8),(int)*(short *)((int)DAT_0001b738 + 0x22)
                          ,(int)*(short *)(DAT_0001b738 + 9),(int)auStack_22);
             (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
             iVar3 = FUN_00003c48();
             local_e = 0;
             local_a = 0;
             local_6 = 0x4000;
-            FUN_0000253e((int)*(short *)(DAT_0001b884 + 8),(int)*(short *)((int)DAT_0001b884 + 0x22)
+            build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b884 + 8),(int)*(short *)((int)DAT_0001b884 + 0x22)
                          ,(int)*(short *)(DAT_0001b884 + 9),(int)auStack_22);
             (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
             iVar4 = FUN_00003c48();
@@ -8937,8 +9818,8 @@ void FUN_00008ff4(void)
   local_a = 0;
   local_e = 0;
   local_6 = -1000;
-  FUN_0000253e(0,(int)*(short *)((int)piVar4 + 0xe),0,(int)asStack_22);
-  FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */0,(int)*(short *)((int)piVar4 + 0xe),0,(int)asStack_22);
+  transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
   DAT_0001d838 = *piVar4 + (int)local_e;
   DAT_0001d834 = piVar4[1] + (int)local_a;
   DAT_0001d830 = piVar4[2] + (int)local_6;
@@ -8955,8 +9836,8 @@ void FUN_00008ff4(void)
   }
   local_a = 0x183;
   local_e = -0x2ee;
-  FUN_0000253e(0,(int)*(short *)((int)piVar4 + 0xe),0,(int)asStack_22);
-  FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */0,(int)*(short *)((int)piVar4 + 0xe),0,(int)asStack_22);
+  transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
   DAT_00024d28 = *piVar4 + (int)local_e;
   DAT_00024d20 = piVar4[2] + (int)local_6;
   iVar2 = *(int *)((int)DAT_0001b738 + 0x2e) + 0x280;
@@ -9353,12 +10234,12 @@ void FUN_000096f4(void)
             DAT_0001b848 = DAT_0001b84a;
             DAT_0001b84a = 0;
           }
-          iVar1 = FUN_00002e08((int)*(char *)(DAT_0001b738 + 0x679));
+          iVar1 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)(DAT_0001b738 + 0x679));
           _DAT_0001b84e = 0;
           if (((iVar1 != 0) && (iVar1 != 0x2d)) && ((*(byte *)(iVar3 + 0x685) & 0x20) == 0)) {
             _DAT_0001b84e = 1;
           }
-          iVar5 = FUN_00002e08((int)*(char *)(iVar3 + 0x67b));
+          iVar5 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)(iVar3 + 0x67b));
           _DAT_0001b84c = 0;
           iVar1 = iVar3;
           if ((iVar5 != 0) && (iVar5 != 0xf)) {
@@ -10256,12 +11137,12 @@ undefined4 FUN_0000a75e(void)
     }
     if ((DAT_00025b24[5] & 0x10U) != 0) {
       if ((uVar9 & 1) == 0) {
-        FUN_0000253e((int)*(short *)(piVar23 + 8),(int)*(short *)((int)piVar23 + 0x22),
+        build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(piVar23 + 8),(int)*(short *)((int)piVar23 + 0x22),
                      (int)*(short *)(piVar23 + 9),0x1d72c);
       }
-      FUN_00001d02(0x1d72c,&DAT_0001d744,0x24d38);
+      matmul3x3_s16( /* Original: FUN_00001d02 */0x1d72c,&DAT_0001d744,0x24d38);
       DAT_00024d62 = &DAT_00024d38;
-      FUN_000027a2(&DAT_0001d72c);
+      invoke_tagged_attitude_compose_neg_sins4( /* Original: FUN_000027a2 */&DAT_0001d72c);
       uVar6 = DAT_0001bd8c;
       uVar5 = DAT_0001bd8a;
       uVar4 = DAT_0001bd88;
@@ -10278,7 +11159,7 @@ undefined4 FUN_0000a75e(void)
         local_1e = (short)(DAT_0001d830 - *(int *)(DAT_00025b24 + 0x20) << (uVar10 & 0x3f));
       }
       if (((DAT_00025b24[6] & 1U) == 0) || (sVar13 == 0)) {
-        FUN_000028dc(1,(int)auStack_28,(int)auStack_28,(short *)&DAT_0001d72c);
+        transform_vecs12_by_matrix3(1,(int)auStack_28,(int)auStack_28,(short *)&DAT_0001d72c);
         if ((sVar14 != 0) &&
            (iVar20 = FUN_00003da8((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10)), iVar20 != 0)) {
           FUN_00003ea0(DAT_00025b24);
@@ -10288,7 +11169,7 @@ undefined4 FUN_0000a75e(void)
         local_1a = DAT_0001bd8c;
         local_16 = DAT_0001bd8a;
         local_12 = DAT_0001bd88;
-        FUN_000028dc(2,(int)auStack_28,(int)auStack_28,(short *)&DAT_0001d72c);
+        transform_vecs12_by_matrix3(2,(int)auStack_28,(int)auStack_28,(short *)&DAT_0001d72c);
         DAT_0001bd8c = local_1a;
         DAT_0001bd8a = local_16;
         DAT_0001bd88 = local_12;
@@ -12026,9 +12907,9 @@ void FUN_0000c80c(void)
   iVar5 = *(short *)(DAT_0001b5a0 + 0x100) + -1;
   iVar6 = *(short *)(DAT_0001b5a0 + 0x102) + -1;
   uVar1 = (ushort)(sVar4 - 0x1000) & 0x3fff;
-  iVar2 = FUN_00001dd8(uVar1);
+  iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */uVar1);
   sVar4 = *(short *)(DAT_0001b5a0 + 0x104);
-  iVar3 = FUN_00001d76(uVar1);
+  iVar3 = sin_fixed14( /* Original: FUN_00001d76 */uVar1);
   FUN_0000c572(1,iVar5,iVar6,iVar5 + ((int)(short)iVar2 * (int)sVar4 >> 0xc),
                iVar6 + ((int)(short)iVar3 * (int)*(short *)(DAT_0001b5a0 + 0x104) >> 0xc));
   return;
@@ -12049,9 +12930,9 @@ void FUN_0000c8d6(void)
   iVar5 = *(short *)(DAT_0001b5a0 + 0x150) + -1;
   iVar6 = *(short *)(DAT_0001b5a0 + 0x152) + -1;
   uVar2 = (ushort)(DAT_0001d80e - 0x1000) & 0x3fff;
-  iVar3 = FUN_00001dd8(uVar2);
+  iVar3 = cos_fixed14( /* Original: FUN_00001dd8 */uVar2);
   sVar1 = *(short *)(DAT_0001b5a0 + 0x154);
-  iVar4 = FUN_00001d76(uVar2);
+  iVar4 = sin_fixed14( /* Original: FUN_00001d76 */uVar2);
   FUN_0000c572(6,iVar5,iVar6,iVar5 + ((int)(short)iVar3 * (int)sVar1 >> 0xc),
                iVar6 + ((int)(short)iVar4 * (int)*(short *)(DAT_0001b5a0 + 0x154) >> 0xc));
   return;
@@ -12072,9 +12953,9 @@ void FUN_0000c948(void)
   uVar2 = DAT_0001bc80 / 0x78 - 0x2000U & 0x3fff;
   iVar5 = *(short *)(DAT_0001b5a0 + 0x120) + -1;
   iVar6 = *(short *)(DAT_0001b5a0 + 0x122) + -1;
-  iVar3 = FUN_00001dd8(uVar2);
+  iVar3 = cos_fixed14( /* Original: FUN_00001dd8 */uVar2);
   sVar1 = *(short *)(DAT_0001b5a0 + 0x124);
-  iVar4 = FUN_00001d76(uVar2);
+  iVar4 = sin_fixed14( /* Original: FUN_00001d76 */uVar2);
   FUN_0000c572(3,iVar5,iVar6,iVar5 + ((int)(short)iVar3 * (int)sVar1 >> 0xc),
                iVar6 + ((int)(short)iVar4 * (int)*(short *)(DAT_0001b5a0 + 0x124) >> 0xc));
   return;
@@ -12095,9 +12976,9 @@ void FUN_0000c9c2(void)
   uVar2 = (*(int *)(DAT_0001b738 + 0x66a) << 6) / 0x23a + 0x1540U & 0x3fff;
   iVar5 = *(short *)(DAT_0001b5a0 + 0x140) + -1;
   iVar6 = *(short *)(DAT_0001b5a0 + 0x142) + -1;
-  iVar3 = FUN_00001dd8(uVar2);
+  iVar3 = cos_fixed14( /* Original: FUN_00001dd8 */uVar2);
   sVar1 = *(short *)(DAT_0001b5a0 + 0x144);
-  iVar4 = FUN_00001d76(uVar2);
+  iVar4 = sin_fixed14( /* Original: FUN_00001d76 */uVar2);
   FUN_0000c572(5,iVar5,iVar6,iVar5 + ((int)(short)iVar3 * (int)sVar1 >> 0xc),
                iVar6 + ((int)(short)iVar4 * (int)*(short *)(DAT_0001b5a0 + 0x144) >> 0xc));
   return;
@@ -12118,9 +12999,9 @@ void FUN_0000ca44(void)
   uVar2 = ((int)*(short *)(DAT_0001b738 + 0x672) << 6) / 0x5f - 0x2500U & 0x3fff;
   iVar5 = *(short *)(DAT_0001b5a0 + 0x130) + -1;
   iVar6 = *(short *)(DAT_0001b5a0 + 0x132) + -1;
-  iVar3 = FUN_00001dd8(uVar2);
+  iVar3 = cos_fixed14( /* Original: FUN_00001dd8 */uVar2);
   sVar1 = *(short *)(DAT_0001b5a0 + 0x134);
-  iVar4 = FUN_00001d76(uVar2);
+  iVar4 = sin_fixed14( /* Original: FUN_00001d76 */uVar2);
   FUN_0000c572(4,iVar5,iVar6,iVar5 + ((int)(short)iVar3 * (int)sVar1 >> 0xc),
                iVar6 + ((int)(short)iVar4 * (int)*(short *)(DAT_0001b5a0 + 0x134) >> 0xc));
   return;
@@ -12198,13 +13079,13 @@ void FUN_0000cc12(void)
   
   if ((_DAT_00025ffc == 0) || (*(char *)(DAT_0001b738 + 0x67b) != DAT_00025fe8)) {
     DAT_00025fe8 = (short)*(char *)(DAT_0001b738 + 0x67b);
-    iVar3 = FUN_00002e08((int)DAT_00025fe8);
+    iVar3 = abs_int( /* Original: FUN_00002e08 */(int)DAT_00025fe8);
     iVar5 = *(short *)(DAT_0001b5a0 + 0x20e) + -1;
     iVar6 = *(short *)(DAT_0001b5a0 + 0x210) + -1;
     uVar2 = (ushort)((short)((iVar3 * -0xac0) / 0xf) + 0x2000) & 0x3fff;
-    iVar3 = FUN_00001dd8(uVar2);
+    iVar3 = cos_fixed14( /* Original: FUN_00001dd8 */uVar2);
     sVar1 = *(short *)(DAT_0001b5a0 + 0x212);
-    iVar4 = FUN_00001d76(uVar2);
+    iVar4 = sin_fixed14( /* Original: FUN_00001d76 */uVar2);
     FUN_0000c572(10,iVar5,iVar6,iVar5 + ((int)(short)iVar3 * (int)sVar1 >> 0xc),
                  iVar6 + ((int)(short)iVar4 * (int)*(short *)(DAT_0001b5a0 + 0x212) >> 0xc));
   }
@@ -12226,7 +13107,7 @@ void FUN_0000ccca(void)
   
   if ((_DAT_00025ffc == 0) || (*(char *)(DAT_0001b738 + 0x679) != DAT_00025fea)) {
     DAT_00025fea = (short)*(char *)(DAT_0001b738 + 0x679);
-    FUN_00002e08((int)DAT_00025fea);
+    abs_int( /* Original: FUN_00002e08 */(int)DAT_00025fea);
     iVar5 = *(short *)(DAT_0001b5a0 + 0x214) + -1;
     iVar4 = *(short *)(DAT_0001b5a0 + 0x216) + -1;
     iVar2 = FUN_00001db8();
@@ -12271,9 +13152,9 @@ void FUN_0000ce1c(void)
     iVar4 = *(short *)(DAT_0001b5a0 + 0x232) + -1;
     iVar5 = *(short *)(DAT_0001b5a0 + 0x234) + -1;
     uVar6 = (uint)(short)((short)((DAT_00025fec * 0x1555) / 0x2a3) + 0x555);
-    iVar2 = FUN_00001dd8(uVar6);
+    iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */uVar6);
     sVar1 = *(short *)(DAT_0001b5a0 + 0x236);
-    iVar3 = FUN_00001d76(uVar6);
+    iVar3 = sin_fixed14( /* Original: FUN_00001d76 */uVar6);
     FUN_0000c572(0xf,iVar4,iVar5,iVar4 - ((int)(short)iVar2 * (int)sVar1 >> 0xc),
                  iVar5 - ((int)(short)iVar3 * (int)*(short *)(DAT_0001b5a0 + 0x236) >> 0xc));
   }
@@ -14041,7 +14922,7 @@ FUN_0000e262(uint param_1,uint param_2,uint param_3,undefined2 param_4,undefined
   int iVar1;
   undefined4 uVar2;
   
-  iVar1 = FUN_00005116(DAT_00026000,param_1,param_2,param_3,param_4,param_5,param_6,param_7);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_00026000,param_1,param_2,param_3,param_4,param_5,param_6,param_7);
   if (iVar1 == 0) {
     uVar2 = 0;
   }
@@ -14094,8 +14975,23 @@ uint * FUN_0000e340(uint param_1,int param_2,undefined2 param_3)
 
 
 
-int FUN_0000e372(int param_1)
-
+/*
+ * Original: FUN_0000e372
+ * Proposed name: isqrt_floor
+ * Confidence: [PROVEN]
+ *
+ * Integer floor sqrt via binary search on [0,0x7FFF]; returns largest s with
+ * s*s <= param_1. Used in e792 airborne (e²+a²+6²) and grounded (e²+6²).
+ *
+ * False mid-label [PROVEN bytes; callsite STRONG INFERENCE]:
+ *   LEA/table slots use $E352 (= $E372 − 0x20), same +0x20 pattern as
+ *   $2DE8→abs_int, $1D56→sin_fixed14, $1DB8→cos_fixed14.
+ *   Capstone @0xE352 is mid-previous BSR.W displacement / garbage (FRESTORE),
+ *   not a real entry. Ghidra LAB_0000e350_2; jump-table poke @0x11C4 stores
+ *   #$E352 at obj+0x32E. Call sites that LEA $E352 (e.g. @0x22CC) are treated
+ *   as isqrt_floor [INFERRED].
+ */
+int isqrt_floor(int param_1) /* Original: FUN_0000e372 */
 {
   short sVar1;
   int iVar2;
@@ -14123,8 +15019,25 @@ int FUN_0000e372(int param_1)
 
 
 
-int FUN_0000e3b2(int param_1,int param_2,int param_3,int param_4,int param_5,int param_6,int param_7
-                ,int param_8)
+/*
+ * Original: FUN_0000e3b2
+ * Proposed name: acos_scaled_dot3
+ * Confidence: [PROVEN] formula; [STRONG INFERENCE] acos via FUN_00001e3a
+ *
+ * Capstone @0xE3B2–0xE40A:
+ *   denom = (param_4 * param_8) >> 16
+ *   if denom == 0: return 0
+ *   numer = (param_1*param_5 + param_2*param_6 + param_3*param_7) >> 4
+ *   return (short) acos_fixed14( /* Original: FUN_00001e3a */numer / denom)
+ *
+ * acos_fixed14 binary-searches cos table DAT_0001ad6c (same as cos_fixed14)
+ * → inverse-cos / angle-from-cosine [STRONG INFERENCE]. So this is an angle
+ * from a scaled 3D dot product.
+ *
+ * No overlay BSR/JSR found. Evidence: Capstone; table identity with cos path.
+ */
+int acos_scaled_dot3(int param_1,int param_2,int param_3,int param_4,int param_5,int param_6,int param_7
+                ,int param_8) /* Original: FUN_0000e3b2 */
 
 {
   int iVar1;
@@ -14134,7 +15047,7 @@ int FUN_0000e3b2(int param_1,int param_2,int param_3,int param_4,int param_5,int
     iVar1 = 0;
   }
   else {
-    iVar1 = FUN_00001e3a((param_7 * param_3 + param_6 * param_2 + param_5 * param_1 >> 4) / iVar1);
+    iVar1 = acos_fixed14( /* Original: FUN_00001e3a */(param_7 * param_3 + param_6 * param_2 + param_5 * param_1 >> 4) / iVar1);
     iVar1 = (int)(short)iVar1;
   }
   return iVar1;
@@ -14142,8 +15055,17 @@ int FUN_0000e3b2(int param_1,int param_2,int param_3,int param_4,int param_5,int
 
 
 
-int FUN_0000e40c(short param_1)
-
+/*
+ * Original: FUN_0000e40c
+ * Proposed name: fold_angle_pm_0x2000
+ * Confidence: [PROVEN]
+ *
+ * Fold a signed angle into [-0x2000, +0x2000]: if >0x2000 subtract 0x4000;
+ * if < -0x2000 add 0x4000. Used widely for attitude deltas (e792 landing
+ * rough/gentle gate, LAB_0000f47c yaw blend, grounded soft paths).
+ * Evidence: NOTES FUN_0000e40c; flight contract “folds to ±0x2000”.
+ */
+int fold_angle_pm_0x2000(short param_1) /* Original: FUN_0000e40c */
 {
   if (param_1 < 0x2001) {
     if (param_1 < -0x2000) {
@@ -14158,8 +15080,17 @@ int FUN_0000e40c(short param_1)
 
 
 
-int FUN_0000e42a(uint param_1)
-
+/*
+ * Original: FUN_0000e42a
+ * Proposed name: table_lerp_1b2c0
+ * Confidence: [PROVEN] algorithm; [HYPOTHESIS] physical quantity of input
+ *
+ * Banded lerp over overlapping DAT_0001b2c0[]: high word selects band
+ * (clamped 0..7); low word weights (hi−lo)<<16 fraction.
+ * Callers pass *(world_obj+0x1c) (surface/world cell), not entity pos_1c.
+ * Evidence: Pacific Conflict.c:13796+; NOTES 2026-10-15 helper trio; contract.
+ */
+int table_lerp_1b2c0(uint param_1) /* Original: FUN_0000e42a */
 {
   int iVar1;
   
@@ -14175,8 +15106,17 @@ int FUN_0000e42a(uint param_1)
 
 
 
-int FUN_0000e468(int param_1,short param_2)
-
+/*
+ * Original: FUN_0000e468
+ * Proposed name: damp_short_if_below_0x200
+ * Confidence: [PROVEN]
+ *
+ * If param_1 < 0x200, reduce param_2 by ((0x200−param_1)*param_2)>>12
+ * (toward-zero style for negative products via +0xfff). Else return param_2.
+ * In e792: arg0 = world+0x1c − entity pos_2e (height delta); arg1 = e42a out.
+ * Result kept separately from raw e42a (used later as drag divisor @~0xEDF8).
+ */
+int damp_short_if_below_0x200(int param_1,short param_2) /* Original: FUN_0000e468 */
 {
   int iVar1;
   
@@ -14192,8 +15132,18 @@ int FUN_0000e468(int param_1,short param_2)
 
 
 
-int FUN_0000e4a4(short param_1,short param_2,undefined1 *param_3)
-
+/*
+ * Original: FUN_0000e4a4
+ * Proposed name: compute_template_force_from_626
+ * Confidence: [PROVEN] algorithm; [STRONG INFERENCE] “force” as 0x63a feed
+ *
+ * Inputs: param_1=movement_626, param_2=signed char 0x67b (0→base coeffs),
+ * param_3→entity+0x19e (set to 0xC when 626 > template+0x34).
+ * Mixes template +0x26/+0x28 (or lerp to +0x2a/+0x2c by |param_2|/0xF), then
+ * scales by 626 vs threshold +0x34. Caller smooths into movement_63a.
+ * Note: FUN_0000e512 appears to be a Ghidra register-spill twin — leave alone.
+ */
+int compute_template_force_from_626(short param_1,short param_2,undefined1 *param_3) /* Original: FUN_0000e4a4 */
 {
   int iVar1;
   short sVar2;
@@ -14204,7 +15154,7 @@ int FUN_0000e4a4(short param_1,short param_2,undefined1 *param_3)
     sVar2 = *(short *)(DAT_00026004 + 0x28);
   }
   else {
-    iVar1 = FUN_00002e08((int)param_2);
+    iVar1 = abs_int( /* Original: FUN_00002e08 */(int)param_2);
     sVar3 = *(short *)(DAT_00026004 + 0x26) +
             (short)(((int)(short)iVar1 *
                     ((int)*(short *)(DAT_00026004 + 0x2a) - (int)*(short *)(DAT_00026004 + 0x26))) /
@@ -14272,8 +15222,15 @@ int FUN_0000e512(void)
 
 
 
-void FUN_0000e570(short param_1,int *param_2)
-
+/*
+ * Original: FUN_0000e570
+ * Proposed name: scale_template_field_38
+ * Confidence: [PROVEN]
+ *
+ * *param_2 = template(+0x38) * (0x551a / ((param_1+0x105)>>3)) >> 8.
+ * In e792, param_1 is raw table_lerp_1b2c0 (sVar15), not the e468-damped value.
+ */
+void scale_template_field_38(short param_1,int *param_2) /* Original: FUN_0000e570 */
 {
   *param_2 = *(int *)(DAT_00026004 + 0x38) * (int)(short)(0x551a / (short)(param_1 + 0x105 >> 3)) >>
              8;
@@ -14358,14 +15315,14 @@ void FUN_0000e5aa(int *param_1)
     FUN_00010650(param_1);
     if (((*(ushort *)((int)param_1 + 0x686) ^ *(ushort *)(param_1 + 0x1a1)) & 0x2000) != 0) {
       if ((*(byte *)(param_1 + 0x1a1) & 0x20) == 0) {
-        iVar4 = FUN_00002e08((int)*(char *)(DAT_0001b738 + 0x679));
+        iVar4 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)(DAT_0001b738 + 0x679));
         *(char *)((int)param_1 + 0x679) = (char)iVar4;
         if ((char)iVar4 == '\0') {
           *(undefined1 *)((int)param_1 + 0x679) = 1;
         }
       }
       else {
-        iVar4 = FUN_00002e08((int)*(char *)(DAT_0001b738 + 0x679));
+        iVar4 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)(DAT_0001b738 + 0x679));
         *(char *)((int)param_1 + 0x679) = -(char)iVar4;
       }
     }
@@ -14378,10 +15335,37 @@ void FUN_0000e5aa(int *param_1)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-short * FUN_0000e792(int *param_1)
-
+/*
+ * Original: FUN_0000e792
+ * Source: Pacific Conflict.c:14018–14748 / binary @0xE792
+ * Proposed name: update_aircraft_entity
+ * Confidence: [STRONG INFERENCE] overall role; blocks annotated incrementally
+ *
+ * Large per-entity flight/combat update. NOT called from run_simulation_tick /
+ * dispatch_entity_tick — callers include FUN_00010ce8, FUN_00010f68,
+ * FUN_000110f4, FUN_0001820a (see docs/PROJECT_STATUS.md).
+ *
+ * Contract: docs/contracts/flight_FUN_0000e792_contract.md
+ * Layout: docs/STRUCTS.md (Entity offsets from this function)
+ *
+ * Reconstruction status:
+ *   Block 0 — prologue + template field_40 + contact early-out [ANNOTATED iter 12]
+ *   Block 1 — flags_685 RNG on movement_662/666 + status bit0 reset [ANNOTATED iter 13]
+ *   Block 1b — movement_669 gate + status_1a0 accumulator [ANNOTATED iter 13]
+ *   Block 2 — e42a/e468/e570 prep + local_34 + ownership 66e/672/66a [ANNOTATED iter 14]
+ *   Block 3 — movement_626 step + reverse-flight clamps/local_48 [ANNOTATED iter 15]
+ *   Block 4 — e4a4→63a, e468 drag, thrust_636, stall iVar25 [ANNOTATED iter 16]
+ *   Block 5 — attitude matrix + 028dc commit + field_63e touchdown [ANNOTATED iter 17]
+ *   Block 6 — airborne/grounded post-commit + LAB_0000f47c [ANNOTATED iter 18]
+ *   Block 7 — char epilogue + weapons + flags_685&2 + bVar6 [ANNOTATED iter 19]
+ *   Remainder — function complete for primary flight path; deeper callees pending
+ *
+ * Note: Ghidra often indexes status as param_1+0x1a1 (uint*); binary uses
+ * absolute byte offsets (e.g. BTST bit3 at entity+0x684). Preserve expressions.
+ */
+short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
 {
-  int iVar1;
+  int iVar1; /* *param_1 — world/object pointer */
   uint *puVar2;
   char cVar3;
   int *piVar4;
@@ -14421,16 +15405,22 @@ short * FUN_0000e792(int *param_1)
   short local_a;
   short local_6;
   
+  /*
+   * ---- Block 0: prologue + contact early-out (binary @0xE792–0xE89E) ----
+   * Snapshot attitude/speed locals; bind external template at param_1[1] →
+   * DAT_00026004; adjust altitude candidate iVar23 by template+0x40
+   * (full if direction_char_679=='-', else halved) [PROVEN / contract].
+   */
   iVar1 = *param_1;
   bVar6 = false;
-  DAT_00026004 = param_1[1];
-  local_28 = *(ushort *)(param_1 + 8);
+  DAT_00026004 = param_1[1]; /* external template pointer */
+  local_28 = *(ushort *)(param_1 + 8);           /* attitude-related */
   local_2a = *(ushort *)((int)param_1 + 0x22);
   sVar17 = *(short *)(param_1 + 9);
-  iVar25 = *(int *)((int)param_1 + 0x62a);
+  iVar25 = *(int *)((int)param_1 + 0x62a);      /* movement_62a */
   iVar20 = iVar25 >> 2;
-  if (*(char *)((int)param_1 + 0x679) == '-') {
-    sVar12 = *(short *)(DAT_00026004 + 0x40);
+  if (*(char *)((int)param_1 + 0x679) == '-') { /* direction_char_679 */
+    sVar12 = *(short *)(DAT_00026004 + 0x40);   /* template field_40 */
   }
   else {
     sVar12 = *(short *)(DAT_00026004 + 0x40);
@@ -14439,40 +15429,57 @@ short * FUN_0000e792(int *param_1)
     }
     sVar12 = sVar12 >> 1;
   }
-  iVar23 = *(int *)((int)param_1 + 0x2e) + (int)sVar12;
-  iVar19 = *(int *)((int)param_1 + 0x66a);
+  iVar23 = *(int *)((int)param_1 + 0x2e) + (int)sVar12; /* pos_2e + adj */
+  iVar19 = *(int *)((int)param_1 + 0x66a);              /* movement_66a */
   sVar12 = (short)*(char *)((int)param_1 + 0x67e) +
            *(short *)(param_1 + 0x18d) + (short)*(char *)((int)param_1 + 0x67d);
+  /*
+   * Contact early-out [PROVEN]: status bit 3 at entity+0x684 (Ghidra: +0x1a1).
+   * Compare pos_2e to surface *(world+0x1c)-0x16; set position_velocity_c;
+   * optional player DAT_0001b850; jitter 0x61a/0x61e via overlay_rng_next
+   * (Ghidra FUN_00011544 callsite); clear
+   * movement_669; return (skips rest of update).
+   */
   if ((*(byte *)(param_1 + 0x1a1) & 8) != 0) {
     if (*(int *)((int)param_1 + 0x2e) < *(int *)(iVar1 + 0x1c) + -0x16) {
-      param_1[3] = -0x16;
+      param_1[3] = -0x16; /* position_velocity_c */
     }
     else {
       if ((*(char *)(param_1 + 0xb) == '\x10') &&
          (*(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) | 0x1000,
-         param_1 == DAT_0001b738)) {
+         param_1 == DAT_0001b738)) { /* player entity */
         _DAT_0001b850 = 1;
       }
       param_1[3] = iVar23 - *(int *)(iVar1 + 0x1c);
     }
-    uVar13 = FUN_00011544();
+    uVar13 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(short *)((int)param_1 + 0x61e) = (uVar13 & 0x7f) + *(short *)((int)param_1 + 0x61e);
     *(ushort *)(param_1 + 9) = *(short *)((int)param_1 + 0x61e) + *(short *)(param_1 + 9) & 0x3fff;
-    uVar7 = FUN_00011544();
+    uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(short *)((int)param_1 + 0x61a) = *(short *)((int)param_1 + 0x61a) - ((ushort)uVar7 & 0x7f);
     uVar13 = *(short *)((int)param_1 + 0x61a) + *(short *)(param_1 + 8);
     *(ushort *)(param_1 + 8) = uVar13 & 0x3fff;
-    *(undefined1 *)((int)param_1 + 0x669) = 0;
+    *(undefined1 *)((int)param_1 + 0x669) = 0; /* movement_669 */
     return (short *)(CONCAT22((short)((uint)uVar7 >> 0x10),uVar13) & 0xffff3fff);
   }
+  /*
+   * ---- Block 1: flags_685 control jitter (binary @0xE8A0–0xE93C) --------
+   * [PROVEN] If flags_685 bit2: movement_662 += (overlay_rng_next()&0x7f)-0x40;
+   *   clamp via abs_int abs > 0x200 → {-0x200,+0x200}.
+   * [PROVEN] If flags_685 bit3: same for movement_666; clamp threshold 0x140
+   *   → {-0x140,+0x140} (0xFEC0 / 0x140).
+   * [PROVEN] If status bit0 (Ghidra param_1+0x1a1 / binary +0x684 bit0):
+   *   movement_662=0, movement_666=0xFF80.
+   * Evidence: NOTES.md 2026-10-15 slice; flight contract “flags_685 RNG”.
+   */
   if ((*(byte *)((int)param_1 + 0x685) & 4) != 0) {
-    uVar8 = FUN_00011564();
+    uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
     sVar21 = *(short *)((int)param_1 + 0x662) + ((ushort)uVar8 & 0x7f) + -0x40;
-    *(short *)((int)param_1 + 0x662) = sVar21;
-    iVar9 = FUN_00002e08((int)sVar21);
+    *(short *)((int)param_1 + 0x662) = sVar21; /* movement_662 */
+    iVar9 = abs_int( /* Original: FUN_00002e08 */(int)sVar21); /* magnitude */
     if (0x200 < iVar9) {
       if (*(short *)((int)param_1 + 0x662) < 0) {
-        uVar14 = 0xfe00;
+        uVar14 = 0xfe00; /* -0x200 */
       }
       else {
         uVar14 = 0x200;
@@ -14481,13 +15488,13 @@ short * FUN_0000e792(int *param_1)
     }
   }
   if ((*(byte *)((int)param_1 + 0x685) & 8) != 0) {
-    uVar8 = FUN_00011564();
+    uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
     sVar21 = *(short *)((int)param_1 + 0x666) + ((ushort)uVar8 & 0x7f) + -0x40;
-    *(short *)((int)param_1 + 0x666) = sVar21;
-    iVar9 = FUN_00002e08((int)sVar21);
+    *(short *)((int)param_1 + 0x666) = sVar21; /* movement_666 */
+    iVar9 = abs_int( /* Original: FUN_00002e08 */(int)sVar21);
     if (0x140 < iVar9) {
       if (*(short *)((int)param_1 + 0x666) < 0) {
-        uVar14 = 0xfec0;
+        uVar14 = 0xfec0; /* -0x140 */
       }
       else {
         uVar14 = 0x140;
@@ -14499,8 +15506,16 @@ short * FUN_0000e792(int *param_1)
     *(undefined2 *)((int)param_1 + 0x662) = 0;
     *(undefined2 *)((int)param_1 + 0x666) = 0xff80;
   }
+  /*
+   * ---- Block 1b: movement_669 gate + status_1a0 accumulator (→0xE9xx) ----
+   * [PROVEN] Default movement_669=1; clear + zero local if gate fails
+   * (flags_685&0x40 with status_1a3==0, or status&0x300, or both 67d/67e zero).
+   * If flags_685 sign bit set, halve signed byte at +0x19a toward zero, then
+   * add into status_1a0; when over template+0x1e, subtract threshold and maybe
+   * decrement 67d/67e via overlay_rng_next. [NOTES.md 14137–14163]
+   */
   sVar21 = (short)*(char *)(param_1 + 0x19a);
-  *(undefined1 *)((int)param_1 + 0x669) = 1;
+  *(undefined1 *)((int)param_1 + 0x669) = 1; /* movement_669 */
   if (((((*(byte *)((int)param_1 + 0x685) & 0x40) == 0) || (*(short *)(param_1 + 0x1a3) != 0)) &&
       ((*(ushort *)(param_1 + 0x1a1) & 0x300) == 0)) &&
      ((*(char *)((int)param_1 + 0x67d) != '\0' || (*(char *)((int)param_1 + 0x67e) != '\0')))) {
@@ -14515,10 +15530,10 @@ short * FUN_0000e792(int *param_1)
     *(undefined1 *)((int)param_1 + 0x669) = 0;
     sVar21 = 0;
   }
-  *(short *)(param_1 + 0x1a0) = sVar21 + *(short *)(param_1 + 0x1a0);
+  *(short *)(param_1 + 0x1a0) = sVar21 + *(short *)(param_1 + 0x1a0); /* status_1a0 */
   if (*(short *)(DAT_00026004 + 0x1e) < *(short *)(param_1 + 0x1a0)) {
     *(short *)(param_1 + 0x1a0) = *(short *)(param_1 + 0x1a0) - *(short *)(DAT_00026004 + 0x1e);
-    uVar8 = FUN_00011564();
+    uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
     if (((uVar8 & 1) == 0) || (*(char *)((int)param_1 + 0x67d) == '\0')) {
       if (*(char *)((int)param_1 + 0x67e) != '\0') {
         *(char *)((int)param_1 + 0x67e) = *(char *)((int)param_1 + 0x67e) + -1;
@@ -14528,10 +15543,19 @@ short * FUN_0000e792(int *param_1)
       *(char *)((int)param_1 + 0x67d) = *(char *)((int)param_1 + 0x67d) + -1;
     }
   }
-  iVar9 = FUN_0000e42a(*(uint *)(iVar1 + 0x1c));
-  sVar15 = (short)iVar9;
-  iVar9 = FUN_0000e468(*(int *)(iVar1 + 0x1c) - *(int *)((int)param_1 + 0x2e),sVar15);
-  FUN_0000e570(sVar15,&local_26);
+  /*
+   * ---- Block 2a: helper prep + local_34 (binary ~0xE9BE–0xE9EA) ----------
+   * [PROVEN] e42a(*(world+0x1c)) → sVar15 (raw). e468(world+0x1c−pos_2e, raw)
+   * → iVar9 (damped; later drag). e570(raw) → local_26.
+   * [PROVEN] local_34: 0 if sVar21==0; else if iVar20 > template+0x3e:
+   *   (local_26*sVar21)/9/iVar20; else (sVar21*template+0x3c)/9.
+   * Evidence: flight_FUN_0000e792_contract.md; NOTES helper trio / ownership.
+   */
+  iVar9 = table_lerp_1b2c0(*(uint *)(iVar1 + 0x1c)); /* Original: FUN_0000e42a */
+  sVar15 = (short)iVar9; /* keep undamped for e570 / local_46 */
+  iVar9 = damp_short_if_below_0x200(
+      *(int *)(iVar1 + 0x1c) - *(int *)((int)param_1 + 0x2e),sVar15); /* FUN_0000e468 */
+  scale_template_field_38(sVar15,&local_26); /* Original: FUN_0000e570 */
   if (sVar21 == 0) {
     local_34 = 0;
   }
@@ -14541,10 +15565,18 @@ short * FUN_0000e792(int *param_1)
   else {
     local_34 = ((int)sVar21 * (int)*(short *)(DAT_00026004 + 0x3c)) / 9;
   }
+  /*
+   * ---- Block 2b: designated-entity smoothing 0x66e / 0x672 / 0x66a --------
+   * [PROVEN] Runs only if param_1 == DAT_0001b738 (player) or DAT_0001b888
+   * (second designated). Delta rule: if |d|<8 add d else add (d+7*(d<0))>>3.
+   * [PROVEN] local_46 uses literal 0x666 (not entity+0x666). local_42 from iVar20.
+   * [HYPOTHESIS] axis names pitch/roll/yaw — see contract [INFERRED] mapping.
+   * [PROVEN] Clear movement_669 when (status&0x40) && 0x66e==0.
+   */
   if ((param_1 == DAT_0001b738) || (param_1 == DAT_0001b888)) {
     local_42 = (iVar20 << 0x11) / 0x1c20;
     local_46 = (int)(short)(0x5e50 / (short)(sVar15 + 0xa25 >> 5)) * sVar21 * 0x666 >> 5;
-    iVar24 = local_46 - *(int *)((int)param_1 + 0x66e);
+    iVar24 = local_46 - *(int *)((int)param_1 + 0x66e); /* → movement_66e */
     iVar10 = iVar24;
     if (iVar24 < 0) {
       iVar10 = iVar24 + 7;
@@ -14571,7 +15603,7 @@ short * FUN_0000e792(int *param_1)
       }
       sVar21 = sVar21 >> 1;
     }
-    iVar24 = (int)sVar21 - (int)*(short *)((int)param_1 + 0x672);
+    iVar24 = (int)sVar21 - (int)*(short *)((int)param_1 + 0x672); /* → movement_672 */
     iVar10 = iVar24;
     if (iVar24 < 0) {
       iVar10 = iVar24 + 7;
@@ -14596,7 +15628,7 @@ short * FUN_0000e792(int *param_1)
       iVar19 = iVar10 + 7;
     }
     if (iVar19 >> 3 == 0) {
-      *(int *)((int)param_1 + 0x66a) = iVar10 + *(int *)((int)param_1 + 0x66a);
+      *(int *)((int)param_1 + 0x66a) = iVar10 + *(int *)((int)param_1 + 0x66a); /* movement_66a */
     }
     else {
       if (iVar10 < 0) {
@@ -14608,6 +15640,14 @@ short * FUN_0000e792(int *param_1)
       *(undefined1 *)((int)param_1 + 0x669) = 0;
     }
   }
+  /*
+   * ---- Block 3a: movement_626 step (all entities past contact) ------------
+   * [PROVEN] iVar20 = movement_62a>>2 (set earlier). If iVar20 < 0xCA8, scale
+   * control 0x662 via template +0x34/+0x36 into sVar21; scale gain iVar19 and
+   * side terms local_48/sVar22 from 0x199 / 0x666. Else pass-through.
+   * Then: 626 += ((gain * (sVar21 − (626 − template+0x44))) >> 8).
+   * e468 not used here. Evidence: contract; NOTES movement_626 speed step.
+   */
   if (iVar20 < 0xca8) {
     if (*(short *)(DAT_00026004 + 0x36) < iVar20) {
       iVar19 = (int)*(short *)((int)param_1 + 0x662) * (*(short *)(DAT_00026004 + 0x34) + -0x200);
@@ -14665,6 +15705,13 @@ short * FUN_0000e792(int *param_1)
     iVar19 = iVar19 + 0xff;
   }
   *(short *)((int)param_1 + 0x626) = (short)((uint)iVar19 >> 8) + *(short *)((int)param_1 + 0x626);
+  /*
+   * ---- Block 3b: reverse-flight when field_63e!=0 && dir_679=='-' ---------
+   * [PROVEN] Cap/blend 626 vs template +0x42/+0x46/+0x48; recompute local_48
+   * from (local_46+2*local_42)>>1 * movement_666 (>>16 then >>2). Player clears
+   * DAT_0001b858. Later: attitude local_2a += local_48&0x3fff under same gate.
+   * Evidence: NOTES reverse local_48 / 626 reverse clamps; contract.
+   */
   if ((*(char *)((int)param_1 + 0x63e) != '\0') && (*(char *)((int)param_1 + 0x679) == '-')) {
     if (*(short *)(DAT_00026004 + 0x42) < *(short *)((int)param_1 + 0x626)) {
       *(undefined2 *)((int)param_1 + 0x626) = *(undefined2 *)(DAT_00026004 + 0x42);
@@ -14702,10 +15749,16 @@ short * FUN_0000e792(int *param_1)
   }
   uVar13 = sVar22 + sVar17 & 0x3fff;
   if ((*(char *)((int)param_1 + 0x63e) != '\0') && (*(char *)((int)param_1 + 0x679) == '-')) {
-    local_2a = (local_48 & 0x3fff) + local_2a & 0x3fff;
+    local_2a = (local_48 & 0x3fff) + local_2a & 0x3fff; /* attitude_22 accum */
   }
-  iVar19 = FUN_0000e4a4(*(short *)((int)param_1 + 0x626),(short)*(char *)((int)param_1 + 0x67b),
-                        (undefined1 *)(param_1 + 0x19e));
+  /*
+   * ---- Block 4a: e4a4 → movement_63a (smooth via field_19e) --------------
+   * [PROVEN] Force term from 626 + char 0x67b; if field_19e!=0, blend toward
+   * prior 63a with >>3 step and decrement 19e. Store result at +0x63a.
+   */
+  iVar19 = compute_template_force_from_626(
+      *(short *)((int)param_1 + 0x626),(short)*(char *)((int)param_1 + 0x67b),
+      (undefined1 *)(param_1 + 0x19e)); /* Original: FUN_0000e4a4 */
   iVar19 = (int)(short)iVar19;
   if (*(char *)(param_1 + 0x19e) != '\0') {
     iVar19 = iVar19 - *(short *)((int)param_1 + 0x63a);
@@ -14715,9 +15768,15 @@ short * FUN_0000e792(int *param_1)
     iVar19 = (iVar19 >> 3) + (int)*(short *)((int)param_1 + 0x63a);
     *(char *)(param_1 + 0x19e) = *(char *)(param_1 + 0x19e) + -1;
   }
-  *(short *)((int)param_1 + 0x63a) = (short)iVar19;
+  *(short *)((int)param_1 + 0x63a) = (short)iVar19; /* movement_63a */
+  /*
+   * ---- Block 4b: e468-linear + quadratic drag (asm ~0xEDF8 / 0xEE50) -----
+   * [PROVEN] iVar9 still holds damp_short_if_below_0x200 result from Block 2a.
+   * Linear: iVar10 ∝ iVar20² * template+0x22 * force / e468 / 0xA0 / sVar12.
+   * Quadratic term reuses force² and template+0x24 into iVar19 (feeds thrust).
+   */
   iVar10 = iVar20 * (((int)*(short *)(DAT_00026004 + 0x22) * (iVar20 * iVar19 >> 8)) /
-                    (int)(short)iVar9);
+                    (int)(short)iVar9); /* DIVS by e468-damped */
   if (iVar10 < 0) {
     iVar10 = iVar10 + 7;
   }
@@ -14728,25 +15787,34 @@ short * FUN_0000e792(int *param_1)
   if (iVar19 < 0) {
     iVar19 = iVar19 + 7;
   }
+  /*
+   * ---- Block 4c: thrust movement_636 + grounded 18e + stall iVar25 -------
+   * [PROVEN] Add dir/67b-scaled template+0x20 thrust into 636; remainder/%
+   * vs sVar12 adjusts iVar25 (speed accum / movement_62a related).
+   * If field_63e: update field_18e and subtract from iVar25.
+   * [PROVEN] field_190 (Ghidra param_1+400): ==1 penalize −0xB6; then add
+   * (local_34<<2)/sVar12; if iVar25<1 → stall field_190=2, maybe DAT_0001b868=2.
+   * Evidence: NOTES e4a4/drag, quadratic+636, local_34/stall.
+   */
   sVar17 = *(short *)(DAT_00026004 + 0x20);
   iVar9 = 0;
   local_4c = 0;
   if (*(char *)((int)param_1 + 0x679) != '\0') {
-    iVar24 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679));
+    iVar24 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
     local_4c = (iVar24 * *(short *)(DAT_00026004 + 0x20)) / 0xb;
   }
   if (*(char *)((int)param_1 + 0x67b) != '\0') {
-    iVar9 = FUN_00002e08((int)*(char *)((int)param_1 + 0x67b));
+    iVar9 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x67b));
     iVar9 = (iVar9 * *(short *)(DAT_00026004 + 0x20)) / 0xf;
   }
   iVar19 = (int)*(short *)((int)param_1 + 0x636) +
            (iVar20 * ((iVar20 * (iVar9 + local_4c + (int)sVar17) >> 8) / (int)sVar15) * 2) / 0xa0 +
            (iVar19 >> 3) / 0xa0;
-  *(short *)((int)param_1 + 0x636) = (short)(iVar19 % (int)sVar12);
+  *(short *)((int)param_1 + 0x636) = (short)(iVar19 % (int)sVar12); /* movement_636 */
   iVar25 = iVar25 - iVar19 / (int)sVar12;
   if (*(char *)((int)param_1 + 0x63e) != '\0') {
-    iVar19 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679));
-    if (iVar19 == 0x2d) {
+    iVar19 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
+    if (iVar19 == 0x2d) { /* ASCII '-' */
       if ((iVar20 < *(short *)(DAT_00026004 + 0x46)) || (*(char *)(param_1 + 0xb) == '@')) {
         sVar17 = *(short *)(DAT_00026004 + 0x2e);
       }
@@ -14782,13 +15850,13 @@ short * FUN_0000e792(int *param_1)
     }
     iVar25 = iVar25 - (iVar19 >> 0xc);
   }
-  if (*(char *)(param_1 + 400) == '\x01') {
+  if (*(char *)(param_1 + 400) == '\x01') { /* field_190 == 1 */
     iVar25 = iVar25 + -0xb6;
   }
   iVar25 = (local_34 << 2) / (int)sVar12 + iVar25;
   if (iVar25 < 1) {
     iVar25 = 0;
-    *(undefined1 *)(param_1 + 400) = 2;
+    *(undefined1 *)(param_1 + 400) = 2; /* stall → field_190 = 2 */
     if (((*(int *)((int)param_1 + 0x62a) != 0) && (param_1 == DAT_0001b738)) && (DAT_0001b868 == 1))
     {
       DAT_0001b868 = 2;
@@ -14798,17 +15866,30 @@ short * FUN_0000e792(int *param_1)
   local_a = sStack_4e;
   local_e = 0;
   local_6 = (short)iVar25;
-  FUN_000025a8((int)(short)(local_48 & 0x3fff),(int)(short)local_28,(int)(short)local_2a,
-               (int)(short)uVar13,(int)asStack_22);
-  FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+  /*
+   * ---- Block 5a: attitude matrix + position commit -----------------------
+   * [PROVEN] build_attitude_matrix (FUN_000025a8) → asStack_22; then
+   * transform_vecs12_by_matrix3 (FUN_000028dc) count=1 in-place on velocity
+   * triple auStack_10. Add field_18c into local_a, force field_18c=0xFFA5,
+   * write entity param_1[2..4] = locals>>6.
+   */
+  build_attitude_matrix((int)(short)(local_48 & 0x3fff),(int)(short)local_28,(int)(short)local_2a,
+               (int)(short)uVar13,(int)asStack_22); /* Original: FUN_000025a8 */
+  transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22); /* Original: FUN_000028dc */
   local_a = *(short *)(param_1 + 0x18c) + local_a;
   *(undefined2 *)(param_1 + 0x18c) = 0xffa5;
   param_1[2] = (int)(local_e >> 6);
   param_1[3] = (int)(local_a >> 6);
   param_1[4] = (int)(local_6 >> 6);
+  /*
+   * ---- Block 5b: field_63e touchdown / leave-ground ----------------------
+   * [PROVEN] Airborne (63e==0): surface cross → 63e=1, snap [3], pitch
+   * follow-on (hard < -0x168 → status|0x400 + optional FUN_00013452;
+   * rough/gentle via e40c; clear 18e; player b868/b856). Grounded: clear 63e.
+   */
   if (*(char *)((int)param_1 + 0x63e) == '\0') {
     if ((param_1[3] + *(int *)(iVar1 + 0x1c) < iVar23) && (iVar23 <= *(int *)(iVar1 + 0x1c))) {
-      *(undefined1 *)((int)param_1 + 0x63e) = 1;
+      *(undefined1 *)((int)param_1 + 0x63e) = 1; /* touchdown */
       param_1[3] = iVar23 - *(int *)(iVar1 + 0x1c);
       psVar11 = (short *)(*(short *)((int)param_1 + 0xe) * 0x10);
       if ((int)psVar11 < -0x168) {
@@ -14822,15 +15903,15 @@ short * FUN_0000e792(int *param_1)
       }
       if (*(short *)((int)param_1 + 0xe) * 0x10 < -0xd8) {
 LAB_0000f192:
-        bVar6 = true;
+        bVar6 = true; /* rough */
       }
       else {
-        iVar25 = FUN_0000e40c(uVar13);
-        iVar25 = FUN_00002e08((int)(short)iVar25);
-        if ((0x200 < iVar25) || (iVar25 = FUN_0000e40c(local_28), (short)iVar25 < -0x100))
+        iVar25 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */uVar13);
+        iVar25 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar25);
+        if ((0x200 < iVar25) || (iVar25 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */local_28), (short)iVar25 < -0x100))
         goto LAB_0000f192;
         if (param_1 == DAT_0001b738) {
-          _DAT_0001b856 = 1;
+          _DAT_0001b856 = 1; /* gentle */
         }
       }
       *(undefined2 *)(param_1 + 0x18e) = 0;
@@ -14840,41 +15921,51 @@ LAB_0000f192:
     }
   }
   else if (iVar23 <= param_1[3] + *(int *)(iVar1 + 0x1c)) {
-    *(undefined1 *)((int)param_1 + 0x63e) = 0;
+    *(undefined1 *)((int)param_1 + 0x63e) = 0; /* leave ground */
     *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) & 0xefff;
     if (param_1 == DAT_0001b738) {
       DAT_0001b868 = 0;
     }
   }
+  /*
+   * ---- Block 6a: airborne post-commit (field_63e==0) --------------------
+   * [PROVEN] speed=isqrt_floor(e²+a²+6²); attitude_from_velocity→local_28/2a;
+   * clear field_190 if stall(2); goto LAB_0000f47c. (FUN_0000e372 / 01f22)
+   */
   if (*(char *)((int)param_1 + 0x63e) == '\0') {
     iVar25 = (int)local_6 * (int)local_6 + (int)local_a * (int)local_a + (int)local_e * (int)local_e
     ;
-    iVar20 = FUN_0000e372(iVar25);
+    iVar20 = isqrt_floor( /* Original: FUN_0000e372 */iVar25);
     iVar20 = (int)(short)iVar20;
-    FUN_00001f22(local_e,local_a,local_6,iVar20,iVar25,&local_28,&local_2a);
+    attitude_from_velocity( /* Original: FUN_00001f22 */local_e,local_a,local_6,iVar20,iVar25,&local_28,&local_2a);
     if (*(char *)(param_1 + 400) == '\x02') {
-      *(undefined1 *)(param_1 + 400) = 0;
+      *(undefined1 *)(param_1 + 400) = 0; /* clear stall latch */
     }
     goto LAB_0000f47c;
   }
+  /*
+   * ---- Block 6b: grounded speed + field_0b ASCII switch ------------------
+   * [PROVEN] Optional 13452→field_0b; isqrt(e²+6²); snap pvc; switch '@'/
+   * ' '/0x10/'0'/'P'/... (NOTES grounded field_0b). Clamp local_28; prestall.
+   */
   if (*(int *)((int)param_1 + 0x2e) == 0) {
     uVar18 = FUN_00013452(iVar1);
-    *(undefined1 *)(param_1 + 0xb) = uVar18;
+    *(undefined1 *)(param_1 + 0xb) = uVar18; /* field_0b */
   }
-  iVar25 = FUN_0000e372((int)local_e * (int)local_e + (int)local_6 * (int)local_6);
+  iVar25 = isqrt_floor( /* Original: FUN_0000e372 */(int)local_e * (int)local_e + (int)local_6 * (int)local_6);
   iVar20 = (int)(short)iVar25;
   param_1[3] = iVar23 - *(int *)(iVar1 + 0x1c);
   cVar3 = *(char *)(param_1 + 0xb);
   psVar11 = (short *)CONCAT31((int3)((uint)iVar25 >> 8),cVar3);
   iVar25 = iVar20 >> 2;
   if (cVar3 == '@') {
-    iVar19 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679));
+    iVar19 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
     if (iVar19 != 0x2d) {
       bVar6 = true;
     }
-    uVar16 = FUN_00011544();
+    uVar16 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     uVar16 = uVar16 & 0x7f;
-    uVar13 = FUN_00011544();
+    uVar13 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     uVar13 = (uVar13 & 0x7f) - 0x40;
     if (iVar25 < 0x438) {
       uVar13 = (ushort)((iVar25 * (short)uVar13) / 0x438);
@@ -14886,11 +15977,11 @@ LAB_0000f192:
       if (_DAT_0001b856 == 0) {
         if (iVar20 < 0x10e1) {
           if (iVar20 < 0x2d1) goto LAB_0000f402;
-          uVar8 = FUN_00011564();
+          uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
           uVar16 = (ushort)uVar8 & 0x1f;
         }
         else {
-          uVar8 = FUN_00011564();
+          uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
           uVar16 = (ushort)uVar8 & 0xf;
         }
         if (uVar16 == 0) {
@@ -14914,17 +16005,17 @@ LAB_0000f3fc:
       if (cVar3 == '\x10') {
         *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) | 0x1000;
         if ((*(char *)((int)param_1 + 0x679) != '\0') ||
-           (psVar11 = (short *)FUN_0000e40c(*(short *)((int)param_1 + 0x626)),
+           (psVar11 = (short *)fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)((int)param_1 + 0x626)),
            (short)psVar11 < -0x80)) {
           *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) | 0x400;
           return psVar11;
         }
-        iVar19 = FUN_0000e40c(uVar13);
+        iVar19 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */uVar13);
         sVar17 = (short)iVar19;
         if (sVar17 < 0) {
           sVar17 = sVar17 + 1;
         }
-        uVar8 = FUN_00011564();
+        uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
         uVar13 = ((ushort)uVar8 & 0x3f) + (sVar17 >> 1) + -0x20;
         if (iVar25 < 0x438) {
           uVar13 = (ushort)((iVar25 * (short)uVar13) / 0x438);
@@ -14937,7 +16028,7 @@ LAB_0000f3fc:
   }
   else if (cVar3 == '`') {
 LAB_0000f350:
-    iVar25 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679));
+    iVar25 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
     if (iVar25 != 0x2d) {
       bVar6 = true;
     }
@@ -14946,7 +16037,7 @@ LAB_0000f36c:
   }
   else if (cVar3 < 'a') {
     if (cVar3 == 'P') {
-      iVar25 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679));
+      iVar25 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
       if (iVar25 != 0x2d) {
         bVar6 = true;
       }
@@ -14963,17 +16054,23 @@ LAB_0000f402:
   }
   if (((!bVar6) && (*(char *)((int)param_1 + 0x63f) != '\0')) && (*(char *)(param_1 + 400) == '\0'))
   {
-    *(undefined1 *)(param_1 + 400) = 1;
+    *(undefined1 *)(param_1 + 400) = 1; /* prestall → field_190 */
   }
+  /*
+   * ---- Block 6c: LAB_0000f47c attitude/speed commit epilogue -------------
+   * [PROVEN] Clear 63f; commit pos_20/attitude_22 from local_28/2a; yaw-blend
+   * field_24 via e40c*FUN_00001d56; write movement_62a=iVar20; player ring
+   * DAT_0001bc8c[0x78]/bc80/bc84 clamp ±0x1d80. [UNKNOWN] 01d56 scale body.
+   */
 LAB_0000f47c:
   *(undefined1 *)((int)param_1 + 0x63f) = 0;
-  iVar25 = FUN_0000e40c(local_2a - *(short *)((int)param_1 + 0x22));
-  *(ushort *)(param_1 + 8) = local_28;
-  *(ushort *)((int)param_1 + 0x22) = local_2a;
+  iVar25 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */local_2a - *(short *)((int)param_1 + 0x22));
+  *(ushort *)(param_1 + 8) = local_28; /* pos_20 */
+  *(ushort *)((int)param_1 + 0x22) = local_2a; /* attitude_22 */
   psVar11 = FUN_00001d56();
   *(ushort *)(param_1 + 9) =
-       uVar13 + (short)((int)(short)iVar25 * (int)(short)psVar11 >> 0xc) & 0x3fff;
-  *(int *)((int)param_1 + 0x62a) = iVar20;
+       uVar13 + (short)((int)(short)iVar25 * (int)(short)psVar11 >> 0xc) & 0x3fff; /* field_24 */
+  *(int *)((int)param_1 + 0x62a) = iVar20; /* movement_62a */
   if (param_1 == DAT_0001b738) {
     psVar11 = FUN_00001d56();
     psVar11 = (short *)((iVar20 * (((int)(short)psVar11 << 0xd) >> 0xc)) / 0x1ce);
@@ -14991,6 +16088,13 @@ LAB_0000f47c:
     DAT_0001bc80 = (DAT_0001bc80 + (short)psVar11) - (int)(short)(&DAT_0001bc8c)[iVar25];
     DAT_0001bc84 = (short)iVar25;
   }
+  /*
+   * ---- Block 7a: direction/bank char epilogue (67b / 679) ----------------
+   * [PROVEN] 67b++ when (0<c<0x0F) or c<0. Mid-range 679 in 1..',' with
+   * (flags_685&0x20)==0 → ++, 67a|=2, clear status 0x2000; negative 679
+   * (outer gate) → ++, 67a|=2, set 0x2000. ASCII '-' (0x2D) does not bump.
+   * Evidence: NOTES e792 67b/679 char epilogue.
+   */
   if ((('\0' < *(char *)((int)param_1 + 0x67b)) && (*(char *)((int)param_1 + 0x67b) < '\x0f')) ||
      (*(char *)((int)param_1 + 0x67b) < '\0')) {
     *(char *)((int)param_1 + 0x67b) = *(char *)((int)param_1 + 0x67b) + '\x01';
@@ -15008,13 +16112,21 @@ LAB_0000f47c:
     *(byte *)((int)param_1 + 0x67a) = *(byte *)((int)param_1 + 0x67a) | 2;
     *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) & 0xdfff;
   }
+  /*
+   * ---- Block 7b: weapon fire branches (19d / 676 / 677) ------------------
+   * [PROVEN] 19d+19f: when 19d==1 spawn_weapon_entity (FUN_00012840; player
+   * latch DAT_0001b880); 19f--; 18d-=0x10 unless mission+0x90==2; 19d++ wrap@4.
+   * [PROVEN] 676: phase==1 && 682>1 && !(flags_685&0x10) → spawn_ordnance_oriented,
+   * 682-=2; phase++ wrap@2. 677==1 && !(flags_685&1) → spawn_special_weapon_entity,
+   * status|=1, 677←2; player globals b874/d858/b87c (+ deferred 137da/06ed6).
+   */
   if ((*(char *)(param_1 + 0x19d) != '\0') && (*(char *)(param_1 + 0x19f) != '\0')) {
     if (*(char *)(param_1 + 0x19d) == '\x01') {
-      psVar11 = (short *)FUN_00012840((short)iVar20,0,*(uint *)(iVar1 + 0x18),
+      psVar11 = (short *)spawn_weapon_entity( /* Original: FUN_00012840 */(short)iVar20,0,*(uint *)(iVar1 + 0x18),
                                       *(uint *)(iVar1 + 0x1c),*(uint *)(iVar1 + 0x20),
                                       *(undefined2 *)(param_1 + 8),
                                       *(undefined2 *)((int)param_1 + 0x22),
-                                      *(undefined2 *)(param_1 + 9));
+                                      *(undefined2 *)(param_1 + 9)); /* gun/missile spawn */
       if ((psVar11 != (short *)0x0) && (param_1 == DAT_0001b738)) {
         DAT_0001b880 = psVar11;
         psVar11[0x30a] = 1;
@@ -15037,11 +16149,11 @@ LAB_0000f47c:
     if (((*(char *)((int)param_1 + 0x676) == '\x01') && (1 < *(short *)((int)param_1 + 0x682))) &&
        ((*(byte *)((int)param_1 + 0x685) & 0x10) == 0)) {
       local_28 = *(short *)(param_1 + 8) + 0x40U & 0x3fff;
-      psVar11 = (short *)FUN_00015d20(iVar20,1,*(int *)(iVar1 + 0x18),*(int *)(iVar1 + 0x1c),
+      psVar11 = (short *)spawn_ordnance_oriented( /* Original: FUN_00015d20 */iVar20,1,*(int *)(iVar1 + 0x18),*(int *)(iVar1 + 0x1c),
                                       *(int *)(iVar1 + 0x20),*(short *)(param_1 + 8),
                                       *(short *)((int)param_1 + 0x22),*(short *)(param_1 + 9),
                                       *(short *)((int)param_1 + 0x626) -
-                                      *(short *)(param_1[1] + 0x44) & 0x3fff);
+                                      *(short *)(param_1[1] + 0x44) & 0x3fff); /* bomb/ordnance */
       if ((psVar11 != (short *)0x0) && (param_1 == DAT_0001b738)) {
         psVar11[0x1b] = 1;
       }
@@ -15056,11 +16168,11 @@ LAB_0000f47c:
     }
   }
   if ((*(char *)((int)param_1 + 0x677) == '\x01') && ((*(byte *)((int)param_1 + 0x685) & 1) == 0)) {
-    psVar11 = (short *)FUN_00019430((short)*(undefined4 *)((int)param_1 + 0x62a),
+    psVar11 = (short *)spawn_special_weapon_entity( /* Original: FUN_00019430 */(short)*(undefined4 *)((int)param_1 + 0x62a),
                                     *(uint *)(iVar1 + 0x18),*(uint *)(iVar1 + 0x1c),
                                     *(uint *)(iVar1 + 0x20),*(undefined2 *)(param_1 + 8),
                                     *(undefined2 *)((int)param_1 + 0x22),
-                                    *(undefined2 *)(param_1 + 9));
+                                    *(undefined2 *)(param_1 + 9)); /* special weapon */
     *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) | 1;
     *(undefined1 *)((int)param_1 + 0x677) = 2;
     piVar4 = DAT_0001b738;
@@ -15081,11 +16193,18 @@ LAB_0000f47c:
       psVar11 = (short *)FUN_00006ed6();
     }
   }
+  /*
+   * ---- Block 7c: flags_685 bit2 ammo tail + rough-landing bVar6 cleanup --
+   * [PROVEN] If flags_685&2: 11544 draw; on (d&0x3f)==0 second draw then
+   * decrement 67d or 67e (same RNG rule as Block 1b overflow).
+   * [PROVEN] If bVar6: clamp/clear status_1a2, status=(s&0x8000)|0x900,
+   * state_32=0xE772, clear movement_61a/61e. Skipped on 0x10 early return.
+   */
   if ((*(byte *)((int)param_1 + 0x685) & 2) != 0) {
-    uVar8 = FUN_00011544();
+    uVar8 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     psVar11 = (short *)(uVar8 & 0xffff003f);
     if ((uVar8 & 0x3f) == 0) {
-      psVar11 = (short *)FUN_00011544();
+      psVar11 = (short *)overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
       if ((((uint)psVar11 & 1) == 0) || (*(char *)((int)param_1 + 0x67d) == '\0')) {
         if (*(char *)((int)param_1 + 0x67e) != '\0') {
           *(char *)((int)param_1 + 0x67e) = *(char *)((int)param_1 + 0x67e) + -1;
@@ -15141,7 +16260,7 @@ void FUN_0000f810(int *param_1)
   }
   *(ushort *)((int)param_1 + 0x22) = *(short *)((int)param_1 + 0x22) + (sVar5 >> 1) & 0x3fff;
   *(undefined2 *)(param_1 + 9) = 0;
-  iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a) >> 1);
+  iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a) >> 1);
   if (iVar4 < 1000) {
     iVar4 = 1000;
   }
@@ -15158,7 +16277,7 @@ void FUN_0000f810(int *param_1)
       *(int *)((int)param_1 + 0x62a) = *(int *)((int)param_1 + 0x62a) - iVar4;
     }
     else {
-      iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+      iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
       iVar4 = -iVar4;
 LAB_0000f8de:
       *(int *)((int)param_1 + 0x62a) = iVar4;
@@ -15174,7 +16293,7 @@ LAB_0000f8de:
           *(int *)((int)param_1 + 0x62a) = *(int *)((int)param_1 + 0x62a) - iVar4;
         }
         else {
-          iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+          iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
           iVar4 = -iVar4;
 LAB_0000f94e:
           *(int *)((int)param_1 + 0x62a) = iVar4;
@@ -15190,7 +16309,7 @@ LAB_0000f94e:
               *(int *)((int)param_1 + 0x62a) = *(int *)((int)param_1 + 0x62a) - iVar4;
             }
             else {
-              iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+              iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
               iVar4 = -iVar4;
 LAB_0000f9bc:
               *(int *)((int)param_1 + 0x62a) = iVar4;
@@ -15203,7 +16322,7 @@ LAB_0000f9bc:
             }
             else {
               if (*(char *)(param_1 + 0x19e) != '\x03') {
-                iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+                iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
                 goto LAB_0000f9bc;
               }
               *(int *)((int)param_1 + 0x62a) = iVar4 + *(int *)((int)param_1 + 0x62a);
@@ -15217,7 +16336,7 @@ LAB_0000f9bc:
         }
         else {
           if (*(char *)(param_1 + 0x19e) != '\x02') {
-            iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+            iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
             goto LAB_0000f94e;
           }
           *(int *)((int)param_1 + 0x62a) = iVar4 + *(int *)((int)param_1 + 0x62a);
@@ -15231,7 +16350,7 @@ LAB_0000f9bc:
     }
     else {
       if (*(char *)(param_1 + 0x19e) != '\x01') {
-        iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+        iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
         goto LAB_0000f8de;
       }
       *(int *)((int)param_1 + 0x62a) = iVar4 + *(int *)((int)param_1 + 0x62a);
@@ -15243,7 +16362,7 @@ LAB_0000f9c8:
   local_10 = 0;
   local_c = 0;
   if (*(char *)(param_1 + 0x19e) != '\0') {
-    iVar4 = FUN_00002e08(*(int *)((int)param_1 + 0x62a));
+    iVar4 = abs_int( /* Original: FUN_00002e08 */*(int *)((int)param_1 + 0x62a));
     if (iVar4 < 1000) {
       if (-1 < *(int *)((int)param_1 + 0x62a)) {
         uVar6 = 0xfffffc18;
@@ -15259,9 +16378,9 @@ LAB_0000f9c8:
     else if (*(char *)(param_1 + 0x19e) == '\x03') {
       local_c = *(int *)((int)param_1 + 0x62a);
     }
-    FUN_0000253e((int)*(short *)(param_1 + 8),(int)*(short *)((int)param_1 + 0x22),
+    build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(param_1 + 8),(int)*(short *)((int)param_1 + 0x22),
                  (int)*(short *)(param_1 + 9),(int)auStack_22);
-    FUN_00002ada(1,&local_10,(uint *)&local_10,(int)auStack_22);
+    transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,&local_10,(uint *)&local_10,(int)auStack_22);
   }
   param_1[2] = local_10 >> 6;
   param_1[3] = local_c >> 6;
@@ -15274,7 +16393,7 @@ LAB_0000f9c8:
   *(undefined2 *)((int)param_1 + 0x626) = 0;
   if (*(char *)((int)param_1 + 0x676) != '\0') {
     if (*(char *)((int)param_1 + 0x676) == '\x01') {
-      FUN_00015d20(0,1,*(int *)(iVar1 + 0x18),*(int *)(iVar1 + 0x1c),*(int *)(iVar1 + 0x20),
+      spawn_ordnance_oriented( /* Original: FUN_00015d20 */0,1,*(int *)(iVar1 + 0x18),*(int *)(iVar1 + 0x1c),*(int *)(iVar1 + 0x20),
                    *(short *)(param_1 + 8),*(short *)((int)param_1 + 0x22),*(short *)(param_1 + 9),
                    *(short *)((int)param_1 + 0x626) - *(short *)(param_1[1] + 0x44) & 0x3fff);
     }
@@ -15325,7 +16444,7 @@ undefined4 FUN_0000fb2a(int *param_1)
   iVar1 = *param_1;
   if (((*(byte *)((int)param_1 + 0x67a) & 2) != 0) ||
      ((*(char *)((int)param_1 + 0x679) != '-' &&
-      (iVar4 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679)), 0 < iVar4)))) {
+      (iVar4 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679)), 0 < iVar4)))) {
     bVar15 = *(char *)((int)param_1 + 0x679) == '\0';
     if ((bVar15) || (*(char *)((int)param_1 + 0x679) == '-')) {
       *(byte *)((int)param_1 + 0x67a) = *(byte *)((int)param_1 + 0x67a) & 0xfd;
@@ -15348,7 +16467,7 @@ undefined4 FUN_0000fb2a(int *param_1)
     }
     else {
       *(byte *)((int)param_1 + 0x67a) = *(byte *)((int)param_1 + 0x67a) & 0xfe;
-      iVar5 = FUN_00002e08((int)*(char *)((int)param_1 + 0x679));
+      iVar5 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
       uVar6 = ((0x2d - iVar5) * -0x1000) / 0x2d & 0x3fff;
       (*(code *)&LAB_00002440_4)(uVar6,uVar6,0,asStack_22);
       (*(code *)&LAB_00002440_4)(uVar6,-uVar6 & 0x3fff,0,asStack_34);
@@ -15383,7 +16502,7 @@ undefined4 FUN_0000fb2a(int *param_1)
             *piVar13 = *piVar12 - local_10;
             piVar13[1] = piVar12[1] - local_c;
             piVar13[2] = piVar12[2] - local_8;
-            FUN_00002976(1,(int)piVar13,piVar13,psVar10);
+            transform_vecs12_to_int3_by_matrix3( /* Original: FUN_00002976 */1,(int)piVar13,piVar13,psVar10);
             *piVar13 = local_10 + *piVar13;
             piVar13[1] = local_c + piVar13[1];
             piVar13[2] = local_8 + piVar13[2];
@@ -15394,7 +16513,7 @@ undefined4 FUN_0000fb2a(int *param_1)
               *piVar13 = *piVar12 - (int)sStack_46;
               piVar13[1] = piVar12[1] + iVar3;
               piVar13[2] = piVar12[2];
-              FUN_00002976(1,(int)piVar13,piVar13,psVar10);
+              transform_vecs12_to_int3_by_matrix3( /* Original: FUN_00002976 */1,(int)piVar13,piVar13,psVar10);
               *piVar13 = (int)sStack_46 + *piVar13;
               piVar13[1] = piVar13[1] - iVar3;
               psVar14 = psVar14 + 1;
@@ -15406,7 +16525,7 @@ undefined4 FUN_0000fb2a(int *param_1)
       }
     }
   }
-  FUN_0000262e((int)*(short *)((int)param_1 + 0x626) - (int)*(short *)(param_1[1] + 0x44) & 0x3fff,
+  build_attitude_matrix_x( /* Original: FUN_0000262e */(int)*(short *)((int)param_1 + 0x626) - (int)*(short *)(param_1[1] + 0x44) & 0x3fff,
                (int)*(short *)(param_1 + 8),(int)*(short *)((int)param_1 + 0x22),
                (int)*(short *)(param_1 + 9),0x1d72c);
   return 1;
@@ -15487,7 +16606,7 @@ void FUN_0000fe96(int param_1,int param_2)
   DAT_0001b888 = (int *)*(undefined4 *)(param_2 + 8);
   return;
 switchD_0000ff44_caseD_3:
-  uVar4 = FUN_00011564();
+  uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
   if ((uVar4 & 0x3f) != 0) {
     return;
   }
@@ -15526,7 +16645,7 @@ switchD_0000ff44_caseD_3:
   if (*(int *)(iVar1 + 0x692) != 0) {
     iVar7 = iVar7 >> 1;
   }
-  uVar4 = FUN_00011564();
+  uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
   if (iVar7 <= (int)(uint)((ushort)uVar4 & 0x7f)) {
     return;
   }
@@ -15594,7 +16713,7 @@ uint FUN_000100d4(int param_1,int param_2)
   sVar2 = **(short **)(*(int *)(param_2 + 8) + 4);
   uVar4 = (int)sVar2 - 1;
   switch(uVar4);
-  uVar4 = FUN_00011564();
+  uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar5 = uVar4 & 0xffff003f;
   if ((uVar4 & 0x3f) != 0) {
     return uVar5;
@@ -15627,7 +16746,7 @@ uint FUN_000100d4(int param_1,int param_2)
     if (uVar4 != 0x200) {
       return uVar4;
     }
-    uVar6 = FUN_00011564();
+    uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
     uVar4 = uVar6 & 0xffff007f;
     if (iVar7 <= (int)(uVar6 & 0x7f)) {
       return uVar4;
@@ -15640,7 +16759,7 @@ LAB_000102c4:
     if (*(int *)(iVar1 + 0x692) != 0) {
       iVar7 = iVar7 >> 1;
     }
-    uVar6 = FUN_00011564();
+    uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
     uVar4 = uVar6 & 0xffff007f;
     if (iVar7 <= (int)(uVar6 & 0x7f)) {
       return uVar4;
@@ -15693,8 +16812,21 @@ LAB_000102a8:
 
 
 
-ushort FUN_000102d6(short param_1,short param_2)
-
+/*
+ * Original: FUN_000102d6
+ * Proposed name: atan2_fixed14
+ * Confidence: [STRONG INFERENCE]
+ *
+ * 14-bit heading from two signed components (dx, dy/dz): abs each via
+ * LEA+$2DE8→abs_int, then atan_fixed14 on the dominant-axis ratio with
+ * 0x1000 / 0x2000 quadrant fixups. Same pattern as the heading half of
+ * attitude_from_velocity. Result masked 0x3fff.
+ *
+ * Caller: one BSR @0x10A0C (uses *(p3+2), *(p3+6) then fold_angle_pm_0x2000).
+ *
+ * Evidence: Capstone @0x102D6–0x1035E; BSR.L $1ebc at 0x10310/0x1033C.
+ */
+ushort atan2_fixed14(short param_1,short param_2) /* Original: FUN_000102d6 */
 {
   short sVar1;
   short sVar2;
@@ -15704,14 +16836,14 @@ ushort FUN_000102d6(short param_1,short param_2)
   sVar1 = FUN_00002de8();
   sVar2 = FUN_00002de8();
   if (sVar2 < sVar1) {
-    uVar3 = FUN_00001ebc(((int)param_2 << 0xc) / (int)sVar1);
+    uVar3 = atan_fixed14( /* Original: FUN_00001ebc */((int)param_2 << 0xc) / (int)sVar1);
     unaff_D2w = 0x1000 - uVar3;
     if (0 < param_1) {
       unaff_D2w = -unaff_D2w;
     }
   }
   else if (param_2 != 0) {
-    unaff_D2w = FUN_00001ebc((param_1 * -0x1000) / (int)sVar2);
+    unaff_D2w = atan_fixed14( /* Original: FUN_00001ebc */(param_1 * -0x1000) / (int)sVar2);
     if (param_2 < 0) {
       unaff_D2w = 0x2000 - unaff_D2w;
     }
@@ -15794,7 +16926,7 @@ LAB_00010438:
     }
   }
   else if (iVar4 < 0x10000) goto LAB_00010438;
-  iVar3 = FUN_00002e08(iVar2);
+  iVar3 = abs_int( /* Original: FUN_00002e08 */iVar2);
 LAB_00010464:
   sVar8 = 0;
   for (uVar5 = iVar3 + iVar4; (uVar5 & 0xffff8000) != 0; uVar5 = (int)uVar5 >> 1) {
@@ -15804,18 +16936,18 @@ LAB_00010464:
   *(short *)(param_6 + 2) = (short)(param_2 - iVar6 >> (uVar5 & 0x3f));
   *(short *)(param_6 + 6) = (short)(iVar2 >> (uVar5 & 0x3f));
   *(short *)(param_6 + 10) = (short)(param_4 - iVar7 >> (uVar5 & 0x3f));
-  FUN_00002464(-(int)*(short *)(param_1 + 8) & 0x3fff,-(int)*(short *)((int)param_1 + 0x22) & 0x3fff
+  build_attitude_matrix_3ang_alt( /* Original: FUN_00002464 */-(int)*(short *)(param_1 + 8) & 0x3fff,-(int)*(short *)((int)param_1 + 0x22) & 0x3fff
                ,-(int)*(short *)(param_1 + 9) & 0x3fff,(int)asStack_16);
-  FUN_000028dc(1,param_6,param_6,asStack_16);
+  transform_vecs12_by_matrix3(1,param_6,param_6,asStack_16);
   iVar7 = (int)*(short *)(param_6 + 10) * (int)*(short *)(param_6 + 10) +
           (int)*(short *)(param_6 + 6) * (int)*(short *)(param_6 + 6) +
           (int)*(short *)(param_6 + 2) * (int)*(short *)(param_6 + 2);
-  iVar6 = FUN_0000e372(iVar7);
-  FUN_00001f22(*(short *)(param_6 + 2),*(short *)(param_6 + 6),*(short *)(param_6 + 10),
+  iVar6 = isqrt_floor( /* Original: FUN_0000e372 */iVar7);
+  attitude_from_velocity( /* Original: FUN_00001f22 */*(short *)(param_6 + 2),*(short *)(param_6 + 6),*(short *)(param_6 + 10),
                (int)(short)iVar6,iVar7,&local_18,&local_1a);
-  iVar7 = FUN_0000e40c(local_18);
+  iVar7 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */local_18);
   *param_7 = (short)iVar7;
-  iVar7 = FUN_0000e40c(local_1a);
+  iVar7 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */local_1a);
   *param_8 = (short)iVar7;
   return uVar9;
 }
@@ -15831,7 +16963,7 @@ void FUN_00010558(int param_1,short param_2,short param_3,short param_4)
   
   sVar3 = *(short *)(param_1 + 0x642);
   if ((*(byte *)(param_1 + 0x685) & 1) == 0) {
-    iVar1 = FUN_00002e08((int)param_4);
+    iVar1 = abs_int( /* Original: FUN_00002e08 */(int)param_4);
     if (0x140 < iVar1) {
       if (param_4 < 0) {
         param_4 = -0x140;
@@ -15840,7 +16972,7 @@ void FUN_00010558(int param_1,short param_2,short param_3,short param_4)
         param_4 = 0x140;
       }
     }
-    iVar1 = FUN_00002e08((int)param_2);
+    iVar1 = abs_int( /* Original: FUN_00002e08 */(int)param_2);
     if (0x40 < iVar1) {
       if (param_2 < 0) {
         param_2 = -0x40;
@@ -15849,7 +16981,7 @@ void FUN_00010558(int param_1,short param_2,short param_3,short param_4)
         param_2 = 0x40;
       }
     }
-    iVar1 = FUN_00002e08((int)param_3);
+    iVar1 = abs_int( /* Original: FUN_00002e08 */(int)param_3);
     if (0x200 < iVar1) {
       if (param_3 < 0) {
         param_3 = -0x200;
@@ -15931,7 +17063,7 @@ int * FUN_00010650(int *param_1)
       if (uVar3 == 0x80) {
         sVar11 = 0xff;
         if ((char)uVar9 < '\0') {
-          uVar6 = FUN_00011564();
+          uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
           piVar5 = (int *)(uVar6 & 0xffff0000);
           if ((uVar6 & 3) == 0) {
             uVar9 = uVar8 & 0xff7f;
@@ -15949,10 +17081,10 @@ LAB_00010700:
                                   *(uint *)(pcVar1 + 0x20),param_1);
           }
           else {
-            piVar5 = (int *)FUN_00011544();
+            piVar5 = (int *)overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
             if (((uint)piVar5 & 1) != 0) {
               uVar9 = uVar8 & 0xffbf;
-              piVar5 = (int *)FUN_00011544();
+              piVar5 = (int *)overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
               if (((uint)piVar5 & 1) == 0) goto LAB_00010700;
               uVar10 = uVar9 | 0x80;
             }
@@ -15971,7 +17103,7 @@ LAB_00010700:
                                        *(uint *)(pcVar1 + 0x20),param_1);
         }
         else if (((*(byte *)(param_1 + 0x1a1) & 8) != 0) ||
-                (piVar5 = (int *)FUN_00011564(), ((uint)piVar5 & 1) != 0)) {
+                (piVar5 = (int *)overlay_rng_next( /* Original: FUN_00011564 */), ((uint)piVar5 & 1) != 0)) {
           uVar10 = uVar8 & 0xfeff | 0x400;
         }
       }
@@ -16035,7 +17167,7 @@ LAB_00010700:
             }
           }
         }
-        in_D0 = (int *)FUN_0000528a(pcVar1);
+        in_D0 = (int *)dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
       }
       if (((*(byte *)(param_1 + 0x1a1) & 0x10) != 0) &&
          ((*(byte *)((int)param_1 + 0x686) & 0x10) == 0)) {
@@ -16044,7 +17176,7 @@ LAB_00010700:
       }
       if ((((*(byte *)(param_1 + 0x1a1) & 1) != 0) && (*(char *)((int)param_1 + 0x677) == '\0')) &&
          (param_1 != DAT_0001b738)) {
-        uVar6 = FUN_00011564();
+        uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
         in_D0 = (int *)(uVar6 & 0xffff001f);
         if ((((uVar6 & 0x1f) == 0) && (*(int *)((int)param_1 + 0x32) != 0x111ba)) &&
            (*(short *)(DAT_0001b5a0 + 0x90) != 2)) {
@@ -16061,7 +17193,7 @@ LAB_00010700:
         }
       }
       if (sVar11 != 0) {
-        uVar6 = FUN_00011564();
+        uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
         in_D0 = (int *)(uint)(ushort)(sVar11 >> 1);
         *(short *)(param_1 + 0x1a2) =
              (sVar11 >> 1) + (short)((int)(uVar6 & 0xffff & (int)sVar11) >> 1);
@@ -16092,8 +17224,8 @@ void FUN_000109ba(int param_1,int param_2,int param_3,short param_4,short param_
     sVar6 = (short)uVar3 >> 4;
     goto LAB_00010b0a;
   }
-  uVar3 = FUN_000102d6(*(short *)(param_3 + 2),*(short *)(param_3 + 6));
-  iVar2 = FUN_0000e40c(uVar3);
+  uVar3 = atan2_fixed14( /* Original: FUN_000102d6 */*(short *)(param_3 + 2),*(short *)(param_3 + 6));
+  iVar2 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */uVar3);
   uVar4 = (ushort)iVar2;
   if (param_2 < 0x5000) {
     uVar3 = *(short *)(param_1 + 0x24) + uVar4 & 0x3fff;
@@ -16125,15 +17257,15 @@ LAB_00010a8a:
         uVar3 = uVar1;
       }
     }
-    iVar2 = FUN_0000e40c(uVar3 - *(short *)(param_1 + 0x24) & 0x3fff);
+    iVar2 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */uVar3 - *(short *)(param_1 + 0x24) & 0x3fff);
     uVar4 = (ushort)iVar2;
   }
-  iVar2 = FUN_00002e08((int)(short)uVar4);
+  iVar2 = abs_int( /* Original: FUN_00002e08 */(int)(short)uVar4);
   uVar3 = uVar4;
   if (iVar2 < 0x281) {
     uVar3 = (ushort)((short)uVar4 * 3 + *(short *)(param_1 + 0x61e) * -2 >> 1);
   }
-  iVar2 = FUN_00001dd8(uVar4 & 0x3fff);
+  iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */uVar4 & 0x3fff);
   sVar5 = (short)(((int)(short)iVar2 << 9) >> 0xc);
   *(ushort *)(param_1 + 0x61e) = uVar4;
 LAB_00010b0a:
@@ -16177,11 +17309,11 @@ bool FUN_00010b84(int *param_1)
     *(char *)((int)param_1 + 0x679) = -*(char *)((int)param_1 + 0x679);
   }
   *(undefined1 *)(param_1 + 0x19a) = 9;
-  iVar2 = FUN_0000e40c(0x2c0 - *(short *)(param_1 + 8));
+  iVar2 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */0x2c0 - *(short *)(param_1 + 8));
   sVar3 = (short)iVar2;
   sVar4 = (sVar3 + (sVar3 >> 1)) - *(short *)((int)param_1 + 0x61a);
   *(short *)((int)param_1 + 0x61a) = sVar3;
-  iVar2 = FUN_00002e08((int)sVar4);
+  iVar2 = abs_int( /* Original: FUN_00002e08 */(int)sVar4);
   if (0x200 < iVar2) {
     if (sVar4 < 0) {
       sVar4 = -0x200;
@@ -16286,7 +17418,7 @@ void FUN_00010ce8(int *param_1)
     }
     FUN_00010b2e(param_1,*piVar2,iVar3,piVar2[2]);
   }
-  FUN_0000e792(param_1);
+  update_aircraft_entity(param_1);
   return;
 }
 
@@ -16352,14 +17484,14 @@ undefined4 FUN_00010e28(int *param_1)
     if (*(char *)(param_1 + 0x19f) == '\0') {
       return 1;
     }
-    if ((*(char *)(param_1 + 0x19d) == '\0') && (uVar2 = FUN_00011544(), (uVar2 & 7) == 0)) {
+    if ((*(char *)(param_1 + 0x19d) == '\0') && (uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */), (uVar2 & 7) == 0)) {
       iVar1 = *param_1;
       *(undefined1 *)(param_1 + 0x19d) = 2;
       uVar4 = *(undefined2 *)(param_1 + 9);
-      uVar2 = FUN_00011544();
+      uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
       uVar2 = *(short *)((int)param_1 + 0x22) + -0x80 + (uVar2 & 0xff) & 0x3fff;
-      uVar3 = FUN_00011544();
-      FUN_00012840((short)*(undefined4 *)((int)param_1 + 0x62a),0,*(uint *)(iVar1 + 0x18),
+      uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      spawn_weapon_entity( /* Original: FUN_00012840 */(short)*(undefined4 *)((int)param_1 + 0x62a),0,*(uint *)(iVar1 + 0x18),
                    *(uint *)(iVar1 + 0x1c),*(uint *)(iVar1 + 0x20),
                    *(short *)(param_1 + 8) + (uVar3 & 0x7f) & 0x3fff,uVar2,uVar4);
       *(char *)(param_1 + 0x19f) = *(char *)(param_1 + 0x19f) + -1;
@@ -16485,7 +17617,7 @@ LAB_000110dc:
     FUN_00010b2e(param_1,iVar7,iVar5,iVar3);
   }
 LAB_000110e6:
-  FUN_0000e792(param_1);
+  update_aircraft_entity(param_1);
   return;
 }
 
@@ -16514,7 +17646,7 @@ void FUN_000110f4(int *param_1)
   }
   if (!bVar1) {
     if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
-      FUN_0000e792(param_1);
+      update_aircraft_entity(param_1);
     }
     else {
       (**(code **)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4))(param_1);
@@ -16529,7 +17661,7 @@ void FUN_00011182(int *param_1)
 
 {
   if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
-    FUN_0000e792(param_1);
+    update_aircraft_entity(param_1);
   }
   else {
     (**(code **)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4))(param_1);
@@ -16543,7 +17675,7 @@ void FUN_000111ae(int *param_1)
 
 {
   if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
-    FUN_0000e792(param_1);
+    update_aircraft_entity(param_1);
   }
   else {
     (**(code **)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4))(param_1);
@@ -16582,7 +17714,7 @@ void FUN_000111da(int *param_1)
       *(undefined4 *)((int)param_1 + 0x2e) = 0xffff63c0;
       FUN_00010b2e(param_1,*(int *)(iVar1 + 0x18),iVar4,*(int *)(iVar1 + 0x20));
       *(undefined4 *)((int)param_1 + 0x2e) = 0;
-      FUN_0000e792(param_1);
+      update_aircraft_entity(param_1);
       bVar3 = true;
       *(undefined4 *)((int)param_1 + 0x2e) = uVar2;
       goto LAB_000112b4;
@@ -16598,7 +17730,7 @@ void FUN_000111da(int *param_1)
 LAB_000112b4:
   if (!bVar3) {
     if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
-      FUN_0000e792(param_1);
+      update_aircraft_entity(param_1);
     }
     else {
       (**(code **)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4))(param_1);
@@ -16649,7 +17781,7 @@ void FUN_000112e0(int *param_1)
       *(undefined4 *)((int)param_1 + 0x2e) = 0xffff63c0;
       FUN_00010b2e(param_1,iVar6,iVar7,iVar2);
       *(undefined4 *)((int)param_1 + 0x2e) = 0;
-      FUN_0000e792(param_1);
+      update_aircraft_entity(param_1);
       bVar5 = true;
       *(undefined4 *)((int)param_1 + 0x2e) = uVar3;
     }
@@ -16662,14 +17794,14 @@ void FUN_000112e0(int *param_1)
           iVar7 = 30000;
         }
         FUN_00010b2e(param_1,iVar6,iVar7,iVar2);
-        FUN_0000e792(param_1);
+        update_aircraft_entity(param_1);
         bVar5 = true;
       }
     }
     else if (cVar4 == '\x02') {
       FUN_00010b2e(param_1,*(int *)(iVar1 + 0x18) + param_1[2] * 0x2000,30000,
                    *(int *)(iVar1 + 0x20) + param_1[4] * 0x2000);
-      FUN_0000e792(param_1);
+      update_aircraft_entity(param_1);
       bVar5 = true;
       if (45000 < *(int *)((int)param_1 + 0x696)) {
         *(undefined1 *)((int)param_1 + 0x675) = 0;
@@ -16680,7 +17812,7 @@ void FUN_000112e0(int *param_1)
   }
   if (!bVar5) {
     if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
-      FUN_0000e792(param_1);
+      update_aircraft_entity(param_1);
     }
     else {
       (**(code **)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4))(param_1);
@@ -16714,8 +17846,15 @@ void FUN_000114b4(int param_1)
 
 
 
-int FUN_000114ca(uint param_1,uint param_2)
-
+/*
+ * Original: FUN_000114ca
+ * Proposed name: overlay_rng_mul_mix
+ * Confidence: [PROVEN]
+ *
+ * 32×32→64-ish mix used to fill the overlay RNG table:
+ * ((lo2*hi1 + lo1*hi2)<<16) + lo1*lo2. Constant seed factor 0x1DF5E0D.
+ */
+int overlay_rng_mul_mix(uint param_1,uint param_2) /* Original: FUN_000114ca */
 {
   return ((param_2 & 0xffff) * (param_1 >> 0x10) + (param_1 & 0xffff) * (param_2 >> 0x10)) * 0x10000
          + (param_2 & 0xffff) * (param_1 & 0xffff);
@@ -16723,8 +17862,16 @@ int FUN_000114ca(uint param_1,uint param_2)
 
 
 
-void FUN_0001150a(undefined4 param_1)
-
+/*
+ * Original: FUN_0001150a
+ * Proposed name: overlay_rng_init
+ * Confidence: [PROVEN] fill+warmup; [UNKNOWN] pre-init DAT_00026008[0]
+ *
+ * Stores seed at DAT_0002600c; fills DAT_00026010… for i=1..0x36 via
+ * overlay_rng_mul_mix(0x1DF5E0D, table[i])+1; sets cursor DAT_00026008=0x260E4;
+ * warms with 10000× overlay_rng_next.
+ */
+void overlay_rng_init(undefined4 param_1) /* Original: FUN_0001150a */
 {
   int iVar1;
   int iVar2;
@@ -16734,7 +17881,7 @@ void FUN_0001150a(undefined4 param_1)
   iVar2 = 1;
   piVar3 = &DAT_00026010;
   do {
-    iVar1 = FUN_000114ca(0x1df5e0d,(&DAT_00026008)[iVar2]);
+    iVar1 = overlay_rng_mul_mix(0x1df5e0d,(&DAT_00026008)[iVar2]); /* Original: FUN_000114ca */
     *piVar3 = iVar1 + 1;
     iVar2 = iVar2 + 1;
     piVar3 = piVar3 + 1;
@@ -16742,7 +17889,7 @@ void FUN_0001150a(undefined4 param_1)
   DAT_00026008 = 0x260e4;
   iVar2 = 0;
   do {
-    FUN_00011564();
+    overlay_rng_next(); /* Original: FUN_00011564 */
     iVar2 = iVar2 + 1;
   } while (iVar2 < 10000);
   return;
@@ -16750,8 +17897,18 @@ void FUN_0001150a(undefined4 param_1)
 
 
 
-void FUN_00011544(void)
-
+/*
+ * Original: FUN_00011544
+ * Proposed name: overlay_rng_warmup_epilogue
+ * Confidence: [PROVEN] as binary bytes at $11544; [NOT] as Ghidra call-site target
+ *
+ * Ghidra split the tail of overlay_rng_init here: cursor += 0xD8, then
+ * 10000× next. Binary callers that Ghidra labels FUN_00011544 actually
+ * LEA/JSR $11544 but consume D0 as a single RNG u16 — executing this body
+ * per tick is impossible. Call sites in this .decomp.c are rewritten to
+ * overlay_rng_next with [INFERRED] note. See NOTES “FUN_00011544 call-site alias”.
+ */
+void overlay_rng_warmup_epilogue(void) /* Original: FUN_00011544 */
 {
   int iVar1;
   int unaff_D3;
@@ -16759,7 +17916,7 @@ void FUN_00011544(void)
   DAT_00026008 = unaff_D3 + 0xd8;
   iVar1 = 0;
   do {
-    FUN_00011564();
+    overlay_rng_next(); /* Original: FUN_00011564 */
     iVar1 = iVar1 + 1;
   } while (iVar1 < 10000);
   return;
@@ -16767,8 +17924,17 @@ void FUN_00011544(void)
 
 
 
-uint FUN_00011564(void)
-
+/*
+ * Original: FUN_00011564
+ * Proposed name: overlay_rng_next
+ * Confidence: [PROVEN]
+ *
+ * Additive table RNG: cursor DAT_00026008 advances +4 (wrap −0xD8 past
+ * 0x260E7); taps +0x17 words (wrap −0x20) and +0x36 words (wrap −1);
+ * *cursor = tapA + tapB; return sum >> 16.
+ * Table spans DAT_00026008…≈0x260E4 (~0x37 words). Used heavily by e792.
+ */
+uint overlay_rng_next(void) /* Original: FUN_00011564 */
 {
   uint uVar1;
   uint uVar2;
@@ -16828,7 +17994,7 @@ int FUN_000115fc(int param_1,int param_2,int param_3,undefined2 param_4,undefine
   int iVar1;
   int iVar2;
   
-  iVar1 = FUN_00005116(DAT_000260e8,param_6,param_7,param_8,0,0,0,0);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_000260e8,param_6,param_7,param_8,0,0,0,0);
   if (iVar1 == 0) {
     iVar2 = 0;
   }
@@ -16917,7 +18083,7 @@ void FUN_000116fc(int *param_1)
       return;
     }
   }
-  FUN_000051ec(*param_1);
+  retire_entity( /* Original: FUN_000051ec */*param_1);
   return;
 }
 
@@ -16972,13 +18138,13 @@ undefined4 FUN_00011796(int *param_1)
     *(undefined2 *)((int)param_1 + 0x36) = 0;
   }
   if (param_1[0xe] != DAT_0001b838) {
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     iVar3 = (uint)((ushort)uVar2 & 0xfff) * (int)*(short *)(param_1 + 0xd);
     if (iVar3 < 0) {
       iVar3 = iVar3 + 0x1fff;
     }
     piVar1[4] = iVar3 >> 0xd;
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     sVar5 = *(short *)(param_1 + 0xd);
     if (sVar5 < 0) {
       sVar5 = sVar5 + 1;
@@ -16988,19 +18154,19 @@ undefined4 FUN_00011796(int *param_1)
       iVar3 = iVar3 + 0x1fff;
     }
     piVar1[10] = (iVar3 >> 0xd) + (int)(sVar5 >> 1);
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     iVar3 = (uint)((ushort)uVar2 & 0xfff) * (int)*(short *)(param_1 + 0xd);
     if (iVar3 < 0) {
       iVar3 = iVar3 + 0x1fff;
     }
     piVar1[0x10] = iVar3 >> 0xd;
-    uVar2 = FUN_00011564();
+    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
     iVar3 = (uint)((ushort)uVar2 & 0xfff) * (int)*(short *)(param_1 + 0xd);
     if (iVar3 < 0) {
       iVar3 = iVar3 + 0x1fff;
     }
     piVar1[0x16] = iVar3 >> 0xd;
-    iVar4 = FUN_00002e08(DAT_0001b838 - *(int *)(iVar4 + 0x40));
+    iVar4 = abs_int( /* Original: FUN_00002e08 */DAT_0001b838 - *(int *)(iVar4 + 0x40));
     if ((short)iVar4 < 0x2d) {
       iVar4 = (int)(short)iVar4;
       piVar1[4] = (piVar1[4] * iVar4) / 0x2d;
@@ -17038,22 +18204,22 @@ undefined4 FUN_00011940(int *param_1)
   piVar1[0xc] = param_1[uVar3 * 3 + 0x10];
   piVar1[0xd] = param_1[uVar3 * 3 + 0x11] + -0x12;
   piVar1[0xe] = param_1[uVar3 * 3 + 0x12];
-  uVar3 = FUN_00011564();
+  uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar3 = (ushort)(sVar2 + ((ushort)uVar3 & 3) + 2) & 7;
   piVar1[3] = param_1[uVar3 * 3 + 0x10];
   piVar1[4] = param_1[uVar3 * 3 + 0x11] + 0x1b;
   piVar1[5] = param_1[uVar3 * 3 + 0x12];
-  uVar3 = FUN_00011564();
+  uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar3 = (ushort)(sVar2 + ((ushort)uVar3 & 3) + 2) & 7;
   piVar1[0xf] = param_1[uVar3 * 3 + 0x10];
   piVar1[0x10] = param_1[uVar3 * 3 + 0x11] + -0x1b;
   piVar1[0x11] = param_1[uVar3 * 3 + 0x12];
-  uVar3 = FUN_00011564();
+  uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar3 = (ushort)(sVar2 + ((ushort)uVar3 & 3)) & 7;
   piVar1[0x15] = param_1[uVar3 * 3 + 0x10];
   piVar1[0x16] = param_1[uVar3 * 3 + 0x11];
   piVar1[0x17] = param_1[uVar3 * 3 + 0x12];
-  uVar3 = FUN_00011564();
+  uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar3 = (ushort)(sVar2 + ((ushort)uVar3 & 3) + 4) & 7;
   piVar1[9] = param_1[uVar3 * 3 + 0x10];
   piVar1[10] = param_1[uVar3 * 3 + 0x11];
@@ -17198,7 +18364,7 @@ int FUN_00011c58(int param_1,undefined2 param_2,undefined2 param_3,undefined1 pa
     return 0;
   }
   if ((param_1 != 1) && ((DAT_0001d858 < 3 || (DAT_0001d858 == 8)))) {
-    iVar2 = FUN_00003c00();
+    iVar2 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
     if (iVar2 < 10000) {
       DAT_0001b84a = 0x1e;
     }
@@ -17206,7 +18372,7 @@ int FUN_00011c58(int param_1,undefined2 param_2,undefined2 param_3,undefined1 pa
       DAT_0001b848 = 0xf;
     }
   }
-  iVar2 = FUN_00005116((&DAT_0002626e)[param_1],param_6,param_7,param_8,0,0,0,0);
+  iVar2 = spawn_mission_pool_object( /* Original: FUN_00005116 */(&DAT_0002626e)[param_1],param_6,param_7,param_8,0,0,0,0);
   if (iVar2 == 0) {
     return 0;
   }
@@ -17339,20 +18505,20 @@ void FUN_00011efc(int param_1)
   iVar2 = *(int *)(param_1 + 8);
   iVar6 = ((int)*(short *)(iVar2 + 0x34) << 8) / 100;
   piVar9 = *(int **)(param_1 + 0x44);
-  uVar3 = FUN_00011564();
+  uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
   sVar5 = 0;
   piVar8 = piVar9 + 1;
   do {
     *piVar9 = iVar6 * (*piVar9 >> (*(ushort *)(param_1 + 0x34) & 0x3f)) >> 8;
     *piVar8 = iVar6 * (*piVar8 >> (*(ushort *)(param_1 + 0x34) & 0x3f)) >> 8;
     if (sVar5 < 6) {
-      uVar4 = FUN_00011564();
+      uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
       iVar7 = (*piVar9 * 2 + -0x3f + (uVar4 & 0x7f)) * 0x100;
       if (iVar7 < 0) {
         iVar7 = iVar7 + 1;
       }
       *(int *)(iVar2 + 0x3a + sVar5 * 4) = iVar7 >> 1;
-      uVar4 = FUN_00011564();
+      uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
       iVar7 = (*piVar8 * 2 + -0x3f + (uVar4 & 0x7f)) * 0x100;
       if (iVar7 < 0) {
         iVar7 = iVar7 + 1;
@@ -17367,13 +18533,13 @@ void FUN_00011efc(int param_1)
       }
     }
     else {
-      uVar4 = FUN_00011564();
+      uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
       iVar7 = (*piVar9 * 2 + -0x1f + (uVar4 & 0x3f)) * 0x100;
       if (iVar7 < 0) {
         iVar7 = iVar7 + 1;
       }
       *(int *)(iVar2 + 0x3a + sVar5 * 4) = iVar7 >> 1;
-      uVar4 = FUN_00011564();
+      uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
       iVar7 = (*piVar8 * 2 + -0x1f + (uVar4 & 0x3f)) * 0x100;
       if (iVar7 < 0) {
         iVar7 = iVar7 + 1;
@@ -17869,7 +19035,7 @@ void FUN_00012768(int *param_1)
     *(short *)((int)param_1 + 0x36) = *(short *)((int)param_1 + 0x36) + -1;
   }
   if (sVar1 != 0) {
-    FUN_000051ec(*param_1);
+    retire_entity( /* Original: FUN_000051ec */*param_1);
   }
   return;
 }
@@ -17911,13 +19077,25 @@ undefined4 FUN_0001281e(undefined4 param_1,int param_2)
 
 
 
-int FUN_00012840(undefined2 param_1,int param_2,uint param_3,uint param_4,uint param_5,
-                undefined2 param_6,undefined2 param_7,undefined2 param_8)
-
+/*
+ * Original: FUN_00012840
+ * Proposed name: spawn_weapon_entity
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Weapon/projectile spawn used by update_aircraft_entity field_19d path.
+ * Calls spawn_mission_pool_object(DAT_00026280, xyz, att, 0); on success
+ * returns *(world+8) entity; if param_2≠0 set field_61c|=0x40; write
+ * field_610=param_1 and attitude copies to +0x20/+0x22/+0x24.
+ * Player latch (DAT_0001b880 etc.) is in the e792 caller, not here.
+ * Evidence: NOTES post-spawn field writes; e792 Block 7b.
+ */
+int spawn_weapon_entity(undefined2 param_1,int param_2,uint param_3,uint param_4,uint param_5,
+                undefined2 param_6,undefined2 param_7,undefined2 param_8) /* Original: FUN_00012840 */
 {
   int iVar1;
   
-  iVar1 = FUN_00005116(DAT_00026280,param_3,param_4,param_5,param_6,param_7,param_8,0);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */
+      DAT_00026280,param_3,param_4,param_5,param_6,param_7,param_8,0);
   if (iVar1 == 0) {
     iVar1 = 0;
   }
@@ -17959,15 +19137,15 @@ void FUN_000128b6(int *param_1)
   local_6 = *(short *)(param_1 + 0x184);
   local_a = 0;
   local_e = 0;
-  FUN_0000253e((int)(short)local_24,(int)(short)local_26,(int)sVar2,(int)asStack_22);
-  FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)(short)local_24,(int)(short)local_26,(int)sVar2,(int)asStack_22);
+  transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
   local_a = local_a + -0x5b;
   param_1[2] = (int)(local_e >> 6);
   param_1[3] = (int)(local_a >> 6);
   param_1[4] = (int)(local_6 >> 6);
   iVar4 = (int)local_6 * (int)local_6 + (int)local_a * (int)local_a + (int)local_e * (int)local_e;
-  iVar3 = FUN_0000e372(iVar4);
-  FUN_00001f22(local_e,local_a,local_6,(int)(short)iVar3,iVar4,&local_24,&local_26);
+  iVar3 = isqrt_floor( /* Original: FUN_0000e372 */iVar4);
+  attitude_from_velocity( /* Original: FUN_00001f22 */local_e,local_a,local_6,(int)(short)iVar3,iVar4,&local_24,&local_26);
   sVar5 = local_26 - *(short *)((int)param_1 + 0x22);
   if (sVar5 < 0x2001) {
     if (sVar5 < -0x2000) {
@@ -17979,7 +19157,7 @@ void FUN_000128b6(int *param_1)
   }
   *(ushort *)(param_1 + 8) = local_24;
   *(ushort *)((int)param_1 + 0x22) = local_26 & 0x3fff;
-  iVar4 = FUN_00001d76((int)(short)local_24);
+  iVar4 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)local_24);
   *(ushort *)(param_1 + 9) = sVar2 + (short)((int)(short)iVar4 * (int)sVar5 >> 0xc) & 0x3fff;
   *(short *)(param_1 + 0x184) = (short)iVar3;
   if (param_1[3] + *(int *)(iVar1 + 0x1c) <= *(int *)((int)param_1 + 0x2e)) {
@@ -18104,7 +19282,7 @@ LAB_00012bf4:
       }
       else {
         if ((in_stack_00000018 == 0) &&
-           (uVar5 = FUN_00011564(),
+           (uVar5 = overlay_rng_next( /* Original: FUN_00011564 */),
            iVar4 - *(int *)(pcVar1 + 0x14) <= (int)(uint)((ushort)uVar5 & 0x3ff)))
         goto LAB_00012bf4;
         FUN_00016724(*(int *)(pcVar1 + 8),in_stack_00000014);
@@ -18136,7 +19314,7 @@ LAB_00012c74:
       if (in_stack_00000014 != 0) {
         FUN_00000488((int)pcVar1);
       }
-      FUN_0000528a(pcVar1);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
     }
     else {
       puVar2 = (ushort *)(*(int *)(pcVar1 + 8) + 0x684);
@@ -18212,7 +19390,7 @@ void FUN_00012d34(int *param_1)
         }
       }
       param_1[0x186] = DAT_0001b838 + sVar6;
-      FUN_0000528a(pcVar1);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
     }
     else if (DAT_0001b838 == param_1[0x186]) {
       FUN_00012b66();
@@ -18496,7 +19674,7 @@ int FUN_00013346(int param_1,undefined4 param_2,int param_3)
   
   sVar9 = DAT_0001c1e0._2_2_;
   piVar10 = &DAT_0001d4a4 + DAT_0001c1e0._2_2_;
-  iVar4 = FUN_00003c00();
+  iVar4 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
   do {
     do {
       sVar9 = sVar9 + -1;
@@ -18507,7 +19685,7 @@ LAB_00013446:
       }
       piVar10 = piVar10 + -1;
       iVar1 = *piVar10;
-      iVar5 = FUN_00002e08(*(int *)(iVar1 + 0x10) - iVar4);
+      iVar5 = abs_int( /* Original: FUN_00002e08 */*(int *)(iVar1 + 0x10) - iVar4);
     } while (((*(int *)(iVar1 + 0x14) < iVar5) || ((*(uint *)(iVar1 + 4) & 0x42) != 0)) ||
             (iVar5 = FUN_00003c68(), *(int *)(iVar1 + 0x14) < iVar5));
     sVar8 = *(short *)(iVar1 + 0x3a);
@@ -18831,9 +20009,9 @@ uint * FUN_0001383c(uint param_1,uint param_2)
     *(undefined2 *)((int)puVar2 + 0xe) = 0;
   }
   else {
-    iVar4 = FUN_00001dd8((int)(short)uVar8);
+    iVar4 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)uVar8);
     sVar6 = (short)iVar4;
-    iVar4 = FUN_00001d76((int)(short)uVar8);
+    iVar4 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)uVar8);
     sVar1 = -(short)iVar4;
     sVar5 = sVar1;
     if (sVar1 < 0) {
@@ -19390,7 +20568,7 @@ void FUN_0001443a(int param_1)
     sVar11 = 0;
     if (0 < sVar13) {
       do {
-        iVar10 = FUN_00003c00();
+        iVar10 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
         *local_426 = iVar10;
         sVar11 = sVar11 + 1;
         local_426 = local_426 + 1;
@@ -19404,7 +20582,7 @@ void FUN_0001443a(int param_1)
       do {
         sVar3 = *psVar18;
         pbVar1 = (byte *)(psVar16 + (int)sVar13 + sVar3 * 3);
-        iVar10 = FUN_00003c00();
+        iVar10 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
         *local_426 = iVar10;
         iVar10 = FUN_00003e02((int)pbVar1,iVar10);
         if (iVar10 != 0) {
@@ -19473,7 +20651,7 @@ void FUN_0001443a(int param_1)
       if (0 < local_41e) {
         do {
           iVar10 = piVar5[(short)uVar12];
-          iVar19 = FUN_00003c00();
+          iVar19 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
           *(int *)(iVar10 + 0xc) = iVar19;
           uVar6 = uVar12;
           while (uVar6 = uVar6 - 1, -1 < (int)((uint)uVar6 << 0x10)) {
@@ -19579,12 +20757,12 @@ int FUN_00014830(int param_1,short param_2,int param_3,int param_4,int param_5)
     }
     *(int *)(param_4 + 0x1c) = iVar2 + *(int *)(param_4 + 0x1c);
     if ((*(byte *)(param_4 + 5) & 0x10) == 0) {
-      FUN_00001c5c((int)*(short *)(param_4 + 0x3a) + (int)*(short *)(param_4 + 0x36),
+      translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(param_4 + 0x3a) + (int)*(short *)(param_4 + 0x36),
                    *(int **)(param_4 + 0x44),*(int **)(param_4 + 0x44),0,
                    iVar2 << ((int)*(short *)(param_4 + 0x34) & 0x3fU),0);
     }
     if ((*(byte *)(param_4 + 5) & 8) == 0) {
-      iVar1 = FUN_00003b98(param_4);
+      iVar1 = update_object_camera_metric( /* Original: FUN_00003b98 */param_4);
       *(int *)(param_4 + 0xc) = (iVar1 - *(int *)(param_4 + 0x10)) + *(int *)(param_4 + 0xc);
       sVar5 = *(short *)(param_4 + 0x3a);
       piVar10 = (int *)(*(int *)(param_4 + 0x48) + 0x1c);
@@ -19658,7 +20836,7 @@ int FUN_00014830(int param_1,short param_2,int param_3,int param_4,int param_5)
     puVar3[2] = uVar7;
     if ((short)*puVar4 == *(short *)puVar4) {
       *(short *)((int)puVar4 + 2) = *(short *)((int)puVar4 + 2) + 5;
-      puVar4 = FUN_00001ba8(puVar4,(undefined4 *)((short)*puVar4 * 4 + 8));
+      puVar4 = heap_realloc_grow_only( /* Original: FUN_00001ba8 */puVar4,(undefined4 *)((short)*puVar4 * 4 + 8));
       *(uint **)(param_5 + 0x2c) = puVar4;
     }
     puVar4[*(short *)puVar4 + 1] = (uint)puVar3;
@@ -19696,7 +20874,7 @@ void FUN_00014af2(int param_1)
     *(undefined4 *)(param_1 + 0x18) = *(undefined4 *)(iVar4 + 2);
     *(undefined4 *)(param_1 + 0x1c) = *(undefined4 *)(iVar4 + 6);
     *(undefined4 *)(param_1 + 0x20) = *(undefined4 *)(iVar4 + 10);
-    FUN_00002bd8(param_1,1,(uint *)0x0,(uint *)0x0);
+    apply_template_chain_xform( /* Original: FUN_00002bd8 */param_1,1,(uint *)0x0,(uint *)0x0);
   }
   if ((*(byte *)(param_1 + 6) & 2) == 0) {
     sVar3 = **(short **)(param_1 + 0x2c) + -1;
@@ -19771,7 +20949,7 @@ uint FUN_00014bea(int param_1,short param_2,short param_3,short param_4,short pa
     uVar9 = *(short *)(*(int *)(iVar5 + 0x30) + (short)(ushort)bVar7 * 0x18 + 4) + uVar9 & 0x3fff;
     bVar7 = *(byte *)(iVar5 + 2);
   }
-  uVar8 = FUN_000025a8(-(int)(short)uVar9 & 0x3fff,(int)param_2,(ushort)(uVar9 + param_3) & 0x3fff,
+  uVar8 = build_attitude_matrix(-(int)(short)uVar9 & 0x3fff,(int)param_2,(ushort)(uVar9 + param_3) & 0x3fff,
                        (int)param_4,(int)asStack_16);
   puVar12 = &DAT_0001b5a4;
   sVar10 = DAT_0001b734._2_2_;
@@ -19806,17 +20984,17 @@ code_r0x00014cf6:
   pcVar1[0x19] = '\0';
   pcVar1[0x1a] = '\0';
   pcVar1[0x1b] = '\0';
-  FUN_00002bd8((int)pcVar1,1,(uint *)0x0,(uint *)0x0);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)pcVar1,1,(uint *)0x0,(uint *)0x0);
   local_20 = *(short *)(pcVar1 + 0x1a) - (short)iVar2;
   local_1c = *(short *)(pcVar1 + 0x1e) - (short)iVar3;
   local_18 = *(short *)(pcVar1 + 0x22) - (short)iVar4;
-  uVar8 = FUN_000028dc(1,(int)auStack_22,(int)auStack_22,asStack_16);
+  uVar8 = transform_vecs12_by_matrix3(1,(int)auStack_22,(int)auStack_22,asStack_16);
   *(int *)(pcVar1 + 0x18) = iVar2 + local_20;
   *(int *)(pcVar1 + 0x1c) = (iVar3 + local_1c) - (int)param_5;
   *(int *)(pcVar1 + 0x20) = iVar4 + local_18;
   if (*(int *)(pcVar1 + 0x1c) < 0) {
 LAB_00014d6e:
-    uVar8 = FUN_0000528a(pcVar1);
+    uVar8 = dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
   }
   goto LAB_00014d78;
 }
@@ -19878,7 +21056,7 @@ void FUN_00014d86(undefined4 *param_1)
           *(undefined2 *)(DAT_0001b5a0 + 0xce) = 1;
         }
       }
-      FUN_0000528a(pcVar1);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
     }
     else {
       FUN_00014bea((int)pcVar1,*(short *)(param_1 + 0xd),*(short *)((int)param_1 + 0x36),
@@ -19920,13 +21098,13 @@ void FUN_00014f48(int *param_1,int param_2)
   sVar6 = 0;
   sVar1 = *(short *)((int)param_1 + 0x32);
   if (sVar1 == 1) {
-    uVar5 = FUN_00011544();
+    uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     sVar6 = (uVar5 & 0x3f) + 0x100;
-    uVar3 = FUN_00011544();
+    uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     if ((uVar3 & 1) != 0) {
       sVar6 = -sVar6;
     }
-    uVar3 = FUN_00011564();
+    uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
     unaff_D4w = (short)((uVar3 & 0xffff) % 100) + 100;
     sVar1 = *(short *)(param_1 + 0x13);
 joined_r0x0001504c:
@@ -19935,26 +21113,26 @@ joined_r0x0001504c:
   else {
     if (sVar1 < 2) {
       if (sVar1 != 0) goto LAB_00015082;
-      uVar3 = FUN_00011564();
+      uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
       sVar6 = (short)((uVar3 & 0xffff) % 0x140) + 0x500;
-      iVar4 = FUN_0000e40c(*(short *)(param_1 + 0xd));
+      iVar4 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)(param_1 + 0xd));
       if ((short)iVar4 < 0) {
         sVar6 = -sVar6;
       }
-      uVar3 = FUN_00011564();
+      uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
       unaff_D4w = (short)((uVar3 & 0xffff) % 200) + 1000;
       sVar1 = *(short *)(param_1 + 0x13);
       goto joined_r0x0001504c;
     }
     if (sVar1 != 2) goto LAB_00015082;
   }
-  uVar5 = FUN_00011544();
+  uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
   sVar7 = (uVar5 & 0x7f) + 0x200;
-  uVar3 = FUN_00011544();
+  uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
   if ((uVar3 & 1) != 0) {
     sVar7 = -sVar7;
   }
-  uVar3 = FUN_00011564();
+  uVar3 = overlay_rng_next( /* Original: FUN_00011564 */);
   unaff_D4w = (short)((uVar3 & 0xffff) % 100) + 100;
 LAB_00015082:
   *(undefined2 *)((int)param_1 + 0x46) = 0xf;
@@ -20073,7 +21251,7 @@ void FUN_00015356(int *param_1)
             piVar1[2] = iVar12 / (int)*psVar17;
             iVar10 = sVar13 * 0xc;
             puVar3 = *(undefined4 **)(iVar15 + 0x44);
-            FUN_00001f22((short)*(undefined4 *)(iVar4 + iVar10) - (short)*puVar3,
+            attitude_from_velocity( /* Original: FUN_00001f22 */(short)*(undefined4 *)(iVar4 + iVar10) - (short)*puVar3,
                          (short)*(undefined4 *)(iVar4 + 4 + iVar10) - (short)puVar3[1],
                          (short)*(undefined4 *)(iVar4 + 8 + iVar10) - (short)puVar3[2],0x4000,
                          0x10000000,&local_6,&local_8);
@@ -20090,15 +21268,15 @@ void FUN_00015356(int *param_1)
       *(short *)((int)param_1 + 0x52) = local_a;
     }
     if (*(short *)(param_1 + 0x14) != 0) {
-      cVar8 = FUN_00011544();
+      cVar8 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
       if (cVar8 == '\x1b') {
         *(short *)(param_1 + 0x14) = *(short *)(param_1 + 0x14) + -1;
-        uVar6 = FUN_00011544();
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         iVar15 = (int)(short)((int)(uint)uVar6 % (int)*(short *)((int)param_1 + 0x52));
         puVar2 = (uint *)(param_1 + iVar15 * 3 + 0x15);
-        uVar6 = FUN_00011544();
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         local_6 = (*(short *)((int)param_1 + iVar15 * 6 + 0xe4) + (uVar6 & 0xff)) - 0x80 & 0x3fff;
-        uVar6 = FUN_00011544();
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
         local_8 = (*(short *)((int)param_1 + iVar15 * 6 + 0xe6) + (uVar6 & 0xff)) - 0x80 & 0x3fff;
         if (DAT_0001b870 == 0) {
           uVar23 = 0;
@@ -20108,8 +21286,8 @@ void FUN_00015356(int *param_1)
           iVar15 = 1;
           uVar6 = local_6;
           uVar22 = local_8;
-          uVar7 = FUN_00011544();
-          FUN_00012840(0x7fff - (uVar7 & 0xff),iVar15,uVar9,uVar20,uVar21,uVar6,uVar22,uVar23);
+          uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+          spawn_weapon_entity( /* Original: FUN_00012840 */0x7fff - (uVar7 & 0xff),iVar15,uVar9,uVar20,uVar21,uVar6,uVar22,uVar23);
         }
       }
     }
@@ -20286,9 +21464,9 @@ undefined2 FUN_00015762(char *param_1,short param_2,short param_3,short param_4,
                    );
   uVar17 = (uint)(short)(*(short *)(iVar11 + 0x1e) + *(short *)(iVar11 + 0x1a));
   local_3342 = (short *)(iVar11 + 0x22 + uVar17 * 0xc);
-  FUN_0000253e((int)param_2,(int)param_3,(int)param_4,(int)asStack_3336);
-  FUN_00002976(uVar17,iVar11 + 0x22,&local_1e94,asStack_3336);
-  FUN_00002bd8((int)param_1,uVar17,&local_1e94,&local_1e94);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)param_2,(int)param_3,(int)param_4,(int)asStack_3336);
+  transform_vecs12_to_int3_by_matrix3( /* Original: FUN_00002976 */uVar17,iVar11 + 0x22,&local_1e94,asStack_3336);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)param_1,uVar17,&local_1e94,&local_1e94);
   sVar5 = 0;
   if (0 < *(short *)(iVar11 + 0x1e)) {
     do {
@@ -20342,7 +21520,7 @@ undefined2 FUN_00015762(char *param_1,short param_2,short param_3,short param_4,
         if ((*(byte *)((int)local_3342 + 7) & 2) == 0) {
           *(byte *)(iVar19 + 0x13) = *(byte *)(iVar19 + 0x13) & 0xfd;
         }
-        puVar1 = FUN_00001ba8(*(uint **)(iVar19 + 0x18),(undefined4 *)((int)(short)local_3338 << 1))
+        puVar1 = heap_realloc_grow_only( /* Original: FUN_00001ba8 */*(uint **)(iVar19 + 0x18),(undefined4 *)((int)(short)local_3338 << 1))
         ;
         *(uint **)(iVar19 + 0x18) = puVar1;
         sVar6 = 0;
@@ -20448,8 +21626,20 @@ undefined4 FUN_00015bd4(undefined4 param_1,int param_2)
 
 
 
-int FUN_00015bf6(int param_1,int param_2,int param_3,int param_4,int param_5,short *param_6)
-
+/*
+ * Original: FUN_00015bf6
+ * Proposed name: spawn_ordnance_scattered
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Ordnance spawn (template DAT_0002664a): seed local_6=(speed>>4)+0x2015;
+ * transform_vecs12_by_matrix3 on velocity locals; three RNG ±0x20 taps;
+ * spawn_mission_pool_object at xyz+(locals>>2). On success: write state_32,
+ * vel +8/+c/+10, field_38=0, count_3a=1 or 2 from param_2; copy 0x12 matrix
+ * bytes to entity+0x40 via memmove_block (length 0x12).
+ * Evidence: NOTES 15bf6/15d20 spawn path; e792 field_676.
+ */
+int spawn_ordnance_scattered(int param_1,int param_2,int param_3,int param_4,int param_5,
+                 short *param_6) /* Original: FUN_00015bf6 */
 {
   ushort uVar2;
   int iVar1;
@@ -20461,14 +21651,14 @@ int FUN_00015bf6(int param_1,int param_2,int param_3,int param_4,int param_5,sho
   local_a = 0;
   local_e = 0;
   local_6 = (short)(param_1 >> 4) + 0x2015;
-  FUN_000028dc(1,(int)auStack_10,(int)auStack_10,param_6);
-  uVar2 = FUN_00011544();
+  transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,param_6);
+  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
   local_e = (uVar2 & 0x3f) + local_e + -0x20;
-  uVar2 = FUN_00011544();
+  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
   local_a = (uVar2 & 0x3f) + local_a + -0x20;
-  uVar2 = FUN_00011544();
+  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
   local_6 = (uVar2 & 0x3f) + local_6 + -0x20;
-  iVar1 = FUN_00005116(DAT_0002664a,param_3 + (local_e >> 2),param_4 + (local_a >> 2),
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_0002664a,param_3 + (local_e >> 2),param_4 + (local_a >> 2),
                        param_5 + (local_6 >> 2),0,0,0,0);
   if (iVar1 == 0) {
     iVar1 = 0;
@@ -20486,21 +21676,29 @@ int FUN_00015bf6(int param_1,int param_2,int param_3,int param_4,int param_5,sho
     else {
       *(undefined2 *)(iVar1 + 0x3a) = 2;
     }
-    FUN_0001a63e((undefined4 *)param_6,(undefined4 *)(iVar1 + 0x40),&DAT_00000012);
+    memmove_block( /* Original: FUN_0001a63e */(undefined4 *)param_6,(undefined4 *)(iVar1 + 0x40),&DAT_00000012);
   }
   return iVar1;
 }
 
 
 
-void FUN_00015d20(int param_1,int param_2,int param_3,int param_4,int param_5,short param_6,
-                 short param_7,short param_8,short param_9)
-
+/*
+ * Original: FUN_00015d20
+ * Proposed name: spawn_ordnance_oriented
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Wrapper for e792 field_676: build_attitude_matrix_x(yaw_arg, pos_20, att22,
+ * field_24) then spawn_ordnance_scattered. Player latch short*[0x1b]=1 is in
+ * the caller. Sibling FUN_00015d78 uses FUN_0000253e instead of matrix_x.
+ */
+void spawn_ordnance_oriented(int param_1,int param_2,int param_3,int param_4,int param_5,short param_6,
+                 short param_7,short param_8,short param_9) /* Original: FUN_00015d20 */
 {
   short asStack_16 [9];
   
-  FUN_0000262e((int)param_9,(int)param_6,(int)param_7,(int)param_8,(int)asStack_16);
-  FUN_00015bf6(param_1,param_2,param_3,param_4,param_5,asStack_16);
+  build_attitude_matrix_x((int)param_9,(int)param_6,(int)param_7,(int)param_8,(int)asStack_16); /* Original: FUN_0000262e */
+  spawn_ordnance_scattered(param_1,param_2,param_3,param_4,param_5,asStack_16); /* Original: FUN_00015bf6 */
   return;
 }
 
@@ -20512,8 +21710,8 @@ void FUN_00015d78(int param_1,int param_2,int param_3,int param_4,int param_5,sh
 {
   short asStack_16 [9];
   
-  FUN_0000253e((int)param_6,(int)param_7,(int)param_8,(int)asStack_16);
-  FUN_00015bf6(param_1,param_2,param_3,param_4,param_5,asStack_16);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)param_6,(int)param_7,(int)param_8,(int)asStack_16);
+  spawn_ordnance_scattered( /* Original: FUN_00015bf6 */param_1,param_2,param_3,param_4,param_5,asStack_16);
   return;
 }
 
@@ -20547,8 +21745,8 @@ void FUN_00015dc8(int *param_1)
     if (*(short *)((int)param_1 + 0x36) != 0) {
       FUN_00000488((int)pcVar2);
     }
-    FUN_0000528a(pcVar2);
-    FUN_000051ec(iVar1);
+    dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar2);
+    retire_entity( /* Original: FUN_000051ec */iVar1);
   }
   *(short *)(param_1 + 0xe) = *(short *)(param_1 + 0xe) + 1;
   if (*(short *)(param_1 + 0xe) != 0x1f) {
@@ -20560,7 +21758,7 @@ void FUN_00015dc8(int *param_1)
       return;
     }
   }
-  FUN_000051ec(iVar1);
+  retire_entity( /* Original: FUN_000051ec */iVar1);
   return;
 }
 
@@ -20572,7 +21770,7 @@ undefined4 FUN_00015e62(int *param_1)
   if (DAT_000265d0 < 0x1e) {
     if (*(short *)((int)param_1 + 0x3a) < 8) {
       if (*(short *)((int)param_1 + 0x3a) == 2) {
-        FUN_00002976(2,*(int *)(*param_1 + 0x44),*(int **)(*param_1 + 0x44),
+        transform_vecs12_to_int3_by_matrix3( /* Original: FUN_00002976 */2,*(int *)(*param_1 + 0x44),*(int **)(*param_1 + 0x44),
                      (short *)(param_1 + 0x10));
       }
       *(short *)((int)param_1 + 0x3a) = *(short *)((int)param_1 + 0x3a) + 8;
@@ -20978,14 +22176,14 @@ uint FUN_0001665a(int param_1,int param_2)
         if (sVar2 == 0xe) {
           return CONCAT22((short)(uVar3 >> 0x10),sVar2);
         }
-        if ((sVar2 == 0x1b) && (uVar3 = FUN_00011564(), (uVar3 & 0xf) == 0)) {
+        if ((sVar2 == 0x1b) && (uVar3 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar3 & 0xf) == 0)) {
           *(undefined2 *)(*(int *)(param_2 + 8) + 0x46) = 1;
         }
       }
-      uVar3 = FUN_000051ec(param_1);
+      uVar3 = retire_entity( /* Original: FUN_000051ec */param_1);
     }
     else {
-      uVar4 = FUN_00011564();
+      uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
       uVar3 = uVar4 & 0xffff0007;
       if ((uVar4 & 7) == 0) {
         *(int *)(iVar1 + 0x3c) = param_2;
@@ -21009,12 +22207,12 @@ uint FUN_00016724(int param_1,int param_2)
     _DAT_0001b842 = 1;
   }
   else if (**(short **)(param_1 + 4) != 3) goto LAB_00016758;
-  uVar1 = FUN_00011564();
+  uVar1 = overlay_rng_next( /* Original: FUN_00011564 */);
   if ((uVar1 & 3) != 0) {
     return uVar1 & 0xffff0003;
   }
 LAB_00016758:
-  uVar1 = FUN_00011564();
+  uVar1 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar1 = uVar1 & 0xffff00ff;
   uVar2 = (ushort)uVar1;
   if (uVar2 < 6) {
@@ -21070,13 +22268,13 @@ uint FUN_000167f4(int param_1,int param_2)
   uVar3 = FUN_00003cca();
   if ((int)uVar3 <= *(int *)(param_2 + 0x14)) {
     iVar2 = *(int *)(param_2 + 8);
-    uVar4 = FUN_00011564();
+    uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
     uVar3 = uVar4 & 0xffff0007;
     if ((uVar4 & 7) == 0) {
       FUN_00016724(iVar2,(int)*(short *)(iVar1 + 0x36));
-      uVar3 = FUN_000051ec(param_1);
+      uVar3 = retire_entity( /* Original: FUN_000051ec */param_1);
     }
-    else if ((iVar2 == DAT_0001b738) && (uVar3 = FUN_00011564(), (uVar3 & 1) != 0)) {
+    else if ((iVar2 == DAT_0001b738) && (uVar3 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar3 & 1) != 0)) {
       _DAT_0001b842 = 1;
     }
   }
@@ -21091,7 +22289,7 @@ uint FUN_000168ae(int param_1,int param_2)
   uint uVar1;
   uint uVar2;
   
-  uVar1 = FUN_00011564();
+  uVar1 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar2 = uVar1 & 0xffff000f;
   if ((uVar1 & 0xf) == 0) {
     uVar2 = FUN_00012f52(param_2,param_1);
@@ -21108,7 +22306,7 @@ uint * FUN_000168d2(int param_1,int param_2,short param_3,uint *param_4)
   
   puVar1 = heap_alloc_cleared(param_2 + param_3 * 0xc);
   *(short *)(param_2 + -2 + (int)puVar1) = param_3;
-  FUN_00002d10(param_1,(int)param_3,param_4,(uint *)(param_2 + (int)puVar1));
+  apply_template_chain_xform_always( /* Original: FUN_00002d10 */param_1,(int)param_3,param_4,(uint *)(param_2 + (int)puVar1));
   return puVar1;
 }
 
@@ -21121,7 +22319,7 @@ uint * FUN_0001691c(undefined4 param_1,int param_2,short param_3,undefined4 *par
   
   puVar1 = heap_alloc_cleared(param_2 + param_3 * 0xc);
   *(short *)(param_2 + -2 + (int)puVar1) = param_3;
-  FUN_0001a63e(param_4,(undefined4 *)(param_2 + (int)puVar1),(undefined4 *)(param_3 * 0xc));
+  memmove_block( /* Original: FUN_0001a63e */param_4,(undefined4 *)(param_2 + (int)puVar1),(undefined4 *)(param_3 * 0xc));
   return puVar1;
 }
 
@@ -21225,7 +22423,7 @@ int FUN_00016ae8(int param_1,uint param_2,uint param_3,uint param_4)
   int iVar1;
   int iVar2;
   
-  iVar1 = FUN_00005116((&DAT_00026650)[param_1],param_2,param_3,param_4,0,0,0,0);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */(&DAT_00026650)[param_1],param_2,param_3,param_4,0,0,0,0);
   if (iVar1 == 0) {
     iVar2 = 0;
   }
@@ -21277,7 +22475,7 @@ int * FUN_00016b9e(uint param_1,uint param_2,uint param_3,int *param_4)
     *(undefined2 *)((int)piVar1 + 0x56) = 1;
     *(char *)(*param_4 + 3) = *(char *)(*param_4 + 3) + '\x01';
     FUN_0001702a(piVar1);
-    iVar2 = FUN_00003c00();
+    iVar2 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
     if (iVar2 < 5000) {
       DAT_0001b84a = 0x1e;
     }
@@ -21366,9 +22564,9 @@ undefined2 FUN_00016c6a(int *param_1)
       uVar9 = (short)uVar9 >> 1;
     } while (sVar7 < 4);
     uVar9 = *(ushort *)(param_1 + 0x14);
-    if ((uVar9 == 0) || (uVar6 = FUN_00011564(), (uVar6 & 3) == 0)) {
+    if ((uVar9 == 0) || (uVar6 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar6 & 3) == 0)) {
       if ((uVar9 & 3) == 3) {
-        uVar6 = FUN_00011564();
+        uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
         if ((uVar6 & 1) == 0) {
           uVar9 = uVar9 | 8;
         }
@@ -21377,7 +22575,7 @@ undefined2 FUN_00016c6a(int *param_1)
         }
       }
       else {
-        uVar6 = FUN_00011564();
+        uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
         if ((uVar6 & 1) == 0) {
           uVar9 = uVar9 | 2;
         }
@@ -21394,11 +22592,11 @@ undefined2 FUN_00016c6a(int *param_1)
     break;
   case 3:
     if (*(char *)((int)piVar2 + 0x685) < '\0') {
-      uVar6 = FUN_00011564();
+      uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
       uVar9 = (ushort)uVar6 & 0x1f;
     }
     else {
-      uVar6 = FUN_00011564();
+      uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
       uVar9 = (ushort)uVar6 & 3;
     }
     if (uVar9 == 0) {
@@ -21483,9 +22681,9 @@ undefined2 FUN_00016e06(int *param_1)
     uVar11 = (short)uVar11 >> 1;
   } while (sVar7 < 4);
   uVar11 = *(ushort *)(param_1 + 0x14);
-  if ((uVar11 == 0) || (uVar5 = FUN_00011564(), (uVar5 & 1) == 0)) {
+  if ((uVar11 == 0) || (uVar5 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar5 & 1) == 0)) {
     if ((uVar11 & 3) == 3) {
-      uVar5 = FUN_00011564();
+      uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
       if ((uVar5 & 1) == 0) {
         uVar11 = uVar11 | 8;
       }
@@ -21494,7 +22692,7 @@ undefined2 FUN_00016e06(int *param_1)
       }
     }
     else {
-      uVar5 = FUN_00011564();
+      uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
       if ((uVar5 & 1) == 0) {
         uVar11 = uVar11 | 2;
       }
@@ -21581,7 +22779,7 @@ void FUN_0001702a(int *param_1)
     *(short *)(param_1 + 0xd) = *(short *)(param_1 + 0xd) + -1;
   }
   if (sVar1 != 0) {
-    FUN_000051ec(*param_1);
+    retire_entity( /* Original: FUN_000051ec */*param_1);
   }
   return;
 }
@@ -21618,7 +22816,7 @@ int FUN_000170ba(uint param_1,uint param_2,uint param_3)
 {
   int iVar1;
   
-  iVar1 = FUN_00005116(DAT_00026658,param_1,param_2,param_3,0,0,0,0);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_00026658,param_1,param_2,param_3,0,0,0,0);
   if (iVar1 == 0) {
     iVar1 = 0;
   }
@@ -21774,7 +22972,7 @@ undefined2 FUN_00017150(int *param_1)
     uVar12 = uVar12 | 0xf;
   }
   else if ((uVar12 & 9) != 9) {
-    uVar8 = FUN_00011564();
+    uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
     if ((uVar8 & 1) == 0) {
       uVar12 = uVar12 | 8;
     }
@@ -21798,7 +22996,7 @@ void FUN_00017380(int *param_1)
   
   sVar1 = FUN_00017150(param_1);
   if (sVar1 != 0) {
-    FUN_000051ec(*param_1);
+    retire_entity( /* Original: FUN_000051ec */*param_1);
   }
   return;
 }
@@ -21835,25 +23033,25 @@ int FUN_000173fe(uint param_1,uint param_2,uint param_3)
   int iVar1;
   ushort uVar2;
   
-  iVar1 = FUN_00005116(DAT_0002665c,param_1,param_2,param_3,0,0,0,0);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_0002665c,param_1,param_2,param_3,0,0,0,0);
   if (iVar1 == 0) {
     iVar1 = 0;
   }
   else {
     iVar1 = *(int *)(iVar1 + 8);
     *(int *)(iVar1 + 0x32) = DAT_0001b838 + 0x2d;
-    uVar2 = FUN_00011544();
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(uint *)(iVar1 + 8) = (uVar2 & 0xff) - 0x7f;
-    uVar2 = FUN_00011544();
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(uint *)(iVar1 + 0xc) = (uVar2 & 0xff) - 0x7f;
-    uVar2 = FUN_00011544();
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(uint *)(iVar1 + 0x10) = (uVar2 & 0xff) - 0x7f;
     *(short *)(iVar1 + 0x36) = *(short *)(iVar1 + 0xe) << 4;
-    uVar2 = FUN_00011544();
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(ushort *)(iVar1 + 0x20) = (uVar2 & 0xff) << 6;
-    uVar2 = FUN_00011544();
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(ushort *)(iVar1 + 0x22) = (uVar2 & 0xff) << 6;
-    uVar2 = FUN_00011544();
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     *(ushort *)(iVar1 + 0x24) = (uVar2 & 0xff) << 6;
   }
   return iVar1;
@@ -21882,7 +23080,7 @@ void FUN_000174c4(int *param_1)
   }
   if ((*(int *)((int)param_1 + 0x32) == DAT_0001b838) ||
      (*(int *)(iVar1 + 0x1c) <= *(int *)((int)param_1 + 0x2e))) {
-    FUN_000051ec(iVar1);
+    retire_entity( /* Original: FUN_000051ec */iVar1);
   }
   return;
 }
@@ -21917,7 +23115,7 @@ void FUN_000175c0(int *param_1)
 
 {
   if (*(int *)(*param_1 + 0x3c) <= DAT_0001b838) {
-    FUN_000051ec(*param_1);
+    retire_entity( /* Original: FUN_000051ec */*param_1);
   }
   return;
 }
@@ -21934,7 +23132,7 @@ undefined4 FUN_000175de(int param_1,uint param_2,uint param_3,uint param_4)
   short sVar5;
   int iVar6;
   
-  iVar3 = FUN_00005116(DAT_00026660,param_2,param_3,param_4,0,0,0,0);
+  iVar3 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_00026660,param_2,param_3,param_4,0,0,0,0);
   if (iVar3 == 0) {
     uVar4 = 0;
   }
@@ -22260,8 +23458,8 @@ void FUN_00017b68(void)
   iVar1 = *DAT_0001b738;
   sVar2 = *(short *)(DAT_0001b5a0 + 0x1e8);
   sVar3 = *(short *)(DAT_0001b5a0 + 0x1ea);
-  iVar7 = FUN_00001d76((int)DAT_0001d80e);
-  iVar8 = FUN_00001dd8((int)DAT_0001d80e);
+  iVar7 = sin_fixed14( /* Original: FUN_00001d76 */(int)DAT_0001d80e);
+  iVar8 = cos_fixed14( /* Original: FUN_00001dd8 */(int)DAT_0001d80e);
   if (*(short *)(DAT_0001b5a0 + 0x9e) == 0) {
     puVar14 = DAT_0001b520;
     sVar11 = DAT_00026672._2_2_;
@@ -22332,7 +23530,7 @@ uint * FUN_00017d16(uint param_1,int param_2)
     *(byte *)(param_1 + 5) = *(byte *)(param_1 + 5) | 0x10;
   }
   puVar3[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  uVar4 = FUN_00011564();
+  uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar2 = (ushort)uVar4;
   uVar5 = uVar2 & 0xf;
   iVar1 = *(int *)(param_1 + 0xc);
@@ -22413,7 +23611,7 @@ void FUN_00017dd4(int *param_1)
       }
       sVar13 = sVar13 + 1;
     } while (sVar13 < 5);
-    if ((sVar15 == 0) && (uVar5 = FUN_00011564(), (uVar5 & 0x1ff) == 0)) {
+    if ((sVar15 == 0) && (uVar5 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar5 & 0x1ff) == 0)) {
       iVar9 = *param_1;
       iVar1 = *DAT_0001b738;
       if (*(short *)((int)param_1 + 0x32) < 3) {
@@ -22422,7 +23620,7 @@ void FUN_00017dd4(int *param_1)
       else {
         sVar15 = 3;
       }
-      uVar5 = FUN_00011564();
+      uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
       sVar15 = (short)((int)(uVar5 & 0xffff) % (int)sVar15) + 1;
       iVar8 = *(int *)(iVar9 + 0x18);
       iVar2 = *(int *)(iVar1 + 0x18);
@@ -22434,18 +23632,18 @@ void FUN_00017dd4(int *param_1)
       for (uVar5 = iVar7 + iVar6; (uVar5 & 0xffff8000) != 0; uVar5 = (int)uVar5 >> 1) {
         sVar13 = sVar13 + 1;
       }
-      FUN_00001f22((short)(iVar8 - iVar2 >> ((int)sVar13 & 0x3fU)),0,
+      attitude_from_velocity( /* Original: FUN_00001f22 */(short)(iVar8 - iVar2 >> ((int)sVar13 & 0x3fU)),0,
                    (short)(iVar3 - iVar4 >> ((int)sVar13 & 0x3fU)),0,0,(ushort *)0x0,&local_6);
-      uVar11 = FUN_00011544();
+      uVar11 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
       local_6 = local_6 + ((uVar11 & 0x1f) - 0x10) * 0x40 & 0x3fff;
       iVar9 = *(int *)(iVar9 + 0xc);
-      iVar8 = FUN_00001d76((int)(short)local_6);
+      iVar8 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)local_6);
       sVar13 = (short)((iVar9 << 1) / 3 >> 5);
       local_e = *(int *)(iVar1 + 0x18) - ((int)(short)iVar8 * (int)sVar13 >> 7);
-      uVar11 = FUN_00011544();
-      iVar9 = FUN_00001dd8((int)(short)local_6);
+      uVar11 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      iVar9 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)local_6);
       uVar5 = *(int *)(iVar1 + 0x20) + ((int)sVar13 * (int)(short)iVar9 >> 7);
-      uVar12 = FUN_00011544();
+      uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
       local_6 = local_6 + ((uVar12 & 0x1f) - 0x10) * 0x40 + 0x2000 & 0x3fff;
       sVar13 = 0;
       sVar14 = 0;
@@ -22454,9 +23652,9 @@ void FUN_00017dd4(int *param_1)
           while (param_1[sVar13 + 0xd] != 0) {
             sVar13 = sVar13 + 1;
           }
-          uVar12 = FUN_00011544();
+          uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
           local_e = (uVar12 & 0xffff0fff) + (local_e - 0x800);
-          uVar12 = FUN_00011544();
+          uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
           uVar5 = (uVar12 & 0xffff0fff) + (uVar5 - 0x800);
           piVar10 = (int *)FUN_0000e262(local_e,(uint)(uVar11 & 0xfff) * 10 + 30000,uVar5,0,local_6,
                                         0,1);
@@ -22536,13 +23734,13 @@ void FUN_000180c8(int param_1)
   
   if (((*(short *)(param_1 + 0x32) != 0) && (DAT_0001b870 == 0)) &&
      (*(int *)(param_1 + 0x34) <= DAT_0001b838)) {
-    uVar5 = FUN_00011544();
+    uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     uVar5 = uVar5 % 0x1540 - 0xa80 & 0x3fff;
-    sVar6 = FUN_00011544();
+    sVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     iVar3 = sVar6 + 0x5a3c0 >> 4;
-    iVar1 = FUN_00001d76((int)(short)uVar5);
-    iVar2 = FUN_00001dd8((int)(short)uVar5);
-    uVar7 = FUN_00011544();
+    iVar1 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)uVar5);
+    iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)uVar5);
+    uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
     iVar3 = FUN_0000e262(-(iVar3 * (short)iVar1 >> 8) - 0xb92670,40000,
                          (iVar3 * (short)iVar2 >> 8) + 0x7f8e4c,0,
                          (uVar7 & 0x1ff) + uVar5 + 0xdf00 & 0x3fff,0,1);
@@ -22562,7 +23760,7 @@ void FUN_000180c8(int param_1)
     else {
       iVar3 = 0x546;
     }
-    uVar4 = FUN_00011564();
+    uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
     *(uint *)(param_1 + 0x34) = (uVar4 & 0xffff) % 0x1c2 + DAT_0001b838 + iVar3 + -0xe1;
   }
   return;
@@ -22628,20 +23826,20 @@ void FUN_0001820a(int *param_1)
     local_18 = local_18 >> 2;
     iVar10 = FUN_00002de8();
     if ((0x53f < iVar10) && (*(char *)((int)param_1 + 0x69a) != '\x04')) {
-      FUN_0000e40c(*(short *)(iVar9 + 0x22) - *(short *)((int)param_1 + 0x22));
+      fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)(iVar9 + 0x22) - *(short *)((int)param_1 + 0x22));
       iVar10 = FUN_00002de8();
-      if ((iVar10 < 0x1001) || (uVar5 = FUN_00011564(), (uVar5 & 1) == 0)) {
+      if ((iVar10 < 0x1001) || (uVar5 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar5 & 1) == 0)) {
         FUN_00010cb2(param_1);
         do {
           if (*(char *)((int)param_1 + 0x69a) == '\0') {
             param_1[0x1a7] = *(int *)(iVar6 + 0x18);
             param_1[0x1a8] = *(int *)(iVar6 + 0x1c);
             param_1[0x1a9] = *(int *)(iVar6 + 0x20);
-            uVar5 = FUN_00011564();
+            uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
             uVar4 = (ushort)uVar5 & 3;
             if ((uVar4 == 1) && (0x32a0 < *(int *)((int)param_1 + 0x62a))) {
-              iVar7 = FUN_0000e40c(*(short *)(param_1 + 8));
-              iVar7 = FUN_00002e08((int)(short)iVar7);
+              iVar7 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)(param_1 + 8));
+              iVar7 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar7);
               if (0x1ff < iVar7) goto LAB_000185d4;
               *(undefined1 *)((int)param_1 + 0x69a) = 3;
             }
@@ -22666,7 +23864,7 @@ LAB_000185d4:
             if (cVar3 == '\x02') {
               if (*(char *)((int)param_1 + 0x69b) == '\0') {
                 param_1[0x1a8] = *(int *)(iVar6 + 0x1c);
-                uVar5 = FUN_00011564();
+                uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
                 if ((uVar5 & 1) == 0) {
                   sVar8 = 0x200;
                   goto LAB_00018720;
@@ -22677,7 +23875,7 @@ LAB_0001870c:
                 *(undefined1 *)((int)param_1 + 0x69b) = 2;
               }
               else {
-                uVar5 = FUN_00011564();
+                uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
                 if ((uVar5 & 1) != 0) {
                   *(undefined1 *)((int)param_1 + 0x69a) = 0;
                 }
@@ -22690,11 +23888,11 @@ LAB_00018720:
                 uVar4 = sVar8 - *(short *)((int)param_1 + 0x22);
                 *(undefined1 *)((int)param_1 + 0x69b) = 1;
               }
-              iVar7 = FUN_00001d76((int)(short)(uVar4 & 0x3fff));
+              iVar7 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)(uVar4 & 0x3fff));
               param_1[0x1a7] =
                    *(int *)(iVar6 + 0x18) +
                    ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x2d >> 6) >> 0xc);
-              iVar7 = FUN_00001dd8((int)(short)(uVar4 & 0x3fff));
+              iVar7 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)(uVar4 & 0x3fff));
               param_1[0x1a9] =
                    *(int *)(iVar6 + 0x20) +
                    ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x2d >> 6) >> 0xc);
@@ -22703,11 +23901,11 @@ LAB_00018720:
               if (cVar3 == '\x01') {
                 if (*(char *)((int)param_1 + 0x69b) == '\0') {
                   param_1[0x1a8] = *(int *)(iVar6 + 0x1c);
-                  iVar7 = FUN_00001d76(-(int)*(short *)((int)param_1 + 0x22) & 0x3fff);
+                  iVar7 = sin_fixed14( /* Original: FUN_00001d76 */-(int)*(short *)((int)param_1 + 0x22) & 0x3fff);
                   param_1[0x1a7] =
                        *(int *)(iVar6 + 0x18) +
                        ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x4b >> 6) >> 0xc);
-                  iVar7 = FUN_00001dd8(-(int)*(short *)((int)param_1 + 0x22) & 0x3fff);
+                  iVar7 = cos_fixed14( /* Original: FUN_00001dd8 */-(int)*(short *)((int)param_1 + 0x22) & 0x3fff);
                   param_1[0x1a9] =
                        *(int *)(iVar6 + 0x20) +
                        ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x4b >> 6) >> 0xc);
@@ -22723,13 +23921,13 @@ LAB_00018878:
             else if (cVar3 == '\x03') {
               cVar3 = *(char *)((int)param_1 + 0x69b);
               if (cVar3 == '\x01') {
-                uVar5 = FUN_00011564();
+                uVar5 = overlay_rng_next( /* Original: FUN_00011564 */);
                 uVar5 = (uint)(short)(((ushort)uVar5 & 0xff) << 6);
-                iVar7 = FUN_00001d76(uVar5);
+                iVar7 = sin_fixed14( /* Original: FUN_00001d76 */uVar5);
                 param_1[0x1a7] =
                      *(int *)(iVar6 + 0x18) +
                      ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x78 >> 6) >> 0xc);
-                iVar7 = FUN_00001dd8(uVar5);
+                iVar7 = cos_fixed14( /* Original: FUN_00001dd8 */uVar5);
                 param_1[0x1a9] =
                      *(int *)(iVar6 + 0x20) +
                      ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x78 >> 6) >> 0xc);
@@ -22739,11 +23937,11 @@ LAB_00018878:
               else if (cVar3 < '\x02') {
                 if (cVar3 == '\0') {
                   uVar5 = (ushort)-*(short *)((int)param_1 + 0x22) & 0x3fff;
-                  iVar7 = FUN_00001d76(uVar5);
+                  iVar7 = sin_fixed14( /* Original: FUN_00001d76 */uVar5);
                   param_1[0x1a7] =
                        *(int *)(iVar6 + 0x18) +
                        ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x2d >> 6) >> 0xc);
-                  iVar7 = FUN_00001dd8(uVar5);
+                  iVar7 = cos_fixed14( /* Original: FUN_00001dd8 */uVar5);
                   param_1[0x1a9] =
                        *(int *)(iVar6 + 0x20) +
                        ((int)(short)iVar7 * (*(int *)((int)param_1 + 0x62a) * 0x2d >> 6) >> 0xc);
@@ -22796,14 +23994,14 @@ LAB_00018878:
     local_22 = (short)(*(int *)(iVar7 + 0x18) - *(int *)(iVar6 + 0x18) >> (uVar5 & 0x3f));
     local_1e = (short)(*(int *)(iVar7 + 0x1c) - *(int *)(iVar6 + 0x1c) >> (uVar5 & 0x3f));
     local_1a = (short)(*(int *)(iVar7 + 0x20) - *(int *)(iVar6 + 0x20) >> (uVar5 & 0x3f));
-    FUN_00002464(-(int)*(short *)(param_1 + 8) & 0x3fff,
+    build_attitude_matrix_3ang_alt( /* Original: FUN_00002464 */-(int)*(short *)(param_1 + 8) & 0x3fff,
                  -(int)*(short *)((int)param_1 + 0x22) & 0x3fff,
                  -(int)*(short *)(param_1 + 9) & 0x3fff,(int)asStack_36);
-    FUN_000028dc(1,(int)auStack_24,(int)auStack_24,asStack_36);
+    transform_vecs12_by_matrix3(1,(int)auStack_24,(int)auStack_24,asStack_36);
     iVar7 = (int)local_1a * (int)local_1a +
             (int)local_1e * (int)local_1e + (int)local_22 * (int)local_22;
-    iVar6 = FUN_0000e372(iVar7);
-    FUN_00001f22(local_22,local_1e,local_1a,(int)(short)iVar6,iVar7,&local_38,&local_3a);
+    iVar6 = isqrt_floor( /* Original: FUN_0000e372 */iVar7);
+    attitude_from_velocity( /* Original: FUN_00001f22 */local_22,local_1e,local_1a,(int)(short)iVar6,iVar7,&local_38,&local_3a);
     local_16 = (*(code *)&LAB_0000e3e8_4)((int)(short)local_38);
     local_18 = (*(code *)&LAB_0000e3e8_4)((int)(short)local_3a);
     iVar7 = FUN_00002de8();
@@ -22811,7 +24009,7 @@ LAB_00018878:
        (*(char *)((int)param_1 + 0x676) == '\0')) {
       *(undefined1 *)((int)param_1 + 0x676) = 1;
     }
-    if ((*(char *)((int)param_1 + 0x69a) != '\x04') || (uVar5 = FUN_00011564(), (uVar5 & 0x1f) == 0)
+    if ((*(char *)((int)param_1 + 0x69a) != '\x04') || (uVar5 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar5 & 0x1f) == 0)
        ) {
       *(undefined1 *)((int)param_1 + 0x69a) = 0;
     }
@@ -22822,7 +24020,7 @@ LAB_00018878:
     *(undefined1 *)((int)param_1 + 0x69a) = 0;
   }
 LAB_000188a6:
-  FUN_0000e792(param_1);
+  update_aircraft_entity(param_1);
   return;
 }
 
@@ -22882,7 +24080,7 @@ int FUN_00018956(uint param_1,uint param_2,uint param_3,int param_4,int param_5)
 {
   int iVar1;
   
-  iVar1 = FUN_00005116(*(int *)(&DAT_00026768 + param_4 * 4),param_1,param_2,param_3,0,0,0,0);
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */*(int *)(&DAT_00026768 + param_4 * 4),param_1,param_2,param_3,0,0,0,0);
   if (iVar1 == 0) {
     iVar1 = 0;
   }
@@ -22919,7 +24117,7 @@ void FUN_000189d0(int *param_1)
     *(undefined2 *)((int)param_1 + 0x22) = *(undefined2 *)((int)piVar3 + 0x22);
   }
   else {
-    FUN_000051ec(iVar1);
+    retire_entity( /* Original: FUN_000051ec */iVar1);
     *(char *)(iVar2 + 3) = *(char *)(iVar2 + 3) + -1;
     *(undefined4 *)((int)param_1 + 0x32) = 0;
   }
@@ -22954,8 +24152,8 @@ undefined4 FUN_00018a34(int *param_1)
       iVar2 = *(int *)(DAT_0001b5a0 + 0x8c);
       iVar3 = *(int *)(iVar7 + 0x44);
       sStack_a = (short)(0x32 << ((int)*(short *)(iVar7 + 0x34) & 0x3fU));
-      iVar7 = FUN_00001dd8((int)*(short *)(*(int *)(iVar9 + 8) + 0x24));
-      iVar7 = FUN_00002e08((int)(short)iVar7);
+      iVar7 = cos_fixed14( /* Original: FUN_00001dd8 */(int)*(short *)(*(int *)(iVar9 + 8) + 0x24));
+      iVar7 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar7);
       psVar11 = *(short **)(iVar8 + 0x18);
       sVar10 = *(short *)(iVar8 + 0x14);
       iVar9 = (int)sStack_a;
@@ -23043,7 +24241,7 @@ uint FUN_00018bba(int param_1,int param_2)
   uVar3 = CONCAT22((short)((uint)in_D0 >> 0x10),sVar2);
   if (((((*(short *)(iVar1 + 0x3e) == 0x200) && (2 < sVar2)) && (sVar2 < 5)) ||
       ((*(short *)(iVar1 + 0x3e) == 0x100 && (sVar2 < 3)))) && (*(short *)(iVar1 + 0x40) != 0)) {
-    uVar4 = FUN_00011564();
+    uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
     uVar3 = uVar4 & 0xffff003f;
     if ((uVar4 & 0x3f) == 0) {
       iVar5 = FUN_00003c68();
@@ -23056,7 +24254,7 @@ uint FUN_00018bba(int param_1,int param_2)
       if (*(int *)(iVar1 + 0x36) != 0) {
         iVar6 = iVar6 >> 1;
       }
-      uVar4 = FUN_00011564();
+      uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
       uVar3 = uVar4 & 0xffff007f;
       if ((int)(uVar4 & 0x7f) < iVar6) {
         if (*(int *)(iVar1 + 0x36) == 0) {
@@ -23140,7 +24338,7 @@ LAB_00018cf6:
         param_1[0x14] = local_18 / (int)*local_20;
         iVar19 = sVar11 * 0xc;
         puVar3 = *(undefined4 **)(iVar8 + 0x44);
-        FUN_00001f22((short)*(undefined4 *)(iVar7 + iVar19) - (short)*puVar3,
+        attitude_from_velocity( /* Original: FUN_00001f22 */(short)*(undefined4 *)(iVar7 + iVar19) - (short)*puVar3,
                      (short)*(undefined4 *)(iVar7 + 4 + iVar19) - (short)puVar3[1],
                      (short)*(undefined4 *)(iVar7 + 8 + iVar19) - (short)puVar3[2],0x4000,0x10000000
                      ,&local_6,&local_8);
@@ -23173,7 +24371,7 @@ LAB_00018df2:
         *(undefined4 *)((int)param_1 + 0x36) = 0;
       }
       else {
-        uVar6 = FUN_00011564();
+        uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
         if (((ushort)uVar6 & 0x3f) == 0x15) {
           uVar6 = FUN_00003c68();
           *(uint *)((int)param_1 + 0x3a) = uVar6;
@@ -23188,11 +24386,11 @@ LAB_00018df2:
             sVar14 = (short)(*(int *)(iVar19 + 0x20) - *(int *)(iVar8 + 0x20) >> (uVar6 & 0x3f));
             iVar8 = (int)sVar14 * (int)sVar14 +
                     (int)sVar12 * (int)sVar12 + (int)sVar11 * (int)sVar11;
-            iVar7 = FUN_0000e372(iVar8);
-            FUN_00001f22(sVar11,sVar12,sVar14,(int)(short)iVar7,iVar8,&local_a,&local_c);
+            iVar7 = isqrt_floor( /* Original: FUN_0000e372 */iVar8);
+            attitude_from_velocity( /* Original: FUN_00001f22 */sVar11,sVar12,sVar14,(int)(short)iVar7,iVar8,&local_a,&local_c);
             if (0x3f < (short)local_a) {
-              iVar8 = FUN_0000e40c(local_c - *(short *)((int)param_1 + 0x56));
-              iVar8 = FUN_00002e08((int)(short)iVar8);
+              iVar8 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */local_c - *(short *)((int)param_1 + 0x56));
+              iVar8 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar8);
               if (iVar8 < 0x1001) {
                 uVar9 = 0;
                 do {
@@ -23209,17 +24407,17 @@ LAB_00018df2:
                   }
                   sVar11 = (short)(iVar8 >> 10);
                   *(int *)((int)param_1 + (short)uVar16 * 4 + 0xd2) = DAT_0001b838 + sVar11;
-                  uVar9 = FUN_00011544();
+                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                   iVar8 = *(int *)(iVar19 + 8);
-                  uVar10 = FUN_00011544();
+                  uVar10 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                   piVar2 = (int *)((int)param_1 + (short)uVar16 * 0xc + 0x5a);
                   iVar7 = (int)(short)((uVar9 & 0x3f) + sVar11);
                   *piVar2 = (uint)(uVar10 & 0xfff) +
                             *(int *)(iVar19 + 0x18) + *(int *)(iVar8 + 8) * iVar7 + -0x800;
-                  uVar9 = FUN_00011544();
+                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                   piVar2[1] = (uint)(uVar9 & 0xfff) +
                               *(int *)(iVar19 + 0x1c) + *(int *)(iVar8 + 0xc) * iVar7 + -0x800;
-                  uVar9 = FUN_00011544();
+                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                   piVar2[2] = (uint)(uVar9 & 0xfff) +
                               *(int *)(iVar19 + 0x20) + *(int *)(iVar8 + 0x10) * iVar7 + -0x800;
                   if (piVar2[1] + -500 < *(int *)(iVar8 + 0x2e)) {
@@ -23283,7 +24481,7 @@ int FUN_00019130(int param_1)
   int iVar1;
   int iVar2;
   
-  iVar1 = FUN_00005116(DAT_0002677c,*(uint *)(param_1 + 0x18),*(uint *)(param_1 + 0x1c),
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_0002677c,*(uint *)(param_1 + 0x18),*(uint *)(param_1 + 0x1c),
                        *(uint *)(param_1 + 0x20),0,0,0,0);
   if (iVar1 == 0) {
     iVar2 = 0;
@@ -23330,7 +24528,7 @@ void FUN_0001917c(undefined4 *param_1)
     else {
       *(char *)(iVar8 + 3) = *(char *)(iVar8 + 3) + -1;
       *(undefined4 *)((int)param_1 + 0x32) = 0;
-      FUN_0000528a(pcVar1);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
     }
   }
   if (((pcVar1[7] & 2U) == 0) && (*(int *)((int)param_1 + 0x36) != 0)) {
@@ -23349,18 +24547,18 @@ void FUN_0001917c(undefined4 *param_1)
           iVar3 = *(int *)(iVar8 + 0x1c) - *(int *)(pcVar1 + 0x1c) >> (uVar6 & 0x3f);
           iVar4 = *(int *)(iVar8 + 0x20) - *(int *)(pcVar1 + 0x20) >> (uVar6 & 0x3f);
           iVar8 = iVar4 * iVar4 + iVar3 * iVar3 + iVar2 * iVar2;
-          iVar7 = FUN_0000e372(iVar8);
-          FUN_00001f22((short)iVar2,(short)iVar3,(short)iVar4,(int)(short)iVar7,iVar8,
+          iVar7 = isqrt_floor( /* Original: FUN_0000e372 */iVar8);
+          attitude_from_velocity( /* Original: FUN_00001f22 */(short)iVar2,(short)iVar3,(short)iVar4,(int)(short)iVar7,iVar8,
                        (ushort *)(param_1 + 0x13),(ushort *)((int)param_1 + 0x4e));
           if (DAT_0001b870 == 0) {
             if (*(short *)((int)param_1 + 0x4a) == 0) {
-              uVar9 = FUN_00011544();
+              uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
               if ((uVar9 & 0xf) == 0) {
-                uVar9 = FUN_00011544();
+                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                 *(ushort *)((int)param_1 + 0x4a) = (uVar9 & 7) + 7;
-                uVar9 = FUN_00011544();
+                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                 *(ushort *)(param_1 + 0x14) = 0x80 - (uVar9 & 0xff);
-                uVar9 = FUN_00011544();
+                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
                 *(ushort *)((int)param_1 + 0x52) = 0x80 - (uVar9 & 0xff);
               }
             }
@@ -23437,9 +24635,22 @@ undefined4 FUN_0001940e(undefined4 param_1,int param_2)
 
 
 
-int FUN_00019430(undefined2 param_1,uint param_2,uint param_3,uint param_4,undefined2 param_5,
-                undefined2 param_6,undefined2 param_7)
-
+/*
+ * Original: FUN_00019430
+ * Proposed name: spawn_special_weapon_entity
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Special-weapon spawn for e792 field_677: spawn_mission_pool_object
+ * (DAT_00026780, xyz, att, 0). On success entity=*(world+8):
+ *   field_610 = DAT_0001b838 (u32); field_614 = param_1; copy att to
+ *   +0x20/22/24; field_618=7; field_61c=0x62.
+ * Then 0xD-vertex loop on *(world+0x44): in-place xyz>>=3; store
+ * entity+0x622/656/68a scaled by 0x1C6/0x1C6/0x255.
+ * [INFERRED] world+0x44 is both 05116 success gate and vertex table.
+ * Player latch DAT_0001b87c is in the e792 caller. Evidence: NOTES.
+ */
+int spawn_special_weapon_entity(undefined2 param_1,uint param_2,uint param_3,uint param_4,
+                undefined2 param_5,undefined2 param_6,undefined2 param_7) /* Original: FUN_00019430 */
 {
   int iVar1;
   int iVar2;
@@ -23447,7 +24658,7 @@ int FUN_00019430(undefined2 param_1,uint param_2,uint param_3,uint param_4,undef
   int iVar4;
   short sVar5;
   
-  iVar3 = FUN_00005116(DAT_00026780,param_2,param_3,param_4,param_5,param_6,param_7,0);
+  iVar3 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_00026780,param_2,param_3,param_4,param_5,param_6,param_7,0);
   if (iVar3 == 0) {
     iVar4 = 0;
   }
@@ -23458,7 +24669,7 @@ int FUN_00019430(undefined2 param_1,uint param_2,uint param_3,uint param_4,undef
     *(undefined2 *)(iVar4 + 0x20) = param_5;
     *(undefined2 *)(iVar4 + 0x22) = param_6;
     *(undefined2 *)(iVar4 + 0x24) = param_7;
-    iVar3 = *(int *)(iVar3 + 0x44);
+    iVar3 = *(int *)(iVar3 + 0x44); /* vertex base / gate */
     sVar5 = 0;
     do {
       iVar2 = sVar5 * 0xc;
@@ -23570,15 +24781,15 @@ void FUN_0001952e(undefined4 *param_1)
     sVar13 = *(short *)(param_1 + 9);
     sVar3 = *(short *)(param_1 + 0x185);
     iVar14 = (int)(sVar3 >> 2);
-    iVar9 = FUN_0000e42a(*(uint *)(pcVar2 + 0x1c));
+    iVar9 = table_lerp_1b2c0(*(uint *)(pcVar2 + 0x1c)); /* Original: FUN_0000e42a */
     iVar8 = (int)*(short *)((int)param_1 + 0x616) +
             (iVar14 * ((iVar14 * iVar8) / (int)(short)iVar9) * 2) / 0xa0;
     *(short *)((int)param_1 + 0x616) = (short)(iVar8 % 10);
     local_a = 0;
     local_e = 0;
     local_6 = sVar3 - (short)(iVar8 / 10);
-    FUN_0000253e((int)(short)local_24,(int)(short)local_26,(int)sVar13,(int)asStack_22);
-    FUN_000028dc(1,(int)auStack_10,(int)auStack_10,asStack_22);
+    build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)(short)local_24,(int)(short)local_26,(int)sVar13,(int)asStack_22);
+    transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
     local_a = local_a + -0x5b;
     param_1[2] = (int)(local_e >> 6);
     param_1[3] = (int)(local_a >> 6);
@@ -23588,8 +24799,8 @@ void FUN_0001952e(undefined4 *param_1)
       param_1[4] = param_1[4] + -7;
     }
     iVar8 = (int)local_6 * (int)local_6 + (int)local_a * (int)local_a + (int)local_e * (int)local_e;
-    iVar9 = FUN_0000e372(iVar8);
-    FUN_00001f22(local_e,local_a,local_6,(int)(short)iVar9,iVar8,&local_24,&local_26);
+    iVar9 = isqrt_floor( /* Original: FUN_0000e372 */iVar8);
+    attitude_from_velocity( /* Original: FUN_00001f22 */local_e,local_a,local_6,(int)(short)iVar9,iVar8,&local_24,&local_26);
     sVar12 = local_26 - *(short *)((int)param_1 + 0x22);
     if (sVar12 < 0x2001) {
       if (sVar12 < -0x2000) {
@@ -23601,7 +24812,7 @@ void FUN_0001952e(undefined4 *param_1)
     }
     *(ushort *)(param_1 + 8) = local_24;
     *(ushort *)((int)param_1 + 0x22) = local_26 & 0x3fff;
-    iVar8 = FUN_00001d76((int)(short)local_24);
+    iVar8 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)local_24);
     *(ushort *)(param_1 + 9) = sVar13 + (short)((int)(short)iVar8 * (int)sVar12 >> 0xc) & 0x3fff;
     *(short *)(param_1 + 0x185) = (short)iVar9;
     if (param_1[3] + *(int *)(pcVar2 + 0x1c) <= *(int *)((int)param_1 + 0x2e) + 0x17f) {
@@ -23613,10 +24824,10 @@ void FUN_0001952e(undefined4 *param_1)
   }
   else {
     sVar12 = *(short *)(pcVar2 + 0x34);
-    uVar10 = FUN_0000e40c(0x588 - *(short *)((int)param_1 + 0x22));
+    uVar10 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */0x588 - *(short *)((int)param_1 + 0x22));
     iVar8 = *(int *)(pcVar2 + 0x44);
-    iVar9 = FUN_00001dd8(uVar10 & 0x3fff);
-    iVar14 = FUN_00001d76(uVar10 & 0x3fff);
+    iVar9 = cos_fixed14( /* Original: FUN_00001dd8 */uVar10 & 0x3fff);
+    iVar14 = sin_fixed14( /* Original: FUN_00001d76 */uVar10 & 0x3fff);
     bVar7 = false;
     sVar13 = 0;
     uVar10 = (uint)sVar12;
@@ -23631,7 +24842,7 @@ void FUN_0001952e(undefined4 *param_1)
         piVar1 = (int *)(iVar8 + 8 + iVar6);
         *piVar1 = (10 << (uVar10 & 0x3f)) + *piVar1;
         sVar5 = 0x15e - *(short *)(iVar8 + 10 + iVar6);
-        iVar11 = FUN_0000e372((int)sVar4 * (int)sVar4 + (int)sVar3 * (int)sVar3 +
+        iVar11 = isqrt_floor( /* Original: FUN_0000e372 */(int)sVar4 * (int)sVar4 + (int)sVar3 * (int)sVar3 +
                               (int)sVar5 * (int)sVar5);
         if ((int)(short)iVar11 < 0x15e << (uVar10 & 0x3f)) {
           *(int *)(iVar8 + iVar6) = (int)sVar3;
@@ -23641,7 +24852,7 @@ void FUN_0001952e(undefined4 *param_1)
       sVar13 = sVar13 + 1;
     } while (sVar13 < 0xd);
     if (!bVar7) {
-      FUN_0000528a(pcVar2);
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar2);
     }
   }
   return;
@@ -23736,7 +24947,7 @@ int FUN_00019aa2(int param_1,int param_2,int param_3,int param_4,undefined2 para
 {
   int iVar1;
   
-  iVar1 = FUN_00005116((&DAT_00026784)[param_1],DAT_0001d838 + param_2,DAT_0001d834 + param_3,
+  iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */(&DAT_00026784)[param_1],DAT_0001d838 + param_2,DAT_0001d834 + param_3,
                        DAT_0001d830 + param_4,0,0,0,0);
   if (iVar1 == 0) {
     iVar1 = 0;
@@ -24008,7 +25219,7 @@ undefined4 FUN_00019fba(int *param_1)
     DAT_000267b2 = (short)(local_1c - local_10 >> 3);
     DAT_000267b6 = (short)(local_18 - local_c >> 3);
     DAT_000267ba = (short)(local_14 - local_8 >> 3);
-    iVar2 = FUN_0000e372((int)DAT_000267b6 * (int)DAT_000267b6 +
+    iVar2 = isqrt_floor( /* Original: FUN_0000e372 */(int)DAT_000267b6 * (int)DAT_000267b6 +
                          (int)DAT_000267b2 * (int)DAT_000267b2 +
                          (int)DAT_000267ba * (int)DAT_000267ba);
     DAT_000267b2 = (short)(((int)DAT_000267b2 << 0xc) / (int)(short)iVar2);
@@ -24147,7 +25358,7 @@ LAB_0001a2da:
   for (uVar10 = iVar5 + iVar6; (uVar10 & 0xffff8000) != 0; uVar10 = (int)uVar10 >> 1) {
     sVar11 = sVar11 + 1;
   }
-  FUN_00001f22((short)(iVar7 - *(int *)(iVar9 + 0x18) >> ((int)(short)(sVar11 + 1) & 0x3fU)),0,
+  attitude_from_velocity( /* Original: FUN_00001f22 */(short)(iVar7 - *(int *)(iVar9 + 0x18) >> ((int)(short)(sVar11 + 1) & 0x3fU)),0,
                (short)(iVar8 - *(int *)(iVar9 + 0x20) >> ((int)(short)(sVar11 + 1) & 0x3fU)),0,0,
                (ushort *)0x0,&local_6);
   iVar6 = (*(int *)(iVar9 + 0x18) - DAT_000267bc) * (int)DAT_000267ba -
@@ -24155,14 +25366,14 @@ LAB_0001a2da:
   if (iVar6 < 0) {
     iVar6 = iVar6 + 0xfff;
   }
-  iVar5 = FUN_00002e08((int)(short)(iVar6 >> 0xc));
-  iVar6 = FUN_00001d76((int)(short)local_6);
+  iVar5 = abs_int( /* Original: FUN_00002e08 */(int)(short)(iVar6 >> 0xc));
+  iVar6 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)local_6);
   iVar6 = (int)(short)iVar6 * (int)(short)iVar5;
   if (iVar6 < 0) {
     iVar6 = iVar6 + 0xfff;
   }
   iVar7 = iVar7 - (iVar6 >> 0xc);
-  iVar6 = FUN_00001dd8((int)(short)local_6);
+  iVar6 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)local_6);
   iVar6 = (int)(short)iVar6 * (int)(short)iVar5;
   if (iVar6 < 0) {
     iVar6 = iVar6 + 0xfff;
@@ -24244,14 +25455,26 @@ LAB_0001a2da:
   }
   *(undefined4 *)((int)param_1 + 0x2e) = uVar1;
   *(undefined1 *)((int)param_1 + 0x679) = uVar2;
-  FUN_0000e792(param_1);
+  update_aircraft_entity(param_1);
   return;
 }
 
 
 
-undefined4 * FUN_0001a63e(undefined4 *param_1,undefined4 *param_2,undefined4 *param_3)
-
+/*
+ * Original: FUN_0001a63e
+ * Proposed name: memmove_block
+ * Confidence: [PROVEN] role as overlap-aware block copy
+ *
+ * Args: (src, dst, nbytes) — nbytes often passed as pointer-cast immediate
+ * (e.g. &DAT_00000012 ≡ 0x12 = 18 bytes = 9×s16 matrix). Returns a scratch
+ * pointer (Ghidra); side effect is the copy.
+ * Paths: src==dst no-op; overlapping src>dst → backward byte/long copy;
+ * else forward (longword fast path when n>0x19 and even). Used by
+ * copy_block_return_dst, spawn_ordnance_scattered (→entity+0x40), grow paths.
+ * Evidence: NOTES FUN_0001a63e; copy_block_return_dst BSR; Capstone-style loops.
+ */
+undefined4 * memmove_block(undefined4 *param_1,undefined4 *param_2,undefined4 *param_3) /* Original: FUN_0001a63e */
 {
   int iVar1;
   int iVar2;
@@ -24263,6 +25486,7 @@ undefined4 * FUN_0001a63e(undefined4 *param_1,undefined4 *param_2,undefined4 *pa
   undefined4 *puVar9;
   undefined4 *puVar6;
   
+  /* param_1=src, param_2=dst, param_3=nbytes */
   puVar6 = (undefined4 *)((int)param_1 - (int)param_2);
   if (puVar6 != (undefined4 *)0x0) {
     puVar8 = puVar6;

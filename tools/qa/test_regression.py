@@ -223,17 +223,95 @@ def check_mission_mvp_data() -> None:
         fail("Mission out-of-bounds threshold drifted from 8.0s")
 
 
+def check_01a48_kind2_jsr_bytes() -> None:
+    """PROVEN: kind2/B572 LEA $1A48, but $1A48 is heap_free epilogue; $1A68 is heap_alloc."""
+    binary = REPO_ROOT / "hellcats-over-the-pacific-sources" / "Hellcats" / "Pacific Conflict"
+    if not binary.is_file():
+        fail(f"Missing binary: {binary}")
+    data = binary.read_bytes()
+    if len(data) < 0xB57A:
+        fail(f"Pacific Conflict too small: {len(data)}")
+    # @0x4ED8: LEA $00001A48,A2 ; JSR (A2) ; MOVE.L D0,$4C(A4)
+    if data[0x4ED8:0x4EE4] != bytes.fromhex("45f900001a484e922940004c"):
+        fail(f"kind2 first JSR drifted: {data[0x4ED8:0x4EE4].hex()}")
+    # second JSR (A2) ; MOVE.L D0,$44(A4)
+    if data[0x4EE6:0x4EEC] != bytes.fromhex("4e9229400044"):
+        fail(f"kind2 second JSR drifted: {data[0x4EE6:0x4EEC].hex()}")
+    # @0xB572: same LEA $1A48 pattern (another malloc-style site)
+    if data[0xB572:0xB57A] != bytes.fromhex("47f900001a484e93"):
+        fail(f"B572 LEA/JSR drifted: {data[0xB572:0xB57A].hex()}")
+    # @0x1A48: MOVE.L A1,$20C60 ; BRA.B $1A64 — free epilogue, not alloc
+    if data[0x1A48:0x1A50] != bytes.fromhex("23c900020c606014"):
+        fail(f"$1A48 free-epi drifted: {data[0x1A48:0x1A50].hex()}")
+    # @0x1A64: MOVEA.L (A7)+,A2 ; RTS — restores free's saved A2
+    if data[0x1A64:0x1A68] != bytes.fromhex("245f4e75"):
+        fail(f"$1A64 free RTS drifted: {data[0x1A64:0x1A68].hex()}")
+    # @0x1A68: MOVEM.L D2-D3/A2,-(A7) — real heap_alloc prologue (= LEA+0x20)
+    if data[0x1A68:0x1A6C] != bytes.fromhex("48e73020"):
+        fail(f"$1A68 prologue drifted: {data[0x1A68:0x1A6C].hex()}")
+    # Alloc reads size at $10(a7) after MOVEM — matches push-size then JSR convention
+    if data[0x1A6C:0x1A70] != bytes.fromhex("242f0010"):
+        fail(f"$1A68 size slot drifted: {data[0x1A6C:0x1A70].hex()}")
+
+
+def check_optional_capstone() -> str:
+    """Optional: Capstone m68k import. Returns PASS/SKIP message suffix."""
+    try:
+        import capstone  # type: ignore
+        from capstone import CS_ARCH_M68K, CS_MODE_BIG_ENDIAN, Cs  # type: ignore
+
+        _ = Cs(CS_ARCH_M68K, CS_MODE_BIG_ENDIAN)
+        return f"available ({capstone.__version__})"
+    except Exception as exc:  # pragma: no cover
+        return f"skipped ({exc})"
+
+
+def check_optional_id05_rng_c() -> str:
+    """Optional: compile/run portable ID05 RNG if a C compiler is present."""
+    import shutil
+    import subprocess
+
+    if shutil.which("cc") is None and shutil.which("clang") is None:
+        return "skipped (no C compiler)"
+    script = REPO_ROOT / "tools" / "qa" / "test_id05_rng_c.sh"
+    if not script.is_file():
+        return "skipped (missing test_id05_rng_c.sh)"
+    proc = subprocess.run(["bash", str(script)], capture_output=True, text=True)
+    if proc.returncode != 0:
+        fail(f"id05 RNG C harness failed: {proc.stdout}\n{proc.stderr}")
+    return "compiled+tested"
+
+
+def check_optional_ghidra() -> str:
+    import os
+
+    root = Path(os.environ.get("GHIDRA_INSTALL_DIR", "/Users/math/Sites/tests/ghidra_12.1.x"))
+    headless = root / "support" / "analyzeHeadless"
+    if not headless.is_file():
+        return "skipped (analyzeHeadless not found)"
+    return f"available ({root})"
+
+
 def main() -> int:
     checks = [
         ("runner-layout", check_runner_layout),
         ("loader-fixture", check_loader_fixture),
         ("replay-fixture", check_replay_fixture),
         ("mission-mvp-data", check_mission_mvp_data),
+        ("01a48-kind2-jsr-bytes", check_01a48_kind2_jsr_bytes),
+    ]
+    optional = [
+        ("optional-capstone", check_optional_capstone),
+        ("optional-id05-rng-c", check_optional_id05_rng_c),
+        ("optional-ghidra", check_optional_ghidra),
     ]
     try:
         for name, fn in checks:
             fn()
             print(f"PASS {name}")
+        for name, fn in optional:
+            detail = fn()
+            print(f"PASS {name}: {detail}")
     except AssertionError as exc:
         print(f"FAIL {exc}")
         return 1

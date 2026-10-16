@@ -18,4 +18,15 @@
 
 ## Godot SimCore
 
-**[MVP APPROXIMATION]** Per-tick **`param_2_entity_updates`** counts how many entities are updated with **`param_2 == 0`** vs **`1`** (four passes). Full **FUN_0000435a** is **not** ported; counts support ordering/RNG analysis.
+**[RECONSTRUCTED]** Gate + `+0xc` scale/clamp + kind2 poly `+0x1c` via `SimCore._apply_fun_0000435a`, called from:
+1. spawn `04e6e` followup (`param_2==0`)
+2. per-entity `FUN_000044a4` tick path (`_update_single_entity` → world_obj_ptr)
+3. `FUN_000046da` after factory `+8` (`param_2==1`) — `_046da_from_parent` and `_call_fun_000046da` (Pacific Conflict.c:5251)
+
+Scale/poly sources mocked (`spawn_0435a_scale_src`, `spawn_0435a_poly_srcs`).
+
+**[DEFERRED]** Real template stream base (`*(template+0xe)` / poly stream).
+
+**[RECONSTRUCTED]** `FUN_000044a4` type-5 flag tweak after `0435a` via `apply_044a4_type5_flags` / `mission_short_b0`.
+
+**[MVP APPROXIMATION]** Per-tick **`param_2_entity_updates`** counts how many entities are updated with **`param_2 == 0`** vs **`1`** (four passes). e792 slices still run after `044a4` in the same entity update (original callers differ).

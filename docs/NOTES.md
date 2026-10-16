@@ -13,6 +13,494 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Entries
 
+### 2026-10-16 — FUN_000046da → FUN_0000435a(param_2=1)
+
+- **[PROVEN]** Pacific Conflict.c:5251: after factory `+8`, `FUN_0000435a((char *)puVar1, 1)` then `03b98` / distance gate.
+- **[PROVEN]** param_2=1 skips kind2 poly `+0x1c` loop (5048: `*param_1==2 && param_2==0`); gate / `+0xc` scale still apply when phase `0 < a8 < 6`.
+- **Godot:** `_046da_from_parent` and `_call_fun_000046da` call `_apply_fun_0000435a(obj, 1)` before `03b98`; kind-3 rollup clears `deferred_0435a`.
+- **[DEFERRED]** Real `*(template+0xe)` scale source (still `spawn_0435a_scale_src`); `02bd8` on 05116/`_call_fun_000046da` path.
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_000046da tail (02bd8 / 03b98 / gate)
+
+- **[PROVEN]** Decomp 5236–5259: `02bd8(obj,1,0,0)`; factory `+8` if desc[1]≠0; `0435a`; `03b98`→`+0x10`; if `(metric−obj+0xc)<0x19c80` → `04e6e` else `d0e4[c1dc++]`.
+- **Godot:** wired in `_046da_from_parent`; `0435a` now wired (see entry above); factory aux from table shorts.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_000046da front half in kind-3 loop
+
+- **[PROVEN]** Decomp 5223–5235: desc from embed+`idx*0x18+0x2E`; `045ba`; `table+0x14=obj`; `+0x24=parent`; bump `+3` if idx equal; OR flags if `idx < parent+0x2c`.
+- **Godot:** `_046da_from_parent` + kind-3 loop; tail now includes `02bd8`/`03b98`/gate.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_00004e6e kind-3 child table
+
+- **[PROVEN]** Capstone `@0x5072–0x5106`: `d4a4[c1e0++]=obj`; `01a68(count*0x18)`→`obj+0x30`; copy/relocate from `*(obj+0x28)+0x1A`; `046da(obj,i,i)`×count; then `03b98`.
+- **Godot:** `_04e6e_kind3` reuses `_016e2_build_child_table`; `046da` front half wired.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_00004e6e kind-2 list + vertex alloc (016e2)
+
+- **[PROVEN]** Decomp ~5631–5643: kind2 → `b5a4[b734++]` or `d4a4[c1e0++]` from `obj+7` bit0; `01a48`×2 → `obj+0x4c/+0x44` size `(36+3a)*0xC`.
+- **Godot:** `_call_fun_00004e6e` replaces stub for `016e2` bdac/bda4; mock ptrs via `spawn_04e6e_*`.
+- **[DEFERRED]** kind3 child table; `04808`/`02bd8`/`0435a` follow-up on this path.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_00001c04 vertex buffer copy
+
+- **[PROVEN]** Capstone `@0x1C04–0x1C5A`: `count=*(s16*)(obj+0x36)+*(s16*)(obj+0x3a)`; copy `count`×`0xC` from `*(obj+0x44)` → `*(obj+0x4c)`.
+- **Godot:** `apply_01c04_plan`; `_call_fun_00001c04` writes `mem_u32` (wired from `016e2` after `04e6e(bda4)`).
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_00001be4 = FUN_00001ba8 mid-entry $1BE4
+
+- **[PROVEN]** Capstone `@0x1BA8–0x1C00`: `01ba8` grow-only realloc; `$1BE4` is mid-entry after `01b84` → `1a63e(old,new,cap)` + `019d0(old)` + return new. `016e2` LEA/JSR `$1BE4` (only site).
+- **[PROVEN]** Capacity: `*(p-4)==0xFF` → `(*(p-8)-1)*8`; else `(1<<*(p-4))-4`.
+- **Godot:** `apply_01ba8_capacity` / `need_grow` / `apply_01be4_tail` / `fun_0001a63e_copy_bytes`; harness `spawn_01be4_new_ptr`/`nbytes`.
+- **[DEFERRED]** Recover `016e2` A2/D2/D3 after `04e4e` (LEA clobbers A2); live `019d0` on mock objs.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_00004e06 / mid-entry $4E4E body
+
+- **[PROVEN]** Capstone: `$4E06` full fn (gate `bit1(obj+7)`, desc via `parent+0x28/+0x2E+idx*0x18`, copies `+18/1c/20/14`, `02bd8(obj,1,0,0)`); `$4E4E` is mid-entry (last copy+`02bd8`). `016e2` LEA/JSR `$4E4E`.
+- **[PROVEN]** Ghidra `FUN_00004e06` matches; phantom `FUN_00004e4e` is the mid-entry slice.
+- **Godot:** `apply_04e06_*` / `apply_04e4e_tail`; `_call_fun_00004e4e` runs full `04e06` effect on stack arg obj.
+- **[DEFERRED]** Live `02bd8` template walk when `obj+0x24≠0`; `01be4` body.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_000016e2 bda8/bda4/1b734 + bc28 window
+
+- **[PROVEN]** Capstone `@0x183E–0x18D4`: `bda8=*(bdac+0x48)`; `bda4=*(table+0x74)`; `04e6e`/`01c04(bda4)`; `clr.l 1b734`; `b88e=*(root+0x2C)-1`; `bc28/34/38` = child[i-1/i/i+1]; `b88c=i+1`; RTS.
+- **Godot:** `_016e2_publish_bda_tail`; stubs `last_01c04_calls`.
+- **[DEFERRED]** Hook bodies (`04e4e`/`01be4`/`04e6e`/`01c04`); real `01b6c`/`045ba` heap.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-15 — FUN_000016e2 bdb0/bdac + 04e4e/01be4 stubs
+
+- **[PROVEN]** Capstone `@0x17B4–0x1832`: `04e4e(bdb4)`/`01be4(bdb4)`; `bdb0=child[1]`; `04e4e(bdb0)` then `01be4(bdb4)` again; `bdac` from child[3] if `*(b5a0+0x90)==2` else child[2]+`04e6e`.
+- **Godot:** `_016e2_publish_bdb_hooks`; stub call logs `last_04e4e_calls` / `01be4` / `04e6e`.
+- **[DEFERRED]** Hook bodies; `bda8`/`bda4`; `bc28` window.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-15 — FUN_000016e2 per-child 04690 + bdb4
+
+- **[PROVEN]** Capstone `@0x176C–0x17AC`: `04690(*(table+i*0x18+0x14))` → store obj; `obj+0x24=root`; `obj+1/+2=index`; `DAT_0001bdb4=*(table+0x14)`.
+- **Godot:** `_016e2_resolve_children`; `apply_016e2_link_child` / `publish_bdb4`.
+- **[DEFERRED]** `04e4e`/`01be4` hooks; `bdb0`/`bdac` publish.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000016e2 child×0x18 table
+
+- **[PROVEN]** Capstone `@0x1704–0x1764`: `src=*(root+0x28)+0x1A`; `bytes=s16(root+0x2E)*0x18` via `LEA (A0,A0.L*2)`+`ASL #3`; `01a68` → `root+0x30`; copy 6 longs; `*(slot+0x14)+=*(b5a0+0x8C)`.
+- **Godot:** `apply_016e2_child_*`; `_016e2_build_child_table` in `init_mission_object_tables`.
+- **[DEFERRED]** Per-child `04690` + `obj+0x24=root`; `bdb4` publish.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000016e2 root 04690 → DAT_0001d6fc
+
+- **[PROVEN]** Capstone `@0x16EC–0x16FC`: `MOVE.L $8C(A0)` with `A0=DAT_0001b5a0`; `BSR.L $4690`; `MOVE.L D0,$1D6FC`.
+- **[PROVEN]** `04690` `@0x4690`: `045ba` → obj; byte `desc[1]` factory → `obj+8`; return obj.
+- **Godot:** `_call_fun_00004690`; `init_mission_object_tables` publishes `dat_0001d6fc`.
+- **[DEFERRED]** Child×`0x18` table; live byte-typed `1b524` factory on root; `bdb4` publish.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000016e2 → publish_00054_all
+
+- **[PROVEN]** Capstone `@0x16E6`: `BSR.L $54` → `overlay_init_template_pointer_tables` (disp target `0x54`).
+- **Godot:** `SimCore.init_mission_object_tables()` calls `publish_00054_all()`; sets `overlay_00054_published`.
+- **[DEFERRED]** (superseded: root `04690` now wired; child table still open).
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — 04690 indexes DAT_0001b524 by desc[1]
+
+- **[PROVEN]** Decomp/Capstone `04690`: `tmpl = DAT_0001b524[desc[1]]`; factory at `*(tmpl+6)`.
+- **Godot:** `apply_1b524_type_key`; SimCore default `spawn_1b524_type_key=-1` → use `desc[1]`; override ≥0 for tests.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00000054 Block D → DAT_0001b58c…1b59c
+
+- **[PROVEN]** Capstone `@0x2A4–0x332`: 5× `PEA $1A` / src `$1AAEA…$1AB52` → `MOVE.L D0,$68…$78(A5)` with `A5=$1B524`.
+- **Fixture:** `dat_00054_block_d_fixed_slots.json`.
+- **Godot:** `apply_00054_block_d`; SimCore `publish_00054_block_d()` / `publish_00054_all()` (A–D).
+- **[DEFERRED]** `FUN_00000032` mem copy; record schemas.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00000054 Block C → DAT_0001b524[key]
+
+- **[PROVEN]** Capstone `@0x256–0x2A2`: `LEA $1AA5E,A2`; 5× alloc/copy `0x1C`; `MOVEA.W (A2),A0` → `(A5,A0.L*4)` with `A5=$1B524`.
+- **[PROVEN]** ROM keys at record+0 are all `0` (five writes → slot 0; last wins).
+- **Fixture:** `dat_00054_block_c_keyed_1c.json`.
+- **Godot:** `apply_00054_block_c`; SimCore `publish_00054_block_c()`.
+- **[DEFERRED]** Block D (`1b58c…1b59c`).
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00000054 Block B → DAT_0001b540
+
+- **[PROVEN]** Capstone `@0xA2–0x252`: 16 fixed clones (15×`0x1A`, 1×`0x20` @`$1A988`) → `A5($1B524)+off` incl. `+0x1C`→`DAT_0001b540`.
+- **Fixture:** `dat_00054_block_b_fixed_slots.json`.
+- **Godot:** `apply_00054_block_b`; SimCore `publish_00054_block_b()` sets `dat_0001b540` for `115b0`.
+- **[DEFERRED]** Blocks C–D; `FUN_00000032` mem copy.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — 04690 factory resolve from tpl+6
+
+- **[PROVEN]** Capstone/decomp: `fn = *(DAT_0001b524[type]+6)` then `JSR` — install immediates live on the template, not a SimCore side-channel.
+- **Godot:** `apply_1b524_resolve_factory` (tpl+6 preferred, `spawn_1b524_factory_imm` fallback); `046da` no longer writes `tpl+6` at call time.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000115b0 factory (+046da wire)
+
+- **[PROVEN]** Capstone `@0x115b0–0x115d8`: `01b6c(0xa2)`; `*handle=obj`; `obj+4|=0x112000`; `MOVE.L $1b540.L,$4(A0)`.
+- **[PROVEN]** Install imm `#0x11590` @`0x115F0` → entry +`0x20` (same class as `16a1a`→`16a3a`).
+- **Godot:** `apply_115b0_factory`; SimCore opt-in via `spawn_1b524_factory_imm=#0x11590` + `dat_0001b540`.
+- **[DEFERRED]** Real `01b6c`; Block B publish of `DAT_0001b540`; `tpl+6` auto-resolve.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — SimCore 046da → FUN_00016a3a factory wire
+
+- **Godot:** `spawn_1b524_factory_imm` / `spawn_1b524_type_key`; when imm→`0x16A3A`, `046da` runs `apply_16a3a_factory` with `01a68(0x58)` as `01b6c` stand-in, writes `h+4`/flags/`+0x34`, installs `#0x16A1A` at `tpl+6`, then existing +8 clear/`aux`.
+- **Opt-in:** default imm=0 keeps mock `spawn_05116_entity_handle` (Mission 1 path unchanged).
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00016a3a factory (+0x20 install fixup)
+
+- **[PROVEN]** Capstone `@0x16AB2`: `MOVE.L #$16a1a, 6(A0)` — immediate lands mid-instruction inside prior function; real entry `LINK.W` @`0x16a3a` (`FUN_00016a3a`). Same delta for `#0x11590` → `@0x115b0`.
+- **[PROVEN]** `FUN_00016a3a` `@0x16a3a–0x16a76`: `01b6c(0x58)`; `*handle=obj`; `obj+4|=0x12000`; `clr.w obj+0x34`; `handle+4=DAT_0001b524[type]`; return handle.
+- **Godot:** `apply_1b524_factory_entry_addr`, `apply_16a3a_factory` (01b6c deferred — caller handle).
+- **[DEFERRED]** Wire into `04690` call path; port `FUN_000115b0`; real `01b6c`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00000054 Block A → DAT_0001b524 publish
+
+- **[PROVEN]** Capstone `@0x54–0xA0`: Loop 4× — `LEA $1A48` (stand-in→`01a68`) alloc `0x4A`, `FUN_00000032` copy from static `@0x1A790` step `0x4A`, `MOVEA.W (A2),A0` then `(A5,A0.L*4)` with `A5=DAT_0001b524`.
+- **[PROVEN]** ROM keys: `0x5858`, then three `0x0999` (last write wins for that slot).
+- **Fixture:** `hellcats/tests/fixtures/dat_00054_template_records_4a.json` (file `0x1a790`).
+- **Godot:** `load_00054_template_records_4a`, `apply_00054_publish_slot`, `apply_00054_first_loop(_record)` — alloc via live `01a68`; copy body deferred (bytes retained on step).
+- **[DEFERRED]** Blocks B–D; `FUN_00000032` byte copy into mock mem; factory bodies at `+6`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — Large 019d0 adjacent coalesce (+1b524 factory slot)
+
+- **[PROVEN]** Capstone `0x1A08–0x1A42`: if free block touches next → absorb words; if touches prev → merge into prev (+`01a48` cursor deferred).
+- **Godot:** `apply_019d0_free_large` merges adjacent `large_free` nodes; realloc can reuse without `0199a`.
+- **[PROVEN]** Runtime installs factories via `*(DAT_0001b524[type]+6)=addr` (e.g. `#0x16A1A` @`0x16AB2`); file image of `1b524` is not the live table (`FUN_00000054` publishes).
+- **Godot:** `apply_1b524_set_factory` records the +6 write (no factory body yet).
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004690 / 046da vtable +8
+
+- **[PROVEN]** Capstone `@0x46A2–0x46D0`: if `desc[1]≠0`, `JSR *(DAT_0001b524[type]+6)(obj,type,0)` → `obj+8`; if handle≠0 then `CLR.L (handle)`.
+- **[PROVEN]** `046da` `@0x5237–0x5248`: same +8; factory arg3=slot short; copy slot+2/+4/+6 → handle+0x20/22/24.
+- **[DEFERRED]** Real `DAT_0001b524` factory bodies — SimCore uses `spawn_05116_entity_handle` as handle.
+- **Godot:** `apply_04690_vtable_plus8` / `apply_046da_factory_plus8`; wired in `_call_fun_000046da`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — $1A48 is heap_free epilogue (D0 mystery)
+
+- **[PROVEN]** Capstone `0x19D0–0x1A66`: `FUN_000019d0` ends at `$1A48` (`MOVE.L A1,$20C60` → `BRA $1A64` → `MOVEA.L (A7)+,A2` → `RTS`).
+- **[PROVEN]** Kind2 `@0x4ED8` and `@0xB572` `LEA $1A48` then `JSR`, then `MOVE.L D0,…` (malloc convention).
+- **[PROVEN]** Real alloc `@0x1A68`: `MOVEM D2-D3/A2`; size at `$10(a7)`; returns payload in D0 — **`$1A48+0x20`**.
+- **[INFERRED]** LEA immediates off-by `0x20` (point at free epi instead of `heap_alloc`); Godot stand-in `01a68` matches call convention.
+- **QA:** `01a48-kind2-jsr-bytes` locks kind2, B572, free epi, and alloc prologue bytes.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — Capstone: kind2 JSR → $1A48 ≠ heap_alloc
+
+- Superseded by `$1A48` free-epilogue entry above (same evidence, fuller chain).
+
+### 2026-10-15 — SimCore 04e6e +0x4c/+0x44 via 01a68
+
+- **[PROVEN]** Capstone size `(s16+36+s16+3a)*0xC` for both vertex pools (5640–5643).
+- **[PROVEN]** Capstone JSR target is `$1A48` (cursor), not `$1A68`; SimCore uses `apply_01a68_alloc` as heap_alloc stand-in (see Capstone entry above).
+- **Godot:** `heap_01a68` for `+0x4c` then `+0x44`; `spawn_04e6e_use_mock_ptrs` opt-out.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — SimCore 04808 wires FUN_00001a68
+
+- **[PROVEN]** C `04808`: `01a68(buf_bytes)` → `obj+0x48`; per poly `01a68(count<<1)` → record `+0x18`.
+- **Godot:** `SimCore.heap_01a68` + `apply_01a68_alloc` in spawn path; `spawn_04808_use_mock_ptrs` keeps old fixed mocks for opt-out.
+- **[PROVEN]** Fixture: 78-byte buf → large/`0199a`; index heaps distinct small-bin payloads.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0000199a + 01a68 large take/split
+
+- **[PROVEN]** `0199a` (2043–2059): `01958(words<<3)`; store words; tag `0xff`; free payload into large ring.
+- **[PROVEN]** `01a68` large (2163–2191): `words=(n+7)>>3+1`; exact unlink or shrink+carve at `addr+remain*8`; payload `+8`.
+- **[SIMPLIFIED]** Large ring is an array (no full circular coalesce / `01a48` cursor).
+- **Godot:** `apply_0199a_fresh_large` / `apply_01a68_large_alloc` / `apply_019d0_free_large` / `apply_01a68_alloc`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — DAT_00020c64 small freelist pop/push
+
+- **[PROVEN]** `01a68` (2157–2160): if `20c64[bin]` non-null → head=`*head`, tag byte=`bin`, return `head+4`.
+- **[PROVEN]** `019d0` small (2117–2121): `header=payload-4`; `*header=old_head`; `20c64[bin]=header` (LIFO).
+- **[DEFERRED]** Large `019d0` coalesce (`header==-1`); `0199a`; SimCore live heap wiring.
+- **Godot:** `apply_01a68_small_alloc` / `apply_019d0_free_small` on bump+freelist state.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00001974 fresh small-bin (+01958 bump)
+
+- **[PROVEN]** `01958` (2013–2021): `block = heap_base + DAT_00020c50`; cursor `+= grow`.
+- **[PROVEN]** `01974` (2025–2039): `grow=1<<(bin&0x3f)`; header byte=`bin`; payload=`block+4`. Called when `DAT_00020c64[bin]` null.
+- **[DEFERRED]** Freelist pop; `0199a` large; `0xffffffff` failure; SimCore live heap.
+- **Godot:** `apply_01958_heap_bump` / `apply_01974_fresh_small_bin` / `apply_01a68_fresh_small_from_request`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00001a68 size-class routing
+
+- **[PROVEN]** `Pacific Conflict.c:2148–2164`: `rounded=(n+7)&~3`; bin loop from `((rounded-1)>>2)` starting at 2; `<6` → small bin; else `large_words=(n+7)>>3+1`.
+- **[PROVEN]** Examples: req 10→bin4/cap12; `0x18`→bin5/cap28; `0x40`→large words9; `0x52`→words12.
+- **[DEFERRED]** Freelist `DAT_00020c64`/`20c60`, `01974`/`0199a`, real payload return; `01a48` ABI.
+- **Godot:** `apply_01a68_round_bytes` / `apply_01a68_route` / `apply_01b38_zero_bytes` (size only).
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00002d10 null-aux always-0253e
+
+- **[PROVEN]** `Pacific Conflict.c:3387–3439`: always `0253e`→`02ada`→`01c5c` per node; no angle gate; no `+0x34` shift; commit when both aux null (same as `02bd8`).
+- **[PROVEN]** Sole caller `FUN_000168d2` (UI/menu paths) — not spawn `04e6e`→`02bd8`.
+- **[DEFERRED]** Both-aux mesh path; real `+0x30`/`byte@+2` slot indexing; `168d2`/`01b6c` wiring.
+- **Godot:** `apply_02d10_null_aux_node` / `_walk`; epilogue reuses `apply_02bd8_null_aux_commit`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — DAT_0001b190 ROM band table
+
+- **[PROVEN]** 40× `int32` BE @ file `0x1b190` in `Pacific Conflict` (255360); `DAT_0001b18c[s]` ≡ `table[s−1]`.
+- **[PROVEN]** Indices 0–7 header/sentinel; monotonic thresholds from index 8 (`40041`…`100000000`).
+- **[PROVEN]** `03da8` with `field_30=0`, `param_2=0x10` → band **3** (mock previously → 1).
+- **Godot:** fixture `dat_0001b190_band_table.json`; `FlightMath.load_dat_0001b190_table()`; `SimCore` loads in `_init`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0000253e 3-angle attitude matrix
+
+- **[PROVEN]** `0253e` = `0202a(a,b,c,0)` → `024f8` (`020e6` then `01d02(Rz,Rx)`→`01d02(temp,Ry)`).
+- **[PROVEN]** Numeric ≡ `025a8(0,a,b,c)` when fourth angle is 0.
+- **[RESOLVED — see 2026-10-15 tag map]** `DAT_00020ce4` stores a code address; JSR'd by `invoke_tagged_attitude_compose_neg_sins{4,6}`.
+- **Godot:** `fun_000024f8` / `fun_0000253e`; `02bd8` rotate path builds matrix from slot angles when no fixture `matrix9`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00002ada matrix×vec3 (>>12, no +0x800)
+
+- **[PROVEN]** Capstone `@0x2ADA–0x2BBA`: expand s16[9] → s32; for each int32 vec3, column-dots `>>12` (no `+0x800`, unlike `028dc`).
+- **[PROVEN]** `02bd8` rotate path: `0253e` then `02ada` (fixture `matrix9` optional override).
+- **Godot:** `fun_00002ada`; wired into `apply_02bd8_*_node`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000044a4 type-5 flags ±0x40
+
+
+- **[PROVEN]** Pacific Conflict.c:5083–5089: if `*(obj+8)!=0` and `**(short**)(entity+4)==5`, then `*(b5a0+0xb0)==0` → `flags_04|=0x40`, else `&=~0x40`.
+- **Godot:** `apply_044a4_type5_flags`; `SimCore._apply_fun_000044a4` (0435a then type-5); `mission_short_b0`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0000435a on tick FUN_000044a4
+
+- **[PROVEN]** Pacific Conflict.c:5082: `FUN_000044a4` calls `FUN_0000435a(param_1, param_2)` before the type-5 flag tweak.
+- **[RECONSTRUCTED]** `SimCore._update_single_entity` runs `_apply_fun_000044a4` when the entity has a world obj.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00002bd8 both-aux 01c5c + field_34 shift
+
+
+- **[PROVEN]** Pacific Conflict.c:3367–3371: when mesh and verts both non-null, `01c5c(count, mesh, verts, dx<<(field_34&0x3f), ...)`; then `param_3 ← param_4` for next node.
+- **[DEFERRED]** `0253e`/`02ada` when node shorts nonzero; real chain `+0x24`/`+2` table index.
+- **Godot:** `apply_02bd8_shifted_deltas`, `apply_02bd8_both_aux_node`/`_walk`; `SimCore` both-aux path when mesh+verts set.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00001c5c + 02bd8 null-OR template walk
+
+- **[PROVEN]** `FUN_00001c5c` (2313–2331): for `count` vec3s, `dst = src + (dx,dy,dz)`.
+- **[PROVEN]** `FUN_00002bd8` (3347–3360): node needs rotate if any of `+2/+4/+6` shorts nonzero; null-OR aux path calls `01c5c(1, local, local, +8/+c/+10)` when !rotate.
+- **[DEFERRED]** `0253e`/`02ada` rotate path; chain link via `+0x24`/`+2`.
+- **Godot:** `apply_fun_00001c5c`, `apply_02bd8_null_aux_node`/`_walk`; `SimCore.last_02bd8_walk`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0000435a kind2 poly +0x1c loop
+
+
+- **[PROVEN]** Pacific Conflict.c:5048–5071: when kind==2 and `param_2==0`, for each poly write `buf+0x1c` from `*(stream+10)`: player→`*5`, else half or `*iVar4`; stride `0x20`; stream `+0x0E+count*2`.
+- **[DEFERRED]** Real stream base (`b5a0+0x8c` + template offset + `0x22+(1a+1e)*0xc`); `DAT_0001b738` player compare.
+- **Godot:** `apply_0435a_poly_1c_value` / `apply_0435a_poly_1c_loop`; `SimCore` overwrites `04808` buf `+0x1c`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0000435a gate + +0xc scale
+
+- **[PROVEN]** Pacific Conflict.c:5018–5046: enter if `(+7)&2==0` and `0 < *(b5a0+0xa8) < 6`; scale `iVar4 = phase-1` or `1` if `(+5)&2`; skip `+0xc` when `==1000000000`; else half/`*iVar4` from `*(tpl+0xe)`; kind2 clamp to `0x42B209` when `>(and +6 bit4 clear)`.
+- **[DEFERRED]** real template `+0xe` via `b5a0+0x8c` chain.
+- **Godot:** `apply_0435a_gate` / `apply_0435a_scale_factor` / `apply_0435a_field_0c`; `SimCore.last_0435a`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00003da8 distance-band index
+
+
+- **[PROVEN]** Pacific Conflict.c:4675–4697: `s=*(obj+0x30)`; compare `param_2` to `DAT_0001b190[s]` / `DAT_0001b18c[s]`(=`table[s-1]`); in-band → return 0; else walk ± and write `+0x30`, return 1.
+- **[PROVEN]** ROM table imported via `hellcats/tests/fixtures/dat_0001b190_band_table.json` (see 2026-10-15 entry).
+- **Godot:** `apply_fun_00003da8`; wired after post-`02bd8` followup with `param_2=*(obj+0x10)`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004e6e post-02bd8 → 0435a / 03da8
+
+- **[PROVEN]** Pacific Conflict.c:5657–5658: after `02bd8` on kind2 fall-through, `FUN_0000435a(obj, 0)` then `FUN_00003da8(obj, *(obj+0x10))`.
+- **[DEFERRED]** Body of `0435a`; `02bd8` template walk; alt paths when bit4 set on `+5/6/7`.
+- **Godot:** `apply_04e6e_post_02bd8_followup`; `SimCore.last_04e6e_followup`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004808 (obj+6)&2 trailer
+
+
+- **[PROVEN]** Pacific Conflict.c:5306–5311: if `(obj+6)&2`, at `*(+0x48)+field_3a*0x20` write u16 `0 .. field_38-1`.
+- **[PROVEN]** Buffer size already included trailer region via `apply_04808_buffer_bytes` bit1 extras.
+- **Godot:** `apply_04808_bit1_trailer`; `SimCore` writes trailer words after poly loop.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004808 multi-poly loop
+
+- **[PROVEN]** Capstone `@0x4858–0x48E4`: loop `i=0..field_3a-1`; record stride `0x20`; after each poly `param_2 += 0x0E + count*2`.
+- **[PROVEN]** Per poly: header fill + `01a68(count<<1)` → `+0x18` + index copy (already ported).
+- **[DEFERRED]** real `01a68` heap identity.
+- **Godot:** `apply_04808_stream_advance`, `apply_04808_poly_loop`; `SimCore` fills N polys from desc stream.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00002bd8 null-aux +18/+1c/+20 commit
+
+
+- **[PROVEN]** Pacific Conflict.c:3377–3381: when `param_3==0` and `param_4==0`, write locals → `obj+0x18/+0x1c/+0x20`. Does **not** touch `+0x44`.
+- **[PROVEN]** Empty template chain (`+0x24==0`): loop skipped → locals unchanged (identity commit).
+- **[PROVEN]** `04e6e` call passes non-null mesh/`+0x44` → commit skipped on that path.
+- **[DEFERRED]** Template walk / `0253e` / `02ada` / `01c5c` mutating locals before commit.
+- **Godot:** `apply_02bd8_null_aux_commit`; `SimCore.last_02bd8_commit`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004e6e → 02bd8 flag gate
+
+- **[PROVEN]** Capstone `@0x4F4A/4F88/4FEE`: `FUN_00002bd8` only when bit4 clear on `obj+5`, `+6`, and `+7`.
+- **[PROVEN]** Args `@0x502E–0x503A`: `(obj, s16(36)+s16(3a), mesh_base, *(obj+0x44))`.
+- **[DEFERRED]** `FUN_00002bd8` template walk; `01c5c`/`0435a` alt paths; `04808` multi-poly.
+- **Godot:** `apply_04e6e_02bd8_gate`, `apply_04e6e_02bd8_args`; `SimCore.last_02bd8_*` after `04808`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004808 index-word alloc + copy
+
+
+- **[PROVEN]** Capstone `@0x48A2–0x48B0`: `01a68(s16(count)<<1)`; ptr → poly `+0x18`. Count = poly `+0x14` (= desc byte `@8`).
+- **[PROVEN]** `@0x48B8–0x48CE`: copy `count` u16 words from desc `@+0x0E`; stream advances `0x0E+count*2`.
+- **[PROVEN]** Post-`04808` `02bd8` gate `@0x4F4A/4F88/4FEE`: bit4 clear on `obj+5/6/7`; args `(obj, 36+3a, mesh, +0x44)`.
+- **[DEFERRED]** Multi-poly loop iterations; bit1 trailer `@0x48E6+`; flag-gated `02bd8` wire.
+- **Godot:** `apply_04808_index_alloc_bytes`, `apply_04808_index_words`; `SimCore` mock index heap + first-poly copy.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004808 buffer size + one poly record
+
+- **[PROVEN]** Capstone `@0x4814–0x483A`: buffer bytes = `s16(+0x3a)*0x20`; if `(obj+6)&2` then `+= s16(+0x3a)*6 + s16(+0x38)*2`. Result ptr → `obj+0x48` via `01a68` (mocked).
+- **[PROVEN]** `@0x4858–0x4898`: first poly record stride `0x20`: `+8=0`; `+0xc←u32@0`; `+0x10..13←bytes@4..7`; `+0x14←u16(byte@8)`; `+0x16←byte9&0xf0`; `+0x17←byte9&0x0f`; `+0x1c←u32@0xa`. Then `DAT_0001daa2=1`.
+- **[DEFERRED]** Multi-poly loop; flag-gated `02bd8`/`01c5c`/`0435a`.
+- **Godot:** `apply_04808_buffer_bytes`, `apply_04808_poly_record`; `SimCore` sets `+0x48`, optional first record, `dat_0001daa2`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00004e6e kind2 list + alloc size (5631–5643)
+
+- **[PROVEN]** Capstone `@0x4E8E–0x4EBE`: `(obj+7)&1` → `DAT_0001d4a4[c1e0++]`; else `DAT_0001b5a4[b734++]`.
+- **[PROVEN]** `@0x4EC4–0x4ED6`: `01a48` size = `(s16(+0x36)+s16(+0x3a))*0xC` (stack arg; Ghidra omitted). Both `+0x4c` and `+0x44` use that size.
+- **[DEFERRED]** `FUN_00004808` index-word / multi-poly; flag-gated `02bd8`/`01c5c`/`0435a`.
+- **Godot:** `apply_04e6e_kind2_list_select`, `apply_04e6e_kind2_alloc_bytes`; `dat_0001b5a4_world` / `dat_0001d4a4_world`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00001d56 call-site ≡ FUN_00001d76 (sin)
+
+- **[PROVEN]** Capstone `@0xF4A2`: `LEA $1d56; JSR`; `$1d56` is matrix-mul epilogue mid-label; real sin is `@0x1D76` (**+0x20**, same pattern as `$2DE8`→`$2E08`). Zero absolute refs to `$1d76`; five to `$1d56`.
+- **[PROVEN]** Arg = `local_28`/`pos_20` angle; D0 = sin-table lerp (`DAT` usable base file `0x1ab8c`). Twin: `$1db8`→`$1dd8` cos.
+- **[RECONSTRUCTED]** `fun_00001d56_callsite` → `fun_00001d76`; `apply_lab_0000f47c` uses it (removed `0x1000` stand-in).
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — Contact 61a/61e → pos_20 / field_24 (14095–14101)
+
+- **[PROVEN]** Capstone `@0xE864–0xE894`: two `LEA $11544; JSR` → `61e += D0&0x7f`; `field_24 = (field_24+61e)&0x3fff`; `61a -= D0&0x7f`; `pos_20 = (pos_20+61a)&0x3fff`; clear `669`; bra exit.
+- **[RECONSTRUCTED]** Ghidra `param_1+9/+8` are uint* slots → offsets `0x24`/`0x20` (`field_24`/`pos_20`), not attitude_22.
+- **Godot:** `apply_contact_61a_61e_attitude`; wired in `SimCore._apply_ground_contact_early_out`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — Capstone: FUN_00003b98 camera-relative abs axes
+
+- **[PROVEN]** Capstone `@0x3B98`: `a0=*(obj+0x18)−DAT_0001d838` (then `+0x1c/−d834`, `+0x20/−d830`); push; `JSR` abs; combine; `MOVE.L D0,$10(A3)`.
+- **[PROVEN]** Real abs is `FUN_00002e08` `@0x2E08` (`MOVE.L 4(A7),D0; BGE; NEG; RTS`). Call sites `LEA $2DE8` hit a **false mid-label** inside `FUN_00002d10` epilogue (0x20 bytes before abs); same stack ABI as `02e08`.
+- **[RECONSTRUCTED]** Godot: `apply_03b98_camera_abs_axes` + `dat_0001d838/834/830`; derives axes from world pos unless override set.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green. Binary: `Hellcats/Pacific Conflict` (255360).
+
+### 2026-10-15 — FUN_00003b98 metric combine (4522–4544)
+
+- **[RECONSTRUCTED]** `metric = max(a,b,c) + ((sum of other two) >> 2)`; writes `obj+0x10`; D0==metric (twin `FUN_00003c00` returns same).
+- **Godot:** `apply_fun_00003b98`; `SimCore` writes `+0x10` then feeds gate.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — world+0x44 via 046da→04e6e gate (5252–5258, 5640–5643)
+
+- **[PROVEN]** `FUN_00002bd8` does **not** write `+0x44` (updates `+0x18/+0x1c/+0x20` only when both aux ptrs null).
+- **[RECONSTRUCTED]** After `0435a`, `(FUN_00003b98_D0 − obj[+0xc]) < 0x19c80` → `FUN_00004e6e`; else push onto `DAT_0001d0e4[]`.
+- **[RECONSTRUCTED]** `04e6e` kind 2: `+0x4c = FUN_00001a48(); +0x44 = FUN_00001a48()` (real `01a48` ABI still BLOCKED — mock ptrs).
+- **[INFERRED]** `03b98` Ghidra-void; callers use D0 — harness `spawn_046da_03b98_metric` stand-in.
+- **Godot:** `apply_046da_04e6e_distance_gate`, `apply_04e6e_kind2_vertex_ptrs`; `05116` gate reads `mem[world+0x44]`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000045ba kind 2/3 field copy (5149–5190)
+
+- **[RECONSTRUCTED]** Kind 2 → size `0x52`: copy desc coords/flags/shorts; `obj+0x38` defaults to 1 when desc+0x1c==0; `obj+0x40=DAT_0001b838`. Kind 3 → size `0x34` + desc back-pointer at `+0x28`.
+- **[DEFERRED]** Real `FUN_00001b6c` heap; other kind tags; `+0x44` (not written by 045ba); vtable factory at `+8` (`046da`/`04690`).
+- **[INFERRED]** Mock world pointer still from `spawn_05116_world_obj`; `+8`/`+0x44` still mock-installed after identity stores.
+- **Godot:** `apply_045ba_from_desc`; `SimCore._call_fun_000046da` applies fields before identity.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_000046da identity stores (5227–5235)
+
+- **[RECONSTRUCTED]** After `045ba` / slot+0x14 publish: `world+0x24=DAT_0001d6fc`; `+1=template`; `+2=slot`; if `slot==tpl` then `+3++`; if `tpl<*(pool+0x2c)` then `*(u32*)(world+4)|=1`.
+- **[DEFERRED]** `FUN_000045ba` alloc; vtable install at `+8`; `02bd8` / `0435a` / `03b98` / `04e6e`.
+- **[INFERRED]** Mock still supplies `world+8` entity handle and `+0x44` gate (not written by 046da body).
+- **Godot:** `apply_046da_identity_stores`; `SimCore._call_fun_000046da`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00001ba8 grow-by-10 in FUN_00005116
+
+- **[RECONSTRUCTED]** `FUN_00001ba8` (2252–2271): grow-only realloc; if capacity < request → alloc+zero (`01b84`), copy old capacity (`1a63e`), free old (`019d0`).
+- **[RECONSTRUCTED]** `05116` full pool (5726–5731): `01ba8(table,(count+10)*0x18)`; `*(d6fc+0x30)=new`; `*(d6fc+0x2e)+=10`; fill slot at old count.
+- **[INFERRED]** Flat `mem_u32` model copies logical slots and zeros +10; real heap header capacity / `01b84`/`019d0` deferred.
+- **Godot:** `grow_05116_request_bytes` / `apply_01ba8_05116_grow`; `SimCore._grow_05116_table`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00019430 0xd vertex scale loop
+
+- **[RECONSTRUCTED]** `FUN_00019430` (23098–23110): `vert_base=*(world+0x44)`; for `i` in `0..0xc`: in-place `x/y/z>>=3` at `vert_base+i*0xc`; `entity+0x622+i*4=x*0x1c6`, `+0x656+i*4=y*0x1c6`, `+0x68a+i*4=z*0x255`.
+- **[INFERRED]** `world+0x44` doubles as 05116 success gate (nonzero) and vertex table pointer.
+- **Godot:** `apply_fun_00019430_vertex_loop`; `EntityState.vertex_scale_622/656/68a`; wired in `_call_fun_00019430`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0001a63e matrix copy into entity+0x40
+
+- **[RECONSTRUCTED]** `FUN_0001a63e` (23890–24010): general memmove `src→dst`, nbytes in arg3. `15bf6` call uses immediate `0x12` (Ghidra `&DAT_00000012`) = 18 bytes = 9×s16.
+- **[RECONSTRUCTED]** Godot: `fun_0001a63e_copy_matrix9` (forward non-overlap path only); `EntityState.attitude_matrix_40`; wired after `15bf6` spawn field writes.
+- **[DEFERRED]** Full overlap/backward memmove; longword fast path for `n>0x19`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_0000262e / 021e0 wired into 15d20→15bf6
+
+- **[RECONSTRUCTED]** `FUN_000021e0`: X-axis basis `[1,0,0; 0,c3,-s3; 0,s3,c3]` (twin of `021a0`).
+- **[RECONSTRUCTED]** `FUN_0000262e` (2970–2976): `0202a(p2,p3,p4,p1)` → `020e6` → `021e0` → `02562` (same product as `025a8` with X-axis 4th).
+- **[RECONSTRUCTED]** `15d20` builds matrix via `0262e(yaw_arg,pos_20,att22,field_24)`; `15bf6` runs `028dc` on locals before 11544 RNG.
+- **[RECONSTRUCTED]** `1a63e` → `entity+0x40` — see entry “FUN_0001a63e matrix copy…”.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00015bf6 / 15d20 spawn path (028dc/1a63e deferred)
+
+- **[RECONSTRUCTED]** `FUN_00015bf6` (20088–20128): `local_6=(speed>>4)+0x2015`; three 11544 draws perturb locals; `05116(DAT_0002664a, xyz+locals>>2, 0…)`; on success write `state_32=a<<4`, `+8/+c/+10=locals>>2`, `field_38=0`, `count_3a=(param_2==0)?1:2`.
+- **[RECONSTRUCTED]** `FUN_00015d20` (20133–20141) → `15bf6(..., param_2=1, …)`; player latch `short*[0x1b]=1` (`field_36`).
+- **[RECONSTRUCTED]** `0262e`/`028dc` into locals — see entry “FUN_0000262e / 021e0…”. `1a63e` still deferred.
+- **Godot:** `apply_15bf6_local_perturb` / `apply_fun_00015bf6_spawn_fields`; `SimCore._call_fun_00015bf6` / `_call_fun_00015d20`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
+### 2026-10-15 — FUN_00019430 post-spawn writes (vertex loop deferred)
+
+- **[RECONSTRUCTED]** `FUN_00019430` (23077–23114): `05116(DAT_00026780, xyz, att, 0)` → `entity=*(world+8)`; `field_610=DAT_0001b838` (u32); `field_614=param_1`; `+0x20/22/24`; `field_618=7`; `field_61c=0x62`.
+- **[DEFERRED]** 0xd vertex `>>3` / `*0x1c6`/`*0x255` loop over `*(world+0x44)`; `FUN_0001a63e`.
+- **Godot:** `apply_fun_00019430_spawn_fields`; `SimCore._call_fun_00019430` (pool or entity fixture); player `DAT_0001b87c`.
+- **Validation:** Godot **13 passed, 0 failed**; Python QA green.
+
 ### 2026-10-15 — FUN_00012840 wired through FUN_00005116 pool
 
 - **[RECONSTRUCTED]** When `*(DAT_0001d6fc+0x30)` and slot count > 0: `12840` calls `05116(DAT_00026280, xyz, att, 0)`, then `entity=*(world+8)`, then post-spawn field writes (17551–17571).
@@ -40,7 +528,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[INFERRED]** Call-site “FUN_00011544” ≡ one `FUN_00011564` draw (D0 = `sum>>16`). Executing `$11544` literally would be 10k draws + unbalanced MOVEM — not viable per tick. Godot: `RngOverlay11564.fun_00011544_callsite()` → `next()`.
 - **[RECONSTRUCTED]** `flags_685&2` ammo tail (14721–14734): first callsite draw; if `(d0&0x3f)==0` second draw; if `(d1&1)==0` or `67d==0` then `67e--` if nonzero else `67d--`. Godot: `apply_e792_flags685_bit2_tail` / `SimCore._apply_e792_flags685_bit2_tail`.
 - **[RECONSTRUCTED]** Grounded `@` (0x40): two callsite draws → `field_18c += (d0&0x7f)`, `uVar13=(d1&0x7f)-0x40` with speed scale; optional third `11564` for `b854` when player/`b856==0`/speed≥`0x2d1` (14537–14555).
-- **[DEFERRED]** Contact-path `0x61a`/`0x61e` attitude writes via 11544 (bad decomp / separate sites).
+- **[DONE]** Contact-path `0x61a`/`0x61e` → `pos_20`/`field_24` via 11544 — see entry “Contact 61a/61e…”.
 - **Validation:** Godot **13 passed, 0 failed**; `python3 tools/qa/test_regression.py` green. Mission 1 / `FlightModelMvp` unchanged.
 
 ### 2026-10-15 — FUN_00011564 overlay RNG fixture (not yet SimCore)
@@ -126,7 +614,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 ### 2026-10-15 — LAB_0000f47c yaw epilogue
 
 - **[RECONSTRUCTED]** LAB_0000f47c (14606–14629): clear `field_63f`; commit `pos_20`/`attitude_22` from `local_28`/`local_2a`; `field_24 = (uVar13 + e40c(local_2a−att22)*scale>>12) & 0x3fff`; `movement_62a = iVar20`; player ring `DAT_0001bc8c[0x78]` / `bc80` / `bc84` with clamp ±`0x1d80`. Godot: `apply_lab_0000f47c`.
-- **[UNKNOWN]** `FUN_00001d56` Ghidra body unusable; `SimCore.fun_00001d56_scale` default `0x1000` (fixed-point 1.0 stand-in).
+- **[DONE]** `FUN_00001d56` call-site ≡ `FUN_00001d76` — see entry “FUN_00001d56 call-site…”.
 - **Validation:** `test_flight_math.gd` (`_test_lab_0000f47c`); `test_sim_tick_ordering.gd` (`_test_fun_0000e792_lab_0000f47c`).
 
 ### 2026-10-15 — grounded field_0b RNG tails (11564)
@@ -398,3 +886,47 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[UNKNOWN]** Exact original keycode-to-keyboard-layout mapping for all `param_1` values; we have direct codepoint evidence for many keys, but not a full authoritative table per platform layout.
 - **[UNKNOWN]** Exact historical training mission script/scoring thresholds/objective timing text.
 - **[UNKNOWN]** Exact semantic names for movement accumulators `0x66e`, `0x672`, `0x66a` (axis/control-surface identity).
+
+### 2026-10-15 — DAT_00020ce4 attitude compose tags ($2408 / $2468 / $26e0)
+
+Writers (MOVE.L #imm, $20CE4.L):
+- `finalize_attitude_matrix_3ang` @0x2500 → **$2408**
+- `compose_attitude_matrix_x` @0x25E2 → **$2468**
+- `compose_attitude_matrix_6ang` @0x2660 → **$26e0**
+
+Consumers: `invoke_tagged_attitude_compose_neg_sins4` / `_sins6` — NEG.W sin scratch, then `MOVEA.L $20CE4; JSR (A0)`.
+
+**[PROVEN] landings (Capstone):**
+| Tag | Enclosing LINK | Landing instruction | Meaning |
+|---|---|---|---|
+| `$2408` | `build_attitude_matrix_from_dir_roll` @0x229E | `pea.l -$24(a6)` mid matmul setup | Mid-body at first matmul; locals already filled — **not** a clean public entry |
+| `$2468` | `build_attitude_matrix_3ang_alt` @0x2464 | `clr.l -(a7)` (= push angle4=0) | **Entry+4**: skips LINK; expects live A6 frame with angles at `$8/$c/$10`, out at `$14` |
+| `$26e0` | `build_attitude_matrix_6ang` @0x26CC | `bsr.w $202a` | **Entry+$14**: after LINK + four angle pushes; expects those four longs already on stack + live A6 |
+
+**[STRONG INFERENCE]** `$2468` / `$26e0` are intentional secondary entries for re-running the matching build after sin negation, reusing an existing A6/stack setup.
+
+**[PROVEN callsite @0xA890]** Enclosing `LINK @0xA75E` still live; `build_attitude_matrix_3ang` set tag `$2408`; invoke arg=`$1d72c`. A6 is **not** `build_attitude_matrix_from_dir_roll`'s frame ⇒ literal mid-`0229e` entry cannot use the expected locals.
+
+**[PROVEN]** `$2408 = finalize_attitude_matrix_3ang_alt (@0x2428) − 0x20`.
+
+**[STRONG INFERENCE]** Stored tag is another +0x20 false address; intended JSR target is `finalize_attitude_matrix_3ang_alt` (refill bases from negated global sins → rewrite out matrix). Same family as `$E352`→`isqrt_floor`.
+
+**[PROVEN callsite @0x66F6]** After `build_attitude_matrix_6ang` (tag `$26e0`); invoke_neg_sins6(`$1d744`). Tag `$26e0` is mid-wrapper at `BSR 0202a` without the four angle pushes — stack contract for a literal JSR is also unsatisfied; intended target may be `compose_attitude_matrix_6ang` `@0x2654` [HYPOTHESIS].
+
+**Next:** annotate `FUN_0000229e`; verify A6 at @0xA890.
+
+
+### 2026-10-15 — False mid-label +0x20 family (`$E352` → `isqrt_floor`)
+
+**[PROVEN]** Real `isqrt_floor` entry is `@0xE372` (MOVEM… binary search … RTS).
+
+**[PROVEN]** `$E352 = $E372 − 0x20`. Bytes at `$E352` sit inside the preceding routine’s `BSR.W` displacement (`@0xE350: 61 00 FF 52`); Capstone-from-`$E352` yields nonsensical `FRESTORE`, not isqrt.
+
+**[PROVEN]** Callsite materializations of `$E352`:
+- `LEA $E352.l,A2; JSR (A2)` @0x22CC (inside `build_attitude_matrix_from_dir_roll`)
+- Jump-table fill `MOVE.L #$E352, $32E(A0)` @0x11C4 (with other +0x20-skewed slots `$1DB8`, etc.)
+
+**[STRONG INFERENCE]** Same intentional-or-tooling skew as `$2DE8`→`abs_int`, `$1D56`→`sin_fixed14`, `$1DB8`→`cos_fixed14`: treat LEA/table targets as the real entry +0x20.
+
+**[OPEN]** Why the image encodes entry−0x20 (reloc artifact vs hand-maintained vtable) remains unexplained; do not “fix” LEAs to `$E372` without binary rewrite authority.
+

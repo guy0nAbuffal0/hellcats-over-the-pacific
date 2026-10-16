@@ -22,8 +22,10 @@ const OFFSETS := {
 	"attitude_22": 0x22,  # [RECONSTRUCTED] local_2a reverse attitude (Pacific Conflict.c:14065, 14341–14342)
 	"field_24": 0x24,   # [RECONSTRUCTED] sVar17 / *(param_1+9); also DAT_0001d6fc compare in FUN_0000528a
 	"pos_2e": 0x2e,
-	"state_32": 0x32,
-	"count_3a": 0x3a,
+	"state_32": 0x32,  # [RECONSTRUCTED] also FUN_00015bf6 local_a<<4 (20115)
+	"field_36": 0x36,  # [RECONSTRUCTED] player 15d20 latch short*[0x1b]=1 (14683)
+	"field_38": 0x38,  # [RECONSTRUCTED] FUN_00015bf6 clears to 0 (20119)
+	"count_3a": 0x3a,  # [RECONSTRUCTED] FUN_00015bf6 writes 1 or 2 from param_2 (20120–20124)
 	"field_3c": 0x3c,   # [RECONSTRUCTED] written by FUN_0000528a / FUN_000051ec (32-bit)
 	"ptr_48": 0x48,
 	"index_50": 0x50,
@@ -61,9 +63,10 @@ const OFFSETS := {
 	"field_19d": 0x19d,  # [RECONSTRUCTED] e792 weapon phase; fire at 1, wrap 4→0 (14648–14671)
 	"field_19e": 0x19e,  # [RECONSTRUCTED] e4a4 overspeed / countdown byte
 	"field_19f": 0x19f,  # [RECONSTRUCTED] e792 weapon ammo/count; decremented on fire (14660)
-	"field_610": 0x610,  # [RECONSTRUCTED] FUN_00012840 writes param_1 (speed) (17566)
-	"field_614": 0x614,  # [RECONSTRUCTED] player fire latch short*[0x30a]=1 (14657)
-	"field_61c": 0x61c,  # [RECONSTRUCTED] FUN_00012840 ORs 0x40 when param_2!=0 (17563–17564)
+	"field_610": 0x610,  # [RECONSTRUCTED] 12840: speed u16; 19430: DAT_0001b838 u32 (17566, 23093)
+	"field_614": 0x614,  # [RECONSTRUCTED] 12840 latch / 19430 param_1 speed (14657, 23094)
+	"field_618": 0x618,  # [RECONSTRUCTED] FUN_00019430 writes 7 (23111)
+	"field_61c": 0x61c,  # [RECONSTRUCTED] 12840 OR 0x40; 19430 writes 0x62 (17563, 23112)
 	"field_641": 0x641,  # [RECONSTRUCTED] adds tpl+0x32 into 63e thrust (14394)
 	"status_1a0": 0x1a0,
 	"status_1a1": 0x1a1,
@@ -77,10 +80,24 @@ var external_template: RefCounted = null
 ## Surface height is *(world_obj_ptr + 0x1c). field_00 type byte may overlay byte 0 of this word on BE;
 ## kept as a separate Dictionary key until a byte-accurate entity buffer exists.
 var world_obj_ptr: int = 0
+## [RECONSTRUCTED] 9×s16 attitude matrix at entity+0x40 (FUN_0001a63e from 15bf6, nbytes 0x12).
+var attitude_matrix_40: Array = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+## [RECONSTRUCTED] FUN_00019430 scaled vertex channels (13×int at +0x622 / +0x656 / +0x68a).
+var vertex_scale_622: Array = []
+var vertex_scale_656: Array = []
+var vertex_scale_68a: Array = []
 
 func _init() -> void:
 	for key in OFFSETS:
 		data[key] = 0
+	attitude_matrix_40 = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+	vertex_scale_622 = []
+	vertex_scale_656 = []
+	vertex_scale_68a = []
+	for _i in range(0xD):
+		vertex_scale_622.append(0)
+		vertex_scale_656.append(0)
+		vertex_scale_68a.append(0)
 
 func get_field(key: String) -> int:
 	return data.get(key, 0) as int

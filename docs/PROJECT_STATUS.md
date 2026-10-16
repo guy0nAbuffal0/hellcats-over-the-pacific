@@ -163,7 +163,7 @@ These run in `SimCore` and unit tests. They do not fly the on-screen aircraft.
 - `FUN_000051ec` (5751–5779) — **ported** for proven stores, including table poke and `**(entity+8)=0` via `SimCore.mem_u32`.
 - `FUN_00006fb8` (7180–7189) — **ported**: six globals set to `100000000`.
 
-`FUN_0000435a` is counted (`param_2` 0 vs 1) and is not ported. The contract says so.
+`FUN_0000435a` gate/`+0xc`/kind2 poly helpers are wired on tick `044a4`, spawn `04e6e` followup (`param_2==0`), and `046da` (`param_2==1`). Template scale sources remain mocked.
 
 ### Terrain, sea, and collision
 
@@ -381,11 +381,11 @@ They do not cover rendering, camera motion, keyboard integration, stall and out-
 
 The two sims should stay apart until one change has a single owner. Mission 1 sea/island solids are in place; the headless baseline includes them.
 
-**Recommended milestone:** port `FUN_00015d20` / `FUN_00019430`, or real `046da` / `01ba8` grow — still without merging integrators.
+**Recommended milestone:** kind-2 `04808` / `02bd8` follow-up on the 05116/`046da` path, or real template `+0xe` scale source for `0435a` — still without merging integrators.
 
-1. Port `FUN_00015d20` entry (`0262e` + `15bf6`) or `FUN_00019430` post-spawn pattern.
-2. Replace mock `046da` with a proven minimal install, or port `01ba8` grow-by-10.
-3. Identify real `FUN_00001d56` (replace `fun_00001d56_scale=0x1000` stand-in).
+1. Wire `FUN_00002bd8` into `_call_fun_000046da` (05116 path), matching `_046da_from_parent` / decomp 5236.
+2. Wire `04808`/`02bd8` on the `016e2` kind-2 `04e6e` path.
+3. Trace D2/D3/A2 into `01be4` mid-entry after `04e4e`.
 4. Only after ownership is explicit, decide whether player motion should move into `SimCore` or whether `SimCore` remains a parity lab.
 
 Later work, in the order requested:

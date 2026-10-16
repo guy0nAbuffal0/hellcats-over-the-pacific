@@ -22,6 +22,21 @@ func run() -> bool:
 	ok = _test_fun_0000e40c() and ok
 	ok = _test_fun_00013452_empty_list() and ok
 	ok = _test_fun_000025a8_identity() and ok
+	ok = _test_fun_0000253e() and ok
+	ok = _test_fun_00002d10_null_aux() and ok
+	ok = _test_fun_00001a68_route() and ok
+	ok = _test_fun_00001974_fresh_small_bin() and ok
+	ok = _test_fun_00001a68_freelist() and ok
+	ok = _test_fun_0000199a_large_alloc() and ok
+	ok = _test_fun_00004690_vtable_plus8() and ok
+	ok = _test_fun_000019d0_large_coalesce() and ok
+	ok = _test_fun_00000054_first_loop() and ok
+	ok = _test_fun_00000054_block_b() and ok
+	ok = _test_fun_00000054_block_c() and ok
+	ok = _test_fun_00000054_block_d() and ok
+	ok = _test_fun_00016a3a_factory() and ok
+	ok = _test_fun_000115b0_factory() and ok
+	ok = _test_fun_0000262e_identity() and ok
 	ok = _test_fun_0000e372() and ok
 	ok = _test_fun_00001f22() and ok
 	ok = _test_grounded_speed_recommit() and ok
@@ -30,7 +45,12 @@ func run() -> bool:
 	ok = _test_e792_char_epilogue() and ok
 	ok = _test_e792_weapon_19d_branch() and ok
 	ok = _test_fun_00012840_spawn_fields() and ok
+	ok = _test_fun_00019430_spawn_fields() and ok
+	ok = _test_fun_00019430_vertex_loop() and ok
+	ok = _test_fun_00015bf6_helpers() and ok
+	ok = _test_fun_0001a63e_copy_matrix9() and ok
 	ok = _test_fun_00005116_slot_helpers() and ok
+	ok = _test_contact_61a_61e_attitude() and ok
 	ok = _test_e792_weapon_676_677_branch() and ok
 	ok = _test_e792_bvar6_cleanup() and ok
 	ok = _test_e792_flags685_bit2_tail() and ok
@@ -316,6 +336,452 @@ func _test_fun_00013452_empty_list() -> bool:
 	ok = Assertions.assert_equal(r, 0x10, "13346 empty-list") and ok
 	return ok
 
+## [RECONSTRUCTED] FUN_0000262e / 021e0 identity and X-axis twin of 025a8.
+func _test_fun_0000262e_identity() -> bool:
+	var ok := true
+	var sc: Dictionary = {"c3": 0x1000, "s3": 0}
+	var m: Array = FlightMathScript.fun_000021e0(sc)
+	ok = Assertions.assert_equal(int(m[0]), 0x1000, "021e0[0]") and ok
+	ok = Assertions.assert_equal(int(m[4]), 0x1000, "021e0[4]") and ok
+	ok = Assertions.assert_equal(int(m[8]), 0x1000, "021e0[8]") and ok
+	ok = Assertions.assert_equal(int(m[5]), 0, "021e0[5]") and ok
+	m = FlightMathScript.fun_0000262e(0, 0, 0, 0)
+	ok = Assertions.assert_equal(int(m[0]), 0x1000, "0262e[0] identity") and ok
+	ok = Assertions.assert_equal(int(m[4]), 0x1000, "0262e[4] identity") and ok
+	ok = Assertions.assert_equal(int(m[8]), 0x1000, "0262e[8] identity") and ok
+	## Nonzero yaw (p1→c3/s3): 0262e differs from 025a8 (021e0 vs 021a0).
+	var a8: Array = FlightMathScript.fun_000025a8(0x400, 0, 0, 0)
+	var e2: Array = FlightMathScript.fun_0000262e(0x400, 0, 0, 0)
+	ok = Assertions.assert_true(int(a8[0]) != int(e2[0]) or int(a8[4]) != int(e2[4]), "0262e≠025a8") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_0000199a + 01a68 large take/split (2043–2059 / 2163–2191).
+func _test_fun_0000199a_large_alloc() -> bool:
+	var ok := true
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0x4000}
+	var a: Dictionary = FlightMathScript.apply_01a68_alloc(0x40, st)
+	ok = Assertions.assert_true(bool(a.get("ok", false)), "large ok") and ok
+	ok = Assertions.assert_true(bool(a.get("from_0199a", false)), "via 0199a") and ok
+	ok = Assertions.assert_equal(int(a.get("large_words", -1)), 9, "9 words") and ok
+	ok = Assertions.assert_equal(int(a.get("header_byte", -1)), 0xFF, "tag ff") and ok
+	ok = Assertions.assert_equal(int(a.get("payload_ptr", -1)), 0x4008, "pay+8") and ok
+	ok = Assertions.assert_equal(int(st.get("heap_cursor", -1)), 72, "9<<3") and ok
+	var p1: int = int(a.get("payload_ptr", 0))
+	## free then realloc → reuse without bump
+	var fr: Dictionary = FlightMathScript.apply_019d0_free_large(p1, st)
+	ok = Assertions.assert_true(bool(fr.get("ok", false)), "large free") and ok
+	var b: Dictionary = FlightMathScript.apply_01a68_alloc(0x40, st)
+	ok = Assertions.assert_true(not bool(b.get("from_0199a", true)), "reuse") and ok
+	ok = Assertions.assert_equal(int(b.get("payload_ptr", -1)), p1, "same pay") and ok
+	ok = Assertions.assert_equal(int(st.get("heap_cursor", -1)), 72, "no bump") and ok
+	## split: grow 20 words, alloc 9 → remain 11
+	st = {"heap_cursor": 0, "heap_base": 0x5000}
+	FlightMathScript.apply_0199a_fresh_large(20, st)
+	var c: Dictionary = FlightMathScript.apply_01a68_large_alloc(0x40, st)
+	ok = Assertions.assert_true(bool(c.get("split", false)), "split") and ok
+	ok = Assertions.assert_equal(int(c.get("large_words", -1)), 9, "took 9") and ok
+	ok = Assertions.assert_equal(
+		int((st["large_free"] as Array)[0]["words"]), 11, "remain 11"
+	) and ok
+	## dispatch: small still works via apply_01a68_alloc
+	var s: Dictionary = FlightMathScript.apply_01a68_alloc(10, st)
+	ok = Assertions.assert_true(bool(s.get("use_small_bins", true)) or int(s.get("size_class", -1)) == 4, "small") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_000019d0 large adjacent coalesce (2101–2112).
+func _test_fun_000019d0_large_coalesce() -> bool:
+	var ok := true
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0x6000}
+	## two adjacent 9-word larges (0x40 → 9 words each)
+	var a: Dictionary = FlightMathScript.apply_01a68_alloc(0x40, st)
+	var b: Dictionary = FlightMathScript.apply_01a68_alloc(0x40, st)
+	var p1: int = int(a.get("payload_ptr", 0))
+	var p2: int = int(b.get("payload_ptr", 0))
+	ok = Assertions.assert_equal(p2, p1 + 9 * 8, "adjacent pay") and ok
+	## free higher then lower → forward absorb into one 18-word free
+	FlightMathScript.apply_019d0_free_large(p2, st)
+	var fr: Dictionary = FlightMathScript.apply_019d0_free_large(p1, st)
+	ok = Assertions.assert_true(bool(fr.get("coalesce", false)), "coalesced") and ok
+	ok = Assertions.assert_true(bool(fr.get("coalesced_forward", false)), "forward") and ok
+	ok = Assertions.assert_equal(int(fr.get("words", -1)), 18, "18 words") and ok
+	ok = Assertions.assert_equal((st["large_free"] as Array).size(), 1, "1 free") and ok
+	## 0x80 → 17 words; fits in merged 18 without 0199a (split remain 1)
+	var c: Dictionary = FlightMathScript.apply_01a68_alloc(0x80, st)
+	ok = Assertions.assert_true(not bool(c.get("from_0199a", true)), "reuse merged") and ok
+	ok = Assertions.assert_equal(int(c.get("large_words", -1)), 17, "took 17") and ok
+	ok = Assertions.assert_true(bool(c.get("split", false)), "split") and ok
+	## backward merge: free low then high
+	st = {"heap_cursor": 0, "heap_base": 0x7000}
+	a = FlightMathScript.apply_01a68_alloc(0x40, st)
+	b = FlightMathScript.apply_01a68_alloc(0x40, st)
+	p1 = int(a.get("payload_ptr", 0))
+	p2 = int(b.get("payload_ptr", 0))
+	FlightMathScript.apply_019d0_free_large(p1, st)
+	fr = FlightMathScript.apply_019d0_free_large(p2, st)
+	ok = Assertions.assert_true(bool(fr.get("coalesced_backward", false)), "backward") and ok
+	ok = Assertions.assert_equal(int(fr.get("words", -1)), 18, "back 18") and ok
+	## factory slot write helper
+	var sf: Dictionary = FlightMathScript.apply_1b524_set_factory(0x1000, 0x16A1A)
+	ok = Assertions.assert_equal(int(sf.get("factory_offset", -1)), 6, "+6") and ok
+	ok = Assertions.assert_equal(int(sf.get("factory_addr", -1)), 0x16A1A, "addr") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00000054 Block A: 4×0x4A → DAT_0001b524[key] (Capstone 0x58–0xA0).
+func _test_fun_00000054_first_loop() -> bool:
+	var ok := true
+	var recs: Array = FlightMathScript.load_00054_template_records_4a()
+	ok = Assertions.assert_equal(recs.size(), 4, "4 records") and ok
+	ok = Assertions.assert_equal(int((recs[0] as Dictionary).get("key", -1)), 0x5858, "key0") and ok
+	ok = Assertions.assert_equal(int((recs[1] as Dictionary).get("key", -1)), 0x0999, "key1") and ok
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0x8000}
+	var table: Dictionary = {}
+	var loop: Dictionary = FlightMathScript.apply_00054_first_loop(st, table)
+	ok = Assertions.assert_true(bool(loop.get("ok", false)), "loop ok") and ok
+	ok = Assertions.assert_equal(int(loop.get("record_count", -1)), 4, "4 steps") and ok
+	ok = Assertions.assert_equal(table.size(), 2, "2 live keys") and ok
+	ok = Assertions.assert_true(table.has(0x5858), "has 5858") and ok
+	ok = Assertions.assert_true(table.has(0x0999), "has 0999") and ok
+	## last 0x0999 overwrite wins
+	var steps: Array = loop.get("steps", []) as Array
+	var last_alloc: Dictionary = (steps[3] as Dictionary).get("alloc", {}) as Dictionary
+	var first_alloc: Dictionary = (steps[0] as Dictionary).get("alloc", {}) as Dictionary
+	var last_ptr: int = int(last_alloc.get("payload_ptr", -1))
+	var first_ptr: int = int(first_alloc.get("payload_ptr", -1))
+	ok = Assertions.assert_equal(int(table[0x0999]), last_ptr, "0999 last") and ok
+	ok = Assertions.assert_equal(int(table[0x5858]), first_ptr, "5858 first") and ok
+	ok = Assertions.assert_true(first_ptr != last_ptr, "distinct payloads") and ok
+	## publish helper sign-extend
+	var t2: Dictionary = {}
+	var pub: Dictionary = FlightMathScript.apply_00054_publish_slot(t2, 0xF000, 0xABCD)
+	ok = Assertions.assert_equal(int(pub.get("key_signed", 0)), -4096, "s16 key") and ok
+	ok = Assertions.assert_equal(int(t2[-4096]), 0xABCD, "neg slot") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00000054 Block B: 16 fixed slots → DAT_0001b538…1b574.
+func _test_fun_00000054_block_b() -> bool:
+	var ok := true
+	var recs: Array = FlightMathScript.load_00054_block_b_records()
+	ok = Assertions.assert_equal(recs.size(), 16, "16 records") and ok
+	var sizes: Array = []
+	for r in recs:
+		sizes.append(int((r as Dictionary).get("size", 0)))
+	ok = Assertions.assert_true(sizes.count(0x20) == 1, "one 0x20") and ok
+	ok = Assertions.assert_true(sizes.count(0x1A) == 15, "fifteen 0x1A") and ok
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0xB000}
+	var slots: Dictionary = {}
+	var loop: Dictionary = FlightMathScript.apply_00054_block_b(st, slots)
+	ok = Assertions.assert_true(bool(loop.get("ok", false)), "block b ok") and ok
+	ok = Assertions.assert_equal(slots.size(), 16, "16 slots") and ok
+	ok = Assertions.assert_true(slots.has(0x1B540), "has 1b540") and ok
+	ok = Assertions.assert_equal(int(loop.get("dat_0001b540", -1)), int(slots[0x1B540]), "1b540 ptr") and ok
+	ok = Assertions.assert_true(int(slots[0x1B540]) != 0, "1b540 nonzero") and ok
+	ok = Assertions.assert_true(slots.has(0x1B554), "has 0x20 slot") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00000054 Block C: 5×0x1C keyed → DAT_0001b524 (ROM keys all 0).
+func _test_fun_00000054_block_c() -> bool:
+	var ok := true
+	var recs: Array = FlightMathScript.load_00054_block_c_records()
+	ok = Assertions.assert_equal(recs.size(), 5, "5 records") and ok
+	for r in recs:
+		ok = Assertions.assert_equal(int((r as Dictionary).get("key", -1)), 0, "key0") and ok
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0xC000}
+	var table: Dictionary = {}
+	var loop: Dictionary = FlightMathScript.apply_00054_block_c(st, table)
+	ok = Assertions.assert_true(bool(loop.get("ok", false)), "block c ok") and ok
+	ok = Assertions.assert_equal(int(loop.get("record_count", -1)), 5, "5 steps") and ok
+	ok = Assertions.assert_equal(table.size(), 1, "1 live key") and ok
+	ok = Assertions.assert_true(table.has(0), "has key 0") and ok
+	var steps: Array = loop.get("steps", []) as Array
+	var last_ptr: int = int((steps[4] as Dictionary).get("alloc", {}).get("payload_ptr", -1))
+	ok = Assertions.assert_equal(int(table[0]), last_ptr, "last wins") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00000054 Block D: 5×0x1A → DAT_0001b58c…1b59c.
+func _test_fun_00000054_block_d() -> bool:
+	var ok := true
+	var recs: Array = FlightMathScript.load_00054_block_d_records()
+	ok = Assertions.assert_equal(recs.size(), 5, "5 records") and ok
+	ok = Assertions.assert_equal(int((recs[0] as Dictionary).get("slot_abs", -1)), 0x1B58C, "1b58c") and ok
+	ok = Assertions.assert_equal(int((recs[4] as Dictionary).get("slot_abs", -1)), 0x1B59C, "1b59c") and ok
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0xD000}
+	var slots: Dictionary = {}
+	var loop: Dictionary = FlightMathScript.apply_00054_block_d(st, slots)
+	ok = Assertions.assert_true(bool(loop.get("ok", false)), "block d ok") and ok
+	ok = Assertions.assert_equal(slots.size(), 5, "5 slots") and ok
+	ok = Assertions.assert_true(slots.has(0x1B58C) and slots.has(0x1B59C), "ends") and ok
+	ok = Assertions.assert_equal(int(loop.get("dat_0001b58c", -1)), int(slots[0x1B58C]), "58c ptr") and ok
+	ok = Assertions.assert_true(int(slots[0x1B58C]) != int(slots[0x1B59C]), "distinct") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00016a3a factory (+0x20 fixup from install imm 0x16a1a).
+func _test_fun_00016a3a_factory() -> bool:
+	var ok := true
+	var fix: Dictionary = FlightMathScript.apply_1b524_factory_entry_addr(0x16A1A)
+	ok = Assertions.assert_true(bool(fix.get("adjusted", false)), "16a1a adjust") and ok
+	ok = Assertions.assert_equal(int(fix.get("entry", -1)), 0x16A3A, "→16a3a") and ok
+	ok = Assertions.assert_equal(int(fix.get("delta", -1)), 0x20, "+0x20") and ok
+	fix = FlightMathScript.apply_1b524_factory_entry_addr(0x11590)
+	ok = Assertions.assert_equal(int(fix.get("entry", -1)), 0x115B0, "→115b0") and ok
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0x9000}
+	var table: Dictionary = {}
+	FlightMathScript.apply_00054_first_loop(st, table)
+	var tpl: int = int(table[0x5858])
+	var sf: Dictionary = FlightMathScript.apply_1b524_set_factory(tpl, 0x16A1A)
+	ok = Assertions.assert_equal(int(sf.get("factory_addr", -1)), 0x16A1A, "slot imm") and ok
+	var fac: Dictionary = FlightMathScript.apply_16a3a_factory(0xBEE0, 0x0001, 0x5858, table, 0xA000)
+	ok = Assertions.assert_true(bool(fac.get("ok", false)), "factory ok") and ok
+	ok = Assertions.assert_equal(int(fac.get("alloc_size", -1)), 0x58, "0x58") and ok
+	ok = Assertions.assert_equal(int(fac.get("handle_u32_00", -1)), 0xBEE0, "*h=obj") and ok
+	ok = Assertions.assert_equal(int(fac.get("handle_u32_04", -1)), tpl, "h+4=tpl") and ok
+	ok = Assertions.assert_equal(int(fac.get("obj_flags_04", -1)), 0x12001, "|=0x12000") and ok
+	ok = Assertions.assert_equal(int(fac.get("obj_u16_34", -1)), 0, "+34 clr") and ok
+	ok = Assertions.assert_equal(int(fac.get("factory_entry", -1)), 0x16A3A, "entry") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_000115b0 factory (+0x20 fixup from install imm 0x11590).
+func _test_fun_000115b0_factory() -> bool:
+	var ok := true
+	var fix: Dictionary = FlightMathScript.apply_1b524_factory_entry_addr(0x11590)
+	ok = Assertions.assert_equal(int(fix.get("entry", -1)), 0x115B0, "→115b0") and ok
+	const SLOT_1B540 := 0x55AA1234
+	var fac: Dictionary = FlightMathScript.apply_115b0_factory(0xBEE1, 0x0002, SLOT_1B540, 0xB000)
+	ok = Assertions.assert_true(bool(fac.get("ok", false)), "ok") and ok
+	ok = Assertions.assert_equal(int(fac.get("alloc_size", -1)), 0xA2, "0xa2") and ok
+	ok = Assertions.assert_equal(int(fac.get("handle_u32_00", -1)), 0xBEE1, "*h=obj") and ok
+	ok = Assertions.assert_equal(int(fac.get("handle_u32_04", -1)), SLOT_1B540, "h+4=1b540") and ok
+	ok = Assertions.assert_equal(int(fac.get("obj_flags_04", -1)), 0x112002, "|=0x112000") and ok
+	ok = Assertions.assert_equal(int(fac.get("factory_entry", -1)), 0x115B0, "entry") and ok
+	ok = Assertions.assert_equal(int(fac.get("stored_install_imm", -1)), 0x11590, "imm") and ok
+	## resolve: tpl+6 wins over fallback
+	var table: Dictionary = {0x5858: 0x1000}
+	var r: Dictionary = FlightMathScript.apply_1b524_resolve_factory(table, 0x5858, 0x16A1A, 0x11590)
+	ok = Assertions.assert_equal(str(r.get("source", "")), "tpl+6", "tpl prefer") and ok
+	ok = Assertions.assert_equal(int(r.get("entry", -1)), 0x16A3A, "→16a3a") and ok
+	r = FlightMathScript.apply_1b524_resolve_factory(table, 0x5858, 0, 0x11590)
+	ok = Assertions.assert_equal(str(r.get("source", "")), "fallback", "fb") and ok
+	ok = Assertions.assert_equal(int(r.get("entry", -1)), 0x115B0, "→115b0") and ok
+	var tk: Dictionary = FlightMathScript.apply_1b524_type_key(0x5858, -1)
+	ok = Assertions.assert_equal(str(tk.get("source", "")), "desc[1]", "desc key") and ok
+	ok = Assertions.assert_equal(int(tk.get("type_key", -1)), 0x5858, "5858") and ok
+	tk = FlightMathScript.apply_1b524_type_key(1, 0x0999)
+	ok = Assertions.assert_equal(str(tk.get("source", "")), "override", "ovr") and ok
+	ok = Assertions.assert_equal(int(tk.get("type_key", -1)), 0x0999, "0999") and ok
+	var pr: Dictionary = FlightMathScript.apply_016e2_publish_root(0xABC0, 0x100)
+	ok = Assertions.assert_equal(int(pr.get("dat_0001d6fc", -1)), 0xABC0, "1d6fc") and ok
+	ok = Assertions.assert_true(bool(pr.get("ok", false)), "root ok") and ok
+	pr = FlightMathScript.apply_016e2_publish_root(0, 0x100)
+	ok = Assertions.assert_true(not bool(pr.get("ok", true)), "null root") and ok
+	ok = Assertions.assert_equal(FlightMathScript.apply_016e2_child_table_bytes(2), 0x30, "2*18") and ok
+	ok = Assertions.assert_equal(FlightMathScript.apply_016e2_child_src_base(0x1000), 0x101A, "src") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_016e2_relocate_child_name(0x10, 0x200), 0x210, "reloc"
+	) and ok
+	var ch: Dictionary = FlightMathScript.apply_016e2_copy_child_record(
+		[1, 2, 3, 4, 5, 0x99]
+	)
+	ok = Assertions.assert_equal(int(ch.get("field_14", -1)), 0x99, "f14") and ok
+	ok = Assertions.assert_equal((ch.get("words", []) as Array).size(), 6, "6 words") and ok
+	var lk: Dictionary = FlightMathScript.apply_016e2_link_child(0x1000, 3)
+	ok = Assertions.assert_equal(int(lk.get("field_24", -1)), 0x1000, "link24") and ok
+	ok = Assertions.assert_equal(int(lk.get("field_01", -1)), 3, "link1") and ok
+	ok = Assertions.assert_equal(int(lk.get("field_02", -1)), 3, "link2") and ok
+	var bd: Dictionary = FlightMathScript.apply_016e2_publish_bdb4(0xBDB4)
+	ok = Assertions.assert_equal(int(bd.get("dat_0001bdb4", -1)), 0xBDB4, "bdb4") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_016e2_child_slot_obj(0x1000, 1), 0x1000 + 0x2C, "slot1"
+	) and ok
+	var sel: Dictionary = FlightMathScript.apply_016e2_bdac_select(0, 0x1000)
+	ok = Assertions.assert_equal(int(sel.get("child_index", -1)), 2, "bdac idx2") and ok
+	ok = Assertions.assert_true(bool(sel.get("call_04e6e", false)), "04e6e") and ok
+	sel = FlightMathScript.apply_016e2_bdac_select(2, 0x1000)
+	ok = Assertions.assert_equal(int(sel.get("child_index", -1)), 3, "bdac idx3") and ok
+	ok = Assertions.assert_true(bool(sel.get("call_04e4e", false)), "04e4e m2") and ok
+	var g: Dictionary = FlightMathScript.apply_04e06_gate(0)
+	ok = Assertions.assert_true(bool(g.get("run_body", false)), "04e06 run") and ok
+	g = FlightMathScript.apply_04e06_gate(2)
+	ok = Assertions.assert_true(bool(g.get("skip", false)), "04e06 skip") and ok
+	var dp: Dictionary = FlightMathScript.apply_04e06_desc_ptr(0x1000, 1, 0x2000, 0x30)
+	ok = Assertions.assert_equal(int(dp.get("slot_addr", -1)), 0x1000 + 0x2E + 0x18, "slot") and ok
+	ok = Assertions.assert_equal(int(dp.get("desc_ptr", -1)), 0x2030, "desc") and ok
+	var cp: Dictionary = FlightMathScript.apply_04e06_field_copies(0xA, 0xB, 0xC, 0xD)
+	ok = Assertions.assert_equal(int(cp.get("field_18", -1)), 0xA, "f18") and ok
+	ok = Assertions.assert_equal(int(cp.get("field_14", -1)), 0xD, "f14") and ok
+	var tl: Dictionary = FlightMathScript.apply_04e4e_tail(0xEE)
+	ok = Assertions.assert_equal(int(tl.get("field_14", -1)), 0xEE, "tail14") and ok
+	var b8: Dictionary = FlightMathScript.apply_016e2_publish_bda8(0xBDAC, 0xBDA80048)
+	ok = Assertions.assert_equal(int(b8.get("dat_0001bda8", -1)), 0xBDA80048, "bda8") and ok
+	var b4: Dictionary = FlightMathScript.apply_016e2_publish_bda4(0x1000, 0xBDA4)
+	ok = Assertions.assert_equal(int(b4.get("dat_0001bda4", -1)), 0xBDA4, "bda4") and ok
+	ok = Assertions.assert_equal(int(b4.get("slot_addr", -1)), 0x1000 + 0x74, "slot4") and ok
+	var win: Dictionary = FlightMathScript.apply_016e2_bc28_window(2, 0x1000)
+	ok = Assertions.assert_equal(int(win.get("dat_0001b88e", -1)), 1, "b88e") and ok
+	ok = Assertions.assert_equal(int(win.get("dat_0001b88c", -1)), 3, "b88c") and ok
+	ok = Assertions.assert_equal(int(win.get("bc28_slot", -1)), 0x1000 + 0x2C, "bc28slot") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00004690 / 046da vtable +8 (5202–5208 / 5237–5248).
+func _test_fun_00004690_vtable_plus8() -> bool:
+	var ok := true
+	var z: Dictionary = FlightMathScript.apply_04690_vtable_plus8(0, 0xC0DE)
+	ok = Assertions.assert_true(not bool(z.get("install", true)), "type0 skip") and ok
+	var a: Dictionary = FlightMathScript.apply_04690_vtable_plus8(1, 0xC0DE)
+	ok = Assertions.assert_true(bool(a.get("install", false)), "type1 install") and ok
+	ok = Assertions.assert_equal(int(a.get("field_08", -1)), 0xC0DE, "+8") and ok
+	ok = Assertions.assert_true(bool(a.get("clear_handle", false)), "clear *h") and ok
+	a = FlightMathScript.apply_04690_vtable_plus8(2, 0)
+	ok = Assertions.assert_true(bool(a.get("install", false)), "null h install") and ok
+	ok = Assertions.assert_true(not bool(a.get("clear_handle", true)), "no clear") and ok
+	var d: Dictionary = FlightMathScript.apply_046da_factory_plus8(1, 0xF00D, 0xA, 0xB, 0xC, 0x11)
+	ok = Assertions.assert_true(bool(d.get("write_aux", false)), "aux") and ok
+	ok = Assertions.assert_equal(int(d.get("aux_20", -1)), 0xA, "+20") and ok
+	ok = Assertions.assert_equal(int(d.get("aux_22", -1)), 0xB, "+22") and ok
+	ok = Assertions.assert_equal(int(d.get("aux_24", -1)), 0xC, "+24") and ok
+	ok = Assertions.assert_equal(int(d.get("factory_arg3", -1)), 0x11, "arg3") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00001a68 freelist pop + 019d0 small push (2157–2160 / 2117–2121).
+func _test_fun_00001a68_freelist() -> bool:
+	var ok := true
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0x3000}
+	var a: Dictionary = FlightMathScript.apply_01a68_small_alloc(10, st)
+	ok = Assertions.assert_true(not bool(a.get("from_freelist", true)), "1st fresh") and ok
+	var p1: int = int(a.get("payload_ptr", 0))
+	var b: Dictionary = FlightMathScript.apply_01a68_small_alloc(10, st)
+	ok = Assertions.assert_true(not bool(b.get("from_freelist", true)), "2nd fresh") and ok
+	var p2: int = int(b.get("payload_ptr", 0))
+	ok = Assertions.assert_true(p2 != p1, "distinct") and ok
+	var fr: Dictionary = FlightMathScript.apply_019d0_free_small(p1, st)
+	ok = Assertions.assert_true(bool(fr.get("ok", false)), "free ok") and ok
+	ok = Assertions.assert_equal(int(fr.get("size_class", -1)), 4, "free bin4") and ok
+	var c: Dictionary = FlightMathScript.apply_01a68_small_alloc(10, st)
+	ok = Assertions.assert_true(bool(c.get("from_freelist", false)), "reuse") and ok
+	ok = Assertions.assert_equal(int(c.get("payload_ptr", -1)), p1, "got p1") and ok
+	ok = Assertions.assert_equal(int(st.get("heap_cursor", -1)), 32, "no new bump") and ok
+	## LIFO: free p2 then p1 → next alloc is p1
+	FlightMathScript.apply_019d0_free_small(p2, st)
+	FlightMathScript.apply_019d0_free_small(p1, st)
+	var d: Dictionary = FlightMathScript.apply_01a68_small_alloc(10, st)
+	ok = Assertions.assert_equal(int(d.get("payload_ptr", -1)), p1, "LIFO top") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00001974 / 01958 fresh small-bin bump (2025–2039 / 2013–2021).
+func _test_fun_00001974_fresh_small_bin() -> bool:
+	var ok := true
+	var st: Dictionary = {"heap_cursor": 0, "heap_base": 0x1000}
+	var a: Dictionary = FlightMathScript.apply_01974_fresh_small_bin(4, st)
+	ok = Assertions.assert_equal(int(a.get("grow_bytes", -1)), 16, "bin4 grow") and ok
+	ok = Assertions.assert_equal(int(a.get("payload_capacity", -1)), 12, "bin4 cap") and ok
+	ok = Assertions.assert_equal(int(a.get("header_byte", -1)), 4, "hdr") and ok
+	ok = Assertions.assert_equal(int(a.get("header_offset", -1)), 0x1000, "block") and ok
+	ok = Assertions.assert_equal(int(a.get("payload_ptr", -1)), 0x1004, "pay") and ok
+	var b: Dictionary = FlightMathScript.apply_01974_fresh_small_bin(4, st)
+	ok = Assertions.assert_equal(int(b.get("header_offset", -1)), 0x1010, "2nd bump") and ok
+	ok = Assertions.assert_equal(int(st.get("heap_cursor", -1)), 32, "cursor 32") and ok
+	st = {"heap_cursor": 0, "heap_base": 0x2000}
+	var f: Dictionary = FlightMathScript.apply_01a68_fresh_small_from_request(10, st)
+	ok = Assertions.assert_true(bool(f.get("ok", false)), "req10 ok") and ok
+	ok = Assertions.assert_equal(int(f.get("size_class", -1)), 4, "req10 bin") and ok
+	ok = Assertions.assert_equal(int(f.get("payload_ptr", -1)), 0x2004, "req10 pay") and ok
+	f = FlightMathScript.apply_01a68_fresh_small_from_request(0x18, st)
+	ok = Assertions.assert_equal(int(f.get("grow_bytes", -1)), 32, "18 grow32") and ok
+	ok = Assertions.assert_equal(int(f.get("payload_capacity", -1)), 28, "18 cap28") and ok
+	f = FlightMathScript.apply_01a68_fresh_small_from_request(0x40, st)
+	ok = Assertions.assert_true(bool(f.get("deferred_large", false)), "40 large") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00001a68 size-class routing (2148–2164) — no freelist.
+func _test_fun_00001a68_route() -> bool:
+	var ok := true
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_01a68_round_bytes(10), 16, "round 10→16"
+	) and ok
+	var r: Dictionary = FlightMathScript.apply_01a68_route(10)
+	ok = Assertions.assert_true(bool(r.get("use_small_bins", false)), "10 small") and ok
+	ok = Assertions.assert_equal(int(r.get("small_bin", -1)), 4, "10 bin4") and ok
+	ok = Assertions.assert_equal(int(r.get("payload_capacity", -1)), 12, "10 cap12") and ok
+	r = FlightMathScript.apply_01a68_route(0x18)
+	ok = Assertions.assert_true(bool(r.get("use_small_bins", false)), "18 small") and ok
+	ok = Assertions.assert_equal(int(r.get("small_bin", -1)), 5, "18 bin5") and ok
+	ok = Assertions.assert_equal(int(r.get("payload_capacity", -1)), 28, "18 cap28") and ok
+	r = FlightMathScript.apply_01a68_route(0x40)
+	ok = Assertions.assert_true(not bool(r.get("use_small_bins", true)), "40 large") and ok
+	ok = Assertions.assert_equal(int(r.get("large_words", -1)), 9, "40 words9") and ok
+	r = FlightMathScript.apply_01a68_route(0x52)
+	ok = Assertions.assert_equal(int(r.get("large_words", -1)), 12, "52 words12") and ok
+	var idx: int = FlightMathScript.apply_04808_index_alloc_bytes(5)
+	r = FlightMathScript.apply_01a68_route(idx)
+	ok = Assertions.assert_equal(idx, 10, "5<<1") and ok
+	ok = Assertions.assert_equal(int(r.get("small_bin", -1)), 4, "idx bin") and ok
+	var pool: int = FlightMathScript.apply_04e6e_kind2_alloc_bytes(2, 3)
+	r = FlightMathScript.apply_01a68_route(pool)
+	ok = Assertions.assert_equal(pool, 60, "2+3)*0xC") and ok
+	ok = Assertions.assert_equal(int(r.get("large_words", -1)), 9, "60 words9") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_01b38_zero_bytes(FlightMathScript.apply_01a68_route(10)),
+		12, "01b38 small"
+	) and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_01b38_zero_bytes(FlightMathScript.apply_01a68_route(0x40)),
+		64, "01b38 large"
+	) and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00002d10 null-aux: always 0253e→02ada→01c5c (vs 02bd8 angle gate).
+func _test_fun_00002d10_null_aux() -> bool:
+	var ok := true
+	## Zero angles: still rotates (identity) then translates — differs from 02bd8 skip.
+	var n: Dictionary = FlightMathScript.apply_02d10_null_aux_node(
+		10, 20, 30, 5, 0, -1, 0, 0, 0
+	)
+	ok = Assertions.assert_true(bool(n.get("applied_0253e", false)), "always 0253e") and ok
+	ok = Assertions.assert_equal(int(n.get("x", -1)), 15, "id+dx") and ok
+	ok = Assertions.assert_equal(int(n.get("z", -1)), 29, "id+dz") and ok
+	## Ry90 then +1 on x: (10,0,0)→(0,0,10) then +dx → (1,0,10)
+	n = FlightMathScript.apply_02d10_null_aux_node(10, 0, 0, 1, 0, 0, 0, 0x1000, 0)
+	ok = Assertions.assert_equal(int(n.get("x", -1)), 1, "Ry90+dx x") and ok
+	ok = Assertions.assert_equal(int(n.get("z", -1)), 10, "Ry90+dx z") and ok
+	var w: Dictionary = FlightMathScript.apply_02d10_null_aux_walk(
+		0, 0, 0, [{"dx": 1, "dy": 2, "dz": 3}, {"dx": 10, "dy": 0, "dz": 0}]
+	)
+	ok = Assertions.assert_equal(int(w.get("steps", -1)), 2, "2 steps") and ok
+	ok = Assertions.assert_equal(int(w.get("x", -1)), 11, "walk x") and ok
+	var c: Dictionary = FlightMathScript.apply_02bd8_null_aux_commit(
+		int(w.get("x", 0)), int(w.get("y", 0)), int(w.get("z", 0)), 0, 0, 1
+	)
+	ok = Assertions.assert_true(bool(c.get("commit", false)), "02d10 commit") and ok
+	ok = Assertions.assert_equal(int(c.get("field_18", -1)), 11, "commit x") and ok
+	## Contrast: 02bd8 with zero angles does 01c5c only (no 0253e flag)
+	var b: Dictionary = FlightMathScript.apply_02bd8_null_aux_node(
+		10, 20, 30, 5, 0, -1, 0, 0, 0
+	)
+	ok = Assertions.assert_true(not bool(b.get("applied_0253e", false)), "02bd8 no 0253e") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_0000253e = 0202a(a,b,c,0)→024f8; ≡ 025a8(0,a,b,c).
+func _test_fun_0000253e() -> bool:
+	var ok := true
+	var m: Array = FlightMathScript.fun_0000253e(0, 0, 0)
+	ok = Assertions.assert_equal(int(m[0]), 0x1000, "0253e id[0]") and ok
+	ok = Assertions.assert_equal(int(m[4]), 0x1000, "0253e id[4]") and ok
+	ok = Assertions.assert_equal(int(m[8]), 0x1000, "0253e id[8]") and ok
+	ok = Assertions.assert_equal(int(m[1]), 0, "0253e id[1]") and ok
+	## Ry 90°: (0, 0x1000, 0)
+	m = FlightMathScript.fun_0000253e(0, 0x1000, 0)
+	ok = Assertions.assert_equal(int(m[0]), 0, "Ry90[0]") and ok
+	ok = Assertions.assert_equal(int(m[2]), 0x1000, "Ry90[2]") and ok
+	ok = Assertions.assert_equal(int(m[6]), -0x1000, "Ry90[6]") and ok
+	ok = Assertions.assert_equal(int(m[4]), 0x1000, "Ry90[4]") and ok
+	## ≡ 025a8(0, a, b, c)
+	var a: int = 0x80
+	var b: int = 0x100
+	var c: int = 0x40
+	m = FlightMathScript.fun_0000253e(a, b, c)
+	var a8: Array = FlightMathScript.fun_000025a8(0, a, b, c)
+	for i in range(9):
+		ok = Assertions.assert_equal(int(m[i]), int(a8[i]), "0253e≡025a8[%d]" % i) and ok
+	return ok
+
 func _test_fun_000025a8_identity() -> bool:
 	var ok := true
 	var id: Array = FlightMathScript.identity_matrix_9()
@@ -436,27 +902,36 @@ func _test_grounded_field_0b_switch() -> bool:
 ## [RECONSTRUCTED] LAB_0000f47c yaw blend + player ring (14606–14629).
 func _test_lab_0000f47c() -> bool:
 	var ok := true
-	## local_2a - attitude_22 = 0x100; e40c keeps it; scale 0x1000 → add 0x100
+	## 01d56-callsite ≡ sin(local_28); local_28=0x1000 → scale≈0x1000
+	ok = Assertions.assert_equal(
+		FlightMathScript.fun_00001d56_callsite(0x1000),
+		FlightMathScript.fun_00001d76(0x1000),
+		"01d56≡01d76"
+	) and ok
+	var scale: int = FlightMathScript.fun_00001d56_callsite(0x1000)
+	## local_2a - attitude_22 = 0x100; e40c keeps it; *scale>>12
 	var ep: Dictionary = FlightMathScript.apply_lab_0000f47c(
-		0x111, 0x200, 0x100, 0x10, 100, 0x1000, false, 0, 0, 0
+		0x1000, 0x200, 0x100, 0x10, 100, false, 0, 0, 0
 	)
+	var expect_24: int = (0x10 + ((0x100 * scale) >> 12)) & 0x3FFF
 	ok = Assertions.assert_true(bool(ep.get("clear_field_63f", false)), "clears 63f") and ok
-	ok = Assertions.assert_equal(int(ep.get("pos_20", -1)), 0x111, "pos_20=local_28") and ok
+	ok = Assertions.assert_equal(int(ep.get("pos_20", -1)), 0x1000, "pos_20=local_28") and ok
 	ok = Assertions.assert_equal(int(ep.get("attitude_22", -1)), 0x200, "att22=local_2a") and ok
-	ok = Assertions.assert_equal(int(ep.get("field_24", -1)), (0x10 + 0x100) & 0x3FFF, "yaw blend") and ok
+	ok = Assertions.assert_equal(int(ep.get("field_24", -1)), expect_24, "yaw blend") and ok
+	ok = Assertions.assert_equal(int(ep.get("scale_01d56", -1)), scale, "scale=sin") and ok
 	ok = Assertions.assert_equal(int(ep.get("movement_62a", -1)), 100, "62a=speed") and ok
 	ok = Assertions.assert_true(not bool(ep.get("wrote_ring", true)), "non-player no ring") and ok
-	## player ring: speed 0xE7, scale 0x1000 → (0xE7*0x2000)/0x1ce = 0x1000
+	## player ring: speed 0xE7, sin(0x1000)≈0x1000 → (0xE7*0x2000)/0x1ce = 0x1000
 	ep = FlightMathScript.apply_lab_0000f47c(
-		0, 0, 0, 0, 0xE7, 0x1000, true, 0, 0, 0
+		0x1000, 0, 0, 0, 0xE7, true, 0, 0, 0
 	)
 	ok = Assertions.assert_true(bool(ep.get("wrote_ring", false)), "player ring") and ok
 	ok = Assertions.assert_equal(int(ep.get("ring_value", -1)), 0x1000, "ring = 0x1000") and ok
 	ok = Assertions.assert_equal(int(ep.get("dat_0001bc84", -1)), 1, "bc84 advances") and ok
 	ok = Assertions.assert_equal(int(ep.get("dat_0001bc80", -1)), 0x1000, "bc80 += ring") and ok
-	## clamp +0x1d80 (0x1CE*0x2000/0x1ce = 0x2000 > 0x1d80)
+	## clamp +0x1d80
 	ep = FlightMathScript.apply_lab_0000f47c(
-		0, 0, 0, 0, 0x1CE, 0x1000, true, 0, 0, 0
+		0x1000, 0, 0, 0, 0x1CE, true, 0, 0, 0
 	)
 	ok = Assertions.assert_equal(int(ep.get("ring_value", -1)), 0x1D80, "ring clamp hi") and ok
 	return ok
@@ -537,7 +1012,117 @@ func _test_fun_00012840_spawn_fields() -> bool:
 	ok = Assertions.assert_equal(int(wr.get("field_61c", -1)), 0x0041, "61c|0x40") and ok
 	return ok
 
-## [RECONSTRUCTED] FUN_00005116 free-slot / fill / world gate (5705–5745).
+## [RECONSTRUCTED] FUN_00019430 post-spawn field writes (23092–23112).
+func _test_fun_00019430_spawn_fields() -> bool:
+	var ok := true
+	var wr: Dictionary = FlightMathScript.apply_fun_00019430_spawn_fields(
+		0x1234, 0x11, 0x22, 0x33, 0xABCD1234
+	)
+	ok = Assertions.assert_equal(int(wr.get("field_610", -1)), 0xABCD1234, "610=b838") and ok
+	ok = Assertions.assert_equal(int(wr.get("field_614", -1)), 0x1234, "614=speed") and ok
+	ok = Assertions.assert_equal(int(wr.get("pos_20", -1)), 0x11, "pos_20") and ok
+	ok = Assertions.assert_equal(int(wr.get("attitude_22", -1)), 0x22, "att22") and ok
+	ok = Assertions.assert_equal(int(wr.get("field_24", -1)), 0x33, "field_24") and ok
+	ok = Assertions.assert_equal(int(wr.get("field_618", -1)), 7, "618=7") and ok
+	ok = Assertions.assert_equal(int(wr.get("field_61c", -1)), 0x62, "61c=0x62") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00019430 0xd vertex >>3 / scale (23098–23110).
+func _test_fun_00019430_vertex_loop() -> bool:
+	var ok := true
+	var verts: Array = []
+	for i in range(0xD):
+		verts.append({"x": 0x40 + i, "y": 0x80 + i, "z": 0x100 + i})
+	var vl: Dictionary = FlightMathScript.apply_fun_00019430_vertex_loop(verts)
+	ok = Assertions.assert_equal(int(vl.get("count", -1)), 0xD, "13 verts") and ok
+	var s0: Dictionary = (vl.get("verts_shifted", []) as Array)[0] as Dictionary
+	ok = Assertions.assert_equal(int(s0.get("x", -1)), 0x40 >> 3, "x>>3") and ok
+	ok = Assertions.assert_equal(int(s0.get("y", -1)), 0x80 >> 3, "y>>3") and ok
+	ok = Assertions.assert_equal(int(s0.get("z", -1)), 0x100 >> 3, "z>>3") and ok
+	ok = Assertions.assert_equal(
+		int((vl.get("entity_622", []) as Array)[0]), (0x40 >> 3) * 0x1C6, "622*0x1c6"
+	) and ok
+	ok = Assertions.assert_equal(
+		int((vl.get("entity_656", []) as Array)[0]), (0x80 >> 3) * 0x1C6, "656*0x1c6"
+	) and ok
+	ok = Assertions.assert_equal(
+		int((vl.get("entity_68a", []) as Array)[0]), (0x100 >> 3) * 0x255, "68a*0x255"
+	) and ok
+	## negative arithmetic >>3
+	vl = FlightMathScript.apply_fun_00019430_vertex_loop([{"x": -16, "y": 0, "z": 0}])
+	ok = Assertions.assert_equal(
+		int(((vl.get("verts_shifted", []) as Array)[0] as Dictionary).get("x", 1)), -2, "neg>>3"
+	) and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00015bf6 locals + post-spawn writes (20098–20125).
+func _test_fun_00015bf6_helpers() -> bool:
+	var ok := true
+	## speed 0x100 → local_6 = (0x10)+0x2015 = 0x2025; draws 0x20 → no net change on e/a
+	var loc: Dictionary = FlightMathScript.apply_15bf6_local_perturb(0x100, [0x20, 0x20, 0x20])
+	ok = Assertions.assert_equal(int(loc.get("local_e", -1)), 0, "e unchanged") and ok
+	ok = Assertions.assert_equal(int(loc.get("local_a", -1)), 0, "a unchanged") and ok
+	ok = Assertions.assert_equal(int(loc.get("local_6", -1)), 0x2025, "6 base") and ok
+	ok = Assertions.assert_equal(int(loc.get("spawn_z_delta", -1)), 0x2025 >> 2, "z>>2") and ok
+	ok = Assertions.assert_true(not bool(loc.get("applied_028dc", true)), "no matrix → no 028dc") and ok
+	## identity 028dc before RNG: (0,0,z) stays on Z
+	loc = FlightMathScript.apply_15bf6_local_perturb(
+		0x100, [0x20, 0x20, 0x20], FlightMathScript.identity_matrix_9()
+	)
+	ok = Assertions.assert_true(bool(loc.get("applied_028dc", false)), "028dc applied") and ok
+	ok = Assertions.assert_equal(int(loc.get("local_e", -1)), 0, "id e") and ok
+	ok = Assertions.assert_equal(int(loc.get("local_a", -1)), 0, "id a") and ok
+	ok = Assertions.assert_equal(int(loc.get("local_6", -1)), 0x2025, "id 6") and ok
+	## draw 0x3f → +0x1f; draw 0 → -0x20
+	loc = FlightMathScript.apply_15bf6_local_perturb(0, [0x3F, 0x00, 0x20])
+	ok = Assertions.assert_equal(int(loc.get("local_e", -1)), 0x1F, "e +0x1f") and ok
+	ok = Assertions.assert_equal(int(loc.get("local_a", -1)), -0x20, "a -0x20") and ok
+	var wr: Dictionary = FlightMathScript.apply_fun_00015bf6_spawn_fields(0x10, 0x20, 0x40, 1)
+	ok = Assertions.assert_equal(int(wr.get("state_32", -1)), 0x20 << 4, "32=a<<4") and ok
+	ok = Assertions.assert_equal(int(wr.get("entity_data_ptr", -1)), 0x10 >> 2, "+8") and ok
+	ok = Assertions.assert_equal(int(wr.get("position_velocity_c", -1)), 0x20 >> 2, "+c") and ok
+	ok = Assertions.assert_equal(int(wr.get("ptr_10", -1)), 0x40 >> 2, "+10") and ok
+	ok = Assertions.assert_equal(int(wr.get("field_38", -1)), 0, "38=0") and ok
+	ok = Assertions.assert_equal(int(wr.get("count_3a", -1)), 2, "3a=2 when p2") and ok
+	wr = FlightMathScript.apply_fun_00015bf6_spawn_fields(0, 0, 0, 0)
+	ok = Assertions.assert_equal(int(wr.get("count_3a", -1)), 1, "3a=1 when p2=0") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_0001a63e 9×s16 forward copy (nbytes 0x12; 20126).
+func _test_fun_0001a63e_copy_matrix9() -> bool:
+	var ok := true
+	var src: Array = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+	var dst: Array = FlightMathScript.fun_0001a63e_copy_matrix9(src)
+	for i in range(9):
+		ok = Assertions.assert_equal(int(dst[i]), i + 1, "1a63e[%d]" % i) and ok
+	## s16 truncation
+	dst = FlightMathScript.fun_0001a63e_copy_matrix9([0x10001, -1])
+	ok = Assertions.assert_equal(int(dst[0]), 1, "trunc low16") and ok
+	ok = Assertions.assert_equal(int(dst[1]), -1, "s16 -1") and ok
+	dst = FlightMathScript.fun_0001a63e_copy_matrix9(FlightMathScript.identity_matrix_9())
+	ok = Assertions.assert_equal(int(dst[0]), 0x1000, "id[0]") and ok
+	ok = Assertions.assert_equal(int(dst[4]), 0x1000, "id[4]") and ok
+	ok = Assertions.assert_equal(int(dst[8]), 0x1000, "id[8]") and ok
+	return ok
+
+## [RECONSTRUCTED] Contact 61a/61e → pos_20 / field_24 (14095–14101; Capstone @0xE864).
+func _test_contact_61a_61e_attitude() -> bool:
+	var ok := true
+	var r: Dictionary = FlightMathScript.apply_contact_61a_61e_attitude(
+		0x83, 0x05, 100, 200, 0x100, 0x200
+	)
+	## 61e += 0x83&0x7f (=3) → 103; field_24 = (0x100+103)&0x3fff
+	ok = Assertions.assert_equal(int(r.get("movement_61e", -1)), 103, "61e+=rng") and ok
+	ok = Assertions.assert_equal(int(r.get("field_24", -1)), 0x167, "24+=61e") and ok
+	## 61a -= 5 → 195; pos_20 = (0x200+195)&0x3fff
+	ok = Assertions.assert_equal(int(r.get("movement_61a", -1)), 195, "61a-=rng") and ok
+	ok = Assertions.assert_equal(int(r.get("pos_20", -1)), 0x2C3, "20+=61a") and ok
+	r = FlightMathScript.apply_contact_61a_61e_attitude(0, 0x7F, 0, 0x10, 0x3FFE, 0x3FFE)
+	ok = Assertions.assert_equal(int(r.get("movement_61a", -1)) & 0xFFFF, 0xFF91, "61a wrap s16") and ok
+	ok = Assertions.assert_equal(int(r.get("field_24", -1)), 0x3FFE, "24 mask") and ok
+	return ok
+
+## [RECONSTRUCTED] FUN_00005116 free-slot / fill / world gate / 01ba8 grow (5705–5745).
 func _test_fun_00005116_slot_helpers() -> bool:
 	var ok := true
 	ok = Assertions.assert_equal(
@@ -546,6 +1131,31 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	ok = Assertions.assert_equal(
 		FlightMathScript.find_05116_free_slot_index([1, 2]), 2, "full → grow idx"
 	) and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.grow_05116_request_bytes(2), (2 + 10) * 0x18, "grow bytes"
+	) and ok
+	var grow: Dictionary = FlightMathScript.apply_01ba8_05116_grow(2)
+	ok = Assertions.assert_equal(int(grow.get("new_count", -1)), 12, "2→12") and ok
+	ok = Assertions.assert_equal(int(grow.get("first_new_index", -1)), 2, "first new") and ok
+	## 01ba8 capacity / 01be4 mid-entry tail
+	var cap: Dictionary = FlightMathScript.apply_01ba8_capacity(0xFF, 5)
+	ok = Assertions.assert_equal(int(cap.get("capacity", -1)), 32, "large cap") and ok
+	cap = FlightMathScript.apply_01ba8_capacity(6, 0)
+	ok = Assertions.assert_equal(int(cap.get("capacity", -1)), 60, "small 2^6-4") and ok
+	var ng: Dictionary = FlightMathScript.apply_01ba8_need_grow(32, 40)
+	ok = Assertions.assert_true(bool(ng.get("need_grow", false)), "need grow") and ok
+	ng = FlightMathScript.apply_01ba8_need_grow(64, 40)
+	ok = Assertions.assert_true(bool(ng.get("return_old", false)), "keep old") and ok
+	var tail: Dictionary = FlightMathScript.apply_01be4_tail(0x1000, 0x2000, 0x20)
+	ok = Assertions.assert_true(bool(tail.get("is_01ba8_mid_entry", false)), "mid") and ok
+	ok = Assertions.assert_equal(int(tail.get("result_ptr", -1)), 0x2000, "ret new") and ok
+	var mv: Dictionary = FlightMathScript.fun_0001a63e_copy_bytes([0, 0], [0xAABBCCDD, 0x11223344], 8)
+	ok = Assertions.assert_equal(int(mv.get("words", [0])[0]), 0xAABBCCDD, "mv0") and ok
+	var c04: Dictionary = FlightMathScript.apply_01c04_plan(2, 1, 0x4400, 0x4C00)
+	ok = Assertions.assert_equal(int(c04.get("count", -1)), 3, "01c04 cnt") and ok
+	ok = Assertions.assert_equal(int(c04.get("nbytes", -1)), 0x24, "01c04 bytes") and ok
+	c04 = FlightMathScript.apply_01c04_plan(0, 0, 0x4400, 0x4C00)
+	ok = Assertions.assert_true(bool(c04.get("skip", false)), "01c04 skip") and ok
 	var fill: Dictionary = FlightMathScript.apply_05116_slot_fill(
 		0x10, 0x20, 0x30, 0xA, 0xB, 0xC, 0xD
 	)
@@ -561,6 +1171,272 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	g = FlightMathScript.apply_05116_world_gate(0x1000, 0)
 	ok = Assertions.assert_true(bool(g.get("need_051ec", false)), "need 051ec") and ok
 	ok = Assertions.assert_equal(int(g.get("world_obj", -1)), 0, "fail clears") and ok
+	## 046da identity stores
+	var idn: Dictionary = FlightMathScript.apply_046da_identity_stores(0x4000, 3, 3, 10, 0, 0)
+	ok = Assertions.assert_equal(int(idn.get("field_24", -1)), 0x4000, "24=pool") and ok
+	ok = Assertions.assert_equal(int(idn.get("field_01", -1)), 3, "01=tpl") and ok
+	ok = Assertions.assert_equal(int(idn.get("field_02", -1)), 3, "02=slot") and ok
+	ok = Assertions.assert_true(bool(idn.get("bumped_03", false)), "slot==tpl +3") and ok
+	ok = Assertions.assert_equal(int(idn.get("field_03", -1)), 1, "03→1") and ok
+	ok = Assertions.assert_true(bool(idn.get("ored_flag1", false)), "tpl<2c |1") and ok
+	idn = FlightMathScript.apply_046da_identity_stores(0x4000, 5, 2, 3, 0, 0)
+	ok = Assertions.assert_true(not bool(idn.get("bumped_03", true)), "slot!=tpl") and ok
+	ok = Assertions.assert_true(not bool(idn.get("ored_flag1", true)), "tpl>=2c") and ok
+	## 045ba kind 2 / 3 field copy
+	var d2: Dictionary = {
+		0: 2, 2: 0x1111, 6: 0x2222, 10: 0x3333, 0x0E: 0x4444, 0x12: 0x5555,
+		0x16: 0x66, 0x18: 0x77, 0x1A: 0x88, 0x1C: 0, 0x1E: 0x99, 0x20: 0xAA,
+	}
+	var a2: Dictionary = FlightMathScript.apply_045ba_from_desc(d2, 0xB838)
+	ok = Assertions.assert_true(bool(a2.get("ok", false)), "kind2 ok") and ok
+	ok = Assertions.assert_equal(int(a2.get("size", -1)), 0x52, "kind2 size") and ok
+	ok = Assertions.assert_equal(int((a2.get("u8", {}) as Dictionary).get(0, -1)), 2, "kind2 +0") and ok
+	ok = Assertions.assert_equal(int((a2.get("u32", {}) as Dictionary).get(0x18, -1)), 0x1111, "k2 +18") and ok
+	ok = Assertions.assert_equal(int((a2.get("u16", {}) as Dictionary).get(0x38, -1)), 1, "1c==0→1") and ok
+	ok = Assertions.assert_equal(int((a2.get("u32", {}) as Dictionary).get(0x40, -1)), 0xB838, "+40=b838") and ok
+	var d3: Dictionary = {
+		0: 3, 2: 1, 6: 2, 10: 3, 0x0E: 4, 0x12: 5, 0x16: 6, 0x18: 7, "desc_ptr": 0xD000,
+	}
+	var a3: Dictionary = FlightMathScript.apply_045ba_from_desc(d3, 0)
+	ok = Assertions.assert_true(bool(a3.get("ok", false)), "kind3 ok") and ok
+	ok = Assertions.assert_equal(int(a3.get("size", -1)), 0x34, "kind3 size") and ok
+	ok = Assertions.assert_equal(int((a3.get("u32", {}) as Dictionary).get(0x28, -1)), 0xD000, "k3 desc*") and ok
+	ok = Assertions.assert_true(not bool(FlightMathScript.apply_045ba_from_desc({0: 1}, 0).get("ok", true)), "kind1 fail") and ok
+	## 03b98 camera abs axes + combine + 046da → 04e6e gate
+	var ax98: Dictionary = FlightMathScript.apply_03b98_camera_abs_axes(
+		100, -20, 5, 90, 0, 5
+	)
+	ok = Assertions.assert_equal(int(ax98.get("a", -1)), 10, "abs dx") and ok
+	ok = Assertions.assert_equal(int(ax98.get("b", -1)), 20, "abs dy") and ok
+	ok = Assertions.assert_equal(int(ax98.get("c", -1)), 0, "abs dz") and ok
+	var m98: Dictionary = FlightMathScript.apply_fun_00003b98(10, 1, 5)
+	ok = Assertions.assert_equal(int(m98.get("metric", -1)), 11, "03b98 10,1,5→11") and ok
+	ok = Assertions.assert_equal(int(m98.get("field_10", -1)), 11, "03b98 field_10") and ok
+	m98 = FlightMathScript.apply_fun_00003b98(0, 0, 0)
+	ok = Assertions.assert_equal(int(m98.get("metric", -1)), 0, "03b98 zeros") and ok
+	m98 = FlightMathScript.apply_fun_00003b98(0x30000, 0, 0)
+	ok = Assertions.assert_equal(int(m98.get("metric", -1)), 0x30000, "03b98 one-axis") and ok
+	var g44: Dictionary = FlightMathScript.apply_046da_04e6e_distance_gate(0, 0)
+	ok = Assertions.assert_true(bool(g44.get("need_04e6e", false)), "near → 04e6e") and ok
+	g44 = FlightMathScript.apply_046da_04e6e_distance_gate(0x30000, 0)
+	ok = Assertions.assert_true(bool(g44.get("deferred", false)), "far → defer") and ok
+	var v44: Dictionary = FlightMathScript.apply_04e6e_kind2_vertex_ptrs(0x4C00, 0x4400, 2, 3)
+	ok = Assertions.assert_equal(int(v44.get("field_4c", -1)), 0x4C00, "+4c") and ok
+	ok = Assertions.assert_equal(int(v44.get("field_44", -1)), 0x4400, "+44") and ok
+	ok = Assertions.assert_equal(int(v44.get("alloc_bytes", -1)), 5 * 0xC, "alloc (36+3a)*0xC") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_04e6e_kind2_alloc_bytes(1, 1), 0x18, "alloc 1+1"
+	) and ok
+	var ls: Dictionary = FlightMathScript.apply_04e6e_kind2_list_select(0)
+	ok = Assertions.assert_true(bool(ls.get("to_b5a4", false)), "bit0 clear → b5a4") and ok
+	ls = FlightMathScript.apply_04e6e_kind2_list_select(1)
+	ok = Assertions.assert_true(bool(ls.get("to_d4a4", false)), "bit0 set → d4a4") and ok
+	var k3: Dictionary = FlightMathScript.apply_04e6e_kind3_plan(2)
+	ok = Assertions.assert_true(bool(k3.get("to_d4a4", false)), "k3 d4a4") and ok
+	ok = Assertions.assert_equal(int(k3.get("count", -1)), 2, "k3 cnt") and ok
+	ok = Assertions.assert_equal(int(k3.get("table_bytes", -1)), 0x30, "k3 bytes") and ok
+	var dp: Dictionary = FlightMathScript.apply_046da_desc_ptr(0x1000, 1, 0x2000, 0x30)
+	ok = Assertions.assert_equal(int(dp.get("slot_addr", -1)), 0x1000 + 0x18 + 0x2E, "046da slot") and ok
+	ok = Assertions.assert_equal(int(dp.get("desc_ptr", -1)), 0x2030, "046da desc") and ok
+	var lk: Dictionary = FlightMathScript.apply_046da_parent_child_links(0xD300, 0, 0, 2, 0, 0)
+	ok = Assertions.assert_equal(int(lk.get("field_24", -1)), 0xD300, "link parent") and ok
+	ok = Assertions.assert_true(bool(lk.get("bumped_03", false)), "bump03") and ok
+	ok = Assertions.assert_true(bool(lk.get("ored_flag1", false)), "or1") and ok
+	## 04808 buffer size + one poly record
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_04808_buffer_bytes(2, 0, 0), 0x40, "3a*0x20"
+	) and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_04808_buffer_bytes(2, 3, 2), 0x40 + 12 + 6, "bit1 extra"
+	) and ok
+	var pr: Dictionary = FlightMathScript.apply_04808_poly_record({
+		0: 0xAABBCCDD, 4: 1, 5: 2, 6: 3, 7: 4, 8: 5, 9: 0xAB, 0x0A: 0x11223344,
+	})
+	ok = Assertions.assert_equal(int(pr.get("rec_u32_0c", -1)), 0xAABBCCDD, "rec +0c") and ok
+	ok = Assertions.assert_equal(int(pr.get("rec_u16_14", -1)), 5, "count") and ok
+	ok = Assertions.assert_equal(int(pr.get("rec_u8_16", -1)), 0xA0, "nibble hi") and ok
+	ok = Assertions.assert_equal(int(pr.get("rec_u8_17", -1)), 0x0B, "nibble lo") and ok
+	ok = Assertions.assert_equal(int(pr.get("rec_u32_1c", -1)), 0x11223344, "rec +1c") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_04808_index_alloc_bytes(5), 10, "count<<1"
+	) and ok
+	var ix: Dictionary = FlightMathScript.apply_04808_index_words([0x1111, 0x2222, 0x3333], 3)
+	ok = Assertions.assert_equal(int(ix.get("alloc_bytes", -1)), 6, "idx bytes") and ok
+	ok = Assertions.assert_equal(int(ix.get("stream_advance", -1)), 0x0E + 6, "stream+") and ok
+	var iw: Array = ix.get("words", [])
+	ok = Assertions.assert_equal(iw.size(), 3, "3 words") and ok
+	ok = Assertions.assert_equal(int(iw[1]), 0x2222, "word1") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_04808_stream_advance(2), 0x12, "0x0E+4"
+	) and ok
+	var loop48: Dictionary = FlightMathScript.apply_04808_poly_loop([
+		{"desc": {0: 0xAAAA, 8: 1, 9: 0x10, 0x0A: 1}, "words": [0x1]},
+		{"desc": {0: 0xBBBB, 8: 2, 9: 0x20, 0x0A: 2}, "words": [0x2, 0x3]},
+	], 2)
+	ok = Assertions.assert_equal(int(loop48.get("filled", -1)), 2, "2 polys") and ok
+	ok = Assertions.assert_equal(int(loop48.get("stream_end", -1)), 0x10 + 0x12, "stream end") and ok
+	var rec1: Dictionary = (loop48.get("records", []) as Array)[1]
+	ok = Assertions.assert_equal(int(rec1.get("rec_base", -1)), 0x20, "stride 0x20") and ok
+	ok = Assertions.assert_equal(int((rec1.get("record", {}) as Dictionary).get("rec_u32_0c", -1)), 0xBBBB, "poly1") and ok
+	var tr48: Dictionary = FlightMathScript.apply_04808_bit1_trailer(2, 3, 2)
+	ok = Assertions.assert_true(bool(tr48.get("enabled", false)), "bit1 on") and ok
+	ok = Assertions.assert_equal(int(tr48.get("trailer_offset", -1)), 0x40, "after 2*0x20") and ok
+	ok = Assertions.assert_equal(int(tr48.get("word_count", -1)), 3, "38 words") and ok
+	ok = Assertions.assert_equal(int((tr48.get("words", []) as Array)[2]), 2, "word=i") and ok
+	tr48 = FlightMathScript.apply_04808_bit1_trailer(2, 3, 0)
+	ok = Assertions.assert_true(not bool(tr48.get("enabled", true)), "bit1 off") and ok
+	## 04e6e → 02bd8 flag gate
+	var gate28: Dictionary = FlightMathScript.apply_04e6e_02bd8_gate(0, 0, 0)
+	ok = Assertions.assert_true(bool(gate28.get("need_02bd8", false)), "all clear → 02bd8") and ok
+	gate28 = FlightMathScript.apply_04e6e_02bd8_gate(0x10, 0, 0)
+	ok = Assertions.assert_true(not bool(gate28.get("need_02bd8", true)), "bit4 +5 blocks") and ok
+	gate28 = FlightMathScript.apply_04e6e_02bd8_gate(0, 0x10, 0)
+	ok = Assertions.assert_true(not bool(gate28.get("need_02bd8", true)), "bit4 +6 blocks") and ok
+	gate28 = FlightMathScript.apply_04e6e_02bd8_gate(0, 0, 0x10)
+	ok = Assertions.assert_true(not bool(gate28.get("need_02bd8", true)), "bit4 +7 blocks") and ok
+	var args28: Dictionary = FlightMathScript.apply_04e6e_02bd8_args(0x100, 2, 3, 0x2000, 0x4400)
+	ok = Assertions.assert_equal(int(args28.get("param_2_count", -1)), 5, "36+3a") and ok
+	ok = Assertions.assert_equal(int(args28.get("param_4_verts", -1)), 0x4400, "verts +44") and ok
+	## 02bd8 null-aux commit
+	var c28: Dictionary = FlightMathScript.apply_02bd8_null_aux_commit(10, 20, 30, 0, 0, 0)
+	ok = Assertions.assert_true(bool(c28.get("commit", false)), "both null → commit") and ok
+	ok = Assertions.assert_true(bool(c28.get("locals_unchanged", false)), "empty chain") and ok
+	ok = Assertions.assert_equal(int(c28.get("field_18", -1)), 10, "commit +18") and ok
+	c28 = FlightMathScript.apply_02bd8_null_aux_commit(10, 20, 30, 0, 1, 0)
+	ok = Assertions.assert_true(not bool(c28.get("commit", true)), "verts set → no commit") and ok
+	c28 = FlightMathScript.apply_02bd8_null_aux_commit(10, 20, 30, 1, 0, 0)
+	ok = Assertions.assert_true(not bool(c28.get("commit", true)), "mesh set → no commit") and ok
+	var fu48: Dictionary = FlightMathScript.apply_04e6e_post_02bd8_followup(0x8000, 0x11)
+	ok = Assertions.assert_true(bool(fu48.get("need_0435a", false)), "0435a") and ok
+	ok = Assertions.assert_equal(int(fu48.get("0435a_param_2", -1)), 0, "0435a arg2=0") and ok
+	ok = Assertions.assert_true(bool(fu48.get("need_03da8", false)), "03da8") and ok
+	ok = Assertions.assert_equal(int(fu48.get("03da8_param_2", -1)), 0x11, "03da8=+10") and ok
+	## FUN_00003da8 band index
+	var tab: Array = [0, 10, 50, 100, 500, 1000]
+	var d8: Dictionary = FlightMathScript.apply_fun_00003da8(3, 75, tab)
+	## ROM DAT_0001b190: field_30=0, param_2=0x10 → band 3
+	var rom: Array = FlightMathScript.load_dat_0001b190_table()
+	ok = Assertions.assert_equal(rom.size(), 40, "b190 count") and ok
+	ok = Assertions.assert_equal(int(rom[3]), 2048, "b190[3]") and ok
+	ok = Assertions.assert_equal(int(rom[39]), 100000000, "b190[39]") and ok
+	var rom8: Dictionary = FlightMathScript.apply_fun_00003da8(0, 0x10, rom)
+	ok = Assertions.assert_equal(int(rom8.get("return", -1)), 1, "ROM change") and ok
+	ok = Assertions.assert_equal(int(rom8.get("field_30", -1)), 3, "ROM →3") and ok
+	ok = Assertions.assert_equal(int(d8.get("return", -1)), 0, "in-band no-op") and ok
+	ok = Assertions.assert_equal(int(d8.get("field_30", -1)), 3, "stay 3") and ok
+	d8 = FlightMathScript.apply_fun_00003da8(3, 5, tab)
+	ok = Assertions.assert_equal(int(d8.get("return", -1)), 1, "walk down") and ok
+	ok = Assertions.assert_equal(int(d8.get("field_30", -1)), 1, "→1") and ok
+	d8 = FlightMathScript.apply_fun_00003da8(3, 200, tab)
+	ok = Assertions.assert_equal(int(d8.get("return", -1)), 1, "walk up") and ok
+	ok = Assertions.assert_equal(int(d8.get("field_30", -1)), 4, "→4") and ok
+	## FUN_000044a4 type-5 flags
+	var t5: Dictionary = FlightMathScript.apply_044a4_type5_flags(0, 0x100, 5, 0)
+	ok = Assertions.assert_true(bool(t5.get("applied", false)), "type5 apply") and ok
+	ok = Assertions.assert_equal(int(t5.get("flags_04", -1)) & 0x40, 0x40, "|=0x40") and ok
+	t5 = FlightMathScript.apply_044a4_type5_flags(0x40, 0x100, 5, 1)
+	ok = Assertions.assert_equal(int(t5.get("flags_04", -1)) & 0x40, 0, "&=~0x40") and ok
+	t5 = FlightMathScript.apply_044a4_type5_flags(0, 0x100, 4, 0)
+	ok = Assertions.assert_true(not bool(t5.get("applied", true)), "type!=5") and ok
+	t5 = FlightMathScript.apply_044a4_type5_flags(0, 0, 5, 0)
+	ok = Assertions.assert_true(not bool(t5.get("applied", true)), "no entity") and ok
+	## FUN_0000435a gate / +0xc
+	var g35: Dictionary = FlightMathScript.apply_0435a_gate(0, 1)
+	ok = Assertions.assert_true(bool(g35.get("enter", false)), "phase1 enter") and ok
+	g35 = FlightMathScript.apply_0435a_gate(2, 1)
+	ok = Assertions.assert_true(not bool(g35.get("enter", true)), "bit1 +7 blocks") and ok
+	g35 = FlightMathScript.apply_0435a_gate(0, 0)
+	ok = Assertions.assert_true(not bool(g35.get("enter", true)), "phase0 blocks") and ok
+	ok = Assertions.assert_equal(FlightMathScript.apply_0435a_scale_factor(0, 3), 2, "phase-1") and ok
+	ok = Assertions.assert_equal(FlightMathScript.apply_0435a_scale_factor(2, 3), 1, "bit1 +5 →1") and ok
+	var c35: Dictionary = FlightMathScript.apply_0435a_field_0c(0, 0x1000, 0, 2, 0)
+	ok = Assertions.assert_equal(int(c35.get("field_0c", -1)), 0x800, "half") and ok
+	c35 = FlightMathScript.apply_0435a_field_0c(0, 100, 3, 2, 0)
+	ok = Assertions.assert_equal(int(c35.get("field_0c", -1)), 300, "*scale") and ok
+	c35 = FlightMathScript.apply_0435a_field_0c(0, 0x500000, 1, 2, 0)
+	ok = Assertions.assert_true(bool(c35.get("clamped", false)), "clamp") and ok
+	ok = Assertions.assert_equal(int(c35.get("field_0c", -1)), 0x42B209, "clamp val") and ok
+	c35 = FlightMathScript.apply_0435a_field_0c(1000000000, 100, 1, 2, 0)
+	ok = Assertions.assert_true(not bool(c35.get("wrote", true)), "sentinel skip") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_0435a_poly_1c_value(100, 0, false), 50, "1c half"
+	) and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_0435a_poly_1c_value(100, 3, false), 300, "1c *scale"
+	) and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_0435a_poly_1c_value(100, 0, true), 500, "1c player*5"
+	) and ok
+	var p1c: Dictionary = FlightMathScript.apply_0435a_poly_1c_loop([0x200, 0x400], 2, 0, false, 0, 2)
+	ok = Assertions.assert_true(bool(p1c.get("ran", false)), "1c loop") and ok
+	ok = Assertions.assert_equal(int((p1c.get("values", []) as Array)[0]), 0x100, "poly0") and ok
+	ok = Assertions.assert_equal(int((p1c.get("values", []) as Array)[1]), 0x200, "poly1") and ok
+	p1c = FlightMathScript.apply_0435a_poly_1c_loop([1], 1, 0, false, 1, 2)
+	ok = Assertions.assert_true(not bool(p1c.get("ran", true)), "param_2!=0 skip") and ok
+	## FUN_00001c5c + 02bd8 null-aux node/walk
+	var c1c: Dictionary = FlightMathScript.apply_fun_00001c5c(1, [10, 20, 30], 1, 2, 3)
+	ok = Assertions.assert_equal(int((c1c.get("xyz", []) as Array)[0]), 11, "1c5c x") and ok
+	ok = Assertions.assert_equal(int((c1c.get("xyz", []) as Array)[2]), 33, "1c5c z") and ok
+	ok = Assertions.assert_true(
+		not FlightMathScript.apply_02bd8_node_need_rotate(0, 0, 0), "no rot"
+	) and ok
+	ok = Assertions.assert_true(
+		FlightMathScript.apply_02bd8_node_need_rotate(1, 0, 0), "need rot"
+	) and ok
+	var n28: Dictionary = FlightMathScript.apply_02bd8_null_aux_node(10, 20, 30, 5, 0, -1)
+	ok = Assertions.assert_true(bool(n28.get("ok", false)), "node ok") and ok
+	ok = Assertions.assert_equal(int(n28.get("x", -1)), 15, "node x") and ok
+	ok = Assertions.assert_equal(int(n28.get("z", -1)), 29, "node z") and ok
+	var w28: Dictionary = FlightMathScript.apply_02bd8_null_aux_walk(
+		0, 0, 0, [{"dx": 1, "dy": 2, "dz": 3}, {"dx": 10, "dy": 0, "dz": 0}]
+	)
+	ok = Assertions.assert_equal(int(w28.get("steps", -1)), 2, "2 steps") and ok
+	ok = Assertions.assert_equal(int(w28.get("x", -1)), 11, "walk x") and ok
+	ok = Assertions.assert_equal(int(w28.get("y", -1)), 2, "walk y") and ok
+	## rotate without fixture matrix9 → 0253e(s2,s4,s6) then 02ada
+	var n_rot: Dictionary = FlightMathScript.apply_02bd8_null_aux_node(
+		10, 0, 0, 0, 0, 0, 0, 0, 0
+	)
+	## s2=s4=s6=0 → no rotate
+	ok = Assertions.assert_true(bool(n_rot.get("ok", false)), "no-rot ok") and ok
+	n_rot = FlightMathScript.apply_02bd8_null_aux_node(10, 0, 0, 0, 0, 0, 0, 0x1000, 0)
+	ok = Assertions.assert_true(bool(n_rot.get("applied_0253e", false)), "0253e built") and ok
+	ok = Assertions.assert_true(bool(n_rot.get("applied_02ada", false)), "02ada") and ok
+	ok = Assertions.assert_equal(int(n_rot.get("z", -1)), 10, "Ry90 x→+z") and ok
+	ok = Assertions.assert_equal(int(n_rot.get("x", -1)), 0, "Ry90 x→0") and ok
+	w28 = FlightMathScript.apply_02bd8_null_aux_walk(
+		0, 0, 0, [{"dx": 1, "dy": 0, "dz": 0, "s2": 1}]
+	)
+	ok = Assertions.assert_true(not bool(w28.get("blocked_rotate", true)), "rot ok") and ok
+	ok = Assertions.assert_equal(int(w28.get("steps", -1)), 1, "rot 1 step") and ok
+	## FUN_00002ada (no +0x800)
+	var id9: Array = [0x1000, 0, 0, 0, 0x1000, 0, 0, 0, 0x1000]
+	var a28: Dictionary = FlightMathScript.fun_00002ada(1, [100, 200, 300], id9)
+	ok = Assertions.assert_equal(int((a28.get("xyz", []) as Array)[0]), 100, "id x") and ok
+	ok = Assertions.assert_equal(int((a28.get("xyz", []) as Array)[2]), 300, "id z") and ok
+	var sc9: Array = [0x2000, 0, 0, 0, 0x2000, 0, 0, 0, 0x2000]
+	a28 = FlightMathScript.fun_00002ada(1, [100, 200, 300], sc9)
+	ok = Assertions.assert_equal(int((a28.get("xyz", []) as Array)[0]), 200, "×2 x") and ok
+	ok = Assertions.assert_equal(int((a28.get("xyz", []) as Array)[1]), 400, "×2 y") and ok
+	w28 = FlightMathScript.apply_02bd8_null_aux_walk(
+		10, 0, 0, [{"s2": 1, "matrix9": sc9}]
+	)
+	ok = Assertions.assert_equal(int(w28.get("steps", -1)), 1, "02ada step") and ok
+	ok = Assertions.assert_equal(int(w28.get("x", -1)), 20, "02ada×2") and ok
+	## both-aux + field_34 shift
+	var sh28: Dictionary = FlightMathScript.apply_02bd8_shifted_deltas(1, 2, 3, 4)
+	ok = Assertions.assert_equal(int(sh28.get("dx", -1)), 16, "1<<4") and ok
+	ok = Assertions.assert_equal(int(sh28.get("dy", -1)), 32, "2<<4") and ok
+	var b28: Dictionary = FlightMathScript.apply_02bd8_both_aux_walk(
+		1, [10, 20, 30], [{"dx": 1, "dy": 0, "dz": 0}], 3
+	)
+	ok = Assertions.assert_equal(int(b28.get("steps", -1)), 1, "both 1 step") and ok
+	ok = Assertions.assert_equal(int((b28.get("xyz", []) as Array)[0]), 10 + 8, "10+(1<<3)") and ok
+	b28 = FlightMathScript.apply_02bd8_both_aux_walk(
+		2, [1, 2, 3, 4, 5, 6], [{"dx": 1, "dy": 1, "dz": 1}], 0
+	)
+	ok = Assertions.assert_equal(int(b28.get("count", -1)), 2, "count 2") and ok
+	ok = Assertions.assert_equal(int((b28.get("xyz", []) as Array)[3]), 5, "v1 x") and ok
 	return ok
 
 ## [RECONSTRUCTED] field_676 / 677 weapon phases (14673–14719).
