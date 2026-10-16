@@ -637,7 +637,20 @@ void FUN_00000930(undefined4 param_1,undefined4 param_2)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000a42(undefined4 param_1)
+/*
+ * Original: FUN_00000a42; source: ID02.c:640.
+ * Recovered name: draw_thick_line_pixel_index_a5safe [STRONG INFERENCE] (iteration 146).
+ * Overlay service slot A5-0x1116 (JT $3fa).
+ * Status: RENAMED; Ghidra truncated at $A89B (only the fgColor store is
+ * exported). Bytes file 0xa42..0xa84 [PROVEN]: CurrentA5 thunk; args are five
+ * longs (colour, x1, y1, x2, y2; low words used for coordinates):
+ *   thePort (long A5-0x160c)->fgColor (+0x50) = colour  (raw pixel index,
+ *   no ForeColor/RGB lookup); PenSize(2, 2) $A89B; MoveTo(x1, y1) $A893;
+ *   LineTo(x2, y2) $A891.
+ * [STRONG INFERENCE] 2-pixel line in a palette index - e.g. HUD lines drawn
+ * by the overlay.
+ */
+void draw_thick_line_pixel_index_a5safe /* Original: FUN_00000a42 */ (undefined4 param_1)
 
 {
   *(undefined4 *)(*(int *)(DAT_00000904 + -0x160c) + 0x50) = param_1;
@@ -649,7 +662,18 @@ void FUN_00000a42(undefined4 param_1)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000a86(void)
+/*
+ * Original: FUN_00000a86; source: ID02.c:652.
+ * Recovered name: draw_thick_xor_line_a5safe [STRONG INFERENCE] (iteration 146).
+ * Overlay service slot A5-0x1112 (JT $32a).
+ * Status: RENAMED; Ghidra truncated at $A862. Bytes 0xa86..0xace [PROVEN]:
+ * CurrentA5 thunk; args four longs (x1, y1, x2, y2):
+ *   ForeColor(33 blackColor) $A862; PenMode(2 srcXor) $A89C; PenSize(2, 2);
+ *   MoveTo(x1, y1); LineTo(x2, y2); PenMode(0 srcCopy).
+ * XOR mode makes the line erasable by redrawing it [STRONG INFERENCE].
+ * Mode constants per Inside Macintosh; note 0 is restored, not patCopy (8).
+ */
+void draw_thick_xor_line_a5safe /* Original: FUN_00000a86 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -660,7 +684,32 @@ void FUN_00000a86(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000ad0(void)
+/*
+ * Original: FUN_00000ad0; source: ID02.c:663.
+ * Recovered name: paint_view_horizon_bands_a5safe [STRONG INFERENCE structure /
+ * HYPOTHESIS purpose] (iteration 147).
+ * Status: RENAMED; Ghidra truncated at $A8D8. Bytes 0xad0..0xc66 [PROVEN].
+ * CurrentA5 thunk; overlay service slot A5-0x110a (JT $3ea). Long args at
+ * 8(A6) y1, $c y2, then words used: $16 cA, $1a cD, $1e xA, $22 xB, $26 cB, $2a cC.
+ * View rect: v0 = A5-0x1202, h0 = A5-0x1200, right = h0 + A5-0x11fe,
+ * bottom = v0 + A5-0x11fc.
+ *   saved = NewRgn; GetClip(saved); SetClip(view region long A5-0x13b6);
+ *   set_draw_color_index(cA); PaintRect(v0, h0, v0+y1, right) $A8A2;
+ *   if (y1 <= y2) {
+ *     OpenPoly $A8CB; MoveTo(h0, v0+y1); LineTo(xA, v0+y1); LineTo(xB, v0+y2);
+ *       LineTo(h0, v0+y2); LineTo(h0, v0+y1); ClosePoly $A8CC;
+ *       set_draw_color_index(cB); PaintPoly $A8C7; KillPoly $A8CD;
+ *     OpenPoly; MoveTo(right, v0+y1); LineTo(right, v0+y2); LineTo(xB, v0+y2);
+ *       LineTo(xA, v0+y1); LineTo(right, v0+y1); ClosePoly;
+ *       set_draw_color_index(cC); PaintPoly; KillPoly;
+ *     set_draw_color_index(cD); PaintRect(v0+y2, h0, bottom, right);
+ *   }
+ *   PenPat(A5-0x161c) $A89D; SetClip(saved); DisposeRgn(saved).
+ * Note: when y1 > y2 only the top band is painted.
+ * [HYPOTHESIS] Sky band / tilted horizon split in two polygons / ground band
+ * fill of the 3-D view (artificial horizon background).
+ */
+void paint_view_horizon_bands_a5safe /* Original: FUN_00000ad0 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -842,7 +891,7 @@ void FUN_00000fa0(undefined4 param_1,undefined2 param_2)
 {
   undefined4 unaff_D2;
   
-  FUN_000015cc(CONCAT22(param_2,(short)((uint)unaff_D2 >> 0x10)));
+  set_draw_color_index(CONCAT22(param_2,(short)((uint)unaff_D2 >> 0x10)));
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
 }
@@ -927,7 +976,16 @@ int FUN_0000150a(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000015cc(undefined4 param_1)
+/*
+ * Original: FUN_000015cc; source: ID02.c:884.
+ * Recovered name: set_draw_color_index [STRONG INFERENCE] (iteration 147).
+ * Exported C kept (truncated in the 1-bit branch). Arg: word colour index.
+ *   if (mode word A5-0x137a == 1) { A5-0x13ba = colour; JT $1ca(...) [B&W
+ *     pattern selection, UNKNOWN target] ... }
+ *   else thePort (A5-0x160c)->fgColor (+0x50) = (long)colour.
+ * Callers: paint_view_horizon_bands_a5safe (4x), FUN_00000fa0 (ID02.c:799).
+ */
+void set_draw_color_index /* Original: FUN_000015cc */ (undefined4 param_1)
 
 {
   int unaff_A5;

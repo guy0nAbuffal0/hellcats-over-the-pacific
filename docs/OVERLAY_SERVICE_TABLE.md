@@ -20,10 +20,10 @@ consistent with being called from overlay context.
 | A5-0x1122 | 0x1b42 | $33a | ID02 0xc68 | `apply_pending_color_entries_a5safe` |
 | A5-0x111e | 0x1b52 | $372 | ID02 0x197c | `run_segment3_entry_and_unload_a5safe` |
 | A5-0x111a | 0x1b4a | $3aa | ID02 0x195c | `blit_image_clipped_to_region_a5safe` |
-| A5-0x1116 | 0x1b5a | $3fa | ID02 0xa42 | not yet named |
-| A5-0x1112 | 0x1b62 | $32a | ID02 0xa86 | not yet named |
+| A5-0x1116 | 0x1b5a | $3fa | ID02 0xa42 | `draw_thick_line_pixel_index_a5safe` |
+| A5-0x1112 | 0x1b62 | $32a | ID02 0xa86 | `draw_thick_xor_line_a5safe` |
 | A5-0x110e | 0x1baa | $362 | ID02 0x1308 | not yet named |
-| A5-0x110a | 0x1bb2 | $3ea | ID02 0xad0 | not yet named |
+| A5-0x110a | 0x1bb2 | $3ea | ID02 0xad0 | `paint_view_horizon_bands_a5safe` |
 | A5-0x1106 | 0x1b82 | $3d2 | ID02 0xe9e | not yet named |
 | A5-0x1102 | 0x1b92 | $352 | ID02 0xf74 | not yet named |
 | A5-0x10fe | 0x1b8a | $312 | ID02 0xf52 | not yet named |

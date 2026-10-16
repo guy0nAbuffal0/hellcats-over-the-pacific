@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 145
+**Last iteration:** 147
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,7 +11,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 80 | 0 | 0 | 45 | 0 | 0 |
+| ID02.c | 125 | 76 | 0 | 0 | 49 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **545** | **0** | **0** | **185** | **0** | **6** |
+| **TOTAL** | **736** | **541** | **0** | **0** | **189** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 545 NOT_STARTED + 6 BLOCKED (iteration 145);
-185 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 541 NOT_STARTED + 6 BLOCKED (iteration 147);
+189 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -225,6 +225,10 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00001876` (ID02) | `blit_image_clipped_to_region` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:964` | `ID02.decomp.c` | region clip via FUN_000016aa; CopyBits from port A5−0x1496 | — | 145 (2026-10-17) | Capstone; token diff = renames |
 | `FUN_0000195c` (ID02) | `blit_image_clipped_to_region_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:973` | `ID02.decomp.c` | CurrentA5 thunk; slot −0x111a | — | 145 (2026-10-17) | Capstone; token diff = renames |
 | `FUN_0000197c` (ID02) | `run_segment3_entry_and_unload_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:984` | `ID02.decomp.c` | JT $17a + UnloadSeg 3; slot −0x111e | — | 145 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_00000a42` (ID02) | `draw_thick_line_pixel_index_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:640` | `ID02.decomp.c` | thePort fgColor; PenSize/MoveTo/LineTo; slot −0x1116 | — | 146 (2026-10-17) | Capstone; JT confirmed; token diff = renames |
+| `FUN_00000a86` (ID02) | `draw_thick_xor_line_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:652` | `ID02.decomp.c` | ForeColor/PenMode srcXor/PenSize/MoveTo/LineTo; slot −0x1112 | — | 146 (2026-10-17) | Capstone; JT confirmed |
+| `FUN_00000ad0` (ID02) | `paint_view_horizon_bands_a5safe` | ID02 | RENAMED | STRONG INFERENCE (purpose HYPOTHESIS) | `ID02.c:663` | `ID02.decomp.c` | view rect A5−0x1202..−0x11fc; clip A5−0x13b6; PaintRect/OpenPoly/PaintPoly; slot −0x110a | Arg meanings | 147 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_000015cc` (ID02) | `set_draw_color_index` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:884` | `ID02.decomp.c` (+1 call) | fgColor or B&W JT $1ca | 1-bit branch | 147 (2026-10-17) | C + bytes |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1320,8 +1324,31 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - QA: source line refs initially taken from the decomp file; corrected to ID02.c.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID02 service entries `FUN_00000a42`, `FUN_00000a86`,
-`FUN_00000ad0` (slots −0x1116, −0x1112, −0x110a).
+### Iteration 146 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 144-145); 32
+  protected hashes verified.
+- `FUN_00000a42` = draw_thick_line_pixel_index_a5safe (fgColor = raw index,
+  PenSize 2, MoveTo/LineTo; slot −0x1116). `FUN_00000a86` =
+  draw_thick_xor_line_a5safe (black, PenMode srcXor, PenSize 2, line,
+  PenMode 0; slot −0x1112). Both truncated in Ghidra; decoded from bytes.
+- `FUN_00000ad0` (slot −0x110a; clip region A5−0x13b6, rect globals
+  A5−0x1202..−0x11fc, FUN_000015cc, PaintRect) deferred to the next pass.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 147 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 146 preserved.
+- `FUN_00000ad0` = paint_view_horizon_bands_a5safe: clipped to view region
+  A5−0x13b6, paints a top band, two quadrilaterals split along a tilted line
+  (xA@y1 → xB@y2), and a bottom band, each in its own colour index
+  (slot −0x110a). Sky/horizon/ground role = HYPOTHESIS.
+- `FUN_000015cc` = set_draw_color_index (fgColor = index; 1-bit mode via JT
+  $1ca). Caller list corrected to FUN_00000fa0 (initially cited a decomp line).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID02 `FUN_00000fa0` (service slot −0x10fa) and
+neighbours `FUN_00000f52` / `FUN_00000f74` / `FUN_00000fd2`.
 
 ## Resuming the five-minute workflow
 
