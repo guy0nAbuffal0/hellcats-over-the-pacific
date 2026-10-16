@@ -671,7 +671,19 @@ void FUN_00000ad0(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000c68(void)
+/*
+ * Original: FUN_00000c68; source: ID02.c:674.
+ * Recovered name: apply_pending_color_entries_a5safe [STRONG INFERENCE] (iteration 145).
+ * Status: RENAMED; Ghidra truncated at $AA3F. Bytes file 0xc68..0xca4 [PROVEN]:
+ * CurrentA5 thunk; ct = long A5-0x14b2 (colour table allocated by
+ * initialize_application); SetEntries(-1, ct->ctSize (+6) - 1, &ct->ctTable
+ * (+8)) $AA3F; ct->ctSize = 0. Default value of overlay service slot A5-0x1122
+ * (JT $33a); build_palette_index_map swaps in clear_ctab_size_callback (which
+ * only clears ctSize, discarding the entries) when palette indices collide.
+ * [STRONG INFERENCE] The overlay accumulates RGB entries in the table and
+ * calls the slot to apply them. Trap name per Inside Macintosh.
+ */
+void apply_pending_color_entries_a5safe /* Original: FUN_00000c68 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -995,7 +1007,24 @@ void FUN_000016aa(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001876(void)
+/*
+ * Original: FUN_00001876; source: ID02.c:964.
+ * Recovered name: blit_image_clipped_to_region [STRONG INFERENCE] (iteration 145).
+ * Status: RENAMED; Ghidra truncated at $A89B. Bytes 0x1876..0x195a [PROVEN]:
+ *   PenSize(1,1); r = NewRgn(); OpenRgn(); FUN_000016aa() (draws the clip
+ *   shape); CloseRgn(r); saved = NewRgn(); GetClip(saved); SetClip(r);
+ *   if (!(HGetState(h = long A5-0x12b0) & 0x80)) { HLock(h); locked = 1 }
+ *     (JT $2d2 = ID09 0x3b0 $A069; JT $272 HLock);
+ *   ForeColor(black) / BackColor(white);
+ *   (**port->portPixMap).baseAddr = *h, .rowBytes = record[A5-0x13ae].+0xa
+ *     (port = long A5-0x1496; records 0x160 bytes at *(long A5-0x13b2));
+ *   CopyBits(&port->portBits, &thePort->portBits, &port->portRect,
+ *            &port->portRect, srcCopy, nil) $A8EC;
+ *   if (locked) HUnlock(h); SetClip(saved); DisposeRgn(saved); DisposeRgn(r).
+ * [HYPOTHESIS] Draws a stored picture (e.g. cockpit panel) through a shaped
+ * clip; image/record meanings UNKNOWN. Caller: blit_image_clipped_to_region_a5safe.
+ */
+void blit_image_clipped_to_region /* Original: FUN_00001876 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1004,10 +1033,16 @@ void FUN_00001876(void)
 
 
 
-void FUN_0000195c(void)
+/*
+ * Original: FUN_0000195c; source: ID02.c:973.
+ * Recovered name: blit_image_clipped_to_region_a5safe [STRONG INFERENCE] (iteration 145).
+ * CurrentA5 thunk (bytes 0x195c..0x197a) calling blit_image_clipped_to_region.
+ * Overlay service slot A5-0x111a (JT $3aa).
+ */
+void blit_image_clipped_to_region_a5safe /* Original: FUN_0000195c */ (void)
 
 {
-  FUN_00001876();
+  blit_image_clipped_to_region(); /* Original: FUN_00001876 */
   return;
 }
 
@@ -1015,7 +1050,14 @@ void FUN_0000195c(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000197c(void)
+/*
+ * Original: FUN_0000197c; source: ID02.c:984.
+ * Recovered name: run_segment3_entry_and_unload_a5safe [STRONG INFERENCE] (iteration 145).
+ * Bytes 0x197c..0x19a0 [PROVEN]: CurrentA5 thunk; JSR $17a(A5) (segment 3 file
+ * 0x5cc4, routine UNKNOWN); UnloadSeg(JT $18a = segment 3 entry) $A9F1.
+ * Overlay service slot A5-0x111e (JT $372).
+ */
+void run_segment3_entry_and_unload_a5safe /* Original: FUN_0000197c */ (void)
 
 {
   (**(code **)(DAT_00000904 + 0x17a))();
@@ -2813,7 +2855,19 @@ enqueue_sample_on_channel /* Original: FUN_00004050 */ (int param_1,undefined4 p
 
 
 
-void FUN_0000412e(uint param_1)
+/*
+ * Original: FUN_0000412e; source: ID02.c:2299-2317.
+ * Recovered name: set_sound_playback_rate [STRONG INFERENCE] (iteration 144).
+ * Overlay service slot A5-0x10d6 (JT $452).
+ * Exported C complete. CurrentA5 routine; no effect while sound inactive.
+ * param_1 = rate, 16.16 fixed point, clamped to [0x8000, 0x30000] (0.5x..3.0x).
+ *   A5-0xc2a = rate * 370 >> 16   samples consumed per VBL refill
+ *   A5-0xc2e = rate << 16         fractional step (low 16 bits of rate)
+ *   A5-0xc32 = rate >> 16         integer step
+ * These are the 32.32 step and length read by the VBL handlers. Unsigned
+ * arithmetic; rate * 0x172 cannot overflow for the clamped range.
+ */
+void set_sound_playback_rate /* Original: FUN_0000412e */ (uint param_1)
 
 {
   int iVar1;
@@ -2835,7 +2889,20 @@ void FUN_0000412e(uint param_1)
 
 
 
-void FUN_000041a6(int param_1)
+/*
+ * Original: FUN_000041a6; source: ID02.c:2321-2340.
+ * Recovered name: release_channel_loop [STRONG INFERENCE] (iteration 144).
+ * Overlay service slot A5-0x10ce (JT $44a).
+ * Exported C complete. For ch 0..1 while sound active:
+ *   n = alloc_sound_buffer_node(ch, silence A5-0xc26, 0, 0x172, 0) (self-looping
+ *   silence); free head (+4) = n->next; for each node from the channel head
+ *   (+0) along +0x14 until n: continuation (+0x18) = next (+0x14).
+ * Breaks any self-looping (sustain) node so playback proceeds through the
+ * remaining nodes into the new silence node [STRONG INFERENCE]. Resolves the
+ * sustain-release question in docs/SOUND_SYSTEM.md. Ghidra's unaff_A3 is the
+ * pushed word 0 (artifact).
+ */
+void release_channel_loop /* Original: FUN_000041a6 */ (int param_1)
 
 {
   int iVar1;
@@ -2884,7 +2951,15 @@ void silence_sound_channel /* Original: FUN_00004242 */ (int param_1)
 
 
 
-undefined4 FUN_000042b0(int param_1)
+/*
+ * Original: FUN_000042b0; source: ID02.c:2360-2374.
+ * Recovered name: is_channel_playing [STRONG INFERENCE] (iteration 144).
+ * Overlay service slot A5-0x10d2 (JT $43a).
+ * Exported C complete. Returns 0 if sound inactive or ch outside 0..1;
+ * else (word) current node's buffer (+8) != silence buffer A5-0xc26. The upper
+ * word in Ghidra's CONCAT22 is register residue, not meaningful.
+ */
+undefined4 is_channel_playing /* Original: FUN_000042b0 */ (int param_1)
 
 {
   undefined4 uVar1;
@@ -3105,6 +3180,8 @@ void configure_palette_entries /* Original: FUN_00004738 */ (undefined4 param_1)
  * NewPtrClear colour-table block from initialize_application; +6 = ctSize
  * [HYPOTHESIS]), restores A5/D2. Installed as function pointer A5-0x1122 via
  * JT A5+0x46a by build_palette_index_map when palette indices collide.
+ * Iteration 145: it is the 'discard' alternative to apply_pending_color_entries_a5safe
+ * (FUN_00000c68, SetEntries) normally installed in that slot.
  */
 void clear_ctab_size_callback /* Original: FUN_0000488a */ (void)
 

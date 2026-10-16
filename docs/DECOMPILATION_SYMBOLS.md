@@ -44,6 +44,12 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | STRONG INFERENCE | Iter 141: arg == 1 → $0196 = A5−0x35c. |
 | `FUN_00003f54` (ID02) | `play_sample_on_channel` | STRONG INFERENCE | Iter 142: queue sample on ch 0..1 with optional sustain loop; see SOUND_SYSTEM.md. |
 | `FUN_00004050` (ID02) | `enqueue_sample_on_channel` | STRONG INFERENCE (purpose HYPOTHESIS) | Iter 143: queues nodes like play_sample_on_channel but leaves channel head unchanged. |
+| `FUN_0000412e` (ID02) | `set_sound_playback_rate` | STRONG INFERENCE | Iter 144: 16.16 rate → step/len globals. |
+| `FUN_000041a6` (ID02) | `release_channel_loop` | STRONG INFERENCE | Iter 144: breaks sustain self-loops, ends in silence. |
+| `FUN_000042b0` (ID02) | `is_channel_playing` | STRONG INFERENCE | Iter 144: current buffer ≠ silence. |
+| `FUN_00000c68` (ID02) | `apply_pending_color_entries_a5safe` | STRONG INFERENCE | Iter 145: SetEntries(-1, ctSize-1, ctTable) on A5−0x14b2; ctSize = 0. |
+| `FUN_00001876` (ID02) | `blit_image_clipped_to_region` | STRONG INFERENCE | Iter 145: CopyBits image A5−0x12b0 via port A5−0x1496 clipped to region from FUN_000016aa. |
+| `FUN_0000195c` / `FUN_0000197c` (ID02) | `blit_image_clipped_to_region_a5safe` / `run_segment3_entry_and_unload_a5safe` | STRONG INFERENCE | Iter 145: CurrentA5 service thunks. |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
 | A5−0x7d0 | sound channel records [2] × 0x238 bytes | STRONG INFERENCE | Indexed by silence_sound_channel / FUN_00003d50. |
 | ID02 file 0x1b42 (unexported) | `install_overlay_service_table` (proposed) | STRONG INFERENCE | Iter 135: 34 JT addresses → A5 table; A5−0x1040 work buffer. See OVERLAY_SERVICE_TABLE.md. |

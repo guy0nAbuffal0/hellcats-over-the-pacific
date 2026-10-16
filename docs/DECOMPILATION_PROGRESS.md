@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 143
+**Last iteration:** 145
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,7 +11,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 87 | 0 | 0 | 38 | 0 | 0 |
+| ID02.c | 125 | 80 | 0 | 0 | 45 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **552** | **0** | **0** | **178** | **0** | **6** |
+| **TOTAL** | **736** | **545** | **0** | **0** | **185** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 552 NOT_STARTED + 6 BLOCKED (iteration 143);
-178 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 545 NOT_STARTED + 6 BLOCKED (iteration 145);
+185 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -218,6 +218,13 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2154` | `ID02.decomp.c` | $0196 = A5−0x35c if arg == 1; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
 | `FUN_00003f54` (ID02) | `play_sample_on_channel` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2231-2260` | `ID02.decomp.c` | alloc_sound_buffer_node; select_two_channel_sound_handler; service slot −0x10de | Release of sustain loop | 142 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00004050` (ID02) | `enqueue_sample_on_channel` | ID02 | RENAMED | STRONG INFERENCE (purpose HYPOTHESIS) | `ID02.c:2266` | `ID02.decomp.c` | as play_sample_on_channel without head store; slot −0x10da | Reachability of queued nodes | 143 (2026-10-17) | C complete; token diff = renames |
+| `FUN_0000412e` (ID02) | `set_sound_playback_rate` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2299-2317` | `ID02.decomp.c` | rate clamp; A5−0xc2a/−0xc2e/−0xc32; slot −0x10d6 | — | 144 (2026-10-17) | C complete; JT slot confirmed; token diff = renames |
+| `FUN_000041a6` (ID02) | `release_channel_loop` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2321-2340` | `ID02.decomp.c` | alloc silence node; rewrite continuations; slot −0x10ce | — | 144 (2026-10-17) | C complete; JT slot confirmed; token diff = renames |
+| `FUN_000042b0` (ID02) | `is_channel_playing` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2360-2374` | `ID02.decomp.c` | buffer != silence; slot −0x10d2 | — | 144 (2026-10-17) | C complete; JT slot confirmed; token diff = renames |
+| `FUN_00000c68` (ID02) | `apply_pending_color_entries_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:674` | `ID02.decomp.c` | SetEntries on A5−0x14b2 table; slot −0x1122 | — | 145 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_00001876` (ID02) | `blit_image_clipped_to_region` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:964` | `ID02.decomp.c` | region clip via FUN_000016aa; CopyBits from port A5−0x1496 | — | 145 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_0000195c` (ID02) | `blit_image_clipped_to_region_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:973` | `ID02.decomp.c` | CurrentA5 thunk; slot −0x111a | — | 145 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_0000197c` (ID02) | `run_segment3_entry_and_unload_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:984` | `ID02.decomp.c` | JT $17a + UnloadSeg 3; slot −0x111e | — | 145 (2026-10-17) | Capstone; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1288,8 +1295,33 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   HYPOTHESIS). SOUND_SYSTEM.md and OVERLAY_SERVICE_TABLE.md updated.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** remaining sound service slots `FUN_0000412e`
-(−0x10d6), `FUN_000042b0` (−0x10d2), `FUN_000041a6` (−0x10ce).
+### Iteration 144 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 142-143); 32
+  protected hashes verified.
+- Renamed the remaining sound services: `FUN_0000412e` →
+  set_sound_playback_rate (16.16 rate clamped 0.5x..3x), `FUN_000041a6` →
+  release_channel_loop (appends silence and un-loops every node up to it —
+  answers the sustain-release question), `FUN_000042b0` → is_channel_playing.
+  JT slots $452/$44a/$43a confirmed. SOUND_SYSTEM.md / OVERLAY_SERVICE_TABLE.md
+  updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 145 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 144 preserved.
+- `FUN_00000c68` = apply_pending_color_entries_a5safe (SetEntries $AA3F on the
+  A5−0x14b2 colour table, then ctSize = 0); default for slot −0x1122, with
+  clear_ctab_size_callback as the collision 'discard' alternative.
+- `FUN_00001876` = blit_image_clipped_to_region (OpenRgn/FUN_000016aa/
+  CloseRgn clip, HGetState/HLock image A5−0x12b0, CopyBits via port
+  A5−0x1496, restore clip); `FUN_0000195c` its CurrentA5 thunk (slot −0x111a);
+  `FUN_0000197c` = run_segment3_entry_and_unload_a5safe (slot −0x111e).
+- QA: source line refs initially taken from the decomp file; corrected to ID02.c.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID02 service entries `FUN_00000a42`, `FUN_00000a86`,
+`FUN_00000ad0` (slots −0x1116, −0x1112, −0x110a).
 
 ## Resuming the five-minute workflow
 

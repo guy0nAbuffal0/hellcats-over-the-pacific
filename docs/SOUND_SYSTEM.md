@@ -43,6 +43,9 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
 | 0x3d50 | `alloc_sound_buffer_node` | pop + fill a node |
 | 0x3f54 | `play_sample_on_channel` | queue sample (optional sustain loop); service slot `-0x10de` |
 | 0x4050 | `enqueue_sample_on_channel` | as play, without setting the channel head; service slot `-0x10da` |
+| 0x412e | `set_sound_playback_rate` | 16.16 rate clamped 0.5x..3x → step and samples-per-VBL; slot `-0x10d6` |
+| 0x41a6 | `release_channel_loop` | append silence, un-loop every node up to it; slot `-0x10ce` |
+| 0x42b0 | `is_channel_playing` | current node buffer ≠ silence; slot `-0x10d2` |
 | 0x4242 | `silence_sound_channel` | queue looping silence; service slot `-0x10ca` |
 | 0x3d36 | `clear_sound_buffer_to_silence` | 370 × 0x80 into `SoundBase` |
 | 0x39a8 | `vbl_sound_handler_ch0_unrolled` | VBL refill, channel 0 (×8 unrolled) |
@@ -67,4 +70,5 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
 - End-of-buffer and continuation handling inside the handlers.
 - Whether nodes from `enqueue_sample_on_channel` are actually reached
   (depends on handler end-of-buffer logic).
-- How the three-node sustain loop is released.
+- ~~How the three-node sustain loop is released~~ — `release_channel_loop`
+  (iteration 144) rewrites continuations to break self-loops.

@@ -17,9 +17,9 @@ consistent with being called from overlay context.
 | A5-0x130c | 0x1bfa | $1c2 | ID06 0x9d8 | not yet named |
 | A5-0x1308 | 0x1c02 | $19a | ID06 0xe10 | not yet named |
 | A5-0x1304 | 0x1c0a | $1a2 | ID06 0x8a2 | not yet named |
-| A5-0x1122 | 0x1b42 | $33a | ID02 0xc68 | not yet named |
-| A5-0x111e | 0x1b52 | $372 | ID02 0x197c | not yet named |
-| A5-0x111a | 0x1b4a | $3aa | ID02 0x195c | not yet named |
+| A5-0x1122 | 0x1b42 | $33a | ID02 0xc68 | `apply_pending_color_entries_a5safe` |
+| A5-0x111e | 0x1b52 | $372 | ID02 0x197c | `run_segment3_entry_and_unload_a5safe` |
+| A5-0x111a | 0x1b4a | $3aa | ID02 0x195c | `blit_image_clipped_to_region_a5safe` |
 | A5-0x1116 | 0x1b5a | $3fa | ID02 0xa42 | not yet named |
 | A5-0x1112 | 0x1b62 | $32a | ID02 0xa86 | not yet named |
 | A5-0x110e | 0x1baa | $362 | ID02 0x1308 | not yet named |
@@ -34,9 +34,9 @@ consistent with being called from overlay context.
 | A5-0x10ea | 0x1b7a | $3c2 | ID02 0x11ec | not yet named |
 | A5-0x10de | 0x1bba | $442 | ID02 0x3f54 | `play_sample_on_channel` |
 | A5-0x10da | 0x1bc2 | $42a | ID02 0x4050 | `enqueue_sample_on_channel` |
-| A5-0x10d6 | 0x1bca | $452 | ID02 0x412e | not yet named |
-| A5-0x10d2 | 0x1bd2 | $43a | ID02 0x42b0 | not yet named |
-| A5-0x10ce | 0x1bda | $44a | ID02 0x41a6 | not yet named |
+| A5-0x10d6 | 0x1bca | $452 | ID02 0x412e | `set_sound_playback_rate` |
+| A5-0x10d2 | 0x1bd2 | $43a | ID02 0x42b0 | `is_channel_playing` |
+| A5-0x10ce | 0x1bda | $44a | ID02 0x41a6 | `release_channel_loop` |
 | A5-0x10ca | 0x1be2 | $432 | ID02 0x4242 | `silence_sound_channel` |
 | A5-0x10c6 | 0x1bea | $35a | ID02 0x14e6 | not yet named |
 | A5-0x10c2 | 0x1c12 | $31a | ID02 0x19a2 | `new_handle_clear_or_die_a5safe` |
