@@ -2,8 +2,8 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 141
-**Last iteration date:** 2026-10-16
+**Last iteration:** 143
+**Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
 ## Inventory summary
@@ -11,7 +11,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 89 | 0 | 0 | 36 | 0 | 0 |
+| ID02.c | 125 | 87 | 0 | 0 | 38 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **554** | **0** | **0** | **176** | **0** | **6** |
+| **TOTAL** | **736** | **552** | **0** | **0** | **178** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 554 NOT_STARTED + 6 BLOCKED (iteration 141);
-176 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 552 NOT_STARTED + 6 BLOCKED (iteration 143);
+178 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -216,6 +216,8 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00003aae` (ID02) | `vbl_sound_handler_ch0_variant` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1868` | `ID02.decomp.c` | JT 0x412; ch0 resample ×2; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
 | `FUN_00003bc4` (ID02) | `vbl_sound_handler_two_channel` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1990` | `ID02.decomp.c` | JT 0x422; ch0+ch1 mix; writes $0196; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
 | `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2154` | `ID02.decomp.c` | $0196 = A5−0x35c if arg == 1; Lvl1DT[1] | Variant differences; end-of-buffer logic | 141 (2026-10-16) | Capstone feature scan; token diff = renames |
+| `FUN_00003f54` (ID02) | `play_sample_on_channel` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2231-2260` | `ID02.decomp.c` | alloc_sound_buffer_node; select_two_channel_sound_handler; service slot −0x10de | Release of sustain loop | 142 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00004050` (ID02) | `enqueue_sample_on_channel` | ID02 | RENAMED | STRONG INFERENCE (purpose HYPOTHESIS) | `ID02.c:2266` | `ID02.decomp.c` | as play_sample_on_channel without head store; slot −0x10da | Reachability of queued nodes | 143 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1266,9 +1268,28 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   select_two_channel_sound_handler.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** write `docs/SOUND_SYSTEM.md` (channel records, node
-layout, silence buffer, VBL hook chain, shutdown) from iterations 138-141, then
-continue ID02 with callers of alloc_sound_buffer_node (play-sample API).
+### Iteration 142 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 132-141). Verified
+  32 protected hashes.
+- Renamed `FUN_00003f54` → play_sample_on_channel (ch 0..1; optional
+  sustain loop via a self-looping middle node, else sample + looping silence;
+  service slot −0x10de).
+- Wrote `docs/SOUND_SYSTEM.md` (hardware model, channel/node layout, globals,
+  function table, VBL hook pattern, open questions). Service-table doc names
+  updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 143 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 142 preserved.
+- `FUN_00004050` = play_sample_on_channel minus the channel-head store;
+  renamed `enqueue_sample_on_channel` (mechanics STRONG INFERENCE, purpose
+  HYPOTHESIS). SOUND_SYSTEM.md and OVERLAY_SERVICE_TABLE.md updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** remaining sound service slots `FUN_0000412e`
+(−0x10d6), `FUN_000042b0` (−0x10d2), `FUN_000041a6` (−0x10ce).
 
 ## Resuming the five-minute workflow
 

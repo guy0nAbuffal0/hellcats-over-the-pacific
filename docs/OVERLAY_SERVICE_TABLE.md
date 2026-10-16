@@ -32,12 +32,12 @@ consistent with being called from overlay context.
 | A5-0x10f2 | 0x1b6a | $322 | ID02 0xd3a | `blit_offscreen_frame_to_window` |
 | A5-0x10ee | 0x1b72 | $34a | ID02 0xe3e | not yet named |
 | A5-0x10ea | 0x1b7a | $3c2 | ID02 0x11ec | not yet named |
-| A5-0x10de | 0x1bba | $442 | ID02 0x3f54 | not yet named |
-| A5-0x10da | 0x1bc2 | $42a | ID02 0x4050 | not yet named |
+| A5-0x10de | 0x1bba | $442 | ID02 0x3f54 | `play_sample_on_channel` |
+| A5-0x10da | 0x1bc2 | $42a | ID02 0x4050 | `enqueue_sample_on_channel` |
 | A5-0x10d6 | 0x1bca | $452 | ID02 0x412e | not yet named |
 | A5-0x10d2 | 0x1bd2 | $43a | ID02 0x42b0 | not yet named |
 | A5-0x10ce | 0x1bda | $44a | ID02 0x41a6 | not yet named |
-| A5-0x10ca | 0x1be2 | $432 | ID02 0x4242 | not yet named |
+| A5-0x10ca | 0x1be2 | $432 | ID02 0x4242 | `silence_sound_channel` |
 | A5-0x10c6 | 0x1bea | $35a | ID02 0x14e6 | not yet named |
 | A5-0x10c2 | 0x1c12 | $31a | ID02 0x19a2 | `new_handle_clear_or_die_a5safe` |
 | A5-0x10be | 0x1c1a | $332 | ID02 0x1a04 | `dispose_handle_a5safe` |

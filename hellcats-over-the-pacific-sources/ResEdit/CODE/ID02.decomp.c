@@ -2717,8 +2717,24 @@ void init_sound_system /* Original: FUN_00003dd0 */ (int param_1)
 
 
 
+/*
+ * Original: FUN_00003f54; source: ID02.c:2231-2260.
+ * Recovered name: play_sample_on_channel [STRONG INFERENCE] (iteration 142).
+ * Exported C complete. Args: ch, sample buffer, start, end, loop_start,
+ * loop_end (longs). CurrentA5 routine (DAT_00000904). Overlay service slot
+ * A5-0x10de (JT $442).
+ * Returns 0 if sound inactive (A5-0xc38 == 0) or ch outside 0..1. Otherwise:
+ *   loop_start < loop_end: nodes [start, loop_start) -> [loop_start, loop_end)
+ *     (flag 0: repeats itself) -> [loop_end, end);
+ *   else: [start, end) -> looping silence (A5-0xc26, 0, 0x172);
+ *   select_two_channel_sound_handler(ch); channel ch head (A5-0x7d0 +
+ *   ch*0x238) = first node; returns 1.
+ * Ghidra's CONCAT22(1, ...) is the word flag 1 pushed for linked nodes.
+ * Note the third (tail) node is only reached if the loop node is later
+ * re-linked [HYPOTHESIS: sustain loop with release tail].
+ */
 undefined4
-FUN_00003f54(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,uint param_5,
+play_sample_on_channel /* Original: FUN_00003f54 */ (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,uint param_5,
             uint param_6)
 
 {
@@ -2752,8 +2768,20 @@ FUN_00003f54(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 
 
 
+/*
+ * Original: FUN_00004050; source: ID02.c:2266-2296.
+ * Recovered name: enqueue_sample_on_channel [STRONG INFERENCE mechanics /
+ * HYPOTHESIS purpose] (iteration 143).
+ * Exported C complete; identical to play_sample_on_channel except that it does
+ * NOT store the first node into the channel head (A5-0x7d0 + ch*0x238). Nodes
+ * are allocated in free-list order with continuation = next free node, so the
+ * new chain is only reached if the currently playing chain continues into the
+ * free-list head [HYPOTHESIS; not verified against handler end-of-buffer code].
+ * Returns 0 if sound inactive or ch outside 0..1, else 1 (after
+ * select_two_channel_sound_handler(ch)). Overlay service slot A5-0x10da (JT $42a).
+ */
 undefined4
-FUN_00004050(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,uint param_5,
+enqueue_sample_on_channel /* Original: FUN_00004050 */ (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,uint param_5,
             uint param_6)
 
 {
