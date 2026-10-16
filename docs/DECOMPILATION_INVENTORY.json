@@ -1,6 +1,6 @@
 {
-  "generated": "2026-10-15",
-  "total": 731,
+  "generated": "2026-10-16",
+  "total": 736,
   "functions": [
     {
       "file": "ID01.c",
@@ -645,6 +645,12 @@
       "line": 2108
     },
     {
+      "name": "FUN_00003d50",
+      "return": "undefined4 *",
+      "file": "ID02.c",
+      "line": 2126
+    },
+    {
       "file": "ID02.c",
       "name": "FUN_00003db8",
       "return": "void",
@@ -655,6 +661,18 @@
       "name": "FUN_00003dd0",
       "return": "void",
       "line": 2170
+    },
+    {
+      "name": "FUN_00003f54",
+      "return": "undefined4",
+      "file": "ID02.c",
+      "line": 2231
+    },
+    {
+      "name": "FUN_00004050",
+      "return": "undefined4",
+      "file": "ID02.c",
+      "line": 2266
     },
     {
       "file": "ID02.c",
@@ -3075,6 +3093,12 @@
       "line": 13651
     },
     {
+      "name": "FUN_0000e262",
+      "return": "undefined4",
+      "file": "Pacific Conflict.c",
+      "line": 13673
+    },
+    {
       "file": "Pacific Conflict.c",
       "name": "FUN_0000e2a4",
       "return": "uint *",
@@ -3187,6 +3211,12 @@
       "name": "FUN_000102d6",
       "return": "ushort",
       "line": 15333
+    },
+    {
+      "name": "FUN_00010360",
+      "return": "undefined4",
+      "file": "Pacific Conflict.c",
+      "line": 15361
     },
     {
       "file": "Pacific Conflict.c",

@@ -126,20 +126,39 @@ void FUN_000003c2(void)
 
 
 
-byte * FUN_00000432(byte *param_1)
+/*
+ * Original: FUN_00000432; source: ID09.c:129-143.
+ * Recovered name: length_prefixed_bytes_to_c_string_in_place
+ * Confidence: [STRONG INFERENCE] string convention; [PROVEN] C byte transform.
+ * Input: writable buffer of at least buffer[0] + 1 bytes; first byte is count.
+ * Output: original buffer pointer; count payload bytes shifted left one byte,
+ * followed by a zero byte. Embedded zero bytes are copied, not skipped.
+ * Side effects: writes only buffer[0..initial_count]; no global accesses.
+ * Known callers: none found in the ten original C exports.
+ * Known callees: none.
+ * Evidence: ID09.c:132-141 zero-extends the byte count, copies forward from
+ * cursor[1], then writes zero; :142 returns the original pointer.
+ * Local mapping: param_1 -> buffer; uVar1 -> remaining_count;
+ * pbVar2 -> write_cursor.
+ * Unknown: actual callers, encoding and binary address mapping/ABI. No binary
+ * verification claimed; retain Ghidra's ushort decrement and 0xffff sentinel.
+ */
+byte * length_prefixed_bytes_to_c_string_in_place(byte *buffer)
 
 {
-  ushort uVar1;
-  byte *pbVar2;
+  ushort remaining_count;
+  byte *write_cursor;
   
-  uVar1 = (ushort)*param_1;
-  pbVar2 = param_1;
-  while (uVar1 = uVar1 - 1, uVar1 != 0xffff) {
-    *pbVar2 = pbVar2[1];
-    pbVar2 = pbVar2 + 1;
+  remaining_count = (ushort)*buffer;
+  write_cursor = buffer;
+  /* Pre-decrement wraps a zero count to 0xffff: zero-length copies nothing. */
+  while (remaining_count = remaining_count - 1, remaining_count != 0xffff) {
+    /* Forward copy preserves the unread byte despite overlapping ranges. */
+    *write_cursor = write_cursor[1];
+    write_cursor = write_cursor + 1;
   }
-  *pbVar2 = 0;
-  return param_1;
+  *write_cursor = 0;
+  return buffer;
 }
 
 

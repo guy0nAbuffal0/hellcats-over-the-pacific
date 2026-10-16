@@ -10,6 +10,8 @@ Bind the Godot **Mission-1** flight path to **evidence-backed** motion rules fro
 
 ## Update order (this pass)
 
+**[RECONSTRUCTED — 2026-10-16]** Randomized controls (`Pacific Conflict.c:14105–14138`): for flags `0x04` / `0x08`, draw from `FUN_00011564` in that order, add `(draw & 0x7f) - 0x40` to `0x662` / `0x666`, narrow the sum to signed 16 bits (`short sVar21`), then clamp to ±`0x200` / ±`0x140`. `FUN_00002e08` (3461–3468) is integer absolute value. The status-bit override follows both draws. `SimCore` now preserves narrowing before clamping; deterministic overflow and ordinary-value fixtures in `test_sim_tick_ordering.gd` distinguish this from wide-integer clamping. This slice does not alter playable `FlightModelMvp`.
+
 **[RECONSTRUCTED]** Contact early-out (Pacific Conflict.c:14083–14104; Capstone `@0xE85A–0xE89C`): if `(status_1a1 & 8) != 0`, update `position_velocity_c` from `pos_2e` vs `*(iVar1+0x1c)`, optional `status\|0x1000` / `DAT_0001b850`, then two 11544-callsite draws: `61e+=rng&0x7f` → `field_24=(field_24+61e)&0x3fff`; `61a-=rng&0x7f` → `pos_20=(pos_20+61a)&0x3fff`; clear `0x669`; early exit. Godot: `apply_contact_61a_61e_attitude`. **[INFERRED]** Call-site `FUN_00011544` ≡ one `FUN_00011564`.
 
 **[RECONSTRUCTED]** In the original, the **0x66e / 0x672 / 0x66a** block runs **after** control/status setup and **FUN_0000e42a** / **FUN_0000e468** / **FUN_0000e570** prep (`local_26`, `local_46`, `local_42`), and **only** for **player** or **designated target** (`DAT_0001b738` / `DAT_0001b888`).

@@ -2,25 +2,34 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 99  
-**Last iteration date:** 2026-10-15  
-**Loop:** local monitored shell `AGENT_LOOP_TICK_hellcats_decomp` every 300s (PID 54957 / terminal 343366)
+**Last iteration:** 100
+**Last iteration date:** 2026-10-16
+**Loop:** automatic recurrence is not configured in this session: available tools expose neither subscription timers nor monitored-output wake notifications. Prior PID 54957 / terminal 343366 is historical and not confirmed active. Resume manually using the instructions below.
 
 ## Inventory summary
 
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 122 | 122 | 0 | 0 | 0 | 0 | 0 |
+| ID02.c | 125 | 125 | 0 | 0 | 0 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 24 | 0 | 0 | 0 | 0 | 0 |
 | ID06.c | 24 | 24 | 0 | 0 | 0 | 0 | 0 |
 | ID07.c | 2 | 2 | 0 | 0 | 0 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| ID09.c | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
-| Pacific Conflict.c | 441 | 328 | 0 | 0 | 106 | 0 | 8 |
-| **TOTAL** | **731** | **614** | **0** | **0** | **110** | **0** | **8** |
+| ID09.c | 4 | 3 | 0 | 0 | 1 | 0 | 0 |
+| Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
+| **TOTAL** | **736** | **619** | **0** | **0** | **111** | **0** | **6** |
+
+Inventory correction (iteration 100): five multiline definitions were previously
+omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
+`FUN_00004050` (:2266); Pacific Conflict `FUN_0000e262` (:13673),
+`FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
+functions with annotations remain RENAMED. The two blocked labels `$E352` and
+`$1A186` remain documented below but are not function definitions and do not
+contribute to function totals. Remaining work: 619 NOT_STARTED + 6 BLOCKED;
+111 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -38,7 +47,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `ID06.c` | `ID06.decomp.c` | seeded (copy) |
 | `ID07.c` | `ID07.decomp.c` | seeded (copy) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
-| `ID09.c` | `ID09.decomp.c` | seeded (copy) |
+| `ID09.c` | `ID09.decomp.c` | preserved + iteration 100 helper reconstruction |
 | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–99 edits |
 
 ## Function tracker (processed / in focus)
@@ -164,6 +173,8 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00000348` | `alloc_and_read_resource_payload` | ID08 | RENAMED | PROVEN | `ID08.c:249` / `@0x348` | `ID08.decomp.c` | `$2ca/$2c2` size; `$22a` alloc; `$2b2` read | Exact trap names | 69 | Capstone; 1 call site |
 | `FUN_00000338` | `sysbeep_and_exit_to_shell` | ID08 | RENAMED | PROVEN | `@0x338` | `ID08.decomp.c` | `_SysBeep(100)` + `_ExitToShell` | No callers in ID08 | 70 | Capstone traps |
 | `FUN_0000039c` | `bootstrap_window_and_load_overlay` | ID08 | RENAMED | PROVEN call | `@0x39C` | `ID08.decomp.c` | window/port; `'HELL'`; JSR→`load_overlay…` | Trap names; HELL check | 71 | Capstone; completes ID08 |
+| `FUN_00000432` | `length_prefixed_bytes_to_c_string_in_place` | ID09 | RENAMED | STRONG INFERENCE | `ID09.c:129-143` | `ID09.decomp.c:129-162` | Caller buffer only; no globals/callees; no direct callers found | Binary mapping, ABI, encoding and runtime callers | 100 (2026-10-16) | Full-file token equivalence; independent QA; strict C99 helper compile; 768 reference cases pass; protected hashes pass |
+
 All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 
 ## Iteration log
@@ -649,7 +660,40 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Renamed `FUN_00003c48`→`approx_dist3_from_abs` and `FUN_00003c68`→`approx_dist3_xyz`
   (max+|others|>>2 distance approx).
 
-**Next iteration target:** Revisit `$1A48` allocator ABI (BLOCKED) or `ID09` entry.
+### Iteration 100 — 2026-10-16
+
+- Resumed existing work; all ten output files already existed and were preserved.
+- Renamed ID09 `FUN_00000432` and its three locals; annotated input bounds,
+  output, overlap direction, zero-length case, global dependencies and uncertainty.
+- Evidence: `ID09.c:135-142`; independent reverse-engineering and QA agents agreed.
+  Full-file comparison after removing comments and reversing four identifier renames
+  matches the original (632 tokens). No binary address mapping was assumed.
+- Isolated helper compiled with `cc -std=c99 -Wall -Wextra -Werror` using explicit
+  8-bit byte / 16-bit ushort aliases. All 768 cases (length 0..255, zero/255/varying
+  payloads) matched a memmove-based reference, including return pointer and canary
+  bytes. Harness: `/tmp/hellcats-id09-iteration100.c` (temporary).
+- Status remains RENAMED: these checks establish preservation of exported C,
+  not the original runtime ABI or instruction-level correspondence.
+- Corrected inventory omissions for five multiline signatures; historical entries
+  and previous reconstruction edits remain intact. See inventory correction below.
+- Two unrelated ID05 RNG test binary artifacts changed during this session;
+  they were not edited or reverted by this iteration.
+
+**Next iteration target:** `ID09.c:27` / `FUN_00000048`, initialization block through
+`param_1[2] = 0`: annotate only after resolving evidence for the selector globals.
+
+## Resuming the five-minute workflow
+
+Invoke: “Resume one five-minute Hellcats C reconstruction iteration from
+`docs/DECOMPILATION_PROGRESS.md`, preserving original artifacts and existing edits.”
+Before each pass, inspect Git status and verify the protected checksum manifest
+relative to `hellcats-over-the-pacific-sources/ResEdit/CODE`. Select the next block,
+assign one owner per edited file, compare original C and dependencies, validate
+changes, then update this checkpoint and symbol map. Do not recreate existing
+outputs, commit, push, or touch gameplay code. If a future session exposes a real
+agent wake scheduler, configure a 300-second interval and record its returned
+handle only after activation; a shell printing ticks alone does not wake this agent.
+
 
 ## Priority queue (suggested)
 

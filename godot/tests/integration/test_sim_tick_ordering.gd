@@ -21,6 +21,7 @@ func run() -> bool:
 	ok = _test_multi_tick_stable_order() and ok
 	ok = _test_trace_includes_tick_order() and ok
 	ok = _test_rng_draws_and_param2_entity_counts() and ok
+	ok = _test_randomized_control_s16_before_clamp() and ok
 	ok = _test_fun_00006fb8_reset() and ok
 	ok = _test_fun_00005df8_slot_clear() and ok
 	ok = _test_fun_0000528a_branches() and ok
@@ -418,6 +419,38 @@ func _test_trace_includes_tick_order() -> bool:
 		return false
 	var nested: Variant = (rec as Dictionary).get("tick_order", {})
 	ok = Assertions.assert_true(nested is Dictionary and (nested as Dictionary).has("passes"), "trace has tick_order.passes") and ok
+	return ok
+
+## C 14105–14137 assigns to short sVar21 before abs/clamping.
+func _test_randomized_control_s16_before_clamp() -> bool:
+	var sim := SimCoreScript.new(0)
+	var ok := true
+	# initial, RNG draw, expected 662, expected 666
+	for fixture in [[32767, 127, -512, -320], [-32768, 0, 512, 320],
+		[0, 127, 63, 63], [0, 0, -64, -64], [320, 64, 320, 320]]:
+		var words: Array = []
+		words.resize(56)
+		words.fill(0)
+		# Cursor 55 -> 1: table[24]+table[55]; then 2: table[25]+table[1].
+		words[24] = int(fixture[1]) << 16
+		sim.rng.set_table(words, 55)
+		var e := EntityStateScript.new()
+		e.set_u8_field("flags_685", 0x0c)
+		e.set_s16_field("movement_662", int(fixture[0]))
+		e.set_s16_field("movement_666", int(fixture[0]))
+		sim._apply_randomized_control_offsets(e)
+		ok = Assertions.assert_true(e.get_s16_field("movement_662") == int(fixture[2]), "662 signed wrap before clamp: %s" % str(fixture)) and ok
+		ok = Assertions.assert_true(e.get_s16_field("movement_666") == int(fixture[3]), "666 signed wrap before clamp: %s" % str(fixture)) and ok
+		ok = Assertions.assert_true(sim.rng.get_cursor_index() == 2, "both control branches consume one overlay draw") and ok
+	# Status override happens after both draws, even for overflowing inputs.
+	var e := EntityStateScript.new()
+	e.set_u8_field("flags_685", 0x0c)
+	e.set_u16_field("status_1a1", 1)
+	e.set_s16_field("movement_662", 32767)
+	e.set_s16_field("movement_666", -32768)
+	sim._apply_randomized_control_offsets(e)
+	ok = Assertions.assert_true(e.get_s16_field("movement_662") == 0 and e.get_s16_field("movement_666") == -128, "status override follows randomized controls") and ok
+	ok = Assertions.assert_true(sim.rng.get_cursor_index() == 4, "status override retains both draws") and ok
 	return ok
 
 func _test_rng_draws_and_param2_entity_counts() -> bool:

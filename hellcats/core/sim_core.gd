@@ -642,10 +642,11 @@ func _apply_randomized_control_offsets(entity: RefCounted) -> void:
 	var flags_685: int = entity.get_u8_field("flags_685")
 	if (flags_685 & 0x04) != 0:
 		var movement_662: int = entity.get_s16_field("movement_662") + (_rng_consume() & 0x7F) - 0x40
-		entity.set_s16_field("movement_662", _clamp_s16(movement_662, -0x200, 0x200))
+		## C 14107: short sVar21 narrows the sum before abs/clamping.
+		entity.set_s16_field("movement_662", _clamp_s16(_to_s16(movement_662), -0x200, 0x200))
 	if (flags_685 & 0x08) != 0:
 		var movement_666: int = entity.get_s16_field("movement_666") + (_rng_consume() & 0x7F) - 0x40
-		entity.set_s16_field("movement_666", _clamp_s16(movement_666, -0x140, 0x140))
+		entity.set_s16_field("movement_666", _clamp_s16(_to_s16(movement_666), -0x140, 0x140))
 	if (entity.get_u16_field("status_1a1") & 0x0001) != 0:
 		entity.set_s16_field("movement_662", 0)
 		entity.set_s16_field("movement_666", -0x80)

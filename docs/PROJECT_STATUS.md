@@ -2,6 +2,24 @@
 
 Assessment date: 15 October 2026.
 
+## Focused convergence update — 16 October 2026
+
+**Verified:** baseline recheck passed all 13 Godot scripts and Python regression checks. The earlier class-resolution / fixture failures did not recur. An initial sandboxed Godot launch crashed in its user-log rotation; rerunning with an explicit `/tmp` log outside the sandbox succeeded.
+
+One flight-harness correction: `SimCore._apply_randomized_control_offsets` now narrows each perturbed `movement_662` / `movement_666` sum to signed 16 bits **before** clamping. `FUN_0000e792` at `Pacific Conflict.c:14105–14138` assigns to `short sVar21` before `FUN_00002e08` (absolute value, lines 3461–3468). Previously an overflow could clamp to the opposite sign. The reverse-engineering review independently confirmed the ordering. Mission 1 continues to use `FlightModelMvp`; this change is confined to `SimCore`.
+
+Validation: new deterministic overlay-table fixtures failed four overflow assertions before the fix (12 scripts passed / 1 failed), then all 13 scripts passed. Fixtures also check ordinary positive/negative deltas, a clamp boundary, two RNG draws, and the subsequent status override. Commands run from repository root:
+
+```sh
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path . --log-file /tmp/hellcats-loop-runtime.log --script res://godot/tests/run_all.gd
+python3 tools/qa/test_regression.py
+git diff --check
+```
+
+Final Godot and Python exits: **0**. No GDScript parse errors; Godot logged a macOS `get_system_ca_certificates` diagnostic after the passing summary. Python's optional C RNG check compiled and passed. No manual gameplay or visual checks were performed. No original-binary trace was captured; fidelity here is to the decompiled short-assignment semantics, not demonstrated whole-game parity.
+
+Next focused loop: verify signed-width behavior in the adjacent control accumulator / threshold decrement (`FUN_0000e792:14139–14167`) with boundary fixtures. Broader dispatch and playable-flight migration remain unresolved.
+
 This report describes the Godot repository as it exists today. It does not describe a planned game. Claims are tagged:
 
 - **Verified** — read from a file, scene, script, original C source, or a command that was run.
