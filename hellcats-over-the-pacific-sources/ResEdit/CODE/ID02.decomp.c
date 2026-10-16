@@ -743,7 +743,20 @@ void apply_pending_color_entries_a5safe /* Original: FUN_00000c68 */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000ca6(void)
+/*
+ * Original: FUN_00000ca6; source: ID02.c:685.
+ * Recovered name: new_offscreen_cport [STRONG INFERENCE] (iteration 149).
+ * Bytes 0xca6..0xd22 [PROVEN]; Ghidra truncated after the allocation. Args:
+ * word rowBytes [8(A6)], Ptr base [$a], Rect bounds by value [$e..$15].
+ *   port = NewPtrClear(0x6c = sizeof(CGrafPort)) (JT $232, ID09 0x20c);
+ *   saved = thePort; OpenCPort(port) $AA00; SetPort(saved);
+ *   pm.rowBytes = rowBytes; pm.baseAddr = base; pm.bounds = bounds;
+ *   port->portRect = bounds; RectRgn(port->visRgn, &bounds); return port (D0).
+ * Unlike open_offscreen_cport_a5safe it does not OR 0x8000 into rowBytes (the
+ * caller blit_offscreen_frame_to_window already does) and uses bounds as
+ * portRect directly. No NULL check. JT $402; also called from ID03 0x3788.
+ */
+void new_offscreen_cport /* Original: FUN_00000ca6 */ (void)
 
 {
   int unaff_A5;
@@ -791,7 +804,7 @@ void close_and_dispose_port /* Original: FUN_00000d24 */ (void)
  * [top, left, bottom, right], dstRect A5-0x14ea = srcRect; rowBytes =
  * ((A5-0x1372 * A5-0x137a + 15) >> 4) * 2 | 0x8000 (PixMap flag; bytes
  * 0xd6e..0xd7e, the 0x8000 OR is not shown by Ghidra); port =
- * FUN_00000ca6(rowBytes, base, bounds) -> A5-0x103a.
+ * new_offscreen_cport (FUN_00000ca6)(rowBytes, base, bounds) -> A5-0x103a.
  * Each call: (**port->portPixMap).baseAddr = param_1; src.bottom = height;
  * dst.top = top; dst.bottom = top + height; dst.left/right = src.left/right;
  * mode 2 -> dst.left/right -= word A5-0x137e; mode 3 -> += A5-0x137e.
@@ -816,7 +829,7 @@ void blit_offscreen_frame_to_window /* Original: FUN_00000d3a */ (undefined4 par
     *(undefined2 *)(iVar1 + -0x14ee) = *(undefined2 *)(iVar1 + -0x1370);
     *(undefined4 *)(iVar1 + -0x14ea) = *(undefined4 *)(iVar1 + -0x14f2);
     *(undefined4 *)(iVar1 + -0x14e6) = *(undefined4 *)(iVar1 + -0x14ee);
-    uVar2 = FUN_00000ca6();
+    uVar2 = new_offscreen_cport(); /* Original: FUN_00000ca6 */
     *(undefined4 *)(iVar1 + -0x103a) = uVar2;
   }
   *(undefined4 *)**(undefined4 **)(*(int *)(iVar1 + -0x103a) + 2) = param_1;
@@ -841,7 +854,19 @@ void blit_offscreen_frame_to_window /* Original: FUN_00000d3a */ (undefined4 par
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000e3e(int param_1,undefined4 param_2)
+/*
+ * Original: FUN_00000e3e; source: ID02.c:749.
+ * Recovered name: blit_pixels_via_port_a5safe [STRONG INFERENCE] (iteration 149).
+ * Overlay service slot A5-0x10ee (JT $34a).
+ * Bytes 0xe3e..0xe9c [PROVEN]; Ghidra truncated after the first store.
+ * Args: GrafPtr src_port [8], Ptr base [$c], Rect *src [$10], GrafPtr dst
+ * [$14] (0 = thePort), Rect *dst [$18].
+ *   (**src_port->portPixMap).baseAddr = base; ForeColor(black) $A862;
+ *   BackColor(white) $A863; if (!dst_port) dst_port = thePort (A5-0x160c);
+ *   CopyBits(&src_port->portBits, &dst_port->portBits, src, dst, srcCopy, nil).
+ * General form of blit_offscreen_frame_to_window [STRONG INFERENCE].
+ */
+void blit_pixels_via_port_a5safe /* Original: FUN_00000e3e */ (int param_1,undefined4 param_2)
 
 {
   *(undefined4 *)**(undefined4 **)(param_1 + 2) = param_2;
@@ -853,7 +878,21 @@ void FUN_00000e3e(int param_1,undefined4 param_2)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000e9e(void)
+/*
+ * Original: FUN_00000e9e; source: ID02.c:761.
+ * Recovered name: open_offscreen_cport_a5safe [STRONG INFERENCE] (iteration 149).
+ * Overlay service slot A5-0x1106 (JT $3d2).
+ * Bytes 0xe9e..0xf50 [PROVEN]; Ghidra exported no body. Args: CGrafPtr port
+ * [8], long rowBytes [$c], Ptr base [$10], Rect *bounds [$14].
+ *   saved = thePort; OpenCPort(port) $AA00; SetPort(saved);
+ *   pm = *port->portPixMap: pm.rowBytes = rowBytes | 0x8000 (PixMap flag);
+ *   pm.baseAddr = base; pm.bounds = *bounds;
+ *   portRect (+0x10) = (0, 0, bounds.bottom - bounds.top, bounds.right - bounds.left);
+ *   RectRgn(port->visRgn (+0x18), &portRect) $A8DF.
+ * new_offscreen_cport (FUN_00000ca6) performs the same steps inline on a
+ * freshly allocated port (it does not call this routine).
+ */
+void open_offscreen_cport_a5safe /* Original: FUN_00000e9e */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -864,7 +903,14 @@ void FUN_00000e9e(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000f52(void)
+/*
+ * Original: FUN_00000f52; source: ID02.c:772.
+ * Recovered name: close_port_a5safe [STRONG INFERENCE] (iteration 148).
+ * Overlay service slot A5-0x10fe (JT $312).
+ * Bytes 0xf52..0xf72 [PROVEN]: CurrentA5 thunk; ClosePort(port long arg) $A87D.
+ * Ghidra lost the argument.
+ */
+void close_port_a5safe /* Original: FUN_00000f52 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -875,7 +921,14 @@ void FUN_00000f52(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000f74(void)
+/*
+ * Original: FUN_00000f74; source: ID02.c:783.
+ * Recovered name: swap_port_a5safe [STRONG INFERENCE] (iteration 148).
+ * Overlay service slot A5-0x1102 (JT $352).
+ * Bytes 0xf74..0xf9e [PROVEN]: CurrentA5 thunk; old = thePort (long A5-0x160c);
+ * SetPort(port arg) $A873; returns old in D0. Ghidra lost argument and result.
+ */
+void swap_port_a5safe /* Original: FUN_00000f74 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -886,7 +939,15 @@ void FUN_00000f74(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000fa0(undefined4 param_1,undefined2 param_2)
+/*
+ * Original: FUN_00000fa0; source: ID02.c:794.
+ * Recovered name: paint_rect_color_index_a5safe [STRONG INFERENCE] (iteration 148).
+ * Overlay service slot A5-0x10fa (JT $39a).
+ * Bytes 0xfa0..0xfd0 [PROVEN]: CurrentA5 thunk; set_draw_color_index(word
+ * colour at $e(A6) = low word of 2nd long); PaintRect(Rect *param_1) $A8A2;
+ * PenPat(A5-0x161c) $A89D (restore pattern). Ghidra truncated after the colour call.
+ */
+void paint_rect_color_index_a5safe /* Original: FUN_00000fa0 */ (undefined4 param_1,undefined2 param_2)
 
 {
   undefined4 unaff_D2;
@@ -900,7 +961,22 @@ void FUN_00000fa0(undefined4 param_1,undefined2 param_2)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000fd2(void)
+/*
+ * Original: FUN_00000fd2; source: ID02.c:808.
+ * Recovered name: paint_polygon_rgb_a5safe [STRONG INFERENCE] (iteration 148).
+ * Overlay service slot A5-0x10f6 (JT $3f2).
+ * Bytes 0xfd2..0x10cc [PROVEN]: CurrentA5 thunk. Args: long *pts [8] (count
+ * pairs {x long, y long}), long count [$c], long rgb [$10] = 0xRRGGBBxx.
+ *   RGBColor c = { (rgb>>24 & 0xff) << 8, (rgb>>16 & 0xff) << 8, (rgb>>8 & 0xff) << 8 };
+ *   poly = OpenPoly $A8CB; MoveTo(pts[n-1].x, -pts[n-1].y); for i < n:
+ *     LineTo(pts[i].x, -pts[i].y) $A891;  ClosePoly $A8CC;
+ *   1-bit branch: JT $1ca (segment 6 file 0x116, pattern helper) + FillPoly
+ *   $A8CA; colour branch: RGBForeColor(&c) $AA14 + PaintPoly $A8C7;
+ *   KillPoly $A8CD.
+ * y is negated (world-up to screen-down) [STRONG INFERENCE]; branch condition
+ * not fully traced.
+ */
+void paint_polygon_rgb_a5safe /* Original: FUN_00000fd2 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -911,7 +987,23 @@ void FUN_00000fd2(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000010ce(void)
+/*
+ * Original: FUN_000010ce; source: ID02.c:819.
+ * Recovered name: build_notched_frame_poly [STRONG INFERENCE mechanics]
+ * (iteration 151). Ghidra exported no body. Bytes 0x10ce..0x11ea [PROVEN].
+ * Arg: Rect r by value (top 8, left $a, bottom $c, right $e). Returns PolyHandle.
+ *   poly = OpenPoly(); r.right -= thePort->pnSize.h (+0x36);
+ *   r.bottom -= thePort->pnSize.v (+0x34);
+ *   c = ((r.right - r.left) * 4) / 16  (DIVS.W; width/4);
+ *   d = c + c/2 - pnSize.v/2;
+ *   MoveTo(left, top); LineTo(right, top); Line(0, d); Line(-c, c); Line(c, c);
+ *   LineTo(right, bottom - c); LineTo(right - c, bottom); LineTo(left + c, bottom);
+ *   LineTo(left, bottom - c); LineTo(left, top + d + 2c); Line(c, -c); Line(-c, -c);
+ *   ... ClosePoly (tail not listed here).
+ * Shape: frame with V-notches on both sides and chamfered bottom corners.
+ * Purpose UNKNOWN (UI decoration). Caller: draw_notched_frame_pair_a5safe.
+ */
+void build_notched_frame_poly /* Original: FUN_000010ce */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -922,7 +1014,24 @@ void FUN_000010ce(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000011ec(void)
+/*
+ * Original: FUN_000011ec; source: ID02.c:830.
+ * Recovered name: draw_notched_frame_pair_a5safe [STRONG INFERENCE mechanics /
+ * UNKNOWN purpose] (iteration 151; INVESTIGATING in iteration 150).
+ * Iteration 151: both polygons come from the same Rect at A5-0x119c (8 bytes
+ * ending at A5-0x1194), built by build_notched_frame_poly with PenSize 2 and
+ * then PenSize 1 (outer and inner outline); the shift A5-0x1192 - A5-0x119a
+ * (a value minus rect.left) moves the pair for the second copy. Overlay service
+ * slot A5-0x10ea (JT $3c2). Ghidra exported no body. Bytes 0x11ec..0x1306
+ * [PROVEN, partial reading]: CurrentA5 thunk; two polygons built by
+ * FUN_000010ce from data at A5-0x1194 (each after PenSize); black/white;
+ * loop x2: set_draw_color_index(...), FUN_00001632(A5-0x118c), PaintPoly,
+ * FillPoly(pattern A5-0x14e2), FramePoly in standard grey indices A5-0x118c /
+ * A5-0x118a (init_standard_colour_indices), then OffsetPoly both by
+ * (A5-0x1192 - A5-0x119a); KillPoly both; PenPat(A5-0x161c).
+ * [UNKNOWN] What the shapes are (possibly a bevelled UI frame drawn twice).
+ */
+void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -948,7 +1057,15 @@ void FUN_00001308(void)
 
 
 
-void FUN_000014e6(void)
+/*
+ * Original: FUN_000014e6; source: ID02.c:856.
+ * Recovered name: swap_mmu_mode_a5safe [STRONG INFERENCE] (iteration 150).
+ * Bytes 0x14e6..0x1508 match the C [PROVEN]: CurrentA5 thunk; JT $2e2 =
+ * ID09 file 0x3c2 swapmmumode_glue (SwapMMUMode, $A05D) with &byte A5-0x1000
+ * (VAR mode: the caller-visible 24/32-bit addressing mode byte).
+ * Overlay service slot A5-0x10c6 (JT $35a).
+ */
+void swap_mmu_mode_a5safe /* Original: FUN_000014e6 */ (void)
 
 {
   (**(code **)(DAT_00000904 + 0x2e2))(DAT_00000904 + -0x1000);
@@ -983,7 +1100,8 @@ int FUN_0000150a(void)
  *   if (mode word A5-0x137a == 1) { A5-0x13ba = colour; JT $1ca(...) [B&W
  *     pattern selection, UNKNOWN target] ... }
  *   else thePort (A5-0x160c)->fgColor (+0x50) = (long)colour.
- * Callers: paint_view_horizon_bands_a5safe (4x), FUN_00000fa0 (ID02.c:799).
+ * Callers: paint_view_horizon_bands_a5safe (4x), paint_rect_color_index_a5safe
+ * (FUN_00000fa0, ID02.c:799).
  */
 void set_draw_color_index /* Original: FUN_000015cc */ (undefined4 param_1)
 

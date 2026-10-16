@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 147
+**Last iteration:** 151
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,7 +11,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 76 | 0 | 0 | 49 | 0 | 0 |
+| ID02.c | 125 | 66 | 0 | 0 | 59 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **541** | **0** | **0** | **189** | **0** | **6** |
+| **TOTAL** | **736** | **531** | **0** | **0** | **199** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 541 NOT_STARTED + 6 BLOCKED (iteration 147);
-189 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 531 NOT_STARTED + 6 BLOCKED (iteration 151);
+199 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -229,6 +229,16 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00000a86` (ID02) | `draw_thick_xor_line_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:652` | `ID02.decomp.c` | ForeColor/PenMode srcXor/PenSize/MoveTo/LineTo; slot −0x1112 | — | 146 (2026-10-17) | Capstone; JT confirmed |
 | `FUN_00000ad0` (ID02) | `paint_view_horizon_bands_a5safe` | ID02 | RENAMED | STRONG INFERENCE (purpose HYPOTHESIS) | `ID02.c:663` | `ID02.decomp.c` | view rect A5−0x1202..−0x11fc; clip A5−0x13b6; PaintRect/OpenPoly/PaintPoly; slot −0x110a | Arg meanings | 147 (2026-10-17) | Capstone; token diff = renames |
 | `FUN_000015cc` (ID02) | `set_draw_color_index` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:884` | `ID02.decomp.c` (+1 call) | fgColor or B&W JT $1ca | 1-bit branch | 147 (2026-10-17) | C + bytes |
+| `FUN_00000f52` (ID02) | `close_port_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | ClosePort; slot −0x10fe | — | 148 (2026-10-17) | Capstone; JT confirmed; token diff = renames |
+| `FUN_00000f74` (ID02) | `swap_port_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | SetPort, returns old thePort; slot −0x1102 | — | 148 (2026-10-17) | Capstone; JT confirmed; token diff = renames |
+| `FUN_00000fa0` (ID02) | `paint_rect_color_index_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | colour index + PaintRect + PenPat; slot −0x10fa | — | 148 (2026-10-17) | Capstone; JT confirmed; token diff = renames |
+| `FUN_00000fd2` (ID02) | `paint_polygon_rgb_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | RGB from 0xRRGGBBxx; poly with y negated; FillPoly or RGBForeColor+PaintPoly; slot −0x10f6 | — | 148 (2026-10-17) | Capstone; JT confirmed; token diff = renames |
+| `FUN_00000e3e` (ID02) | `blit_pixels_via_port_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | baseAddr + CopyBits to port/thePort; slot −0x10ee | — | 149 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_00000e9e` (ID02) | `open_offscreen_cport_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | OpenCPort, pixmap rowBytes|0x8000/base/bounds, portRect, RectRgn; slot −0x1106 | — | 149 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_00000ca6` (ID02) | `new_offscreen_cport` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | NewPtrClear(0x6c) + OpenCPort + pixmap/portRect/visRgn; JT $402 | — | 149 (2026-10-17) | Capstone; token diff = renames |
+| `FUN_000014e6` (ID02) | `swap_mmu_mode_a5safe` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:856` | `ID02.decomp.c` | ID09 swapmmumode_glue on A5−0x1000; slot −0x10c6 | — | 150 (2026-10-17) | C + bytes |
+| `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | ID02 | RENAMED | STRONG INFERENCE mechanics / UNKNOWN purpose | `ID02.c:830` | `ID02.decomp.c` | build_notched_frame_poly ×2 (rect A5−0x119c); grey indices; slot −0x10ea | Shape meaning | 151 (2026-10-17) | Capstone |
+| `FUN_000010ce` (ID02) | `build_notched_frame_poly` | ID02 | RENAMED | STRONG INFERENCE mechanics | `ID02.c:819` | `ID02.decomp.c` | OpenPoly; pnSize; Line/LineTo | Tail not fully listed | 151 (2026-10-17) | Capstone |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1347,8 +1357,51 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   $1ca). Caller list corrected to FUN_00000fa0 (initially cited a decomp line).
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID02 `FUN_00000fa0` (service slot −0x10fa) and
-neighbours `FUN_00000f52` / `FUN_00000f74` / `FUN_00000fd2`.
+### Iteration 148 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 146-147); 32
+  protected hashes verified.
+- Renamed four drawing/port services (all Ghidra-truncated, decoded from
+  bytes): close_port_a5safe, swap_port_a5safe, paint_rect_color_index_a5safe,
+  paint_polygon_rgb_a5safe (packed 0xRRGGBBxx colour; {x,y} long pairs with
+  y negated; B&W FillPoly vs colour RGBForeColor + PaintPoly). JT slots
+  $312/$352/$39a/$3f2 confirmed.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 149 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 148 preserved.
+- Renamed offscreen-port helpers (all Ghidra-truncated): `FUN_00000e3e` →
+  blit_pixels_via_port_a5safe (slot −0x10ee), `FUN_00000e9e` →
+  open_offscreen_cport_a5safe (slot −0x1106), `FUN_00000ca6` →
+  new_offscreen_cport (NewPtrClear 0x6c + OpenCPort; used by
+  blit_offscreen_frame_to_window; +1 call site). Corrected a same-iteration
+  hypothesis (ca6 duplicates rather than calls e9e).
+- QA: first doc-update script had a syntax error and wrote nothing; re-run.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 150 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 149 preserved.
+- `FUN_000014e6` = swap_mmu_mode_a5safe (CurrentA5; ID09 SwapMMUMode glue on
+  byte A5−0x1000; slot −0x10c6).
+- `FUN_000011ec` (slot −0x10ea) partially read: two FUN_000010ce polygons
+  painted/filled/framed in standard grey indices, offset and repeated; marked
+  INVESTIGATING (no rename). Counts: 1 INVESTIGATING.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 151 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 150 preserved.
+- `FUN_000010ce` = build_notched_frame_poly(Rect): polygon with V-notches on
+  both sides and chamfered bottom, sized from width/4 and pen size.
+- `FUN_000011ec` resolved enough to rename: draw_notched_frame_pair_a5safe
+  (same rect A5−0x119c built with pen 2 and pen 1, filled/framed in grey
+  indices, drawn twice with a horizontal shift). Purpose still UNKNOWN.
+  INVESTIGATING count back to 0.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID02 `FUN_00001308` (slot −0x110e).
 
 ## Resuming the five-minute workflow
 

@@ -24,21 +24,21 @@ consistent with being called from overlay context.
 | A5-0x1112 | 0x1b62 | $32a | ID02 0xa86 | `draw_thick_xor_line_a5safe` |
 | A5-0x110e | 0x1baa | $362 | ID02 0x1308 | not yet named |
 | A5-0x110a | 0x1bb2 | $3ea | ID02 0xad0 | `paint_view_horizon_bands_a5safe` |
-| A5-0x1106 | 0x1b82 | $3d2 | ID02 0xe9e | not yet named |
-| A5-0x1102 | 0x1b92 | $352 | ID02 0xf74 | not yet named |
-| A5-0x10fe | 0x1b8a | $312 | ID02 0xf52 | not yet named |
-| A5-0x10fa | 0x1b9a | $39a | ID02 0xfa0 | not yet named |
-| A5-0x10f6 | 0x1ba2 | $3f2 | ID02 0xfd2 | not yet named |
+| A5-0x1106 | 0x1b82 | $3d2 | ID02 0xe9e | `open_offscreen_cport_a5safe` |
+| A5-0x1102 | 0x1b92 | $352 | ID02 0xf74 | `swap_port_a5safe` |
+| A5-0x10fe | 0x1b8a | $312 | ID02 0xf52 | `close_port_a5safe` |
+| A5-0x10fa | 0x1b9a | $39a | ID02 0xfa0 | `paint_rect_color_index_a5safe` |
+| A5-0x10f6 | 0x1ba2 | $3f2 | ID02 0xfd2 | `paint_polygon_rgb_a5safe` |
 | A5-0x10f2 | 0x1b6a | $322 | ID02 0xd3a | `blit_offscreen_frame_to_window` |
-| A5-0x10ee | 0x1b72 | $34a | ID02 0xe3e | not yet named |
-| A5-0x10ea | 0x1b7a | $3c2 | ID02 0x11ec | not yet named |
+| A5-0x10ee | 0x1b72 | $34a | ID02 0xe3e | `blit_pixels_via_port_a5safe` |
+| A5-0x10ea | 0x1b7a | $3c2 | ID02 0x11ec | `draw_notched_frame_pair_a5safe` |
 | A5-0x10de | 0x1bba | $442 | ID02 0x3f54 | `play_sample_on_channel` |
 | A5-0x10da | 0x1bc2 | $42a | ID02 0x4050 | `enqueue_sample_on_channel` |
 | A5-0x10d6 | 0x1bca | $452 | ID02 0x412e | `set_sound_playback_rate` |
 | A5-0x10d2 | 0x1bd2 | $43a | ID02 0x42b0 | `is_channel_playing` |
 | A5-0x10ce | 0x1bda | $44a | ID02 0x41a6 | `release_channel_loop` |
 | A5-0x10ca | 0x1be2 | $432 | ID02 0x4242 | `silence_sound_channel` |
-| A5-0x10c6 | 0x1bea | $35a | ID02 0x14e6 | not yet named |
+| A5-0x10c6 | 0x1bea | $35a | ID02 0x14e6 | `swap_mmu_mode_a5safe` |
 | A5-0x10c2 | 0x1c12 | $31a | ID02 0x19a2 | `new_handle_clear_or_die_a5safe` |
 | A5-0x10be | 0x1c1a | $332 | ID02 0x1a04 | `dispose_handle_a5safe` |
 | A5-0x10ba | 0x1c22 | $40a | ID02 0x1a28 | `realloc_and_clear_handle_a5safe` |

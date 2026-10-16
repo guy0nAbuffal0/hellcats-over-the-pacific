@@ -54,6 +54,15 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00000a86` (ID02) | `draw_thick_xor_line_a5safe` | STRONG INFERENCE | Iter 146: black srcXor 2-px line. |
 | `FUN_00000ad0` (ID02) | `paint_view_horizon_bands_a5safe` | STRONG INFERENCE (purpose HYPOTHESIS) | Iter 147: top band + two tilted quads + bottom band in view region. |
 | `FUN_000015cc` (ID02) | `set_draw_color_index` | STRONG INFERENCE | Iter 147: fgColor = index (or B&W path). |
+| `FUN_00000f52` / `FUN_00000f74` (ID02) | `close_port_a5safe` / `swap_port_a5safe` | STRONG INFERENCE | Iter 148: ClosePort; SetPort returning previous port. |
+| `FUN_00000fa0` (ID02) | `paint_rect_color_index_a5safe` | STRONG INFERENCE | Iter 148: colour index + PaintRect. |
+| `FUN_00000fd2` (ID02) | `paint_polygon_rgb_a5safe` | STRONG INFERENCE | Iter 148: filled polygon in packed RGB, y negated. |
+| `FUN_00000e3e` (ID02) | `blit_pixels_via_port_a5safe` | STRONG INFERENCE | Iter 149: set baseAddr; CopyBits src→dst (default thePort). |
+| `FUN_00000e9e` (ID02) | `open_offscreen_cport_a5safe` | STRONG INFERENCE | Iter 149: OpenCPort + pixmap/portRect/visRgn setup on caller storage. |
+| `FUN_00000ca6` (ID02) | `new_offscreen_cport` | STRONG INFERENCE | Iter 149: allocate CGrafPort (0x6c) and set it up. |
+| `FUN_000014e6` (ID02) | `swap_mmu_mode_a5safe` | STRONG INFERENCE | Iter 150: SwapMMUMode(&A5−0x1000) via ID09 glue; slot −0x10c6. |
+| `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | STRONG INFERENCE mechanics | Iter 151: two notched frames (pen 2/1) from rect A5−0x119c, drawn twice. |
+| `FUN_000010ce` (ID02) | `build_notched_frame_poly` | STRONG INFERENCE mechanics | Iter 151: notched/chamfered frame polygon from a Rect. |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
 | A5−0x7d0 | sound channel records [2] × 0x238 bytes | STRONG INFERENCE | Indexed by silence_sound_channel / FUN_00003d50. |
 | ID02 file 0x1b42 (unexported) | `install_overlay_service_table` (proposed) | STRONG INFERENCE | Iter 135: 34 JT addresses → A5 table; A5−0x1040 work buffer. See OVERLAY_SERVICE_TABLE.md. |
