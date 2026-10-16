@@ -7,8 +7,64 @@ Do not treat example names from planning docs as approved until revalidated here
 
 | Original symbol | Recovered name | Confidence | Evidence |
 |---|---|---|---|
-| `FUN_00000048` (ID09) | UNKNOWN (identifier retained) | UNKNOWN role; PROVEN C control flow | `ID09.c:37-83`: eight-word clear, raw selector classification, byte flags +8/+9, reverse five-byte lookup yielding 0..5, gated byte +0x0d and word +0x0e. No global/function rename justified; record purpose, global widths/provenance and char signedness unresolved. Terminal and selector blocks matched by unique byte searches; see `ID09_TERMINAL_ANALYSIS.md` and `ID09_SELECTOR_ANALYSIS.md`. Selector labels likely fold file bytes into a runtime pointer; omitted +7 write and trap path remain unrepaired. |
-| `FUN_00000432` (ID09) | `length_prefixed_bytes_to_c_string_in_place` | STRONG INFERENCE | `ID09.c:135-142`: unsigned byte length, forward overlapping copy, zero terminator, original-pointer return. No direct callers found. C transform preserved; binary/ABI unverified. |
+| `FUN_00000048` (ID09) | `sysenvirons_glue_fallback` | STRONG INFERENCE | Iter 106: entry dispatcher at file 0x20-0x46 calls `$A090` (_SysEnvirons) only when GetOSTrapAddress($90) ≠ GetToolTrapAddress($9F _Unimplemented) or falls into 0x48; body fills SysEnvRec from documented low-memory globals and returns 0xea84 (−5500 envNotPresent). Lookup table proven at file 0x54..0x58. Trap/global names from Apple docs, not validated against Apple glue. See `ID09_SYSENVIRONS_ANALYSIS.md`. |
+| `FUN_000002a6` (ID09) | `fsopen_glue` | STRONG INFERENCE | Iter 107: file 0x2a6..0x2dc LINK −0x32 IOParam; +0x12←long arg, +0x16←word arg, clears +0x1a/+0x1b/+0x1c; `$A000` (_Open); +0x18→VAR arg; D0→result; pops 10 bytes = FSOpen(fileName, vRefNum, VAR refNum): OSErr. Trap/field names from Inside Macintosh. |
+| `FUN_000003c2` (ID09) | `swapmmumode_glue` | STRONG INFERENCE | Iter 108: file 0x3c2..0x3d4 loads byte via VAR ptr into D0, `$A05D` (_SwapMMUMode), stores D0.B back, pops 4 bytes = SwapMMUMode(VAR mode: SignedByte). Trap name from Inside Macintosh. |
+| `FUN_00000006` (ID07) | `load_str129_string_table` | STRONG INFERENCE | Iter 109: ID07.bin 0x06..0x18e GetResource('STR#',0x81) `$A9A0`, HLock via JT `$272(A5)`, in-place \\p/escape processing, stores 120 string pointers to A5−0xf46[1..120]. Sole caller `FUN_00000190` (ID07). |
+| `FUN_00000190` (ID07) | `init_string_pointer_groups` | STRONG INFERENCE | Iter 110: calls `load_str129_string_table`, copies slots 2..22→A5−0x221e[21], 94..99→A5−0xffe[6], 100..105→A5−0xfae[6], 106..115→A5−0xf86[10]. JT A5+0x592; called from ID02 file 0x2c0a. |
+| `FUN_00002bbc` (ID02) | `initialize_application` | STRONG INFERENCE | Iter 111: ID02.bin 0x2bbc..0x2d9e Toolbox init sequence ($A86E InitGraf … $A850 InitCursor), JT $592 string init + UnloadSeg 7, SysEnvirons via JT $1f2, 'MENU' 2 / 'HEL1' 127/128 load-or-create, SetPort. Caller `FUN_0000309a`. |
+| `FUN_0000309a` (ID02) | `main` | STRONG INFERENCE (entry chain PROVEN) | Iter 112: called from ID01 runtime entry via JT A5+0x4b2 (constant at ID01 file 0x4); runs `initialize_application`, ID08 overlay loader, UnloadSeg 4/8/5, then loops forever on `FUN_00002fd4`. |
+| `FUN_00002fd4` (ID02) | `poll_and_dispatch_event` | STRONG INFERENCE | Iter 113: ID02.bin 0x2fd4..0x3098 GetNextEvent ($A970) + switch on what: mouseDown→0x2f1e, cmd-key→MenuKey→0x36a2, update→Begin/EndUpdate+0x4db0, activate→0x2fa0. Called forever by `main`. |
+| `FUN_000036a2` (ID02) | `do_menu_command` | STRONG INFERENCE | Iter 114: HiWord/LoWord($A86A/$A86B) of menuResult; menu 1 Apple (OpenDeskAcc), menu 3 Edit (SystemEdit), menu 2 13-item command menu (quit = 0x2eaa). Called from `poll_and_dispatch_event` after MenuKey. |
+| `FUN_00002a44` (ID02) | `apply_settings_to_live_options` | STRONG INFERENCE | Iter 116: copies HEL1 127 words S+2..S+0x24 into A5−0x12ee..−0x12d0; change-triggered callbacks via A5−0x1092/−0x104e/−0x1096 gated by A5−0x1006; redraw FUN_00004db0. 6 callers in ID02.bin. |
+| `FUN_00002f1e` (ID02) | `handle_mouse_down` | STRONG INFERENCE | Iter 127: FindWindow switch: inMenuBar→MenuSelect→do_menu_command, inSysWindow→SystemClick, inGoAway(main)→TrackGoAway→HideWindow. |
+| `FUN_00002fa0` (ID02) | `handle_activate_event` | STRONG INFERENCE | Iter 127: (modifiers&3)==3 && message==main_window → InvalRect(&main_window->portRect). |
+| `FUN_00004db0` (ID02) | `redraw_main_window` | STRONG INFERENCE | Iter 128: gated redraw: HideCursor, FUN_00004c18, UnloadSeg 3, overlay callback A5−0x109e, helpers, ShowCursor. Called from update handling and apply_settings_to_live_options. |
+| `FUN_00004c18` (ID02) | `check_device_color_state_changed` | STRONG INFERENCE | Iter 129: compares per-device 256-word arrays from FUN_000048ae with stored copies; on change → JT $182, refresh, overlay callback A5−0x1096. |
+| `FUN_000048ae` (ID02) | `build_palette_index_map` | STRONG INFERENCE | Iter 130: per device slot, PmForeColor(i) → fgColor index → map[i]/inverse[idx]; duplicate detection → A5−0x102a; selects A5−0x1122 = JT 0x46a or 0x33a. |
+| `FUN_000046b4` (ID02) | `rebuild_all_palette_index_maps` | STRONG INFERENCE | Iter 131: rebuild map for each device slot 1..3 (or B&W path). |
+| `FUN_00004738` (ID02) | `configure_palette_entries` | STRONG INFERENCE | Iter 131: depth-4 / depth-8 Palette Manager entry usage + colours. |
+| `FUN_0000488a` (ID02) | `clear_ctab_size_callback` | STRONG INFERENCE | Iter 131: A5 from CurrentA5; (*A5−0x14b2)+6 = 0. |
+| A5−0x136e | device table [4] × 0x16 bytes (slots 1..3 used) | STRONG INFERENCE | +0 GDevice handle (SetGDevice in FUN_000048ae), +4 stored word array. |
+| `FUN_00000728` (ID05) | `ansi_rand` | PROVEN | Iter 118: seed A5−0x6c ×0x41c64e6d +0x3039; returns (seed<<1)>>17. |
+| `FUN_00000746` (ID05) | `ansi_srand` | STRONG INFERENCE | Stores arg to A5−0x6c. Caller: ID05 0x8c0 (init_protection_table, seeded by TickCount). |
+| `FUN_000007f6` (ID05) | `poison_overlay_bytes` | STRONG INFERENCE | 12 × {ptr, byte} into A5−0xb4, byte := 0xFF at base + rand % size. Called from ID08 0x246 (JT $53a) with overlay base/code size. |
+| `FUN_0000085e` (ID05) | `restore_poisoned_overlay_bytes` | STRONG INFERENCE | Restores A5−0xb4 table if A5−0xbc / A5−0xc0 set. Called from ID08 0x29e (JT $55a). |
+| `FUN_00000934` (ID05) | `record_code_index_equals` | STRONG INFERENCE | Iter 119: (s8)rec[4]*20 + (s8)rec[5] == n → word 1/0. Called from ID08 0x282/0x2b2 (JT $54a); success at 0x282 → JT $532 stub (ID05 0x8b2) A5−0xbc++. |
+| `FUN_00000754` (ID05) | `encode_base26_6chars` | PROVEN | Iter 120: 6 chars 'A'+(v%26) right-to-left, NUL; DIVS.L #26 at 0x76c/0x784. |
+| `FUN_000007a8` (ID05) | `decode_base26_6chars` | PROVEN | Iter 120: acc = acc*26 + ((s8)c − 'A') over 6 chars → *out. |
+| `FUN_00000a62` (ID05) | `random_28bit_value` | STRONG INFERENCE | Iter 121: caller 0x442; see ID05.decomp.c header. |
+| `FUN_00000a90` (ID05) | `pack_fields_to_code_buf68` | STRONG INFERENCE | Iter 121: caller 0x498; buf A5−0x68; see ID05.decomp.c header. |
+| `FUN_00000b10` (ID05) | `unpack_fields_from_code` | STRONG INFERENCE | Iter 121: no caller found; see ID05.decomp.c header. |
+| `FUN_00000b84` (ID05) | `encode_code28_to_buf54` | STRONG INFERENCE | Iter 121: ID05 0x4b2; ID08 0x276/0x2a6 (JT $552); see ID05.decomp.c header. |
+| `FUN_00000ba8` (ID05) | `decode_code_to_long_a` | STRONG INFERENCE | Iter 121: no caller found; see ID05.decomp.c header. |
+| `FUN_00000bc2` (ID05) | `encode_long_to_buf40` | STRONG INFERENCE | Iter 121: caller 0x4ce; see ID05.decomp.c header. |
+| `FUN_00000bde` (ID05) | `decode_code_to_long_b` | STRONG INFERENCE | Iter 121: caller 0x674; see ID05.decomp.c header. |
+| `FUN_000002c8` (ID05) | `code_dialog_filter` | STRONG INFERENCE | Iter 122: ModalDialog filter (SetPort, default-button FrameRoundRect, HiliteControl on empty item 3, Return/Enter→1, Esc→2). File 0x3ba..0x4e2 is a separate unexported code-string builder. |
+| `FUN_00000160` (ID05) | `read_DATA128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID08 0x26c (JT $582). |
+| `FUN_000001bc` (ID05) | `write_DATA128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID08 0x2c4 (JT $57a). |
+| `FUN_00000214` (ID05) | `read_TEXT128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID05 0x3f4, 0x458. |
+| `FUN_00000270` (ID05) | `write_TEXT128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID05 0x44a, 0x718. |
+| `FUN_00000006` (ID05) | `center_template_rect_on_screen` | STRONG INFERENCE | Iter 124: GetResource(type,id) rect centred horizontally, top at mbar + 1/3 of remaining height. |
+| `FUN_000000c8` (ID05) | `get_machine_screen_fingerprint` | STRONG INFERENCE | Iter 124: machineType, screen width/height, depth (GDevice or screenBits), 0. |
+| `FUN_000004e4` (ID05) | `get_dialog_item_text_upper` | STRONG INFERENCE | Iter 125: GetIText → C string → upper (ctype A5−0x1608 bit 7 → ID02 0x1ce). |
+| `FUN_00000560` (ID05) | `run_protection_dialog` | STRONG INFERENCE | Iter 125: DLOG 1000 challenge/response loop; ALRT 1001; called from ID08 0x298 (JT $572). |
+| `FUN_000008d6` (ID05) | `pick_random_protection_challenge` | STRONG INFERENCE | Iter 125: random entry of table *(A5−0xba)[A5−0xb6] → 3 words. |
+| `FUN_000008b8` (ID05, not decompiled) | `init_protection_table` (proposed) | STRONG INFERENCE | Iter 126: ansi_srand(arg3); A5−0xba = arg1; A5−0xb6 = arg2; called from ID08 0x25c (JT $542) with (A5−0x1cc4, 56, TickCount). |
+| A5−0x1cc4 | protection challenge table (56 × 12 bytes) | STRONG INFERENCE | Passed to init_protection_table; entries {ptr, len, w1, w2, w3}. See COPY_PROTECTION_FLOW.md. |
+| A5−0x1680..−0x167a | QuickDraw `screenBits.bounds` (top,left,bottom,right) | STRONG INFERENCE | Used as screen rect in ID05 0x06/0xc8. |
+| ID05 file 0x964 (unexported) | protection entry matcher (HYPOTHESIS) | PROVEN bytes | Counts matching entries of table *(A5−0xba)[A5−0xb6] into A5−0xc0; string de-obfuscated with key A5−0x2c. |
+| ID02 local 0x2eaa | quit helper (HYPOTHESIS: `quit_application`) | STRONG INFERENCE | Menu 2 item 13 and fatal MENU-missing path in `initialize_application`. Not a Ghidra-exported function yet (verify). |
+| A5−0x14ca | `main_window` (HYPOTHESIS name) | STRONG INFERENCE | SetPort target at end of `initialize_application`; compared with update evt.message in `poll_and_dispatch_event`. |
+| A5−0x1388 | `has_color_quickdraw` (HYPOTHESIS name) | STRONG INFERENCE | byte ← SysEnvRec.hasColorQD in `initialize_application`. |
+| A5−0x1006 | `overlay_image_base` (HYPOTHESIS name) | PROVEN writer | Written only by ID08 `load_overlay_from_resource` (file 0xd4, aligned 0xf0/0xfe, cleared 0x226); gates overlay callbacks in ID02. |
+| A5−0x1092 / −0x104e / −0x1096 | overlay callback slots (UNKNOWN names) | STRONG INFERENCE | Only read (MOVEA.L + JSR (A0)) in ID02; no d16(A5) writer in any CODE segment → filled indirectly. |
+| A5−0x138a | `settings_dirty` (HYPOTHESIS name) | STRONG INFERENCE | Set to 1 by every persisted option change in `do_menu_command`; cleared by save helper 0x2da0 after WriteResource(HEL1 127). |
+| A5−0x13ac / A5−0x13a8 | `hel1_127_handle` / `hel1_128_handle` | PROVEN role (resource handles) | GetResource('HEL1',0x7f/0x80) results; 0x12a / 0x500-byte defaults. |
+| A5−0xf46 | `str129_string_ptrs[121]` (HYPOTHESIS name) | STRONG INFERENCE role | Written by `load_str129_string_table` slots 1..120; read by `init_string_pointer_groups`. |
+| JT `$4fa(A5)` → `FUN_0000024a` (ID02) | memmove-like (not renamed yet) | STRONG INFERENCE | Overlap-safe byte copy (dst, src, n) in ID02.c:218; CODE0 jump table entry seg 2 off 0x246. |
+| JT `$3a(A5)` → ID01 file 0xbe | runtime word switch helper (no Ghidra function) | PROVEN bytes | Pops return addr as table: lo, hi, default; offsets relative to their own word; zero offset → `BEQ *` hang. |
+| `FUN_00000432` (ID09) | `length_prefixed_bytes_to_c_string_in_place` | STRONG INFERENCE | `ID09.c:135-142`: unsigned byte length, forward overlapping copy, zero terminator, original-pointer return. No direct callers found. C transform preserved. Iter 108: bytes at ID09.bin file 0x432..0x44a match (DBRA shift loop, CLR.B terminator, return arg) — p2cstr-like. |
 | `FUN_00000006` (ID08) | `load_overlay_from_resource` | STRONG INFERENCE | ID08.bin `@0x6`: A5 `$2a2/$2b2/$232/$2aa/…`; ret 0 fail / 1 ok; LOADER_CHAIN overlay candidate. |
 | `FUN_00000348` (ID08) | `alloc_and_read_resource_payload` | PROVEN | ID08.bin `@0x348`: A5 `$2ca`/`$2c2` size; `$22a` alloc→`A5-0x12fc`; `$2b2` read. |
 | `FUN_00000338` (ID08) | `sysbeep_and_exit_to_shell` | PROVEN | ID08.bin `@0x338`: `MOVE.W #$64,-(A7); _SysBeep ($A9C8); _ExitToShell ($A9F4)`. |

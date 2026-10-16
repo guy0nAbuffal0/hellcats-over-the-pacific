@@ -25,8 +25,8 @@ undefined DAT_00000059;
 
 /*
  * Original: FUN_00000048; source: ID09.c:26-103.
- * Recovered name: UNKNOWN (retain original identifier).
- * Status: INVESTIGATING; iterations 101-104; exported body annotated, binary discrepancies open.
+ * Recovered name: sysenvirons_glue_fallback [STRONG INFERENCE] (iteration 106).
+ * Status: RENAMED; iterations 101-106; exported body annotated, binary discrepancies open.
  * Confidence: [PROVEN] exported-C control flow; [UNKNOWN] selector meanings.
  * Input: param_1 points to writable storage for at least eight undefined2 words
  * in the analyzed block (16 bytes under the original 16-bit word model).
@@ -46,8 +46,29 @@ undefined DAT_00000059;
  * erroneous constant propagation across file/runtime memory (STRONG INFERENCE).
  * Original expressions remain unchanged. See docs/ID09_SELECTOR_ANALYSIS.md
  * and docs/ID09_TERMINAL_ANALYSIS.md; whole-function semantics are unverified.
+ *
+ * Iteration 105 proposed name: sysenvirons_glue_fallback [STRONG INFERENCE].
+ * Not applied to the identifier yet (no call sites in the exports to update).
+ * Evidence: 16-byte record (8 words) matching Inside Macintosh SysEnvRec
+ * (environsVersion=1 @0, machineType @2, systemVersion @4, processor @6,
+ * hasFPU @8, hasColorQD @9, keyBoardType @0xa, atDrvrVersNum @0xc,
+ * sysVRefNum @0xe); reads of documented low-memory globals $28e (ROM85),
+ * $b22 (HWCfgFlags), $12f (CPUFlag), $2ae (ROMBase), $21e (KbdType),
+ * $291 (PortBUse), $1fb (SPConfig), $2dc (ABusVars), $210 (BootDrive),
+ * $3f6 (FSFCBLen), $a58 (SysMap); result word 0xea84 = -5500 = envNotPresent.
+ * The address-to-name mapping comes from external Toolbox documentation,
+ * not from this binary; behavior vs. Apple's actual glue is not validated.
+ *
+ * Iteration 106 dispatcher evidence [PROVEN, bytes; trap names from docs]:
+ * file 0x20 TST.W $28e.w / BMI -> 0x48 (this fallback); else 0x26 MOVE.W #$90,D0;
+ * 0x2a A-line $A346 (GetOSTrapAddress); 0x2e MOVE.W #$9f,D0; 0x32 $A746
+ * (GetToolTrapAddress, $9F = _Unimplemented); 0x34 CMPA.L / BEQ -> 0x48.
+ * Otherwise 0x38..0x46 pops return, record pointer (A0) and version word (D0),
+ * executes $A090 (_SysEnvirons) and stores D0 into the Pascal result slot.
+ * So this body runs only when the SysEnvirons trap is absent; this justifies
+ * the rename. The preamble 0x00..0x47 is not exported as a Ghidra function.
  */
-void FUN_00000048(undefined2 *param_1)
+void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1)
 
 {
   undefined1 *puVar1;
@@ -72,7 +93,15 @@ void FUN_00000048(undefined2 *param_1)
   param_1[1] = 0xfffe;
   /* Binary file 0x76: CMPI.B #$ff,$9(A0), after MOVEA.L $02ae.w,A0.
    * File 0x7e tests signed byte +8. The labels below are retained artifacts;
-   * do not interpret them as independently established runtime globals. */
+   * do not interpret them as independently established runtime globals.
+   * Iteration 106 [HYPOTHESIS]: word 1 is SysEnvRec.machineType, and the
+   * selectors are ROM header bytes (ROMBase)+8 / +9 (ROM version word).
+   * Constants: envXL=-2 (0xfffe), envMac=-1 (0xffff), envMachUnknown=0,
+   * env512KE=1, envMacPlus=2, envSE=3, envMacII=4. Byte +9 == 0xff -> XL;
+   * byte +8 <= 0 (64K/128K ROMs $0069/$0075) -> Mac, then 512KE if ROM85 >= 0,
+   * then Plus if HWCfgFlags bit 15 (SCSI) is set; byte +8 == 2 (SE ROM $0276)
+   * -> SE; == 1 (II ROM $0178) -> II; >= 3 -> unknown. ROM version values
+   * come from external documentation and are not checked against this binary. */
   if (DAT_216e0017 != -1) {
     if (DAT_216e0016 < '\x01') {
       param_1[1] = 0xffff;
@@ -116,7 +145,18 @@ void FUN_00000048(undefined2 *param_1)
   /* Scan the five bytes preceding this symbol, starting at symbol - 1.
    * First match in reverse order wins: offsets -1..-5 yield codes 5..1.
    * No match yields 0. The scalar declaration is a Ghidra artifact: no C
-   * array bounds or valid object provenance are established by this export. */
+   * array bounds or valid object provenance are established by this export.
+   * Iteration 105 binary evidence [PROVEN, bytes]: file 0xf8 MOVE.B $21e.w,D0;
+   * 0xfc LEA $59(PC),A0 (disp 0xff5b, PC-relative, so the table travels with
+   * the segment; DAT_00000059 is a segment-relative label, not low memory);
+   * 0x100 MOVE.W #4,D1; 0x104 CMP.B -(A0),D0; 0x106 DBEQ D1; 0x10a ADDQ.W #1;
+   * 0x10c MOVE.W D1,$a(A1). The table is a data island skipped by BRA.B at
+   * file 0x52 -> 0x5a: bytes 0x54..0x59 = 03 13 0b 02 01 00; only 0x54..0x58
+   * are scanned. Result mapping (word +0x0a):
+   *   0x01 -> 5, 0x02 -> 4, 0x0b -> 3, 0x13 -> 2, 0x03 -> 1, otherwise 0.
+   * [STRONG INFERENCE] $21e is Toolbox low-memory KbdType and the codes are
+   * SysEnvRec.keyBoardType (envStandADBKbd=5, envAExtendKbd=4, envMacPlusKbd=3,
+   * envMacAndPad=2, envMacKbd=1, envUnknownKbd=0); see docs/ID09_SYSENVIRONS_ANALYSIS.md. */
   pcVar4 = &DAT_00000059;
   sVar2 = 4;
   do {
@@ -179,7 +219,36 @@ void FUN_00000048(undefined2 *param_1)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000002a6(void)
+/*
+ * Original: FUN_000002a6; source: ID09.c:107-114.
+ * Recovered name: fsopen_glue [STRONG INFERENCE] (iteration 107).
+ * Status: RENAMED. The exported body is only Ghidra's truncation artifact:
+ * A-line word $A000 at file 0x2c6 was treated as bad instruction data.
+ * halt_baddata() is retained unchanged; the real body is described below
+ * from bytes and is NOT reconstructed as executable C (trap ABI is external).
+ *
+ * Binary file 0x2a6..0x2dc [PROVEN, bytes; Capstone 68000 BE]:
+ *   LINK A6,#-$32; LEA -$32(A6),A0      50-byte local parameter block
+ *   MOVE.L $e(A6),$12(A0)                arg (long)  -> block +0x12
+ *   MOVE.W $c(A6),$16(A0)                arg (word)  -> block +0x16
+ *   CLR.B $1a(A0); CLR.B $1b(A0); CLR.L $1c(A0)
+ *   $A000                                 A-line trap, A0 = block
+ *   MOVEA.L $8(A6),A1; MOVE.W $18(A0),(A1)  block +0x18 -> *VAR arg
+ *   MOVE.W D0,$12(A6)                    D0 -> Pascal function result slot
+ *   UNLK; pop return; ADDA.W #$a,A7; JMP (A0)   callee pops 10 arg bytes
+ *
+ * [STRONG INFERENCE, Inside Macintosh File Manager]: $A000 = _Open; the
+ * 50-byte block is an IOParam (ioNamePtr +0x12, ioVRefNum +0x16,
+ * ioRefNum +0x18, ioVersNum +0x1a, ioPermssn +0x1b, ioMisc +0x1c). Matches
+ * FUNCTION FSOpen(fileName: Str255; vRefNum: INTEGER; VAR refNum: INTEGER): OSErr;
+ * (args 4+2+4 = 10 bytes, result word at 8+10 = $12(A6)). Permission is fsCurPerm (0).
+ *
+ * Neighbouring unexported glue in ID09.bin (HYPOTHESIS, same IOParam pattern):
+ * 0x2de FSClose ($A001), 0x2fa/0x2fe FSRead/FSWrite ($A002/$A003, D1 selects),
+ * 0x344 GetVol ($A014), 0x368 GetEOF ($A011), 0x38c GetFPos ($A018).
+ * Callers: none in the exports (inter-segment calls go via the jump table).
+ */
+void fsopen_glue /* Original: FUN_000002a6 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -190,7 +259,26 @@ void FUN_000002a6(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000003c2(void)
+/*
+ * Original: FUN_000003c2; source: ID09.c:118-125.
+ * Recovered name: swapmmumode_glue [STRONG INFERENCE] (iteration 108).
+ * Status: RENAMED. Exported body is Ghidra's truncation at A-line $A05D;
+ * halt_baddata() is retained, the real body is described here only.
+ *
+ * Binary file 0x3c2..0x3d4 [PROVEN, bytes; Capstone 68000 BE]:
+ *   MOVEA.L 4(A7),A0; MOVE.B (A0),D0     load byte through VAR pointer
+ *   $A05D                                 A-line trap, mode in D0.B
+ *   MOVEA.L 4(A7),A0; MOVE.B D0,(A0)     store returned D0.B back
+ *   MOVEA.L (A7)+,A0; ADDQ.W #4,A7; JMP (A0)   callee pops 4 arg bytes
+ * [STRONG INFERENCE, Inside Macintosh OS Utilities]: $A05D = _SwapMMUMode;
+ * matches PROCEDURE SwapMMUMode(VAR mode: SignedByte) (24/32-bit addressing).
+ *
+ * Following unexported glue (HYPOTHESIS): 0x3d6/0x3dc push selectors 10/12
+ * and call $ADED (Pack6 auto-pop: IUMagString / IUMagIDString);
+ * 0x404 NumToString via $A9EE (Pack7, selector 0); 0x416 in-place C->Pascal
+ * string conversion (c2pstr-like). Callers: none in the exports.
+ */
+void swapmmumode_glue /* Original: FUN_000003c2 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here

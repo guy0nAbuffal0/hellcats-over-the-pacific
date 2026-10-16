@@ -1484,7 +1484,45 @@ void FUN_000029f2(void)
 
 
 
-void FUN_00002a44(void)
+/*
+ * Original: FUN_00002a44; source: ID02.c:1487-1546.
+ * Recovered name: apply_settings_to_live_options [STRONG INFERENCE] (iteration 116).
+ * Status: RENAMED. Exported C is complete (no truncation); kept verbatim.
+ * Input: none; reads S = *(HEL1 127 handle A5-0x13ac). Output: void.
+ * Effect: copies settings words from S into a live options block in the A5
+ * world; for some fields, a change triggers a callback through a function
+ * pointer, gated by long A5-0x1006 != 0 [UNKNOWN: probably "overlay/game
+ * context loaded"]; any triggered callback forces a redraw (FUN_00004db0).
+ * Callers [PROVEN, bytes; BSR/JSR d16(PC) scan of ID02.bin]: file 0x6ce,
+ * 0x6f6, 0x716, 0x218a, 0x2a20, 0x39a0 (do_menu_command epilogue). None appear
+ * in the exported C (all inside truncated or mis-decoded bodies).
+ *
+ * Settings word -> live word (menu source from do_menu_command):
+ *   S+0x02 -> A5-0x12ee   (menu 4 item 1 toggle)
+ *   S+0x04 -> A5-0x12ec   (menu 4 item 2 toggle)
+ *   S+0x06 -> A5-0x12e8   (menu 4 item 5 toggle)
+ *   S+0x08 -> A5-0x12e6   (menu 4 item 6 toggle)        change -> (A5-0x1092)()
+ *   S+0x0a -> A5-0x12e4;  S+0x0c -> A5-0x12ea and A5-0x103c
+ *   S+0x10 -> A5-0x12e0   (menu 5 items 1..5 radio)     change -> (A5-0x1092)()
+ *   S+0x12 -> A5-0x12de   (menu 5 item 7)  only if word A5-0x137a == 8,
+ *                         change -> (A5-0x1096)(); else forced 0
+ *   S+0x14 -> A5-0x12dc   (menu 5 item 9)               change -> (A5-0x1092)()
+ *   S+0x16 -> A5-0x12da   (menu 5 item 8)               change -> (A5-0x104e)()
+ *   S+0x18 -> A5-0x12d8   (menu 5 item 10)              change -> (A5-0x1092)()
+ *   S+0x1a -> A5-0x12d6   (menu 5 item 11) only if A5-0x137a == 8, else 0
+ *   S+0x1c -> A5-0x12d4;  S+0x22 -> A5-0x12d2;  S+0x24 -> A5-0x12d0
+ * [HYPOTHESIS] A5-0x137a == 8 may be a screen depth (8-bit colour) gate.
+ * Iteration 117 [PROVEN, bytes]: gate A5-0x1006 is the relocated overlay image
+ * base, written only by ID08 load_overlay_from_resource (file 0xd4 MOVE.L A0,
+ * then 4-byte alignment at 0xf0/0xfe; cleared at 0x226). A d16(A5) byte scan of
+ * ID01-ID09 finds only reads (MOVEA.L) of A5-0x1092/-0x104e/-0x1096 (ID02 file
+ * 0x2a3a, 0x2aec, 0x2b1a, 0x2b50, 0x3694, 0x4d1a); no direct writer. They are
+ * therefore filled indirectly (overlay code or block copy) [STRONG INFERENCE];
+ * the callbacks run overlay-side code only when the overlay is loaded.
+ * Note: S+0x0e (menu 4 items 8-10) is not copied here; FUN_000035bc handles it.
+ * Order of reads/writes is preserved exactly as exported.
+ */
+void apply_settings_to_live_options /* Original: FUN_00002a44 */ (void)
 
 {
   undefined2 uVar1;
@@ -1540,7 +1578,7 @@ void FUN_00002a44(void)
   *(undefined2 *)(unaff_A5 + -0x12d4) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x1c);
   *(undefined2 *)(unaff_A5 + -0x12e4) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 10);
   if (bVar6) {
-    FUN_00004db0();
+    redraw_main_window(); /* Original: FUN_00004db0 */
   }
   return;
 }
@@ -1549,15 +1587,58 @@ void FUN_00002a44(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002bbc(void)
+/*
+ * Original: FUN_00002bbc; source: ID02.c:1552-1564.
+ * Recovered name: initialize_application [STRONG INFERENCE] (iteration 111).
+ * Status: RENAMED. Ghidra decoded only the first two calls and stopped at the
+ * A-line word $A994 (file 0x2bdc). Exported C retained; the remainder below is
+ * described from ID02.bin file 0x2bbc..0x2d9e and NOT reconstructed as C.
+ * JT targets resolved through ID00.bin (seg off + 4-byte CODE header = file).
+ * Trap names are Inside Macintosh assignments [STRONG INFERENCE];
+ * byte sequences and control flow are [PROVEN, bytes].
+ *
+ *   JSR $222(A5)      seg9 file 0x1cc: MaxApplZone glue ($A063, manual path if ROM85<0)
+ *   2x JSR $292(A5)   seg9 file 0x298: MoreMasters ($A036)  [the loop below]
+ *   $A994 CurResFile -> word A5-0x1002 (application resource file refnum)
+ *   PEA -$160c(A5); $A86E InitGraf; $A8FE InitFonts
+ *   JSR $202(A5)(-1, 0) seg9 0x192: FlushEvents ($A032)
+ *   $A912 InitWindows; $A930 InitMenus; $A9CC TEInit; $A97B InitDialogs(nil);
+ *   $A850 InitCursor; JSR $1fa(A5)(-1) seg9 0x18a: SetEventMask (word -> $144)
+ *   JSR $592(A5)      ID07 init_string_pointer_groups; PEA $58a(A5); $A9F1
+ *                     UnloadSeg -> segment 7 is init-only
+ *   JSR $f2(A5)       seg4 file 0x3d42, D0.W == 0 -> $A9F4 ExitToShell [UNKNOWN check]
+ *   JSR $1f2(A5)(1, &env) seg9 file 0x20 = SysEnvirons dispatcher (ID09
+ *                     sysenvirons_glue_fallback); env at -$1e(A6)
+ *   A5-0x1388 byte <- env.hasColorQD (-$15(A6) = env+9)
+ *   A5-0x1387 byte <- (env.processor == 1 || == 2)  [68000/68010 flag, HYPOTHESIS]
+ *   if hasColorQD: BSR file 0x2192; p = JSR $232(A5)(0x6d8) seg9 0x20c
+ *                  NewPtrClear ($A31E) -> A5-0x14b2 and A5-0x1316;
+ *                  *(long*)p = $AA28 result; *(word*)(p+4) = 0x8000
+ *                  [HYPOTHESIS: colour table, ctSeed/ctFlags; $AA28 unconfirmed]
+ *   GetResource('MENU', 2) == nil -> SysBeep(20); BSR 0x2e36; BSR 0x2eaa
+ *   h = GetResource('HEL1', 0x7f) -> A5-0x13ac; if nil:
+ *       NewHandleClear(0x12a) (JT $252, seg9 0x242, $A322); AddResource(h,
+ *       'HEL1', 0x7f, name A5-0xc90); (*h)+0x10=2, +0x0e=1, +0x24=2, +0x26=1;
+ *       BSR 0x2ee4 copies string A5-0xc78 -> (*h)+0x2a; ChangedResource; WriteResource
+ *     else LoadResource(h)
+ *   h = GetResource('HEL1', 0x80) -> A5-0x13a8; if nil: NewHandleClear(0x500),
+ *       AddResource(h,'HEL1',0x80, name A5-0xc66), ChangedResource, WriteResource
+ *     else LoadResource(h)   [0x500 = 20 x 0x40 records, read by ID04.c:711]
+ *   BSR file 0x27e4; SetPort ($A873) (port A5-0x14ca); UNLK; RTS
+ *
+ * Callers: main (FUN_0000309a, ID02.c:1658), which first sets word A5-0x13ae = -1.
+ * [UNKNOWN] Semantics of seg4 check, HEL1 record fields, local helpers
+ * 0x2192 / 0x27e4 / 0x2e36 / 0x2eaa.
+ */
+void initialize_application /* Original: FUN_00002bbc */ (void)
 
 {
   int unaff_A5;
   undefined2 local_6;
-  
-  (**(code **)(unaff_A5 + 0x222))();
+
+  (**(code **)(unaff_A5 + 0x222))(); /* MaxApplZone glue (seg9 file 0x1cc) */
   for (local_6 = 0; local_6 < 2; local_6 = local_6 + 1) {
-    (**(code **)(unaff_A5 + 0x292))();
+    (**(code **)(unaff_A5 + 0x292))(); /* MoreMasters glue (seg9 file 0x298) */
   }
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -1610,7 +1691,22 @@ void FUN_00002ee4(char *param_1,char *param_2)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002f1e(void)
+/*
+ * Original: FUN_00002f1e; source: ID02.c:1613-1618.
+ * Recovered name: handle_mouse_down [STRONG INFERENCE] (iteration 127).
+ * Status: RENAMED; Ghidra truncated at $A92C. Bytes file 0x2f1e..0x2f9e [PROVEN].
+ * Arg: EventRecord *evt [8(A6)]. Caller: poll_and_dispatch_event (mouseDown).
+ *   part = FindWindow(evt->where (+0xa), &win) $A92C;
+ *   switch (part) [ID01 switch helper, table 0x2f40, 1..6, default return]:
+ *     1 inMenuBar   -> do_menu_command(MenuSelect(evt->where) $A93D)
+ *     2 inSysWindow -> SystemClick(evt, win) $A9B3
+ *     3 inContent, 4 inDrag, 5 inGrow -> no action (window is not draggable here)
+ *     6 inGoAway    -> if (win == main_window A5-0x14ca &&
+ *                         TrackGoAway(main_window, evt->where) $A91E)
+ *                        HideWindow(main_window) $A916
+ * Part codes / traps: Inside Macintosh [STRONG INFERENCE].
+ */
+void handle_mouse_down /* Original: FUN_00002f1e */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1621,7 +1717,22 @@ void FUN_00002f1e(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002fa0(undefined8 param_1,undefined4 param_2,ushort param_3)
+/*
+ * Original: FUN_00002fa0; source: ID02.c:1624-1634.
+ * Recovered name: handle_activate_event [STRONG INFERENCE] (iteration 127).
+ * Status: RENAMED. Exported C kept; its inner body was truncated at $A928.
+ * Arg: EventRecord passed by value at 8(A6)..$17(A6). Ghidra's split:
+ * param_1 (8 bytes) = what, message, high word of when (param_1._2_4_ =
+ * message); param_2 = low word of when + where.v; param_3 = modifiers ($16(A6)).
+ * Bytes file 0x2fa0..0x2fd2 [PROVEN]:
+ *   if (word A5-0x14c6 && (evt.modifiers & 3) == 3 && evt.message == main_window
+ *       && main_window != 0)
+ *     InvalRect(&main_window->portRect)  (PEA $10(A0); $A928)
+ * Bits 0/1 of modifiers = activeFlag / changeFlag [STRONG INFERENCE, Inside
+ * Macintosh]; i.e. on activation of the main window, force a full redraw.
+ * Caller: poll_and_dispatch_event (activateEvt).
+ */
+void handle_activate_event /* Original: FUN_00002fa0 */ (undefined8 param_1,undefined4 param_2,ushort param_3)
 
 {
   int unaff_A5;
@@ -1638,7 +1749,37 @@ void FUN_00002fa0(undefined8 param_1,undefined4 param_2,ushort param_3)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002fd4(void)
+/*
+ * Original: FUN_00002fd4; source: ID02.c:1641-1646.
+ * Recovered name: poll_and_dispatch_event [STRONG INFERENCE] (iteration 113).
+ * Status: RENAMED. Exported body is Ghidra's truncation at the first A-line
+ * word ($A938, file 0x2fda). halt_baddata() retained; real body described
+ * from ID02.bin file 0x2fd4..0x3098 [PROVEN, bytes] and NOT reconstructed.
+ * Caller: main (FUN_0000309a) in an infinite loop (BSR at file 0x30f0).
+ * Locals: EventRecord evt at -$12(A6) (what -$12, message -$10, when -$c,
+ * where -$8, modifiers -$4); word got_event at -$2(A6).
+ *
+ *   HiliteMenu(0) ($A938); SystemTask ($A9B4)
+ *   BSR 0x3174 (FUN_00003174); JSR $172(A5) -> seg4 file 0x432 [UNKNOWN]
+ *   got_event = GetNextEvent(-1 /everyEvent/, &evt) ($A970), then
+ *       word 0x49C0 = EXTB.L D0 (68020+ only; Capstone 68000 mode rejects it)
+ *   BSR 0x29f2 (FUN_000029f2); if (!got_event) return
+ *   switch (evt.what) via JSR $3a(A5) (ID01 switch helper; table at 0x300e:
+ *   lo=1, hi=8, default -> return):
+ *     1 mouseDown  -> BSR 0x2f1e (handle_mouse_down)(&evt)
+ *     3 keyDown, 5 autoKey -> if (evt.modifiers & 0x100 /cmdKey/):
+ *          BSR 0x36a2 (do_menu_command)(MenuKey((char)(evt.message & 0xff)))  ($A93E)
+ *     6 updateEvt  -> BSR 0x29f2; if (word A5-0x14c6 && evt.message == A5-0x14ca):
+ *          BeginUpdate(A5-0x14ca) ($A922); BSR 0x4db0 (redraw_main_window);
+ *          EndUpdate ($A923)
+ *     8 activateEvt -> BSR 0x2fa0 (handle_activate_event)(evt by value, 16 bytes)
+ *     2 mouseUp, 4 keyUp, 7 diskEvt -> ignored
+ * Event codes/masks and trap names are Inside Macintosh [STRONG INFERENCE].
+ * [STRONG INFERENCE] A5-0x14ca is the main window (also SetPort target in
+ * initialize_application); A5-0x14c6 gates its redraw. Non-command keys are
+ * not handled here (likely polled elsewhere during gameplay) [HYPOTHESIS].
+ */
+void poll_and_dispatch_event /* Original: FUN_00002fd4 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1649,13 +1790,39 @@ void FUN_00002fd4(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000309a(void)
+/*
+ * Original: FUN_0000309a; source: ID02.c:1650-1660.
+ * Recovered name: main [STRONG INFERENCE] (iteration 112).
+ * Status: RENAMED. Ghidra stopped at UnloadSeg ($A9F1, file 0x30b0); the
+ * remainder is described from ID02.bin file 0x309a..0x30f8 [PROVEN, bytes].
+ *
+ * Entry evidence [PROVEN, bytes]: ID01.bin (JT entry 0 target) holds the long
+ * 0x000004b2 at file 0x4; file 0x24 MOVE.L $4(PC),D1; 0x28 JSR (A5,D1.W)
+ * -> JT A5+0x4b2 = seg 2 off 0x3096 = this function; then JSR via $6c(A5)
+ * and $A9F4 ExitToShell. This is the runtime start calling the program main.
+ *
+ *   long local_a = 0 (-6(A6)); word A5-0x13ae = -1   [exported C below]
+ *   initialize_application()                         [exported C below]
+ *   UnloadSeg(JT $a2  = seg 4 entry)
+ *   JSR $21a(A5)(&local_a): seg9 file 0x1bc = MaxMem glue ($A11D): result
+ *        discarded, grow size stored to local_a [heap compaction]
+ *   BSR file 0x1b42                                  [UNKNOWN helper]
+ *   word A5-0x14c4 = 1
+ *   ok = JSR $1e2(A5) -> seg 8 file 0x6 = ID08 load_overlay_from_resource
+ *   UnloadSeg(JT $1ea = seg 8 entry); UnloadSeg(JT $56a = seg 5 entry)
+ *   BSR file 0x30fa (FUN_000030fa)                   [UNKNOWN]
+ *   if (ok && word A5-0x102e != 0) BSR file 0x35e4   [UNKNOWN]
+ *   for (;;) BSR file 0x2fd4 (poll_and_dispatch_event, FUN_00002fd4) [never returns]
+ *   (UNLK/RTS at 0x30f6 unreachable)
+ * Name chosen for the role (C runtime entry -> main); original symbol unknown.
+ */
+void main /* Original: FUN_0000309a */ (void)
 
 {
   int unaff_A5;
-  
+
   *(undefined2 *)(unaff_A5 + -0x13ae) = 0xffff;
-  FUN_00002bbc();
+  initialize_application(); /* Original: FUN_00002bbc */
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
 }
@@ -1756,7 +1923,64 @@ void FUN_000035e4(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000036a2(void)
+/*
+ * Original: FUN_000036a2; source: ID02.c:1759-1764.
+ * Recovered name: do_menu_command [STRONG INFERENCE] (iteration 114).
+ * Status: RENAMED; body annotation complete (iterations 114-115;
+ * all five menus described). halt_baddata() retained;
+ * real body from ID02.bin file 0x36a2..0x39a6 [PROVEN, bytes], not rebuilt.
+ * Input: long menuResult at 8(A6) (from MenuKey in poll_and_dispatch_event;
+ * presumably also MenuSelect via the mouseDown path).
+ *   menu = HiWord(menuResult) ($A86A) -> -2(A6); item = LoWord ($A86B) -> -4(A6)
+ * Switch tables are ID01 runtime-helper format (lo, hi, default, offsets
+ * relative to their own word); parsed programmatically, targets in file coords.
+ *
+ * switch (menu) [table 0x36ca, 1..5, default -> exit 0x39a0]:
+ *  1 (Apple, 0x36da): item 1 -> JSR $162(A5) [UNKNOWN, likely About box];
+ *       other -> GetPort(&save) $A874; GetItem(A5-0xc4e, item, name) $A946;
+ *       OpenDeskAcc(name) $A9B6; SetPort(save) $A873       [desk accessories]
+ *  2 (0x371a) item switch [table 0x3722, 1..13]:
+ *       1 -> JSR $1da(A5) (seg8 file 0x39c); UnloadSeg seg 8, seg 5 [HYPOTHESIS: start flight]
+ *       2 -> BSR 0x2da0: if word A5-0x138a: ChangedResource+WriteResource(HEL1 127), clear flag
+ *       3, 10, 12 -> no action (separator lines) [HYPOTHESIS]
+ *       4 -> BSR 0x35e4 (also called conditionally by main)
+ *       5 -> D0 = (JSR $da(A5)(A5-0xd6a, 3) == 3) [seg4 file 0x31aa; result unused here]
+ *       6 -> JSR $10a(A5) (seg4 file 0x3976)
+ *       7 -> BSR 0x4fc;  8 -> word A5-0x12f0 = 1; BSR 0x4fc
+ *       9 -> if (JSR $13a(A5) (seg4 file 0x516) == 2):
+ *              word A5-0x12f8 = 0; HideWindow(main_window A5-0x14ca) $A916;
+ *              word A5-0x14c6 = 0 (disables update redraw)
+ *       11 -> JSR $102(A5) (seg4 file 0x137a)
+ *       13 -> BSR 0x2eaa [STRONG INFERENCE: quit; same helper as the fatal
+ *             path in initialize_application]
+ *  3 (Edit, 0x37ce): if (!SystemEdit(item - 1)) ($A9C2) SysBeep(5) ($A9C8)
+ *  Let S = *(HEL1 127 handle A5-0x13ac) (settings record, 0x12a bytes) and
+ *  DIRTY = word A5-0x138a = 1 (consumed by menu 2 item 2 save helper 0x2da0).
+ *  4 (0x37ec) item switch [table 0x37f4, 1..10]  (iteration 115):
+ *       1 -> BCHG #0, S+3;  DIRTY      2 -> BCHG #0, S+5;  DIRTY
+ *       4 -> BCHG #0, byte A5-0x102f (not persisted, no DIRTY)
+ *       5 -> BCHG #0, S+7;  DIRTY      6 -> BCHG #0, S+9;  DIRTY
+ *       8 -> FUN_000035bc(1); DIRTY    9 -> FUN_000035bc(3); DIRTY
+ *      10 -> FUN_000035bc(2); DIRTY    3, 7 -> no action (separators) [HYPOTHESIS]
+ *       FUN_000035bc(v) [ID02.c C]: if word S+0xe != v, store v, BSR 0x27e4
+ *       (also called at end of initialize_application) [UNKNOWN: re-layout?]
+ *  5 (0x38ac) item switch [table 0x38b4, 1..11]:
+ *       1..5 -> word S+0x10 = item (1..5); DIRTY   [radio group; default 2]
+ *       6 -> no action (separator) [HYPOTHESIS]
+ *       7 -> BCHG #0, S+0x13   8 -> S+0x17   9 -> S+0x15   10 -> S+0x19
+ *      11 -> S+0x1b; each DIRTY
+ *  Epilogue (every path, file 0x39a0): BSR 0x2a44 (apply_settings_to_live_options,
+ *  FUN_00002a44; iteration 116: copies S words into live A5 options), UNLK, RTS.
+ *  BCHG on odd byte S+2n+1 flips bit 0 of big-endian word S+2n.
+ *  Defaults when HEL1 127 is created (initialize_application): S+0x0e=1,
+ *  S+0x10=2, S+0x24=2, S+0x26=1. Bit-0 toggles imply on/off options
+ *  [STRONG INFERENCE]; which game option each byte controls is UNKNOWN.
+ *  Note: Capstone mis-aligns at 0x38cc; case 1 entry 0x38d0 decodes as
+ *  MOVEA.L -$13ac(A5),A0; MOVEA.L (A0),A0; MOVEQ #1,D0; MOVE.W D0,$10(A0).
+ * Trap names: Inside Macintosh [STRONG INFERENCE]. Menu titles UNKNOWN until
+ * MENU resources are examined.
+ */
+void do_menu_command /* Original: FUN_000036a2 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -2481,7 +2705,17 @@ void FUN_0000462c(void)
 
 
 
-void FUN_000046b4(void)
+/*
+ * Original: FUN_000046b4; source: ID02.c:2484-2506.
+ * Recovered name: rebuild_all_palette_index_maps [STRONG INFERENCE] (iteration 131).
+ * Bytes file 0x46b4..0x4736 match the C [PROVEN]: clears collision flag
+ * A5-0x102a; B&W (A5-0x137a == 1) -> FUN_00004b62(); else if depth word
+ * A5-0x2cc != 0: if long A5-0x103a, FUN_00000d24(A5-0x103a) and clear it;
+ * for slot 1..3 used: build_palette_index_map(slot, &start, slot.stored (+4),
+ * scratch -$204(A6)). Ghidra's CONCAT22 call lost the last three arguments.
+ * Called from the stub at file 0x4d24 (with 0x462c and callback A5-0x10a2).
+ */
+void rebuild_all_palette_index_maps /* Original: FUN_000046b4 */ (void)
 
 {
   int unaff_A5;
@@ -2499,7 +2733,7 @@ void FUN_000046b4(void)
     }
     for (local_6 = 1; local_6 < 4; local_6 = local_6 + 1) {
       if (*(int *)(local_6 * 0x16 + unaff_A5 + -0x136e) != 0) {
-        FUN_000048ae(CONCAT22(local_6,(short)((uint)auStack_8 >> 0x10)));
+        build_palette_index_map(CONCAT22(local_6,(short)((uint)auStack_8 >> 0x10)));
       }
     }
   }
@@ -2517,7 +2751,22 @@ void FUN_000046b4(void)
 // WARNING: Removing unreachable block (ram,0x00004864)
 // WARNING: Removing unreachable block (ram,0x0000486a)
 
-void FUN_00004738(undefined4 param_1)
+/*
+ * Original: FUN_00004738; source: ID02.c:2520-2532.
+ * Recovered name: configure_palette_entries [STRONG INFERENCE] (iteration 131).
+ * Bytes file 0x4738..0x4888 [PROVEN; Palette Manager traps per Inside Macintosh]:
+ *   depth (word param) == 4, palette A5-0x14ae:
+ *     entries 8..12: SetEntryUsage(pal, e, 2 pmTolerant, 0) $AA9E;
+ *                    SetEntryColor(pal, e, &rgb A5-0x320[e-8]) $AA9C
+ *     entries 0..7 : SetEntryUsage(pal, e, 0 pmCourteous, 0x1000);
+ *                    SetEntryColor(pal, e, &rgb A5-0x350[e])
+ *   depth == 8, palette A5-0x14aa:
+ *     entries 0xd0..0xd8: tolerant, colours A5-0x302[];
+ *     entries 0xc8..0xcf: tolerant, colours A5-0x350[];
+ *     entries 0..0xc7   : SetEntryUsage(pal, e, 4 pmAnimated, 0)
+ *   RGBColor entries are 6 bytes. Callers not yet located.
+ */
+void configure_palette_entries /* Original: FUN_00004738 */ (undefined4 param_1)
 
 {
   if (param_1._0_2_ == 4) {
@@ -2533,7 +2782,17 @@ void FUN_00004738(undefined4 param_1)
 
 
 
-void FUN_0000488a(void)
+/*
+ * Original: FUN_0000488a; source: ID02.c:2536-2545.
+ * Recovered name: clear_ctab_size_callback [STRONG INFERENCE] (iteration 131).
+ * Bytes file 0x488a..0x48ac [PROVEN]: saves A5/D2, loads A5 from low-memory
+ * CurrentA5 ($0904) - i.e. callable from a context where A5 is not the
+ * application's -, clears word +6 of the record at long A5-0x14b2 (the
+ * NewPtrClear colour-table block from initialize_application; +6 = ctSize
+ * [HYPOTHESIS]), restores A5/D2. Installed as function pointer A5-0x1122 via
+ * JT A5+0x46a by build_palette_index_map when palette indices collide.
+ */
+void clear_ctab_size_callback /* Original: FUN_0000488a */ (void)
 
 {
   *(undefined2 *)(*(int *)(DAT_00000904 + -0x14b2) + 6) = 0;
@@ -2544,7 +2803,35 @@ void FUN_0000488a(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-undefined4 FUN_000048ae(undefined4 param_1)
+/*
+ * Original: FUN_000048ae; source: ID02.c:2547.
+ * Recovered name: build_palette_index_map [STRONG INFERENCE] (iteration 130).
+ * Status: RENAMED; Ghidra truncated after the empty-slot test. Bytes file
+ * 0x48ae..0x49fc [PROVEN]. Args: word slot [8], short *start [$a],
+ * short *map [$e], short *inverse [$12]; returns word limit.
+ *   if (!device_table[slot].handle (A5-0x136e + 0x16*slot)) return 0;
+ *   front_is_main = (FrontWindow() $A924 == main_window)  [stored, unused here]
+ *   saved = GetGDevice() $AA32; SetGDevice(slot handle) $AA31;
+ *   clear count[256] (local -$208) and inverse[256];
+ *   depth word A5-0x2cc: 4 -> limit 13, 8 -> limit 217 (0xd9); *start = 0;
+ *     [other depths: limit -6(A6) uninitialised - preserved, UNKNOWN effect]
+ *   for (i = 0; i < limit; i++) {
+ *     PmForeColor(i) $AA97;  idx = low word of thePort->fgColor (+0x52;
+ *     thePort pointer at A5-0x160c);
+ *     map[i] = idx; inverse[idx] = i;
+ *     if (count[idx] && depth == 8 && i < 200) word A5-0x102a = 1;  collision
+ *     count[idx]++;
+ *   }
+ *   SetGDevice(saved);
+ *   long A5-0x1122 = A5-0x102a ? A5+0x46a (JT -> ID02 file 0x488a)
+ *                              : A5+0x33a (JT -> ID02 file 0xc68);
+ *   return limit.
+ * Interpretation [STRONG INFERENCE]: maps palette entries to actual device
+ * pixel values (and back); a collision selects an alternate routine via the
+ * function pointer A5-0x1122. Traps per Inside Macintosh (Palette Manager).
+ * Callers: check_device_color_state_changed (2x), FUN_000046b4.
+ */
+undefined4 build_palette_index_map /* Original: FUN_000048ae */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -2640,7 +2927,31 @@ Low-level Error: Symbol $$undef00000003 extends beyond the end of the address sp
 */
 
 
-void FUN_00004c18(void)
+/*
+ * Original: FUN_00004c18; source: ID02.c:2643-2688.
+ * Recovered name: check_device_color_state_changed [STRONG INFERENCE on
+ * structure / HYPOTHESIS on purpose] (iteration 129).
+ * Exported C is complete and matches bytes file 0x4c18..0x4d22 [PROVEN].
+ * - Clears word A5-0x102a and local "changed" flag (local_e).
+ * - If word A5-0x137a == 1: FUN_00004b62() only (likely 1-bit / B&W path).
+ * - Else for slot i = 1..3 of the 0x16-byte table at A5-0x136e (+0 long
+ *   = device handle, +4 long = stored word array):
+ *     if slot used: count = build_palette_index_map(i, &start, fresh, scratch);
+ *       compare fresh[start..count) with stored[]; on first difference mark
+ *       changed; then if i == 1 call JT $182 (seg 3 file 0x6c1c)
+ *       (A5-0x1354, fresh), and build_palette_index_map(i, &start, stored, scratch)
+ *       refreshes the stored copy.
+ * - If anything changed and the overlay is loaded (A5-0x1006): call the
+ *   overlay callback A5-0x1096 (same slot as in apply_settings_to_live_options).
+ * build_palette_index_map (FUN_000048ae; see its header): returns 0 for an empty slot; otherwise
+ * FrontWindow == main_window flag, saves GetGDevice ($AA32), SetGDevice
+ * ($AA31) to the slot handle, clears two 256-word buffers, picks start
+ * index 0x0d / 0xd9 when word A5-0x2cc == 4 / 8 [rest not yet decoded].
+ * [HYPOTHESIS] Detects palette / colour-table changes on up to three
+ * screens (e.g. after a desk accessory) and lets the overlay re-sync colours.
+ * Caller: redraw_main_window (BSR at file 0x4df0).
+ */
+void check_device_color_state_changed /* Original: FUN_00004c18 */ (void)
 
 {
   undefined4 uVar1;
@@ -2660,7 +2971,7 @@ void FUN_00004c18(void)
   else {
     for (local_6 = 1; local_6 < 4; local_6 = local_6 + 1) {
       if (*(int *)(local_6 * 0x16 + unaff_A5 + -0x136e) != 0) {
-        uVar1 = FUN_000048ae(CONCAT22(local_6,(short)((uint)&local_8 >> 0x10)));
+        uVar1 = build_palette_index_map(CONCAT22(local_6,(short)((uint)&local_8 >> 0x10)));
         local_a = (short)uVar1;
         local_c = 0;
         for (; local_8 < (short)uVar1; local_8 = local_8 + 1) {
@@ -2675,7 +2986,7 @@ void FUN_00004c18(void)
           if (local_6 == 1) {
             (**(code **)(unaff_A5 + 0x182))(*(undefined4 *)(unaff_A5 + -0x1354),asStack_20e);
           }
-          FUN_000048ae(CONCAT22(local_6,(short)((uint)&local_8 >> 0x10)));
+          build_palette_index_map(CONCAT22(local_6,(short)((uint)&local_8 >> 0x10)));
         }
       }
     }
@@ -2718,7 +3029,28 @@ void FUN_00004d6a(int param_1)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004db0(void)
+/*
+ * Original: FUN_00004db0; source: ID02.c:2721-2736 (last function of ID02;
+ * segment ends at file 0x4e1a).
+ * Recovered name: redraw_main_window [STRONG INFERENCE] (iteration 128).
+ * Status: RENAMED. Exported C kept; Ghidra truncated after the -0x12ea fix-up
+ * at A-line $A852. Bytes file 0x4db0..0x4e18 [PROVEN]:
+ *   tmp = (word A5-0x12d4 && word A5-0x1032) -> -4(A6)  [stored, never read;
+ *         Ghidra correctly dropped it as dead]
+ *   if (A5-0x14c6 redraw enabled && A5-0x1006 overlay loaded && word A5-0x12f8) {
+ *     if (live option A5-0x12ea == 0) { A5-0x103c = 0; A5-0x12ea = 1; }
+ *     HideCursor $A852;
+ *     BSR 0x4c18 (check_device_color_state_changed, FUN_00004c18);
+ *     UnloadSeg(JT $18a = segment 3 entry) $A9F1;
+ *     (*(code **)(A5-0x109e))();      overlay-side callback [UNKNOWN target]
+ *     BSR 0x4d96 [not a Ghidra function]; FUN_00000930(0, 1) (BSR 0x930);
+ *     BSR 0xa26 [not a Ghidra function]; ShowCursor $A853;
+ *   }
+ * Callers: poll_and_dispatch_event (updateEvt, between Begin/EndUpdate),
+ * apply_settings_to_live_options (after an option-change callback).
+ * [HYPOTHESIS] Renders the game view into the main window through the overlay.
+ */
+void redraw_main_window /* Original: FUN_00004db0 */ (void)
 
 {
   int unaff_A5;

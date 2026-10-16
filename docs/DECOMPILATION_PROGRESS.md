@@ -2,25 +2,25 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 104
+**Last iteration:** 131
 **Last iteration date:** 2026-10-16
-**Loop:** automatic recurrence is not configured in this session: available tools expose neither subscription timers nor monitored-output wake notifications. Prior PID 54957 / terminal 343366 is historical and not confirmed active. Resume manually using the instructions below.
+**Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
 ## Inventory summary
 
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 125 | 0 | 0 | 0 | 0 | 0 |
+| ID02.c | 125 | 112 | 0 | 0 | 13 | 0 | 0 |
 | ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
-| ID05.c | 24 | 24 | 0 | 0 | 0 | 0 | 0 |
+| ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 24 | 0 | 0 | 0 | 0 | 0 |
-| ID07.c | 2 | 2 | 0 | 0 | 0 | 0 | 0 |
+| ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| ID09.c | 4 | 2 | 1 | 0 | 1 | 0 | 0 |
+| ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **618** | **1** | **0** | **111** | **0** | **6** |
+| **TOTAL** | **736** | **577** | **0** | **0** | **153** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 618 NOT_STARTED + 1 INVESTIGATING + 6 BLOCKED;
-111 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 577 NOT_STARTED + 6 BLOCKED (iteration 131);
+153 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -40,12 +40,12 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | Immutable input | Editable output | Status |
 |---|---|---|
 | `ID01.c` | `ID01.decomp.c` | seeded (copy) |
-| `ID02.c` | `ID02.decomp.c` | seeded (copy) |
+| `ID02.c` | `ID02.decomp.c` | seeded + iter 111-112 (initialize_application, main, poll_and_dispatch_event, do_menu_command, apply_settings_to_live_options, handle_mouse_down, handle_activate_event, redraw_main_window, check_device_color_state_changed, build_palette_index_map, palette helpers) |
 | `ID03.c` | `ID03.decomp.c` | seeded (copy) |
 | `ID04.c` | `ID04.decomp.c` | seeded (copy) |
-| `ID05.c` | `ID05.decomp.c` | seeded (copy) |
+| `ID05.c` | `ID05.decomp.c` | seeded + iter 118 (all 24 functions renamed, iterations 118-125) |
 | `ID06.c` | `ID06.decomp.c` | seeded (copy) |
-| `ID07.c` | `ID07.decomp.c` | seeded (copy) |
+| `ID07.c` | `ID07.decomp.c` | seeded + iter 109-110 (both functions renamed) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
 | `ID09.c` | `ID09.decomp.c` | preserved + iterations 100-104 helper and initializer annotations |
 | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–99 edits |
@@ -175,7 +175,48 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_0000039c` | `bootstrap_window_and_load_overlay` | ID08 | RENAMED | PROVEN call | `@0x39C` | `ID08.decomp.c` | window/port; `'HELL'`; JSR→`load_overlay…` | Trap names; HELL check | 71 | Capstone; completes ID08 |
 | `FUN_00000432` | `length_prefixed_bytes_to_c_string_in_place` | ID09 | RENAMED | STRONG INFERENCE | `ID09.c:129-143` | `ID09.decomp.c` (Original: FUN_00000432 header) | Caller buffer only; no globals/callees; no direct callers found | Binary mapping, ABI, encoding and runtime callers | 100 (2026-10-16) | Full-file token equivalence; independent QA; strict C99 helper compile; 768 reference cases pass; protected hashes pass |
 
-| `FUN_00000048` | UNKNOWN (identifier retained) | ID09 | INVESTIGATING | PROVEN C control flow / UNKNOWN role | `ID09.c:26-103` | `ID09.decomp.c` (stable Original header, all exported blocks; terminal and selector binary evidence) | Selector globals, reverse byte table, gated source record; no direct callees | Runtime selector pointer, omitted +7 write, trap ABI and omitted path; see evidence notes | 104 (2026-10-16) | Comment-only token preservation; independent review; all 32 protected hashes unchanged |
+| `FUN_00000048` | `sysenvirons_glue_fallback` | ID09 | RENAMED | STRONG INFERENCE role / PROVEN C control flow + dispatcher and lookup bytes | `ID09.c:26-103` | `ID09.decomp.c` (Original header + all exported blocks) | Entry dispatcher file 0x20-0x46 (`$A346`/`$A746`/`$A090`); low-memory globals | Omitted +7 write; `$A260`/`$A207` trap ABI; 'ERIK' literal; machineType mapping HYPOTHESIS; validation vs Apple glue | 106 (2026-10-16) | Token diff = rename only; Capstone decode; 32 protected hashes unchanged |
+| `FUN_000002a6` | `fsopen_glue` | ID09 | RENAMED | PROVEN bytes / STRONG INFERENCE role | `ID09.c:107-114` | `ID09.decomp.c` (header; body retained as halt_baddata) | `$A000` _Open; IOParam frame | Callers via jump table unknown; neighbouring unexported glue | 107 (2026-10-16) | Token diff = rename only; Capstone decode; 32 hashes OK |
+| `FUN_000003c2` | `swapmmumode_glue` | ID09 | RENAMED | PROVEN bytes / STRONG INFERENCE role | `ID09.c:118-125` | `ID09.decomp.c` (header; body retained as halt_baddata) | `$A05D` _SwapMMUMode | Callers via jump table unknown | 108 (2026-10-16) | Token diff = rename only; Capstone decode; 32 hashes OK |
+| `FUN_00000006` (ID07) | `load_str129_string_table` | ID07 | RENAMED | PROVEN bytes / STRONG INFERENCE role | `ID07.c:9-16` | `ID07.decomp.c` (header; body retained as halt_baddata; call site renamed) | `$A9A0` GetResource; JT `$272`→seg9 HLock, `$4fa`→ID02 `FUN_0000024a` memmove, `$3a`→ID01 switch helper @0xbe; writes A5−0xf46[1..120] | NULL handle / count bounds; ID01 switch helper not yet inventoried as function | 109 (2026-10-16) | Token diff = rename only; Capstone; CODE0 JT parse; 32 hashes OK |
+| `FUN_00000190` (ID07) | `init_string_pointer_groups` | ID07 | RENAMED | PROVEN copy / STRONG INFERENCE role | `ID07.c:20-44` | `ID07.decomp.c` | `load_str129_string_table`; writes A5−0x221e/−0xffe/−0xfae/−0xf86; caller ID02 file 0x2c0a | Meaning of each string group | 110 (2026-10-16) | Token diff = rename only; byte search; 32 hashes OK |
+| `FUN_00002bbc` (ID02) | `initialize_application` | ID02 | RENAMED | PROVEN bytes / STRONG INFERENCE role | `ID02.c:1552-1564` | `ID02.decomp.c` (header; truncated C retained; caller renamed) | Toolbox init traps; ID09 glue (MaxApplZone, MoreMasters, FlushEvents, SetEventMask, NewPtrClear, NewHandleClear, SysEnvirons); ID07 strings; 'MENU' 2, 'HEL1' 127/128 | seg4 file 0x3d42 check; `$AA28`; HEL1 record layouts; helpers 0x2192/0x27e4/0x2e36/0x2eaa | 111 (2026-10-16) | Token diff = rename only; Capstone + JT resolution; 32 hashes OK |
+| `FUN_0000309a` (ID02) | `main` | ID02 | RENAMED | PROVEN entry chain / STRONG INFERENCE role | `ID02.c:1650-1660` | `ID02.decomp.c` (header; truncated C retained) | ID01 entry JSR (A5,$4b2); `initialize_application`; ID08 overlay loader; UnloadSeg 4/8/5; loop on `FUN_00002fd4` | Helpers 0x1b42, 0x30fa, 0x35e4; A5−0x13ae/−0x14c4/−0x102e meanings | 112 (2026-10-16) | Token diff = rename only; Capstone + JT resolution; 32 hashes OK |
+| `FUN_00002fd4` (ID02) | `poll_and_dispatch_event` | ID02 | RENAMED | PROVEN bytes / STRONG INFERENCE role | `ID02.c:1641-1646` | `ID02.decomp.c` (header; truncated C retained) | GetNextEvent; switch helper; callees 0x2f1e mouseDown, 0x36a2 menu cmd, 0x4db0 redraw, 0x2fa0 activate, 0x29f2, 0x3174, seg4 0x432 | Callee semantics; A5−0x14c6 flag; 68020-only EXTB.L vs 68000 support | 113 (2026-10-16) | Token diff = rename only; Capstone 000+020 decode; 32 hashes OK |
+| `FUN_000036a2` (ID02) | `do_menu_command` | ID02 | RENAMED | PROVEN bytes / STRONG INFERENCE role | `ID02.c:1759-1764` | `ID02.decomp.c` (header: all five menus) | HiWord/LoWord; ID01 switch helper; desk accessories; SystemEdit; seg4/seg8 JT callees; local 0x2da0, 0x2eaa, 0x35e4, 0x4fc | Option byte meanings; menu titles; 0x2a44/0x27e4 roles; seg4 callee roles | 115 (2026-10-16) | Token diff = rename only; switch tables parsed; 32 hashes OK |
+| `FUN_00002a44` (ID02) | `apply_settings_to_live_options` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1487-1546` | `ID02.decomp.c` (header with S→live map) | HEL1 127 S; live A5−0x12ee..−0x12d0; callbacks A5−0x1092/−0x104e/−0x1096; gate A5−0x1006, A5−0x137a==8; FUN_00004db0 | Callback targets; gate meanings; option semantics | 116 (2026-10-16) | Token diff = rename only; entry bytes match C; 6 callers by byte scan; 32 hashes OK |
+| `FUN_00002f1e` (ID02) | `handle_mouse_down` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1613-1618` | `ID02.decomp.c` | FindWindow/MenuSelect/SystemClick/TrackGoAway/HideWindow; do_menu_command | — | 127 (2026-10-16) | Switch table parsed; token diff = renames |
+| `FUN_00002fa0` (ID02) | `handle_activate_event` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1624-1634` | `ID02.decomp.c` | InvalRect(portRect) of main_window | — | 127 (2026-10-16) | Bytes match C + truncated tail |
+| `FUN_00004db0` (ID02) | `redraw_main_window` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2721-2736` | `ID02.decomp.c` (header; call site renamed) | gates A5−0x14c6/−0x1006/−0x12f8; Hide/ShowCursor; UnloadSeg 3; overlay callback A5−0x109e; FUN_00004c18, FUN_00000930, 0x4d96, 0xa26 | Callee roles; callback target | 128 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00004c18` (ID02) | `check_device_color_state_changed` | ID02 | RENAMED | STRONG INFERENCE (purpose confirmed iter 130) | `ID02.c:2643-2688` | `ID02.decomp.c` | device table A5−0x136e[1..3]; FUN_000048ae; FUN_00004b62; JT $182 (seg3 0x6c1c); callback A5−0x1096 | FUN_000048ae tail; JT $182 role | 129 (2026-10-16) | C matches bytes; token diff = renames |
+| `FUN_000048ae` (ID02) | `build_palette_index_map` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2547` | `ID02.decomp.c` | Get/SetGDevice; PmForeColor; thePort fgColor; depth A5−0x2cc; collision A5−0x102a; fnptr A5−0x1122 → 0x488a / 0xc68 | Uninitialised limit for other depths; selected routines' roles | 130 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_000046b4` (ID02) | `rebuild_all_palette_index_maps` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2484-2506` | `ID02.decomp.c` | build_palette_index_map; FUN_00004b62; FUN_00000d24 | A5−0x103a role | 131 (2026-10-16) | C matches bytes; token diff = renames |
+| `FUN_00004738` (ID02) | `configure_palette_entries` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2520-2532` | `ID02.decomp.c` | SetEntryUsage/SetEntryColor; palettes A5−0x14ae/−0x14aa; RGB tables A5−0x350/−0x320/−0x302 | Callers | 131 (2026-10-16) | Capstone (Ghidra truncated) |
+| `FUN_0000488a` (ID02) | `clear_ctab_size_callback` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:2536-2545` | `ID02.decomp.c` | CurrentA5 $904; A5−0x14b2 block | +6 field meaning | 131 (2026-10-16) | Bytes match C |
+| `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
+| `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
+| `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
+| `FUN_0000085e` (ID05) | `restore_poisoned_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:211-232` | `ID05.decomp.c` | table A5−0xb4; gates A5−0xbc/−0xc0; caller ID08 0x29e | Gate writers unknown | 118 (2026-10-16) | JT $55a resolved; single caller |
+| `FUN_00000934` (ID05) | `record_code_index_equals` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:261-268` | `ID05.decomp.c` (header also documents unexported 0x964 routine and 0x8b2 stub) | ID08 callers 0x282/0x2b2; gates A5−0xbc/−0xc0 | Table contents A5−0xba; key A5−0x2c; n/rec origin | 119 (2026-10-16) | Bytes match C; token diff = renames; 32 hashes OK |
+| `FUN_00000754` (ID05) | `encode_base26_6chars` | ID05 | RENAMED | PROVEN | `ID05.c:152-168` | `ID05.decomp.c` | callers 0xb00/0xb98/0xbce | Purpose of encoded values | 120 (2026-10-16) | DIVS.L #26 bytes; token diff = renames |
+| `FUN_000007a8` (ID05) | `decode_base26_6chars` | ID05 | RENAMED | PROVEN | `ID05.c:172-187` | `ID05.decomp.c` | callers 0xb1c/0xbb4/0xbea | — | 120 (2026-10-16) | MULU.L #26 bytes; token diff = renames |
+| `FUN_00000a62` (ID05) | `random_28bit_value` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:278-287` | `ID05.decomp.c` | caller 0x442 | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_00000a90` (ID05) | `pack_fields_to_code_buf68` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:291-306` | `ID05.decomp.c` | caller 0x498; buf A5−0x68 | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_00000b10` (ID05) | `unpack_fields_from_code` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:310-323` | `ID05.decomp.c` | no caller found | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_00000b84` (ID05) | `encode_code28_to_buf54` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:327-334` | `ID05.decomp.c` | ID05 0x4b2; ID08 0x276/0x2a6 (JT $552) | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_00000ba8` (ID05) | `decode_code_to_long_a` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:338-345` | `ID05.decomp.c` | no caller found | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_00000bc2` (ID05) | `encode_long_to_buf40` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:349-356` | `ID05.decomp.c` | caller 0x4ce | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_00000bde` (ID05) | `decode_code_to_long_b` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:360-367` | `ID05.decomp.c` | caller 0x674 | Field semantics | 121 (2026-10-16) | C mechanics; callers by byte scan; token diff = renames |
+| `FUN_000002c8` (ID05) | `code_dialog_filter` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:99-104` | `ID05.decomp.c` (header: routine A filter + unexported routine B 0x3ba code builder) | Dialog traps; codec wrappers; FUN_000000c8/0214/0270; ID09 GetVol/p2cstr; ID02 strcmp/strcpy | Routine B caller; A5−0xca / −0xd66 strings; FUN_00000214/0270 roles | 122 (2026-10-16) | Capstone 68020; token diff = renames; 32 hashes OK |
+| `FUN_00000160` (ID05) | `read_DATA128_pair` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:51-58` | `ID05.decomp.c` | GetResource/HNoPurge/HPurge/ReleaseResource; callers ID08 0x26c (JT $582) | Meaning of the two longs | 123 (2026-10-16) | Capstone; JT/BSR scan; token diff = renames |
+| `FUN_000001bc` (ID05) | `write_DATA128_pair` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:64-69` | `ID05.decomp.c` | GetResource/HNoPurge/HPurge/ReleaseResource; callers ID08 0x2c4 (JT $57a) | Meaning of the two longs | 123 (2026-10-16) | Capstone; JT/BSR scan; token diff = renames |
+| `FUN_00000214` (ID05) | `read_TEXT128_pair` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:75-82` | `ID05.decomp.c` | GetResource/HNoPurge/HPurge/ReleaseResource; callers ID05 0x3f4, 0x458 | Meaning of the two longs | 123 (2026-10-16) | Capstone; JT/BSR scan; token diff = renames |
+| `FUN_00000270` (ID05) | `write_TEXT128_pair` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:88-93` | `ID05.decomp.c` | GetResource/HNoPurge/HPurge/ReleaseResource; callers ID05 0x44a, 0x718 | Meaning of the two longs | 123 (2026-10-16) | Capstone; JT/BSR scan; token diff = renames |
+| `FUN_00000006` (ID05) | `center_template_rect_on_screen` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:12-19` | `ID05.decomp.c` | GetResource; screenBits A5−0x1680..−0x167a; GetMBarHeight (ID09 0x19c) | Callers; template type | 124 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_000000c8` (ID05) | `get_machine_screen_fingerprint` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:23-45` | `ID05.decomp.c` | SysEnvirons; GetGDevice ($AA32) pixmap; screenBits | — | 124 (2026-10-16) | Capstone; truncated colour branch documented |
+| `FUN_000004e4` (ID05) | `get_dialog_item_text_upper` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:110-115` | `ID05.decomp.c` | GetDItem/GetIText; ctype A5−0x1608; ID02 FUN_000001ce | toupper confirmation | 125 (2026-10-16) | Capstone; token diff = renames |
+| `FUN_00000560` (ID05) | `run_protection_dialog` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:121-126` | `ID05.decomp.c` | DLOG 1000 / ALRT 1001; code_dialog_filter; matcher 0x964; DATA/TEXT pairs; caller ID08 0x298 (JT $572) | Field UI meaning; table source | 125 (2026-10-16) | Capstone; JT resolution; token diff = renames |
+| `FUN_000008d6` (ID05) | `pick_random_protection_challenge` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:244-257` | `ID05.decomp.c` | ansi_rand; table A5−0xba/−0xb6 | — | 125 (2026-10-16) | C + caller 0x5a6 |
 
 All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 
@@ -745,9 +786,340 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Function remains INVESTIGATING; counts unchanged. Modified ID09 reconstruction,
   progress/symbol maps and the new selector evidence note only.
 
-**Next iteration target:** `ID09.c:72-79` / `FUN_00000048`: independently locate
-PC-relative reverse-lookup setup and recover its five literal table bytes, keeping
-file coordinates separate from runtime addresses.
+### Iteration 105 — 2026-10-16
+
+- Verified all 32 protected hashes; preserved uncommitted iterations 101-104.
+- Decoded file 0xf8..0x10c: `MOVE.B $21e.w,D0`, unique `LEA $59(PC),A0`,
+  `CMP.B -(A0)` / `DBEQ` / `ADDQ.W` / store to +0x0a. The five scanned bytes
+  are a BRA-skipped data island at file 0x54..0x58: `03 13 0b 02 01`
+  (0x01→5, 0x02→4, 0x0b→3, 0x13→2, 0x03→1, else 0). Ghidra loop equivalent.
+- Function-level identification: record layout, low-memory globals and
+  return 0xea84 (−5500 envNotPresent) match the Toolbox SysEnvirons glue
+  fallback. Proposed `sysenvirons_glue_fallback` [STRONG INFERENCE]; identifier
+  not renamed yet. Wrote `ID09_SYSENVIRONS_ANALYSIS.md`.
+- Validation: comment-only token comparison, protected hashes. Still INVESTIGATING.
+
+### Iteration 106 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-105.
+- Decoded ID09.bin file 0x20..0x46 (not exported by Ghidra): ROM85 sign test,
+  `$A346` GetOSTrapAddress($90) vs `$A746` GetToolTrapAddress($9F
+  _Unimplemented), then `$A090` _SysEnvirons when implemented, else fall to
+  0x48. Renamed `FUN_00000048` → `sysenvirons_glue_fallback` [STRONG INFERENCE];
+  original identifier kept in header and inline comment. No call sites in any export.
+- Annotated machineType codes (`ID09.c:44-64`) vs SysEnvRec constants and ROM
+  version bytes as HYPOTHESIS.
+- Noted file 0x04..0x1e: return-address-indexed BSR stubs feeding A-line `$ADEA`
+  (likely `_Pack3` auto-pop, Standard File selectors) — HYPOTHESIS, not exported.
+- Validation: comment-stripped token diff vs ID09.c shows only this rename and
+  the prior FUN_00000432 rename; protected hashes OK. Not VERIFIED.
+
+### Iteration 107 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-106.
+- Decoded ID09.bin file 0x188..0x3c2. File coordinate matches Ghidra here
+  (LINK at 0x2a6). `FUN_000002a6` = Pascal FSOpen glue: 50-byte IOParam on the
+  stack, ioNamePtr/ioVRefNum set, version/permission/misc cleared, `$A000`
+  _Open, ioRefNum → VAR arg, D0 → result, callee pops 10 bytes. Ghidra stopped
+  decoding at the A-line word. Renamed to `fsopen_glue` [STRONG INFERENCE]; truncated C body kept.
+- Segment ID09 is a Toolbox/File Manager glue library: unexported stubs for
+  FSClose, FSRead/FSWrite, GetVol, GetEOF, GetFPos plus register-based OS
+  trap shims at 0x18a..0x2a4 (HYPOTHESIS, documented in the header only).
+- Validation: token diff vs ID09.c = renames only; protected hashes OK.
+
+### Iteration 108 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-107.
+- Decoded ID09.bin file 0x3c2..0x44a. `FUN_000003c2` = SwapMMUMode(VAR mode)
+  glue: byte via VAR pointer → D0, `$A05D`, D0.B stored back, pops 4 bytes.
+  Renamed `swapmmumode_glue` [STRONG INFERENCE]; truncated C body kept.
+- Unexported neighbours (HYPOTHESIS): Pack6 IUMagString/IUMagIDString stubs
+  (0x3d6/0x3dc), NumToString via Pack7 (0x404), c2pstr-like (0x416). The
+  bytes at 0x432 match the existing `length_prefixed_bytes_to_c_string_in_place`
+  (p2cstr-like): MOVEQ #0/MOVE.B/DBRA shift loop, CLR.B, return arg pointer.
+- ID09: all 4 exported functions now RENAMED; none VERIFIED.
+- Validation: token diff vs ID09.c = renames only; protected hashes OK.
+
+### Iteration 109 — 2026-10-16
+
+- Verified 32 protected hashes; ID07.decomp.c was an unmodified seed.
+- Decoded ID07.bin 0x06..0x18e: GetResource('STR#',129), HLock, walk 120
+  entries; "\p" prefix → Pascal string (memmove drops marker), else C string;
+  "\r"/"\t" escapes via runtime switch helper; pointers to A5−0xf46[1..120].
+  Ghidra failed on the inline switch table at file 0xda.
+- Resolved A5 jump-table targets from ID00.bin (above/below/jtsize/jtoff header,
+  entries offset/MOVE.W #seg/_LoadSeg; seg offset + 4-byte CODE header = file
+  offset): `$272`→seg 9 file 0x270 (`$A029` HLock glue), `$4fa`→seg 2
+  `FUN_0000024a` (overlap-safe memmove), `$3a`→seg 1 file 0xbe (switch helper).
+- Renamed `FUN_00000006` (ID07 only) → `load_str129_string_table`
+  [STRONG INFERENCE]; renamed its sole call site in FUN_00000190. Same-named
+  `FUN_00000006` in other segments are distinct functions and untouched.
+- Validation: token diff = rename only; protected hashes OK.
+
+### Iteration 110 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-109.
+- `FUN_00000190` (ID07) copies string-pointer slices 2..22, 94..99, 100..105,
+  106..115 of A5−0xf46 into A5−0x221e, −0xffe, −0xfae, −0xf86. Renamed
+  `init_string_pointer_groups` [STRONG INFERENCE].
+- Caller found by byte search: ID02.bin file 0x2c0a `JSR $592(A5)` inside the
+  truncated `FUN_00002bbc` (CODE 0 entry seg 7 off 0x18c). Readers located in
+  ID04 (0x22e2; ID04.c:711; LEAs at 0x131a/0x1cba/0x1d14/0x2aac).
+- ID07: both functions RENAMED. Validation: token diff = renames only; hashes OK.
+
+### Iteration 111 — 2026-10-16
+
+- Verified 32 protected hashes; ID02.decomp.c was an unmodified seed.
+- Decoded ID02.bin 0x2bbc..0x2d9e with a JT-resolving disassembler
+  (scratch tool, not in repo). `FUN_00002bbc` = application startup: heap
+  setup, standard Toolbox Init* sequence, event mask, string tables (then
+  UnloadSeg seg 7), seg-4 gate → ExitToShell, SysEnvirons (ID09 glue) →
+  hasColorQD / CPU flags at A5−0x1388/−0x1387, optional colour-table
+  allocation, 'MENU' 2 check, 'HEL1' 127 (0x12a bytes) and 128 (0x500 bytes)
+  load-or-create, SetPort. Renamed `initialize_application` [STRONG INFERENCE];
+  renamed call site in `FUN_0000309a` (ID02.c:1658).
+- Links iterations 105-110: confirms ID09 dispatcher at file 0x20 is called as
+  SysEnvirons(1,&rec) and ID07 is an init-only string segment.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 112 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-111.
+- Proven entry chain: ID01.bin (CODE 0 JT entry 0) loads constant 0x4b2 and
+  `JSR (A5,D1.W)` → JT $4b2 → ID02 `FUN_0000309a`, then ExitToShell.
+- Decoded 0x309a..0x30f8: initialize_application, UnloadSeg seg 4, MaxMem
+  glue, helper 0x1b42, A5−0x14c4=1, ID08 overlay loader (result kept),
+  UnloadSeg seg 8 and seg 5, helper 0x30fa, conditional 0x35e4, then infinite
+  loop on `FUN_00002fd4`. Renamed `main` [STRONG INFERENCE].
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 113 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-112.
+- Decoded ID02.bin 0x2fd4..0x3098: HiliteMenu(0), SystemTask, two helpers,
+  GetNextEvent(everyEvent), switch on evt.what (1 mouseDown → 0x2f1e;
+  3/5 key with cmdKey → MenuKey → 0x36a2; 6 update of main window
+  A5−0x14ca → Begin/EndUpdate around 0x4db0; 8 activate → 0x2fa0).
+  Renamed `poll_and_dispatch_event` [STRONG INFERENCE].
+- Finding: word 0x49C0 = EXTB.L D0 (68020+) appears twice; ID02 is compiled
+  for 68020+ or relies on a CPU gate (seg4 check in initialize_application?) — open question.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 114 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-113.
+- `FUN_000036a2` = menu command dispatcher: HiWord/LoWord of menuResult,
+  switch on menu 1..5. Annotated menu 1 (Apple: item 1 → JT $162, others →
+  OpenDeskAcc), menu 2 (13 items, incl. save HEL1 127 at item 2, quit helper
+  0x2eaa at item 13, separators at 3/10/12), menu 3 (Edit → SystemEdit, else
+  SysBeep(5)). Switch tables parsed programmatically. Renamed `do_menu_command`.
+- Large function: menus 4 (0x37ec) and 5 (0x38ac) deliberately left for next pass.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 115 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-114.
+- Completed `do_menu_command`: menus 4 and 5 are option menus over the
+  HEL1 127 settings record S (BCHG #0 toggles at S+3/5/7/9/0x13/0x15/0x17/
+  0x19/0x1b; radio word S+0x10 = 1..5; word S+0xe = 1/3/2 via FUN_000035bc),
+  each setting dirty word A5−0x138a; menu 4 item 4 toggles non-persistent
+  byte A5−0x102f. Common epilogue BSR 0x2a44. Comment-only edit.
+- Validation: token diff = renames only (unchanged since 114); hashes OK.
+
+### Iteration 116 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-115.
+- `FUN_00002a44` (clean C) copies HEL1 127 settings words into live A5
+  options (−0x12ee..−0x12d0, −0x103c); on change of selected fields and
+  A5−0x1006 != 0, calls function pointers A5−0x1092 / −0x104e / −0x1096,
+  then redraws via FUN_00004db0. Two fields gated by A5−0x137a == 8.
+  Renamed `apply_settings_to_live_options` [STRONG INFERENCE]; documented
+  the menu item → S word → live word map (odd-byte BCHG = bit 0 of BE word).
+- Byte scan of ID02.bin found 6 PC-relative callers (0x6ce, 0x6f6, 0x716,
+  0x218a, 0x2a20, 0x39a0).
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 117 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-116.
+- Byte scan (d16(A5) operands, decoded at candidate starts) across ID01-ID09:
+  A5−0x1092/−0x104e/−0x1096 are only read (ID02 0x2a3a, 0x2aec, 0x2b1a,
+  0x2b50, 0x3694, 0x4d1a); no direct writer exists in the CODE segments.
+  A5−0x1006 is written only by ID08 (0xd4 store, 0xf0/0xfe align, 0x226
+  clear) = relocated overlay base. Pacific Conflict.c has no A5-relative
+  references to these slots (its A5 is not the application A5 in Ghidra).
+- Decoded ID08 0x236..0x29e (Ghidra-truncated tail): JT $53a(base, code
+  size) [seg5 file 0x7f6], TickCount ($A975) → JT $542(A5−0x1cc4, 0x38,
+  ticks) [seg5 0x8b8], then seg5 routines $582/$552/$54a/$532/$572.
+  Recorded only; ID08.decomp.c not edited this iteration.
+- Comment-only update to `apply_settings_to_live_options` header (ID02).
+- Validation: token diff unchanged (renames only); protected hashes OK.
+  No function status change.
+
+### Iteration 118 — 2026-10-16
+
+- Verified 32 protected hashes; ID05.decomp.c was an unmodified seed.
+- JT $53a → ID05 `FUN_000007f6`: right after ID08 loads and relocates the
+  overlay, 12 random bytes of the overlay code are saved to table A5−0xb4
+  and overwritten with 0xFF. JT $55a → `FUN_0000085e` restores them (reverse
+  order) only if word A5−0xbc or long A5−0xc0 is non-zero; called once, ID08
+  0x29e, after seg5 calls $542/$582/$552/$54a/$532/$572. Copy-protection
+  booby trap is HYPOTHESIS.
+- `FUN_00000728` = ANSI rand LCG (seed A5−0x6c) [PROVEN]; `FUN_00000746` = srand.
+- Decoded 68020 DIVUL.L $c(A6),D1:D0 (file 0x80a) = `% param_2`.
+- Renamed 4 ID05 functions + 4 call sites. Token diff = renames only; hashes OK.
+
+### Iteration 119 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-118.
+- Gate writers found (68020-aware byte scan): A5−0xbc incremented only by the
+  unexported stub at ID05 file 0x8b2 (JT $532), called by ID08 0x28c when
+  `FUN_00000934` (JT $54a) returns nonzero. A5−0xc0 cleared/incremented only
+  by unexported ID05 routine 0x964..0xa60 (called from ID05 0x69c), which
+  counts table entries (A5−0xba, count A5−0xb6, 12-byte records) whose
+  key-obfuscated string (key A5−0x2c, & 0x7f) and three words match the args.
+- Renamed `FUN_00000934` → `record_code_index_equals` (rec[4]*20+rec[5]==n).
+  Also noted ID05 `FUN_00000754`/`FUN_000007a8` = 6-letter base-26 encode/decode.
+- Scratch disassembler switched to 68020 mode (ID02/ID05 use EXTB.L, MULU.L, DIVUL.L).
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 120 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-119.
+- Bytes confirm `FUN_00000754` = signed base-26 6-letter encoder (DIVS.L #26)
+  and `FUN_000007a8` = decoder (MULU.L #26, (s8)c − 'A'); renamed
+  `encode_base26_6chars` / `decode_base26_6chars` [PROVEN] plus 6 call sites
+  (wrappers at ID05 0xa90..0xbde, buffers A5−0x68/−0x54/−0x40).
+- Decoded the 0x964 matcher call at ID05 0x69c: args (−0x262, −0x264, −0x266
+  words of the caller frame; string = 0x4e4(ptr, 3)); result word stored to
+  −0x26a(A6) and tested.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 121 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-120.
+- Renamed seven ID05 codec wrappers (0xa62..0xbde) with mechanics-based names:
+  random_28bit_value, pack_fields_to_code_buf68 / unpack_fields_from_code,
+  encode_code28_to_buf54, encode_long_to_buf40, decode_code_to_long_a/_b.
+- Callers by JT/BSR scan: ID05 0x442, 0x498, 0x4b2, 0x4ce, 0x674 (all inside
+  the large truncated ID05 routine around 0x2c8..0x728); ID08 0x276/0x2a6 via
+  JT $552 — at 0x276 the 6-letter string is the `rec` checked by
+  record_code_index_equals (letters 5-6).
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 122 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-121.
+- Ghidra's `FUN_000002c8` spans two routines. A (0x2c8..0x3b8): Pascal modal
+  dialog filter — first-call default-button frame on item 1, OK dimmed while
+  item 3 text empty, Return/Enter → item 1, Esc → item 2. Renamed
+  `code_dialog_filter`. B (0x3ba..0x4e2, unexported): builds output code
+  strings from FUN_000000c8 words and FUN_00000214 values via the codec
+  wrappers; compares the GetVol name with A5−0xca and may re-randomise via
+  FUN_00000270(0, random_28bit_value()).
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 123 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-122.
+- ID05 0x160/0x1bc/0x214/0x270 (all truncated at $A9A0 in Ghidra) are
+  read/write accessors for two longs in resources 'DATA' 128 and 'TEXT' 128
+  (GetResource, HNoPurge, copy, [ChangedResource+WriteResource], HPurge,
+  ReleaseResource). Renamed read/write_DATA128_pair, read/write_TEXT128_pair.
+  Callers: ID08 0x26c/0x2c4 (DATA via JT $582/$57a), ID05 0x3f4/0x44a/0x458/0x718 (TEXT).
+- ID05 now 19/24 RENAMED. Validation: token diff = renames; hashes OK.
+
+### Iteration 124 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-123.
+- `FUN_000000c8` = machine/screen fingerprint: SysEnvirons machineType, plus
+  screen width/height/depth from the GDevice pixmap (Color QD) or screenBits
+  (depth 1). These are the five words packed by pack_fields_to_code_buf68, so
+  the protection code is machine-dependent [STRONG INFERENCE].
+- `FUN_00000006` = centre a template rect horizontally, 1/3 down below the
+  menu bar (GetMBarHeight glue). Both renamed; ID05 21/24 RENAMED.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 125 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-124.
+- Decoded ID05 0x4e4..0x726. `FUN_000004e4` = dialog item text → upper-case
+  C string (static A5−0x1c9). `FUN_00000560` = protection dialog driver
+  (JT $572, called from ID08 0x298): skip if stored code already valid; else
+  random challenge (w1..w3) via `FUN_000008d6`, DLOG 1000 with
+  code_dialog_filter, item 2 → ExitToShell, item 3 answer checked by matcher
+  0x964, item 4 decoded to *a, ALRT 1001 on failure; on success persists via
+  write_TEXT128_pair. Manual look-up protection = STRONG INFERENCE.
+- Renamed get_dialog_item_text_upper, run_protection_dialog,
+  pick_random_protection_challenge. **ID05 is fully RENAMED (24/24).**
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 126 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-125.
+- Wrote `docs/COPY_PROTECTION_FLOW.md`: full ID08 → ID05 protection chain
+  (poison, seed/table init, DATA 128 check, dialog, restore, persist) with
+  file offsets; ID08 offsets re-verified by decoding 0x24c..0x2d4.
+- Decoded ID05 0x8b8 (Ghidra "Unable to decompile", not inventoried):
+  `ansi_srand(ticks)`, table pointer A5−0xba = A5−0x1cc4, count A5−0xb6 = 56.
+  Comment added above Ghidra's error block; inventory counts unchanged.
+- Validation: ID05 token diff unchanged (34 rename hunks); hashes OK.
+
+### Iteration 127 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-126.
+- `FUN_00002f1e` = mouseDown handler: FindWindow part switch (menu bar →
+  MenuSelect → do_menu_command; system window → SystemClick; go-away on main
+  window → TrackGoAway + HideWindow; content/drag/grow ignored).
+- `FUN_00002fa0` = activate handler: main window activation (activeFlag +
+  changeFlag) → InvalRect(portRect). Both renamed; dispatcher header updated.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 128 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-127.
+- `FUN_00004db0` (last ID02 function) = main-window redraw: gated by redraw
+  flag, overlay base and A5−0x12f8; forces live option A5−0x12ea to 1 if 0;
+  HideCursor, FUN_00004c18, UnloadSeg seg 3, overlay callback A5−0x109e,
+  helpers 0x4d96 / FUN_00000930(0,1) / 0xa26, ShowCursor. Dead local flag
+  (A5−0x12d4 && A5−0x1032) documented. Renamed `redraw_main_window` + 1 call site.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 129 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-128.
+- `FUN_00004c18`: for up to 3 GDevice slots (A5−0x136e, 0x16 bytes each),
+  fetches a fresh 256-word array via `FUN_000048ae` (Get/SetGDevice, depth
+  4/8 start index) and compares to the stored copy; on change calls JT $182
+  (slot 1) and refreshes, then overlay callback A5−0x1096. B&W path
+  (A5−0x137a == 1) → FUN_00004b62. Renamed `check_device_color_state_changed`.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 130 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-129.
+- Finished `FUN_000048ae`: for palette entries 0..12 (4-bit) / 0..216 (8-bit)
+  calls PmForeColor ($AA97) and reads the resulting device index from
+  thePort->fgColor, building map/inverse tables; detects duplicate indices
+  (8-bit, entry < 200) → A5−0x102a; then picks function pointer A5−0x1122 =
+  JT 0x46a (ID02 0x488a) or 0x33a (ID02 0xc68). Renamed
+  `build_palette_index_map` (+3 call sites); confirms the palette purpose of
+  check_device_color_state_changed.
+- Validation: token diff = renames only; protected hashes OK.
+
+### Iteration 131 — 2026-10-16
+
+- Verified 32 protected hashes; preserved uncommitted iterations 101-130.
+- Renamed three palette helpers in ID02: `FUN_000046b4` →
+  rebuild_all_palette_index_maps (per-slot build_palette_index_map, B&W path,
+  releases A5−0x103a via FUN_00000d24); `FUN_00004738` → configure_palette_entries
+  (SetEntryUsage/SetEntryColor for 4-bit palette A5−0x14ae and 8-bit palette
+  A5−0x14aa; entries 0..0xc7 animated at 8-bit); `FUN_0000488a` →
+  clear_ctab_size_callback (CurrentA5-safe; installed via JT 0x46a).
+- Validation: token diff = renames only; protected hashes OK.
+
+**Next iteration target:** `ID02.c` / `FUN_00004b62` (B&W path used by both
+rebuild_all_palette_index_maps and check_device_color_state_changed).
 
 ## Resuming the five-minute workflow
 
