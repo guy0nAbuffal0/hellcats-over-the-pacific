@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 97  
+**Last iteration:** 99  
 **Last iteration date:** 2026-10-15  
 **Loop:** local monitored shell `AGENT_LOOP_TICK_hellcats_decomp` every 300s (PID 54957 / terminal 343366)
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 2 | 0 | 0 | 0 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
-| Pacific Conflict.c | 441 | 330 | 0 | 0 | 104 | 0 | 8 |
-| **TOTAL** | **731** | **616** | **0** | **0** | **108** | **0** | **8** |
+| Pacific Conflict.c | 441 | 328 | 0 | 0 | 106 | 0 | 8 |
+| **TOTAL** | **731** | **614** | **0** | **0** | **110** | **0** | **8** |
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -39,7 +39,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `ID07.c` | `ID07.decomp.c` | seeded (copy) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
 | `ID09.c` | `ID09.decomp.c` | seeded (copy) |
-| `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–97 edits |
+| `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–99 edits |
 
 ## Function tracker (processed / in focus)
 
@@ -131,8 +131,10 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00019fba` | `try_begin_landing_approach` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x19FBA` | `Pacific Conflict.decomp.c` | setup 267xx glide; +0x32→1a186 | handler | 91 | Capstone; 2 BSR |
 | `FUN_00019c5e` | `find_nearest_runway_approach_ends` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x19C5E` | `Pacific Conflict.decomp.c` | nearest 'p'/4 pad ends | pad schema | 92 | Capstone; 1 BSR |
 | `FUN_00019c26` | `store_xyz_asr` | Pacific Conflict | RENAMED | PROVEN | `@0x19C26` | `Pacific Conflict.decomp.c` | A1←(x,y,z)>>s | — | 93 | Capstone; 4 BSR |
-| `FUN_0001a1a6` | `tick_landing_approach_glide` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x1A1A6` | `Pacific Conflict.decomp.c` | glide along 267xx | — | 95 | Capstone |
+| `FUN_0001a1a6` | `tick_landing_approach_glide` | Pacific Conflict | RENAMED / ANNOTATED | STRONG INFERENCE | `@0x1A1A6` | `Pacific Conflict.decomp.c` | glide phases annotated | abort band | 95+98 | Capstone |
 | `FUN_00000354` | `probe_nearest_facility_kind` | Pacific Conflict | RENAMED | PROVEN | `@0x0354` | `Pacific Conflict.decomp.c` | 0x12→0x100, 0x13→0x200 | Ghidra void ABI | 97 | Capstone; 12 BSR |
+| `FUN_00003c48` | `approx_dist3_from_abs` | Pacific Conflict | RENAMED | PROVEN | `@0x3C48` | `Pacific Conflict.decomp.c` | max+(a+b)>>2 on regs | — | 99 | Capstone |
+| `FUN_00003c68` | `approx_dist3_xyz` | Pacific Conflict | RENAMED | PROVEN | `@0x3C68` | `Pacific Conflict.decomp.c` | 6-arg XYZ approx dist | — | 99 | Capstone; 31 BSR |
 | `$1A186` | *(false mid of landing tick)* | Pacific Conflict | BLOCKED | PROVEN | `1A1A6−0x20` | — | installed by `19fba` | real=`1A1A6` | 95 | +0x20 family |
 | `FUN_00012840` | `spawn_weapon_entity` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x12840` | `Pacific Conflict.decomp.c` | `DAT_00026280` → pool; entity `+0x610/61c/20..24` | Exact munition class | 22 | NOTES post-spawn; 3 call sites |
 | `FUN_00015d20` | `spawn_ordnance_oriented` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x15D20` | `Pacific Conflict.decomp.c` | `build_attitude_matrix_x` → `spawn_ordnance_scattered` | — | 23 | NOTES; e792 field_676 |
@@ -637,12 +639,22 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 
 - Renamed `FUN_00000354`→`probe_nearest_facility_kind` (0x12→0x100, 0x13→0x200).
 
-**Next iteration target:** Annotate more of `tick_landing_approach_glide` body.
+### Iteration 98 — 2026-10-16
+
+- Annotated `tick_landing_approach_glide` phases (lead, Y clamp, throttle bands,
+  lateral offset, touchdown restore, abort band).
+
+### Iteration 99 — 2026-10-16
+
+- Renamed `FUN_00003c48`→`approx_dist3_from_abs` and `FUN_00003c68`→`approx_dist3_xyz`
+  (max+|others|>>2 distance approx).
+
+**Next iteration target:** Revisit `$1A48` allocator ABI (BLOCKED) or `ID09` entry.
 
 ## Priority queue (suggested)
 
-1. `tick_landing_approach_glide` — deepen glide steering comments  
-2. Revisit `$1A48` allocator ABI (BLOCKED)  
-3. `ID09.c` / `ID05.c` segment entries  
-4. `FUN_00003c48` — distance helper used by runway ends  
+1. Revisit `$1A48` allocator ABI (BLOCKED)  
+2. `ID09.c` / `ID05.c` segment entries  
+3. Inventory remaining high-traffic `FUN_*` in Pacific Conflict  
+4. `FUN_00003cca` — multi-sample min using approx_dist3_xyz  
 

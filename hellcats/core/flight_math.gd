@@ -571,6 +571,29 @@ static func apply_01ba8_need_grow(capacity: int, request: int) -> Dictionary:
 	}
 
 
+## [RECONSTRUCTED] 04958 → 01ba8 size arg (5466): (int)sVar9 << 1.
+static func apply_04958_01ba8_request(pair_count: int) -> int:
+	return (_to_s16(pair_count) << 1) & 0xFFFFFFFF
+
+
+## [RECONSTRUCTED] FUN_00001ba8 grow-only plan (2252–2270).
+## capacity from header; if capacity < request → alloc+copy+free (caller); else keep.
+static func apply_01ba8_realloc_plan(
+	header_byte_m4: int, large_words_m8: int, request: int
+) -> Dictionary:
+	var cap: Dictionary = apply_01ba8_capacity(header_byte_m4, large_words_m8)
+	var capacity: int = int(cap.get("capacity", 0))
+	var ng: Dictionary = apply_01ba8_need_grow(capacity, request)
+	return {
+		"large": bool(cap.get("large", false)),
+		"capacity": capacity,
+		"request": int(request) & 0xFFFFFFFF,
+		"need_grow": bool(ng.get("need_grow", false)),
+		"keep_old": bool(ng.get("return_old", false)),
+		"copy_nbytes": capacity,
+	}
+
+
 ## [RECONSTRUCTED] FUN_00001c04 vertex buffer copy (Capstone @0x1C04–0x1C5A; decomp ~2289).
 ## count = *(s16*)(obj+0x36) + *(s16*)(obj+0x3a); if count<=0 skip.
 ## Copy count triples (0xC bytes each) from *(obj+0x44) → *(obj+0x4c).
@@ -2338,6 +2361,143 @@ static func apply_04958_clip_b242(pairs_result: Dictionary, param_4: int) -> Dic
 		r["cull"] = false
 		r["flag_or_13"] = 0
 		r["deferred_b2f4"] = true
+	return r
+
+
+## [RECONSTRUCTED] FUN_0000b2f4 (10434–10483; Capstone @0xB2F4).
+## Closed xz ring clip keep z >= clip_plane (DAT_00020aea).
+static func fun_0000b2f4(pairs: Array, clip_plane: int) -> Dictionary:
+	var n: int = pairs.size()
+	var out: Array = []
+	if n == 0:
+		return {"count": 0, "pairs": out, "clip_plane": clip_plane}
+	var plane: int = _to_s32(clip_plane)
+	for i in range(n):
+		var cur: Dictionary = pairs[i] as Dictionary
+		var prev: Dictionary = pairs[(i - 1 + n) % n] as Dictionary
+		var cx: int = int(cur.get("x", 0))
+		var cz: int = int(cur.get("z", 0))
+		var px: int = int(prev.get("x", 0))
+		var pz: int = int(prev.get("z", 0))
+		if cz < plane:
+			if plane <= pz:
+				## curr out (z<plane), prev in — emit intersection at z=plane.
+				var dz: int = pz - cz
+				var ix: int = cx
+				if dz != 0:
+					ix = cx + _div_trunc((px - cx) * (plane - cz), dz)
+				out.append({"x": _to_s32(ix), "z": plane})
+		else:
+			if pz < plane:
+				## curr in, prev out — emit intersection then current.
+				var dz2: int = cz - pz
+				var ix2: int = px
+				if dz2 != 0:
+					ix2 = px + _div_trunc((cx - px) * (plane - pz), dz2)
+				out.append({"x": _to_s32(ix2), "z": plane})
+				out.append({"x": cx, "z": cz})
+			else:
+				out.append({"x": cx, "z": cz})
+	return {
+		"count": out.size(),
+		"pairs": out,
+		"clip_plane": plane,
+	}
+
+
+## [RECONSTRUCTED] 04958 after b242: if count!=0 → b2f4 plane=-param_4 (5444–5445).
+## Cull if b2f4 yields 0. b3aa deferred.
+static func apply_04958_clip_b2f4(pairs_result: Dictionary, param_4: int) -> Dictionary:
+	var r: Dictionary = pairs_result.duplicate(true)
+	r["applied_b2f4"] = false
+	r["deferred_b3aa"] = false
+	if not bool(r.get("deferred_b2f4", false)):
+		return r
+	var pairs: Array = r.get("pairs", []) as Array
+	var plane: int = -_to_s16(param_4)
+	var clipped: Dictionary = fun_0000b2f4(pairs, plane)
+	var n_out: int = int(clipped.get("count", 0))
+	r["applied_b2f4"] = true
+	r["deferred_b2f4"] = false
+	r["b2f4"] = clipped
+	r["clip_plane_b2f4"] = plane
+	r["pairs"] = clipped.get("pairs", [])
+	r["pair_count"] = n_out
+	if n_out == 0:
+		r["cull"] = true
+		r["flag_or_13"] = 2
+	else:
+		r["cull"] = false
+		r["flag_or_13"] = 0
+		r["deferred_b3aa"] = true
+	return r
+
+
+## [RECONSTRUCTED] FUN_0000b3aa (10488–10537; Capstone @0xB3AA).
+## Mirror of b2f4: closed xz ring clip keep z <= clip_plane (DAT_0001b73e).
+static func fun_0000b3aa(pairs: Array, clip_plane: int) -> Dictionary:
+	var n: int = pairs.size()
+	var out: Array = []
+	if n == 0:
+		return {"count": 0, "pairs": out, "clip_plane": clip_plane}
+	var plane: int = _to_s32(clip_plane)
+	for i in range(n):
+		var cur: Dictionary = pairs[i] as Dictionary
+		var prev: Dictionary = pairs[(i - 1 + n) % n] as Dictionary
+		var cx: int = int(cur.get("x", 0))
+		var cz: int = int(cur.get("z", 0))
+		var px: int = int(prev.get("x", 0))
+		var pz: int = int(prev.get("z", 0))
+		if plane < cz:
+			if pz <= plane:
+				## curr out (z>plane), prev in — emit intersection at z=plane.
+				var dz: int = pz - cz
+				var ix: int = cx
+				if dz != 0:
+					ix = cx + _div_trunc((px - cx) * (plane - cz), dz)
+				out.append({"x": _to_s32(ix), "z": plane})
+		else:
+			if plane < pz:
+				## curr in, prev out — emit intersection then current.
+				var dz2: int = cz - pz
+				var ix2: int = px
+				if dz2 != 0:
+					ix2 = px + _div_trunc((cx - px) * (plane - pz), dz2)
+				out.append({"x": _to_s32(ix2), "z": plane})
+				out.append({"x": cx, "z": cz})
+			else:
+				out.append({"x": cx, "z": cz})
+	return {
+		"count": out.size(),
+		"pairs": out,
+		"clip_plane": plane,
+	}
+
+
+## [RECONSTRUCTED] 04958 after b2f4: if count!=0 → b3aa plane=param_4 (5451–5452).
+## Final clip; cull if count 0. Surviving count → poly+0x14 deferred to caller.
+static func apply_04958_clip_b3aa(pairs_result: Dictionary, param_4: int) -> Dictionary:
+	var r: Dictionary = pairs_result.duplicate(true)
+	r["applied_b3aa"] = false
+	if not bool(r.get("deferred_b3aa", false)):
+		return r
+	var pairs: Array = r.get("pairs", []) as Array
+	var plane: int = _to_s16(param_4)
+	var clipped: Dictionary = fun_0000b3aa(pairs, plane)
+	var n_out: int = int(clipped.get("count", 0))
+	r["applied_b3aa"] = true
+	r["deferred_b3aa"] = false
+	r["b3aa"] = clipped
+	r["clip_plane_b3aa"] = plane
+	r["pairs"] = clipped.get("pairs", [])
+	r["pair_count"] = n_out
+	if n_out == 0:
+		r["cull"] = true
+		r["flag_or_13"] = 2
+	else:
+		r["cull"] = false
+		r["flag_or_13"] = 0
+		r["write_count_14"] = true
 	return r
 
 

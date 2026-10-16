@@ -1105,7 +1105,7 @@ undefined4 FUN_00000334(void)
  * Confidence: [PROVEN] 0x12/0x13→0x100/0x200; [STRONG INFERENCE] “facility”
  *
  * Scan DAT_0001b5a4 pool for entities whose *(+8)+4 short is 0x12 or 0x13,
- * within range *(entity+0xc), pick nearest by FUN_00003c68 to the query
+ * within range *(entity+0xc), pick nearest by approx_dist3_xyz to the query
  * object. Return 0x100 (kind 0x12), 0x200 (kind 0x13), or 0.
  *
  * Capstone @0x0354: first arg is entity ptr on stack (Ghidra `void` is wrong;
@@ -1135,7 +1135,7 @@ undefined4 probe_nearest_facility_kind(void) /* Original: FUN_00000354 */
     piVar7 = piVar6;
     if (((*(int *)(iVar1 + 8) != 0) &&
         (((psVar2 = *(short **)(*(int *)(iVar1 + 8) + 4), *psVar2 == 0x12 || (*psVar2 == 0x13)) &&
-         (iVar3 = FUN_00003c68(), iVar3 < *(int *)(iVar1 + 0xc))))) && (iVar3 < iVar5)) {
+         (iVar3 = approx_dist3_xyz( /* Original: FUN_00003c68 */), iVar3 < *(int *)(iVar1 + 0xc))))) && (iVar3 < iVar5)) {
       iVar5 = iVar3;
       iVar8 = iVar1;
     }
@@ -1425,7 +1425,7 @@ void FUN_00000954(int param_1,undefined *param_2)
       sVar3 = 0;
       if (0 < local_6) {
         do {
-          iVar2 = FUN_00003c68();
+          iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
           if (iVar2 < local_198[sVar3]) {
             if (0 < local_b5c[iVar6 * 3 + 1]) {
               cVar4 = 'C';
@@ -1575,7 +1575,7 @@ void FUN_00000c4c(int *param_1,int param_2,int param_3,int *param_4,short param_
     if (0 < aiStack_690[*(short *)(param_3 + 0xe) * 3]) {
       return;
     }
-    iVar1 = FUN_00003c68();
+    iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     if (param_1[8] <= iVar1) {
       return;
     }
@@ -5620,8 +5620,16 @@ int compute_camera_abs_metric(void) /* Original: FUN_00003c00; args lost by Ghid
 
 
 
-int FUN_00003c48(void)
-
+/*
+ * Original: FUN_00003c48
+ * Proposed name: approx_dist3_from_abs
+ * Confidence: [PROVEN] formula
+ *
+ * Register ABI (D0,D1,D3 = |Δ| components): return max + ((a+b)>>2) after
+ * ordering D1 vs D3. Same combine as approx_dist3_xyz epilogue. Capstone
+ * @0x3C48–0x3C66 (0 BSR; used via register calls / shared tail).
+ */
+int approx_dist3_from_abs(void) /* Original: FUN_00003c48 */
 {
   int in_D0;
   int in_D1;
@@ -5638,8 +5646,16 @@ int FUN_00003c48(void)
 
 
 
-int FUN_00003c68(void)
-
+/*
+ * Original: FUN_00003c68
+ * Proposed name: approx_dist3_xyz
+ * Confidence: [PROVEN]
+ *
+ * Stack: (x1,y1,z1, x2,y2,z2). Abs each Δ via LEA+$2DE8→abs_int, then
+ * max(|Δ|) + ((sum of other two)>>2). Fast 3D distance approx (not Euclidean).
+ * Capstone @0x3C68–0x3CC8; Ghidra often omits the six args.
+ */
+int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 {
   int iVar1;
   int iVar2;
@@ -5674,9 +5690,9 @@ int FUN_00003cca(void)
   short sVar5;
   short sVar6;
   
-  uVar1 = FUN_00003c68();
+  uVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   uVar1 = uVar1 & 0xffff;
-  uVar2 = FUN_00003c68();
+  uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   uVar2 = uVar2 & 0xffff;
   sVar4 = 4;
   while( true ) {
@@ -5684,7 +5700,7 @@ int FUN_00003cca(void)
     sVar5 = (short)uVar2;
     sVar4 = sVar4 + -1;
     if (sVar4 == -1) break;
-    uVar3 = FUN_00003c68();
+    uVar3 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     if (sVar5 < sVar6) {
       uVar1 = uVar3 & 0xffff;
     }
@@ -6589,9 +6605,9 @@ LAB_00004aee:
           piVar18 = piVar18 + 2;
         }
         else {
-          iVar16 = FUN_00003c68();
+          iVar16 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
           iVar19 = iVar16 + iVar19;
-          iVar16 = FUN_00003c68();
+          iVar16 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
           if (iVar16 / (int)(short)(sVar12 + 3) <= iVar19) goto LAB_00004aee;
         }
       }
@@ -9588,7 +9604,7 @@ uint FUN_00008972(void)
      ((DAT_0001b838 + -0x4b <= *(int *)(iVar1 + 0x40) ||
       (0x373 < *(int *)(iVar1 + 0x1c) - *(int *)((int)DAT_0001b87c + 0x2e))))) {
     iVar5 = *DAT_0001b738;
-    uVar2 = FUN_00003c68();
+    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     if ((int)uVar2 < 0x9ab1) {
       iVar7 = *(int *)(iVar1 + 0x18) + *(int *)(iVar5 + 0x18);
       if (iVar7 < 0) {
@@ -9713,7 +9729,7 @@ int FUN_00008c30(void)
       if (DAT_0001b884 != (int *)0x0) {
         iVar8 = *DAT_0001b738;
         iVar1 = *DAT_0001b884;
-        if ((iVar1 != 0) && (uVar2 = FUN_00003c68(), (int)uVar2 < 0x9ab1)) {
+        if ((iVar1 != 0) && (uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */), (int)uVar2 < 0x9ab1)) {
           local_28 = *(int *)(iVar8 + 0x18) + *(int *)(iVar1 + 0x18);
           if (local_28 < 0) {
             local_28 = local_28 + 1;
@@ -9744,14 +9760,14 @@ int FUN_00008c30(void)
             build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b738 + 8),(int)*(short *)((int)DAT_0001b738 + 0x22)
                          ,(int)*(short *)(DAT_0001b738 + 9),(int)auStack_22);
             (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
-            iVar3 = FUN_00003c48();
+            iVar3 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
             local_e = 0;
             local_a = 0;
             local_6 = 0x4000;
             build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b884 + 8),(int)*(short *)((int)DAT_0001b884 + 0x22)
                          ,(int)*(short *)(DAT_0001b884 + 9),(int)auStack_22);
             (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
-            iVar4 = FUN_00003c48();
+            iVar4 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
             iVar9 = iVar1;
             if (iVar3 <= iVar4) {
               iVar9 = iVar8;
@@ -16632,7 +16648,7 @@ switchD_0000ff44_caseD_3:
   if ((*(int *)(iVar1 + 0x32) != 0x110d4) && (*(int *)(iVar1 + 0x32) != 0x11162)) {
     return;
   }
-  iVar5 = FUN_00003c68();
+  iVar5 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   if (iVar5 == 0) {
     iVar7 = 0x7fffffff;
   }
@@ -16741,7 +16757,7 @@ uint FUN_000100d4(int param_1,int param_2)
       (*(int *)(iVar1 + 0x32) != 0x111ba)) && (*(int *)(iVar1 + 0x32) != 0x112c0)) {
     return uVar5;
   }
-  uVar5 = FUN_00003c68();
+  uVar5 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   if (uVar5 == 0) {
     iVar7 = 0x7fffffff;
   }
@@ -17698,7 +17714,7 @@ void tick_ai_1b310_approach_fire(int *param_1) /* Original: FUN_00010ecc */
   ensure_ai_script_1b310_tick( /* Original: FUN_00010da8 */param_1);
   psVar1 = *(short **)((int)param_1 + 0x616);
   if (*psVar1 == 1) {
-    iVar2 = FUN_00003c68();
+    iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     if (((iVar2 < 50000) && (20000 < *(int *)(iVar3 + 0x1c))) &&
        ((*(byte *)(param_1 + 0x1a1) & 1) == 0)) {
       *psVar1 = 2;
@@ -17835,7 +17851,7 @@ void FUN_000110f4(int *param_1)
       *(undefined4 *)((int)param_1 + 0x692) = 0;
     }
     else {
-      iVar2 = FUN_00003c68();
+      iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
       *(int *)((int)param_1 + 0x696) = iVar2;
       FUN_0001820a(param_1);
       bVar1 = true;
@@ -17898,7 +17914,7 @@ void FUN_000111da(int *param_1)
   else {
     iVar1 = *(int *)((int)param_1 + 0x692);
     if (((*(byte *)(iVar1 + 7) & 2) == 0) && (*(int *)(iVar1 + 0x44) != 0)) {
-      iVar4 = FUN_00003c68();
+      iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
       *(int *)((int)param_1 + 0x696) = iVar4;
       if (*(int *)((int)param_1 + 0x696) < 0xafc9) {
         iVar4 = *(int *)(iVar1 + 0x1c);
@@ -17963,7 +17979,7 @@ void FUN_000112e0(int *param_1)
   }
   else {
     iVar1 = *param_1;
-    iVar6 = FUN_00003c68();
+    iVar6 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     *(int *)((int)param_1 + 0x696) = iVar6;
     iVar6 = *(int *)(iVar2 + 0x18);
     iVar7 = *(int *)(iVar2 + 0x1c);
@@ -19468,7 +19484,7 @@ LAB_00012d26:
         } while (((*(uint *)(pcVar1 + 4) & 0x10242) != 0) &&
                 ((*(int *)(pcVar1 + 8) == 0 || (*(int *)(pcVar1 + 8) != DAT_0001b738))));
         if (in_stack_00000010 < *(int *)(pcVar1 + 0x14)) goto LAB_00012cd4;
-        iVar4 = FUN_00003c68();
+        iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
       } while (1999 < iVar4 - *(int *)(pcVar1 + 0x14));
       if (iVar4 < *(int *)(pcVar1 + 0x14)) {
 LAB_00012bf4:
@@ -19522,7 +19538,7 @@ LAB_00012cd4:
   if ((((in_stack_0000001c != 0) && (*(int *)(pcVar1 + 8) != 0)) &&
       (0x14 < **(short **)(*(int *)(pcVar1 + 8) + 4))) &&
      ((**(short **)(*(int *)(pcVar1 + 8) + 4) < 0x1a &&
-      (iVar4 = FUN_00003c68(), iVar4 < *(int *)(pcVar1 + 0x14))))) {
+      (iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */), iVar4 < *(int *)(pcVar1 + 0x14))))) {
     piVar9 = *(int **)(pcVar1 + 8);
 LAB_00012d1e:
     FUN_00014f48(piVar9,in_stack_00000014);
@@ -19572,11 +19588,11 @@ void FUN_00012d34(int *param_1)
             if (DAT_0001b870 == 0) {
               *(short *)(DAT_0001b5a0 + 0xcc) = *(short *)(DAT_0001b5a0 + 0xcc) + 1;
             }
-            if (((*(short *)(DAT_0001b5a0 + 0x90) == 3) && (iVar3 = FUN_00003c68(), iVar3 < 0xce40))
+            if (((*(short *)(DAT_0001b5a0 + 0x90) == 3) && (iVar3 = approx_dist3_xyz( /* Original: FUN_00003c68 */), iVar3 < 0xce40))
                && (*(short *)(DAT_0001b5a0 + 0xce) == 0)) {
               *(undefined2 *)(DAT_0001b5a0 + 0xce) = 1;
             }
-            if (((*(short *)(DAT_0001b5a0 + 0x90) == 4) && (iVar3 = FUN_00003c68(), iVar3 < 0xce40))
+            if (((*(short *)(DAT_0001b5a0 + 0x90) == 4) && (iVar3 = approx_dist3_xyz( /* Original: FUN_00003c68 */), iVar3 < 0xce40))
                && (*(short *)(DAT_0001b5a0 + 0xce) == 0)) {
               *(undefined2 *)(DAT_0001b5a0 + 0xce) = 1;
             }
@@ -19884,7 +19900,7 @@ LAB_00013446:
       iVar1 = *piVar10;
       iVar5 = abs_int( /* Original: FUN_00002e08 */*(int *)(iVar1 + 0x10) - iVar4);
     } while (((*(int *)(iVar1 + 0x14) < iVar5) || ((*(uint *)(iVar1 + 4) & 0x42) != 0)) ||
-            (iVar5 = FUN_00003c68(), *(int *)(iVar1 + 0x14) < iVar5));
+            (iVar5 = approx_dist3_xyz( /* Original: FUN_00003c68 */), *(int *)(iVar1 + 0x14) < iVar5));
     sVar8 = *(short *)(iVar1 + 0x3a);
     iVar5 = *(int *)(iVar1 + 0x48) + sVar8 * 0x20;
     while( true ) {
@@ -20449,7 +20465,7 @@ void FUN_00013e4e(int param_1,int param_2)
   int iVar1;
   
   if ((*(uint *)(param_2 + 4) & *(uint *)(param_1 + 4) & 0x100000) != 0) {
-    iVar1 = FUN_00003c68();
+    iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     iVar1 = (iVar1 >> 2) + (iVar1 >> 1);
     if ((iVar1 < *(int *)(param_1 + 0x14)) || (iVar1 < *(int *)(param_2 + 0x14))) {
       FUN_00014348(param_1,param_2);
@@ -20495,7 +20511,7 @@ uint * FUN_00013ee0(uint param_1,uint param_2)
   short sStack_1e;
   short local_6;
   
-  iVar8 = FUN_00003c68();
+  iVar8 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   puVar9 = (uint *)(iVar8 - (iVar8 >> 2));
   if ((int)puVar9 <= *(int *)(param_2 + 0x14) + *(int *)(param_1 + 0x14)) {
     if ((*(byte *)(param_2 + 6) & 2) == 0) {
@@ -20635,7 +20651,7 @@ void FUN_0001429c(uint param_1,uint param_2)
   uint *puVar2;
   
   if (*(int *)(param_1 + 8) == DAT_0001b738) {
-    iVar1 = FUN_00003c68();
+    iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     if (iVar1 - (iVar1 >> 2) <= *(int *)(param_2 + 0x14) + *(int *)(param_1 + 0x14)) {
       if ((*(byte *)(param_2 + 6) & 2) == 0) {
         puVar2 = (uint *)FUN_000135a0(param_1,param_2);
@@ -21161,7 +21177,7 @@ LAB_00014d78:
       pcVar1 = (char *)*puVar12;
       uVar8 = *(uint *)(pcVar1 + 4) & 0x202;
       puVar12 = puVar11;
-    } while (((uVar8 != 0) || (uVar8 = FUN_00003c68(), *(int *)(param_1 + 0x14) <= (int)uVar8)) ||
+    } while (((uVar8 != 0) || (uVar8 = approx_dist3_xyz( /* Original: FUN_00003c68 */), *(int *)(param_1 + 0x14) <= (int)uVar8)) ||
             (*(int *)(pcVar1 + 8) == 0));
     sVar6 = **(short **)(*(int *)(pcVar1 + 8) + 4);
     uVar8 = CONCAT22((short)(uVar8 >> 0x10),sVar6);
@@ -21281,7 +21297,7 @@ void FUN_00014f48(int *param_1,int param_2)
   short unaff_D4w;
   
   if ((DAT_0001d854 != 0) &&
-     (iVar4 = *param_1, iVar2 = FUN_00003c68(), iVar2 <= *(int *)(iVar4 + 0x14))) {
+     (iVar4 = *param_1, iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */), iVar2 <= *(int *)(iVar4 + 0x14))) {
     DAT_0001d854 = 0;
   }
   if (param_2 != 0) {
@@ -22532,14 +22548,14 @@ int * FUN_00016966(int param_1,short *param_2)
   int *piVar5;
   
   piVar5 = (int *)(param_2 + *param_2 * 6 + 2);
-  iVar1 = FUN_00003c68();
+  iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   if (iVar1 < 5000) {
     *param_2 = *param_2 + 1;
     if (param_2[1] <= *param_2) {
       *param_2 = 0;
     }
     piVar5 = (int *)(param_2 + *param_2 * 6 + 2);
-    uVar2 = FUN_00003c68();
+    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
     sVar4 = 0;
     for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
       sVar4 = sVar4 + 1;
@@ -24054,7 +24070,7 @@ LAB_000185d4:
             iVar7 = 1;
           }
           else {
-            iVar7 = FUN_00003c68();
+            iVar7 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
           }
           if ((iVar7 < 2000) && ((param_1[0x1aa] < iVar7 || (iVar7 < 400)))) {
             cVar3 = *(char *)((int)param_1 + 0x69a);
@@ -24441,7 +24457,7 @@ uint FUN_00018bba(int param_1,int param_2)
     uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
     uVar3 = uVar4 & 0xffff003f;
     if ((uVar4 & 0x3f) == 0) {
-      iVar5 = FUN_00003c68();
+      iVar5 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
       if (iVar5 == 0) {
         iVar6 = 0x7fffffff;
       }
@@ -24570,7 +24586,7 @@ LAB_00018df2:
       else {
         uVar6 = overlay_rng_next( /* Original: FUN_00011564 */);
         if (((ushort)uVar6 & 0x3f) == 0x15) {
-          uVar6 = FUN_00003c68();
+          uVar6 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
           *(uint *)((int)param_1 + 0x3a) = uVar6;
           if ((int)uVar6 <= *(int *)((int)param_1 + 0x42)) {
             sVar11 = 0;
@@ -24732,7 +24748,7 @@ void FUN_0001917c(undefined4 *param_1)
     iVar8 = *(int *)((int)param_1 + 0x36);
     if (((*(byte *)(iVar8 + 7) & 2) == 0) && (*(int *)(iVar8 + 0x44) != 0)) {
       if (*(short *)((int)param_1 + 0x46) == 0) {
-        uVar6 = FUN_00003c68();
+        uVar6 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
         *(uint *)((int)param_1 + 0x3a) = uVar6;
         if ((int)uVar6 <= *(int *)((int)param_1 + 0x42)) {
           sVar10 = 0;
@@ -25242,7 +25258,7 @@ void store_xyz_asr(int param_1,int param_2,int param_3,uint param_4) /* Original
  * Scan entity pools (DAT_0001b5a4 then DAT_0001d4a4): type==2 and
  * probe_nearest_facility_kind==0x200 → candidate field/carrier. Among pads with
  * +0x16=='p' and +0x14==4, scale 4 verts via store_xyz_asr, pick
- * closer approach pair (FUN_00003c48). Write two XYZ ends to *param_2 /
+ * closer approach pair (approx_dist3_from_abs). Write two XYZ ends to *param_2 /
  * *param_3. Return 0 if best score < 0x40740, else 1.
  *
  * Sole caller: try_begin_landing_approach (@0x19FD6).
@@ -25303,7 +25319,7 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
       if (*pcVar2 == '\x02') {
         iVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
         if (iVar4 == 0x200) {
-          iVar4 = FUN_00003c68();
+          iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
           if (iVar4 < local_66) {
             iVar14 = *(int *)(pcVar2 + 0x48);
             local_5a = *(short *)(pcVar2 + 0x3a);
@@ -25320,8 +25336,8 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
                 store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
                 piVar1 = (int *)(iVar5 + psVar3[3] * 0xc);
                 store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
-                iVar5 = FUN_00003c48();
-                iVar6 = FUN_00003c48();
+                iVar5 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
+                iVar6 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
                 if (iVar6 < iVar5) {
                   local_10 = local_1c;
                   local_c = local_18;
@@ -25360,8 +25376,8 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
                 if (iVar10 < 0) {
                   iVar10 = iVar10 + 1;
                 }
-                iVar11 = FUN_00003c48();
-                iVar12 = FUN_00003c48();
+                iVar11 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
+                iVar12 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
                 local_58 = iVar5 >> 1;
                 local_54 = iVar6 >> 1;
                 local_50 = iVar10 >> 1;
@@ -25436,7 +25452,7 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
   
   iVar1 = *param_1;
   iVar2 = find_nearest_runway_approach_ends( /* Original: FUN_00019c5e */iVar1,&local_10,&local_1c);
-  if (((iVar2 == 0) && (iVar2 = FUN_00003c68(), 9999 < iVar2)) && (iVar2 < 0x26ac1)) {
+  if (((iVar2 == 0) && (iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */), 9999 < iVar2)) && (iVar2 < 0x26ac1)) {
     iVar2 = (local_1c - local_10) * 6;
     if (iVar2 < 0) {
       iVar2 = iVar2 + 0x3f;
@@ -25503,15 +25519,10 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
  * Proposed name: tick_landing_approach_glide
  * Confidence: [STRONG INFERENCE]
  *
- * Per-frame landing glide: pull DAT_000267bc/c0/c4 aim point and
- * DAT_000267b2/b6/ba dir; distance via FUN_00003c68; slide aim along dir;
- * adjust_ai_throttle_vs_speed / steer_entity_toward_point; on +0x63e restore
- * prior +0x32 from DAT_00026798.
+ * Per-frame landing glide (phases below). Installed via +0x32←0x1A186
+ * (= this−0x20) [BLOCKED false mid-label].
  *
- * Installed by try_begin_landing_approach via literal 0x1A186 (= this−0x20)
- * [BLOCKED false mid-label; same family as sin/cos/$E352].
- *
- * Evidence: Capstone link @0x1A1A6; consumes 267xx filled by 19fba.
+ * Evidence: Capstone @0x1A1A6; 267xx from try_begin_landing_approach.
  */
 void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
 {
@@ -25530,14 +25541,17 @@ void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
   short local_12;
   ushort local_6;
   
+  /* Snapshot aim (267bc/c0/c4), save +0x2e/+0x679, range to aim via approx_dist3_xyz.
+   * Force +0x2e to 0xFFFFF060 while computing (restored at exit). */
   iVar8 = DAT_000267c4;
   iVar12 = DAT_000267c0;
   iVar7 = DAT_000267bc;
   uVar1 = *(undefined4 *)((int)param_1 + 0x2e);
   uVar2 = *(undefined1 *)((int)param_1 + 0x679);
   iVar9 = *param_1;
-  iVar4 = FUN_00003c68();
+  iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
   *(undefined4 *)((int)param_1 + 0x2e) = 0xfffff060;
+  /* iVar6 = along-track lead from range bands (10000 / 0x8e30 / 13000). */
   if (iVar4 < 0xae31) {
     if (iVar4 < 0x8e31) {
       iVar6 = iVar4 + -10000;
@@ -25553,6 +25567,7 @@ void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
   else {
     iVar6 = iVar4 + -13000;
   }
+  /* Slide aim XYZ opposite glide dir (267b2/b6/ba) by lead iVar6. */
   iVar5 = iVar6 * DAT_000267b2;
   if (iVar5 < 0) {
     iVar5 = iVar5 + 0xfff;
@@ -25563,6 +25578,7 @@ void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
     iVar5 = iVar5 + 0xfff;
   }
   iVar12 = iVar12 - (iVar5 >> 0xc);
+  /* Vertical floor: clamp Y to 267c0+267ae or blend toward obj+0x1c. */
   if (DAT_000267c0 + DAT_000267ae < iVar12) {
     if (iVar6 < 0x9c41) {
       if (iVar6 < 0x8c41) goto LAB_0001a2da;
@@ -25589,6 +25605,7 @@ LAB_0001a2da:
     iVar5 = iVar5 + 0xfff;
   }
   iVar8 = iVar8 - (iVar5 >> 0xc);
+  /* Throttle target from lead distance: 0 / 0x7bc / 0x9d8. */
   if (iVar6 < 0x9ab1) {
     if (iVar6 < 4000) {
       local_12 = 0;
@@ -25600,6 +25617,7 @@ LAB_0001a2da:
   else {
     local_12 = 0x9d8;
   }
+  /* Heading from Δxz to aim; lateral offset via sin/cos of local_6. */
   iVar6 = FUN_00002de8();
   iVar5 = FUN_00002de8();
   sVar11 = 0;
@@ -25627,9 +25645,11 @@ LAB_0001a2da:
     iVar6 = iVar6 + 0xfff;
   }
   iVar8 = (iVar6 >> 0xc) + iVar8;
+  /* Touchdown (+0x63e): restore prior AI callback. */
   if (*(char *)((int)param_1 + 0x63e) != '\0') {
     *(undefined4 *)((int)param_1 + 0x32) = DAT_00026798;
   }
+  /* Optional 2-frame blend (267ac) toward predicted entity position. */
   if (DAT_000267ac != 0) {
     iVar7 = (int)DAT_000267ac * (iVar7 - DAT_000267bc) +
             (2 - DAT_000267ac) * ((*(int *)(iVar9 + 0x18) + param_1[2] * 0x2d) - DAT_000267bc);
@@ -25689,6 +25709,7 @@ LAB_0001a2da:
   iVar7 = DAT_0002679c + (iVar8 >> 3);
   DAT_0002679c = iVar7;
   DAT_000267a0 = iVar9;
+  /* Mirror aim into optional tracker object DAT_00020b40. */
   if (DAT_00020b40 != (int *)0x0) {
     *(int *)(*DAT_00020b40 + 0x18) = iVar9;
     *(int *)(*piVar3 + 0x1c) = iVar12;
@@ -25696,6 +25717,7 @@ LAB_0001a2da:
   }
   adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,local_12);
   steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,iVar9,iVar12,iVar7);
+  /* Mid-band range + abs noise: abort glide, restore prior +0x32. */
   if (((iVar4 < 18000) && (15000 < iVar4)) &&
      ((iVar9 = FUN_00002de8(), 100 < iVar9 || (iVar9 = FUN_00002de8(), 0x5a < iVar9)))) {
     _DAT_0001b83c = 1;

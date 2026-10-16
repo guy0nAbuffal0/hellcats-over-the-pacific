@@ -1146,6 +1146,14 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	ok = Assertions.assert_true(bool(ng.get("need_grow", false)), "need grow") and ok
 	ng = FlightMathScript.apply_01ba8_need_grow(64, 40)
 	ok = Assertions.assert_true(bool(ng.get("return_old", false)), "keep old") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_04958_01ba8_request(3), 6, "04958 req<<1"
+	) and ok
+	var rp: Dictionary = FlightMathScript.apply_01ba8_realloc_plan(6, 0, 40)
+	ok = Assertions.assert_true(bool(rp.get("keep_old", false)), "cap60≥40 keep") and ok
+	rp = FlightMathScript.apply_01ba8_realloc_plan(0xFF, 5, 40)
+	ok = Assertions.assert_true(bool(rp.get("need_grow", false)), "cap32<40 grow") and ok
+	ok = Assertions.assert_equal(int(rp.get("copy_nbytes", -1)), 32, "copy old cap") and ok
 	var tail: Dictionary = FlightMathScript.apply_01be4_tail(0x1000, 0x2000, 0x20)
 	ok = Assertions.assert_true(bool(tail.get("is_01ba8_mid_entry", false)), "mid") and ok
 	ok = Assertions.assert_equal(int(tail.get("result_ptr", -1)), 0x2000, "ret new") and ok
@@ -1374,6 +1382,32 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	ok = Assertions.assert_true(bool(cb2.get("applied_b242", false)), "b242 on") and ok
 	ok = Assertions.assert_true(bool(cb2.get("deferred_b2f4", false)), "b2f4 defer") and ok
 	ok = Assertions.assert_true(not bool(cb2.get("cull", true)), "b242 keep") and ok
+	## FUN_0000b2f4 min-z clip (keep z >= plane)
+	clip = FlightMathScript.fun_0000b2f4(
+		[{"x": 0, "z": 0}, {"x": 10, "z": 0}, {"x": 5, "z": 10}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 3, "b2f4 cross→3") and ok
+	clip = FlightMathScript.fun_0000b2f4(
+		[{"x": 0, "z": 6}, {"x": 10, "z": 6}, {"x": 5, "z": 10}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 3, "b2f4 all in") and ok
+	var cb3: Dictionary = FlightMathScript.apply_04958_clip_b2f4(cb2, 0x7FE4)
+	ok = Assertions.assert_true(bool(cb3.get("applied_b2f4", false)), "b2f4 on") and ok
+	ok = Assertions.assert_true(bool(cb3.get("deferred_b3aa", false)), "b3aa defer") and ok
+	ok = Assertions.assert_true(not bool(cb3.get("cull", true)), "b2f4 keep") and ok
+	## FUN_0000b3aa max-z clip (keep z <= plane)
+	clip = FlightMathScript.fun_0000b3aa(
+		[{"x": 0, "z": 0}, {"x": 10, "z": 0}, {"x": 5, "z": 10}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 4, "b3aa cross→4") and ok
+	clip = FlightMathScript.fun_0000b3aa(
+		[{"x": 0, "z": 0}, {"x": 10, "z": 0}, {"x": 5, "z": 4}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 3, "b3aa all in") and ok
+	var cb4: Dictionary = FlightMathScript.apply_04958_clip_b3aa(cb3, 0x7FE4)
+	ok = Assertions.assert_true(bool(cb4.get("applied_b3aa", false)), "b3aa on") and ok
+	ok = Assertions.assert_true(bool(cb4.get("write_count_14", false)), "count→+14") and ok
+	ok = Assertions.assert_true(not bool(cb4.get("cull", true)), "b3aa keep") and ok
 	## 04e6e → 15762 args (5669–5682)
 	var a62: Dictionary = FlightMathScript.apply_04e6e_15762_args(0, 0x17, 1, 2, 3, 4)
 	ok = Assertions.assert_true(bool(a62.get("zeroed", false)), "null handle→0") and ok

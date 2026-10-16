@@ -1613,6 +1613,64 @@ var spawn_01be4_new_ptr: int = 0
 var spawn_01be4_nbytes: int = -1
 
 
+## [RECONSTRUCTED] FUN_00001ba8 grow-only realloc (2252–2270; Capstone @0x1BA8).
+## If capacity < request → 01b84≈01a68(request)+zero, 1a63e(old,new,cap), 019d0(old).
+func _apply_fun_00001ba8(old_ptr: int, request: int) -> Dictionary:
+	var r: Dictionary = {
+		"fn": "01ba8",
+		"old_ptr": int(old_ptr) & 0xFFFFFFFF,
+		"request": int(request) & 0xFFFFFFFF,
+	}
+	if old_ptr == 0:
+		r["ok"] = false
+		r["reason"] = "null_ptr"
+		return r
+	var hb: int = int(mem_u32.get(old_ptr - 4, 0)) & 0xFF
+	var large_words: int = int(mem_u32.get(old_ptr - 8, 0))
+	var plan: Dictionary = FlightMathScript.apply_01ba8_realloc_plan(hb, large_words, request)
+	r["plan"] = plan
+	if bool(plan.get("keep_old", false)):
+		r["result_ptr"] = old_ptr
+		r["grew"] = false
+		r["ok"] = true
+		return r
+	## Grow: 01b84(request,1) ≈ 01a68(request) + 01b38 zero (zero deferred for mock).
+	var alloc: Dictionary = FlightMathScript.apply_01a68_alloc(request, heap_01a68)
+	var new_ptr: int = int(alloc.get("payload_ptr", 0))
+	r["alloc"] = alloc
+	if new_ptr == 0:
+		r["ok"] = false
+		r["reason"] = "alloc_failed"
+		r["result_ptr"] = old_ptr
+		return r
+	var nbytes: int = int(plan.get("copy_nbytes", 0))
+	if nbytes < 0:
+		nbytes = 0
+	var nwords: int = (nbytes + 3) >> 2
+	var src_words: Array = []
+	var dst_words: Array = []
+	for i in range(nwords):
+		src_words.append(int(mem_u32.get(old_ptr + i * 4, 0)))
+		dst_words.append(0)
+	var copied: Dictionary = FlightMathScript.fun_0001a63e_copy_bytes(
+		dst_words, src_words, nbytes
+	)
+	var out_words: Array = copied.get("words", [])
+	for i in range(out_words.size()):
+		mem_u32[new_ptr + i * 4] = int(out_words[i]) & 0xFFFFFFFF
+	r["1a63e"] = copied
+	var hdr: int = (old_ptr - 4) & 0xFFFFFFFF
+	var tracked: bool = (heap_01a68.get("block_class", {}) as Dictionary).has(hdr)
+	if tracked:
+		r["019d0"] = FlightMathScript.apply_019d0_free_small(old_ptr, heap_01a68)
+	else:
+		r["019d0"] = {"fn": "019d0", "obj": old_ptr, "deferred_untracked": true}
+	r["result_ptr"] = new_ptr
+	r["grew"] = true
+	r["ok"] = true
+	return r
+
+
 ## [RECONSTRUCTED] FUN_00001be4 = FUN_00001ba8 mid-entry @ $1BE4 (Capstone @0x1BE4–0x1C00).
 ## Tail: 1a63e(old,new,nbytes) + 019d0(old). Full 01ba8 gate is before this entry.
 func _call_fun_00001be4(obj: int) -> Dictionary:
@@ -1887,7 +1945,7 @@ func _04e6e_kind2_04808_followup(obj: int) -> Dictionary:
 ## [RECONSTRUCTED] FUN_00004958 through simple poly cull (5342 / 5374–5462).
 ## Call-site immediates from 5686; local_1be4 rel; nested 02bd8; then per-poly
 ## index walk for index_count==1 (project xz → cull if pairs<3).
-## [DEFERRED] b2f4/b3aa clip; local_f54 gather.
+## [DEFERRED] local_f54 gather after clip/01ba8.
 func _apply_fun_00004958(obj: int) -> Dictionary:
 	var args: Dictionary = FlightMathScript.apply_04e6e_04958_args()
 	var f36: int = int(mem_u32.get(obj + 0x36, 0))
@@ -1953,17 +2011,35 @@ func _apply_fun_00004958(obj: int) -> Dictionary:
 				dat_0001d830,
 				phase_a8,
 			)
-			## 5430–5438: if pairs>=3 → b190(plane=-param_4); if n≠0 → b242(plane=param_4).
+			## 5430–5454: b190(-p4)→b242(+p4)→b2f4(-p4)→b3aa(+p4); then cull / +0x14.
 			var p4: int = int(args.get("param_4", 0))
 			pairs = FlightMathScript.apply_04958_clip_b190(pairs, p4)
 			pairs = FlightMathScript.apply_04958_clip_b242(pairs, p4)
+			pairs = FlightMathScript.apply_04958_clip_b2f4(pairs, p4)
+			pairs = FlightMathScript.apply_04958_clip_b3aa(pairs, p4)
 			pairs["header"] = hdr
 			pairs["poly_index"] = pi
-			if bool(pairs.get("ok", false)) and bool(pairs.get("cull", false)) and poly_base != 0:
+			if bool(pairs.get("ok", false)) and poly_base != 0:
 				var slot: int = poly_base + pi * 0x20
 				var fl: int = int(mem_u32.get(slot + 0x13, 0)) & 0xFF
-				mem_u32[slot + 0x13] = (fl | 2) & 0xFF
-				pairs["flag_13"] = int(mem_u32.get(slot + 0x13, 0))
+				if bool(pairs.get("cull", false)):
+					## 5460–5461: count==0 → flag_13 |= 2
+					mem_u32[slot + 0x13] = (fl | 2) & 0xFF
+					pairs["flag_13"] = int(mem_u32.get(slot + 0x13, 0))
+				elif bool(pairs.get("write_count_14", false)):
+					## 5463–5466: count→+0x14; flag_13&=~2; 01ba8(ptr, count<<1)→+0x18.
+					var n_clip: int = int(pairs.get("pair_count", 0))
+					mem_u32[slot + 0x14] = n_clip & 0xFFFF
+					mem_u32[slot + 0x13] = (fl & 0xFD) & 0xFF
+					pairs["flag_13"] = int(mem_u32.get(slot + 0x13, 0))
+					pairs["count_14"] = int(mem_u32.get(slot + 0x14, 0))
+					var old_18: int = int(mem_u32.get(slot + 0x18, 0))
+					var req: int = FlightMathScript.apply_04958_01ba8_request(n_clip)
+					var ba8: Dictionary = _apply_fun_00001ba8(old_18, req)
+					pairs["01ba8"] = ba8
+					if bool(ba8.get("ok", false)):
+						mem_u32[slot + 0x18] = int(ba8.get("result_ptr", old_18))
+						pairs["ptr_18"] = int(mem_u32.get(slot + 0x18, 0))
 			poly_walk.append(pairs)
 			cur = int(hdr.get("next_stream", 0))
 	return {

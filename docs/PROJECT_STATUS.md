@@ -381,9 +381,9 @@ They do not cover rendering, camera motion, keyboard integration, stall and out-
 
 The two sims should stay apart until one change has a single owner. Mission 1 sea/island solids are in place; the headless baseline includes them.
 
-**Recommended milestone:** `04958` `b2f4` (next clip after `b242`), or `15762` `1562e` poly emit, or `01be4` ABI — still without merging integrators.
+**Recommended milestone:** `04958` `local_f54` gather (clipped verts → poly buffer), or `15762` `1562e` poly emit, or `01be4` ABI — still without merging integrators.
 
-1. Port `FUN_0000b2f4` after `04958`/`b242`, or `FUN_0001562e` on `15762`.
+1. Port `local_f54` / post-`01ba8` vertex gather on `04958`, or `FUN_0001562e` on `15762`.
 2. Trace D2/D3/A2 into `01be4` mid-entry after `04e4e`.
 3. Only after ownership is explicit, decide whether player motion should move into `SimCore` or whether `SimCore` remains a parity lab.
 

@@ -13,20 +13,44 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Entries
 
+### 2026-10-16 — FUN_00001ba8 after 04958 clip survive
+
+- **[PROVEN]** Pacific Conflict.c:5466: `01ba8(*(poly+0x18), count<<1)` → store back to `+0x18`.
+- **[PROVEN]** `01ba8` (2252–2270): capacity from header (`0xFF`→`(words-1)*8` else `(1<<b)-4`); grow-only via `01b84`+`1a63e`+`019d0`.
+- **Godot:** `apply_04958_01ba8_request` / `apply_01ba8_realloc_plan`; SimCore `_apply_fun_00001ba8` on survive path.
+- **[DEFERRED]** `01b38` zero-fill on new block; `local_f54` gather of clipped verts into buffer.
+- **Validation:** Godot 13/0; Python all passed (this tick).
+
+### 2026-10-16 — FUN_0000b3aa max-z clip (04958 clip chain complete)
+
+- **[PROVEN]** Pacific Conflict.c:5451–5454: if `b2f4` count≠0 → `DAT_0001b73e=param_4` then `b3aa`; restore; final `sVar9`.
+- **[PROVEN]** `b3aa` (10488–10537): closed xz ring clip keep `z<=plane` (mirror of `b2f4`).
+- **[PROVEN]** 5460–5465: count==0 → `flag_13|=2`; else `*(s16*)(poly+0x14)=count`, `flag_13&=~2`, then `01ba8`.
+- **Godot:** `fun_0000b3aa` / `apply_04958_clip_b3aa`; SimCore full chain + count/`flag_13` + `01ba8` (this tick).
+- **Validation:** Godot 13/0; Python all passed (prior tick).
+
+### 2026-10-16 — FUN_0000b2f4 min-z clip after b242
+
+- **[PROVEN]** Pacific Conflict.c:5444–5445: if `b242` count≠0 → `DAT_00020aea=-param_4` then `b2f4`; restore.
+- **[PROVEN]** `b2f4` (10434–10483): closed xz ring clip keep `z>=plane`.
+- **Godot:** `fun_0000b2f4` / `apply_04958_clip_b2f4`; plane=`-_to_s16(param_4)`; SimCore chains after `b242`.
+- **[DEFERRED]** `01ba8` / `local_f54` (`b3aa` now wired).
+- **Validation:** Godot 13/0; Python all passed (prior tick).
+
 ### 2026-10-16 — FUN_0000b242 max-x clip after b190
 
 - **[PROVEN]** Pacific Conflict.c:5437–5438: if `b190` count≠0 → `DAT_00020aec=param_4` then `b242(out,n,in)`; restore.
 - **[PROVEN]** `b242` (10371–10429): closed xz ring clip keep `x<=plane` (mirror of `b190`).
 - **Godot:** `fun_0000b242` / `apply_04958_clip_b242`; plane=`_to_s16(param_4)`; SimCore chains after `b190`.
-- **[DEFERRED]** `b2f4`/`b3aa`; `local_f54` gather.
-- **Validation:** Godot 13/0; Python all passed (this tick).
+- **[DEFERRED]** `01ba8` / `local_f54` (`b3aa` wired).
+- **Validation:** Godot 13/0; Python all passed (prior tick).
 
 ### 2026-10-16 — FUN_0000b190 x-plane clip on 04958
 
 - **[PROVEN]** Pacific Conflict.c:5430–5431: if thinned pairs≥3 → `DAT_00020aee=-param_4` then `b190(local_464,n,out)`; restore `20aee`.
 - **[PROVEN]** `b190` (10308–10366): closed xz ring clip keep `x>=plane`; return out-count (`Δbytes>>3`).
 - **Godot:** `fun_0000b190` / `apply_04958_clip_b190`; plane=`-_to_s16(param_4)` (call-site `0x7fe4`).
-- **[DEFERRED]** `b2f4`/`b3aa`; `local_f54` gather (`b242` now wired).
+- **[DEFERRED]** `01ba8` / `local_f54` (clip chain through `b3aa`).
 - **Validation:** Godot 13/0; Python all passed (prior tick).
 
 ### 2026-10-16 — FUN_00003c68 + 04958 multi-index thinning
@@ -34,7 +58,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[PROVEN]** Capstone `@0x3C68`: six stack longs `(x0,y0,z0,x1,y1,z1)`; `a=|x1-x0|` etc via LEA `$2DE8`≡`02e08`; `max+((sum other)>>2)` (same combine as `03b98`/`03c00`).
 - **[PROVEN]** Capstone `@0x4AAE` (04958): later indices push `(prev_x,0,prev_z,cur_x,0,cur_z)` then `(1d838,0,1d830,cur_x,0,cur_z)`; accept when `cam/(a8+3) <= acc`.
 - **Godot:** `fun_00003c68`; `apply_04958_poly_pairs` thins multi-index; SimCore passes `dat_0001d838`/`1d830` + `b5a0+0xa8`.
-- **[DEFERRED]** `b2f4`/`b3aa` clip; `local_f54` gather (`b190`/`b242` wired).
+- **[DEFERRED]** `01ba8` / `local_f54` (clip chain through `b3aa`).
 - **Validation:** Godot headless + Python regression (this tick).
 
 ### 2026-10-16 — 04958 poly index walk (simple cull)
