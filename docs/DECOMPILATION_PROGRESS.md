@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 100
+**Last iteration:** 104
 **Last iteration date:** 2026-10-16
 **Loop:** automatic recurrence is not configured in this session: available tools expose neither subscription timers nor monitored-output wake notifications. Prior PID 54957 / terminal 343366 is historical and not confirmed active. Resume manually using the instructions below.
 
@@ -18,9 +18,9 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID06.c | 24 | 24 | 0 | 0 | 0 | 0 | 0 |
 | ID07.c | 2 | 2 | 0 | 0 | 0 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| ID09.c | 4 | 3 | 0 | 0 | 1 | 0 | 0 |
+| ID09.c | 4 | 2 | 1 | 0 | 1 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **619** | **0** | **0** | **111** | **0** | **6** |
+| **TOTAL** | **736** | **618** | **1** | **0** | **111** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,7 +28,7 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 619 NOT_STARTED + 6 BLOCKED;
+contribute to function totals. Remaining work: 618 NOT_STARTED + 1 INVESTIGATING + 6 BLOCKED;
 111 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
@@ -47,7 +47,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `ID06.c` | `ID06.decomp.c` | seeded (copy) |
 | `ID07.c` | `ID07.decomp.c` | seeded (copy) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
-| `ID09.c` | `ID09.decomp.c` | preserved + iteration 100 helper reconstruction |
+| `ID09.c` | `ID09.decomp.c` | preserved + iterations 100-104 helper and initializer annotations |
 | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–99 edits |
 
 ## Function tracker (processed / in focus)
@@ -173,7 +173,9 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00000348` | `alloc_and_read_resource_payload` | ID08 | RENAMED | PROVEN | `ID08.c:249` / `@0x348` | `ID08.decomp.c` | `$2ca/$2c2` size; `$22a` alloc; `$2b2` read | Exact trap names | 69 | Capstone; 1 call site |
 | `FUN_00000338` | `sysbeep_and_exit_to_shell` | ID08 | RENAMED | PROVEN | `@0x338` | `ID08.decomp.c` | `_SysBeep(100)` + `_ExitToShell` | No callers in ID08 | 70 | Capstone traps |
 | `FUN_0000039c` | `bootstrap_window_and_load_overlay` | ID08 | RENAMED | PROVEN call | `@0x39C` | `ID08.decomp.c` | window/port; `'HELL'`; JSR→`load_overlay…` | Trap names; HELL check | 71 | Capstone; completes ID08 |
-| `FUN_00000432` | `length_prefixed_bytes_to_c_string_in_place` | ID09 | RENAMED | STRONG INFERENCE | `ID09.c:129-143` | `ID09.decomp.c:129-162` | Caller buffer only; no globals/callees; no direct callers found | Binary mapping, ABI, encoding and runtime callers | 100 (2026-10-16) | Full-file token equivalence; independent QA; strict C99 helper compile; 768 reference cases pass; protected hashes pass |
+| `FUN_00000432` | `length_prefixed_bytes_to_c_string_in_place` | ID09 | RENAMED | STRONG INFERENCE | `ID09.c:129-143` | `ID09.decomp.c` (Original: FUN_00000432 header) | Caller buffer only; no globals/callees; no direct callers found | Binary mapping, ABI, encoding and runtime callers | 100 (2026-10-16) | Full-file token equivalence; independent QA; strict C99 helper compile; 768 reference cases pass; protected hashes pass |
+
+| `FUN_00000048` | UNKNOWN (identifier retained) | ID09 | INVESTIGATING | PROVEN C control flow / UNKNOWN role | `ID09.c:26-103` | `ID09.decomp.c` (stable Original header, all exported blocks; terminal and selector binary evidence) | Selector globals, reverse byte table, gated source record; no direct callees | Runtime selector pointer, omitted +7 write, trap ABI and omitted path; see evidence notes | 104 (2026-10-16) | Comment-only token preservation; independent review; all 32 protected hashes unchanged |
 
 All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 
@@ -679,8 +681,73 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Two unrelated ID05 RNG test binary artifacts changed during this session;
   they were not edited or reverted by this iteration.
 
-**Next iteration target:** `ID09.c:27` / `FUN_00000048`, initialization block through
-`param_1[2] = 0`: annotate only after resolving evidence for the selector globals.
+### Iteration 101 — 2026-10-16
+
+- Inspected the clean starting worktree and verified all 32 protected checksums.
+- Annotated `ID09.c:37-65` in the existing reconstruction: eight-word clear,
+  raw selector result codes, signed-word tests, and the side effect inside `&&`.
+- Preserved every token outside comments, including the repeated word-2 clear.
+  No semantic names assigned to unresolved global addresses or record fields.
+- Separate analysis agrees on C-level behavior. Plain-char signedness, overlapping
+  global widths and binary correspondence remain unresolved; no binary offset
+  was inferred from a Ghidra address. Whole function remains INVESTIGATING.
+- Scope: comments in `ID09.decomp.c`, symbol map and this checkpoint only.
+- Validation: complete ID09 token stream unchanged versus iteration-100 baseline;
+  independent QA and protected hashes pass. Full translation-unit compilation
+  remains unsuitable because original Ghidra register/jumptable/type artifacts
+  are retained. No VERIFIED promotion.
+
+### Iteration 102 — 2026-10-16
+
+- Preserved the uncommitted iteration-101 changes and verified all 32 protected
+  checksums before editing. Continued `ID09.c:66-83` in the existing output.
+- Documented distinct signed-word/bit-12 and unsigned-threshold gates for output
+  bytes +8/+9; kept byte stores separate under the intended big-endian layout.
+- Recovered reverse lookup mechanics: five bytes before `DAT_00000059`, first
+  reverse-order match maps to 5..1, no match to 0. The scalar declaration does
+  not establish valid C pointer provenance; no inferred array was substituted.
+- Documented the gated source-byte copy to +0x0d and word copy to +0x0e, including
+  later overwrite and unresolved aliasing. Record and hardware names remain UNKNOWN.
+- Validation: independent analysis/review; whole-file comment-stripped tokens
+  identical to the iteration-101 baseline; protected checksums and diff whitespace
+  checks pass. No compilation claim for the malformed Ghidra translation unit.
+- Modified only `ID09.decomp.c`, this checkpoint and `DECOMPILATION_SYMBOLS.md`.
+  Function remains INVESTIGATING, with no count or VERIFIED-status change.
+
+### Iteration 103 — 2026-10-16
+
+- Preserved iterations 101-102 and verified all 32 protected hashes.
+- Located terminal stack loop by unique signature in `ID09.bin` at physical
+  offset 0x13e; hex export matches all 1100 bytes. Neighboring signatures
+  corroborate the match without assuming runtime addresses are file offsets.
+- Independent Capstone decoding confirms 61 word clears (122 bytes), final-stack
+  +24 word write, omitted A-line/control-flow region, stack restoration and JMP(A1).
+- Annotated exported C terminal block without replacing its truncated control flow.
+  Wrote `ID09_TERMINAL_ANALYSIS.md` with bytes, physical offsets and ABI unknowns.
+- Validation: comment-only token preservation, independent binary/QA review,
+  protected hashes and diff checks. Function remains INVESTIGATING, not VERIFIED.
+- Modified `ID09.decomp.c`, progress/symbol documents and the new evidence note.
+
+### Iteration 104 — 2026-10-16
+
+- Verified all 32 protected hashes; preserved existing iteration edits.
+- Unique initialization signature locates binary file 0x68; byte decoding proves
+  a pointer load from absolute $02ae and selector tests at pointer +8/+9.
+- Physical file 0x2ae contains 0x216e000e: +8/+9 exactly produce the suspicious
+  Ghidra labels. Erroneous file/runtime constant propagation is STRONG INFERENCE;
+  actual pointer value and import configuration remain unknown.
+- Found omitted signed-byte gate at file 0xc4 and output +7 write at 0xd2,
+  corresponding to Ghidra's removed-block warning. Added discrepancy comments
+  without changing executable tokens or introducing substitute globals.
+- Added `ID09_SELECTOR_ANALYSIS.md` with exact searched signature, byte table,
+  confidence distinctions and repair constraints. Independent analysis/QA,
+  byte-table checks, protected hashes and diff checks pass.
+- Function remains INVESTIGATING; counts unchanged. Modified ID09 reconstruction,
+  progress/symbol maps and the new selector evidence note only.
+
+**Next iteration target:** `ID09.c:72-79` / `FUN_00000048`: independently locate
+PC-relative reverse-lookup setup and recover its five literal table bytes, keeping
+file coordinates separate from runtime addresses.
 
 ## Resuming the five-minute workflow
 

@@ -7,6 +7,7 @@ Do not treat example names from planning docs as approved until revalidated here
 
 | Original symbol | Recovered name | Confidence | Evidence |
 |---|---|---|---|
+| `FUN_00000048` (ID09) | UNKNOWN (identifier retained) | UNKNOWN role; PROVEN C control flow | `ID09.c:37-83`: eight-word clear, raw selector classification, byte flags +8/+9, reverse five-byte lookup yielding 0..5, gated byte +0x0d and word +0x0e. No global/function rename justified; record purpose, global widths/provenance and char signedness unresolved. Terminal and selector blocks matched by unique byte searches; see `ID09_TERMINAL_ANALYSIS.md` and `ID09_SELECTOR_ANALYSIS.md`. Selector labels likely fold file bytes into a runtime pointer; omitted +7 write and trap path remain unrepaired. |
 | `FUN_00000432` (ID09) | `length_prefixed_bytes_to_c_string_in_place` | STRONG INFERENCE | `ID09.c:135-142`: unsigned byte length, forward overlapping copy, zero terminator, original-pointer return. No direct callers found. C transform preserved; binary/ABI unverified. |
 | `FUN_00000006` (ID08) | `load_overlay_from_resource` | STRONG INFERENCE | ID08.bin `@0x6`: A5 `$2a2/$2b2/$232/$2aa/…`; ret 0 fail / 1 ok; LOADER_CHAIN overlay candidate. |
 | `FUN_00000348` (ID08) | `alloc_and_read_resource_payload` | PROVEN | ID08.bin `@0x348`: A5 `$2ca`/`$2c2` size; `$22a` alloc→`A5-0x12fc`; `$2b2` read. |
