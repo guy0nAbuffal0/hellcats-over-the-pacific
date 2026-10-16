@@ -56,6 +56,24 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001e3a` | `acos_fixed14` | PROVEN | `@0x1E3A`: clamp ±0x1000; binary search + lerp on cos table `DAT_0001ad6c` → angle. |
 | `FUN_00001ebc` | `atan_fixed14` | STRONG INFERENCE | `@0x1EBC`: binary search+lerp on `DAT_0001af6c` longs; `((idx−0x3f)<<6)+frac & 0x3fff`. Heading via ratio+quadrants. |
 | `FUN_000102d6` | `atan2_fixed14` | STRONG INFERENCE | `@0x102D6`: abs(dx),abs(dy) then `atan_fixed14` + 0x1000/0x2000 quadrants → 14-bit heading. |
+| `FUN_000109ba` | `apply_relative_heading_steer` | STRONG INFERENCE | `@0x109BA`: atan2 on rel +2/+6, fold, range-blend vs +0x24, smooth +0x61e, `enqueue_control_inputs_avg4`. |
+| `FUN_00010558` | `enqueue_control_inputs_avg4` | PROVEN | `@0x10558`: clamp; 4-slot rings +0x644/4c/54; means → +0x666/+0x662/+0x664; gated by +0x685 bit0. |
+| `FUN_00010b2e` | `steer_entity_toward_point` | STRONG INFERENCE | `@0x10B2E`: `build_relative_steer_sample` then `apply_relative_heading_steer`; target world XYZ. |
+| `FUN_00010360` | `build_relative_steer_sample` | STRONG INFERENCE | `@0x10360`: range→*p5; scaled Δxyz@p6+2/6/a; body rot; attitude_from_velocity→*p7/*p8. |
+| `FUN_00010cb2` | `max_ai_throttle_maybe_invert_679` | STRONG INFERENCE | `@0x10CB2`: +0x668←9; if +0x679>0 and altΔ>100 then neg +0x679. |
+| `FUN_00010c2c` | `adjust_ai_throttle_vs_speed` | STRONG INFERENCE | `@0x10C2C`: (target−(+0x62a>>2)) blend → ± into +0x668 [0..9]; extremes touch +0x679 / max_ai_throttle…. |
+| `FUN_00010cd8` | `invert_ai_bias_67b_if_positive` | PROVEN | `@0x10CD8`: if +0x67b>0 then neg.b +0x67b. |
+| `FUN_00010b84` | `ai_bootstrap_climb_phase` | STRONG INFERENCE | `@0x10B84`: init biases; throttle 9; pitch fold(0x2c0−att); enqueue; ret altΔ>2000. |
+| `FUN_00010ce8` | `tick_ai_climb_then_waypoint` | STRONG INFERENCE | `@0x10CE8`: +0x616 script; phase0 climb else waypoint+throttle+steer; `update_aircraft_entity`. |
+| `FUN_00010d68` | `ensure_ai_script_1b2e0_tick` | STRONG INFERENCE | `@0x10D68`: alloc script from `DAT_0001b2e0`, word1=0x9d8; `tick_ai_climb_then_waypoint`. |
+| `FUN_00010da8` | `ensure_ai_script_1b310_tick` | STRONG INFERENCE | `@0x10DA8`: `DAT_0001b310`, word1=0xd5c; then tick. |
+| `FUN_00010de8` | `ensure_ai_script_1b340_tick` | STRONG INFERENCE | `@0x10DE8`: `DAT_0001b340`, word1=0x9d8; then tick. |
+| `FUN_00010e28` | `ai_script_try_fire_burst` | STRONG INFERENCE | `@0x10E28`: after [0x1ab]≤time, fire via `spawn_weapon_entity` until +0x67c==0 → return 1. |
+| `FUN_00010ecc` | `tick_ai_1b310_approach_fire` | STRONG INFERENCE | `@0x10ECC`: `ensure_ai_script_1b310_tick`; script 1→2 on approach; 2→3 on fire-burst done. |
+| `FUN_00010f68` | `tick_ai_1b370_mission` | STRONG INFERENCE | `@0x10F68`: script `DAT_0001b370`; phases climb/fire/waypoint/chase player; `update_aircraft_entity`. |
+| `FUN_00019fba` | `try_begin_landing_approach` | STRONG INFERENCE | `@0x19FBA`: `find_nearest_runway_approach_ends`+range → `DAT_000267xx` glide; +0x32=`0x1A186`; ret 0/1. |
+| `FUN_00019c5e` | `find_nearest_runway_approach_ends` | STRONG INFERENCE | `@0x19C5E`: nearest type2/0x200 pad ('p',4); two XYZ ends; 0 if score<0x40740. |
+| `FUN_00019c26` | `store_xyz_asr` | PROVEN | `@0x19C26`: ASR x/y/z by s into A1 dest; used with entity +0x34 scale. |
 | `FUN_00001d02` | `matmul3x3_s16` | PROVEN | `@0x1D02`: 3×3 s16 `out=left×right`, each element 3×`MULS.W` then `ASR #12`. |
 | `FUN_000020e6` | `fill_attitude_rotation_bases` | PROVEN layout | `@0x20E6`: expand sincos pairs 1–3 into bases at `DAT_0001d7d4` / `1d7bc` / `1d7a4` (≈Rx/Ry/Rz, `0x1000`=1). |
 | `FUN_000021a0` | `fill_attitude_rotation_basis_4` | PROVEN layout | `@0x21A0`: angle4 (`1d7ee/f0`) → `DAT_0001d78c` as ≈Ry `[[c,0,s],[0,1,0],[-s,0,c]]`. |

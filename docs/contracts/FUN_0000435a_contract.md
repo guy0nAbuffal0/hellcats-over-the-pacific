@@ -23,9 +23,9 @@
 2. per-entity `FUN_000044a4` tick path (`_update_single_entity` → world_obj_ptr)
 3. `FUN_000046da` after factory `+8` (`param_2==1`) — `_046da_from_parent` and `_call_fun_000046da` (Pacific Conflict.c:5251)
 
-Scale/poly sources mocked (`spawn_0435a_scale_src`, `spawn_0435a_poly_srcs`).
+**[RECONSTRUCTED]** `+0xc` scale source: `*(template+0xe)` via `_0435a_resolve_scale_src` when parent/embed/`b5a0+0x8c` resolve; else `spawn_0435a_scale_src`.
 
-**[DEFERRED]** Real template stream base (`*(template+0xe)` / poly stream).
+**[RECONSTRUCTED]** Kind2 `param_2==0` poly `+0x1c`: stream from same template (`+0x22` / `+0x1a` / `+0x1e`) via `_0435a_resolve_poly_srcs`; else `spawn_0435a_poly_srcs`.
 
 **[RECONSTRUCTED]** `FUN_000044a4` type-5 flag tweak after `0435a` via `apply_044a4_type5_flags` / `mission_short_b0`.
 

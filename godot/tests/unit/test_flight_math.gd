@@ -1285,9 +1285,94 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	ok = Assertions.assert_equal(int((tr48.get("words", []) as Array)[2]), 2, "word=i") and ok
 	tr48 = FlightMathScript.apply_04808_bit1_trailer(2, 3, 0)
 	ok = Assertions.assert_true(not bool(tr48.get("enabled", true)), "bit1 off") and ok
-	## 04e6e → 02bd8 flag gate
+	## 04e6e → post-04808 path / 02bd8 flag gate
 	var gate28: Dictionary = FlightMathScript.apply_04e6e_02bd8_gate(0, 0, 0)
 	ok = Assertions.assert_true(bool(gate28.get("need_02bd8", false)), "all clear → 02bd8") and ok
+	var p48: Dictionary = FlightMathScript.apply_04e6e_post_04808_path(0x10, 0, 0)
+	ok = Assertions.assert_equal(str(p48.get("path", "")), "01c5c", "+5→01c5c") and ok
+	ok = Assertions.assert_true(bool(p48.get("need_03ea0", false)), "01c5c→03ea0") and ok
+	p48 = FlightMathScript.apply_04e6e_post_04808_path(0, 0, 0x10)
+	ok = Assertions.assert_equal(str(p48.get("path", "")), "15762", "+7→15762") and ok
+	p48 = FlightMathScript.apply_04e6e_post_04808_path(0, 0x10, 0x10)
+	ok = Assertions.assert_equal(str(p48.get("path", "")), "04958", "+6 wins") and ok
+	## 04e6e → 04958 args / entry rel / post follow-up
+	var a58: Dictionary = FlightMathScript.apply_04e6e_04958_args()
+	ok = Assertions.assert_equal(int(a58.get("param_2", -1)), 0xB4E1, "04958 p2") and ok
+	ok = Assertions.assert_equal(int(a58.get("param_4", -1)), 0x7FE4, "04958 p4") and ok
+	var r58: Dictionary = FlightMathScript.apply_04958_entry_rel(
+		[10, 20, 30, 40, 50, 60], 1, 1
+	)
+	ok = Assertions.assert_true(bool(r58.get("applied", false)), "04958 rel") and ok
+	ok = Assertions.assert_equal(int((r58.get("local_1be4", []) as Array)[0]), 30, "1be4 x") and ok
+	var fu58: Dictionary = FlightMathScript.apply_04e6e_post_04958_followup(1)
+	ok = Assertions.assert_equal(str(fu58.get("path", "")), "04916", "0e==1→04916") and ok
+	fu58 = FlightMathScript.apply_04e6e_post_04958_followup(0)
+	ok = Assertions.assert_equal(str(fu58.get("path", "")), "03ea0", "0e!=1→03ea0") and ok
+	var p16: Dictionary = FlightMathScript.apply_fun_00004916(2, 0x1234, 0x80)
+	ok = Assertions.assert_equal(int(p16.get("count", -1)), 2, "04916 count") and ok
+	ok = Assertions.assert_equal(int((p16.get("slots", []) as Array)[0].get("field_4", -1)), 0x1234, "04916 word") and ok
+	## 03c68 abs-delta metric + 04958 poly pairs / thinning
+	ok = Assertions.assert_equal(
+		FlightMathScript.fun_00003c68(0, 0, 0, 4, 0, 0), 4, "03c68 |dx|"
+	) and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.fun_00003c68(0, 0, 0, 4, 4, 4), 6, "03c68 4+((4+4)>>2)"
+	) and ok
+	var pxz: Dictionary = FlightMathScript.apply_04958_project_xz(110, 330, 10, 30, 0)
+	ok = Assertions.assert_equal(int(pxz.get("x", -1)), 100, "proj x") and ok
+	ok = Assertions.assert_equal(int(pxz.get("z", -1)), 300, "proj z") and ok
+	var pp: Dictionary = FlightMathScript.apply_04958_poly_pairs_simple(
+		[101, 202, 303], [0], 100, 300, 0
+	)
+	ok = Assertions.assert_true(bool(pp.get("ok", false)), "pairs ok") and ok
+	ok = Assertions.assert_true(bool(pp.get("cull", false)), "cull <3") and ok
+	ok = Assertions.assert_equal(int((pp.get("pairs", []) as Array)[0].get("x", -1)), 1, "pair x") and ok
+	## Large edge vs camera at origin → cam/denom (100/3) <= edge acc (100) → accept.
+	pp = FlightMathScript.apply_04958_poly_pairs(
+		[0, 0, 0, 100, 0, 0], [0, 1], 0, 0, 0, 0, 0, 0
+	)
+	ok = Assertions.assert_equal(int(pp.get("pair_count", -1)), 2, "thin accept both") and ok
+	## Tiny edge vs distant camera on Z → cam/denom (1000/3) > edge (1) → skip.
+	pp = FlightMathScript.apply_04958_poly_pairs(
+		[0, 0, 0, 1, 0, 0], [0, 1], 0, 0, 0, 0, 1000, 0
+	)
+	ok = Assertions.assert_equal(int(pp.get("pair_count", -1)), 1, "thin skip") and ok
+	## 04e6e → 15762 args (5669–5682)
+	var a62: Dictionary = FlightMathScript.apply_04e6e_15762_args(0, 0x17, 1, 2, 3, 4)
+	ok = Assertions.assert_true(bool(a62.get("zeroed", false)), "null handle→0") and ok
+	a62 = FlightMathScript.apply_04e6e_15762_args(0x1000, 0x10, 1, 2, 3, 4)
+	ok = Assertions.assert_true(bool(a62.get("zeroed", false)), "key<15→0") and ok
+	a62 = FlightMathScript.apply_04e6e_15762_args(0x1000, 0x17, 0x10, 0x20, 0x30, 0x40)
+	ok = Assertions.assert_true(not bool(a62.get("zeroed", true)), "key in range") and ok
+	ok = Assertions.assert_equal(int(a62.get("param_2", -1)), 0x10, "p2=+34") and ok
+	ok = Assertions.assert_equal(int(a62.get("param_5", -1)), 0x40, "p5=+40") and ok
+	var e62: Dictionary = FlightMathScript.apply_15762_entry_plan(0x2000, 1, 1, 0, 0, 0, 0)
+	ok = Assertions.assert_equal(int(e62.get("count_1a_1e", -1)), 2, "1a+1e") and ok
+	ok = Assertions.assert_equal(int(e62.get("poly_stream", -1)), 0x2000 + 0x22 + 0x18, "stream") and ok
+	ok = Assertions.assert_true(bool(e62.get("applied_0253e", false)), "0253e") and ok
+	ok = Assertions.assert_true(not bool(e62.get("applied_02976", true)), "no src→no 02976") and ok
+	## 02976 identity: (x*0x1000+0x800)>>12 ≈ x
+	var mat76: Array = FlightMathScript.fun_0000253e(0, 0, 0)
+	var t76: Dictionary = FlightMathScript.fun_00002976(1, [0x100, 0x200, 0x300], mat76)
+	ok = Assertions.assert_equal(int((t76.get("xyz", []) as Array)[0]), 0x100, "02976 id x") and ok
+	ok = Assertions.assert_equal(int((t76.get("xyz", []) as Array)[1]), 0x200, "02976 id y") and ok
+	ok = Assertions.assert_equal(int((t76.get("xyz", []) as Array)[2]), 0x300, "02976 id z") and ok
+	e62 = FlightMathScript.apply_15762_entry_plan(0x2000, 1, 0, 0, 0, 0, 0, [10, 20, 30])
+	ok = Assertions.assert_true(bool(e62.get("applied_02976", false)), "02976 with src") and ok
+	ok = Assertions.assert_equal(int((e62.get("local_1e94", []) as Array)[0]), 10, "1e94 x") and ok
+	## 15762 local_3324 rel + bias_1a
+	var r3324: Dictionary = FlightMathScript.apply_15762_local_3324_rel(
+		[10, 20, 30, 40, 50, 60], 1, 1
+	)
+	ok = Assertions.assert_true(bool(r3324.get("applied", false)), "3324 on") and ok
+	ok = Assertions.assert_equal(int((r3324.get("xyz", []) as Array)[0]), 30, "3324 x") and ok
+	ok = Assertions.assert_equal(int((r3324.get("xyz", []) as Array)[1]), 30, "3324 y") and ok
+	var b1a: Dictionary = FlightMathScript.apply_15762_bias_1a_low16(
+		[0x51, 0x62, 0x73, 0x81, 0x92, 0xA3], 1, 0, 0, 0x44, 0
+	)
+	ok = Assertions.assert_true(bool(b1a.get("applied", false)), "bias on") and ok
+	ok = Assertions.assert_equal(int((b1a.get("xyz", []) as Array)[1]), 0x1E, "bias y") and ok
+	ok = Assertions.assert_equal(int((b1a.get("xyz", []) as Array)[3]), 0x81, "v1 kept") and ok
 	gate28 = FlightMathScript.apply_04e6e_02bd8_gate(0x10, 0, 0)
 	ok = Assertions.assert_true(not bool(gate28.get("need_02bd8", true)), "bit4 +5 blocks") and ok
 	gate28 = FlightMathScript.apply_04e6e_02bd8_gate(0, 0x10, 0)
@@ -1340,6 +1425,24 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	ok = Assertions.assert_true(not bool(t5.get("applied", true)), "type!=5") and ok
 	t5 = FlightMathScript.apply_044a4_type5_flags(0, 0, 5, 0)
 	ok = Assertions.assert_true(not bool(t5.get("applied", true)), "no entity") and ok
+	## FUN_0000435a template addr (5020–5022)
+	var t35: Dictionary = FlightMathScript.apply_0435a_template_addr(0x2000, 0x1000, 1, 0x30)
+	ok = Assertions.assert_true(bool(t35.get("ok", false)), "tpl ok") and ok
+	ok = Assertions.assert_equal(int(t35.get("slot_addr", -1)), 0x1000 + 0x2E + 0x18, "tpl slot") and ok
+	ok = Assertions.assert_equal(int(t35.get("template_ptr", -1)), 0x2030, "tpl ptr") and ok
+	t35 = FlightMathScript.apply_0435a_template_addr(0, 0x1000, 0, 0)
+	ok = Assertions.assert_true(not bool(t35.get("ok", true)), "tpl needs base") and ok
+	## FUN_00004e6e → 04808 desc addr (5644–5647)
+	var d48: Dictionary = FlightMathScript.apply_04e6e_04808_desc_addr(0x1000, 2, 2)
+	ok = Assertions.assert_equal(int(d48.get("offset", -1)), 0x22 + 4 * 0xC, "04808 off") and ok
+	ok = Assertions.assert_equal(int(d48.get("desc_ptr", -1)), 0x1000 + 0x22 + 0x30, "04808 desc") and ok
+	## FUN_0000435a poly stream base / advance (5049 / 5069)
+	var sb35: Dictionary = FlightMathScript.apply_0435a_poly_stream_base(0x1000, 2, 1)
+	ok = Assertions.assert_equal(int(sb35.get("offset", -1)), 0x22 + 2 * 0xC + 0xC, "stream off") and ok
+	ok = Assertions.assert_equal(int(sb35.get("stream_base", -1)), 0x1000 + 0x22 + 0x24, "stream base") and ok
+	ok = Assertions.assert_equal(
+		FlightMathScript.apply_0435a_poly_stream_advance(0x2000, 2), 0x2000 + 0x0E + 4, "adv"
+	) and ok
 	## FUN_0000435a gate / +0xc
 	var g35: Dictionary = FlightMathScript.apply_0435a_gate(0, 1)
 	ok = Assertions.assert_true(bool(g35.get("enter", false)), "phase1 enter") and ok
@@ -1387,6 +1490,11 @@ func _test_fun_00005116_slot_helpers() -> bool:
 	ok = Assertions.assert_true(bool(n28.get("ok", false)), "node ok") and ok
 	ok = Assertions.assert_equal(int(n28.get("x", -1)), 15, "node x") and ok
 	ok = Assertions.assert_equal(int(n28.get("z", -1)), 29, "node z") and ok
+	var slot_n: Dictionary = FlightMathScript.apply_02bd8_chain_slot_node(
+		0, 0, 0, 1, 2, 3
+	)
+	ok = Assertions.assert_equal(int(slot_n.get("dx", -1)), 1, "slot dx") and ok
+	ok = Assertions.assert_equal(int(slot_n.get("s2", -1)), 0, "slot s2") and ok
 	var w28: Dictionary = FlightMathScript.apply_02bd8_null_aux_walk(
 		0, 0, 0, [{"dx": 1, "dy": 2, "dz": 3}, {"dx": 10, "dy": 0, "dz": 0}]
 	)

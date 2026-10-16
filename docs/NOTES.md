@@ -13,13 +13,104 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Entries
 
+### 2026-10-16 — 04958 poly index walk (simple cull)
+
+- **[PROVEN]** Pacific Conflict.c:5405–5462 / 5493: stream count@+8, indices@+0xe (same as 04808 desc); project xz `(v0-1d724,v2-1d71c)>>param_3`; pairs<3 → `poly+0x13|=2`.
+- **Godot:** `apply_04958_project_xz` / `apply_04958_poly_pairs_simple` for `index_count==1`; writes cull flag.
+- **[DEFERRED]** `FUN_00003c68` thinning when `index_count>1`; `b190`/`b242`/`b2f4`/`b3aa` clip; `local_f54` gather.
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — nested FUN_00002bd8 in 04958
+
+- **[PROVEN]** Pacific Conflict.c:5396: `02bd8(obj, *(s16*)(tpl+0x1a), tpl+0x22, auStack_15e4)` — both-aux; count is `1a` only (not `1a+1e`).
+- **[PROVEN]** Src treated as int32×3 at `tpl+0x22` (contrast `15762`/`02976` packed +2/+6/+10).
+- **Godot:** `_apply_fun_00004958` runs `apply_02bd8_both_aux_walk` → `auStack_15e4`.
+- **[DEFERRED]** `03c68` thinning / clip chain (simple cull path now wired).
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_00004958 entry + 04916 on +6 path
+
+- **[PROVEN]** Pacific Conflict.c:5686–5693: `+6` → `04958(obj,0xb4e1,0,0x7fe4)`; if `*(s16*)(b5a0+0xe)==1` → `04916(obj,0x80)` else `03ea0`. No prior `0435a`/`03da8`.
+- **[PROVEN]** 04958 entry 5378–5395: `local_1be4[i]=verts[i+36]-verts[0]`; `poly_stream=tpl+0x22+(1a+1e)*0xC`.
+- **[PROVEN]** 04916 (5319–5337): each of `field_3a` poly slots: `+4←*(table+param_2*2)`, `+0xf←0xff`.
+- **Godot:** `_apply_fun_00004958` / `_apply_fun_00004916` on `+6` path; nested `02bd8` now wired.
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — 15762 local_3324 rel + bias_1a
+
+- **[PROVEN]** Pacific Conflict.c:19929–19942: if `1e>0`, `local_3324[i]=local_1e94[i+1a]-local_1e94[0]` (full int32).
+- **[PROVEN]** 19944–19958: for first `1a` verts, BE low-16 subtract `(+18<<sh)`, `(param_5<<sh)`, `(+20<<sh)`.
+- **Godot:** `apply_15762_local_3324_rel` / `apply_15762_bias_1a_low16` after nested `02bd8` (rel before bias).
+- **[DEFERRED]** `asStack_2924` fill; `FUN_0001562e` poly emit; return.
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — nested FUN_00002bd8 after 02976 in 15762
+
+- **[PROVEN]** Pacific Conflict.c:19928: `02bd8(obj, count, &local_1e94, &local_1e94)` — both-aux (src≡dst); no `+0x18/1c/20` commit.
+- **Godot:** `_apply_fun_00015762` runs `apply_02bd8_both_aux_walk` on `local_1e94` via parent-chain slots.
+- **[DEFERRED]** `1562e` poly emit / return; both-aux rotate path still omits post-`02ada` `01c5c` (pre-existing).
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_00002976 after 0253e in 15762
+
+- **[PROVEN]** Pacific Conflict.c:19926–19928: after `0253e` → `02976(count, tpl+0x22, &local_1e94, matrix)` then `02bd8`.
+- **[PROVEN]** `02976` (3144–3170): same +2/+6/+10 × matrix +0x800>>12 as `028dc`, but int32×3 outs.
+- **Godot:** `fun_00002976`; `apply_15762_entry_plan` runs it when src triples present; SimCore reads tpl+0x22 stream.
+- **[DEFERRED]** poly copy/delta loops, return value (nested 02bd8 now wired).
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_00015762 args + entry on +7 path
+
+- **[PROVEN]** Pacific Conflict.c:5669–5682: handle=`*(obj+8)`; if null or `**(s16**)(handle+4)`∉[0x15,0x19] → angles 0; else `+0x34/+36/+38/+40` → `15762(obj,…)`.
+- **[PROVEN]** Entry 19920–19928: tpl via parent/embed; count=`*(+0x1a)+*(+0x1e)`; `0253e(p2,p3,p4)`.
+- **Godot:** `apply_04e6e_15762_args` / `apply_15762_entry_plan` / `_apply_fun_00015762` on `15762` path after 0435a/03da8.
+- **[DEFERRED]** nested `02bd8`, poly loops, return value (02976 now wired).
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_00004e6e kind2 bit4 path select (+5→01c5c)
+
+- **[PROVEN]** Pacific Conflict.c:5653–5693: `+6`→`04958`; else `+7`→`15762`; else `+5`→`01c5c(36+3a,mesh,verts,0,0,0)`+rates/`03ea0`; else `02bd8`+rates then `03ea0` (LAB).
+- **Godot:** `apply_04e6e_post_04808_path`; `01c5c` path copies mesh→verts; `03ea0` recorded (`deferred_body`); `15762`/`04958` bodies still deferred.
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_00004e6e kind2 04808/02bd8 on 016e2 path
+
+- **[PROVEN]** Pacific Conflict.c:5639–5658: after +0x4c/+0x44 alloc, `04808(obj, tpl+0x22+(36+3a)*0xC)`; flag-gated `02bd8`; `0435a(obj,0)`; `03da8`.
+- **Godot:** `_04e6e_kind2_04808_followup` shared by `_call_fun_00004e6e` (016e2 bdac/bda4) and nested 046da near-path; desc from `spawn_04808_desc_ptr` or mem tpl.
+- **[DEFERRED]** `obj+8` → `DAT_0001c25c` publish (5648–5652); `15762`/`04958` bodies; live `03ea0`.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_0000435a poly stream *(rec+10) → +0x1c
+
+- **[PROVEN]** Pacific Conflict.c:5049–5069: stream=`iVar5+0x22+*(s16*)(+0x1a)*0xC+*(s16*)(+0x1e)*0xC`; each poly `*(stream+10)` → buf+0x1c; advance `+0xE+*(u8*)(+8)*2`.
+- **Godot:** `apply_0435a_poly_stream_base` / `_advance` + `_0435a_resolve_poly_srcs`; mem when template resolves, else `spawn_0435a_poly_srcs`.
+- **Validation:** Godot headless + Python regression (this tick).
+
+### 2026-10-16 — FUN_0000435a *(template+0xe) scale source
+
+- **[PROVEN]** Pacific Conflict.c:5020–5038: `iVar5 = *(b5a0+0x8c) + *(*(obj+0x24)+0x28 + 0x2e + (obj+1)*0x18)`; `+0xc` from `*(iVar5+0xe)` × scale.
+- **Godot:** `apply_0435a_template_addr` + `_0435a_resolve_scale_src`; mem path when parent/embed/b5a0+0x8c present, else `spawn_0435a_scale_src` fallback.
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_000046da 02bd8 null-aux template walk
+
+- **[PROVEN]** Pacific Conflict.c:3343–3375: while `*(obj+0x24)≠0`, slot=`*(cur+0x30)+idx*0x18`, rotate/translate locals, `idx=*(cur+2)`, `cur=*(cur+0x24)`; then null-aux commit to `+0x18/+0x1c/+0x20`.
+- **[PROVEN]** Per node (3355–3360): optional `0253e`→`02ada`, then **always** `01c5c` (rotate path previously omitted translate — fixed).
+- **Godot:** `_02bd8_nodes_from_parent_chain` + `_apply_046da_02bd8` on both 046da entry points; `spawn_046da_02bd8_nodes` override (`[]` skips walk; `null` → mem chain).
+- **Validation:** Godot 13/0; Python regression pass.
+
+### 2026-10-16 — FUN_000046da → FUN_00002bd8(obj,1,null,null)
+
+- **[PROVEN]** Pacific Conflict.c:5236: after identity links, `FUN_00002bd8((int)puVar1,1,NULL,NULL)` then factory `+8` / `0435a`.
+- **Godot:** `_call_fun_000046da` and `_046da_from_parent` run null-aux walk+commit; `last_046da_02bd8_commit` survives nested `04e6e`.
+- **Validation:** Godot 13/0; Python regression pass.
+
 ### 2026-10-16 — FUN_000046da → FUN_0000435a(param_2=1)
 
 - **[PROVEN]** Pacific Conflict.c:5251: after factory `+8`, `FUN_0000435a((char *)puVar1, 1)` then `03b98` / distance gate.
 - **[PROVEN]** param_2=1 skips kind2 poly `+0x1c` loop (5048: `*param_1==2 && param_2==0`); gate / `+0xc` scale still apply when phase `0 < a8 < 6`.
 - **Godot:** `_046da_from_parent` and `_call_fun_000046da` call `_apply_fun_0000435a(obj, 1)` before `03b98`; kind-3 rollup clears `deferred_0435a`.
-- **[DEFERRED]** Real `*(template+0xe)` scale source (still `spawn_0435a_scale_src`); `02bd8` on 05116/`_call_fun_000046da` path.
-- **Validation:** Godot headless + Python regression (this tick).
+- **Validation:** Godot 13/0; Python regression pass.
 
 ### 2026-10-16 — FUN_000046da tail (02bd8 / 03b98 / gate)
 
@@ -42,8 +133,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 ### 2026-10-16 — FUN_00004e6e kind-2 list + vertex alloc (016e2)
 
 - **[PROVEN]** Decomp ~5631–5643: kind2 → `b5a4[b734++]` or `d4a4[c1e0++]` from `obj+7` bit0; `01a48`×2 → `obj+0x4c/+0x44` size `(36+3a)*0xC`.
-- **Godot:** `_call_fun_00004e6e` replaces stub for `016e2` bdac/bda4; mock ptrs via `spawn_04e6e_*`.
-- **[DEFERRED]** kind3 child table; `04808`/`02bd8`/`0435a` follow-up on this path.
+- **Godot:** `_call_fun_00004e6e` replaces stub for `016e2` bdac/bda4; mock ptrs via `spawn_04e6e_*`; kind2 follow-up now shared (see 04808 entry above).
 - **Validation:** Godot 13/0; Python regression pass.
 
 ### 2026-10-16 — FUN_00001c04 vertex buffer copy

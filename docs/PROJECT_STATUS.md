@@ -381,12 +381,11 @@ They do not cover rendering, camera motion, keyboard integration, stall and out-
 
 The two sims should stay apart until one change has a single owner. Mission 1 sea/island solids are in place; the headless baseline includes them.
 
-**Recommended milestone:** kind-2 `04808` / `02bd8` follow-up on the 05116/`046da` path, or real template `+0xe` scale source for `0435a` — still without merging integrators.
+**Recommended milestone:** `04958` `03c68` thinning / clip chain, or `15762` `1562e` poly emit, or `01be4` ABI — still without merging integrators.
 
-1. Wire `FUN_00002bd8` into `_call_fun_000046da` (05116 path), matching `_046da_from_parent` / decomp 5236.
-2. Wire `04808`/`02bd8` on the `016e2` kind-2 `04e6e` path.
-3. Trace D2/D3/A2 into `01be4` mid-entry after `04e4e`.
-4. Only after ownership is explicit, decide whether player motion should move into `SimCore` or whether `SimCore` remains a parity lab.
+1. Port `FUN_00003c68` + multi-index thinning in `04958`, or `FUN_0001562e` on the `15762` path.
+2. Trace D2/D3/A2 into `01be4` mid-entry after `04e4e`.
+3. Only after ownership is explicit, decide whether player motion should move into `SimCore` or whether `SimCore` remains a parity lab.
 
 Later work, in the order requested:
 

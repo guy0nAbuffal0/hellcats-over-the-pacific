@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 77  
+**Last iteration:** 93  
 **Last iteration date:** 2026-10-15  
 **Loop:** local monitored shell `AGENT_LOOP_TICK_hellcats_decomp` every 300s (PID 54957 / terminal 343366)
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 2 | 0 | 0 | 0 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
-| Pacific Conflict.c | 441 | 350 | 0 | 0 | 84 | 0 | 7 |
-| **TOTAL** | **731** | **636** | **0** | **0** | **88** | **0** | **7** |
+| Pacific Conflict.c | 441 | 332 | 0 | 0 | 102 | 0 | 7 |
+| **TOTAL** | **731** | **618** | **0** | **0** | **106** | **0** | **7** |
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -39,7 +39,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `ID07.c` | `ID07.decomp.c` | seeded (copy) |
 | `ID08.c` | `ID08.decomp.c` | seeded + iter 68–71 edits (all 4 FUN renamed) |
 | `ID09.c` | `ID09.decomp.c` | seeded (copy) |
-| `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–77 edits |
+| `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | seeded + iter 1–93 edits |
 
 ## Function tracker (processed / in focus)
 
@@ -113,6 +113,24 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00001e3a` | `acos_fixed14` | Pacific Conflict | RENAMED | PROVEN | `@0x1E3A` | `Pacific Conflict.decomp.c` | inverse cos table `1ad6c` | — | 75 | Capstone; 3 call sites |
 | `FUN_00001ebc` | `atan_fixed14` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x1EBC` | `Pacific Conflict.decomp.c` | table `1af6c` longs; mid-biased | table scale | 76 | Capstone; 4 BSR |
 | `FUN_000102d6` | `atan2_fixed14` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x102D6` | `Pacific Conflict.decomp.c` | abs+atan_fixed14 + quadrants | axis meaning of args | 77 | Capstone; 1 BSR |
+| `FUN_000109ba` | `apply_relative_heading_steer` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x109BA` | `Pacific Conflict.decomp.c` | atan2+fold → +0x61e; avg4 | 61a/c/e | 78 | Capstone; 2 callers |
+| `FUN_00010558` | `enqueue_control_inputs_avg4` | Pacific Conflict | RENAMED | PROVEN | `@0x10558` | `Pacific Conflict.decomp.c` | 4-ring → +0x662/4/6 | channel axis names | 79 | Capstone; 4 BSR |
+| `FUN_00010b2e` | `steer_entity_toward_point` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10B2E` | `Pacific Conflict.decomp.c` | sample+steer wrapper | — | 80 | Capstone; 10 callers |
+| `FUN_00010360` | `build_relative_steer_sample` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10360` | `Pacific Conflict.decomp.c` | Δxyz→body; attitude cmds | Y-bump | 81 | Capstone; 2 BSR |
+| `FUN_00010cb2` | `max_ai_throttle_maybe_invert_679` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10CB2` | `Pacific Conflict.decomp.c` | +0x668=9; maybe neg +0x679 | +0x679 meaning | 82 | Capstone; 5 BSR |
+| `FUN_00010c2c` | `adjust_ai_throttle_vs_speed` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10C2C` | `Pacific Conflict.decomp.c` | target vs +0x62a → +0x668 | +0x62a unit | 83 | Capstone; 6 BSR |
+| `FUN_00010cd8` | `invert_ai_bias_67b_if_positive` | Pacific Conflict | RENAMED | PROVEN | `@0x10CD8` | `Pacific Conflict.decomp.c` | neg +0x67b if >0 | — | 84 | Capstone; 3 BSR |
+| `FUN_00010b84` | `ai_bootstrap_climb_phase` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10B84` | `Pacific Conflict.decomp.c` | pitch→2c0; ret alt>2000 | script context | 85 | Capstone; 2 BSR |
+| `FUN_00010ce8` | `tick_ai_climb_then_waypoint` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10CE8` | `Pacific Conflict.decomp.c` | script +0x616; climb→steer | `16966` | 86 | Capstone; 3 BSR |
+| `FUN_00010d68` | `ensure_ai_script_1b2e0_tick` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10D68` | `Pacific Conflict.decomp.c` | table 1b2e0; spd 0x9d8 | table contents | 87 | Capstone |
+| `FUN_00010da8` | `ensure_ai_script_1b310_tick` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10DA8` | `Pacific Conflict.decomp.c` | table 1b310; spd 0xd5c | table contents | 87 | Capstone; 1 BSR |
+| `FUN_00010de8` | `ensure_ai_script_1b340_tick` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10DE8` | `Pacific Conflict.decomp.c` | table 1b340; spd 0x9d8 | table contents | 87 | Capstone |
+| `FUN_00010e28` | `ai_script_try_fire_burst` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10E28` | `Pacific Conflict.decomp.c` | timegate+RNG fire; ret ammo0 | +0x67c meaning | 88 | Capstone; 2 BSR |
+| `FUN_00010ecc` | `tick_ai_1b310_approach_fire` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10ECC` | `Pacific Conflict.decomp.c` | 1b310 tick; 1→2→3 fire | `03c68` | 89 | Capstone; 0 BSR |
+| `FUN_00010f68` | `tick_ai_1b370_mission` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x10F68` | `Pacific Conflict.decomp.c` | 1b370 multi-phase mission | landing helper | 90 | Capstone; 0 BSR |
+| `FUN_00019fba` | `try_begin_landing_approach` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x19FBA` | `Pacific Conflict.decomp.c` | setup 267xx glide; +0x32→1a186 | handler | 91 | Capstone; 2 BSR |
+| `FUN_00019c5e` | `find_nearest_runway_approach_ends` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x19C5E` | `Pacific Conflict.decomp.c` | nearest 'p'/4 pad ends | pad schema | 92 | Capstone; 1 BSR |
+| `FUN_00019c26` | `store_xyz_asr` | Pacific Conflict | RENAMED | PROVEN | `@0x19C26` | `Pacific Conflict.decomp.c` | A1←(x,y,z)>>s | — | 93 | Capstone; 4 BSR |
 | `FUN_00012840` | `spawn_weapon_entity` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x12840` | `Pacific Conflict.decomp.c` | `DAT_00026280` → pool; entity `+0x610/61c/20..24` | Exact munition class | 22 | NOTES post-spawn; 3 call sites |
 | `FUN_00015d20` | `spawn_ordnance_oriented` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x15D20` | `Pacific Conflict.decomp.c` | `build_attitude_matrix_x` → `spawn_ordnance_scattered` | — | 23 | NOTES; e792 field_676 |
 | `FUN_00015bf6` | `spawn_ordnance_scattered` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x15BF6` | `Pacific Conflict.decomp.c` | `DAT_0002664a`; RNG scatter; `1a63e` | `1a63e` body | 23 | NOTES spawn fields |
@@ -534,12 +552,76 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 
 - Renamed `FUN_000102d6`→`atan2_fixed14` (2-arg heading; same quadrants as attitude heading).
 
-**Next iteration target:** `FUN_000109ba` — sole caller of `atan2_fixed14` (@0x10A0C).
+### Iteration 78 — 2026-10-16
+
+- Renamed `FUN_000109ba`→`apply_relative_heading_steer` (atan2/fold → entity +0x61e; calls `10558`).
+
+### Iteration 79 — 2026-10-16
+
+- Renamed `FUN_00010558`→`enqueue_control_inputs_avg4` (4-sample rings → +0x662/+0x664/+0x666).
+
+### Iteration 80 — 2026-10-16
+
+- Renamed `FUN_00010b2e`→`steer_entity_toward_point` (`10360` + `apply_relative_heading_steer`).
+
+### Iteration 81 — 2026-10-16
+
+- Renamed `FUN_00010360`→`build_relative_steer_sample` (Δxyz→body frame + attitude cmds).
+
+### Iteration 82 — 2026-10-16
+
+- Renamed `FUN_00010cb2`→`max_ai_throttle_maybe_invert_679` (+0x668=9; conditional +0x679 negate).
+
+### Iteration 83 — 2026-10-16
+
+- Renamed `FUN_00010c2c`→`adjust_ai_throttle_vs_speed` (target vs +0x62a → throttle +0x668).
+
+### Iteration 84 — 2026-10-16
+
+- Renamed `FUN_00010cd8`→`invert_ai_bias_67b_if_positive` (neg +0x67b if >0).
+
+### Iteration 85 — 2026-10-16
+
+- Renamed `FUN_00010b84`→`ai_bootstrap_climb_phase` (pitch toward 0x2c0; true when altΔ>2000).
+
+### Iteration 86 — 2026-10-16
+
+- Renamed `FUN_00010ce8`→`tick_ai_climb_then_waypoint` (script +0x616: climb phase → waypoint steer).
+
+### Iteration 87 — 2026-10-16
+
+- Renamed `FUN_00010d68`/`10da8`/`10de8`→`ensure_ai_script_{1b2e0,1b310,1b340}_tick`.
+
+### Iteration 88 — 2026-10-16
+
+- Renamed `FUN_00010e28`→`ai_script_try_fire_burst` (timegate + RNG spawn_weapon; 1 when ammo 0).
+
+### Iteration 89 — 2026-10-16
+
+- Renamed `FUN_00010ecc`→`tick_ai_1b310_approach_fire` (1b310 tick + phase 1→2→3 fire).
+
+### Iteration 90 — 2026-10-16
+
+- Renamed `FUN_00010f68`→`tick_ai_1b370_mission` (DAT_0001b370 multi-phase climb/fire/steer).
+
+### Iteration 91 — 2026-10-16
+
+- Renamed `FUN_00019fba`→`try_begin_landing_approach` (267xx glide path; install +0x32=0x1A186).
+
+### Iteration 92 — 2026-10-16
+
+- Renamed `FUN_00019c5e`→`find_nearest_runway_approach_ends` (scan pads 'p'/4 → two XYZ ends).
+
+### Iteration 93 — 2026-10-16
+
+- Renamed `FUN_00019c26`→`store_xyz_asr` (A1 ← (x,y,z) >> scale).
+
+**Next iteration target:** Resume `update_aircraft_entity` flags_685 / 0x662 path (Block 1).
 
 ## Priority queue (suggested)
 
-1. `FUN_000109ba` — atan2_fixed14 consumer  
+1. `update_aircraft_entity` / `FUN_0000e792` — flags_685 → 0x662/0x666  
 2. Revisit `$1A48` allocator ABI (BLOCKED)  
 3. `ID09.c` / `ID05.c` segment entries  
-4. Camera/view consumers of attitude builds  
+4. Landing handler at `0x1A186` / `FUN_0001a1a6`  
 

@@ -12,6 +12,10 @@ func run() -> bool:
 	var ok := true
 	ok = _test_pass_order_and_param2() and ok
 	ok = _test_fun_0000435a_on_tick_044a4() and ok
+	ok = _test_fun_0000435a_poly_stream_mem() and ok
+	ok = _test_fun_00004e6e_01c5c_path() and ok
+	ok = _test_fun_00004e6e_15762_path() and ok
+	ok = _test_fun_00004e6e_04958_path() and ok
 	ok = _test_phase_gate_skips_arrays() and ok
 
 	ok = _test_multi_tick_stable_order() and ok
@@ -113,6 +117,266 @@ func _test_fun_0000435a_on_tick_044a4() -> bool:
 	ok = Assertions.assert_equal(int(sim.last_0435a.get("param_2", -1)), 1, "p2=1") and ok
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(WORLD + 0x0C, -1)), 0x800, "+0xc again") and ok
 	return ok
+
+
+## [RECONSTRUCTED] 04e6e kind2 +7 → 15762 through local_3324 + bias_1a (19920–19958).
+func _test_fun_00004e6e_15762_path() -> bool:
+	var sim := SimCoreScript.new(0x15762)
+	const B5A0 := 0xB100
+	const DESC := 0xB200
+	const PARENT := 0xB300
+	const EMBED := 0xB400
+	const TPL := 0xB500
+	const OBJ := 0xB600
+	const HANDLE := 0xB700
+	const TYPEP := 0xB800
+	const SLOT_TBL := 0xB850
+	sim.dat_0001b5a0 = B5A0
+	sim.mem_u32[B5A0 + 0x8C] = DESC
+	sim.mem_u32[PARENT + 0x28] = EMBED
+	sim.mem_u32[PARENT + 0x30] = SLOT_TBL
+	sim.mem_u32[PARENT + 0x24] = 0  # end 02bd8 chain
+	sim.mem_u32[EMBED + 0x2E] = TPL - DESC
+	## Chain slot idx0: zero angles → 01c5c only; deltas +1/+2/+3.
+	sim.mem_u32[SLOT_TBL + 2] = 0
+	sim.mem_u32[SLOT_TBL + 4] = 0
+	sim.mem_u32[SLOT_TBL + 6] = 0
+	sim.mem_u32[SLOT_TBL + 8] = 1
+	sim.mem_u32[SLOT_TBL + 0x0C] = 2
+	sim.mem_u32[SLOT_TBL + 0x10] = 3
+	sim.mem_u32[TPL + 0x1A] = 1
+	sim.mem_u32[TPL + 0x1E] = 1  # enables local_3324 relative copy
+	## Packed vecs12: two records (identity 0253e → pass-through).
+	sim.mem_u32[TPL + 0x22 + 2] = 0x50
+	sim.mem_u32[TPL + 0x22 + 6] = 0x60
+	sim.mem_u32[TPL + 0x22 + 10] = 0x70
+	sim.mem_u32[TPL + 0x22 + 0xC + 2] = 0x80
+	sim.mem_u32[TPL + 0x22 + 0xC + 6] = 0x90
+	sim.mem_u32[TPL + 0x22 + 0xC + 10] = 0xA0
+	sim.mem_u32[OBJ] = 2
+	sim.mem_u32[OBJ + 1] = 0
+	sim.mem_u32[OBJ + 2] = 0  # chain slot index
+	sim.mem_u32[OBJ + 5] = 0
+	sim.mem_u32[OBJ + 6] = 0
+	sim.mem_u32[OBJ + 7] = 0x10  # bit4 → 15762
+	sim.mem_u32[OBJ + 8] = HANDLE
+	sim.mem_u32[OBJ + 0x18] = 0
+	sim.mem_u32[OBJ + 0x20] = 0
+	sim.mem_u32[OBJ + 0x24] = PARENT
+	sim.mem_u32[OBJ + 0x34] = 0  # no delta shift
+	sim.mem_u32[OBJ + 0x36] = 0
+	sim.mem_u32[OBJ + 0x3A] = 0
+	sim.mem_u32[HANDLE + 4] = TYPEP
+	sim.mem_u32[TYPEP] = 0x17  # in [0x15,0x19]
+	sim.mem_u32[HANDLE + 0x34] = 0  # identity 0253e
+	sim.mem_u32[HANDLE + 0x36] = 0
+	sim.mem_u32[HANDLE + 0x38] = 0
+	sim.mem_u32[HANDLE + 0x40] = 0x44  # param_5 → bias y
+	sim.spawn_04e6e_use_mock_ptrs = true
+	sim.spawn_04e6e_ptr_4c = 0xB900
+	sim.spawn_05116_world_field_44 = 1
+	var r: Dictionary = sim._call_fun_00004e6e(OBJ)
+	var ok := Assertions.assert_true(bool(r.get("ok", false)), "ok")
+	ok = Assertions.assert_equal(str(sim.last_04e6e_path.get("path", "")), "15762", "path") and ok
+	ok = Assertions.assert_true(not bool(sim.last_15762.get("args", {}).get("zeroed", true)), "args") and ok
+	ok = Assertions.assert_equal(int(sim.last_15762.get("args", {}).get("param_5", -1)), 0x44, "p5") and ok
+	ok = Assertions.assert_true(bool(sim.last_15762.get("entry", {}).get("applied_0253e", false)), "0253e") and ok
+	ok = Assertions.assert_true(bool(sim.last_15762.get("entry", {}).get("applied_02976", false)), "02976") and ok
+	ok = Assertions.assert_true(bool(sim.last_15762.get("entry", {}).get("applied_02bd8", false)), "02bd8") and ok
+	ok = Assertions.assert_true(bool(sim.last_15762.get("entry", {}).get("applied_local_3324", false)), "3324") and ok
+	ok = Assertions.assert_true(bool(sim.last_15762.get("entry", {}).get("applied_bias_1a", false)), "bias") and ok
+	ok = Assertions.assert_equal(int(sim.last_15762.get("02bd8", {}).get("steps", -1)), 1, "02bd8 steps") and ok
+	## After 02bd8: v0=(0x51,0x62,0x73) v1=(0x81,0x92,0xA3); 3324 = v1-v0.
+	var rel: Array = sim.last_15762.get("entry", {}).get("local_3324", []) as Array
+	ok = Assertions.assert_equal(rel.size(), 3, "3324 len") and ok
+	ok = Assertions.assert_equal(int(rel[0]), 0x30, "3324 x") and ok
+	ok = Assertions.assert_equal(int(rel[1]), 0x30, "3324 y") and ok
+	ok = Assertions.assert_equal(int(rel[2]), 0x30, "3324 z") and ok
+	## Bias 1a: y0 -= param_5 (0x44); v1 untouched.
+	var xyz: Array = sim.last_15762.get("entry", {}).get("local_1e94", []) as Array
+	ok = Assertions.assert_equal(xyz.size(), 6, "1e94 len") and ok
+	ok = Assertions.assert_equal(int(xyz[0]), 0x51, "1e94 x") and ok
+	ok = Assertions.assert_equal(int(xyz[1]), 0x1E, "1e94 y-p5") and ok
+	ok = Assertions.assert_equal(int(xyz[2]), 0x73, "1e94 z") and ok
+	ok = Assertions.assert_equal(int(xyz[3]), 0x81, "v1 x") and ok
+	ok = Assertions.assert_true(bool(sim.last_15762.get("deferred_body", false)), "body defer") and ok
+	return ok
+
+
+## [RECONSTRUCTED] 04e6e kind2 +6 → 04958 entry + nested 02bd8 + 04916 (5374–5396 / 5686).
+func _test_fun_00004e6e_04958_path() -> bool:
+	var sim := SimCoreScript.new(0x4958)
+	const B5A0 := 0xD100
+	const DESC := 0xD200
+	const PARENT := 0xD300
+	const EMBED := 0xD400
+	const TPL := 0xD500
+	const OBJ := 0xD600
+	const VERTS := 0xD700
+	const POLY := 0xD800
+	const TABLE := 0xD900
+	const SLOT_TBL := 0xD950
+	sim.dat_0001b5a0 = B5A0
+	sim.mem_u32[B5A0 + 0x8C] = DESC
+	sim.mem_u32[B5A0 + 0x0E] = 1  # → 04916
+	sim.mem_u32[B5A0 + 0x88] = TABLE
+	sim.mem_u32[TABLE + 0x80 * 2] = 0x55AA
+	sim.mem_u32[PARENT + 0x28] = EMBED
+	sim.mem_u32[PARENT + 0x30] = SLOT_TBL
+	sim.mem_u32[PARENT + 0x24] = 0
+	sim.mem_u32[EMBED + 0x2E] = TPL - DESC
+	## Chain slot: zero angles → 01c5c; deltas +1/+2/+3.
+	sim.mem_u32[SLOT_TBL + 2] = 0
+	sim.mem_u32[SLOT_TBL + 4] = 0
+	sim.mem_u32[SLOT_TBL + 6] = 0
+	sim.mem_u32[SLOT_TBL + 8] = 1
+	sim.mem_u32[SLOT_TBL + 0x0C] = 2
+	sim.mem_u32[SLOT_TBL + 0x10] = 3
+	sim.mem_u32[TPL + 0x1A] = 1
+	sim.mem_u32[TPL + 0x1E] = 0
+	## tpl+0x22 int32×3 for nested 02bd8 (count=1a).
+	sim.mem_u32[TPL + 0x22 + 0] = 100
+	sim.mem_u32[TPL + 0x22 + 4] = 200
+	sim.mem_u32[TPL + 0x22 + 8] = 300
+	## Poly stream at tpl+0x22+(1a+1e)*0xC: count@+8=1, index0@+0xe.
+	const PSTREAM := TPL + 0x22 + 0xC
+	sim.mem_u32[PSTREAM + 8] = 1
+	sim.mem_u32[PSTREAM + 0x0E] = 0
+	sim.mem_u32[OBJ] = 2
+	sim.mem_u32[OBJ + 1] = 0
+	sim.mem_u32[OBJ + 2] = 0
+	sim.mem_u32[OBJ + 5] = 0
+	sim.mem_u32[OBJ + 6] = 0x10  # bit4 → 04958
+	sim.mem_u32[OBJ + 7] = 0
+	sim.mem_u32[OBJ + 0x24] = PARENT
+	sim.mem_u32[OBJ + 0x34] = 0
+	sim.mem_u32[OBJ + 0x36] = 1
+	sim.mem_u32[OBJ + 0x3A] = 1
+	## Mock +0x44 (verts) and 04808 → +0x48 (poly buffer).
+	sim.mem_u32[VERTS + 0] = 10
+	sim.mem_u32[VERTS + 4] = 20
+	sim.mem_u32[VERTS + 8] = 30
+	sim.mem_u32[VERTS + 12] = 40
+	sim.mem_u32[VERTS + 16] = 50
+	sim.mem_u32[VERTS + 20] = 60
+	sim.spawn_04e6e_use_mock_ptrs = true
+	sim.spawn_04e6e_ptr_4c = 0xDA00
+	sim.spawn_05116_world_field_44 = VERTS
+	sim.spawn_04808_use_mock_ptrs = true
+	sim.spawn_04808_buf_ptr = POLY
+	sim.dat_0001d724 = 100
+	sim.dat_0001d71c = 300
+	var r: Dictionary = sim._call_fun_00004e6e(OBJ)
+	var ok := Assertions.assert_true(bool(r.get("ok", false)), "ok")
+	ok = Assertions.assert_equal(str(sim.last_04e6e_path.get("path", "")), "04958", "path") and ok
+	ok = Assertions.assert_equal(int(sim.last_04958.get("args", {}).get("param_2", -1)), 0xB4E1, "p2") and ok
+	ok = Assertions.assert_true(bool(sim.last_04958.get("entry_rel", {}).get("applied", false)), "rel") and ok
+	var be4: Array = sim.last_04958.get("entry_rel", {}).get("local_1be4", []) as Array
+	ok = Assertions.assert_equal(int(be4[0]), 30, "1be4 x") and ok
+	ok = Assertions.assert_true(bool(sim.last_04958.get("applied_02bd8", false)), "02bd8") and ok
+	ok = Assertions.assert_equal(int(sim.last_04958.get("02bd8", {}).get("steps", -1)), 1, "steps") and ok
+	var stacked: Array = sim.last_04958.get("auStack_15e4", []) as Array
+	ok = Assertions.assert_equal(int(stacked[0]), 101, "15e4 x+1") and ok
+	ok = Assertions.assert_equal(int(stacked[1]), 202, "15e4 y+2") and ok
+	ok = Assertions.assert_equal(int(stacked[2]), 303, "15e4 z+3") and ok
+	ok = Assertions.assert_true(bool(sim.last_04958.get("applied_poly_walk", false)), "poly walk") and ok
+	var pw: Array = sim.last_04958.get("poly_walk", []) as Array
+	ok = Assertions.assert_equal(pw.size(), 1, "1 poly") and ok
+	ok = Assertions.assert_true(bool(pw[0].get("cull", false)), "cull") and ok
+	var pair0: Dictionary = (pw[0].get("pairs", []) as Array)[0] as Dictionary
+	ok = Assertions.assert_equal(int(pair0.get("x", -1)), 1, "pair x") and ok
+	ok = Assertions.assert_equal(int(pair0.get("z", -1)), 3, "pair z") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(POLY + 0x13, -1)) & 2, 2, "flag|2") and ok
+	ok = Assertions.assert_equal(
+		int(sim.last_04958.get("poly_stream", {}).get("poly_stream", -1)),
+		PSTREAM,
+		"stream"
+	) and ok
+	ok = Assertions.assert_equal(str(sim.last_04e6e_followup.get("followup", "")), "04916", "fu") and ok
+	ok = Assertions.assert_true(bool(sim.last_04916.get("applied", false)), "04916") and ok
+	ok = Assertions.assert_equal(int(sim.last_04916.get("poly_ptr", -1)), POLY, "poly ptr") and ok
+	ok = Assertions.assert_equal(int(sim.last_04916.get("table_word", -1)), 0x55AA, "tbl word") and ok
+	ok = Assertions.assert_equal(int(sim.last_04916.get("count", -1)), 1, "04916 n") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(POLY + 4, -1)), 0x55AA, "poly+4") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(POLY + 0x0F, -1)), 0xFF, "poly+f") and ok
+	ok = Assertions.assert_true(bool(sim.last_04958.get("deferred_body", false)), "body defer") and ok
+	return ok
+
+
+## [RECONSTRUCTED] 04e6e kind2 +5 bit4 → 01c5c mesh→verts (5661–5664).
+func _test_fun_00004e6e_01c5c_path() -> bool:
+	var sim := SimCoreScript.new(0x4E6F)
+	const OBJ := 0xC100
+	const MESH := 0xC200
+	const VERT := 0xC300
+	sim.mem_u32[OBJ] = 2
+	sim.mem_u32[OBJ + 5] = 0x10  # bit4 → 01c5c
+	sim.mem_u32[OBJ + 6] = 0
+	sim.mem_u32[OBJ + 7] = 0
+	sim.mem_u32[OBJ + 0x36] = 1
+	sim.mem_u32[OBJ + 0x3A] = 0
+	sim.spawn_04e6e_use_mock_ptrs = true
+	sim.spawn_04e6e_ptr_4c = 0xC400
+	sim.spawn_05116_world_field_44 = VERT
+	sim.spawn_02bd8_mesh_ptr = MESH
+	sim.mem_u32[MESH + 0] = 10
+	sim.mem_u32[MESH + 4] = 20
+	sim.mem_u32[MESH + 8] = 30
+	var r: Dictionary = sim._call_fun_00004e6e(OBJ)
+	var ok := Assertions.assert_true(bool(r.get("ok", false)), "ok")
+	ok = Assertions.assert_equal(str(sim.last_04e6e_path.get("path", "")), "01c5c", "path") and ok
+	ok = Assertions.assert_true(not bool(sim.last_02bd8_gate.get("need_02bd8", true)), "no 02bd8") and ok
+	ok = Assertions.assert_equal(int(sim.last_01c5c.get("count", -1)), 1, "count") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(VERT + 0, -1)), 10, "vx") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(VERT + 4, -1)), 20, "vy") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(VERT + 8, -1)), 30, "vz") and ok
+	ok = Assertions.assert_true(bool(sim.last_03ea0.get("called", false)), "03ea0") and ok
+	return ok
+
+
+## [RECONSTRUCTED] 0435a kind2 poly +0x1c from template stream (5049–5069).
+func _test_fun_0000435a_poly_stream_mem() -> bool:
+	var sim := SimCoreScript.new(0x435B)
+	const B5A0 := 0xF100
+	const DESC := 0xF200
+	const PARENT := 0xF300
+	const EMBED := 0xF400
+	const TPL := 0xF500
+	const WORLD := 0xF600
+	const BUF := 0xF700
+	sim.dat_0001b5a0 = B5A0
+	sim.mem_u32[B5A0 + 0x8C] = DESC
+	sim.mission_phase_a8 = 1
+	sim.spawn_0435a_poly_srcs = [0xDEAD, 0xBEEF]  # must not be used
+	sim.spawn_0435a_scale_src = 0xDEAD
+	sim.mem_u32[PARENT + 0x28] = EMBED
+	sim.mem_u32[EMBED + 0x2E] = TPL - DESC
+	sim.mem_u32[TPL + 0x0E] = 0x1000
+	sim.mem_u32[TPL + 0x1A] = 0
+	sim.mem_u32[TPL + 0x1E] = 0
+	## stream @ TPL+0x22; two records, count=0 → stride 0x0E
+	const S0 := TPL + 0x22
+	const S1 := S0 + 0x0E
+	sim.mem_u32[S0 + 8] = 0
+	sim.mem_u32[S0 + 0x0A] = 0x200
+	sim.mem_u32[S1 + 8] = 0
+	sim.mem_u32[S1 + 0x0A] = 0x400
+	sim.mem_u32[WORLD] = 2
+	sim.mem_u32[WORLD + 1] = 0
+	sim.mem_u32[WORLD + 0x24] = PARENT
+	sim.mem_u32[WORLD + 0x3A] = 2
+	sim.mem_u32[WORLD + 0x48] = BUF
+	sim.mem_u32[WORLD + 0x0C] = 0
+	sim.mem_u32[WORLD + 7] = 0
+	var r: Dictionary = sim._apply_fun_0000435a(WORLD, 0)
+	var ok := Assertions.assert_true(bool(r.get("gate", {}).get("enter", false)), "enter")
+	ok = Assertions.assert_equal(str(r.get("poly_srcs", {}).get("source", "")), "mem_stream", "mem") and ok
+	ok = Assertions.assert_equal(int(r.get("poly_1c", {}).get("count", -1)), 2, "2 polys") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(BUF + 0x1C, -1)), 0x100, "poly0 half") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(BUF + 0x20 + 0x1C, -1)), 0x200, "poly1 half") and ok
+	ok = Assertions.assert_equal(str(r.get("scale_src", {}).get("source", "")), "mem_0e", "0e") and ok
+	return ok
+
 
 func _test_phase_gate_skips_arrays() -> bool:
 	var sim := SimCoreScript.new(0x1111)
@@ -1106,6 +1370,9 @@ func _test_fun_00005116_pool_scan() -> bool:
 	sim.spawn_0435a_poly_srcs = [0x200, 0x400]  # stream+10 → poly +0x1c (half when scale=0)
 	## mesh=0 → null-OR walk; verts=+44 nonzero → no commit of locals
 	sim.spawn_02bd8_nodes = [{"dx": 0x100, "dy": 0, "dz": 0}]
+	## Empty override: skip 046da mem-chain walk so this fixture stays focused on 04e6e/04808.
+	## Mem-chain walk covered in _test_fun_00016a3a_via_046da.
+	sim.spawn_046da_02bd8_nodes = []
 	var r: int = sim._call_fun_00005116(DESC, 10, 20, 30, 0xA, 0xB, 0xC, 0xD)
 	var ok := Assertions.assert_equal(r, WORLD, "returns world obj")
 	ok = Assertions.assert_equal(sim.last_05116_slot_index, 1, "used free slot1") and ok
@@ -1223,12 +1490,11 @@ func _test_fun_00005116_pool_scan() -> bool:
 		int(sim.mem_u32.get(sim.spawn_04808_buf_ptr + 0x20 + 0x1C, -1)), 0x200, "poly1 +1c"
 	) and ok
 	## far desc x → 03b98 defer → +0x44 cleared → 05116 fails
-
-
 	sim.mem_u32[TABLE + 0x18 + 0x14] = 0
 	sim.mem_u32[DESC + 2] = 0x30000
 	sim.dat_0001d838 = 0
 	sim.spawn_05116_world_field_44 = 1
+	sim.spawn_046da_02bd8_nodes = []  # keep far-axis fixture free of slot-chain translate
 	r = sim._call_fun_00005116(DESC, 1, 2, 3, 0, 0, 0, 0)
 	ok = Assertions.assert_equal(r, 0, "defer → 05116 fail") and ok
 	ok = Assertions.assert_true(sim.last_046da_deferred, "deferred flag") and ok
@@ -1290,8 +1556,18 @@ func _test_fun_00016a3a_via_046da() -> bool:
 	sim.spawn_1b524_factory_imm = 0
 	sim.spawn_1b524_type_key = -1
 	sim.spawn_046da_03b98_axes_override = [0, 0, 0]
+	sim.mem_u32[WORLD + 0x18] = 0x10
+	sim.mem_u32[WORLD + 0x1C] = 0x20
+	sim.mem_u32[WORLD + 0x20] = 0x30
+	## Override nodes (slot +2/+4/+6 also carry factory aux; keep those for h+20 asserts).
+	sim.spawn_046da_02bd8_nodes = [{"dx": 0x100, "dy": 0, "dz": 0x5}]
 	sim._call_fun_000046da(DESC, 1, 0)
 	var ok := Assertions.assert_true(bool(sim.last_16a3a_factory.get("ok", false)), "16a3a ok")
+	ok = Assertions.assert_true(bool(sim.last_046da_02bd8_commit.get("commit", false)), "046da 02bd8") and ok
+	ok = Assertions.assert_equal(int(sim.last_046da_02bd8_walk.get("steps", -1)), 1, "02bd8 walk") and ok
+	ok = Assertions.assert_equal(int(sim.last_046da_02bd8_walk.get("x", -1)), 0x110, "walk x") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(WORLD + 0x18, -1)), 0x110, "mem +18") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(WORLD + 0x20, -1)), 0x35, "mem +20") and ok
 	ok = Assertions.assert_equal(
 		str(sim.last_1b524_factory_resolve.get("type_key_info", {}).get("source", "")),
 		"desc[1]",
@@ -1306,13 +1582,33 @@ func _test_fun_00016a3a_via_046da() -> bool:
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(WORLD + 4, -1)) & 0x12000, 0x12000, "|=0x12000") and ok
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(WORLD + 0x34, -1)), 0, "+34 clr") and ok
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(h + 0x20, -1)), 0x22, "aux+20") and ok
+	## Mem-chain path: clear override; zero angles; slot0 deltas only.
+	sim.spawn_046da_02bd8_nodes = null
+	sim.mem_u32[TABLE + 2] = 0
+	sim.mem_u32[TABLE + 4] = 0
+	sim.mem_u32[TABLE + 6] = 0
+	sim.mem_u32[TABLE + 8] = 0x40
+	sim.mem_u32[TABLE + 0x0C] = 0
+	sim.mem_u32[TABLE + 0x10] = 0
+	sim.mem_u32[WORLD + 0x18] = 0x10
+	sim.mem_u32[WORLD + 0x1C] = 0
+	sim.mem_u32[WORLD + 0x20] = 0
+	sim.mem_u32[WORLD + 4] = 1
+	sim._call_fun_000046da(DESC, 1, 0)
+	ok = Assertions.assert_equal(int(sim.last_046da_02bd8_walk.get("steps", -1)), 1, "chain steps") and ok
+	ok = Assertions.assert_equal(int(sim.mem_u32.get(WORLD + 0x18, -1)), 0x50, "chain +18") and ok
 	## Fallback imm still works when tpl+6 empty
+	sim.mem_u32[TABLE + 2] = 0x22
+	sim.mem_u32[TABLE + 4] = 0x33
+	sim.mem_u32[TABLE + 6] = 0x44
 	sim.mem_u32[tpl + 6] = 0
 	sim.spawn_1b524_factory_imm = 0x16A1A
 	sim.mem_u32[WORLD + 4] = 1
+	sim.spawn_046da_02bd8_nodes = []
 	sim._call_fun_000046da(DESC, 1, 0)
 	ok = Assertions.assert_equal(str(sim.last_1b524_factory_resolve.get("source", "")), "fallback", "fb") and ok
 	ok = Assertions.assert_true(bool(sim.last_16a3a_factory.get("ok", false)), "fb ok") and ok
+	ok = Assertions.assert_true(bool(sim.last_046da_02bd8_commit.get("commit", false)), "fb 02bd8") and ok
 	return ok
 
 ## [RECONSTRUCTED] 046da → FUN_000115b0 via *(1b524[type]+6)=#0x11590 (+0x20).
@@ -1417,7 +1713,7 @@ func _test_fun_00004e6e_kind3() -> bool:
 	ok = Assertions.assert_true(bool(one.get("distance_gate", {}).get("need_04e6e", false)), "near") and ok
 	ok = Assertions.assert_true(one.has("nested_04e6e"), "nested 04e6e") and ok
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(CHILD + 0x10, -1)), int(one.get("03b98", {}).get("field_10", -2)), "+10") and ok
-	## Phase open: 0435a writes +0xc from scale_src before the distance gate.
+	## Phase open: 0435a writes +0xc from *(template+0xe) before the distance gate.
 	sim = SimCoreScript.new(0x4E6E)
 	sim.dat_0001b5a0 = B5A0
 	sim.mem_u32[B5A0 + 0x8C] = DESC
@@ -1429,9 +1725,10 @@ func _test_fun_00004e6e_kind3() -> bool:
 	sim.mem_u32[EMBED + 0x1A + 0x14] = CD0 - DESC
 	sim.mem_u32[CD0] = 2
 	sim.mem_u32[CD0 + 1] = 1
+	sim.mem_u32[CD0 + 0x0E] = 0x2000  # *(template+0xe)
 	sim.spawn_046da_child_objs = [CHILD]
 	sim.mission_phase_a8 = 2
-	sim.spawn_0435a_scale_src = 0x2000
+	sim.spawn_0435a_scale_src = 0xDEAD  # must not be used when mem resolves
 	sim.mem_u32[CHILD + 0x0C] = 0
 	sim.mem_u32[CHILD + 7] = 0
 	r = sim._call_fun_00004e6e(OBJ)
@@ -1440,6 +1737,12 @@ func _test_fun_00004e6e_kind3() -> bool:
 	var one_b: Dictionary = sim.last_046da_kind3_calls[0] if sim.last_046da_kind3_calls.size() > 0 else {}
 	ok = Assertions.assert_equal(int(one_b.get("0435a", {}).get("param_2", -1)), 1, "046da p2") and ok
 	ok = Assertions.assert_true(bool(one_b.get("0435a", {}).get("gate", {}).get("enter", false)), "0435a enter") and ok
+	ok = Assertions.assert_equal(
+		str(one_b.get("0435a", {}).get("scale_src", {}).get("source", "")), "mem_0e", "tpl+0xe"
+	) and ok
+	ok = Assertions.assert_equal(
+		int(one_b.get("0435a", {}).get("scale_src", {}).get("template_ptr", -1)), CD0, "tpl=CD0"
+	) and ok
 	return ok
 
 
@@ -1460,7 +1763,6 @@ func _test_fun_000016e2_calls_00054() -> bool:
 	const OBJ2 := 0xEB00
 	const OBJ3 := 0xED00
 	const OBJ4 := 0xEF00
-	const BDA8_VAL := 0xBDA80048
 	sim.dat_0001b5a0 = B5A0
 	sim.mem_u32[B5A0 + 0x8C] = DESC
 	sim.mem_u32[B5A0 + 0x90] = 0  # → bdac = child[2] + 04e6e
@@ -1487,7 +1789,6 @@ func _test_fun_000016e2_calls_00054() -> bool:
 	sim.mem_u32[EMBED + 0x1A + 0x48 + 0x14] = CD3 - DESC
 	sim.mem_u32[EMBED + 0x1A + 0x60 + 0] = 0xE0
 	sim.mem_u32[EMBED + 0x1A + 0x60 + 0x14] = CD4 - DESC
-	sim.mem_u32[OBJ2 + 0x48] = BDA8_VAL
 	## 01c04 on bda4=OBJ4: counts via 045ba; 04e6e kind2 allocs +44/+4c (mock fixtures)
 	const SRC44 := 0xF100
 	const DST4C := 0xF200
@@ -1518,7 +1819,11 @@ func _test_fun_000016e2_calls_00054() -> bool:
 	ok = Assertions.assert_equal(sim.dat_0001bdb4, OBJ0, "bdb4") and ok
 	ok = Assertions.assert_equal(sim.dat_0001bdb0, OBJ1, "bdb0") and ok
 	ok = Assertions.assert_equal(sim.dat_0001bdac, OBJ2, "bdac") and ok
-	ok = Assertions.assert_equal(sim.dat_0001bda8, BDA8_VAL, "bda8") and ok
+	## bda8 ← *(bdac+0x48) after kind2 04808 buffer install
+	ok = Assertions.assert_equal(
+		sim.dat_0001bda8, int(sim.mem_u32.get(OBJ2 + 0x48, -1)), "bda8=+48"
+	) and ok
+	ok = Assertions.assert_true(sim.dat_0001bda8 != 0, "bda8 nonzero") and ok
 	ok = Assertions.assert_equal(sim.dat_0001bda4, OBJ4, "bda4") and ok
 	ok = Assertions.assert_equal(sim.dat_0001b734, 0, "b734 clr") and ok
 	ok = Assertions.assert_equal(sim.dat_0001bc28, OBJ1, "bc28") and ok
@@ -1540,6 +1845,10 @@ func _test_fun_000016e2_calls_00054() -> bool:
 	ok = Assertions.assert_equal(sim.last_04e6e_calls.size(), 2, "04e6e×2") and ok
 	ok = Assertions.assert_equal(int(sim.last_04e6e_calls[0].get("kind", -1)), 2, "04e6e k2") and ok
 	ok = Assertions.assert_true(bool(sim.last_04e6e_calls[0].get("ok", false)), "04e6e0 ok") and ok
+	ok = Assertions.assert_true(
+		not bool(sim.last_04e6e_calls[0].get("deferred_followup", true)), "04808 followup"
+	) and ok
+	ok = Assertions.assert_true(sim.last_04e6e_calls[0].has("followup"), "followup dict") and ok
 	ok = Assertions.assert_equal(sim.dat_0001b5a4_world.size(), 2, "b5a4×2") and ok
 	ok = Assertions.assert_equal(sim.dat_0001b734, 0, "b734 cleared after") and ok
 	ok = Assertions.assert_equal(int(sim.mem_u32.get(OBJ4 + 0x44, -1)), SRC44, "o4+44") and ok

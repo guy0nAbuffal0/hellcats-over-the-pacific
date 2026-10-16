@@ -1878,18 +1878,382 @@ static func apply_04808_poly_loop(polys: Array, field_3a: int) -> Dictionary:
 	}
 
 
-## [RECONSTRUCTED] FUN_00004e6e post-04808 → 02bd8 flag gate (Capstone @0x4F4A/4F88/4FEE).
-## need_02bd8 iff bit4 clear on obj+5, +6, and +7. Else alternate 01c5c / 0435a paths.
-static func apply_04e6e_02bd8_gate(byte_05: int, byte_06: int, byte_07: int) -> Dictionary:
+## [RECONSTRUCTED] FUN_00004e6e → 15762 angle args (5669–5682).
+## If handle==0 or type_key=**(s16**)(handle+4) outside [0x15,0x19] → all zeros;
+## else shorts from handle+0x34/+0x36/+0x38/+0x40 → 15762(param_2..5).
+static func apply_04e6e_15762_args(
+	handle_ptr: int,
+	type_key_s16: int,
+	handle_34: int,
+	handle_36: int,
+	handle_38: int,
+	handle_40: int
+) -> Dictionary:
+	var key: int = _to_s16(type_key_s16)
+	var zeroed: bool = handle_ptr == 0 or key < 0x15 or key > 0x19
+	if zeroed:
+		return {
+			"ok": true,
+			"zeroed": true,
+			"type_key": key,
+			"param_2": 0,
+			"param_3": 0,
+			"param_4": 0,
+			"param_5": 0,
+		}
+	return {
+		"ok": true,
+		"zeroed": false,
+		"type_key": key,
+		"param_2": _to_s16(handle_34),
+		"param_3": _to_s16(handle_36),
+		"param_4": _to_s16(handle_38),
+		"param_5": _to_s16(handle_40),
+	}
+
+
+## [RECONSTRUCTED] FUN_00015762 entry plan (19920–19928) + 02976 (19927).
+## tpl stream count = *(s16*)(tpl+0x1a)+*(s16*)(tpl+0x1e); 0253e(p2,p3,p4);
+## then 02976(count, tpl+0x22, local_1e94, matrix). Nested 02bd8 is both-aux
+## (19928): apply_02bd8_both_aux_walk — wired by SimCore after this plan.
+## src_vecs12_xyz: flat s16 triples from 0xC records at +2/+6/+10 (length ≥ 3*count).
+static func apply_15762_entry_plan(
+	tpl: int,
+	s16_1a: int,
+	s16_1e: int,
+	param_2: int,
+	param_3: int,
+	param_4: int,
+	param_5: int,
+	src_vecs12_xyz: Array = []
+) -> Dictionary:
+	var n: int = _to_s16(s16_1a) + _to_s16(s16_1e)
+	var stream: int = (tpl + 0x22 + n * 0xC) & 0xFFFFFFFF if tpl != 0 else 0
+	var mat: Array = fun_0000253e(param_2, param_3, param_4)
+	var xform: Dictionary = {}
+	var applied_02976: bool = false
+	if n > 0 and src_vecs12_xyz.size() >= n * 3:
+		xform = fun_00002976(n, src_vecs12_xyz, mat)
+		applied_02976 = true
+	return {
+		"ok": tpl != 0,
+		"tpl": tpl & 0xFFFFFFFF,
+		"count_1a_1e": n,
+		"poly_stream": stream,
+		"param_5": _to_s16(param_5),
+		"matrix9": mat,
+		"applied_0253e": true,
+		"applied_02976": applied_02976,
+		"local_1e94": xform.get("xyz", []),
+		"applied_02bd8": false,
+		"deferred_02bd8": true,
+	}
+
+
+## [RECONSTRUCTED] FUN_00015762 local_3324 relative copy (19929–19942).
+## For i in 0..count_1e-1: local_3324[i] = local_1e94[i+count_1a] - local_1e94[0].
+static func apply_15762_local_3324_rel(
+	local_1e94: Array, count_1a: int, count_1e: int
+) -> Dictionary:
+	var n1a: int = _to_s16(count_1a)
+	var n1e: int = _to_s16(count_1e)
+	var out: Array = []
+	if n1e <= 0:
+		return {"ok": true, "count_1e": n1e, "xyz": out, "applied": false}
+	var ox: int = int(local_1e94[0]) if local_1e94.size() > 0 else 0
+	var oy: int = int(local_1e94[1]) if local_1e94.size() > 1 else 0
+	var oz: int = int(local_1e94[2]) if local_1e94.size() > 2 else 0
+	for i in range(n1e):
+		var src: int = (i + n1a) * 3
+		var x: int = int(local_1e94[src]) if src < local_1e94.size() else 0
+		var y: int = int(local_1e94[src + 1]) if src + 1 < local_1e94.size() else 0
+		var z: int = int(local_1e94[src + 2]) if src + 2 < local_1e94.size() else 0
+		out.append(_to_s32(x - ox))
+		out.append(_to_s32(y - oy))
+		out.append(_to_s32(z - oz))
+	return {"ok": true, "count_1e": n1e, "xyz": out, "applied": true}
+
+
+## [RECONSTRUCTED] FUN_00015762 bias first count_1a verts (19944–19958).
+## BE low-16 of each int32: x -= (field_18<<sh); y -= (param_5<<sh); z -= (field_20<<sh).
+## sh = field_34 & 0x3f. Mutates a duplicate of local_1e94.
+static func apply_15762_bias_1a_low16(
+	local_1e94: Array,
+	count_1a: int,
+	field_18: int,
+	field_20: int,
+	param_5: int,
+	field_34: int
+) -> Dictionary:
+	var n1a: int = _to_s16(count_1a)
+	var sh: int = _to_s16(field_34) & 0x3F
+	## C: (short)(field<<sh) — low 16 of shifted int32.
+	var dx: int = _to_s16(((field_18 << sh) & 0xFFFFFFFF) & 0xFFFF)
+	var dy: int = _to_s16(((_to_s16(param_5) << sh) & 0xFFFFFFFF) & 0xFFFF)
+	var dz: int = _to_s16(((field_20 << sh) & 0xFFFFFFFF) & 0xFFFF)
+	var out: Array = local_1e94.duplicate()
+	if n1a <= 0:
+		return {
+			"ok": true,
+			"count_1a": n1a,
+			"xyz": out,
+			"applied": false,
+			"shift": sh,
+			"dx": dx,
+			"dy": dy,
+			"dz": dz,
+		}
+	for i in range(n1a):
+		var base: int = i * 3
+		if base + 2 >= out.size():
+			break
+		out[base] = _be_int_sub_low16(int(out[base]), dx)
+		out[base + 1] = _be_int_sub_low16(int(out[base + 1]), dy)
+		out[base + 2] = _be_int_sub_low16(int(out[base + 2]), dz)
+	return {
+		"ok": true,
+		"count_1a": n1a,
+		"xyz": out,
+		"applied": true,
+		"shift": sh,
+		"dx": dx,
+		"dy": dy,
+		"dz": dz,
+	}
+
+
+## BE int32: subtract delta from the low 16-bit half (short at +2), keep high half.
+static func _be_int_sub_low16(value: int, delta_s16: int) -> int:
+	var v: int = value & 0xFFFFFFFF
+	var lo: int = _to_s16(v & 0xFFFF) - _to_s16(delta_s16)
+	return _to_s32((v & 0xFFFF0000) | (lo & 0xFFFF))
+
+
+## [RECONSTRUCTED] FUN_00004e6e → 04958 call-site args (5686).
+## Fixed immediates: param_2=0xb4e1, param_3=0, param_4=0x7fe4.
+static func apply_04e6e_04958_args() -> Dictionary:
+	return {
+		"ok": true,
+		"param_2": 0xB4E1,
+		"param_3": 0,
+		"param_4": 0x7FE4,
+	}
+
+
+## [RECONSTRUCTED] FUN_00004958 entry local_1be4 rel (5378–5392).
+## Same shape as 15762 local_3324: for i in 0..field_3a-1,
+## local_1be4[i] = verts[i+field_36] - verts[0] (int32×3 at obj+0x44).
+static func apply_04958_entry_rel(
+	verts_xyz: Array, field_36: int, field_3a: int
+) -> Dictionary:
+	var rel: Dictionary = apply_15762_local_3324_rel(verts_xyz, field_36, field_3a)
+	return {
+		"ok": true,
+		"local_1be4": rel.get("xyz", []),
+		"count_3a": _to_s16(field_3a),
+		"base_36": _to_s16(field_36),
+		"applied": bool(rel.get("applied", false)),
+	}
+
+
+## [RECONSTRUCTED] FUN_00004958 poly_stream tip (5394–5395).
+## stream = tpl+0x22 + (*(s16*)(tpl+0x1a)+*(s16*)(tpl+0x1e))*0xC
+## (decomp: (uint*)(tpl+0x22) + 1a*3 + 1e*3 → same byte offset).
+static func apply_04958_poly_stream(tpl: int, s16_1a: int, s16_1e: int) -> Dictionary:
+	var n: int = _to_s16(s16_1a) + _to_s16(s16_1e)
+	var stream: int = (tpl + 0x22 + n * 0xC) & 0xFFFFFFFF if tpl != 0 else 0
+	return {"ok": tpl != 0, "tpl": tpl & 0xFFFFFFFF, "count_1a_1e": n, "poly_stream": stream}
+
+
+## [RECONSTRUCTED] FUN_00004916 (5319–5337).
+## For i in 0..field_3a-1: *(poly+4)=*(s16*)(table+param_2*2); *(u8*)(poly+0xf)=0xff; poly+=0x20.
+static func apply_fun_00004916(
+	field_3a: int, table_word_at_param2: int, param_2: int = 0x80
+) -> Dictionary:
+	var n: int = _to_s16(field_3a)
+	var word: int = _to_s16(table_word_at_param2)
+	var slots: Array = []
+	for _i in range(maxi(n, 0)):
+		slots.append({"field_4": word, "field_0f": 0xFF})
+	return {
+		"ok": true,
+		"count": maxi(n, 0),
+		"param_2_index": param_2,
+		"slots": slots,
+		"applied": n > 0,
+	}
+
+
+## [RECONSTRUCTED] FUN_00003c68 (Capstone @0x3C68–0x3CC0).
+## Six stack longs: (x0,y0,z0,x1,y1,z1) → abs-delta metric
+##   a=|x1-x0|, b=|y1-y0|, c=|z1-z0|; return max + ((sum of other two)>>2).
+## Abs via LEA $2DE8 (false entry) ≡ FUN_00002e08. Twin of 03c00 but pairwise.
+static func fun_00003c68(
+	x0: int, y0: int, z0: int, x1: int, y1: int, z1: int
+) -> int:
+	var a: int = fun_00002e08(_to_s32(x1) - _to_s32(x0))
+	var b: int = fun_00002e08(_to_s32(y1) - _to_s32(y0))
+	var c: int = fun_00002e08(_to_s32(z1) - _to_s32(z0))
+	return int(apply_fun_00003b98(a, b, c).get("metric", 0))
+
+
+## [RECONSTRUCTED] FUN_00004958 project one xz pair (5410–5415).
+## out_x = (vert_x - DAT_0001d724) >> (param_3 & 0x3f)
+## out_z = (vert_z - DAT_0001d71c) >> (param_3 & 0x3f)  — uses components 0 and 2.
+static func apply_04958_project_xz(
+	vert_x: int, vert_z: int, dat_724: int, dat_71c: int, param_3: int
+) -> Dictionary:
+	var sh: int = param_3 & 0x3F
+	return {
+		"x": _to_s32((vert_x - dat_724) >> sh),
+		"z": _to_s32((vert_z - dat_71c) >> sh),
+		"shift": sh,
+	}
+
+
+## [RECONSTRUCTED] FUN_00004958 poly stream header (5405 / 5493; matches 04808 desc).
+## count = *(u8*)(stream+8); indices = s16[count] at stream+0xe; next = stream+0xe+count*2.
+static func apply_04958_poly_stream_header(stream: int, index_count: int) -> Dictionary:
+	var n: int = index_count & 0xFF
+	return {
+		"stream": stream & 0xFFFFFFFF,
+		"index_count": n,
+		"indices_off": 0x0E,
+		"next_stream": (stream + 0x0E + n * 2) & 0xFFFFFFFF,
+	}
+
+
+## [RECONSTRUCTED] FUN_00004958 poly index walk + 03c68 thinning (5402–5462; Capstone @0x4AAE).
+## First index always emitted. Later: edge=03c68(prev,cur); acc+=edge;
+## cam=03c68(cam_xz,cur); accept if cam/(phase_a8+3) <= acc (then acc←0).
+## y components pushed as 0 at call site. pair_count<3 → cull.
+static func apply_04958_poly_pairs(
+	au_stack_15e4: Array,
+	index_words: Array,
+	dat_724: int,
+	dat_71c: int,
+	param_3: int,
+	cam_x: int = 0,
+	cam_z: int = 0,
+	phase_a8: int = 0
+) -> Dictionary:
+	var n: int = index_words.size()
+	var pairs: Array = []
+	var accepted: Array = []
+	var acc: int = 0
+	var prev_x: int = 0
+	var prev_z: int = 0
+	var denom: int = _to_s16(phase_a8) + 3
+	if denom == 0:
+		denom = 1
+	for i in range(n):
+		var idx: int = _to_s16(int(index_words[i]))
+		var base: int = idx * 3
+		var vx: int = int(au_stack_15e4[base]) if base < au_stack_15e4.size() else 0
+		var vz: int = int(au_stack_15e4[base + 2]) if base + 2 < au_stack_15e4.size() else 0
+		var take: bool = i == 0
+		var edge: int = 0
+		var cam_m: int = 0
+		if not take:
+			edge = fun_00003c68(prev_x, 0, prev_z, vx, 0, vz)
+			acc = acc + edge
+			cam_m = fun_00003c68(cam_x, 0, cam_z, vx, 0, vz)
+			## Capstone: if cam_m / (a8+3) <= acc → accept
+			take = _div_trunc(cam_m, denom) <= acc
+		if take:
+			acc = 0
+			prev_x = vx
+			prev_z = vz
+			var proj: Dictionary = apply_04958_project_xz(vx, vz, dat_724, dat_71c, param_3)
+			pairs.append({"x": int(proj.get("x", 0)), "z": int(proj.get("z", 0))})
+			accepted.append({
+				"index": idx,
+				"edge": edge,
+				"cam_metric": cam_m,
+				"vert_x": vx,
+				"vert_z": vz,
+			})
+	var pair_count: int = pairs.size()
+	var cull: bool = pair_count < 3
+	return {
+		"ok": true,
+		"deferred_03c68": false,
+		"pair_count": pair_count,
+		"pairs": pairs,
+		"accepted": accepted,
+		"cull": cull,
+		"flag_or_13": 2 if cull else 0,
+		"index_count": n,
+		"denom": denom,
+	}
+
+
+## Alias kept for older unit tests — delegates to apply_04958_poly_pairs.
+static func apply_04958_poly_pairs_simple(
+	au_stack_15e4: Array,
+	index_words: Array,
+	dat_724: int,
+	dat_71c: int,
+	param_3: int
+) -> Dictionary:
+	return apply_04958_poly_pairs(
+		au_stack_15e4, index_words, dat_724, dat_71c, param_3, 0, 0, 0
+	)
+
+
+## [RECONSTRUCTED] FUN_00004e6e post-04958 follow-up (5687–5693).
+## If *(s16*)(b5a0+0xe)==1 → 04916(obj,0x80); else 03ea0.
+static func apply_04e6e_post_04958_followup(b5a0_field_0e: int) -> Dictionary:
+	var v: int = _to_s16(b5a0_field_0e)
+	var need_04916: bool = v == 1
+	return {
+		"b5a0_0e": v,
+		"need_04916": need_04916,
+		"need_03ea0": not need_04916,
+		"path": "04916" if need_04916 else "03ea0",
+	}
+
+
+## [RECONSTRUCTED] FUN_00004e6e post-04808 path select (5653–5693).
+## Priority: +6 bit4 → 04958; else +7 bit4 → 15762; else +5 bit4 → 01c5c; else 02bd8.
+## 02bd8 and 01c5c paths both end at 0435a/03da8 then 03ea0 (LAB_00005056).
+static func apply_04e6e_post_04808_path(byte_05: int, byte_06: int, byte_07: int) -> Dictionary:
 	var b5: int = byte_05 & 0xFF
 	var b6: int = byte_06 & 0xFF
 	var b7: int = byte_07 & 0xFF
-	var need: bool = (b5 & 0x10) == 0 and (b6 & 0x10) == 0 and (b7 & 0x10) == 0
+	var bit4_05: bool = (b5 & 0x10) != 0
+	var bit4_06: bool = (b6 & 0x10) != 0
+	var bit4_07: bool = (b7 & 0x10) != 0
+	var path: String = "02bd8"
+	if bit4_06:
+		path = "04958"
+	elif bit4_07:
+		path = "15762"
+	elif bit4_05:
+		path = "01c5c"
 	return {
-		"need_02bd8": need,
-		"bit4_05": (b5 & 0x10) != 0,
-		"bit4_06": (b6 & 0x10) != 0,
-		"bit4_07": (b7 & 0x10) != 0,
+		"path": path,
+		"need_02bd8": path == "02bd8",
+		"need_01c5c": path == "01c5c",
+		"need_15762": path == "15762",
+		"need_04958": path == "04958",
+		"need_03ea0": path == "02bd8" or path == "01c5c",
+		"bit4_05": bit4_05,
+		"bit4_06": bit4_06,
+		"bit4_07": bit4_07,
+	}
+
+
+## [RECONSTRUCTED] FUN_00004e6e post-04808 → 02bd8 flag gate (Capstone @0x4F4A/4F88/4FEE).
+## need_02bd8 iff bit4 clear on obj+5, +6, and +7. Else alternate 01c5c / 0435a paths.
+static func apply_04e6e_02bd8_gate(byte_05: int, byte_06: int, byte_07: int) -> Dictionary:
+	var p: Dictionary = apply_04e6e_post_04808_path(byte_05, byte_06, byte_07)
+	return {
+		"need_02bd8": bool(p.get("need_02bd8", false)),
+		"bit4_05": bool(p.get("bit4_05", false)),
+		"bit4_06": bool(p.get("bit4_06", false)),
+		"bit4_07": bool(p.get("bit4_07", false)),
+		"path": str(p.get("path", "")),
 	}
 
 
@@ -1935,6 +2299,25 @@ static func apply_044a4_type5_flags(
 		"applied": true,
 		"flags_04": out & 0xFFFFFFFF,
 		"set_bit40": set_bit,
+	}
+
+
+## [RECONSTRUCTED] FUN_0000435a template base iVar5 (5020–5022).
+## tpl = *(b5a0+0x8c) + *( *(obj+0x24)+0x28 + 0x2e + (obj+1)*0x18 ).
+static func apply_0435a_template_addr(
+	b5a0_8c: int,
+	parent_embed: int,
+	obj_byte_01: int,
+	raw_off: int
+) -> Dictionary:
+	var idx: int = obj_byte_01 & 0xFF
+	var slot: int = parent_embed + 0x2E + idx * 0x18
+	var ok: bool = b5a0_8c != 0 and parent_embed != 0
+	return {
+		"ok": ok,
+		"slot_addr": slot & 0xFFFFFFFF,
+		"index": idx,
+		"template_ptr": (b5a0_8c + raw_off) & 0xFFFFFFFF if ok else 0,
 	}
 
 
@@ -2005,8 +2388,41 @@ static func apply_0435a_poly_1c_value(src_0a: int, scale_factor: int, is_player:
 	return (src_0a * scale_factor) & 0xFFFFFFFF
 
 
+## [RECONSTRUCTED] FUN_00004e6e → 04808 desc stream (5644–5647).
+## desc = tpl + 0x22 + (*(s16*)(obj+0x36)+*(s16*)(obj+0x3a))*0xC.
+static func apply_04e6e_04808_desc_addr(tpl: int, field_36: int, field_3a: int) -> Dictionary:
+	var n: int = _to_s16(field_36) + _to_s16(field_3a)
+	var off: int = 0x22 + n * 0xC
+	return {
+		"ok": tpl != 0,
+		"count_36_3a": n,
+		"offset": off & 0xFFFFFFFF,
+		"desc_ptr": (tpl + off) & 0xFFFFFFFF,
+	}
+
+
+## [RECONSTRUCTED] FUN_0000435a poly stream base (5049).
+## stream = tpl + 0x22 + *(s16*)(tpl+0x1a)*0xC + *(s16*)(tpl+0x1e)*0xC.
+static func apply_0435a_poly_stream_base(tpl: int, s16_1a: int, s16_1e: int) -> Dictionary:
+	var a: int = _to_s16(s16_1a)
+	var e: int = _to_s16(s16_1e)
+	var off: int = 0x22 + a * 0xC + e * 0xC
+	return {
+		"ok": tpl != 0,
+		"offset": off & 0xFFFFFFFF,
+		"stream_base": (tpl + off) & 0xFFFFFFFF,
+		"s16_1a": a,
+		"s16_1e": e,
+	}
+
+
+## [RECONSTRUCTED] FUN_0000435a stream step (5069): +0xE + *(u8*)(rec+8)*2.
+static func apply_0435a_poly_stream_advance(stream: int, byte_08: int) -> int:
+	return (stream + 0x0E + (byte_08 & 0xFF) * 2) & 0xFFFFFFFF
+
+
 ## [RECONSTRUCTED] FUN_0000435a kind2 param_2==0 poly +0x1c loop (5048–5071).
-## srcs: per-poly *(stream+10). Writes stride 0x20 at buf+0x1c. Stream +0x0E+count*2 deferred to caller.
+## srcs: per-poly *(stream+10). Writes stride 0x20 at buf+0x1c.
 static func apply_0435a_poly_1c_loop(
 	srcs: Array,
 	field_3a: int,
@@ -2224,8 +2640,7 @@ static func apply_02bd8_both_aux_walk(
 
 
 ## [RECONSTRUCTED] FUN_00002bd8 one template node, null-OR-aux path (3355–3360).
-## !rotate: 01c5c(1, local, local, +8/+c/+10).
-## rotate: 0253e(s2,s4,s6)→matrix (or fixture matrix9) then 02ada count=1.
+## Optional rotate (0253e→02ada), then always 01c5c(1, local, deltas) — decomp order.
 static func apply_02bd8_null_aux_node(
 	local_x: int,
 	local_y: int,
@@ -2239,34 +2654,51 @@ static func apply_02bd8_null_aux_node(
 	matrix9: Array = []
 ) -> Dictionary:
 	var need_rot: bool = apply_02bd8_node_need_rotate(s2, s4, s6)
+	var x: int = local_x
+	var y: int = local_y
+	var z: int = local_z
+	var built_0253e: bool = false
+	var rot: Dictionary = {}
+	var mat: Array = []
 	if need_rot:
-		var built_0253e: bool = false
-		var mat: Array = matrix9
+		mat = matrix9
 		if mat.is_empty():
 			mat = fun_0000253e(s2, s4, s6)
 			built_0253e = true
-		var rot: Dictionary = fun_00002ada(1, [local_x, local_y, local_z], mat)
-		var rxyz: Array = rot.get("xyz", [local_x, local_y, local_z])
-		return {
-			"ok": true,
-			"need_rotate": true,
-			"applied_02ada": true,
-			"applied_0253e": built_0253e,
-			"matrix9": mat,
-			"x": int(rxyz[0]) if rxyz.size() > 0 else 0,
-			"y": int(rxyz[1]) if rxyz.size() > 1 else 0,
-			"z": int(rxyz[2]) if rxyz.size() > 2 else 0,
-			"02ada": rot,
-		}
-	var added: Dictionary = apply_fun_00001c5c(1, [local_x, local_y, local_z], dx, dy, dz)
-	var xyz: Array = added.get("xyz", [local_x, local_y, local_z])
+		rot = fun_00002ada(1, [x, y, z], mat)
+		var rxyz: Array = rot.get("xyz", [x, y, z])
+		x = int(rxyz[0]) if rxyz.size() > 0 else 0
+		y = int(rxyz[1]) if rxyz.size() > 1 else 0
+		z = int(rxyz[2]) if rxyz.size() > 2 else 0
+	var added: Dictionary = apply_fun_00001c5c(1, [x, y, z], dx, dy, dz)
+	var xyz: Array = added.get("xyz", [x, y, z])
 	return {
 		"ok": true,
-		"need_rotate": false,
+		"need_rotate": need_rot,
+		"applied_02ada": need_rot,
+		"applied_0253e": built_0253e,
+		"applied_01c5c": true,
+		"matrix9": mat,
 		"x": int(xyz[0]) if xyz.size() > 0 else 0,
 		"y": int(xyz[1]) if xyz.size() > 1 else 0,
 		"z": int(xyz[2]) if xyz.size() > 2 else 0,
+		"02ada": rot,
 		"01c5c": added,
+	}
+
+
+## [RECONSTRUCTED] One 02bd8 chain level's slot fields (3345–3360).
+## slot = *(parent+0x30) + index*0x18; angles at +2/+4/+6; deltas at +8/+0xc/+0x10.
+static func apply_02bd8_chain_slot_node(
+	s2: int, s4: int, s6: int, dx: int, dy: int, dz: int
+) -> Dictionary:
+	return {
+		"s2": _to_s16(s2),
+		"s4": _to_s16(s4),
+		"s6": _to_s16(s6),
+		"dx": dx,
+		"dy": dy,
+		"dz": dz,
 	}
 
 
@@ -3381,6 +3813,37 @@ static func fun_00002ada(count: int, src_xyz: Array, matrix9: Array) -> Dictiona
 		out.append(((x * m0 + y * m3 + z * m6) >> 12) & 0xFFFFFFFF)
 		out.append(((x * m1 + y * m4 + z * m7) >> 12) & 0xFFFFFFFF)
 		out.append(((x * m2 + y * m5 + z * m8) >> 12) & 0xFFFFFFFF)
+	return {"count": n, "xyz": out}
+
+
+## [RECONSTRUCTED] FUN_00002976 (3144–3170; Capstone @0x2976).
+## count×: read s16 at src +2/+6/+10 (0xC stride), write int32×3 outs.
+## Same dots as 028dc (+0x800>>12) but MOVE.L destinations (not packed shorts).
+## src_xyz: flat [x0,y0,z0,…] already extracted from +2/+6/+10.
+static func fun_00002976(count: int, src_xyz: Array, matrix9: Array) -> Dictionary:
+	## Call sites pass small non-negative counts in the low word (DBF-style loop).
+	var n: int = count & 0xFFFF
+	var m: Array = matrix9.duplicate()
+	while m.size() < 9:
+		m.append(0)
+	var m0: int = _to_s16(int(m[0]))
+	var m1: int = _to_s16(int(m[1]))
+	var m2: int = _to_s16(int(m[2]))
+	var m3: int = _to_s16(int(m[3]))
+	var m4: int = _to_s16(int(m[4]))
+	var m5: int = _to_s16(int(m[5]))
+	var m6: int = _to_s16(int(m[6]))
+	var m7: int = _to_s16(int(m[7]))
+	var m8: int = _to_s16(int(m[8]))
+	var out: Array = []
+	for i in range(n):
+		var base: int = i * 3
+		var x: int = _to_s16(int(src_xyz[base]) if base < src_xyz.size() else 0)
+		var y: int = _to_s16(int(src_xyz[base + 1]) if base + 1 < src_xyz.size() else 0)
+		var z: int = _to_s16(int(src_xyz[base + 2]) if base + 2 < src_xyz.size() else 0)
+		out.append(_to_s32((z * m6 + y * m3 + x * m0 + 0x800) >> 12))
+		out.append(_to_s32((z * m7 + y * m4 + x * m1 + 0x800) >> 12))
+		out.append(_to_s32((z * m8 + y * m5 + x * m2 + 0x800) >> 12))
 	return {"count": n, "xyz": out}
 
 

@@ -8977,7 +8977,7 @@ LAB_00007ba8:
       }
       if ((*(char *)((int)DAT_0001b738 + 0x679) < '\x01') || (*(short *)(DAT_0001b5a0 + 0xa4) == 0))
       goto LAB_00007d52;
-      iVar5 = FUN_00019fba(DAT_0001b738);
+      iVar5 = try_begin_landing_approach( /* Original: FUN_00019fba */DAT_0001b738);
       if (iVar5 == 0) {
         _DAT_0001b83e = 1;
       }
@@ -9882,12 +9882,12 @@ void FUN_0000923e(void)
       if (iVar1 < 0) {
         iVar1 = iVar1 + 1;
       }
-      FUN_00010558((int)DAT_0001b738,DAT_0001b858,
+      enqueue_control_inputs_avg4( /* Original: FUN_00010558 */(int)DAT_0001b738,DAT_0001b858,
                    (*(short *)(DAT_0001b5a0 + 0x340) - DAT_00020b2c) * 3,(short)(iVar1 >> 1));
     }
     else {
       iVar1 = *DAT_0001b888;
-      FUN_00010b2e(DAT_0001b738,*(int *)(iVar1 + 0x18),*(int *)(iVar1 + 0x1c),*(int *)(iVar1 + 0x20)
+      steer_entity_toward_point( /* Original: FUN_00010b2e */DAT_0001b738,*(int *)(iVar1 + 0x18),*(int *)(iVar1 + 0x1c),*(int *)(iVar1 + 0x20)
                   );
     }
   }
@@ -15342,15 +15342,15 @@ void FUN_0000e5aa(int *param_1)
  * Confidence: [STRONG INFERENCE] overall role; blocks annotated incrementally
  *
  * Large per-entity flight/combat update. NOT called from run_simulation_tick /
- * dispatch_entity_tick — callers include FUN_00010ce8, FUN_00010f68,
- * FUN_000110f4, FUN_0001820a (see docs/PROJECT_STATUS.md).
+ * dispatch_entity_tick — callers include tick_ai_climb_then_waypoint,
+ * tick_ai_1b370_mission, FUN_000110f4, FUN_0001820a (see docs/PROJECT_STATUS.md).
  *
  * Contract: docs/contracts/flight_FUN_0000e792_contract.md
  * Layout: docs/STRUCTS.md (Entity offsets from this function)
  *
  * Reconstruction status:
  *   Block 0 — prologue + template field_40 + contact early-out [ANNOTATED iter 12]
- *   Block 1 — flags_685 RNG on movement_662/666 + status bit0 reset [ANNOTATED iter 13]
+ *   Block 1 — flags_685 RNG on control_662/666; ≡ enqueue avg channels [iter 13+94]
  *   Block 1b — movement_669 gate + status_1a0 accumulator [ANNOTATED iter 13]
  *   Block 2 — e42a/e468/e570 prep + local_34 + ownership 66e/672/66a [ANNOTATED iter 14]
  *   Block 3 — movement_626 step + reverse-flight clamps/local_48 [ANNOTATED iter 15]
@@ -16668,11 +16668,11 @@ LAB_0001007c:
     if ((sVar2 < 0x15) || (0x19 < sVar2)) {
       if (sVar2 < 5) {
         *(undefined4 *)(iVar1 + 0x32) = 0x110d4;
-        FUN_00010cd8(iVar1);
+        invert_ai_bias_67b_if_positive( /* Original: FUN_00010cd8 */iVar1);
       }
     }
     else {
-      FUN_00010cd8(iVar1);
+      invert_ai_bias_67b_if_positive( /* Original: FUN_00010cd8 */iVar1);
       *(undefined4 *)(iVar1 + 0x32) = 0x112c0;
       *(undefined1 *)(iVar1 + 0x675) = 0;
     }
@@ -16789,7 +16789,7 @@ LAB_000102c4:
             *(undefined4 *)(iVar1 + 0x32) = 0x111ba;
           }
 LAB_0001029c:
-          uVar4 = FUN_00010cd8(iVar1);
+          uVar4 = invert_ai_bias_67b_if_positive( /* Original: FUN_00010cd8 */iVar1);
           goto LAB_000102a8;
         }
       }
@@ -16853,10 +16853,26 @@ ushort atan2_fixed14(short param_1,short param_2) /* Original: FUN_000102d6 */
 
 
 
+/*
+ * Original: FUN_00010360
+ * Proposed name: build_relative_steer_sample
+ * Confidence: [STRONG INFERENCE]
+ *
+ * From entity + target world (x,y,z):
+ *   *param_5 ← altitude/range metric (obj+0x1c + p1[3]*0x2d − entity+0x2e);
+ *     if <4000, bump target Y and maybe FUN_00010cb2; return 1 else 0.
+ *   Scale Δ(x,y,z) vs obj +0x18/+0x1c/+0x20 into param_6 shorts at +2/+6/+10,
+ *   rotate into body frame (attitude matrix + transform_vecs12_by_matrix3),
+ *   attitude_from_velocity → fold → *param_7 / *param_8 (steer commands).
+ *
+ * Consumed by steer_entity_toward_point / apply_relative_heading_steer
+ * (atan2 uses param_6 +2/+6).
+ *
+ * Evidence: Capstone @0x10360+; sole BSR from 10b2e; AI also @0x182F4.
+ */
 undefined4
-FUN_00010360(int *param_1,int param_2,int param_3,int param_4,int *param_5,int param_6,
-            undefined2 *param_7,undefined2 *param_8)
-
+build_relative_steer_sample(int *param_1,int param_2,int param_3,int param_4,int *param_5,int param_6,
+            undefined2 *param_7,undefined2 *param_8) /* Original: FUN_00010360 */
 {
   int iVar1;
   int iVar2;
@@ -16877,7 +16893,7 @@ FUN_00010360(int *param_1,int param_2,int param_3,int param_4,int *param_5,int p
   if (iVar6 < 4000) {
     param_3 = (param_3 + 4000) - *param_5;
     if (*param_5 < 0x3e9) {
-      FUN_00010cb2(param_1);
+      max_ai_throttle_maybe_invert_679( /* Original: FUN_00010cb2 */param_1);
     }
     uVar9 = 1;
   }
@@ -16954,8 +16970,22 @@ LAB_00010464:
 
 
 
-void FUN_00010558(int param_1,short param_2,short param_3,short param_4)
-
+/*
+ * Original: FUN_00010558
+ * Proposed name: enqueue_control_inputs_avg4
+ * Confidence: [PROVEN] ring+average; [STRONG INFERENCE] “control inputs”
+ *
+ * When entity +0x685 bit0 clear: clamp (p4±0x140, p2±0x40, p3±0x200), push
+ * into 4-slot rings at +0x644 / +0x64c / +0x654 (index +0x642), maintain
+ * running sums +0x65c/+0x65e/+0x660, write means (sum>>2) to:
+ *   +0x666 ← avg(param_4)   +0x662 ← avg(param_3)   +0x664 ← avg(param_2)
+ *
+ * Those averages are consumed by update_aircraft_entity (e.g. flags_685
+ * path on 0x662/0x666). No-op if +0x685 bit0 set.
+ *
+ * Callers: apply_relative_heading_steer, FUN_00010b84, @0x92D6, @0x110B4.
+ */
+void enqueue_control_inputs_avg4(int param_1,short param_2,short param_3,short param_4) /* Original: FUN_00010558 */
 {
   int iVar1;
   short sVar2;
@@ -17206,8 +17236,28 @@ LAB_00010700:
 
 
 
-void FUN_000109ba(int param_1,int param_2,int param_3,short param_4,short param_5)
-
+/*
+ * Original: FUN_000109ba
+ * Proposed name: apply_relative_heading_steer
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Entity steering update from a relative sample:
+ *   param_1 — entity base
+ *   param_2 — range/metric (bands at 0, 0x1000, 0x5000)
+ *   param_3 — buffer; atan2 uses shorts at +2 and +6
+ *   param_4 / param_5 — stick/command samples stored to entity +0x61a/+0x61c
+ *
+ * Near-zero command path (|p4|,|p5|<0x501 and p2≥0): blend into prior
+ * 0x61a/0x61c and skip atan2. Else: atan2_fixed14 → fold_angle_pm_0x2000,
+ * optionally clamp/blend vs entity heading at +0x24 by range, smooth into
+ * +0x61e, derive cos-scaled lateral, then enqueue_control_inputs_avg4( /* Original: FUN_00010558 */entity, …).
+ *
+ * Callers: FUN_00010b2e (@0x10B76), AI path BSR.L @0x18388.
+ *
+ * Unknown: meaning of +0x61a/c/e beyond
+ * filtered steer state.
+ */
+void apply_relative_heading_steer(int param_1,int param_2,int param_3,short param_4,short param_5) /* Original: FUN_000109ba */
 {
   ushort uVar1;
   int iVar2;
@@ -17271,29 +17321,53 @@ LAB_00010a8a:
 LAB_00010b0a:
   *(short *)(param_1 + 0x61a) = param_4;
   *(short *)(param_1 + 0x61c) = param_5;
-  FUN_00010558(param_1,sVar6,sVar5,uVar3);
+  enqueue_control_inputs_avg4( /* Original: FUN_00010558 */param_1,sVar6,sVar5,uVar3);
   return;
 }
 
 
 
-void FUN_00010b2e(int *param_1,int param_2,int param_3,int param_4)
-
+/*
+ * Original: FUN_00010b2e
+ * Proposed name: steer_entity_toward_point
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Thin wrapper: build_relative_steer_sample( /* Original: FUN_00010360 */entity, x,y,z, …) builds range + relative
+ * sample buffer, then apply_relative_heading_steer. Call sites pass world
+ * target coords (often other-entity +0x18/+0x1c/+0x20).
+ *
+ * Evidence: Capstone @0x10B2E–0x10B82; BSR $10360 then $109ba.
+ * Callee: build_relative_steer_sample.
+ */
+void steer_entity_toward_point(int *param_1,int param_2,int param_3,int param_4) /* Original: FUN_00010b2e */
 {
   short local_18;
   short local_16;
   int local_14;
   undefined1 auStack_10 [12];
   
-  FUN_00010360(param_1,param_2,param_3,param_4,&local_14,(int)auStack_10,&local_16,&local_18);
-  FUN_000109ba((int)param_1,local_14,(int)auStack_10,local_16,local_18);
+  build_relative_steer_sample( /* Original: FUN_00010360 */param_1,param_2,param_3,param_4,&local_14,(int)auStack_10,&local_16,&local_18);
+  apply_relative_heading_steer( /* Original: FUN_000109ba */(int)param_1,local_14,(int)auStack_10,local_16,local_18);
   return;
 }
 
 
 
-bool FUN_00010b84(int *param_1)
-
+/*
+ * Original: FUN_00010b84
+ * Proposed name: ai_bootstrap_climb_phase
+ * Confidence: [STRONG INFERENCE]
+ *
+ * AI script phase-0 helper: ensure +0x67b≠0; if altΔ>200 and +0x679>0 flip
+ * 679; set throttle +0x668=9; steer pitch toward fold(0x2c0 − att@+0x20)
+ * via +0x61a and enqueue_control_inputs_avg4(…,0,delta,0). If altΔ>2000,
+ * negate +0x67b and return true (advance script); else false.
+ *
+ * Callers: FUN_00010ce8 / case-0 script paths (@0x10CFC/@0x10FC0).
+ *
+ * Evidence: Capstone @0x10B84–0x10C2A.
+ */
+bool ai_bootstrap_climb_phase(int *param_1) /* Original: FUN_00010b84 */
 {
   int iVar1;
   int iVar2;
@@ -17322,7 +17396,7 @@ bool FUN_00010b84(int *param_1)
       sVar4 = 0x200;
     }
   }
-  FUN_00010558((int)param_1,0,sVar4,0);
+  enqueue_control_inputs_avg4( /* Original: FUN_00010558 */(int)param_1,0,sVar4,0);
   iVar1 = *(int *)(iVar1 + 0x1c) - *(int *)((int)param_1 + 0x2e);
   if (2000 < iVar1) {
     *(char *)((int)param_1 + 0x67b) = -*(char *)((int)param_1 + 0x67b);
@@ -17332,8 +17406,21 @@ bool FUN_00010b84(int *param_1)
 
 
 
-void FUN_00010c2c(int *param_1,short param_2)
-
+/*
+ * Original: FUN_00010c2c
+ * Proposed name: adjust_ai_throttle_vs_speed
+ * Confidence: [STRONG INFERENCE]
+ *
+ * error = param_2 − (entity+0x62a >> 2); store at +0x620. First-order
+ * blend with prior into +0x63c fractional accumulator; add high byte into
+ * +0x668 (throttle byte, clamp 0..9). Extremes: accum < −0x438 → set
+ * +0x679=1 if zero; accum > 0x1c2 → max_ai_throttle_maybe_invert_679.
+ *
+ * Callers pass constants like 0xd5c or table/script targets.
+ *
+ * Evidence: Capstone @0x10C2C–0x10CB0; +0x668 clamp matches 10cb2.
+ */
+void adjust_ai_throttle_vs_speed(int *param_1,short param_2) /* Original: FUN_00010c2c */
 {
   short sVar1;
   short sVar2;
@@ -17360,15 +17447,28 @@ void FUN_00010c2c(int *param_1,short param_2)
     }
   }
   else if (0x1c2 < sVar1) {
-    FUN_00010cb2(param_1);
+    max_ai_throttle_maybe_invert_679( /* Original: FUN_00010cb2 */param_1);
   }
   return;
 }
 
 
 
-void FUN_00010cb2(int *param_1)
-
+/*
+ * Original: FUN_00010cb2
+ * Proposed name: max_ai_throttle_maybe_invert_679
+ * Confidence: [PROVEN] +0x668=9; [STRONG INFERENCE] throttle / +0x679 bias
+ *
+ * Writes 9 to entity +0x668 (Ghidra param_1+0x19a; clamped 0..9 elsewhere
+ * in adjust_ai_throttle_vs_speed). If +0x679 > 0 and (obj+0x1c − entity+0x2e) > 100,
+ * negates +0x679 (signed bias flip).
+ *
+ * Callers: build_relative_steer_sample (close range), adjust_ai_throttle_vs_speed,
+ * AI paths @0x18240/@0x18404/@0x18570.
+ *
+ * Unknown: exact gameplay meaning of +0x679 (climb/bank bias?).
+ */
+void max_ai_throttle_maybe_invert_679(int *param_1) /* Original: FUN_00010cb2 */
 {
   *(undefined1 *)(param_1 + 0x19a) = 9;
   if (('\0' < *(char *)((int)param_1 + 0x679)) &&
@@ -17380,8 +17480,17 @@ void FUN_00010cb2(int *param_1)
 
 
 
-void FUN_00010cd8(int param_1)
-
+/*
+ * Original: FUN_00010cd8
+ * Proposed name: invert_ai_bias_67b_if_positive
+ * Confidence: [PROVEN] op; [STRONG INFERENCE] “AI bias” label
+ *
+ * If entity +0x67b > 0, negate it (same pattern as +0x679 flips elsewhere).
+ * Capstone @0x10CD8–0x10CE6. Callers @0x1008E/@0x100B0/@0x1029E.
+ *
+ * Unknown: gameplay role of +0x67b vs +0x679.
+ */
+void invert_ai_bias_67b_if_positive(int param_1) /* Original: FUN_00010cd8 */
 {
   if ('\0' < *(char *)(param_1 + 0x67b)) {
     *(char *)(param_1 + 0x67b) = -*(char *)(param_1 + 0x67b);
@@ -17391,8 +17500,22 @@ void FUN_00010cd8(int param_1)
 
 
 
-void FUN_00010ce8(int *param_1)
-
+/*
+ * Original: FUN_00010ce8
+ * Proposed name: tick_ai_climb_then_waypoint
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Per-frame AI tick using script block at entity +0x616:
+ *   *script==0 → ai_bootstrap_climb_phase; on true, advance *script.
+ *   else → FUN_00016966(obj, script+2) waypoint; adjust_ai_throttle_vs_speed
+ *          from script[1]; steer_entity_toward_point (Y floored vs +0x2e+0x1000).
+ * Always ends with update_aircraft_entity.
+ *
+ * Callers: FUN_00010d68 / 10da8 / 10de8 (alloc different script tables).
+ *
+ * Evidence: Capstone @0x10CE8–0x10D66; BSR e792 ≡ update_aircraft_entity.
+ */
+void tick_ai_climb_then_waypoint(int *param_1) /* Original: FUN_00010ce8 */
 {
   short *psVar1;
   undefined3 extraout_var;
@@ -17402,21 +17525,21 @@ void FUN_00010ce8(int *param_1)
   
   psVar1 = *(short **)((int)param_1 + 0x616);
   if (*psVar1 == 0) {
-    bVar4 = FUN_00010b84(param_1);
+    bVar4 = ai_bootstrap_climb_phase( /* Original: FUN_00010b84 */param_1);
     if (CONCAT31(extraout_var,bVar4) != 0) {
       *psVar1 = *psVar1 + 1;
     }
   }
   else {
     piVar2 = FUN_00016966(*param_1,psVar1 + 2);
-    FUN_00010c2c(param_1,psVar1[1]);
+    adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,psVar1[1]);
     if (piVar2[1] - *(int *)((int)param_1 + 0x2e) < 0x1000) {
       iVar3 = *(int *)((int)param_1 + 0x2e) + 0x1000;
     }
     else {
       iVar3 = piVar2[1];
     }
-    FUN_00010b2e(param_1,*piVar2,iVar3,piVar2[2]);
+    steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,*piVar2,iVar3,piVar2[2]);
   }
   update_aircraft_entity(param_1);
   return;
@@ -17424,8 +17547,15 @@ void FUN_00010ce8(int *param_1)
 
 
 
-void FUN_00010d68(int *param_1)
-
+/*
+ * Original: FUN_00010d68
+ * Proposed name: ensure_ai_script_1b2e0_tick
+ * Confidence: [STRONG INFERENCE]
+ *
+ * If +0x616 unset: FUN_000168d2(..., &DAT_0001b2e0) → script; word[1]=0x9d8
+ * (throttle target). Then tick_ai_climb_then_waypoint.
+ */
+void ensure_ai_script_1b2e0_tick(int *param_1) /* Original: FUN_00010d68 */
 {
   uint *puVar1;
   
@@ -17434,14 +17564,21 @@ void FUN_00010d68(int *param_1)
     *(uint **)((int)param_1 + 0x616) = puVar1;
     *(undefined2 *)((int)puVar1 + 2) = 0x9d8;
   }
-  FUN_00010ce8(param_1);
+  tick_ai_climb_then_waypoint( /* Original: FUN_00010ce8 */param_1);
   return;
 }
 
 
 
-void FUN_00010da8(int *param_1)
-
+/*
+ * Original: FUN_00010da8
+ * Proposed name: ensure_ai_script_1b310_tick
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Same as 10d68 with DAT_0001b310 and throttle word 0xd5c.
+ * Caller: FUN_00010ecc @0x10ED8.
+ */
+void ensure_ai_script_1b310_tick(int *param_1) /* Original: FUN_00010da8 */
 {
   uint *puVar1;
   
@@ -17450,14 +17587,20 @@ void FUN_00010da8(int *param_1)
     *(uint **)((int)param_1 + 0x616) = puVar1;
     *(undefined2 *)((int)puVar1 + 2) = 0xd5c;
   }
-  FUN_00010ce8(param_1);
+  tick_ai_climb_then_waypoint( /* Original: FUN_00010ce8 */param_1);
   return;
 }
 
 
 
-void FUN_00010de8(int *param_1)
-
+/*
+ * Original: FUN_00010de8
+ * Proposed name: ensure_ai_script_1b340_tick
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Same pattern: DAT_0001b340, throttle word 0x9d8, then tick.
+ */
+void ensure_ai_script_1b340_tick(int *param_1) /* Original: FUN_00010de8 */
 {
   uint *puVar1;
   
@@ -17466,14 +17609,27 @@ void FUN_00010de8(int *param_1)
     *(uint **)((int)param_1 + 0x616) = puVar1;
     *(undefined2 *)((int)puVar1 + 2) = 0x9d8;
   }
-  FUN_00010ce8(param_1);
+  tick_ai_climb_then_waypoint( /* Original: FUN_00010ce8 */param_1);
   return;
 }
 
 
 
-undefined4 FUN_00010e28(int *param_1)
-
+/*
+ * Original: FUN_00010e28
+ * Proposed name: ai_script_try_fire_burst
+ * Confidence: [STRONG INFERENCE]
+ *
+ * After timegate param_1[0x1ab] ≤ DAT_0001b838: if ammo byte +0x67c
+ * (Ghidra +0x19f) is 0 → return 1 (burst done). Else when cooldown +0x674
+ * clear and RNG&7==0: spawn_weapon_entity at obj pos with jittered
+ * attitudes; set cooldown 2; dec ammo; +0x634 −= 6. Else return 0.
+ *
+ * Callers: AI script phase 2 (@0x10F54 / @0x10FEE).
+ *
+ * Evidence: Capstone @0x10E28–0x10ECA; BSR $12840 ≡ spawn_weapon_entity.
+ */
+undefined4 ai_script_try_fire_burst(int *param_1) /* Original: FUN_00010e28 */
 {
   int iVar1;
   ushort uVar2;
@@ -17503,15 +17659,27 @@ undefined4 FUN_00010e28(int *param_1)
 
 
 
-void FUN_00010ecc(int *param_1)
-
+/*
+ * Original: FUN_00010ecc
+ * Proposed name: tick_ai_1b310_approach_fire
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Runs ensure_ai_script_1b310_tick, then advances +0x616 script:
+ *   state 1 → 2 when FUN_00003c68 metric <50000, alt>20000, +0x684 bit0
+ *             clear; sets fire timegate [0x1ab]=time+0x4b; may flag
+ *             DAT_0001b5a0+0xce = −1.
+ *   state 2 → 3 when ai_script_try_fire_burst returns nonzero.
+ *
+ * Evidence: Capstone @0x10ECC–0x10F66. Likely dispatched via fn ptr (0 BSR).
+ */
+void tick_ai_1b310_approach_fire(int *param_1) /* Original: FUN_00010ecc */
 {
   short *psVar1;
   int iVar2;
   int iVar3;
   
   iVar3 = *param_1;
-  FUN_00010da8(param_1);
+  ensure_ai_script_1b310_tick( /* Original: FUN_00010da8 */param_1);
   psVar1 = *(short **)((int)param_1 + 0x616);
   if (*psVar1 == 1) {
     iVar2 = FUN_00003c68();
@@ -17524,7 +17692,7 @@ void FUN_00010ecc(int *param_1)
       }
     }
   }
-  else if ((*psVar1 == 2) && (iVar3 = FUN_00010e28(param_1), iVar3 != 0)) {
+  else if ((*psVar1 == 2) && (iVar3 = ai_script_try_fire_burst( /* Original: FUN_00010e28 */param_1), iVar3 != 0)) {
     *psVar1 = 3;
   }
   return;
@@ -17532,8 +17700,21 @@ void FUN_00010ecc(int *param_1)
 
 
 
-void FUN_00010f68(int *param_1)
-
+/*
+ * Original: FUN_00010f68
+ * Proposed name: tick_ai_1b370_mission
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Multi-phase AI mission using script from DAT_0001b370 (FUN_0001691c →
+ * +0x616; word at +4 init 3). Switch on *script:
+ *   0 climb bootstrap; 1→2 at waypoint idx 4 + fire timegate;
+ *   2 fire burst→3; 3 waypoint/steer (→4 + try_begin_landing_approach at idx 0);
+ *   4/5 cut throttle / flag +0x641; default chase player DAT_0001b738.
+ * Always update_aircraft_entity.
+ *
+ * Evidence: Capstone jmp-table @0x10F68+; callees already renamed.
+ */
+void tick_ai_1b370_mission(int *param_1) /* Original: FUN_00010f68 */
 {
   short *psVar1;
   undefined3 extraout_var;
@@ -17554,7 +17735,7 @@ void FUN_00010f68(int *param_1)
   psVar1 = *(short **)((int)param_1 + 0x616);
   switch(*psVar1) {
   case 0:
-    bVar6 = FUN_00010b84(param_1);
+    bVar6 = ai_bootstrap_climb_phase( /* Original: FUN_00010b84 */param_1);
     if (CONCAT31(extraout_var,bVar6) != 0) {
       *psVar1 = *psVar1 + 1;
     }
@@ -17566,7 +17747,7 @@ void FUN_00010f68(int *param_1)
     }
     break;
   case 2:
-    iVar3 = FUN_00010e28(param_1);
+    iVar3 = ai_script_try_fire_burst( /* Original: FUN_00010e28 */param_1);
     if (iVar3 != 0) {
       *psVar1 = 3;
     }
@@ -17586,7 +17767,7 @@ void FUN_00010f68(int *param_1)
     else {
       sVar8 = 0;
     }
-    FUN_00010558((int)param_1,0,0,sVar8);
+    enqueue_control_inputs_avg4( /* Original: FUN_00010558 */(int)param_1,0,0,sVar8);
     *(undefined1 *)(param_1 + 0x19a) = 0;
     *(undefined1 *)((int)param_1 + 0x641) = 1;
     goto LAB_000110e6;
@@ -17601,10 +17782,10 @@ void FUN_00010f68(int *param_1)
   if ((*psVar1 == 3) && (psVar1[2] == 0)) {
     *psVar1 = 4;
     *(undefined1 *)((int)param_1 + 0x679) = 1;
-    FUN_00019fba(param_1);
+    try_begin_landing_approach( /* Original: FUN_00019fba */param_1);
   }
   else {
-    FUN_00010c2c(param_1,(short)*(undefined4 *)(&DAT_0001b3d0 + psVar1[2] * 4));
+    adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,(short)*(undefined4 *)(&DAT_0001b3d0 + psVar1[2] * 4));
     if (piVar4[1] - *(int *)((int)param_1 + 0x2e) < 0x1000) {
       iVar5 = *(int *)((int)param_1 + 0x2e) + 0x1000;
     }
@@ -17614,7 +17795,7 @@ void FUN_00010f68(int *param_1)
     iVar3 = piVar4[2];
     iVar7 = *piVar4;
 LAB_000110dc:
-    FUN_00010b2e(param_1,iVar7,iVar5,iVar3);
+    steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,iVar7,iVar5,iVar3);
   }
 LAB_000110e6:
   update_aircraft_entity(param_1);
@@ -17709,10 +17890,10 @@ void FUN_000111da(int *param_1)
       else {
         iVar4 = 40000;
       }
-      FUN_00010c2c(param_1,0xd5c);
+      adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,0xd5c);
       uVar2 = *(undefined4 *)((int)param_1 + 0x2e);
       *(undefined4 *)((int)param_1 + 0x2e) = 0xffff63c0;
-      FUN_00010b2e(param_1,*(int *)(iVar1 + 0x18),iVar4,*(int *)(iVar1 + 0x20));
+      steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,*(int *)(iVar1 + 0x18),iVar4,*(int *)(iVar1 + 0x20));
       *(undefined4 *)((int)param_1 + 0x2e) = 0;
       update_aircraft_entity(param_1);
       bVar3 = true;
@@ -17779,7 +17960,7 @@ void FUN_000112e0(int *param_1)
       }
       uVar3 = *(undefined4 *)((int)param_1 + 0x2e);
       *(undefined4 *)((int)param_1 + 0x2e) = 0xffff63c0;
-      FUN_00010b2e(param_1,iVar6,iVar7,iVar2);
+      steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,iVar6,iVar7,iVar2);
       *(undefined4 *)((int)param_1 + 0x2e) = 0;
       update_aircraft_entity(param_1);
       bVar5 = true;
@@ -17793,13 +17974,13 @@ void FUN_000112e0(int *param_1)
         else {
           iVar7 = 30000;
         }
-        FUN_00010b2e(param_1,iVar6,iVar7,iVar2);
+        steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,iVar6,iVar7,iVar2);
         update_aircraft_entity(param_1);
         bVar5 = true;
       }
     }
     else if (cVar4 == '\x02') {
-      FUN_00010b2e(param_1,*(int *)(iVar1 + 0x18) + param_1[2] * 0x2000,30000,
+      steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,*(int *)(iVar1 + 0x18) + param_1[2] * 0x2000,30000,
                    *(int *)(iVar1 + 0x20) + param_1[4] * 0x2000);
       update_aircraft_entity(param_1);
       bVar5 = true;
@@ -17808,7 +17989,7 @@ void FUN_000112e0(int *param_1)
         FUN_000100bc((int)param_1);
       }
     }
-    FUN_00010c2c(param_1,0xd5c);
+    adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,0xd5c);
   }
   if (!bVar5) {
     if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
@@ -23812,7 +23993,7 @@ void FUN_0001820a(int *param_1)
     }
     piVar2 = (int *)(iVar9 + 0x36 + iVar10 * 0x14);
     iVar10 = sVar8 + 4;
-    FUN_00010360(param_1,*piVar1 + iVar10 * (*piVar2 - *piVar1),
+    build_relative_steer_sample( /* Original: FUN_00010360 */param_1,*piVar1 + iVar10 * (*piVar2 - *piVar1),
                  piVar1[1] + iVar10 * (piVar2[1] - piVar1[1]),
                  piVar1[2] + iVar10 * (piVar2[2] - piVar1[2]),&local_14,(int)auStack_10,&local_16,
                  &local_18);
@@ -23829,7 +24010,7 @@ void FUN_0001820a(int *param_1)
       fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)(iVar9 + 0x22) - *(short *)((int)param_1 + 0x22));
       iVar10 = FUN_00002de8();
       if ((iVar10 < 0x1001) || (uVar5 = overlay_rng_next( /* Original: FUN_00011564 */), (uVar5 & 1) == 0)) {
-        FUN_00010cb2(param_1);
+        max_ai_throttle_maybe_invert_679( /* Original: FUN_00010cb2 */param_1);
         do {
           if (*(char *)((int)param_1 + 0x69a) == '\0') {
             param_1[0x1a7] = *(int *)(iVar6 + 0x18);
@@ -23955,12 +24136,12 @@ LAB_00018878:
           }
         } while (*(char *)((int)param_1 + 0x69a) == '\0');
         param_1[0x1aa] = iVar7;
-        FUN_00010b2e(param_1,param_1[0x1a7],param_1[0x1a8],param_1[0x1a9]);
+        steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,param_1[0x1a7],param_1[0x1a8],param_1[0x1a9]);
         goto LAB_000188a6;
       }
       *(undefined1 *)((int)param_1 + 0x69a) = 4;
     }
-    FUN_000109ba((int)param_1,local_14,(int)auStack_10,local_16,local_18);
+    apply_relative_heading_steer( /* Original: FUN_000109ba */(int)param_1,local_14,(int)auStack_10,local_16,local_18);
     if (*(int *)((int)param_1 + 0x696) < 0x3000) {
       iVar9 = *(int *)(iVar9 + 0x62a) >> 2;
       if (*(int *)((int)param_1 + 0x696) < 0x800) {
@@ -23980,10 +24161,10 @@ LAB_00018878:
         }
         sVar8 = (short)(iVar10 >> 0xd) + (short)iVar9;
       }
-      FUN_00010c2c(param_1,sVar8);
+      adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,sVar8);
     }
     else {
-      FUN_00010cb2(param_1);
+      max_ai_throttle_maybe_invert_679( /* Original: FUN_00010cb2 */param_1);
     }
     sVar8 = 0;
     for (uVar5 = *(uint *)((int)param_1 + 0x696); (uVar5 & 0xffff8000) != 0; uVar5 = (int)uVar5 >> 1
@@ -24015,8 +24196,8 @@ LAB_00018878:
     }
   }
   else {
-    FUN_00010b2e(param_1,*(int *)(iVar7 + 0x18),*(int *)(iVar7 + 0x1c),*(int *)(iVar7 + 0x20));
-    FUN_00010cb2(param_1);
+    steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,*(int *)(iVar7 + 0x18),*(int *)(iVar7 + 0x1c),*(int *)(iVar7 + 0x20));
+    max_ai_throttle_maybe_invert_679( /* Original: FUN_00010cb2 */param_1);
     *(undefined1 *)((int)param_1 + 0x69a) = 0;
   }
 LAB_000188a6:
@@ -25016,8 +25197,16 @@ void FUN_00019bbc(int *param_1)
 
 
 
-void FUN_00019c26(int param_1,int param_2,int param_3,uint param_4)
-
+/*
+ * Original: FUN_00019c26
+ * Proposed name: store_xyz_asr
+ * Confidence: [PROVEN]
+ *
+ * Dest in A1 (register ABI): write (x>>s, y>>s, z>>s) where s=param_4.
+ * Capstone @0x19C26–0x19C5C also ASR’s the stack copies then MOVEM to A1.
+ * Used by find_nearest_runway_approach_ends with entity scale at +0x34.
+ */
+void store_xyz_asr(int param_1,int param_2,int param_3,uint param_4) /* Original: FUN_00019c26 */
 {
   int *in_A1;
   
@@ -25029,8 +25218,22 @@ void FUN_00019c26(int param_1,int param_2,int param_3,uint param_4)
 
 
 
-undefined4 FUN_00019c5e(undefined4 param_1,int *param_2,int *param_3)
-
+/*
+ * Original: FUN_00019c5e
+ * Proposed name: find_nearest_runway_approach_ends
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Scan entity pools (DAT_0001b5a4 then DAT_0001d4a4): type==2 and
+ * FUN_00000354==0x200 → candidate field/carrier. Among pads with
+ * +0x16=='p' and +0x14==4, scale 4 verts via store_xyz_asr, pick
+ * closer approach pair (FUN_00003c48). Write two XYZ ends to *param_2 /
+ * *param_3. Return 0 if best score < 0x40740, else 1.
+ *
+ * Sole caller: try_begin_landing_approach (@0x19FD6).
+ *
+ * Evidence: Capstone @0x19C5E+; endpoint stores match landing glide setup.
+ */
+undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int *param_3) /* Original: FUN_00019c5e */
 {
   int *piVar1;
   char *pcVar2;
@@ -25094,13 +25297,13 @@ undefined4 FUN_00019c5e(undefined4 param_1,int *param_2,int *param_3)
                 iVar5 = *(int *)(pcVar2 + 0x44);
                 psVar3 = *(short **)(iVar14 + 0x18);
                 piVar1 = (int *)(iVar5 + *psVar3 * 0xc);
-                FUN_00019c26(*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
+                store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
                 piVar1 = (int *)(iVar5 + psVar3[1] * 0xc);
-                FUN_00019c26(*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
+                store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
                 piVar1 = (int *)(iVar5 + psVar3[2] * 0xc);
-                FUN_00019c26(*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
+                store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
                 piVar1 = (int *)(iVar5 + psVar3[3] * 0xc);
-                FUN_00019c26(*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
+                store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
                 iVar5 = FUN_00003c48();
                 iVar6 = FUN_00003c48();
                 if (iVar6 < iVar5) {
@@ -25190,8 +25393,21 @@ undefined4 FUN_00019c5e(undefined4 param_1,int *param_2,int *param_3)
 
 
 
-undefined4 FUN_00019fba(int *param_1)
-
+/*
+ * Original: FUN_00019fba
+ * Proposed name: try_begin_landing_approach
+ * Confidence: [STRONG INFERENCE]
+ *
+ * If find_nearest_runway_approach_ends fills approach endpoints and range metric ∈ (9999,0x26ac1):
+ * write glide path into DAT_000267xx (pos + unit dir with Y=0xFDC0), nudge
+ * start along dir×10000, clear AI flags, save prior +0x32 into DAT_00026798,
+ * install handler 0x1A186, return 0. Else return 1.
+ *
+ * Callers: tick_ai_1b370_mission phase 3→4; player keypath @0x7C98.
+ *
+ * Evidence: Capstone @0x19FBA+; globals 267bc/c0/c4/b2/b6/ba.
+ */
+undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
 {
   int iVar1;
   int iVar2;
@@ -25203,7 +25419,7 @@ undefined4 FUN_00019fba(int *param_1)
   int local_8;
   
   iVar1 = *param_1;
-  iVar2 = FUN_00019c5e(iVar1,&local_10,&local_1c);
+  iVar2 = find_nearest_runway_approach_ends( /* Original: FUN_00019c5e */iVar1,&local_10,&local_1c);
   if (((iVar2 == 0) && (iVar2 = FUN_00003c68(), 9999 < iVar2)) && (iVar2 < 0x26ac1)) {
     iVar2 = (local_1c - local_10) * 6;
     if (iVar2 < 0) {
@@ -25446,8 +25662,8 @@ LAB_0001a2da:
     *(int *)(*piVar3 + 0x1c) = iVar12;
     *(int *)(*piVar3 + 0x20) = iVar7;
   }
-  FUN_00010c2c(param_1,local_12);
-  FUN_00010b2e(param_1,iVar9,iVar12,iVar7);
+  adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,local_12);
+  steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,iVar9,iVar12,iVar7);
   if (((iVar4 < 18000) && (15000 < iVar4)) &&
      ((iVar9 = FUN_00002de8(), 100 < iVar9 || (iVar9 = FUN_00002de8(), 0x5a < iVar9)))) {
     _DAT_0001b83c = 1;

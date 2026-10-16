@@ -238,14 +238,25 @@ var last_02bd8_gate: Dictionary = {}
 var last_02bd8_args: Dictionary = {}
 var last_02bd8_commit: Dictionary = {}
 var last_02bd8_walk: Dictionary = {}
+## 046da-site 02bd8(obj,1,null,null) — kept when nested 04e6e overwrites last_02bd8_*.
+var last_046da_02bd8_commit: Dictionary = {}
+var last_046da_02bd8_walk: Dictionary = {}
+## Optional node list override for 046da 02bd8 walk; null → build from +0x24 chain.
+var spawn_046da_02bd8_nodes = null
 var last_04e6e_followup: Dictionary = {}
+var last_04e6e_path: Dictionary = {}
+var last_01c5c: Dictionary = {}
+var last_03ea0: Dictionary = {}
+var last_15762: Dictionary = {}
+var last_04958: Dictionary = {}
+var last_04916: Dictionary = {}
 ## DAT_0001b190 distance-band table for FUN_00003da8 (b18c[s]=table[s-1]).
 ## Loaded from ROM fixture in _init; mock fallback only if fixture missing.
 var dat_0001b190: Array = []
 var last_03da8: Dictionary = {}
-## Mock *(template+0xe) scale source for FUN_0000435a +0xc.
+## Fallback *(template+0xe) when parent/embed chain cannot be resolved.
 var spawn_0435a_scale_src: int = 0x1000
-## Per-poly *(stream+10) sources for FUN_0000435a kind2 +0x1c loop.
+## Fallback per-poly *(stream+10) when template stream cannot be walked.
 var spawn_0435a_poly_srcs: Array = []
 ## When set, treat world+8 as player entity for 0435a *5 path (DAT_0001b738).
 var spawn_0435a_is_player: bool = false
@@ -1268,8 +1279,8 @@ func _grow_05116_table(old_base: int, old_count: int) -> int:
 	return new_base
 
 
-## [RECONSTRUCTED] FUN_000046da: 045ba → identity → 0435a(…,1) → 04e6e distance gate → kind2 +0x44/+0x4c.
-## [DEFERRED] real 01b6c/01a48 heap; 02bd8 on 05116 path; full template+0xe scale source.
+## [RECONSTRUCTED] FUN_000046da: 045ba → identity → 02bd8(walk+commit) → +8 → 0435a(…,1) → gate.
+## [DEFERRED] real 01b6c/01a48 heap.
 func _read_045ba_desc(desc_ptr: int) -> Dictionary:
 	var d: Dictionary = {
 		0: int(mem_u32.get(desc_ptr, 0)) & 0xFF,
@@ -1649,9 +1660,457 @@ func _call_fun_00001be4(obj: int) -> Dictionary:
 	return r
 
 
+## [RECONSTRUCTED] FUN_00004e6e kind2 after +0x4c/+0x44: 04808 → 02bd8 → 0435a → 03da8.
+## Shared by `_call_fun_00004e6e` (016e2) and nested 046da near-path.
+func _04e6e_kind2_04808_followup(obj: int) -> Dictionary:
+	var f36: int = int(mem_u32.get(obj + 0x36, 0))
+	var f3a: int = int(mem_u32.get(obj + 0x3A, 0))
+	var byte06: int = int(mem_u32.get(obj + 6, 0)) & 0xFF
+	var byte07: int = int(mem_u32.get(obj + 7, 0)) & 0xFF
+	var f38: int = int(mem_u32.get(obj + 0x38, 0))
+	var buf_bytes: int = FlightMathScript.apply_04808_buffer_bytes(f3a, f38, byte06)
+	var buf_alloc: Dictionary = {}
+	var buf_ptr: int = spawn_04808_buf_ptr
+	if spawn_04808_use_mock_ptrs and buf_ptr != 0:
+		buf_alloc = {"ok": true, "payload_ptr": buf_ptr, "mocked": true}
+	else:
+		buf_alloc = FlightMathScript.apply_01a68_alloc(buf_bytes, heap_01a68)
+		buf_ptr = int(buf_alloc.get("payload_ptr", 0))
+		spawn_04808_buf_ptr = buf_ptr
+	mem_u32[obj + 0x48] = buf_ptr
+	last_04808 = {
+		"buffer_bytes": buf_bytes,
+		"field_48": buf_ptr,
+		"buf_alloc": buf_alloc,
+		"index_allocs": [],
+	}
+	## Desc stream: spawn override, else tpl+0x22+(36+3a)*0xC (5644–5647).
+	var desc_ptr: int = spawn_04808_desc_ptr
+	var desc_source: String = "spawn"
+	if desc_ptr == 0:
+		var tpl_r: Dictionary = _0435a_resolve_scale_src(obj)
+		var tpl: int = int(tpl_r.get("template_ptr", 0))
+		if tpl != 0:
+			var daddr: Dictionary = FlightMathScript.apply_04e6e_04808_desc_addr(tpl, f36, f3a)
+			desc_ptr = int(daddr.get("desc_ptr", 0))
+			desc_source = "mem_tpl"
+			last_04808["desc_addr"] = daddr
+	last_04808["desc_source"] = desc_source
+	if desc_ptr != 0 and _to_s16(f3a) > 0:
+		var poly_n: int = _to_s16(f3a)
+		var polys: Array = []
+		var stream_off: int = 0
+		for pi in range(poly_n):
+			var dp: int = desc_ptr + stream_off
+			var poly_desc: Dictionary = {
+				0: int(mem_u32.get(dp + 0, 0)),
+				4: int(mem_u32.get(dp + 4, 0)),
+				5: int(mem_u32.get(dp + 5, 0)),
+				6: int(mem_u32.get(dp + 6, 0)),
+				7: int(mem_u32.get(dp + 7, 0)),
+				8: int(mem_u32.get(dp + 8, 0)),
+				9: int(mem_u32.get(dp + 9, 0)),
+				0x0A: int(mem_u32.get(dp + 0x0A, 0)),
+			}
+			var words_in: Array = []
+			if spawn_04808_index_words.size() > 0 and spawn_04808_index_words[0] is Array:
+				if pi < spawn_04808_index_words.size():
+					words_in = spawn_04808_index_words[pi]
+			elif pi == 0:
+				words_in = spawn_04808_index_words
+			polys.append({"desc": poly_desc, "words": words_in})
+			stream_off += FlightMathScript.apply_04808_stream_advance(
+				int(poly_desc.get(8, 0)) & 0xFF
+			)
+		var loop_r: Dictionary = FlightMathScript.apply_04808_poly_loop(polys, poly_n)
+		last_04808["loop"] = loop_r
+		var recs: Array = loop_r.get("records", [])
+		if recs.size() > 0:
+			last_04808["record"] = recs[0].get("record", {})
+			last_04808["index"] = recs[0].get("index_words", {})
+		var index_allocs: Array = []
+		for entry in recs:
+			var base: int = buf_ptr + int(entry.get("rec_base", 0))
+			var rec: Dictionary = entry.get("record", {})
+			mem_u32[base + 0x08] = int(rec.get("rec_u32_08", 0))
+			mem_u32[base + 0x0C] = int(rec.get("rec_u32_0c", 0))
+			mem_u32[base + 0x10] = int(rec.get("rec_u8_10", 0))
+			mem_u32[base + 0x11] = int(rec.get("rec_u8_11", 0))
+			mem_u32[base + 0x12] = int(rec.get("rec_u8_12", 0))
+			mem_u32[base + 0x13] = int(rec.get("rec_u8_13", 0))
+			mem_u32[base + 0x14] = int(rec.get("rec_u16_14", 0))
+			mem_u32[base + 0x16] = int(rec.get("rec_u8_16", 0))
+			mem_u32[base + 0x17] = int(rec.get("rec_u8_17", 0))
+			mem_u32[base + 0x1C] = int(rec.get("rec_u32_1c", 0))
+			var idx: Dictionary = entry.get("index_words", {})
+			var idx_bytes: int = FlightMathScript.apply_04808_index_alloc_bytes(
+				int(rec.get("rec_u16_14", 0))
+			)
+			var idx_alloc: Dictionary = {}
+			var iptr: int = 0
+			if spawn_04808_use_mock_ptrs and spawn_04808_index_ptr != 0:
+				iptr = spawn_04808_index_ptr + int(entry.get("index", 0)) * spawn_04808_index_stride
+				idx_alloc = {"ok": true, "payload_ptr": iptr, "mocked": true}
+			else:
+				idx_alloc = FlightMathScript.apply_01a68_alloc(idx_bytes, heap_01a68)
+				iptr = int(idx_alloc.get("payload_ptr", 0))
+			if index_allocs.is_empty():
+				spawn_04808_index_ptr = iptr
+			index_allocs.append(idx_alloc)
+			mem_u32[base + 0x18] = iptr
+			var words: Array = idx.get("words", [])
+			for wi in range(words.size()):
+				mem_u32[iptr + wi * 2] = int(words[wi]) & 0xFFFF
+		last_04808["index_allocs"] = index_allocs
+	var trailer: Dictionary = FlightMathScript.apply_04808_bit1_trailer(f3a, f38, byte06)
+	last_04808["trailer"] = trailer
+	if bool(trailer.get("enabled", false)):
+		var tbase: int = buf_ptr + int(trailer.get("trailer_offset", 0))
+		var tw: Array = trailer.get("words", [])
+		for ti in range(tw.size()):
+			mem_u32[tbase + ti * 2] = int(tw[ti]) & 0xFFFF
+	dat_0001daa2 = 1
+	last_04808["dat_0001daa2"] = 1
+	var byte05: int = int(mem_u32.get(obj + 5, 0)) & 0xFF
+	last_04e6e_path = FlightMathScript.apply_04e6e_post_04808_path(byte05, byte06, byte07)
+	last_02bd8_gate = FlightMathScript.apply_04e6e_02bd8_gate(byte05, byte06, byte07)
+	last_01c5c = {}
+	last_03ea0 = {}
+	last_15762 = {}
+	last_04958 = {}
+	last_04916 = {}
+	var path: String = str(last_04e6e_path.get("path", ""))
+	var verts44: int = int(mem_u32.get(obj + 0x44, 0))
+	var mesh_ptr: int = spawn_02bd8_mesh_ptr
+	if mesh_ptr == 0:
+		var tpl_r: Dictionary = _0435a_resolve_scale_src(obj)
+		var tpl: int = int(tpl_r.get("template_ptr", 0))
+		if tpl != 0:
+			mesh_ptr = tpl + 0x22
+	if path == "02bd8":
+		## Keep prior mesh contract: both-aux only when spawn_02bd8_mesh_ptr set.
+		last_02bd8_args = FlightMathScript.apply_04e6e_02bd8_args(
+			obj, f36, f3a, spawn_02bd8_mesh_ptr, verts44
+		)
+		var lx: int = int(mem_u32.get(obj + 0x18, 0))
+		var ly: int = int(mem_u32.get(obj + 0x1C, 0))
+		var lz: int = int(mem_u32.get(obj + 0x20, 0))
+		if spawn_02bd8_mesh_ptr != 0 and verts44 != 0:
+			var f34: int = int(mem_u32.get(obj + 0x34, 0))
+			var count28: int = int(last_02bd8_args.get("param_2_count", 1))
+			last_02bd8_walk = FlightMathScript.apply_02bd8_both_aux_walk(
+				count28, spawn_02bd8_mesh_xyz, spawn_02bd8_nodes, f34
+			)
+			last_02bd8_walk["path"] = "both_aux"
+			var out_xyz: Array = last_02bd8_walk.get("xyz", [])
+			for vi in range(out_xyz.size()):
+				mem_u32[verts44 + vi * 4] = int(out_xyz[vi])
+		elif spawn_02bd8_mesh_ptr == 0 or verts44 == 0:
+			last_02bd8_walk = FlightMathScript.apply_02bd8_null_aux_walk(
+				lx, ly, lz, spawn_02bd8_nodes
+			)
+			last_02bd8_walk["path"] = "null_or"
+			lx = int(last_02bd8_walk.get("x", lx))
+			ly = int(last_02bd8_walk.get("y", ly))
+			lz = int(last_02bd8_walk.get("z", lz))
+		var f24: int = int(mem_u32.get(obj + 0x24, 0))
+		last_02bd8_commit = FlightMathScript.apply_02bd8_null_aux_commit(
+			lx, ly, lz, spawn_02bd8_mesh_ptr, verts44, f24
+		)
+		if bool(last_02bd8_commit.get("commit", false)):
+			mem_u32[obj + 0x18] = int(last_02bd8_commit.get("field_18", 0))
+			mem_u32[obj + 0x1C] = int(last_02bd8_commit.get("field_1c", 0))
+			mem_u32[obj + 0x20] = int(last_02bd8_commit.get("field_20", 0))
+		_04e6e_kind2_0435a_03da8_03ea0(obj)
+	elif path == "01c5c":
+		## [RECONSTRUCTED] 5661: 01c5c(36+3a, mesh, verts, 0,0,0) then rates/band/03ea0.
+		var args_1c: Dictionary = FlightMathScript.apply_04e6e_02bd8_args(
+			obj, f36, f3a, mesh_ptr, verts44
+		)
+		var count_1c: int = int(args_1c.get("param_2_count", 0))
+		var src_xyz: Array = []
+		if mesh_ptr != 0 and count_1c > 0:
+			for vi in range(count_1c * 3):
+				src_xyz.append(int(mem_u32.get(mesh_ptr + vi * 4, 0)))
+		last_01c5c = FlightMathScript.apply_fun_00001c5c(count_1c, src_xyz, 0, 0, 0)
+		last_01c5c["mesh_ptr"] = mesh_ptr
+		last_01c5c["verts_ptr"] = verts44
+		if verts44 != 0:
+			var out_xyz2: Array = last_01c5c.get("xyz", [])
+			for vi2 in range(out_xyz2.size()):
+				mem_u32[verts44 + vi2 * 4] = int(out_xyz2[vi2])
+		_04e6e_kind2_0435a_03da8_03ea0(obj)
+	elif path == "15762":
+		## [RECONSTRUCTED] 5667–5682: 0435a/03da8 then 15762 through bias_1a; 1562e deferred.
+		_04e6e_kind2_0435a_03da8_only(obj)
+		last_15762 = _apply_fun_00015762(obj)
+		last_04e6e_followup["path"] = "15762"
+		last_04e6e_followup["15762"] = last_15762
+	else:
+		## [RECONSTRUCTED] 5686–5693: 04958 entry; then 04916 if b5a0+0xe==1 else 03ea0.
+		## No 0435a/03da8 before 04958 (unlike +7/+5/02bd8 paths).
+		last_04958 = _apply_fun_00004958(obj)
+		var b5a0_0e: int = 0
+		if dat_0001b5a0 != 0:
+			b5a0_0e = int(mem_u32.get(dat_0001b5a0 + 0x0E, 0))
+		var fu49: Dictionary = FlightMathScript.apply_04e6e_post_04958_followup(b5a0_0e)
+		if bool(fu49.get("need_04916", false)):
+			last_04916 = _apply_fun_00004916(obj, 0x80)
+			last_04e6e_followup = {
+				"path": "04958",
+				"04958": last_04958,
+				"followup": "04916",
+				"04916": last_04916,
+			}
+		else:
+			last_03ea0 = {"called": true, "deferred_body": true, "obj": obj & 0xFFFFFFFF}
+			last_04e6e_followup = {
+				"path": "04958",
+				"04958": last_04958,
+				"followup": "03ea0",
+				"need_03ea0": true,
+			}
+	return {
+		"04808": last_04808,
+		"path": last_04e6e_path,
+		"02bd8_gate": last_02bd8_gate,
+		"01c5c": last_01c5c,
+		"03ea0": last_03ea0,
+		"15762": last_15762,
+		"04958": last_04958,
+		"04916": last_04916,
+		"followup": last_04e6e_followup,
+		"ok": true,
+	}
+
+
+## [RECONSTRUCTED] FUN_00004958 through simple poly cull (5342 / 5374–5462).
+## Call-site immediates from 5686; local_1be4 rel; nested 02bd8; then per-poly
+## index walk for index_count==1 (project xz → cull if pairs<3).
+## [DEFERRED] 03c68 thinning, b190/b242 clip chain, local_f54 gather.
+func _apply_fun_00004958(obj: int) -> Dictionary:
+	var args: Dictionary = FlightMathScript.apply_04e6e_04958_args()
+	var f36: int = int(mem_u32.get(obj + 0x36, 0))
+	var f3a: int = int(mem_u32.get(obj + 0x3A, 0))
+	var verts: int = int(mem_u32.get(obj + 0x44, 0))
+	var n3a: int = FlightMathScript._to_s16(f3a)
+	var n36: int = FlightMathScript._to_s16(f36)
+	var need: int = maxi(n36 + n3a, 1)
+	var verts_xyz: Array = []
+	if verts != 0:
+		for vi in range(need * 3):
+			verts_xyz.append(int(mem_u32.get(verts + vi * 4, 0)))
+	var rel: Dictionary = FlightMathScript.apply_04958_entry_rel(verts_xyz, f36, f3a)
+	var tpl_r: Dictionary = _0435a_resolve_scale_src(obj)
+	var tpl: int = int(tpl_r.get("template_ptr", 0))
+	var stream: Dictionary = {}
+	var walk58: Dictionary = {}
+	var poly_walk: Array = []
+	var s1a: int = 0
+	var stacked: Array = []
+	if tpl != 0:
+		s1a = int(mem_u32.get(tpl + 0x1A, 0))
+		var s1e: int = int(mem_u32.get(tpl + 0x1E, 0))
+		stream = FlightMathScript.apply_04958_poly_stream(tpl, s1a, s1e)
+		## 5396: count=*(s16*)(tpl+0x1a); src=tpl+0x22 as int32×3 (not packed +2/+6/+10).
+		var n1a: int = FlightMathScript._to_s16(s1a)
+		var src_xyz: Array = []
+		for i in range(maxi(n1a, 0)):
+			var rec: int = tpl + 0x22 + i * 0xC
+			src_xyz.append(int(mem_u32.get(rec + 0, 0)))
+			src_xyz.append(int(mem_u32.get(rec + 4, 0)))
+			src_xyz.append(int(mem_u32.get(rec + 8, 0)))
+		if n1a > 0 and src_xyz.size() >= n1a * 3:
+			var nodes: Array = _02bd8_nodes_from_parent_chain(obj)
+			var f34: int = int(mem_u32.get(obj + 0x34, 0))
+			walk58 = FlightMathScript.apply_02bd8_both_aux_walk(n1a, src_xyz, nodes, f34)
+			walk58["path"] = "04958_both_aux"
+			walk58["count_1a"] = n1a
+			last_02bd8_walk = walk58
+			stacked = walk58.get("xyz", []) as Array
+		## 5400–5495: walk field_3a polys; 03c68 thinning when index_count>1.
+		var cur: int = int(stream.get("poly_stream", 0))
+		var poly_base: int = int(mem_u32.get(obj + 0x48, 0))
+		var param_3: int = int(args.get("param_3", 0))
+		var phase_a8: int = 0
+		if dat_0001b5a0 != 0:
+			phase_a8 = int(mem_u32.get(dat_0001b5a0 + 0xA8, 0))
+		for pi in range(maxi(n3a, 0)):
+			if cur == 0:
+				break
+			var icount: int = int(mem_u32.get(cur + 8, 0)) & 0xFF
+			var hdr: Dictionary = FlightMathScript.apply_04958_poly_stream_header(cur, icount)
+			var words: Array = []
+			for wi in range(icount):
+				words.append(int(mem_u32.get(cur + 0x0E + wi * 2, 0)))
+			var pairs: Dictionary = FlightMathScript.apply_04958_poly_pairs(
+				stacked,
+				words,
+				dat_0001d724,
+				dat_0001d71c,
+				param_3,
+				dat_0001d838,
+				dat_0001d830,
+				phase_a8,
+			)
+			pairs["header"] = hdr
+			pairs["poly_index"] = pi
+			if bool(pairs.get("ok", false)) and bool(pairs.get("cull", false)) and poly_base != 0:
+				var slot: int = poly_base + pi * 0x20
+				var fl: int = int(mem_u32.get(slot + 0x13, 0)) & 0xFF
+				mem_u32[slot + 0x13] = (fl | 2) & 0xFF
+				pairs["flag_13"] = int(mem_u32.get(slot + 0x13, 0))
+			poly_walk.append(pairs)
+			cur = int(hdr.get("next_stream", 0))
+	return {
+		"args": args,
+		"entry_rel": rel,
+		"poly_stream": stream,
+		"02bd8": walk58,
+		"auStack_15e4": stacked,
+		"applied_02bd8": not walk58.is_empty(),
+		"poly_walk": poly_walk,
+		"applied_poly_walk": poly_walk.size() > 0,
+		"verts_ptr": verts,
+		"deferred_body": true,
+		"ok": true,
+	}
+
+
+## [RECONSTRUCTED] FUN_00004916 (5319–5337): write table word + 0xff into each poly slot.
+func _apply_fun_00004916(obj: int, param_2: int) -> Dictionary:
+	var f3a: int = int(mem_u32.get(obj + 0x3A, 0))
+	var poly: int = int(mem_u32.get(obj + 0x48, 0))
+	var table_base: int = 0
+	if dat_0001b5a0 != 0:
+		table_base = int(mem_u32.get(dat_0001b5a0 + 0x88, 0))
+	var word: int = 0
+	if table_base != 0:
+		word = int(mem_u32.get(table_base + param_2 * 2, 0))
+	var plan: Dictionary = FlightMathScript.apply_fun_00004916(f3a, word, param_2)
+	var n: int = int(plan.get("count", 0))
+	var slots: Array = plan.get("slots", []) as Array
+	if poly != 0:
+		for i in range(n):
+			var slot: int = poly + i * 0x20
+			var ent: Dictionary = slots[i] as Dictionary if i < slots.size() else {}
+			mem_u32[slot + 4] = int(ent.get("field_4", 0))
+			mem_u32[slot + 0x0F] = 0xFF
+	plan["poly_ptr"] = poly
+	plan["table_base"] = table_base
+	plan["param_2"] = param_2
+	plan["table_word"] = word
+	return plan
+
+
+## [RECONSTRUCTED] FUN_00015762 through bias_1a (5669–5682 / 19920–19958).
+## [DEFERRED] asStack_2924 init, 1562e poly emit, return.
+## 19928: 02bd8(obj, count, &local_1e94, &local_1e94) — both-aux; no +18/1c/20 commit.
+func _apply_fun_00015762(obj: int) -> Dictionary:
+	var handle: int = int(mem_u32.get(obj + 8, 0))
+	var type_key: int = 0
+	var h34: int = 0
+	var h36: int = 0
+	var h38: int = 0
+	var h40: int = 0
+	if handle != 0:
+		var type_ptr: int = int(mem_u32.get(handle + 4, 0))
+		if type_ptr != 0:
+			type_key = int(mem_u32.get(type_ptr, 0))
+		h34 = int(mem_u32.get(handle + 0x34, 0))
+		h36 = int(mem_u32.get(handle + 0x36, 0))
+		h38 = int(mem_u32.get(handle + 0x38, 0))
+		h40 = int(mem_u32.get(handle + 0x40, 0))
+	var args: Dictionary = FlightMathScript.apply_04e6e_15762_args(
+		handle, type_key, h34, h36, h38, h40
+	)
+	var tpl_r: Dictionary = _0435a_resolve_scale_src(obj)
+	var tpl: int = int(tpl_r.get("template_ptr", 0))
+	var plan: Dictionary = {}
+	var walk62: Dictionary = {}
+	var rel62: Dictionary = {}
+	var bias62: Dictionary = {}
+	if tpl != 0:
+		var s1a: int = int(mem_u32.get(tpl + 0x1A, 0))
+		var s1e: int = int(mem_u32.get(tpl + 0x1E, 0))
+		var n: int = FlightMathScript._to_s16(s1a) + FlightMathScript._to_s16(s1e)
+		## 19927: 02976(count, tpl+0x22, …) — packed shorts at +2/+6/+10 per 0xC.
+		var src_xyz: Array = []
+		for i in range(maxi(n, 0)):
+			var rec: int = tpl + 0x22 + i * 0xC
+			src_xyz.append(int(mem_u32.get(rec + 2, 0)))
+			src_xyz.append(int(mem_u32.get(rec + 6, 0)))
+			src_xyz.append(int(mem_u32.get(rec + 10, 0)))
+		plan = FlightMathScript.apply_15762_entry_plan(
+			tpl,
+			s1a,
+			s1e,
+			int(args.get("param_2", 0)),
+			int(args.get("param_3", 0)),
+			int(args.get("param_4", 0)),
+			int(args.get("param_5", 0)),
+			src_xyz,
+		)
+		## 19928: both-aux 02bd8 on local_1e94 (src≡dst); commit skipped when aux non-null.
+		var xyz: Array = plan.get("local_1e94", []) as Array
+		if bool(plan.get("applied_02976", false)) and xyz.size() >= maxi(n, 0) * 3:
+			var nodes: Array = _02bd8_nodes_from_parent_chain(obj)
+			var f34: int = int(mem_u32.get(obj + 0x34, 0))
+			walk62 = FlightMathScript.apply_02bd8_both_aux_walk(n, xyz, nodes, f34)
+			xyz = walk62.get("xyz", xyz) as Array
+			plan["local_1e94"] = xyz
+			plan["applied_02bd8"] = true
+			plan["deferred_02bd8"] = false
+			plan["02bd8"] = walk62
+			last_02bd8_walk = walk62
+			last_02bd8_walk["path"] = "15762_both_aux"
+			## 19929–19942: local_3324[i] = vert[i+1a] - vert[0]
+			rel62 = FlightMathScript.apply_15762_local_3324_rel(xyz, s1a, s1e)
+			plan["local_3324"] = rel62.get("xyz", [])
+			plan["applied_local_3324"] = bool(rel62.get("applied", false))
+			## 19944–19958: bias first 1a verts (BE low-16 subtract).
+			bias62 = FlightMathScript.apply_15762_bias_1a_low16(
+				xyz,
+				s1a,
+				int(mem_u32.get(obj + 0x18, 0)),
+				int(mem_u32.get(obj + 0x20, 0)),
+				int(args.get("param_5", 0)),
+				f34,
+			)
+			plan["local_1e94"] = bias62.get("xyz", xyz)
+			plan["applied_bias_1a"] = bool(bias62.get("applied", false))
+			plan["bias_1a"] = bias62
+	return {
+		"args": args,
+		"entry": plan,
+		"02bd8": walk62,
+		"local_3324": rel62,
+		"bias_1a": bias62,
+		"handle": handle,
+		"deferred_body": true,
+	}
+
+
+## [RECONSTRUCTED] 0435a(obj,0); 03da8; record 03ea0 (LAB_00005056) — body deferred.
+func _04e6e_kind2_0435a_03da8_03ea0(obj: int) -> void:
+	_04e6e_kind2_0435a_03da8_only(obj)
+	last_03ea0 = {"called": true, "deferred_body": true, "obj": obj & 0xFFFFFFFF}
+	last_04e6e_followup["need_03ea0"] = true
+
+
+func _04e6e_kind2_0435a_03da8_only(obj: int) -> void:
+	var metric10: int = int(mem_u32.get(obj + 0x10, 0))
+	last_04e6e_followup = FlightMathScript.apply_04e6e_post_02bd8_followup(obj, metric10)
+	_apply_fun_0000435a(obj, 0)
+	last_03da8 = FlightMathScript.apply_fun_00003da8(
+		int(mem_u32.get(obj + 0x30, 0)), metric10, dat_0001b190
+	)
+	if bool(last_03da8.get("ok", false)) and int(last_03da8.get("changed", 0)) != 0:
+		mem_u32[obj + 0x30] = int(last_03da8.get("field_30", 0))
+
+
 ## [RECONSTRUCTED] FUN_00004e6e (Capstone @0x4E6E+; decomp ~5587).
-## kind2: list + vertex alloc. kind3: d4a4 + child table (+ deferred 046da×N).
-## [DEFERRED] kind2 04808/02bd8/0435a; kind3 per-child 046da bodies.
+## kind2: list + vertex alloc + 04808/02bd8/0435a/03da8. kind3: d4a4 + 046da×N.
 func _call_fun_00004e6e(obj: int) -> Dictionary:
 	var r: Dictionary = {"fn": "04e6e", "obj": int(obj) & 0xFFFFFFFF}
 	if obj == 0:
@@ -1705,7 +2164,8 @@ func _call_fun_00004e6e(obj: int) -> Dictionary:
 	r["alloc_4c"] = alloc_4c
 	r["alloc_44"] = alloc_44
 	r["dat_0001b734"] = dat_0001b734
-	r["deferred_followup"] = true
+	r["followup"] = _04e6e_kind2_04808_followup(obj)
+	r["deferred_followup"] = false
 	r["ok"] = bool(alloc_4c.get("ok", false)) and bool(alloc_44.get("ok", false))
 	last_04e6e_calls.append(r)
 	return r
@@ -1714,6 +2174,73 @@ func _call_fun_00004e6e(obj: int) -> Dictionary:
 ## Optional per-index child objs for kind-3 046da (else 01a68 0x52 stand-in).
 var spawn_046da_child_objs: Array = []
 var last_046da_kind3_calls: Array = []
+
+
+## [RECONSTRUCTED] Build 02bd8 null-aux nodes by walking obj+0x24 parents (3343–3375).
+## Each step: slot = *(cur+0x30) + idx*0x18; next idx=*(cur+2); next=*(cur+0x24).
+func _02bd8_nodes_from_parent_chain(obj: int) -> Array:
+	var nodes: Array = []
+	var cur: int = int(mem_u32.get(obj + 0x24, 0))
+	var idx: int = int(mem_u32.get(obj + 2, 0)) & 0xFF
+	var guard: int = 0
+	while cur != 0 and guard < 32:
+		guard += 1
+		var table: int = int(mem_u32.get(cur + 0x30, 0))
+		if table == 0:
+			break
+		var slot: int = table + idx * 0x18
+		nodes.append(
+			FlightMathScript.apply_02bd8_chain_slot_node(
+				int(mem_u32.get(slot + 2, 0)),
+				int(mem_u32.get(slot + 4, 0)),
+				int(mem_u32.get(slot + 6, 0)),
+				int(mem_u32.get(slot + 8, 0)),
+				int(mem_u32.get(slot + 0x0C, 0)),
+				int(mem_u32.get(slot + 0x10, 0)),
+			)
+		)
+		idx = int(mem_u32.get(cur + 2, 0)) & 0xFF
+		cur = int(mem_u32.get(cur + 0x24, 0))
+	return nodes
+
+
+## [RECONSTRUCTED] 046da-site FUN_00002bd8(obj,1,null,null): walk then commit (5236 / 3343–3381).
+func _apply_046da_02bd8(world_obj: int) -> Dictionary:
+	var lx: int = int(mem_u32.get(world_obj + 0x18, 0))
+	var ly: int = int(mem_u32.get(world_obj + 0x1C, 0))
+	var lz: int = int(mem_u32.get(world_obj + 0x20, 0))
+	var f24: int = int(mem_u32.get(world_obj + 0x24, 0))
+	var nodes: Array = []
+	var source: String = "none"
+	if spawn_046da_02bd8_nodes is Array:
+		nodes = spawn_046da_02bd8_nodes as Array
+		source = "override"
+	elif f24 != 0:
+		nodes = _02bd8_nodes_from_parent_chain(world_obj)
+		source = "mem_chain"
+	var walk: Dictionary = {}
+	if nodes.size() > 0:
+		walk = FlightMathScript.apply_02bd8_null_aux_walk(lx, ly, lz, nodes)
+		lx = int(walk.get("x", lx))
+		ly = int(walk.get("y", ly))
+		lz = int(walk.get("z", lz))
+	last_046da_02bd8_walk = walk
+	last_02bd8_walk = walk
+	var commit: Dictionary = FlightMathScript.apply_02bd8_null_aux_commit(
+		lx, ly, lz, 0, 0, f24
+	)
+	last_046da_02bd8_commit = commit
+	last_02bd8_commit = commit
+	if bool(commit.get("commit", false)):
+		mem_u32[world_obj + 0x18] = int(commit.get("field_18", 0))
+		mem_u32[world_obj + 0x1C] = int(commit.get("field_1c", 0))
+		mem_u32[world_obj + 0x20] = int(commit.get("field_20", 0))
+	return {
+		"walk": walk,
+		"commit": commit,
+		"source": source,
+		"node_count": nodes.size(),
+	}
 
 
 ## [RECONSTRUCTED] FUN_000046da for kind-3 parent (5223–5259).
@@ -1765,16 +2292,9 @@ func _046da_from_parent(parent: int, index: int) -> Dictionary:
 	r["child_obj"] = child_obj
 	## --- tail (5236–5259) ---
 	if child_obj != 0:
-		var f24: int = int(mem_u32.get(child_obj + 0x24, 0))
-		var commit: Dictionary = FlightMathScript.apply_02bd8_null_aux_commit(
-			int(mem_u32.get(child_obj + 0x18, 0)),
-			int(mem_u32.get(child_obj + 0x1C, 0)),
-			int(mem_u32.get(child_obj + 0x20, 0)),
-			0,
-			0,
-			f24,
-		)
-		r["02bd8_commit"] = commit
+		var bd8: Dictionary = _apply_046da_02bd8(child_obj)
+		r["02bd8"] = bd8
+		r["02bd8_commit"] = bd8.get("commit", {})
 		var type_b: int = 0
 		if desc != 0:
 			type_b = int(mem_u32.get(desc + 1, 0)) & 0xFF
@@ -2027,6 +2547,8 @@ func _call_fun_000046da(desc: int, template_index: int, slot_index: int) -> void
 	last_03b98 = {}
 	last_046da_04e6e_gate = {}
 	last_04e6e_kind2 = {}
+	last_046da_02bd8_commit = {}
+	last_046da_02bd8_walk = {}
 	last_046da_deferred = false
 	if spawn_05116_world_obj == 0:
 		return
@@ -2050,6 +2572,8 @@ func _call_fun_000046da(desc: int, template_index: int, slot_index: int) -> void
 	mem_u32[spawn_05116_world_obj + 2] = int(idn.get("field_02", 0))
 	mem_u32[spawn_05116_world_obj + 3] = int(idn.get("field_03", 0))
 	mem_u32[spawn_05116_world_obj + 4] = int(idn.get("flags_04", 0))
+	## [RECONSTRUCTED] Pacific Conflict.c:5236 — FUN_00002bd8(obj, 1, null, null) before factory.
+	_apply_046da_02bd8(spawn_05116_world_obj)
 	## [RECONSTRUCTED] 046da/04690 vtable +8 when desc[1]≠0 (factory → handle; *handle=0).
 	## Resolve: type=desc[1] → tmpl=1b524[type]; imm=*(tmpl+6) (+0x20).
 	var desc_type: int = 0
@@ -2181,11 +2705,10 @@ func _call_fun_000046da(desc: int, template_index: int, slot_index: int) -> void
 	last_04808 = {}
 	last_02bd8_gate = {}
 	last_02bd8_args = {}
-	last_02bd8_commit = {}
 	last_02bd8_walk = {}
 	last_04e6e_followup = {}
 	last_03da8 = {}
-	## Keep last_0435a from 046da param_2=1; nested 04e6e may overwrite with param_2=0.
+	## Keep last_0435a / last_046da_02bd8_commit from 046da; nested 04e6e may overwrite last_*.
 	if bool(last_046da_04e6e_gate.get("need_04e6e", false)):
 		## Kind-2: list publish → heap×2 size=(36+3a)*0xC → +0x4c/+0x44 (5631–5643).
 		## Capstone: LEA $1A48+JSR×2 → +0x4C/+0x44, but $1A48 is heap_free epilogue
@@ -2222,158 +2745,7 @@ func _call_fun_000046da(desc: int, template_index: int, slot_index: int) -> void
 		last_04e6e_kind2["via_01a68"] = not spawn_04e6e_use_mock_ptrs
 		mem_u32[spawn_05116_world_obj + 0x4C] = ptr_4c
 		mem_u32[spawn_05116_world_obj + 0x44] = ptr_44
-		## [RECONSTRUCTED] FUN_00004808: 01a68(buf) → +0x48; polys; 01a68(count<<1) → +0x18.
-		var byte06: int = int(mem_u32.get(spawn_05116_world_obj + 6, 0)) & 0xFF
-		var f38: int = int(mem_u32.get(spawn_05116_world_obj + 0x38, 0))
-		var buf_bytes: int = FlightMathScript.apply_04808_buffer_bytes(f3a, f38, byte06)
-		var buf_alloc: Dictionary = {}
-		var buf_ptr: int = spawn_04808_buf_ptr
-		if spawn_04808_use_mock_ptrs and buf_ptr != 0:
-			buf_alloc = {"ok": true, "payload_ptr": buf_ptr, "mocked": true}
-		else:
-			buf_alloc = FlightMathScript.apply_01a68_alloc(buf_bytes, heap_01a68)
-			buf_ptr = int(buf_alloc.get("payload_ptr", 0))
-			spawn_04808_buf_ptr = buf_ptr
-		mem_u32[spawn_05116_world_obj + 0x48] = buf_ptr
-		last_04808 = {
-			"buffer_bytes": buf_bytes,
-			"field_48": buf_ptr,
-			"buf_alloc": buf_alloc,
-			"index_allocs": [],
-		}
-		if spawn_04808_desc_ptr != 0 and _to_s16(f3a) > 0:
-			## Build poly fixtures from desc stream + optional per-poly index word lists.
-			var poly_n: int = _to_s16(f3a)
-			var polys: Array = []
-			var stream_off: int = 0
-			for pi in range(poly_n):
-				var dp: int = spawn_04808_desc_ptr + stream_off
-				var poly_desc: Dictionary = {
-					0: int(mem_u32.get(dp + 0, 0)),
-					4: int(mem_u32.get(dp + 4, 0)),
-					5: int(mem_u32.get(dp + 5, 0)),
-					6: int(mem_u32.get(dp + 6, 0)),
-					7: int(mem_u32.get(dp + 7, 0)),
-					8: int(mem_u32.get(dp + 8, 0)),
-					9: int(mem_u32.get(dp + 9, 0)),
-					0x0A: int(mem_u32.get(dp + 0x0A, 0)),
-				}
-				var words_in: Array = []
-				if spawn_04808_index_words.size() > 0 and spawn_04808_index_words[0] is Array:
-					if pi < spawn_04808_index_words.size():
-						words_in = spawn_04808_index_words[pi]
-				elif pi == 0:
-					words_in = spawn_04808_index_words
-				polys.append({"desc": poly_desc, "words": words_in})
-				stream_off += FlightMathScript.apply_04808_stream_advance(
-					int(poly_desc.get(8, 0)) & 0xFF
-				)
-			var loop_r: Dictionary = FlightMathScript.apply_04808_poly_loop(polys, poly_n)
-			last_04808["loop"] = loop_r
-			var recs: Array = loop_r.get("records", [])
-			if recs.size() > 0:
-				last_04808["record"] = recs[0].get("record", {})
-				last_04808["index"] = recs[0].get("index_words", {})
-			var index_allocs: Array = []
-			for entry in recs:
-				var base: int = buf_ptr + int(entry.get("rec_base", 0))
-				var rec: Dictionary = entry.get("record", {})
-				mem_u32[base + 0x08] = int(rec.get("rec_u32_08", 0))
-				mem_u32[base + 0x0C] = int(rec.get("rec_u32_0c", 0))
-				mem_u32[base + 0x10] = int(rec.get("rec_u8_10", 0))
-				mem_u32[base + 0x11] = int(rec.get("rec_u8_11", 0))
-				mem_u32[base + 0x12] = int(rec.get("rec_u8_12", 0))
-				mem_u32[base + 0x13] = int(rec.get("rec_u8_13", 0))
-				mem_u32[base + 0x14] = int(rec.get("rec_u16_14", 0))
-				mem_u32[base + 0x16] = int(rec.get("rec_u8_16", 0))
-				mem_u32[base + 0x17] = int(rec.get("rec_u8_17", 0))
-				mem_u32[base + 0x1C] = int(rec.get("rec_u32_1c", 0))
-				var idx: Dictionary = entry.get("index_words", {})
-				var idx_bytes: int = FlightMathScript.apply_04808_index_alloc_bytes(
-					int(rec.get("rec_u16_14", 0))
-				)
-				var idx_alloc: Dictionary = {}
-				var iptr: int = 0
-				if spawn_04808_use_mock_ptrs and spawn_04808_index_ptr != 0:
-					iptr = spawn_04808_index_ptr + int(entry.get("index", 0)) * spawn_04808_index_stride
-					idx_alloc = {"ok": true, "payload_ptr": iptr, "mocked": true}
-				else:
-					idx_alloc = FlightMathScript.apply_01a68_alloc(idx_bytes, heap_01a68)
-					iptr = int(idx_alloc.get("payload_ptr", 0))
-				if index_allocs.is_empty():
-					spawn_04808_index_ptr = iptr
-				index_allocs.append(idx_alloc)
-				mem_u32[base + 0x18] = iptr
-				var words: Array = idx.get("words", [])
-				for wi in range(words.size()):
-					mem_u32[iptr + wi * 2] = int(words[wi]) & 0xFFFF
-			last_04808["index_allocs"] = index_allocs
-		## [RECONSTRUCTED] (obj+6)&2 trailer: u16 0..38-1 at buf+3a*0x20 (5306–5311).
-		var trailer: Dictionary = FlightMathScript.apply_04808_bit1_trailer(f3a, f38, byte06)
-		last_04808["trailer"] = trailer
-		if bool(trailer.get("enabled", false)):
-			var tbase: int = buf_ptr + int(trailer.get("trailer_offset", 0))
-			var tw: Array = trailer.get("words", [])
-			for ti in range(tw.size()):
-				mem_u32[tbase + ti * 2] = int(tw[ti]) & 0xFFFF
-		dat_0001daa2 = 1
-		last_04808["dat_0001daa2"] = 1
-		## [RECONSTRUCTED] post-04808: 02bd8 when bit4 clear on +5/+6/+7 (5653–5656).
-		var byte05: int = int(mem_u32.get(spawn_05116_world_obj + 5, 0)) & 0xFF
-		last_02bd8_gate = FlightMathScript.apply_04e6e_02bd8_gate(byte05, byte06, byte07)
-		if bool(last_02bd8_gate.get("need_02bd8", false)):
-			var verts44: int = int(mem_u32.get(spawn_05116_world_obj + 0x44, 0))
-			last_02bd8_args = FlightMathScript.apply_04e6e_02bd8_args(
-				spawn_05116_world_obj,
-				f36,
-				f3a,
-				spawn_02bd8_mesh_ptr,
-				verts44
-			)
-			## [RECONSTRUCTED] template walk: null-OR locals, or both-aux mesh→verts (3355–3371).
-			var lx: int = int(mem_u32.get(spawn_05116_world_obj + 0x18, 0))
-			var ly: int = int(mem_u32.get(spawn_05116_world_obj + 0x1C, 0))
-			var lz: int = int(mem_u32.get(spawn_05116_world_obj + 0x20, 0))
-			if spawn_02bd8_mesh_ptr != 0 and verts44 != 0:
-				var f34: int = int(mem_u32.get(spawn_05116_world_obj + 0x34, 0))
-				var count28: int = int(last_02bd8_args.get("param_2_count", 1))
-				last_02bd8_walk = FlightMathScript.apply_02bd8_both_aux_walk(
-					count28, spawn_02bd8_mesh_xyz, spawn_02bd8_nodes, f34
-				)
-				last_02bd8_walk["path"] = "both_aux"
-				var out_xyz: Array = last_02bd8_walk.get("xyz", [])
-				for vi in range(out_xyz.size()):
-					mem_u32[verts44 + vi * 4] = int(out_xyz[vi])
-			elif spawn_02bd8_mesh_ptr == 0 or verts44 == 0:
-				last_02bd8_walk = FlightMathScript.apply_02bd8_null_aux_walk(
-					lx, ly, lz, spawn_02bd8_nodes
-				)
-				last_02bd8_walk["path"] = "null_or"
-				lx = int(last_02bd8_walk.get("x", lx))
-				ly = int(last_02bd8_walk.get("y", ly))
-				lz = int(last_02bd8_walk.get("z", lz))
-			## rotate nodes: FlightMath 0253e→02ada when s2/s4/s6 nonzero.
-			var f24: int = int(mem_u32.get(spawn_05116_world_obj + 0x24, 0))
-			last_02bd8_commit = FlightMathScript.apply_02bd8_null_aux_commit(
-				lx, ly, lz, spawn_02bd8_mesh_ptr, verts44, f24
-			)
-			if bool(last_02bd8_commit.get("commit", false)):
-				mem_u32[spawn_05116_world_obj + 0x18] = int(last_02bd8_commit.get("field_18", 0))
-				mem_u32[spawn_05116_world_obj + 0x1C] = int(last_02bd8_commit.get("field_1c", 0))
-				mem_u32[spawn_05116_world_obj + 0x20] = int(last_02bd8_commit.get("field_20", 0))
-			## [RECONSTRUCTED] 0435a(obj,0); 03da8(obj, +0x10) band index.
-			var metric10: int = int(mem_u32.get(spawn_05116_world_obj + 0x10, 0))
-			last_04e6e_followup = FlightMathScript.apply_04e6e_post_02bd8_followup(
-				spawn_05116_world_obj, metric10
-			)
-			_apply_fun_0000435a(spawn_05116_world_obj, 0)
-			last_03da8 = FlightMathScript.apply_fun_00003da8(
-				int(mem_u32.get(spawn_05116_world_obj + 0x30, 0)),
-				metric10,
-				dat_0001b190
-			)
-			if bool(last_03da8.get("ok", false)) and int(last_03da8.get("changed", 0)) != 0:
-				mem_u32[spawn_05116_world_obj + 0x30] = int(last_03da8.get("field_30", 0))
+		_04e6e_kind2_04808_followup(spawn_05116_world_obj)
 	else:
 		last_046da_deferred = true
 		## Deferred DAT_0001d0e4 path: +0x44 not allocated here → 05116 gate fails.
@@ -2411,8 +2783,69 @@ func _apply_fun_000044a4(world_obj: int, param_2: int) -> Dictionary:
 	return last_044a4
 
 
+## [RECONSTRUCTED] Resolve 0435a iVar5 template + *(tpl+0xe) (5020–5038).
+## Falls back to spawn_0435a_scale_src when parent/embed/b5a0+0x8c missing.
+func _0435a_resolve_scale_src(world_obj: int) -> Dictionary:
+	var parent: int = int(mem_u32.get(world_obj + 0x24, 0))
+	var embed: int = int(mem_u32.get(parent + 0x28, 0)) if parent != 0 else 0
+	var b5a0_8c: int = int(mem_u32.get(dat_0001b5a0 + 0x8C, 0)) if dat_0001b5a0 != 0 else 0
+	var idx: int = int(mem_u32.get(world_obj + 1, 0)) & 0xFF
+	var raw_off: int = 0
+	if embed != 0:
+		raw_off = int(mem_u32.get(embed + 0x2E + idx * 0x18, 0))
+	var addr: Dictionary = FlightMathScript.apply_0435a_template_addr(
+		b5a0_8c, embed, idx, raw_off
+	)
+	if bool(addr.get("ok", false)):
+		var tpl: int = int(addr.get("template_ptr", 0))
+		return {
+			"scale_src": int(mem_u32.get(tpl + 0x0E, 0)),
+			"template_ptr": tpl,
+			"source": "mem_0e",
+			"addr": addr,
+		}
+	return {
+		"scale_src": spawn_0435a_scale_src,
+		"template_ptr": 0,
+		"source": "spawn_fallback",
+		"addr": addr,
+	}
+
+
+## [RECONSTRUCTED] Collect *(stream+10) along 0435a poly records (5049–5069).
+## Prefer mem walk from template; else spawn_0435a_poly_srcs.
+func _0435a_resolve_poly_srcs(template_ptr: int, field_3a: int) -> Dictionary:
+	var n: int = field_3a
+	if n < 0:
+		n = 0
+	if template_ptr != 0:
+		var base: Dictionary = FlightMathScript.apply_0435a_poly_stream_base(
+			template_ptr,
+			int(mem_u32.get(template_ptr + 0x1A, 0)),
+			int(mem_u32.get(template_ptr + 0x1E, 0)),
+		)
+		var stream: int = int(base.get("stream_base", 0))
+		var srcs: Array = []
+		for _i in range(n):
+			srcs.append(int(mem_u32.get(stream + 0x0A, 0)))
+			var byte08: int = int(mem_u32.get(stream + 8, 0)) & 0xFF
+			stream = FlightMathScript.apply_0435a_poly_stream_advance(stream, byte08)
+		return {
+			"srcs": srcs,
+			"source": "mem_stream",
+			"stream_base": base,
+			"stream_end": stream,
+		}
+	return {
+		"srcs": spawn_0435a_poly_srcs.duplicate(),
+		"source": "spawn_fallback",
+		"stream_base": {},
+		"stream_end": 0,
+	}
+
+
 ## [RECONSTRUCTED] FUN_0000435a gate / +0xc / kind2 poly +0x1c (5018–5071).
-## Shared by FUN_000044a4 tick passes and post-02bd8 spawn followup (param_2=0).
+## Shared by FUN_000044a4 tick passes, 046da (param_2=1), and post-02bd8 spawn followup.
 func _apply_fun_0000435a(world_obj: int, param_2: int) -> Dictionary:
 	_fun_0000435a_calls_this_tick += 1
 	last_0435a = {}
@@ -2427,9 +2860,11 @@ func _apply_fun_0000435a(world_obj: int, param_2: int) -> Dictionary:
 		return last_0435a
 	var scale35: int = FlightMathScript.apply_0435a_scale_factor(byte05, mission_phase_a8)
 	var kind: int = int(mem_u32.get(world_obj + 0, 0))
+	var src: Dictionary = _0435a_resolve_scale_src(world_obj)
+	last_0435a["scale_src"] = src
 	var f0c: Dictionary = FlightMathScript.apply_0435a_field_0c(
 		int(mem_u32.get(world_obj + 0x0C, 0)),
-		spawn_0435a_scale_src,
+		int(src.get("scale_src", spawn_0435a_scale_src)),
 		scale35,
 		kind,
 		byte06
@@ -2439,8 +2874,12 @@ func _apply_fun_0000435a(world_obj: int, param_2: int) -> Dictionary:
 	if bool(f0c.get("wrote", false)):
 		mem_u32[world_obj + 0x0C] = int(f0c.get("field_0c", 0))
 	var f3a: int = int(mem_u32.get(world_obj + 0x3A, 0))
+	var poly_src: Dictionary = _0435a_resolve_poly_srcs(
+		int(src.get("template_ptr", 0)), f3a
+	)
+	last_0435a["poly_srcs"] = poly_src
 	var loop1c: Dictionary = FlightMathScript.apply_0435a_poly_1c_loop(
-		spawn_0435a_poly_srcs,
+		poly_src.get("srcs", []),
 		f3a,
 		scale35,
 		spawn_0435a_is_player,
