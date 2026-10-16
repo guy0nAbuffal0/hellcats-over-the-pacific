@@ -1887,7 +1887,7 @@ func _04e6e_kind2_04808_followup(obj: int) -> Dictionary:
 ## [RECONSTRUCTED] FUN_00004958 through simple poly cull (5342 / 5374–5462).
 ## Call-site immediates from 5686; local_1be4 rel; nested 02bd8; then per-poly
 ## index walk for index_count==1 (project xz → cull if pairs<3).
-## [DEFERRED] 03c68 thinning, b190/b242 clip chain, local_f54 gather.
+## [DEFERRED] b2f4/b3aa clip; local_f54 gather.
 func _apply_fun_00004958(obj: int) -> Dictionary:
 	var args: Dictionary = FlightMathScript.apply_04e6e_04958_args()
 	var f36: int = int(mem_u32.get(obj + 0x36, 0))
@@ -1953,6 +1953,10 @@ func _apply_fun_00004958(obj: int) -> Dictionary:
 				dat_0001d830,
 				phase_a8,
 			)
+			## 5430–5438: if pairs>=3 → b190(plane=-param_4); if n≠0 → b242(plane=param_4).
+			var p4: int = int(args.get("param_4", 0))
+			pairs = FlightMathScript.apply_04958_clip_b190(pairs, p4)
+			pairs = FlightMathScript.apply_04958_clip_b242(pairs, p4)
 			pairs["header"] = hdr
 			pairs["poly_index"] = pi
 			if bool(pairs.get("ok", false)) and bool(pairs.get("cull", false)) and poly_base != 0:

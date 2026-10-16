@@ -1337,6 +1337,43 @@ func _test_fun_00005116_slot_helpers() -> bool:
 		[0, 0, 0, 1, 0, 0], [0, 1], 0, 0, 0, 0, 1000, 0
 	)
 	ok = Assertions.assert_equal(int(pp.get("pair_count", -1)), 1, "thin skip") and ok
+	## FUN_0000b190 x-plane clip (keep x >= plane)
+	var clip: Dictionary = FlightMathScript.fun_0000b190(
+		[{"x": 0, "z": 0}, {"x": 10, "z": 0}, {"x": 10, "z": 10}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 4, "b190 cross→4") and ok
+	clip = FlightMathScript.fun_0000b190(
+		[{"x": 10, "z": 0}, {"x": 20, "z": 0}, {"x": 15, "z": 10}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 3, "b190 all in") and ok
+	var cb: Dictionary = FlightMathScript.apply_04958_clip_b190(
+		{"pair_count": 2, "pairs": [{"x": 0, "z": 0}, {"x": 1, "z": 1}], "cull": true},
+		0x7FE4
+	)
+	ok = Assertions.assert_true(not bool(cb.get("applied_b190", true)), "<3 no b190") and ok
+	cb = FlightMathScript.apply_04958_clip_b190(
+		{
+			"pair_count": 3,
+			"pairs": [{"x": 0, "z": 0}, {"x": 10, "z": 0}, {"x": 5, "z": 10}],
+			"cull": false,
+		},
+		0x7FE4
+	)
+	ok = Assertions.assert_true(bool(cb.get("applied_b190", false)), "b190 on") and ok
+	ok = Assertions.assert_true(bool(cb.get("deferred_b242", false)), "b242 defer") and ok
+	## FUN_0000b242 max-x clip (keep x <= plane)
+	clip = FlightMathScript.fun_0000b242(
+		[{"x": 0, "z": 0}, {"x": 10, "z": 0}, {"x": 10, "z": 10}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 3, "b242 cross→3") and ok
+	clip = FlightMathScript.fun_0000b242(
+		[{"x": 0, "z": 0}, {"x": 4, "z": 0}, {"x": 2, "z": 4}], 5
+	)
+	ok = Assertions.assert_equal(int(clip.get("count", -1)), 3, "b242 all in") and ok
+	var cb2: Dictionary = FlightMathScript.apply_04958_clip_b242(cb, 0x7FE4)
+	ok = Assertions.assert_true(bool(cb2.get("applied_b242", false)), "b242 on") and ok
+	ok = Assertions.assert_true(bool(cb2.get("deferred_b2f4", false)), "b2f4 defer") and ok
+	ok = Assertions.assert_true(not bool(cb2.get("cull", true)), "b242 keep") and ok
 	## 04e6e → 15762 args (5669–5682)
 	var a62: Dictionary = FlightMathScript.apply_04e6e_15762_args(0, 0x17, 1, 2, 3, 4)
 	ok = Assertions.assert_true(bool(a62.get("zeroed", false)), "null handle→0") and ok

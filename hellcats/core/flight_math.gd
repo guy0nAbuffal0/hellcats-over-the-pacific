@@ -2201,6 +2201,146 @@ static func apply_04958_poly_pairs_simple(
 	)
 
 
+## [RECONSTRUCTED] FUN_0000b190 (10308–10366; Capstone @0xB190).
+## Sutherland-style clip of closed xz ring against x == clip_plane (DAT_00020aee).
+## pairs: [{x,z}, …] count>=1; returns output pairs + count (byte_delta>>3).
+static func fun_0000b190(pairs: Array, clip_plane: int) -> Dictionary:
+	var n: int = pairs.size()
+	var out: Array = []
+	if n == 0:
+		return {"count": 0, "pairs": out, "clip_plane": clip_plane}
+	var plane: int = _to_s32(clip_plane)
+	for i in range(n):
+		var cur: Dictionary = pairs[i] as Dictionary
+		var prev: Dictionary = pairs[(i - 1 + n) % n] as Dictionary
+		## Decomp walks with piVar7 = previous; first iter uses last vertex.
+		var cx: int = int(cur.get("x", 0))
+		var cz: int = int(cur.get("z", 0))
+		var px: int = int(prev.get("x", 0))
+		var pz: int = int(prev.get("z", 0))
+		if cx < plane:
+			if plane <= px:
+				## Entering from outside←inside along edge prev→cur? decomp: curr out, prev in.
+				var dx: int = px - cx
+				var iz: int = cz
+				if dx != 0:
+					iz = cz + _div_trunc((pz - cz) * (plane - cx), dx)
+				out.append({"x": plane, "z": _to_s32(iz)})
+		else:
+			if px < plane:
+				## curr in, prev out — emit intersection then current.
+				var dx2: int = cx - px
+				var iz2: int = pz
+				if dx2 != 0:
+					iz2 = pz + _div_trunc((cz - pz) * (plane - px), dx2)
+				out.append({"x": plane, "z": _to_s32(iz2)})
+				out.append({"x": cx, "z": cz})
+			else:
+				out.append({"x": cx, "z": cz})
+	return {
+		"count": out.size(),
+		"pairs": out,
+		"clip_plane": plane,
+	}
+
+
+## [RECONSTRUCTED] 04958 post-pairs: if count>=3, b190 against plane=-param_4 (5430–5431).
+## Returns updated pairs/count; cull if b190 yields 0. b242+ deferred.
+static func apply_04958_clip_b190(pairs_result: Dictionary, param_4: int) -> Dictionary:
+	var pair_count: int = int(pairs_result.get("pair_count", 0))
+	var pairs: Array = pairs_result.get("pairs", []) as Array
+	var r: Dictionary = pairs_result.duplicate(true)
+	r["applied_b190"] = false
+	r["deferred_b242"] = false
+	if pair_count < 3:
+		return r
+	var plane: int = -_to_s16(param_4)
+	var clipped: Dictionary = fun_0000b190(pairs, plane)
+	var n_out: int = int(clipped.get("count", 0))
+	r["applied_b190"] = true
+	r["b190"] = clipped
+	r["clip_plane_b190"] = plane
+	r["pairs"] = clipped.get("pairs", [])
+	r["pair_count"] = n_out
+	if n_out == 0:
+		r["cull"] = true
+		r["flag_or_13"] = 2
+	else:
+		r["cull"] = false
+		r["flag_or_13"] = 0
+		r["deferred_b242"] = true
+	return r
+
+
+## [RECONSTRUCTED] FUN_0000b242 (10371–10429; Capstone @0xB242).
+## Mirror of b190: closed xz ring clip keep x <= clip_plane (DAT_00020aec).
+static func fun_0000b242(pairs: Array, clip_plane: int) -> Dictionary:
+	var n: int = pairs.size()
+	var out: Array = []
+	if n == 0:
+		return {"count": 0, "pairs": out, "clip_plane": clip_plane}
+	var plane: int = _to_s32(clip_plane)
+	for i in range(n):
+		var cur: Dictionary = pairs[i] as Dictionary
+		var prev: Dictionary = pairs[(i - 1 + n) % n] as Dictionary
+		var cx: int = int(cur.get("x", 0))
+		var cz: int = int(cur.get("z", 0))
+		var px: int = int(prev.get("x", 0))
+		var pz: int = int(prev.get("z", 0))
+		if plane < cx:
+			if px <= plane:
+				## curr out (x>plane), prev in — emit intersection.
+				var dx: int = px - cx
+				var iz: int = cz
+				if dx != 0:
+					iz = cz + _div_trunc((pz - cz) * (plane - cx), dx)
+				out.append({"x": plane, "z": _to_s32(iz)})
+		else:
+			if plane < px:
+				## curr in, prev out — emit intersection then current.
+				var dx2: int = cx - px
+				var iz2: int = pz
+				if dx2 != 0:
+					iz2 = pz + _div_trunc((cz - pz) * (plane - px), dx2)
+				out.append({"x": plane, "z": _to_s32(iz2)})
+				out.append({"x": cx, "z": cz})
+			else:
+				out.append({"x": cx, "z": cz})
+	return {
+		"count": out.size(),
+		"pairs": out,
+		"clip_plane": plane,
+	}
+
+
+## [RECONSTRUCTED] 04958 after b190: if count!=0 → b242 plane=param_4 (5437–5438).
+## Cull if b242 yields 0. b2f4+ deferred.
+static func apply_04958_clip_b242(pairs_result: Dictionary, param_4: int) -> Dictionary:
+	var r: Dictionary = pairs_result.duplicate(true)
+	r["applied_b242"] = false
+	r["deferred_b2f4"] = false
+	if not bool(r.get("deferred_b242", false)):
+		return r
+	var pairs: Array = r.get("pairs", []) as Array
+	var plane: int = _to_s16(param_4)
+	var clipped: Dictionary = fun_0000b242(pairs, plane)
+	var n_out: int = int(clipped.get("count", 0))
+	r["applied_b242"] = true
+	r["deferred_b242"] = false
+	r["b242"] = clipped
+	r["clip_plane_b242"] = plane
+	r["pairs"] = clipped.get("pairs", [])
+	r["pair_count"] = n_out
+	if n_out == 0:
+		r["cull"] = true
+		r["flag_or_13"] = 2
+	else:
+		r["cull"] = false
+		r["flag_or_13"] = 0
+		r["deferred_b2f4"] = true
+	return r
+
+
 ## [RECONSTRUCTED] FUN_00004e6e post-04958 follow-up (5687–5693).
 ## If *(s16*)(b5a0+0xe)==1 → 04916(obj,0x80); else 03ea0.
 static func apply_04e6e_post_04958_followup(b5a0_field_0e: int) -> Dictionary:

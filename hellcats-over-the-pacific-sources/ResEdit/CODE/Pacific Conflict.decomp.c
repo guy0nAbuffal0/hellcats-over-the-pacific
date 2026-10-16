@@ -1099,8 +1099,22 @@ undefined4 FUN_00000334(void)
 
 
 
-undefined4 FUN_00000354(void)
-
+/*
+ * Original: FUN_00000354
+ * Proposed name: probe_nearest_facility_kind
+ * Confidence: [PROVEN] 0x12/0x13→0x100/0x200; [STRONG INFERENCE] “facility”
+ *
+ * Scan DAT_0001b5a4 pool for entities whose *(+8)+4 short is 0x12 or 0x13,
+ * within range *(entity+0xc), pick nearest by FUN_00003c68 to the query
+ * object. Return 0x100 (kind 0x12), 0x200 (kind 0x13), or 0.
+ *
+ * Capstone @0x0354: first arg is entity ptr on stack (Ghidra `void` is wrong;
+ * callsites often omit the push). find_nearest_runway_approach_ends requires
+ * 0x200 before accepting type==2 pads.
+ *
+ * Evidence: Capstone; 12 BSR sites; runway path @0x19CCE.
+ */
+undefined4 probe_nearest_facility_kind(void) /* Original: FUN_00000354 */
 {
   int iVar1;
   short *psVar2;
@@ -1177,7 +1191,7 @@ void FUN_00000488(int param_1)
   short *psVar1;
   int iVar2;
   
-  if ((-1 < *(short *)(param_1 + 0x50)) && (iVar2 = FUN_00000354(), iVar2 != 0x200)) {
+  if ((-1 < *(short *)(param_1 + 0x50)) && (iVar2 = probe_nearest_facility_kind( /* Original: FUN_00000354 */), iVar2 != 0x200)) {
     if (*(short *)(param_1 + 0x50) == 0) {
       return;
     }
@@ -9136,7 +9150,7 @@ LAB_00008000:
   FUN_000096f4();
   if (((7 < DAT_0001d858) || (*(int *)((int)DAT_0001b738 + 0x62a) != 0)) ||
      (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) goto LAB_00008324;
-  uVar6 = FUN_00000354();
+  uVar6 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
   if (*(short *)(DAT_0001b5a0 + 0xd4) == 1) {
     uVar6 = uVar6 | 1;
     goto switchD_0000833a_caseD_3;
@@ -9471,7 +9485,7 @@ uint FUN_0000879e(void)
   uint uVar2;
   uint uVar3;
   
-  uVar2 = FUN_00000354();
+  uVar2 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
   iVar1 = DAT_0001b5a0;
   uVar3 = uVar2 | 7;
   *(undefined2 *)(DAT_0001b5a0 + 0xd6) = 1;
@@ -15464,13 +15478,15 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
   }
   /*
    * ---- Block 1: flags_685 control jitter (binary @0xE8A0–0xE93C) --------
-   * [PROVEN] If flags_685 bit2: movement_662 += (overlay_rng_next()&0x7f)-0x40;
-   *   clamp via abs_int abs > 0x200 → {-0x200,+0x200}.
-   * [PROVEN] If flags_685 bit3: same for movement_666; clamp threshold 0x140
-   *   → {-0x140,+0x140} (0xFEC0 / 0x140).
-   * [PROVEN] If status bit0 (Ghidra param_1+0x1a1 / binary +0x684 bit0):
-   *   movement_662=0, movement_666=0xFF80.
-   * Evidence: NOTES.md 2026-10-15 slice; flight contract “flags_685 RNG”.
+   * Control channels filled by enqueue_control_inputs_avg4:
+   *   +0x662 ← avg(param_3)  +0x664 ← avg(param_2)  +0x666 ← avg(param_4)
+   * (steer heading → 666; lateral/cos → 662). Capstone re-check iter 94.
+   *
+   * [PROVEN] flags_685 bit2 (@0xE8A0): +0x662 += (overlay_rng_next()&0x7f)-0x40;
+   *   abs>0x200 → clamp ±0x200 (BSR $11564 / $2E08).
+   * [PROVEN] flags_685 bit3 (@0xE8E6): same on +0x666; clamp ±0x140.
+   * [PROVEN] status +0x684 bit0 (@0xE92C): +0x662=0, +0x666=0xFF80.
+   * Note: flags_685 bit0 gates enqueue_control_inputs_avg4 (no new samples).
    */
   if ((*(byte *)((int)param_1 + 0x685) & 4) != 0) {
     uVar8 = overlay_rng_next( /* Original: FUN_00011564 */);
@@ -16634,7 +16650,7 @@ switchD_0000ff44_caseD_3:
     }
   }
   else {
-    iVar6 = FUN_00000354();
+    iVar6 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
     if (iVar6 != 0x100) {
       return;
     }
@@ -16742,7 +16758,7 @@ uint FUN_000100d4(int param_1,int param_2)
     if (0x19 < sVar2) {
       return uVar5;
     }
-    uVar4 = FUN_00000354();
+    uVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
     if (uVar4 != 0x200) {
       return uVar4;
     }
@@ -16777,7 +16793,7 @@ LAB_000102c4:
         }
       }
       else {
-        uVar4 = FUN_00000354();
+        uVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
         if (uVar4 == 0x200) {
           uVar4 = *(ushort *)(iVar1 + 0x684) & 0xffff03b2;
           if ((*(ushort *)(iVar1 + 0x684) & 0x3b2) == 0) {
@@ -19551,7 +19567,7 @@ void FUN_00012d34(int *param_1)
         sVar6 = 0xf;
         if ((*(short *)(param_1 + 0x185) != 0) && (sVar4 = FUN_00013452((int)pcVar1), sVar4 == 0x70)
            ) {
-          uVar2 = FUN_00000354();
+          uVar2 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
           if ((short)uVar2 == 0x100) {
             if (DAT_0001b870 == 0) {
               *(short *)(DAT_0001b5a0 + 0xcc) = *(short *)(DAT_0001b5a0 + 0xcc) + 1;
@@ -21218,7 +21234,7 @@ void FUN_00014d86(undefined4 *param_1)
         FUN_00000488((int)pcVar1);
       }
       if (*(short *)param_1[1] == 0x15) {
-        iVar3 = FUN_00000354();
+        iVar3 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
         if ((iVar3 == 0x200) &&
            ((*(short *)(DAT_0001b5a0 + 0x90) == 7 || (*(short *)(DAT_0001b5a0 + 0x90) == 9)))) {
           if (-1 < *(short *)(DAT_0001b5a0 + 0xce)) {
@@ -21230,7 +21246,7 @@ void FUN_00014d86(undefined4 *param_1)
         }
       }
       if (*(short *)param_1[1] == 0x15) {
-        iVar3 = FUN_00000354();
+        iVar3 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
         if ((iVar3 == 0x100) &&
            (((*(short *)(DAT_0001b5a0 + 0x90) == 8 || (*(short *)(DAT_0001b5a0 + 0x90) == 9)) &&
             (*(short *)(DAT_0001b5a0 + 0xce) == 0)))) {
@@ -24528,7 +24544,7 @@ LAB_00018cf6:
         *(undefined2 *)(param_1 + 0x16) = 0;
       }
 LAB_00018df2:
-      uVar5 = FUN_00000354();
+      uVar5 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
       *(short *)((int)param_1 + 0x3e) = (short)uVar5;
       *(undefined2 *)(param_1 + 0x10) = 1;
     }
@@ -24694,7 +24710,7 @@ void FUN_0001917c(undefined4 *param_1)
   
   pcVar1 = (char *)*param_1;
   if (*(short *)(param_1 + 0x10) == 0) {
-    uVar5 = FUN_00000354();
+    uVar5 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
     *(short *)((int)param_1 + 0x3e) = (short)uVar5;
     *(undefined2 *)(param_1 + 0x10) = 1;
   }
@@ -25224,7 +25240,7 @@ void store_xyz_asr(int param_1,int param_2,int param_3,uint param_4) /* Original
  * Confidence: [STRONG INFERENCE]
  *
  * Scan entity pools (DAT_0001b5a4 then DAT_0001d4a4): type==2 and
- * FUN_00000354==0x200 → candidate field/carrier. Among pads with
+ * probe_nearest_facility_kind==0x200 → candidate field/carrier. Among pads with
  * +0x16=='p' and +0x14==4, scale 4 verts via store_xyz_asr, pick
  * closer approach pair (FUN_00003c48). Write two XYZ ends to *param_2 /
  * *param_3. Return 0 if best score < 0x40740, else 1.
@@ -25285,7 +25301,7 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
       local_62 = local_62 + -1;
       pcVar2 = (char *)*local_62;
       if (*pcVar2 == '\x02') {
-        iVar4 = FUN_00000354();
+        iVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
         if (iVar4 == 0x200) {
           iVar4 = FUN_00003c68();
           if (iVar4 < local_66) {
@@ -25401,7 +25417,7 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
  * If find_nearest_runway_approach_ends fills approach endpoints and range metric ∈ (9999,0x26ac1):
  * write glide path into DAT_000267xx (pos + unit dir with Y=0xFDC0), nudge
  * start along dir×10000, clear AI flags, save prior +0x32 into DAT_00026798,
- * install handler 0x1A186, return 0. Else return 1.
+ * install AI +0x32←0x1A186 (≡ tick_landing_approach_glide−0x20), return 0. Else 1.
  *
  * Callers: tick_ai_1b370_mission phase 3→4; player keypath @0x7C98.
  *
@@ -25470,6 +25486,8 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
       DAT_000267ae = 0x181;
     }
     DAT_00026798 = *(undefined4 *)((int)param_1 + 0x32);
+    /* Literal 0x1A186 = tick_landing_approach_glide @0x1A1A6 − 0x20
+     * [BLOCKED false mid-label family]; intended AI callback is 0x1A1A6. */
     *(undefined4 *)((int)param_1 + 0x32) = 0x1a186;
     return 0;
   }
@@ -25480,8 +25498,22 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_0001a1a6(int *param_1)
-
+/*
+ * Original: FUN_0001a1a6
+ * Proposed name: tick_landing_approach_glide
+ * Confidence: [STRONG INFERENCE]
+ *
+ * Per-frame landing glide: pull DAT_000267bc/c0/c4 aim point and
+ * DAT_000267b2/b6/ba dir; distance via FUN_00003c68; slide aim along dir;
+ * adjust_ai_throttle_vs_speed / steer_entity_toward_point; on +0x63e restore
+ * prior +0x32 from DAT_00026798.
+ *
+ * Installed by try_begin_landing_approach via literal 0x1A186 (= this−0x20)
+ * [BLOCKED false mid-label; same family as sin/cos/$E352].
+ *
+ * Evidence: Capstone link @0x1A1A6; consumes 267xx filled by 19fba.
+ */
+void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
 {
   undefined4 uVar1;
   undefined1 uVar2;

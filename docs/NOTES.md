@@ -13,11 +13,35 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Entries
 
+### 2026-10-16 — FUN_0000b242 max-x clip after b190
+
+- **[PROVEN]** Pacific Conflict.c:5437–5438: if `b190` count≠0 → `DAT_00020aec=param_4` then `b242(out,n,in)`; restore.
+- **[PROVEN]** `b242` (10371–10429): closed xz ring clip keep `x<=plane` (mirror of `b190`).
+- **Godot:** `fun_0000b242` / `apply_04958_clip_b242`; plane=`_to_s16(param_4)`; SimCore chains after `b190`.
+- **[DEFERRED]** `b2f4`/`b3aa`; `local_f54` gather.
+- **Validation:** Godot 13/0; Python all passed (this tick).
+
+### 2026-10-16 — FUN_0000b190 x-plane clip on 04958
+
+- **[PROVEN]** Pacific Conflict.c:5430–5431: if thinned pairs≥3 → `DAT_00020aee=-param_4` then `b190(local_464,n,out)`; restore `20aee`.
+- **[PROVEN]** `b190` (10308–10366): closed xz ring clip keep `x>=plane`; return out-count (`Δbytes>>3`).
+- **Godot:** `fun_0000b190` / `apply_04958_clip_b190`; plane=`-_to_s16(param_4)` (call-site `0x7fe4`).
+- **[DEFERRED]** `b2f4`/`b3aa`; `local_f54` gather (`b242` now wired).
+- **Validation:** Godot 13/0; Python all passed (prior tick).
+
+### 2026-10-16 — FUN_00003c68 + 04958 multi-index thinning
+
+- **[PROVEN]** Capstone `@0x3C68`: six stack longs `(x0,y0,z0,x1,y1,z1)`; `a=|x1-x0|` etc via LEA `$2DE8`≡`02e08`; `max+((sum other)>>2)` (same combine as `03b98`/`03c00`).
+- **[PROVEN]** Capstone `@0x4AAE` (04958): later indices push `(prev_x,0,prev_z,cur_x,0,cur_z)` then `(1d838,0,1d830,cur_x,0,cur_z)`; accept when `cam/(a8+3) <= acc`.
+- **Godot:** `fun_00003c68`; `apply_04958_poly_pairs` thins multi-index; SimCore passes `dat_0001d838`/`1d830` + `b5a0+0xa8`.
+- **[DEFERRED]** `b2f4`/`b3aa` clip; `local_f54` gather (`b190`/`b242` wired).
+- **Validation:** Godot headless + Python regression (this tick).
+
 ### 2026-10-16 — 04958 poly index walk (simple cull)
 
 - **[PROVEN]** Pacific Conflict.c:5405–5462 / 5493: stream count@+8, indices@+0xe (same as 04808 desc); project xz `(v0-1d724,v2-1d71c)>>param_3`; pairs<3 → `poly+0x13|=2`.
-- **Godot:** `apply_04958_project_xz` / `apply_04958_poly_pairs_simple` for `index_count==1`; writes cull flag.
-- **[DEFERRED]** `FUN_00003c68` thinning when `index_count>1`; `b190`/`b242`/`b2f4`/`b3aa` clip; `local_f54` gather.
+- **Godot:** `apply_04958_project_xz` / `apply_04958_poly_pairs` (was simple-only; now includes `03c68` thinning).
+- **[DEFERRED]** clip chain / `local_f54` gather.
 - **Validation:** Godot headless + Python regression (this tick).
 
 ### 2026-10-16 — nested FUN_00002bd8 in 04958
@@ -25,7 +49,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[PROVEN]** Pacific Conflict.c:5396: `02bd8(obj, *(s16*)(tpl+0x1a), tpl+0x22, auStack_15e4)` — both-aux; count is `1a` only (not `1a+1e`).
 - **[PROVEN]** Src treated as int32×3 at `tpl+0x22` (contrast `15762`/`02976` packed +2/+6/+10).
 - **Godot:** `_apply_fun_00004958` runs `apply_02bd8_both_aux_walk` → `auStack_15e4`.
-- **[DEFERRED]** `03c68` thinning / clip chain (simple cull path now wired).
+- **[DEFERRED]** clip chain after thinned pairs.
 - **Validation:** Godot headless + Python regression (this tick).
 
 ### 2026-10-16 — FUN_00004958 entry + 04916 on +6 path

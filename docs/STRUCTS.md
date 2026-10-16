@@ -105,8 +105,9 @@ See `docs/contracts/input_godot_contract.md`.
 | 0x626 | short | 14300, 14307-14315 |
 | 0x62a | int | 14064, 14065 |
 | 0x63e | byte | 7439, 7449, 14301 |
-| 0x662 | short | 14102-14114, 14123, 14256-14294 |
-| 0x666 | short | 14115-14127, 14123, 14280-14330 |
+| 0x662 | short | ctrl avg from `enqueue_control_inputs_avg4` p3; see bitfield § |
+| 0x664 | short | ctrl avg from avg4 p2 |
+| 0x666 | short | ctrl avg from avg4 p4 (heading-ish) |
 | 0x669 | byte | 14097, 14155, 14156, 14200, 14238 |
 | 0x66a | int | 14077, 14078, 14234-14236 |
 | 0x66e | int | 14198, 14202, 14206 |
@@ -115,12 +116,34 @@ See `docs/contracts/input_godot_contract.md`.
 | 0x67c | byte | 961 (DAT_0001b5a0+0xb9) |
 | 0x67d | byte | 14078, 14103, 14157, 14238, 953 |
 | 0x67e | byte | 14077, 14078, 14104, 14158, 954-955 |
-| 0x685 | byte | 14100, 14115, 14137, 14201, 14203 |
-| 0x19a | short/byte | 14124, 14150, 7474 |
-| 0x664 | short (param_1+0x199 as int*) | 14271, 14293 |
+| 0x685 | byte | `flags_685` — bitfield below |
+| 0x19a | short/byte | throttle nibble 0..9 (+0x668) |
 | 0x1a0 | short | 14151, 14152, 14253 |
-| 0x1a1 | byte/ushort | 14079, 14120, 14121, 14137, 14238 |
+| 0x1a1 | byte/ushort | status at +0x684 (Ghidra int* index) |
 | 0x1a3 | short | 14137 |
+
+### Control channels + `flags_685` bitfield (iter 94–96)
+
+Fed by `enqueue_control_inputs_avg4` (`FUN_00010558`) when **bit0 clear**; consumed in `update_aircraft_entity` Block 1+.
+
+| Offset | Avg4 source | Role [STRONG INFERENCE] |
+|--------|-------------|-------------------------|
+| **+0x666** | mean(param_4) | heading / yaw command |
+| **+0x662** | mean(param_3) | pitch-ish / lateral companion |
+| **+0x664** | mean(param_2) | third axis (often 0 from steer) |
+
+| `flags_685` bit | Mask | Confidence | Effect |
+|-----------------|------|------------|--------|
+| 0 | `0x01` | [PROVEN] | Gates avg4 enqueue; also gates special-weapon spawn path (`677`) |
+| 1 | `0x02` | [PROVEN] | Block 7c ammo / draw tail |
+| 2 | `0x04` | [PROVEN] | RNG jitter on **+0x662** (±0x40 then clamp ±0x200) @0xE8A0 |
+| 3 | `0x08` | [PROVEN] | RNG jitter on **+0x666** (clamp ±0x140) @0xE8E6 |
+| 4 | `0x10` | [PROVEN] | Blocks oriented-ordnance spawn when set |
+| 5 | `0x20` | [PROVEN] | Affects `67b`/`679` epilogue / contact branches |
+| 6 | `0x40` | [PROVEN] | Part of `movement_669` gate with status_1a3 |
+| 7 | `0x80` | [PROVEN] | Sign bit: halve throttle byte +0x19a toward 0 |
+
+Related: **+0x684 bit0** (status) forces `+0x662=0`, `+0x666=0xFF80` after jitter.
 
 **[RECONSTRUCTED]** Offsets **0x66e**, **0x672**, and **0x66a** are **written** only inside the ownership branch in the next section (Pacific Conflict.c:14179–14244). They are **read** elsewhere (e.g. 11730, 11753, 7936, 14427).
 

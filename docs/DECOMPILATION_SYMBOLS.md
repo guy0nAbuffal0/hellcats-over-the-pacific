@@ -74,6 +74,9 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00019fba` | `try_begin_landing_approach` | STRONG INFERENCE | `@0x19FBA`: `find_nearest_runway_approach_ends`+range → `DAT_000267xx` glide; +0x32=`0x1A186`; ret 0/1. |
 | `FUN_00019c5e` | `find_nearest_runway_approach_ends` | STRONG INFERENCE | `@0x19C5E`: nearest type2/0x200 pad ('p',4); two XYZ ends; 0 if score<0x40740. |
 | `FUN_00019c26` | `store_xyz_asr` | PROVEN | `@0x19C26`: ASR x/y/z by s into A1 dest; used with entity +0x34 scale. |
+| `FUN_0001a1a6` | `tick_landing_approach_glide` | STRONG INFERENCE | `@0x1A1A6`: consume `DAT_000267xx` glide; steer/throttle; restore +0x32 on +0x63e. |
+| `FUN_00000354` | `probe_nearest_facility_kind` | PROVEN | `@0x0354`: nearest pool entity kind 0x12/0x13 → flags 0x100/0x200 (stack entity arg; Ghidra void wrong). |
+| `$1A186` | *(false mid → `tick_landing_approach_glide`)* | BLOCKED | `0x1A1A6−0x20`; literal stored by `try_begin_landing_approach`. |
 | `FUN_00001d02` | `matmul3x3_s16` | PROVEN | `@0x1D02`: 3×3 s16 `out=left×right`, each element 3×`MULS.W` then `ASR #12`. |
 | `FUN_000020e6` | `fill_attitude_rotation_bases` | PROVEN layout | `@0x20E6`: expand sincos pairs 1–3 into bases at `DAT_0001d7d4` / `1d7bc` / `1d7a4` (≈Rx/Ry/Rz, `0x1000`=1). |
 | `FUN_000021a0` | `fill_attitude_rotation_basis_4` | PROVEN layout | `@0x21A0`: angle4 (`1d7ee/f0`) → `DAT_0001d78c` as ≈Ry `[[c,0,s],[0,1,0],[-s,0,c]]`. |
@@ -98,7 +101,10 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001d56` | *(false mid-`matmul3x3_s16`)*; callsite→`sin_fixed14` | BLOCKED | `@0x1D56` = `$1D76−0x20` (ASR inside matmul). |
 | `FUN_00001db8` | *(false mid-`sin_fixed14`)*; callsite→`cos_fixed14` | BLOCKED | `@0x1DB8` = `$1DD8−0x20`. |
 | `FUN_00006fb8` | `reset_distance_base_globals` | STRONG INFERENCE | `@0x6FB8`: six `MOVE.L #$05F5E100` to `DAT_0001d710/14/18/1c/20/24`. |
-| `FUN_0000e792` | `update_aircraft_entity` | STRONG INFERENCE | Blocks 0–6 prior. Block 7a–c [PROVEN]: `67b`/`679` char epilogue; weapon phases `19d`→`12840`, `676`→`15d20`, `677`→`19430`; `flags_685&2` ammo; `bVar6` status cleanup. Primary path annotated 0–7c. Callers: `10ce8`/`10f68`/`110f4`/`1820a` — not tick. |
+| `FUN_0000e792` | `update_aircraft_entity` | STRONG INFERENCE | Blocks 0–7c; Block1 Capstone@E8A0 links avg4→662/666 (iter 94). Callers: climb/waypoint/AI ticks — not sim tick. |
+| `entity+0x662` | `ctrl_avg_pitchish` (from avg4 p3) | STRONG INFERENCE | Filled by `enqueue_control_inputs_avg4`; jittered if `flags_685` bit2. |
+| `entity+0x666` | `ctrl_avg_heading` (from avg4 p4) | STRONG INFERENCE | Filled by avg4; jittered if `flags_685` bit3; force 0xFF80 if +0x684 bit0. |
+| `entity+0x685` | `flags_685` | PROVEN | bit0 gates avg4; bit2/3 RNG jitter; bit0 of +0x684 clears/forces controls. |
 | `FUN_0000e372` | `isqrt_floor` | PROVEN | `@0xE372`: binary-search floor sqrt on `[0,0x7FFF]`. |
 | `FUN_0000e3b2` | `acos_scaled_dot3` | PROVEN | `@0xE3B2`: `(dot3>>4)/((p4*p8)>>16)` then `acos_fixed14`; 0 if denom 0. |
 | `$E352` / `LAB_0000e350_2` | *(false)*; callsite→`isqrt_floor` | BLOCKED | `@0xE352=$E372−0x20`; mid-BSR garbage; LEA @0x22CC + table `$32E` @0x11C4. |
