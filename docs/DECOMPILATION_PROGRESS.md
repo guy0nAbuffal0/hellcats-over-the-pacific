@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 166
+**Last iteration:** 167
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -12,7 +12,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
 | ID02.c | 125 | 61 | 0 | 0 | 64 | 0 | 0 |
-| ID03.c | 45 | 33 | 0 | 0 | 12 | 0 | 0 |
+| ID03.c | 45 | 32 | 0 | 0 | 13 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **490** | **0** | **0** | **240** | **0** | **6** |
+| **TOTAL** | **736** | **489** | **0** | **0** | **241** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 490 NOT_STARTED + 6 BLOCKED (iteration 166);
-240 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 489 NOT_STARTED + 6 BLOCKED (iteration 167);
+241 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -279,6 +279,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | ID03 | RENAMED | STRONG INFERENCE mechanics | `ID03.c` | `ID03.decomp.c` | ovals, clip region, 4-phase spoke A5−0x2112, size A5−0x2114; 5 callers in FUN_00000514 | What it depicts | 163 (2026-10-17) | Full Capstone decode |
 | `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | ID03 | RENAMED | STRONG INFERENCE mechanics / HYPOTHESIS purpose | `ID03.c` | `ID03.decomp.c` | black disc + grey ring; up to 5 spinning indicators at cos45 offsets by flag bits | Bit-4 position; caller | 164 (2026-10-17) | Capstone |
 | `FUN_00000a3c` (ID03) | `antialias_downsample_bw_3x` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | 7×7 Gaussian-like kernel /969; nearest_palette_index_rgb; MoveTo+Line(0,0) pixel plot; out buffer | x0/y0 h/v roles | 166 (2026-10-17) | Full Capstone decode |
+| `FUN_00003c02` (ID03) | `draw_instrument` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | bezel ring + screws; type 0..9 switch to per-gauge drawers; record A5−0x12a2+type·16 | Gauge identities; tail | 167 (2026-10-17) | Capstone + switch table parsed |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1604,8 +1605,21 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   Renamed antialias_downsample_bw_3x; INVESTIGATING back to 0.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID03 `FUN_00003c02` (first instrument routine using
-draw_ring_with_status_indicators).
+### Iteration 167 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 165-166); 32
+  protected hashes verified.
+- ID03 `FUN_00003c02` = draw_instrument(type, geometry...): bezel via
+  draw_ring_with_status_indicators (flags 0x1b for type 6, else 0x0f), dark grey,
+  then type switch 0..9 → FUN_00001876 / 1b48 / 2d1c / 1fee / 2600 / 22fe /
+  2950 / (none) / 32b8 / 38fc, then per-type record A5−0x12a2 + 16·type.
+  Ghidra decoded the switch table bytes as statements (noted, kept verbatim).
+- Re-interpreted draw_spinning_disc_indicator as a bezel screw head
+  (HYPOTHESIS, header updated; name kept because it describes the mechanics).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** the per-instrument drawers, starting with
+`FUN_00001876` (type 0) and `FUN_00001b48` (type 1).
 
 ## Resuming the five-minute workflow
 

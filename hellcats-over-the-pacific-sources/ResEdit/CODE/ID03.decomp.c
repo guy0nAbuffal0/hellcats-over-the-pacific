@@ -261,8 +261,10 @@ void dispose_offscreen_bw_port /* Original: FUN_0000033c */ (void)
  *       other -> horizontal line through centre;
  *     phase = (phase + 5) & 3   (advances one step per call);
  *   SetClip(saved); DisposeRgn(ring); DisposeRgn(saved).
- * A grey disc with a spoke that rotates 45 degrees per call [STRONG INFERENCE];
- * e.g. propeller / activity indicator [HYPOTHESIS]. Callers: 5 BSRs inside
+ * A grey disc with a spoke that rotates 45 degrees per call [STRONG INFERENCE].
+ * Iteration 167 [HYPOTHESIS, stronger]: a bezel screw head - draw_instrument
+ * places these at the bezel corners, and the stepping phase gives each screw a
+ * different slot orientation (not an animation). Callers: 5 BSRs inside
  * draw_ring_with_status_indicators (FUN_00000514; file 0x624, 0x684, 0x6e2, 0x742, 0x774).
  */
 void draw_spinning_disc_indicator /* Original: FUN_0000035e */ (void)
@@ -713,7 +715,27 @@ void FUN_000038fc(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003c02(undefined4 param_1,undefined2 param_2)
+/*
+ * Original: FUN_00003c02; source: ID03.c:567.
+ * Recovered name: draw_instrument [STRONG INFERENCE] (iteration 167).
+ * Ghidra mis-decoded the inline switch table after JSR $3a(A5) as code (the
+ * pbVar1 |= 0x50 and |= 0x8a00c6 statements are table bytes, not behaviour);
+ * exported C kept verbatim. Bytes 0x3c02..0x3dbe decoded [PROVEN]; tail after
+ * 0x3dbe not listed.
+ * Args: word type [8], words [$a] size, [$c], [$e], [$10], [$12] (geometry).
+ *   draw_ring_with_status_indicators(size, $e, $10, $12, flags) with flags
+ *     0x1b if type == 6, else 0x0f   (bezel + corner screws, see below);
+ *   colour (4,4,4) via lookup_palette_index_for_rgb_level / set_draw_color_index;
+ *   switch (type) [ID01 switch helper, 0..9, table parsed by script]:
+ *     0 -> FUN_00001876   1 -> FUN_00001b48   2 -> FUN_00002d1c
+ *     3 -> FUN_00001fee   4 -> FUN_00002600   5 -> FUN_000022fe
+ *     6 -> FUN_00002950   7 -> (none)         8 -> FUN_000032b8(..., 1)
+ *     9 -> FUN_000038fc(..., 1)       (each called with $a, $c, $e, $10, $12);
+ *   then fills record A5-0x12a2 + type * 16 from the geometry (via
+ *   scale_design_4800) [tail not fully listed].
+ * [HYPOTHESIS] Cockpit instrument panel: one drawing routine per gauge type.
+ */
+void draw_instrument /* Original: FUN_00003c02 */ (undefined4 param_1,undefined2 param_2)
 
 {
   byte *pbVar1;

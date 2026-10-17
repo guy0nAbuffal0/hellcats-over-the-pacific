@@ -80,9 +80,10 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000000c8` / `000000f4` (ID03) | `max3_int` / `nearest_palette_index_rgb` | STRONG INFERENCE | Iter 159. |
 | `FUN_00000006` / `000002a8` / `0000033c` (ID03) | `set_scaled_text_style` / `new_offscreen_bw_port` / `dispose_offscreen_bw_port` | STRONG INFERENCE | Iter 160: text style; 1-bit offscreen GrafPort create/dispose. |
 | `FUN_00000912` (ID03) | `draw_vector_number` | STRONG INFERENCE | Iter 161: stroke-font digits from A5−0x1fde. |
-| `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | STRONG INFERENCE mechanics | Iter 163: grey disc + 4-phase rotating spoke (A5−0x2112), size A5−0x2114. |
+| `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | STRONG INFERENCE mechanics | Iter 163: grey disc + 4-phase rotating spoke (A5−0x2112), size A5−0x2114. Iter 167: likely a bezel screw head (HYPOTHESIS). |
 | `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | STRONG INFERENCE mechanics | Iter 164: ring + up to 5 diagonal spinning indicators by flag bits. |
 | `FUN_00000a3c` (ID03) | `antialias_downsample_bw_3x` | STRONG INFERENCE | Iter 166: 3× Gaussian (7×7, /969) downsample of 1-bit bitmap into grey palette pixels. |
+| `FUN_00003c02` (ID03) | `draw_instrument` | STRONG INFERENCE | Iter 167: bezel + type-switch (0..9) to per-gauge drawers; record A5−0x12a2. |
 | ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
