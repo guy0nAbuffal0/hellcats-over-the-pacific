@@ -80,3 +80,10 @@ background above / below it with the host colours +0x18e / +0x190, choosing
 per side from the corner bits `DAT_0001bd90` (0xf all ground, 0 all sky)
 **[STRONG INFERENCE]**. `reset_background_rows` (0xb460) initialises its
 per-row span buffer.
+
+## Frame output (iteration 305)
+
+Colour depths: `scan_convert_edge_rows` → `present_spans_to_window` (0xd298:
+bands of a 0x2000-byte buffer filled by the span filler `*DAT_00020ac0`,
+copied with host service +0x296). Depth 1: `present_bw_frame` (0xd34c) calls
+host +0x80 = ID06 `rasterize_and_present`.

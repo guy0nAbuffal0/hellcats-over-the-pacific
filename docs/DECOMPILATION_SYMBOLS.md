@@ -500,6 +500,48 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000100d4` (Pacific Conflict) | `enemy_fighter_notice_object` | STRONG INFERENCE | Iter 299: AI / turret handler. |
 | `FUN_000112e0` (Pacific Conflict) | `ai_bombing_run` | STRONG INFERENCE | Iter 299: AI / turret handler. |
 | `FUN_0001917c` (Pacific Conflict) | `tick_turret` | STRONG INFERENCE | Iter 299: AI / turret handler. |
+| `FUN_0000e262` (Pacific Conflict) | `spawn_enemy_fighter` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
+| `FUN_00011796` (Pacific Conflict) | `shape_free_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
+| `FUN_00011940` (Pacific Conflict) | `shape_trailing_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
+| `FUN_00019a54` (Pacific Conflict) | `register_cloud_templates` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
+| `FUN_00019a1a` (Pacific Conflict) | `create_cloud_controller` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
+| `FUN_0000879e` (Pacific Conflict) | `resolve_bailout_outcome` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_00008972` (Pacific Conflict) | `update_bailout_view` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_000088a0` (Pacific Conflict) | `place_camera_behind_object` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_00008abe` (Pacific Conflict) | `turn_camera_toward_point` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_00009550` (Pacific Conflict) | `stop_all_sound_channels` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_0000923e` (Pacific Conflict) | `apply_player_mouse_controls` | STRONG INFERENCE | Iter 302: player input / camera. |
+| `FUN_00008ff4` (Pacific Conflict) | `begin_replay_view` | STRONG INFERENCE | Iter 302: player input / camera. |
+| `FUN_00008c30` (Pacific Conflict) | `update_tracking_camera` | STRONG INFERENCE | Iter 302: player input / camera. |
+| `FUN_00015bd4` (Pacific Conflict) | `register_bullet_template` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_00015b92` (Pacific Conflict) | `create_bullet_controller` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_00015dc8` (Pacific Conflict) | `tick_bullet` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_00015e62` (Pacific Conflict) | `bullet_pre_render` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_00015d78` (Pacific Conflict) | `spawn_ordnance_oriented_3ang` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_0001377a` (Pacific Conflict) | `age_contact_records` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_000137da` (Pacific Conflict) | `drop_contact_records_for_object` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_0000c11e` (Pacific Conflict) | `begin_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
+| `FUN_0000c17e` (Pacific Conflict) | `end_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
+| `FUN_0000cac6` (Pacific Conflict) | `update_bomb_indicator` | STRONG INFERENCE | Iter 304: panel helper. |
+| `FUN_0000cb62` (Pacific Conflict) | `update_throttle_gauge` | STRONG INFERENCE | Iter 304: panel helper. |
+| `FUN_0001a75e` (Pacific Conflict) | `bounded_strlen` | STRONG INFERENCE | Iter 304: panel helper. |
+| `FUN_0000d3bc` (Pacific Conflict) | `draw_line_depth8` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000d5b0` (Pacific Conflict) | `draw_line_depth4` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000d91a` (Pacific Conflict) | `restore_line_depth8` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000db60` (Pacific Conflict) | `restore_line_depth4` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000d27c` (Pacific Conflict) | `mark_view_overlays_drawn` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000d298` (Pacific Conflict) | `present_spans_to_window` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000d34c` (Pacific Conflict) | `present_bw_frame` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000df98` (Pacific Conflict) | `fill_pose_history_angles` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000dfd2` (Pacific Conflict) | `fill_pose_history_flags` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000bca8` (Pacific Conflict) | `copy_rect_depth4` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
+| `FUN_0000bfb0` (Pacific Conflict) | `copy_rect_depth8` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
+| `FUN_00014830` (Pacific Conflict) | `lift_object_onto_terrain` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
+| `FUN_00011486` (Pacific Conflict) | `create_spinner_controller` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
+| `FUN_000114b4` (Pacific Conflict) | `spin_object_heading` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
+| `FUN_00018a34` (Pacific Conflict) | `shadow_pre_render` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
+| `FUN_00017a8c` (Pacific Conflict) | `update_radar_range_buttons` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
+| `FUN_00012f92` (Pacific Conflict) | `create_singleton_type10_controller` | HYPOTHESIS | Iter 307: definition handler / radar buttons. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
