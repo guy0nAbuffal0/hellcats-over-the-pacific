@@ -64,6 +64,9 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | STRONG INFERENCE mechanics | Iter 151: two notched frames (pen 2/1) from rect A5−0x119c, drawn twice. |
 | `FUN_000010ce` (ID02) | `build_notched_frame_poly` | STRONG INFERENCE mechanics | Iter 151: notched/chamfered frame polygon from a Rect. |
 | `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | STRONG INFERENCE mechanics | Iter 152: columned DrawString output with FillRect backgrounds; slot −0x110e. |
+| `FUN_00001656` / `FUN_00001680` (ID02) | `design_x_to_screen` / `design_y_to_screen` | STRONG INFERENCE | Iter 162: A5−0x149e·v/4800 + half view width/height. |
+| `FUN_00001632` / `FUN_0000001e` (ID02) | `set_back_color_index` / `abs_long` | STRONG INFERENCE | Iter 162. |
+| A5−0x1372 / A5−0x1370 | view width / height (words) | STRONG INFERENCE | srcRect right/bottom in blit_offscreen_frame_to_window; centre in design_*_to_screen. |
 | `FUN_000007b0` / `00000598` / `00000666` / `00000512` / `0000087a` (ID06) | `init_raster_target` / `alloc_row_table` / `init_edge_pool` / `free_row_table` / `set_raster_target_base` | STRONG INFERENCE | Iter 153: ID06 rasterizer set-up; structures A5−0x1cce / −0x1cd2 / −0x1cd6. |
 | `FUN_000008a2` / `0000096e` / `000009d8` / `00000e10` / `0000026c` (ID06) | `set_active_row_count` / `reset_edge_table` / `add_polygon_edges` / `rasterize_and_present` / `init_row_table_fields` | STRONG INFERENCE | Iter 154: scanline polygon rasterizer API (service slots −0x1304/−0x1310/−0x130c/−0x1308). |
 | `FUN_00000318` (ID06) | `render_scanline_spans` | STRONG INFERENCE | Iter 155: priority span fill; in-code state at 0x39e..0x3e1. JT $192. |
@@ -73,6 +76,12 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000017c` / `FUN_000001a2` (ID06) | `lookup_colour_map` / `reverse_lookup_colour_map` | STRONG INFERENCE | Iter 157: 256-word map at *A5−0x1ede. |
 | `FUN_00000004` / `000000b0` / `000000f4` (ID06) | `init_pattern_tables` / `alloc_pattern_tables` / `get_pattern_table` | STRONG INFERENCE | Iter 158: mask + pattern table A5−0x1eda (0xc00), grey map A5−0x1ede (0x200). |
 | `FUN_00000916` / `00000942` / `00000d02` (ID06) | `get_raster_target_size` / `realloc_row_table` / `add_rect_polygon` | STRONG INFERENCE | Iter 158. |
+| `FUN_00000056` / `0000008a` / `000000a6` (ID03) | `scale_design_480_min10` / `scale_design_4800` / `scale_design_4800_pen_centred` | STRONG INFERENCE | Iter 159: design-unit → screen scaling via A5−0x149e. |
+| `FUN_000000c8` / `000000f4` (ID03) | `max3_int` / `nearest_palette_index_rgb` | STRONG INFERENCE | Iter 159. |
+| `FUN_00000006` / `000002a8` / `0000033c` (ID03) | `set_scaled_text_style` / `new_offscreen_bw_port` / `dispose_offscreen_bw_port` | STRONG INFERENCE | Iter 160: text style; 1-bit offscreen GrafPort create/dispose. |
+| `FUN_00000912` (ID03) | `draw_vector_number` | STRONG INFERENCE | Iter 161: stroke-font digits from A5−0x1fde. |
+| `FUN_0000035e` (ID03) | UNKNOWN (INVESTIGATING) | HYPOTHESIS | Iter 161: oval dial drawing; see header. |
+| ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
 | A5−0x7d0 | sound channel records [2] × 0x238 bytes | STRONG INFERENCE | Indexed by silence_sound_channel / FUN_00003d50. |

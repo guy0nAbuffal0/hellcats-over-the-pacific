@@ -23,7 +23,13 @@ char DAT_66fa4e77;
 undefined FUN_00000196;
 undefined2 DAT_00000baa;
 
-int FUN_0000001e(int param_1)
+/*
+ * Original: FUN_0000001e; source: ID02.c:26.
+ * Recovered name: abs_long [STRONG INFERENCE] (iteration 162).
+ * Exported C complete: signed absolute value (INT_MIN unchanged by wraparound).
+ * JT $4da; used by ID03 nearest_palette_index_rgb.
+ */
+int abs_long /* Original: FUN_0000001e */ (int param_1)
 
 {
   if (param_1 < 0) {
@@ -1025,7 +1031,7 @@ void build_notched_frame_poly /* Original: FUN_000010ce */ (void)
  * slot A5-0x10ea (JT $3c2). Ghidra exported no body. Bytes 0x11ec..0x1306
  * [PROVEN, partial reading]: CurrentA5 thunk; two polygons built by
  * FUN_000010ce from data at A5-0x1194 (each after PenSize); black/white;
- * loop x2: set_draw_color_index(...), FUN_00001632(A5-0x118c), PaintPoly,
+ * loop x2: set_draw_color_index(...), set_back_color_index (FUN_00001632)(A5-0x118c), PaintPoly,
  * FillPoly(pattern A5-0x14e2), FramePoly in standard grey indices A5-0x118c /
  * A5-0x118a (init_standard_colour_indices), then OffsetPoly both by
  * (A5-0x1192 - A5-0x119a); KillPoly both; PenPat(A5-0x161c).
@@ -1138,7 +1144,14 @@ void set_draw_color_index /* Original: FUN_000015cc */ (undefined4 param_1)
 
 
 
-void FUN_00001632(undefined4 param_1)
+/*
+ * Original: FUN_00001632; source: ID02.c:901.
+ * Recovered name: set_back_color_index [STRONG INFERENCE] (iteration 162).
+ * Exported C complete; bytes 0x1632..0x1654 agree. Background twin of
+ * set_draw_color_index: 1-bit mode (A5-0x137a == 1) -> word A5-0x13b8 =
+ * colour; else thePort->bkColor (+0x54) = (long)colour.
+ */
+void set_back_color_index /* Original: FUN_00001632 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -1154,7 +1167,15 @@ void FUN_00001632(undefined4 param_1)
 
 
 
-int FUN_00001656(undefined4 param_1)
+/*
+ * Original: FUN_00001656; source: ID02.c:917.
+ * Recovered name: design_x_to_screen [STRONG INFERENCE] (iteration 162).
+ * Exported C complete (JT $3ca). (long A5-0x149e * v) / 4800 + view width
+ * (A5-0x1372) / 2 -> screen x of a design x [STRONG INFERENCE]. Bytes use
+ * MULU.L on the sign-extended word (low 32 bits equal the signed product) and
+ * DIVS.L #$12c0.
+ */
+int design_x_to_screen /* Original: FUN_00001656 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -1165,7 +1186,13 @@ int FUN_00001656(undefined4 param_1)
 
 
 
-int FUN_00001680(undefined4 param_1)
+/*
+ * Original: FUN_00001680; source: ID02.c:928.
+ * Recovered name: design_y_to_screen [STRONG INFERENCE] (iteration 162).
+ * Exported C complete (JT $382). Same as design_x_to_screen with view height
+ * (A5-0x1370) / 2 -> screen y.
+ */
+int design_y_to_screen /* Original: FUN_00001680 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -1186,13 +1213,13 @@ void FUN_000016aa(void)
   undefined2 in_stack_fffffffa;
   
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
-    iVar1 = FUN_00001656(CONCAT22(0xf380,in_stack_fffffffa));
-    FUN_00001680(CONCAT22(0x960,(short)iVar1));
+    iVar1 = design_x_to_screen(CONCAT22(0xf380,in_stack_fffffffa));
+    design_y_to_screen(CONCAT22(0x960,(short)iVar1));
                     // WARNING: Bad instruction - Truncating control flow here
     halt_baddata();
   }
-  iVar1 = FUN_00001656(CONCAT22(0xf380,in_stack_fffffffa));
-  FUN_00001680(CONCAT22(0x960,(short)iVar1));
+  iVar1 = design_x_to_screen(CONCAT22(0xf380,in_stack_fffffffa));
+  design_y_to_screen(CONCAT22(0x960,(short)iVar1));
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
 }

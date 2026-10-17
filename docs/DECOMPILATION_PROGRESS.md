@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 158
+**Last iteration:** 162
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,8 +11,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 65 | 0 | 0 | 60 | 0 | 0 |
-| ID03.c | 45 | 45 | 0 | 0 | 0 | 0 | 0 |
+| ID02.c | 125 | 61 | 0 | 0 | 64 | 0 | 0 |
+| ID03.c | 45 | 35 | 1 | 0 | 9 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **506** | **0** | **0** | **224** | **0** | **6** |
+| **TOTAL** | **736** | **492** | **1** | **0** | **237** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 506 NOT_STARTED + 6 BLOCKED (iteration 158);
-224 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 492 NOT_STARTED + 1 INVESTIGATING + 6 BLOCKED (iteration 162);
+237 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -41,7 +41,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 |---|---|---|
 | `ID01.c` | `ID01.decomp.c` | seeded (copy) |
 | `ID02.c` | `ID02.decomp.c` | seeded + iter 111-112 (initialize_application, main, poll_and_dispatch_event, do_menu_command, apply_settings_to_live_options, handle_mouse_down, handle_activate_event, redraw_main_window, check_device_color_state_changed, build_palette_index_map, palette helpers) |
-| `ID03.c` | `ID03.decomp.c` | seeded (copy) |
+| `ID03.c` | `ID03.decomp.c` | seeded + iter 159 (scaling / colour helpers) |
 | `ID04.c` | `ID04.decomp.c` | seeded (copy) |
 | `ID05.c` | `ID05.decomp.c` | seeded + iter 118 (all 24 functions renamed, iterations 118-125) |
 | `ID06.c` | `ID06.decomp.c` | seeded + iter 153-158 (all 24 functions renamed) |
@@ -240,6 +240,10 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | ID02 | RENAMED | STRONG INFERENCE mechanics / UNKNOWN purpose | `ID02.c:830` | `ID02.decomp.c` | build_notched_frame_poly ×2 (rect A5−0x119c); grey indices; slot −0x10ea | Shape meaning | 151 (2026-10-17) | Capstone |
 | `FUN_000010ce` (ID02) | `build_notched_frame_poly` | ID02 | RENAMED | STRONG INFERENCE mechanics | `ID02.c:819` | `ID02.decomp.c` | OpenPoly; pnSize; Line/LineTo | Tail not fully listed | 151 (2026-10-17) | Capstone |
 | `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | ID02 | RENAMED | STRONG INFERENCE mechanics / HYPOTHESIS purpose | `ID02.c:841` | `ID02.decomp.c` | FillRect QD patterns; TextFace/CharWidth/DrawString/DrawText; GetPen/Move columns A5−0x14d2/−0x14d0/−0x14ce; slot −0x110e | Arg layout | 152 (2026-10-17) | Condensed Capstone reading |
+| `FUN_0000001e` (ID02) | `abs_long` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | JT $4da | — | 162 (2026-10-17) | C + bytes; token diff = renames |
+| `FUN_00001632` (ID02) | `set_back_color_index` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | bkColor / A5−0x13b8 | — | 162 (2026-10-17) | C + bytes; token diff = renames |
+| `FUN_00001656` (ID02) | `design_x_to_screen` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | JT $3ca; +width/2 | — | 162 (2026-10-17) | C + bytes; token diff = renames |
+| `FUN_00001680` (ID02) | `design_y_to_screen` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | JT $382; +height/2 | — | 162 (2026-10-17) | C + bytes; token diff = renames |
 | `FUN_000007b0` (ID06) | `init_raster_target` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:494` | `ID06.decomp.c` | target record A5−0x1cce; centre A5−0x1cca/−0x1cc8 | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000598` (ID06) | `alloc_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:405` | `ID06.decomp.c` | A5−0x1cd2 + n×12 row entries | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000666` (ID06) | `init_edge_pool` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:443` | `ID06.decomp.c` | A5−0x1cd6 0x5e9c pool, sentinels | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
@@ -263,6 +267,16 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00000916` (ID06) | `get_raster_target_size` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | width/height out-params | — | 158 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000942` (ID06) | `realloc_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | row table + edge pool rebuild | — | 158 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000d02` (ID06) | `add_rect_polygon` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c` | `ID06.decomp.c` | 4-point polygon via add_polygon_edges | — | 158 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000056` (ID03) | `scale_design_480_min10` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | (A5−0x149e·v+5)/480, ≥10 | A5−0x149e identity | 159 (2026-10-17) | C complete; token diff = renames |
+| `FUN_0000008a` (ID03) | `scale_design_4800` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | A5−0x149e·v/4800; 13 call sites | A5−0x149e identity | 159 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000000a6` (ID03) | `scale_design_4800_pen_centred` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | minus pnSize.h/2 | A5−0x149e identity | 159 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000000c8` (ID03) | `max3_int` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | max of three | A5−0x149e identity | 159 (2026-10-17) | C complete; token diff = renames |
+| `FUN_000000f4` (ID03) | `nearest_palette_index_rgb` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | Chebyshev nearest of 8 base + first-better extended entry | A5−0x149e identity | 159 (2026-10-17) | C complete; token diff = renames |
+| `FUN_00000006` (ID03) | `set_scaled_text_style` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | TextFace + scaled TextSize by mode | — | 160 (2026-10-17) | Capstone (Ghidra truncated); token diff = renames |
+| `FUN_000002a8` (ID03) | `new_offscreen_bw_port` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | 1-bit bitmap + OpenPort/SetPortBits/PortSize/RectRgn | — | 160 (2026-10-17) | Capstone (Ghidra truncated); token diff = renames |
+| `FUN_0000033c` (ID03) | `dispose_offscreen_bw_port` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | ClosePort + DisposPtr bits + port | — | 160 (2026-10-17) | Capstone (Ghidra truncated); token diff = renames |
+| `FUN_00000912` (ID03) | `draw_vector_number` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | stroke font A5−0x1fde[digit]; scale_design_4800_pen_centred | Loop tail not exported | 161 (2026-10-17) | C (truncated) |
+| `FUN_0000035e` (ID03) | UNKNOWN (identifier retained) | ID03 | INVESTIGATING | HYPOTHESIS (round dial) | `ID03.c` | `ID03.decomp.c` (header) | regions; ovals; grey index; ID02 JT $3ca/$382 | Full decode | 161 (2026-10-17) | Partial byte reading |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1501,9 +1515,49 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   **ID06 is fully RENAMED (24/24).** RASTERIZER.md updated.
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID03 (45 functions, all NOT_STARTED): inventory
-and start with JT-exported entries (e.g. ID03 0x3788 / 0x3828 call sites of
-new_offscreen_cport / close_and_dispose_port).
+### Iteration 159 — 2026-10-17
+
+- Nine copies of the scheduled prompt were queued at once; one iteration run.
+  Working tree clean at start (user committed iterations 154-158); 32
+  protected hashes verified. ID03.decomp.c was an unmodified seed.
+- ID03 `FUN_000032b8` (contains the 0x3788 / 0x3828 port calls) is a large
+  Ghidra-truncated drawing routine; deferred until its helpers are named.
+- Renamed five ID03 helpers (complete C): scale_design_480_min10,
+  scale_design_4800 (13 call sites), scale_design_4800_pen_centred, max3_int,
+  nearest_palette_index_rgb (Chebyshev distance; extended-table scan returns
+  the first better entry - preserved). JT $4da = ID02 FUN_0000001e (abs),
+  noted only (ID02 not edited this iteration).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 160 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 159 preserved.
+- Renamed three Ghidra-truncated ID03 helpers from bytes: set_scaled_text_style
+  (TextFace plain/bold + TextSize via scale_design_4800, by mode),
+  new_offscreen_bw_port (1-bit bitmap, OpenPort/SetPortBits/PortSize/RectRgn;
+  2 call sites), dispose_offscreen_bw_port.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 161 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 160 preserved.
+- `FUN_00000912` = draw_vector_number (decimal digits drawn from stroke
+  lists char *A5−0x1fde[d], centred at 6 units per digit, scaled).
+- `FUN_0000035e` partially read (regions, PaintOval/FrameOval, grey index,
+  ticks; ID02 JT $3ca/$382 unnamed) — INVESTIGATING, no rename.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 162 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iterations 159-161 preserved.
+- ID02: `FUN_00001656` / `FUN_00001680` = design_x_to_screen /
+  design_y_to_screen (scale by A5−0x149e/4800 plus half view width / height:
+  A5−0x1372 / A5−0x1370); `FUN_00001632` = set_back_color_index;
+  `FUN_0000001e` = abs_long. MULU.L-vs-signed multiply equivalence noted.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID03 `FUN_0000035e` (finish; uses
+design_x/y_to_screen) and `FUN_00000a3c`.
 
 ## Resuming the five-minute workflow
 

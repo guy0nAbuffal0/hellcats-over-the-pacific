@@ -9,7 +9,16 @@ typedef unsigned char    byte;
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000006(void)
+/*
+ * Original: FUN_00000006; source: ID03.c:12.
+ * Recovered name: set_scaled_text_style [STRONG INFERENCE] (iteration 160).
+ * Ghidra truncated at $A888. Bytes 0x06..0x54 [PROVEN]: word size at 8(A6).
+ *   if (mode A5-0x137a == 1) { TextFace(0) $A888;
+ *       TextSize(scale_design_4800((short)(size * 10) / 3)) $A88A }
+ *   else { TextFace(1 = bold); TextSize(scale_design_4800(size * 10)) }
+ * (1-bit mode uses plain text at one third of the colour-mode size, as coded.)
+ */
+void set_scaled_text_style /* Original: FUN_00000006 */ (void)
 
 {
   int unaff_A5;
@@ -24,7 +33,14 @@ void FUN_00000006(void)
 
 
 
-undefined4 FUN_00000056(undefined4 param_1)
+/*
+ * Original: FUN_00000056; source: ID03.c:27.
+ * Recovered name: scale_design_480_min10 [STRONG INFERENCE] (iteration 159).
+ * Exported C complete: v = (long A5-0x149e * (short)param + 5) / 480, then at
+ * least 10 (when clamped, the high word of the result becomes 0). A5-0x149e is a
+ * scale factor (screen-size dependent) [STRONG INFERENCE; identity UNKNOWN].
+ */
+undefined4 scale_design_480_min10 /* Original: FUN_00000056 */ (undefined4 param_1)
 
 {
   int iVar1;
@@ -42,7 +58,13 @@ undefined4 FUN_00000056(undefined4 param_1)
 
 
 
-int FUN_0000008a(undefined4 param_1)
+/*
+ * Original: FUN_0000008a; source: ID03.c:45.
+ * Recovered name: scale_design_4800 [STRONG INFERENCE] (iteration 159).
+ * Exported C complete: (long A5-0x149e * (short)param) / 4800 (signed, truncating).
+ * Converts design units to screen units [STRONG INFERENCE].
+ */
+int scale_design_4800 /* Original: FUN_0000008a */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -52,20 +74,31 @@ int FUN_0000008a(undefined4 param_1)
 
 
 
-short FUN_000000a6(undefined4 param_1)
+/*
+ * Original: FUN_000000a6; source: ID03.c:55.
+ * Recovered name: scale_design_4800_pen_centred [STRONG INFERENCE] (iteration 159).
+ * Exported C complete: scale_design_4800(v) - thePort->pnSize.h (+0x36) / 2
+ * (pen-centred coordinate). Ghidra's unaff_A6 half is register residue.
+ */
+short scale_design_4800_pen_centred /* Original: FUN_000000a6 */ (undefined4 param_1)
 
 {
   int iVar1;
   int unaff_A5;
   undefined4 unaff_A6;
   
-  iVar1 = FUN_0000008a(CONCAT22(param_1._0_2_,(short)((uint)unaff_A6 >> 0x10)));
+  iVar1 = scale_design_4800(CONCAT22(param_1._0_2_,(short)((uint)unaff_A6 >> 0x10)));
   return (short)iVar1 - *(short *)(*(int *)(unaff_A5 + -0x160c) + 0x36) / 2;
 }
 
 
 
-int FUN_000000c8(int param_1,int param_2,int param_3)
+/*
+ * Original: FUN_000000c8; source: ID03.c:68.
+ * Recovered name: max3_int [STRONG INFERENCE] (iteration 159).
+ * Exported C complete: signed maximum of three longs.
+ */
+int max3_int /* Original: FUN_000000c8 */ (int param_1,int param_2,int param_3)
 
 {
   if (param_1 < param_2) {
@@ -79,7 +112,21 @@ int FUN_000000c8(int param_1,int param_2,int param_3)
 
 
 
-short FUN_000000f4(ushort *param_1)
+/*
+ * Original: FUN_000000f4; source: ID03.c:82.
+ * Recovered name: nearest_palette_index_rgb [STRONG INFERENCE] (iteration 159).
+ * Exported C complete. param_1 -> RGB (3 words). JT $4da = ID02 FUN_0000001e
+ * (abs). Distance = max3_int(|dr|, |dg|, |db|) (Chebyshev).
+ *   best over the 8 base colours at A5-0x350 (6 bytes each);
+ *   then scans the extended table *(long A5-0x14a6) (count word A5-0x14a2)
+ *   and returns the FIRST entry closer than the base best (index + 8), not
+ *   the global minimum - behaviour preserved as exported.
+ *   Result by mode word A5-0x137a: 4 or 1 -> chosen index (local_8);
+ *   8 -> chosen index + 200; any other mode -> local_6 (the scan counter:
+ *   table count if no extended match, else matched index + 8). Same index
+ *   space as ID02 lookup_palette_index_for_rgb_level.
+ */
+short nearest_palette_index_rgb /* Original: FUN_000000f4 */ (ushort *param_1)
 
 {
   ushort uVar1;
@@ -106,7 +153,7 @@ short FUN_000000f4(ushort *param_1)
                       ((uint)*(ushort *)(local_6 * 6 + unaff_A5 + -0x34e) - (uint)uVar2);
     iVar6 = (**(code **)(unaff_A5 + 0x4da))
                       ((uint)*(ushort *)(local_6 * 6 + unaff_A5 + -0x34c) - (uint)uVar3);
-    iVar4 = FUN_000000c8(iVar4,iVar5,iVar6);
+    iVar4 = max3_int(iVar4,iVar5,iVar6);
     if (iVar4 < local_c) {
       local_8 = local_6;
       local_c = iVar4;
@@ -131,7 +178,7 @@ LAB_0000027e:
     iVar6 = (**(code **)(unaff_A5 + 0x4da))
                       ((uint)*(ushort *)(*(int *)(unaff_A5 + -0x14a6) + local_6 * 6 + 4) -
                        (uint)uVar3);
-    iVar4 = FUN_000000c8(iVar4,iVar5,iVar6);
+    iVar4 = max3_int(iVar4,iVar5,iVar6);
     if (iVar4 < local_c) {
       local_6 = local_6 + 8;
       local_8 = local_6;
@@ -145,7 +192,20 @@ LAB_0000027e:
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000002a8(undefined4 param_1)
+/*
+ * Original: FUN_000002a8; source: ID03.c:148.
+ * Recovered name: new_offscreen_bw_port [STRONG INFERENCE] (iteration 160).
+ * Ghidra truncated after the allocations. Bytes 0x2a8..0x33a [PROVEN].
+ * Args: words width [8(A6)], height [$a(A6)]. Returns GrafPtr (D0).
+ *   rowBytes = (width / 16) * 2 + 2; bits = NewPtrClear(height * rowBytes)
+ *   (JT $232); port = NewPtrClear(0x6c); OpenPort(port) $A86F;
+ *   BitMap bm = { bits, rowBytes, (0, 0, height, width) }; SetPortBits(&bm)
+ *   $A875; port->portRect = bm.bounds; PortSize(width, height) $A876;
+ *   RectRgn(port->visRgn, &bm.bounds) $A8DF.
+ * 1-bit offscreen GrafPort [STRONG INFERENCE]. No NULL checks.
+ * Caller: FUN_000032b8 (file 0x3496).
+ */
+void new_offscreen_bw_port /* Original: FUN_000002a8 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -161,7 +221,15 @@ void FUN_000002a8(undefined4 param_1)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000033c(void)
+/*
+ * Original: FUN_0000033c; source: ID03.c:164.
+ * Recovered name: dispose_offscreen_bw_port [STRONG INFERENCE] (iteration 160).
+ * Ghidra truncated. Bytes 0x33c..0x35c [PROVEN]: arg GrafPtr port;
+ *   ClosePort(port) $A87D; DisposPtr(port->portBits.baseAddr (+2)) (JT $23a);
+ *   DisposPtr(port). Inverse of new_offscreen_bw_port. Caller: FUN_000032b8
+ *   (file 0x381e).
+ */
+void dispose_offscreen_bw_port /* Original: FUN_0000033c */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -172,6 +240,16 @@ void FUN_0000033c(void)
 
 // WARNING: Control flow encountered bad instruction data
 
+/*
+ * Original: FUN_0000035e; source: ID03.c:175.
+ * Status: INVESTIGATING (iteration 161); identifier retained. Ghidra exported
+ * no body. Bytes 0x35e..0x512 [PROVEN, partial]: NewRgn x2 + GetClip;
+ * ID02 JT $3ca (file 0x1656) / $382 (0x1680) [unnamed]; scale_design_4800 x2;
+ * grey (2,2,2) via JT $45a lookup_palette_index_for_rgb_level and JT $36a
+ * set_draw_color_index; PaintOval $A8B8 / OpenRgn / FrameOval $A8B7 /
+ * CloseRgn; tick lines (MoveTo/LineTo) with a test of word A5-0x2112 == 1;
+ * SetClip. [HYPOTHESIS] Draws a round instrument dial.
+ */
 void FUN_0000035e(void)
 
 {
@@ -191,8 +269,8 @@ void FUN_00000514(undefined4 param_1)
   
   (**(code **)(unaff_A5 + 0x3ca))();
   (**(code **)(unaff_A5 + 0x382))();
-  FUN_0000008a(CONCAT22(param_1._0_2_,in_stack_fffffff0));
-  FUN_0000008a(CONCAT22(param_1._0_2_,in_stack_fffffff0));
+  scale_design_4800(CONCAT22(param_1._0_2_,in_stack_fffffff0));
+  scale_design_4800(CONCAT22(param_1._0_2_,in_stack_fffffff0));
   (**(code **)(unaff_A5 + 0x45a))(0);
   (**(code **)(unaff_A5 + 0x36a))();
                     // WARNING: Bad instruction - Truncating control flow here
@@ -223,9 +301,9 @@ void FUN_0000077e(char *param_1,undefined4 param_2,undefined4 param_3)
         for (local_a = 0; local_a < 6; local_a = local_a + 1) {
           if (**(char **)(local_a * 4 + unaff_A5 + -0x20b0) == *param_1) {
             iVar1 = *(int *)(local_a * 4 + unaff_A5 + -0x20b0);
-            sVar2 = FUN_000000a6(CONCAT22(*(char *)(iVar1 + 2) * param_2._0_2_ + param_2._2_2_,
+            sVar2 = scale_design_4800_pen_centred(CONCAT22(*(char *)(iVar1 + 2) * param_2._0_2_ + param_2._2_2_,
                                           in_stack_fffffff0));
-            FUN_000000a6(CONCAT22(*(char *)(iVar1 + 3) * param_2._0_2_ + param_3._0_2_,sVar2));
+            scale_design_4800_pen_centred(CONCAT22(*(char *)(iVar1 + 3) * param_2._0_2_ + param_3._0_2_,sVar2));
                     // WARNING: Bad instruction - Truncating control flow here
             halt_baddata();
           }
@@ -250,7 +328,21 @@ void FUN_0000077e(char *param_1,undefined4 param_2,undefined4 param_3)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000912(undefined4 param_1,undefined4 param_2)
+/*
+ * Original: FUN_00000912; source: ID03.c:253.
+ * Recovered name: draw_vector_number [STRONG INFERENCE] (iteration 161).
+ * Exported C kept (truncated after the first stroke). Words: value = param_1
+ * high, scale = param_1 low, cx = param_2 high, y = param_2 low.
+ * Splits value into up to 5 decimal digits (most significant first in
+ * asStack_14[local_6..4]); returns if value had more digits than fit.
+ * Each digit d selects a stroke list char *A5-0x1fde[d] of (dx, dy) byte
+ * pairs; x starts at cx - (digits * 6 * scale) / 2 (centred, 6 units per
+ * digit) and points are scaled by `scale`, converted with
+ * scale_design_4800_pen_centred and drawn with MoveTo/LineTo [rest of the
+ * loop not exported]. Vector-font number display (e.g. instruments)
+ * [HYPOTHESIS for the use].
+ */
+void draw_vector_number /* Original: FUN_00000912 */ (undefined4 param_1,undefined4 param_2)
 
 {
   char *pcVar1;
@@ -280,9 +372,9 @@ void FUN_00000912(undefined4 param_1,undefined4 param_2)
   local_8 = *pcVar1 * param_1._2_2_ +
             (param_2._0_2_ - (short)((4 - local_6) * 6 * param_1._2_2_) / 2);
   local_6 = local_6 + 1;
-  FUN_000000a6(CONCAT22(local_8,uVar3));
+  scale_design_4800_pen_centred(CONCAT22(local_8,uVar3));
   local_a = pcVar1[1] * param_1._2_2_ + local_a;
-  FUN_000000a6(CONCAT22(local_a,uVar3));
+  scale_design_4800_pen_centred(CONCAT22(local_a,uVar3));
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
 }
@@ -308,8 +400,8 @@ void FUN_0000146a(undefined4 param_1,undefined4 param_2)
   int unaff_A5;
   undefined2 in_stack_ffffffec;
   
-  FUN_0000008a(CONCAT22(param_2._0_2_,in_stack_ffffffec));
-  FUN_0000008a(CONCAT22(param_2._0_2_,in_stack_ffffffec));
+  scale_design_4800(CONCAT22(param_2._0_2_,in_stack_ffffffec));
+  scale_design_4800(CONCAT22(param_2._0_2_,in_stack_ffffffec));
   (**(code **)(unaff_A5 + 0x3ca))();
   (**(code **)(unaff_A5 + 0x382))();
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
@@ -336,24 +428,24 @@ void FUN_00001538(undefined2 *param_1,short *param_2,short *param_3,undefined4 p
   undefined2 in_stack_ffffffec;
   
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
-    iVar1 = FUN_0000008a(CONCAT22(*param_1,in_stack_ffffffec));
+    iVar1 = scale_design_4800(CONCAT22(*param_1,in_stack_ffffffec));
     uVar3 = (undefined2)iVar1;
-    iVar1 = FUN_0000008a(CONCAT22(*param_1,uVar3));
-    uVar2 = FUN_000002a8(CONCAT22(uVar3,(short)iVar1));
+    iVar1 = scale_design_4800(CONCAT22(*param_1,uVar3));
+    uVar2 = new_offscreen_bw_port(CONCAT22(uVar3,(short)iVar1));
     *param_5 = uVar2;
-    FUN_0000008a(CONCAT22(*param_1,uVar3));
-    FUN_0000008a(CONCAT22(*param_1,uVar3));
-    iVar1 = FUN_0000008a(CONCAT22(0x14,uVar3));
-    FUN_0000008a(CONCAT22(0x14,(short)iVar1));
+    scale_design_4800(CONCAT22(*param_1,uVar3));
+    scale_design_4800(CONCAT22(*param_1,uVar3));
+    iVar1 = scale_design_4800(CONCAT22(0x14,uVar3));
+    scale_design_4800(CONCAT22(0x14,(short)iVar1));
                     // WARNING: Bad instruction - Truncating control flow here
     halt_baddata();
   }
   *param_2 = *param_2 * 3;
   *param_3 = *param_3 * 3;
-  iVar1 = FUN_0000008a(CONCAT22(*param_1,in_stack_ffffffec));
+  iVar1 = scale_design_4800(CONCAT22(*param_1,in_stack_ffffffec));
   sVar4 = (short)iVar1 * 3;
-  iVar1 = FUN_0000008a(CONCAT22(*param_1,sVar4));
-  uVar2 = FUN_000002a8(CONCAT22(sVar4 + 6,(short)iVar1 * 3 + 6));
+  iVar1 = scale_design_4800(CONCAT22(*param_1,sVar4));
+  uVar2 = new_offscreen_bw_port(CONCAT22(sVar4 + 6,(short)iVar1 * 3 + 6));
   *param_5 = uVar2;
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
