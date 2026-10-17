@@ -5901,6 +5901,20 @@ int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 /* Original: FUN_00003cca; source: Pacific Conflict.c. Recovered name: segment_point_min_distance [PROVEN from bytes] (iteration 308).
  * Ghidra C reviewed (function at overlay offset 0x3cca).
  * Disassembled at 0x3cca (Ghidra lost the stack arguments and shows a void signature). Stack arguments: start point x / y / z longs at 8(a6) / 0xc(a6) / 0x10(a6), segment deltas as words at 0x16 / 0x1a / 0x1e (sign-extended by adda.w), target point x / y / z at 0x20 / 0x24 / 0x28. Computes the distance (approx_dist3_xyz, 0x3c68) from the target to both segment ends, then five times (dbra d5 from 4) takes the midpoint, measures it and replaces the farther end - a bisection that returns the approximate minimum distance between the segment and the point (word in D0). Used by bullet_hits_aircraft / bullet_hits_shape with the path the bullet covered this frame, so fast bullets cannot skip over their target.
+ *
+ * Iteration 355 re-check against the bytes 0x3cca..0x3da6 [PROVEN]; the Ghidra C models
+ * the control flow, but its calls lost every argument, so it is not marked VERIFIED.
+ * Real signature: int segment_point_min_distance(long x0, long y0, long z0, long dx,
+ * long dy, long dz, long px, long py, long pz) - 9 longs (see bullet_hits_aircraft).
+ * Width facts a port must keep:
+ *   - dx / dy / dz are pushed as longs but only their LOW WORDS are used (adda.w
+ *     $16 / $1a / $1e), so each delta is truncated to signed 16 bits;
+ *   - midpoints are (a + b) >> 1 with asr.l and no bias, i.e. FLOOR, unlike the
+ *     caller's truncating +1-bias halving;
+ *   - distances are kept and compared as signed WORDS (move.w d0, cmp.w, then ext.l
+ *     at the end), so a distance above 0x7fff wraps negative and would always "hit".
+ * In the bisection, when the end distance is below the start distance the start is
+ * replaced, otherwise the end (blt at 0x3d74); 5 steps (dbra from 4).
  */
 int segment_point_min_distance /* Original: FUN_00003cca */ (void)
 
@@ -23792,6 +23806,17 @@ LAB_00016358:
 /* Original: FUN_0001665a; source: Pacific Conflict.c. Recovered name: bullet_hits_shape [STRONG INFERENCE] (iteration 263).
  * Ghidra C reviewed (function at overlay offset 0x1665a).
  * Called by test_object_collision when a bullet (template type 0xe) meets a shape b flagged +6 & 4. Within the b range (FUN_00003cca): if b is not flagged +6 & 4, a bullet b is ignored, a type 0x1b b gets controller word +0x46 = 1 with probability 1/16, and the bullet is retired; if b is flagged +6 & 4, with probability 1/8 the bullet controller +0x3c = b [UNKNOWN use]. Template type 0xe is a bullet / gun round [STRONG INFERENCE: it is retired on impact and causes damage rolls]; _DAT_0001b842 is a one-frame event flag consumed by FUN_000096f4 (FUN_000095ac(2), cleared afterwards) [HYPOTHESIS: hit sound]. Complete Ghidra C.
+ *
+ * Iteration 356 [PROVEN, bytes 0x1665a..0x16722; logic identical to the C]: the same
+ * 9-long call as in bullet_hits_aircraft, which Ghidra dropped (bullet pos - vel / 2,
+ * bullet vel, target pos), with a hit when distance <= target range +0x14. Byte +6 & 4
+ * is flag-long bit 10 (0x400):
+ *   set   -> 1/8 per hit: bullet controller +0x3c = target; tick_bullet destroys it
+ *            on its next tick (destruction effect, kill credit for player rounds);
+ *   clear -> solid: a bullet target is ignored; a type-0x1b target's controller +0x46
+ *            = 1 one time in 16 [UNKNOWN role]; the bullet is retired.
+ * So flag bit 10 = destructible by gunfire [STRONG_INFERENCE]. Not VERIFIED because the
+ * C call lost its arguments.
  */
 uint bullet_hits_shape /* Original: FUN_0001665a */ (int param_1,int param_2)
 
@@ -23833,7 +23858,7 @@ uint bullet_hits_shape /* Original: FUN_0001665a */ (int param_1,int param_2)
 
 /* Original: FUN_00016724; source: Pacific Conflict.c. Recovered name: apply_random_aircraft_damage [STRONG INFERENCE] (iteration 263).
  * Ghidra C reviewed (function at overlay offset 0x16724).
- * Args: aircraft controller, flag (bullet controller word +0x36) [UNKNOWN meaning]. Type 1 sets _DAT_0001b842; types 1 and 3 resist 3 hits in 4. Otherwise rolls a byte and sets one damage bit in the controller word +0x684: < 6 bit 0, < 0x2b bit 1, < 0x38 bit 2, < 0x45 bit 3, < 0x51 bit 4, < 0x5e bit 5; else bit 6 the first time, later bit 9 (0x200; Ghidra tests byte +0x684 & 2) is promoted to bit 8 (0x100) and word +0x688 is cleared [iteration 339 correction: not bit 1]. A non-zero flag sets bit 15. The low byte of this word is flags_685 (+0x685), whose bits gate / jitter the control inputs (enqueue_control_inputs_avg4) [PROVEN link]: hits degrade the flight controls. Also called from decomp ~19833. Ghidra C.
+ * Args: aircraft controller, flag (bullet controller word +0x36 = fired by the player, iteration 352; a non-zero flag sets +0x684 bit 15). Type 1 sets _DAT_0001b842; types 1 and 3 resist 3 hits in 4. Otherwise rolls a byte and sets one damage bit in the controller word +0x684: < 6 bit 0, < 0x2b bit 1, < 0x38 bit 2, < 0x45 bit 3, < 0x51 bit 4, < 0x5e bit 5; else bit 6 the first time, later bit 9 (0x200; Ghidra tests byte +0x684 & 2) is promoted to bit 8 (0x100) and word +0x688 is cleared [iteration 339 correction: not bit 1]. A non-zero flag sets bit 15. The low byte of this word is flags_685 (+0x685), whose bits gate / jitter the control inputs (enqueue_control_inputs_avg4) [PROVEN link]: hits degrade the flight controls. Also called from decomp ~19833. Ghidra C.
  */
 uint apply_random_aircraft_damage /* Original: FUN_00016724 */ (int param_1,int param_2)
 

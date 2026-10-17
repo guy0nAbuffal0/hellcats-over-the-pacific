@@ -5,10 +5,9 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 354 (2026-10-18)
-**Next target:** `segment_point_min_distance` (FUN_00003cca): verify its body
-against the bytes with the 9-argument list found in iteration 354 (the
-"multi-sample min" helper from the priority queue).
+**Last iteration:** 356 (2026-10-18)
+**Next target:** definition key 0x1b: identify the type whose controller word
+`+0x46` bullets set (1/16 per hit in `bullet_hits_shape`) and what reads it.
 
 ## Current coverage
 

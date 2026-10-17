@@ -4572,3 +4572,26 @@ handle only after activation; a shell printing ticks alone does not wake this ag
   bullet pos - vel/2, bullet vel, aircraft pos. Recorded as a call-argument
   correction.
 - Not VERIFIED because the C call is incomplete. Comment / doc only.
+
+### Iteration 355 — 2026-10-18
+
+- segment_point_min_distance (FUN_00003cca) re-checked against the bytes
+  0x3cca..0x3da6.
+  - Real signature: 9 longs.
+  - The deltas are read as low words (signed 16-bit truncation).
+  - Midpoints use floor (asr.l, no bias).
+  - Distances are signed words, so values above 0x7fff wrap negative.
+- The Ghidra C lost all call arguments, so the function is not marked VERIFIED.
+- Comment / doc only.
+
+### Iteration 356 — 2026-10-18
+
+- bullet_hits_shape (FUN_0001665a) logic matches the bytes 0x1665a..0x16722.
+  - Same dropped 9-long call as bullet_hits_aircraft.
+  - Flag-long bit 10 (0x400, byte +6 & 4) = destructible by gunfire: 1/8 per
+    hit marks the target in bullet +0x3c, and tick_bullet destroys it.
+  - Otherwise the target is solid and the bullet is retired.
+  - A type-0x1b target gets its controller +0x46 = 1 one time in 16.
+- apply_random_aircraft_damage header updated with the iteration-352 flag
+  meaning.
+- Comment / doc only.

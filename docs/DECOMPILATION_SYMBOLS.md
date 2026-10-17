@@ -864,6 +864,7 @@ The low word is copied (zero-extended) from descriptor +0x16 by
 | 1 | 0x2 | +7 & 0x02 | excluded from view and collision (sent to the out-of-range path) | PROVEN (flow) | collect_far_objects 0x55c4 / 0x56f8 |
 | 2 | 0x4 | +7 & 0x04 | no camera-relative candidate entry | PROVEN (flow) | 0x5600 |
 | 6 | 0x40 | +7 & 0x40 | not put on the visible list; uses the player tests (handle_player_contact / test_player_vs_type0e_proximity); set on the player (DAT_0001b738) | PROVEN (flow) / STRONG_INFERENCE (meaning) | 0x55cc, 0x56f0, 0x579c |
+| 10 | 0x400 | +6 & 0x04 | destructible by gunfire: bullet_hits_shape marks it for destruction 1 hit in 8 (otherwise solid, the bullet stops) | PROVEN (flow) / STRONG_INFERENCE (iter 356) | 0x166c8 |
 | 11 | 0x800 | +6 & 0x08 | one-frame mover flag, cleared by the sweep | PROVEN (flow) | 0x56d2 |
 | 15 | 0x8000 | +6 & 0x80 | added to DAT_0001c1e4 each frame; that list gets the +0x16 notice handlers (dispatch_overlap_collisions) | PROVEN (flow) | 0x56ac, 0x5832 |
 | 20 | 0x100000 | +5 & 0x10 | distance-based (proximity) collision instead of shape collision; set from bit 13 at creation | PROVEN (bit flow) / STRONG_INFERENCE (meaning) | 0x13e62, 0x570c, 0x5796, 0x116ca, alloc 0x45ba |
@@ -943,3 +944,5 @@ Ghidra calls that lost their stack arguments; the bytes give the real list.
 | Caller | Callee | Real arguments | Evidence |
 |---|---|---|---|
 | `bullet_hits_aircraft` (FUN_000167f4) | `segment_point_min_distance` (FUN_00003cca) | 9 longs: bullet pos - vel/2 (x, y, z), bullet vel (x, y, z), aircraft pos (x, y, z) | bytes 0x16804..0x16852, iter 354 |
+| (callee side) | `segment_point_min_distance` (FUN_00003cca) | reads the deltas as low words (signed 16-bit); floor midpoints; word distances (wrap above 0x7fff) | bytes 0x3cca..0x3da6, iter 355 |
+| `bullet_hits_shape` (FUN_0001665a) | `segment_point_min_distance` (FUN_00003cca) | same 9 longs as bullet_hits_aircraft | bytes 0x1666a..0x166b8, iter 356 |
