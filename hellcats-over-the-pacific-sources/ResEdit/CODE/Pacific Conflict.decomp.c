@@ -19991,7 +19991,11 @@ void FUN_000128b6(int *param_1)
 
 
 
-void FUN_00012a2a(int *param_1)
+/* Original: FUN_00012a2a; source: Pacific Conflict.c. Recovered name: bomb_tick [STRONG INFERENCE] (iteration 287).
+ * Ghidra C reviewed (function at overlay offset 0x12a2a).
+ * Definition +2 of type 0xc. Same 75-frame replay ring as aircraft_tick (index +0x60e): live, runs the motion FUN_000128b6 unless it has hit (flag word +0x61c bit 2, this and last frame), then bomb_detonation, and records the pose; during a replay plays the ring back. Type 0xc definition (file 0x1a9a8): +2 bomb_tick (0x12a2a), +6 0x1281e, +0x12 0x12f52 [PROVEN bytes]; the collision pair table makes type 0xc ignore bullets and aircraft (0x14346 RTS). Template type 0xc = dropped bomb [STRONG INFERENCE]. Ghidra C.
+ */
+void bomb_tick /* Original: FUN_00012a2a */ (int *param_1)
 
 {
   int *piVar1;
@@ -20015,7 +20019,7 @@ void FUN_00012a2a(int *param_1)
       param_1[3] = 0;
       param_1[2] = 0;
     }
-    FUN_00012d34(param_1);
+    bomb_detonation(param_1);
     *piVar1 = param_1[2] + *(int *)(iVar2 + 0x18);
     piVar1[1] = param_1[3] + *(int *)(iVar2 + 0x1c);
     piVar1[2] = param_1[4] + *(int *)(iVar2 + 0x20);
@@ -20046,7 +20050,7 @@ void FUN_00012a2a(int *param_1)
     *(undefined2 *)((int)param_1 + 0x22) = *(undefined2 *)((int)piVar1 + 0xe);
     *(undefined2 *)(param_1 + 9) = *(undefined2 *)(piVar1 + 4);
     uVar3 = *(undefined2 *)(param_1 + 0x187);
-    FUN_00012d34(param_1);
+    bomb_detonation(param_1);
     *(undefined2 *)((int)param_1 + 0x61e) = uVar3;
   }
   return;
@@ -20156,7 +20160,11 @@ LAB_00012d1e:
 
 
 
-void FUN_00012d34(int *param_1)
+/* Original: FUN_00012d34; source: Pacific Conflict.c. Recovered name: bomb_detonation [STRONG INFERENCE] (iteration 287).
+ * Ghidra C reviewed (function at overlay offset 0x12d34).
+ * On the first frame of impact (+0x61c bit 2): spawns the impact effect (spawn_destruction_effect at size 200 when +0x616 is 0, else an air burst or a debris explosion by height), and for a bomb of kind +0x614 != 0 landing on surface 0x70 counts the hit by the nearby facility (probe_nearest_facility_kind): 0x100 -> host +0xcc (target hits) += 1 outside replay, and in missions 3 / 4 within 0xce40 sets the objective word +0xce = 1; 0x200 -> host +0xd2 (friendly units destroyed) += 1. Schedules the blast 5 frames later (15 when it hit something) in +0x618 and cleans the object up; on that frame calls apply_blast_damage. When bit 0x40 changes, FUN_00016b9e at the position. Type 0xc definition (file 0x1a9a8): +2 bomb_tick (0x12a2a), +6 0x1281e, +0x12 0x12f52 [PROVEN bytes]; the collision pair table makes type 0xc ignore bullets and aircraft (0x14346 RTS). Template type 0xc = dropped bomb [STRONG INFERENCE]. Ghidra C (apply_blast_damage stack arguments not shown).
+ */
+void bomb_detonation /* Original: FUN_00012d34 */ (int *param_1)
 
 {
   char *pcVar1;
@@ -25285,7 +25293,11 @@ uint FUN_00018bba(int param_1,int param_2)
 
 
 
-void FUN_00018c96(int *param_1)
+/* Original: FUN_00018c96; source: Pacific Conflict.c. Recovered name: tick_flak_gun [STRONG INFERENCE] (iteration 287).
+ * Ghidra C reviewed (function at overlay offset 0x18c96).
+ * Definition +2 of type 0x1a (record after the five ship records, runtime 0x1aaea / file 0x1ab0a: +2 this, +6 0x18b52, +0xa 0x18b98) [PROVEN bytes]. First call: finds the gun face (+0x17 == 1), stores its centre and aim direction, and the nearby facility kind (+0x3e). Then, outside replay, explodes due shells: for each scheduled burst whose time (+0xd2[i]) has come, spawn_effect(2, 100, 0x1e, ...) at its position (+0x5a + 12 i) and apply_blast_damage there; with a target (+0x36) it schedules new bursts at random delays around the predicted target position. Type 0x1a is one of the types carried on ships (carry_attached_objects) [STRONG INFERENCE: anti-aircraft flak gun]. Ghidra C (partly read).
+ */
+void tick_flak_gun /* Original: FUN_00018c96 */ (int *param_1)
 
 {
   uint *puVar1;

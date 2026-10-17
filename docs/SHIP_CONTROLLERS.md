@@ -29,7 +29,8 @@ file offsets; data labels are runtime addresses, at file offset + 0x20).
 | 0x16 | `tick_sinking_controller` | `create_sinking_controller` | — | 1 |
 
 The record after these (key 0x1a, pointers 0x18c96 / 0x18b52 / 0x18b98 after
-+0x20) is not copied by Block C.
++0x20) is not copied by Block C. Iteration 287: it is the flak gun (`tick_flak_gun`), one of the
+types carried on ships.
 
 Template types 0x15..0x19 are the ones the entity update path sends to
 `sink_object_shape_at_waterline` **[PROVEN]**; reading them as ship classes is
