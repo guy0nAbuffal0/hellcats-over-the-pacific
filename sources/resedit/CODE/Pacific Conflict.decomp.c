@@ -16157,7 +16157,7 @@ void aircraft_tick /* Original: FUN_0000e5aa */ (int *param_1)
       *(undefined2 *)(param_1 + 0x1a2) = 0;
       *(ushort *)((int)param_1 + 0x686) = *(ushort *)((int)piVar1 + 0x12) & 0xeeff;
       *(undefined2 *)(param_1 + 0x1a1) = *(undefined2 *)((int)piVar1 + 0x12);
-      if ((*(byte *)(param_1 + 0x1a1) & 0x20) == 0) {
+      if ((*(byte *)(param_1 + 0x1a1) & 0x20) == 0) { /* byte +0x684 & 0x20 = word bit 13 (0x2000), gear lever up (iter 350) */
         *(undefined1 *)((int)param_1 + 0x679) = 0x2d;
       }
       else {
@@ -16346,6 +16346,12 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    *   abs>0x200 → clamp ±0x200 (BSR $11564 / $2E08).
    * [PROVEN] flags_685 bit3 (@0xE8E6): same on +0x666; clamp ±0x140.
    * [PROVEN] status +0x684 bit0 (@0xE92C): +0x662=0, +0x666=0xFF80.
+   *   Iteration 349 correction: Ghidra tests byte +0x684 bit 0 = WORD bit 8 (0x100,
+   *   btst #0,$684 at 0xe92c), the top of the damage ladder - not word bit 0. With it
+   *   the elevator is held at 0 and the aileron at -0x80 (the aircraft rolls off).
+   *   Damage bits [STRONG_INFERENCE]: bit 2 (0x4) = elevator damage (jitter +-0x40),
+   *   bit 3 (0x8) = aileron damage (jitter); bit 1 (0x2) = fuel leak (1/64 per frame,
+   *   -1 unit from a random non-empty tank, decomp ~17110).
    * Note: flags_685 bit0 gates enqueue_control_inputs_avg4 (no new samples).
    */
   if ((*(byte *)((int)param_1 + 0x685) & 4) != 0) {
@@ -17060,9 +17066,9 @@ LAB_0000f47c:
                                       *(int *)(iVar1 + 0x20),*(short *)(param_1 + 8),
                                       *(short *)((int)param_1 + 0x22),*(short *)(param_1 + 9),
                                       *(short *)((int)param_1 + 0x626) -
-                                      *(short *)(param_1[1] + 0x44) & 0x3fff); /* bomb/ordnance */
+                                      *(short *)(param_1[1] + 0x44) & 0x3fff); /* gun round (iter 352: +0x676 firing, ammo +0x682 -= 2, needs guns undamaged = +0x684 bit 4; was "bomb/ordnance") */
       if ((psVar11 != (short *)0x0) && (param_1 == DAT_0001b738)) {
-        psVar11[0x1b] = 1;
+        psVar11[0x1b] = 1; /* bullet controller +0x36 = 1: fired by the player (kill credit in tick_bullet, +0x684 bit 15 in apply_random_aircraft_damage) */
       }
       *(short *)((int)param_1 + 0x682) = *(short *)((int)param_1 + 0x682) + -2;
     }
@@ -17105,6 +17111,9 @@ LAB_0000f47c:
    * [PROVEN] If flags_685&2: 11544 draw; on (d&0x3f)==0 second draw then
    * decrement 67d or 67e (same RNG rule as Block 1b overflow).
    * [PROVEN] If bVar6: clamp/clear status_1a2, status=(s&0x8000)|0x900,
+   *   Iteration 351: bVar6 = crash. 0x900 = bit 11 (wrecked on the ground; the next
+   *   tick takes the early exit at 0xe80e) + bit 8 (burning); +0x32 = 0xe772 is
+   *   update_aircraft_entity itself (0xe792 - 0x20) [STRONG_INFERENCE names].
    * state_32=0xE772, clear movement_61a/61e. Skipped on 0x10 early return.
    */
   if ((*(byte *)((int)param_1 + 0x685) & 2) != 0) {
@@ -17916,6 +17925,17 @@ LAB_00010464:
  * path on 0x662/0x666). No-op if +0x685 bit0 set.
  *
  * Callers: apply_relative_heading_steer, FUN_00010b84, @0x92D6, @0x110B4.
+ *
+ * Iteration 348, control axes [PROVEN flow; names STRONG_INFERENCE]:
+ *   param_3 (mouse vertical offset * 3, clamp +-0x200) -> ring +0x64c, sum +0x65e
+ *           -> +0x662 = ELEVATOR / pitch stick (block 3a: AoA command = stick ×
+ *           stall / 512, so full stick reaches the stall angle);
+ *   param_4 (mouse horizontal offset * 3 / 2, clamp +-0x140) -> ring +0x644, sum
+ *           +0x65c -> +0x666 = AILERON / roll stick (also the ground-steering term
+ *           in block 3b);
+ *   param_2 (DAT_0001b858: +0x40 on 'Z' / '>' keyDown, -0x40 on 'X' / '?', else 0;
+ *           clamp +-0x40) -> ring +0x654, sum +0x660 -> +0x664 = RUDDER.
+ * Each output is the 4-frame average (sum >> 2 with the +3 bias); ring index +0x642.
  */
 void enqueue_control_inputs_avg4(int param_1,short param_2,short param_3,short param_4) /* Original: FUN_00010558 */
 {
@@ -23290,6 +23310,14 @@ void spawn_ordnance_oriented_3ang /* Original: FUN_00015d78 */ (int param_1,int 
 /* Original: FUN_00015dc8; source: Pacific Conflict.c. Recovered name: tick_bullet [STRONG INFERENCE] (iteration 303).
  * Ghidra C reviewed (function at overlay offset 0x15dc8).
  * When the bullet has hit an object (+0x3c, set by bullet_hits_shape) spawns that object destruction effect (spawn_destruction_effect at range / 8, or / 4 when raised) and handles the kill (further down). Bullet definition key 0xe (file 0x1a9e2): +2 tick_bullet, +6 register_bullet_template -> create_bullet_controller, +0xe bullet_pre_render [PROVEN bytes]; the bullet template DAT_0002664a is the one spawn_ordnance_scattered uses. Ghidra C (partly read).
+ *
+ * VERIFIED (iteration 353): independent capstone disassembly of 0x15dc8..0x15e60 is
+ * identical to the C. Facts [PROVEN]: hit object = controller +0x3c; effect size =
+ * its range +0x14 / 8 (C-truncating, +7 bias) when its +0x1c == 0, else / 4; kill credit
+ * only when +0x36 (fired by the player, iteration 352) is non-zero; lifetime counter
+ * word +0x38, retired at 0x1f frames; after frame 3 the long +0x32 (vertical speed in
+ * 1/64 units) gains -0x5b per frame (gravity) and +0xc = it >> 6; retired once the
+ * object y +0x1c <= controller +0x2e (signed cmp.l / bgt).
  */
 void tick_bullet /* Original: FUN_00015dc8 */ (int *param_1)
 
@@ -23869,6 +23897,19 @@ LAB_00016758:
 /* Original: FUN_000167f4; source: Pacific Conflict.c. Recovered name: bullet_hits_aircraft [STRONG INFERENCE] (iteration 263).
  * Ghidra C reviewed (function at overlay offset 0x167f4).
  * Pair handler of dispatch_collision for template type 0xe against types 1..4 (table DAT_0001b43c). Args: bullet a, aircraft b. When the bullet is within the b range (FUN_00003cca distance <= b +0x14): with probability 1/8 applies apply_random_aircraft_damage(b controller, bullet controller word +0x36) and retires the bullet (retire_entity); otherwise, when b is the player (DAT_0001b738), with probability 1/2 sets _DAT_0001b842. Template type 0xe is a bullet / gun round [STRONG INFERENCE: it is retired on impact and causes damage rolls]; _DAT_0001b842 is a one-frame event flag consumed by FUN_000096f4 (FUN_000095ac(2), cleared afterwards) [HYPOTHESIS: hit sound]. Complete Ghidra C.
+ *
+ * CALL-ARGUMENT CORRECTION (iteration 354) [PROVEN, bytes 0x167f4..0x168ac]: Ghidra's
+ * segment_point_min_distance() has no arguments, but the bytes push nine longs
+ * (call order, after the push order is reversed):
+ *   start = bullet object pos (+0x18 / +0x1c / +0x20 of a) - bullet velocity / 2
+ *           (controller +8 / +0xc / +0x10, each halved with the +1 bias);
+ *   velocity (+8 / +0xc / +0x10); point = aircraft object pos (+0x18 / +0x1c / +0x20 of b).
+ * i.e. distance from b to the bullet's path segment over the frame, compared with b's
+ * range +0x14 (cmp.l / bgt: hit when distance <= range). Everything else matches the
+ * C: 1/8 (rng & 7 == 0) -> apply_random_aircraft_damage(b controller, sign-extended
+ * bullet word +0x36 = fired by the player) and retire the bullet; otherwise, for the
+ * player, 1/2 -> _DAT_0001b842 = 1 (hit sound, slot 2 "Hit"). Not marked VERIFIED
+ * because the C call is incomplete.
  */
 uint bullet_hits_aircraft /* Original: FUN_000167f4 */ (int param_1,int param_2)
 

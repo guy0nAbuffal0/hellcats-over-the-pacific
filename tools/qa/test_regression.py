@@ -36,6 +36,8 @@ EXPECTED_RUNNER_PATHS = [
     "res://tests/unit/test_world_collision_mvp.gd",
     "res://tests/integration/test_sim_loader_bridge.gd",
     "res://tests/integration/test_sim_tick_ordering.gd",
+    "res://tests/integration/test_sim_entity_controls.gd",
+    "res://tests/integration/test_movement_smoothing.gd",
     "res://tests/integration/test_replay.gd",
     "res://tests/integration/test_mission_scene_load.gd",
     "res://tests/integration/test_hud_mvp_scene.gd",
@@ -170,10 +172,10 @@ def check_loader_fixture() -> None:
             f"only_in_want={sorted(want - got)}"
         )
 
-    # If legacy fixtures still exist, enforce byte-identical copy to prevent split-brain updates.
+    # A legacy copy would reintroduce split-brain fixture updates.
     legacy = LEGACY_FIXTURES / "proven_loader_targets.json"
-    if legacy.exists() and legacy.read_bytes() != fixture.read_bytes():
-        fail("Legacy and migrated loader fixtures differ; update both or remove legacy fixture.")
+    if legacy.exists():
+        fail("Remove legacy proven_loader_targets.json; godot/tests/fixtures is canonical.")
 
 
 def check_replay_fixture() -> None:
@@ -200,8 +202,8 @@ def check_replay_fixture() -> None:
                 fail(f"replay_inputs[{i}].{k} must be int")
 
     legacy = LEGACY_FIXTURES / "replay_inputs.json"
-    if legacy.exists() and legacy.read_bytes() != fixture.read_bytes():
-        fail("Legacy and migrated replay fixtures differ; update both or remove legacy fixture.")
+    if legacy.exists():
+        fail("Remove legacy replay_inputs.json; godot/tests/fixtures is canonical.")
 
 
 def check_mission_mvp_data() -> None:

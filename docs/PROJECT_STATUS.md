@@ -13,16 +13,11 @@ The repository has two intentionally separate Godot tracks:
 - `godot/strict_port/` is the source-faithful track. New parity work starts here
   and follows the semantic reconstructed C, not prototype behavior.
 
-The strict port is foundational, not gameplay-complete. Its manifest maps three
-of 736 reconstructed functions; all three are structurally and behaviorally
-verified with deterministic tests, none is integrated into the playable runtime,
-and none has original-Mac runtime verification. Run
-`python3 tools/strict_port/check_sync.py --json` for current generated counts.
-
-The reconstruction checkpoint records 674 renamed, 56 independently verified,
-and 6 blocked functions. These are C-reconstruction states, not implementation
-percentages. The resource corpus contains 119 resources across 30 types, with
-116 decoded structures; `python3 tools/resedit.py inventory` reports live counts.
+The strict port is foundational, not gameplay-complete. Run
+`python3 tools/progress_stats.py` for current reconstruction, translation, and
+resource counts, and `python3 tools/strict_port/check_sync.py --json` for strict
+source-hash synchronization. These independent categories must not be collapsed
+into an overall completion percentage.
 
 ## Architecture and next milestone
 
@@ -42,10 +37,11 @@ translations.
 
 ## Evidence and retrieval
 
-Start at `README.md`. Use `tools/re_query.py` for a single function, callers, globals,
-status row, symbol record, or strict-port mapping. Use `tools/resedit.py inspect`
-and `references` for one resource. Do not load project-wide histories or entire
-source corpora for a focused task.
+Start at `README.md`. Use `tools/re_query.py` for a single function, bounded
+excerpt, caller/callee set, globals, status, symbol record, strict mapping, or
+test case. Use `tools/resedit.py inspect`, `item`, `references`, and bounded
+`raw` for one resource. Do not load project-wide histories or entire source
+corpora for a focused task.
 
 Detailed current references:
 

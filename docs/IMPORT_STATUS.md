@@ -2,18 +2,17 @@
 
 Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 
-**Purpose:** Single place to see which **Pacific Conflict.c** (and segment) symbols are reflected in the repo, and how complete that reflection is. This is a **living** table—update it when contracts or code change.
+**Purpose:** Technical cross-reference showing which **Pacific Conflict.c** (and segment) symbols are reflected in the prototype. Current strict-port status comes only from `godot/strict_port/mappings/functions.json` and `tools/progress_stats.py`.
 
 **Corpus:** `Hellcats-Over-the-Pacific_Mac_EN/ResEdit/CODE/` — **Pacific Conflict.c** (main game), **ID01.c–ID09.c** (segment/runtime splits). See `docs/LOADER_CHAIN.md` for how ID segments relate to the overlay.
 
-**Related:** `docs/SUBSYSTEM_MAP.md`, `docs/CONVERGENCE_BACKLOG.md`, `docs/ROADMAP.md`.
+**Related:** `docs/SUBSYSTEM_MAP.md`, `docs/ROADMAP.md`; the prototype-era backlog is archived under `docs/research/`.
 
 ## Resource corpus
 
 The Macintosh resource side is inventoried separately in
-[`RESOURCE_ANALYSIS.md`](RESOURCE_ANALYSIS.md). All 119 curated items across the
-30 on-disk resource directories have local metadata and binary companions. The
-generator records 33 static CODE-reference annotations and keeps those distinct
+[`RESOURCE_ANALYSIS.md`](RESOURCE_ANALYSIS.md). Run `python3 tools/resedit.py inventory`
+for current corpus counts. Generated CODE-reference annotations remain distinct
 from runtime-verified behavior. This does not mean the resources are imported
 into Godot: PICT opcode rendering, resource-backed UI construction, sound
 playback, and most proprietary data consumers remain unported.
@@ -99,7 +98,7 @@ was not replaced.
 
 | Topic | Godot / docs | Status | MVP notes |
 |-------|----------------|--------|-----------|
-| Cockpit ↔ **FUN_0000e792** entity fields | `AircraftState` snapshot; training HUD | **Partial** | `CONVERGENCE_BACKLOG.md` #6: field-accurate HUD vs original **[INFERRED]** still open for parity. |
+| Cockpit ↔ **FUN_0000e792** entity fields | `AircraftState` snapshot; training HUD | **Partial** | Field-accurate HUD vs original remains **[INFERRED]** and open for parity. |
 
 ## Update log
 

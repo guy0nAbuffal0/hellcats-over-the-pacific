@@ -23,16 +23,21 @@ Do not begin a focused task by loading all documentation or a whole CODE file.
 Use deterministic narrow retrieval:
 
 ```sh
-python3 tools/re_query.py function FUN_0000e792
-python3 tools/re_query.py callers FUN_0000e792
-python3 tools/re_query.py globals FUN_0000e792
-python3 tools/re_query.py status FUN_0000e792
+python3 tools/re_query.py function --segment "Pacific Conflict" FUN_0000e792
+python3 tools/re_query.py excerpt --segment "Pacific Conflict" FUN_0000e792 --address 0xf47c
+python3 tools/re_query.py callers --segment "Pacific Conflict" FUN_0000e792
+python3 tools/re_query.py callees --segment "Pacific Conflict" FUN_0000e792
+python3 tools/re_query.py globals --segment "Pacific Conflict" FUN_0000e792 --access reads
+python3 tools/re_query.py tests test_flight_math --case _test_fun_0000e42a
 python3 tools/re_query.py symbol DAT_00026004
 python3 tools/re_query.py source-map FUN_0001358c
 
 python3 tools/resedit.py inspect DITL 137
+python3 tools/resedit.py item DITL 137 5
 python3 tools/resedit.py references ALRT 259
+python3 tools/resedit.py raw DITL 137 --offset 0 --length 32
 python3 tools/resedit.py search "Mission Navigation"
+python3 tools/progress_stats.py
 ```
 
 ## Evidence and code layout
@@ -77,6 +82,8 @@ From the repository root:
 
 ```sh
 python3 tools/qa/test_re.py
+python3 tools/decomp/inventory_functions.py --check
+python3 tools/progress_stats.py --check
 python3 tools/resedit.py verify
 python3 tools/strict_port/check_sync.py --json
 python3 tools/qa/test_regression.py

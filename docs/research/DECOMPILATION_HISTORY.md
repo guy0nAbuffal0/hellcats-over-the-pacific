@@ -4487,3 +4487,88 @@ handle only after activation; a shell printing ticks alone does not wake this ag
 2. `ID09.c` / `ID05.c` segment entries  
 3. Inventory remaining high-traffic `FUN_*` in Pacific Conflict  
 4. `FUN_00003cca` — multi-sample min using approx_dist3_xyz  
+
+### Iteration 348 — 2026-10-18
+
+- enqueue_control_inputs_avg4 (FUN_00010558) data flow: mouse y × 3 (clamp
+  ±0x200) -> +0x662 elevator; mouse x × 3 / 2 (clamp ±0x140) -> +0x666 aileron;
+  DAT_0001b858 (Z / X keys ±0x40) -> +0x664 rudder. Each is a 4-frame average.
+- The elevator scale ±0x200 matches block 3a (full stick = stall AoA).
+- Names STRONG_INFERENCE; flow PROVEN. Comment / doc only.
+
+### Iteration 349 — 2026-10-18
+
+- update_aircraft_entity block 1a: the existing PROVEN note "status +0x684
+  bit0 (@0xE92C)" is byte bit 0, i.e. word bit 8 (0x100) [PROVEN by the
+  iteration-339 scan]. At the top of the damage ladder it forces elevator 0
+  and aileron -0x80.
+- Damage bits [STRONG_INFERENCE]:
+  - bit 1 = fuel leak (1/64 per frame);
+  - bit 2 = elevator jitter;
+  - bit 3 = aileron jitter.
+- Comment / doc only.
+
+### Iteration 350 — 2026-10-18
+
+- +0x684 bit 5 (0x20, byte +0x685) = landing gear jammed: extension of +0x679
+  (1..0x2c -> 0x2d) and the gear sound need it clear; retraction still runs.
+  Set by a damage roll < 0x5e, or by tick_wave_spawner on spawned aircraft.
+- +0x684 bit 13 (0x2000) = gear lever up: set while the gear retracts,
+  cleared while it extends.
+  - aircraft_tick's replay sets the gear to 0x2d when it is clear and to 0
+    when it is set.
+  - Its Ghidra test `*(byte *)(param_1 + 0x1a1) & 0x20` is byte +0x684, i.e.
+    word bit 13.
+- Flow PROVEN, names STRONG_INFERENCE. Comment / doc only.
+
+### Iteration 351 — 2026-10-18
+
+- +0x684 bit 11 (0x800) = wrecked on the ground [STRONG_INFERENCE; flow
+  PROVEN].
+  - A crash keeps only bit 15, then sets 0x900 (wreck + burning) and state
+    handler 0xe772 = update_aircraft_entity (0xe792 - 0x20).
+  - On the next ticks the early exit at 0xe80e rests the wreck at ground
+    - 0x16 with the engine off.
+  - The surface-0x20 bad-contact test skips wrecks.
+  - update_aircraft_damage_state passes !bit 11 to set_state_word_1b86c.
+- Bit 15 is still UNKNOWN: the bullet-controller +0x36 writer was not found.
+- Comment / doc only.
+
+### Iteration 352 — 2026-10-18
+
+- Bullet controller +0x36 = fired by the player [PROVEN].
+  - The only writer is update_aircraft_entity's gun path (`psVar11[0x1b] = 1`
+    on a short *, only for DAT_0001b738).
+  - Readers: tick_bullet (tst.w $36(a3) at 0x15e02 -> tally_destroyed_entity)
+    and bullet_hits_aircraft (movea.w $36(a2) at 0x16872 ->
+    apply_random_aircraft_damage, which sets +0x684 bit 15).
+- So bit 15 = hit by the player [STRONG_INFERENCE]; its consumer is not yet
+  found.
+- The gun-call comment "bomb/ordnance" was corrected to "gun round".
+- Comment / doc only.
+
+### Iteration 353 — 2026-10-18
+
+- tick_bullet (FUN_00015dc8) VERIFIED against the bytes 0x15dc8..0x15e60.
+- Bullet model [PROVEN]:
+  - lifetime 0x1f frames;
+  - gravity -0x5b per frame on the vertical speed long +0x32 after frame 3;
+  - +0xc = that speed >> 6;
+  - retired when at or below controller +0x2e.
+- spawn_ordnance_scattered's long write to +0x32 (= local_a << 4) is therefore
+  the initial vertical speed in 1/64 units.
+- Inventory (schema v2) row set to reconstruction_status VERIFIED,
+  name_verified and semantically_verified true. The registry was then
+  regenerated with tools/decomp/inventory_functions.py; the diff was only
+  semantic_source / evidence_references line refreshes for 93 functions.
+  --check PASS. tools/progress_stats.py gives 673 renamed / 57 verified.
+
+### Iteration 354 — 2026-10-18
+
+- bullet_hits_aircraft (FUN_000167f4) was compared with the bytes 0x167f4..0x168ac.
+- Logic matches: 1/8 damage roll with the sign-extended +0x36 player flag,
+  bullet retired; otherwise a 1/2 hit sound for the player.
+- Ghidra dropped the nine stack arguments of segment_point_min_distance:
+  bullet pos - vel/2, bullet vel, aircraft pos. Recorded as a call-argument
+  correction.
+- Not VERIFIED because the C call is incomplete. Comment / doc only.

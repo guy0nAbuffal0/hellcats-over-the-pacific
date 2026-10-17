@@ -1,9 +1,9 @@
 # ResEdit resource analysis
 
-The curated resource tree is now reproducible and locally inspectable. Each of
-the 119 resource items under `sources/resedit/` has a sibling binary payload and
-JSON metadata record. `sources/resedit/inventory.json` is only an index; the
-resource-local JSON files are the primary inspection records.
+The curated resource tree is reproducible and locally inspectable. Each resource
+item under `sources/resedit/` has a sibling binary payload and JSON metadata
+record. `sources/resedit/inventory.json` is only an index; the resource-local
+JSON files are the primary inspection records.
 
 ## Coverage
 
@@ -14,27 +14,11 @@ as 29. All 30 are retained exactly:
 `HELL`, `ICN#`, `ICON`, `MDPL`, `MENU`, `PICT`, `SIZE`, `STR#`, `TEXT`, `ZERO`,
 `cicn`, `clut`, `icI4`, `icI8`, `ics#`, `ics4`, `ics8`, `snds`, `styl`, `vers`.
 
-Current generated coverage (17 October 2026):
-
-| Measure | Count |
-| --- | ---: |
-| Resource directories | 30 |
-| Individual resources | 119 |
-| Resource-local metadata records | 119 |
-| Indexed binary/hex/image/decompilation representations | 279 |
-| Unassociated CODE support/checksum/tool files inventoried | 12 |
-| Deterministically decoded structures | 116 |
-| Identified internal elements | 1,096 |
-| Proven outgoing resource links | 32 |
-| Static executable-reference annotations | 33 |
-| Type-level named-resource call sites | 2 |
-| Unresolved or truncated primary structures | 3 |
-
-Run `python3 tools/resedit.py inventory` for the authoritative current counts.
-The 33 executable references are direct type/ID references supported by
-decompilation annotations. Two additional `GetNamedResource('snd ', name)` call
-sites are recorded at type scope. They are not claims of runtime observation or
-proof that every named sound executes in a captured session.
+Run `python3 tools/resedit.py inventory` for authoritative detailed counts or
+`python3 tools/progress_stats.py` for the compact cross-domain summary.
+Executable references are direct type/ID references supported by decompilation
+annotations; type-level named-resource call sites remain separate. Neither is a
+claim of runtime observation or proof that every named resource executes.
 
 ## Evidence and edition provenance
 

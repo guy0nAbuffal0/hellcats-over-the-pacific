@@ -150,7 +150,7 @@ Segment 7 has only one ID00 entry (tail 0x018c), which **is** proven (see §4.2)
 
 - **[INFERRED]** [`loader_metadata.gd`](../godot/hellcats/core/loader_metadata.gd) is the clean-room boundary for proven loader-target facts: parsed JSON only, no segment-manager emulation.
 - **[INFERRED]** [`sim_core.gd`](../godot/hellcats/core/sim_core.gd) now accepts that metadata through `load_loader_metadata_from_file()` / `load_loader_metadata_from_json_text()` and resolves targets through `resolve_loader_target()`.
-- **[RECONSTRUCTED]** The headless integration test [`test_sim_loader_bridge.gd`](../godot/hellcats/tests/test_sim_loader_bridge.gd) proves `SimCore` can ingest the proven ID02 and ID05 targets and still execute a deterministic tick.
+- **[RECONSTRUCTED]** The canonical headless integration test [`test_sim_loader_bridge.gd`](../godot/tests/integration/test_sim_loader_bridge.gd) proves `SimCore` can ingest the proven ID02 and ID05 targets and still execute a deterministic tick.
 - **[UNKNOWN]** Runtime relocation, jump-table patching, and actual segment load execution are still out of scope for the Godot core until the address model is proven further.
 
 ## 10) Safe targets for Godot consumption now

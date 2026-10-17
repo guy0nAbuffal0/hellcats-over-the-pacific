@@ -1,4 +1,9 @@
-# Convergence backlog (Mission-1 MVP, prioritized)
+# Archived convergence backlog (Mission-1 MVP)
+
+> Historical prototype-era plan. It is retained for decision provenance, not
+> as an active workflow. Use [`../PROJECT_STATUS.md`](../PROJECT_STATUS.md),
+> [`../STRICT_PORT_FOUNDATION.md`](../STRICT_PORT_FOUNDATION.md), and
+> [`../DECOMPILATION_PROGRESS.md`](../DECOMPILATION_PROGRESS.md) for current work.
 
 Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]**. Order = recommended convergence sequence.
 

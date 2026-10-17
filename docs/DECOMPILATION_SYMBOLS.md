@@ -815,17 +815,19 @@ test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
 | Bit | Mask | Writers | Readers | Meaning | Certainty |
 |---|---|---|---|---|---|
 | 0 | 0x0001 | apply_random_aircraft_damage (roll < 6); spawn path 0xf71c | 0x9246, 0xf6e6, 0x10570, 0x1094a | pilot hit / pilot gone (Ugh sound; blocks a second parachute) | PROVEN flow / STRONG_INFERENCE |
-| 1–3 | 0x000e | damage rolls < 0x2b / < 0x38 / < 0x45 | update_aircraft_entity 0xf794 / 0xe8a0 / 0xe8e6 | control damage | PROVEN flow / UNKNOWN which control |
+| 1 | 0x0002 | damage roll < 0x2b (37 / 256, the most likely hit) | update_aircraft_entity 0xf794 | FUEL LEAK: 1/64 per frame, -1 unit from a random non-empty tank | PROVEN flow / STRONG_INFERENCE (iter 349) |
+| 2 | 0x0004 | damage roll < 0x38 | 0xe8a0 | ELEVATOR damage: +0x662 += rng & 0x7f - 0x40, clamp ±0x200 | PROVEN flow / STRONG_INFERENCE (iter 349) |
+| 3 | 0x0008 | damage roll < 0x45 | 0xe8e6 | AILERON damage: +0x666 jitter, clamp ±0x140 | PROVEN flow / STRONG_INFERENCE (iter 349) |
 | 4 | 0x0010 | damage roll < 0x51 | 0x7fbc, 0xf652, 0x191c2 | guns damaged (Gun sound gate) | STRONG_INFERENCE |
-| 5 | 0x0020 | damage roll < 0x5e; tick_wave_spawner 0x1818a | 0x97e4, 0xf576, 0xfb08 | UNKNOWN | — |
-| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, iter 341) | progressive engine damage: 0x80 engine damaged, 0x100 / 0x200 engine out (0x100 also smoke / AI bail-out) | PROVEN ladder and engine effect / STRONG_INFERENCE names |
+| 5 | 0x0020 | damage roll < 0x5e; tick_wave_spawner 0x1818a | 0x97e4 (gear sound), 0xf576 / 0xfb08 (gear step) | LANDING GEAR JAMMED: gear +0x679 cannot step 1..0x2c towards 0x2d (down) and its sound is suppressed; retraction (negative values) still runs | PROVEN flow / STRONG_INFERENCE (iter 350) |
+| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, iter 341) | progressive engine damage: 0x80 engine damaged, 0x100 / 0x200 engine out (0x100 also smoke / AI bail-out); 0x100 also forces elevator 0 / aileron -0x80 (roll-off, 0xe92c) | PROVEN ladder and engine effect / STRONG_INFERENCE names |
 | 1–9 | 0x03fe | — | landing / ditch / bail-out outcomes | "aircraft damaged" | PROVEN use |
 | 10 | 0x0400 | hard landing 0xf136 / 0xf3a2, aircraft_collision, apply_blast_damage | 0x8fa0, 0xe722, 0x1077a | crashed / destroyed | STRONG_INFERENCE |
-| 11 | 0x0800 | 0xf7f0 (with 0x100, after keeping only 0x8000) | 0xe80e, 0xf372, 0x1070c.. | UNKNOWN | — |
+| 11 | 0x0800 | crash at the end of update_aircraft_entity (0xf7ea / 0xf7f0: status = (s & 0x8000) \| 0x900, state handler +0x32 = 0xe772 = update_aircraft_entity) | update_aircraft_entity early exit (0xe80e: rests at ground - 0x16, jitter, engine off); surface 0x20 bad-contact skip (0xf372); update_aircraft_damage_state (0x1070c / 0x10740 / 0x10796; set_state_word_1b86c(!bit 11)) | WRECKED ON THE GROUND (0x900 = wreck + burning) | PROVEN flow / STRONG_INFERENCE (iter 351) |
 | 12 | 0x1000 | water contact 0xe832 / 0xf384; cleared on leaving the ground 0xf0d8 | 0x8066 (ditch outcome), 0xef90, 0x108da | in water | STRONG_INFERENCE |
-| 13 | 0x2000 | set / cleared 0xf5a0 / 0xf588 (beside +0x67a) | 0xe628, 0xe6d4 | UNKNOWN | — |
+| 13 | 0x2000 | set while the gear retracts (+0x679 < 0, 0xf5a0), cleared while it extends (0xf588) | aircraft_tick replay 0xe628 / 0xe6d4 (gear = 0x2d when clear, 0 when set; on a change, re-derives the gear direction from the sign) | GEAR LEVER UP | PROVEN flow / STRONG_INFERENCE (iter 350) |
 | 14 | 0x4000 | aircraft_create 0xe11a, respawn (= 0x4000), key 'M' 0x7af6; cleared by keys '0'..'9' (0x79a6) and the throttle step (0x7df0) | 0x7de4, 0x82b6 (refuel snapshot), 0xeb5c, update_aircraft_entity (with +0x66e == 0 clears engine-running +0x669) | ENGINE SWITCHED OFF (iter 340) | PROVEN flow / STRONG_INFERENCE name |
-| 15 | 0x8000 | apply_random_aircraft_damage when the bullet word +0x36 != 0 | kept by andi #$8000 at 0xf7ea | UNKNOWN | — |
+| 15 | 0x8000 | apply_random_aircraft_damage when the bullet's +0x36 != 0; bullet +0x36 = 1 only for rounds fired by the player (update_aircraft_entity gun path, `psVar11[0x1b] = 1`) | kept by andi #$8000 at 0xf7ea (the only bit to survive a crash); no explicit test found | HIT BY THE PLAYER (kill attribution); its consumer is not yet identified | PROVEN writer chain / STRONG_INFERENCE (iter 352) |
 
 ## Rejected / superseded interpretations
 
@@ -925,3 +927,19 @@ Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
 | +0x42 | 469 | 277 | 469 | 469 | — |
 | +0x44 | 128 | 128 | 128 | 128 | — |
 | +0x46 / +0x48 | 640 / 1067 | same | same | same | — |
+
+## Aircraft control inputs — iteration 348
+
+| Symbol | Meaning | Confidence | Evidence |
+|---|---|---|---|
+| aircraft controller +0x662 / +0x664 / +0x666 (Pacific Conflict) | elevator (±0x200) / rudder (±0x40) / aileron (±0x140) inputs, 4-frame averages | PROVEN (flow, clamps) / STRONG_INFERENCE (names) | Iter 348: enqueue_control_inputs_avg4; mouse y -> elevator, mouse x -> aileron, Z / X keys (DAT_0001b858 = ±0x40) -> rudder; rings +0x644 / +0x64c / +0x654, sums +0x65c / +0x65e / +0x660, index +0x642. |
+| `DAT_0001b858` (Pacific Conflict) | rudder key input (word: +0x40 Z, -0x40 X, 0) | PROVEN | Iter 348: key handler cases 0x5a / 0x3e and 0x58 / 0x3f. |
+| bullet controller +0x36 (Pacific Conflict) | fired by the player (word: 1 / 0) | PROVEN | Iter 352: set only when the shooter is DAT_0001b738; tick_bullet calls tally_destroyed_entity only when it is non-zero; apply_random_aircraft_damage copies it to +0x684 bit 15. |
+
+## Call-argument corrections
+
+Ghidra calls that lost their stack arguments; the bytes give the real list.
+
+| Caller | Callee | Real arguments | Evidence |
+|---|---|---|---|
+| `bullet_hits_aircraft` (FUN_000167f4) | `segment_point_min_distance` (FUN_00003cca) | 9 longs: bullet pos - vel/2 (x, y, z), bullet vel (x, y, z), aircraft pos (x, y, z) | bytes 0x16804..0x16852, iter 354 |

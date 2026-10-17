@@ -19,6 +19,8 @@ const TEST_PATHS := [
 	"res://tests/unit/test_world_collision_mvp.gd",
 	"res://tests/integration/test_sim_loader_bridge.gd",
 	"res://tests/integration/test_sim_tick_ordering.gd",
+	"res://tests/integration/test_sim_entity_controls.gd",
+	"res://tests/integration/test_movement_smoothing.gd",
 	"res://tests/integration/test_replay.gd",
 	"res://tests/integration/test_mission_scene_load.gd",
 	"res://tests/integration/test_hud_mvp_scene.gd",

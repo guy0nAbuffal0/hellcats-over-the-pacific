@@ -1,4 +1,8 @@
-# Convergence loop template (repeat per backlog item)
+# Archived convergence loop template
+
+> Historical prototype-era process. Current reconstruction work follows
+> [`../DECOMPILATION_PROGRESS.md`](../DECOMPILATION_PROGRESS.md); strict ports
+> follow [`../STRICT_PORT_FOUNDATION.md`](../STRICT_PORT_FOUNDATION.md).
 
 ## Roles (conceptual)
 

@@ -5,32 +5,18 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 347 (2026-10-18)
-**Next target:** name the aircraft control inputs `+0x662` / `+0x664` / `+0x666`
-(stick axes, with the ±0x40 jitter when damage bits are set) from
-`apply_player_mouse_controls` and the AI controllers.
+**Last iteration:** 354 (2026-10-18)
+**Next target:** `segment_point_min_distance` (FUN_00003cca): verify its body
+against the bytes with the 9-argument list found in iteration 354 (the
+"multi-sample min" helper from the priority queue).
 
 ## Current coverage
 
-| Source | Inventoried | Renamed | Verified | Blocked |
-|---|---:|---:|---:|---:|
-| ID01.c | 6 | 6 | 0 | 0 |
-| ID02.c | 125 | 125 | 0 | 0 |
-| ID03.c | 45 | 45 | 0 | 0 |
-| ID04.c | 59 | 59 | 0 | 0 |
-| ID05.c | 24 | 24 | 0 | 0 |
-| ID06.c | 24 | 24 | 0 | 0 |
-| ID07.c | 2 | 2 | 0 | 0 |
-| ID08.c | 4 | 4 | 0 | 0 |
-| ID09.c | 4 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 381 | 56 | 6 |
-| **Total** | **736** | **674** | **56** | **6** |
-
-The inventory count comes from
-[`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json). Statuses are
-reconstruction workflow states, not Godot coverage; 674 renamed functions still
-require independent verification. The strict-port manifest currently maps three
-functions and is the sole authoritative C-to-GDScript mapping.
+Run `python3 tools/progress_stats.py` for current orthogonal reconstruction,
+strict-port, and resource counts. The segment-qualified canonical records live
+in [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json); statuses are
+reconstruction workflow states, not Godot coverage. The strict-port manifest is
+the sole authoritative C-to-GDScript mapping.
 
 ## Canonical sources
 
@@ -64,17 +50,20 @@ Useful retrieval examples:
 
 ```sh
 python3 tools/re_query.py function FUN_0000e792
+python3 tools/re_query.py excerpt --segment "Pacific Conflict" FUN_0000e792 --address 0xf47c
 python3 tools/re_query.py callers FUN_0000e792
+python3 tools/re_query.py callees --segment "Pacific Conflict" FUN_0000e792
 python3 tools/re_query.py globals FUN_0000e792
 python3 tools/re_query.py status FUN_0000e792
+python3 tools/re_query.py tests test_flight_math --case _test_fun_0000e42a
 python3 tools/re_query.py symbol DAT_00026004
 python3 tools/re_query.py source-map FUN_0001358c
 ```
 
 ## Priority queue
 
-1. Name the aircraft control inputs described above (aircraft records 1–4 and
-   type-record fields `+0x36..+0x48` were settled in iterations 346–347).
+1. Verify `bullet_hits_aircraft` described above (`tick_bullet` verified in
+   iteration 353).
 2. Revisit the blocked `$1A48` allocator ABI.
 3. Continue independent verification of high-traffic Pacific Conflict functions.
 4. Resolve remaining ID09/ID05 segment-entry evidence.

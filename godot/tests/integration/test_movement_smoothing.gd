@@ -1,20 +1,19 @@
-extends SceneTree
+extends RefCounted
 ## Focused tests for the movement-smoothing slice (Pacific Conflict.c:14179-14244).
-## Evidence: NOTES.md ownership branch; STRUCTS.md 0x66e/0x672/0x66a; ROADMAP next live-port boundary.
+## Evidence: NOTES.md ownership branch; STRUCTS.md 0x66e/0x672/0x66a.
 
 const EntityStateScript := preload("res://hellcats/core/entity_state.gd")
 const EntityTemplateScript := preload("res://hellcats/core/entity_template.gd")
 const FlightMathScript := preload("res://hellcats/core/flight_math.gd")
 const SimCoreScript := preload("res://hellcats/core/sim_core.gd")
 
-func _init() -> void:
+func run() -> bool:
 	var ok := true
 	ok = _test_delta_smoothed_int() and ok
 	ok = _test_delta_smoothed_s16() and ok
 	ok = _test_669_clear_when_66e_zero_and_1a1_bit40() and ok
 	ok = _test_designated_target_also_receives_smoothing() and ok
-	print("Result: %s" % ("ALL PASS" if ok else "SOME FAIL"))
-	quit(0 if ok else 1)
+	return ok
 
 func _test_delta_smoothed_int() -> bool:
 	if FlightMathScript.add_delta_smoothed_int(0, 5) != 5:

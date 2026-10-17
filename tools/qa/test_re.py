@@ -20,14 +20,42 @@ def run(*args: str) -> str:
     return result.stdout
 
 
+def run_failure(*args: str) -> str:
+    result = subprocess.run(
+        [sys.executable, str(TOOL), *args], cwd=ROOT, text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    )
+    assert result.returncode != 0, (args, result.stdout, result.stderr)
+    return result.stderr
+
+
 def main() -> int:
-    function = run("function", "FUN_0000e42a")
+    function = run("function", "--segment", "Pacific Conflict", "FUN_0000e42a")
     assert "table_lerp_1b2c0" in function and "Original: FUN_0000e42a" in function
-    assert "DAT_0001b2c0" in run("globals", "table_lerp_1b2c0")
+    assert "Pacific Conflict::FUN_0000e42a" in run("function", "--segment", "Pacific Conflict", "0xe42a")
+    excerpt = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--lines", "120:135")
+    assert ":16359-16374" in excerpt and "void update_aircraft_entity" not in excerpt
+    block = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--address", "0xf47c", "--limit", "12")
+    assert "LAB_0000f47c:" in block and len(block.splitlines()) <= 14
+    named_block = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--block", "Block 6c", "--limit", "8")
+    assert "Block 6c" in named_block and len(named_block.splitlines()) <= 10
+    assert "DAT_0001b2c0" in run("globals", "table_lerp_1b2c0", "--access", "unknown")
     assert "update_aircraft_entity" in run("callers", "table_lerp_1b2c0")
-    assert "VERIFIED" in run("status", "FUN_0000e42a")
+    assert "Pacific Conflict::FUN_0000e42a" in run("callees", "--segment", "Pacific Conflict", "FUN_0000e792")
+    status = run("status", "--segment", "Pacific Conflict", "FUN_0000e42a")
+    assert '"reconstruction_status": "VERIFIED"' in status and "DECOMPILATION_HISTORY" not in status
     assert "altitude curve" in run("symbol", "DAT_0001b2c0")
     assert "contact_pair_hash" in run("source-map", "FUN_0001358c")
+    correspondence = run("correspondence", "--segment", "Pacific Conflict", "FUN_0001358c")
+    assert '"original"' in correspondence and '"strict_port"' in correspondence
+    test_case = run("tests", "test_flight_math", "--case", "_test_fun_0000e42a")
+    assert "godot/tests/unit/test_flight_math.gd:59-76" in test_case
+    assert "module setup" in test_case and "res://hellcats/core/flight_math.gd" in test_case
+    assert "func _test_fun_0000e468" not in test_case and len(test_case.splitlines()) < 60
+    helper_case = run("tests", "test_replay", "--case", "run")
+    assert "direct helpers: 1" in helper_case and "func _run_once" in helper_case
+    assert "ambiguous function query" in run_failure("function", "FUN_00000006")
+    assert "unsupported address mapping" in run_failure("function", "--segment", "Pacific Conflict", "0xdeadbeef")
     print("PASS targeted reverse-engineering retrieval")
     return 0
 

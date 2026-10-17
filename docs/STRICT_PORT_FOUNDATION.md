@@ -14,10 +14,9 @@ behavior.
 ## Repository audit
 
 Ten `*.decomp.c` files exist, all in `sources/resedit/CODE/`: ID01 through ID09
-and `Pacific Conflict.decomp.c`. `DECOMPILATION_INVENTORY.json` inventories 736
-functions. The current status table in `DECOMPILATION_PROGRESS.md` records 680
-RENAMED, 50 VERIFIED, and 6 BLOCKED functions. These are reverse-engineering
-statuses and must not be reported as Godot-port coverage.
+and `Pacific Conflict.decomp.c`. `DECOMPILATION_INVENTORY.json` is the canonical
+segment-qualified registry. Run `python3 tools/progress_stats.py` for current
+counts; reconstruction statuses must not be reported as Godot-port coverage.
 
 The existing Godot project contains two materially different tracks:
 
@@ -34,7 +33,7 @@ The current Mission 01 dependency chain is `Main.tscn` →
 aircraft, input, flight-model and objective scripts plus three JSON data files.
 It does not call `SimCore.tick()`. The main scene remains unchanged.
 
-`sources/resedit/` contains 119 inventoried resources across 30 types. Reusable
+`sources/resedit/` contains the inventoried resource corpus. Reusable
 evidence includes CODE binaries and metadata, PICT/BMP/PNG artwork, `clut/999`,
 icons, `snds`, mission/data resources, dialogs, menus, text and string tables.
 Exact palettes and original dimensions must be read from these resources; they

@@ -66,7 +66,7 @@ Paths under `res://scenes/` (see also `Main.tscn` run scene in `project.godot`).
 
 ## 5. Data layer
 
-**Authoritative gameplay tunables** live in **`godot/data/mission_01/`** (committed JSON). **[MVP AUTHORING DECISION]** Do not mix loader/extraction fixtures (`godot/hellcats/tests/fixtures/proven_loader_targets.json`, segment IDs, etc.) into mission gameplay JSON.
+**Authoritative gameplay tunables** live in **`godot/data/mission_01/`** (committed JSON). **[MVP AUTHORING DECISION]** Do not mix loader/extraction fixtures (`godot/tests/fixtures/proven_loader_targets.json`, segment IDs, etc.) into mission gameplay JSON.
 
 | File | Purpose |
 | ---- | -------- |

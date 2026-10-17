@@ -1,10 +1,11 @@
-extends SceneTree
+extends RefCounted
 
 const EntityStateScript := preload("res://hellcats/core/entity_state.gd")
 const EntityTemplateScript := preload("res://hellcats/core/entity_template.gd")
+const RngOverlay11564Script := preload("res://hellcats/core/rng_overlay_11564.gd")
 const SimCoreScript := preload("res://hellcats/core/sim_core.gd")
 
-func _init() -> void:
+func run() -> bool:
 	var ok := true
 	ok = _test_rng_control_offsets() and ok
 	ok = _test_status_override() and ok
@@ -15,8 +16,7 @@ func _init() -> void:
 	ok = _test_threshold_decrement_uses_rng_bit_for_count_choice() and ok
 	ok = _test_template_field_40_adjustment() and ok
 	ok = _test_movement_smoothing_only_for_designated() and ok
-	print("Result: %s" % ("ALL PASS" if ok else "SOME FAIL"))
-	quit(0 if ok else 1)
+	return ok
 
 func _test_rng_control_offsets() -> bool:
 	var sim = SimCoreScript.new(0x1234)
@@ -26,8 +26,9 @@ func _test_rng_control_offsets() -> bool:
 	sim.entity_array_1.append(entity)
 	sim.tick()
 
-	var expected_662 := _simulate_control_delta(0x1234, -0x200, 0x200)
-	var expected_666 := _simulate_control_delta(_lcg_step(0x1234), -0x140, 0x140)
+	var expected_rng = RngOverlay11564Script.new(0x1234)
+	var expected_662 := clampi((expected_rng.next() & 0x7F) - 0x40, -0x200, 0x200)
+	var expected_666 := clampi((expected_rng.next() & 0x7F) - 0x40, -0x140, 0x140)
 	var got_662 := entity.get_s16_field("movement_662")
 	var got_666 := entity.get_s16_field("movement_666")
 
@@ -193,18 +194,9 @@ func _test_template_field_40_adjustment() -> bool:
 	print("PASS template field_40 adjustment")
 	return true
 
-func _simulate_control_delta(seed: int, lower: int, upper: int) -> int:
-	var state := _lcg_step(seed)
-	var delta := ((state >> 16) & 0x7FFF) & 0x7F
-	delta -= 0x40
-	return mini(maxi(delta, lower), upper)
-
-func _lcg_step(state: int) -> int:
-	return int((int(state) * 0x41c64e6d + 0x3039) & 0xFFFFFFFF)
-
 func _simulate_rng_low_bit(seed: int) -> int:
-	var state := _lcg_step(seed)
-	return ((state >> 16) & 0x7FFF) & 1
+	var expected_rng = RngOverlay11564Script.new(seed)
+	return expected_rng.next() & 1
 
 func _test_movement_smoothing_only_for_designated() -> bool:
 	var sim = SimCoreScript.new(0x9999)

@@ -1403,6 +1403,50 @@ def cmd_references(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_item(args: argparse.Namespace) -> int:
+    """Return one decoded child without exposing the rest of the resource."""
+    r = load_metadata(args.type, args.id)
+    elements = r["decoded"].get("elements", [])
+    keyed = [
+        element for element in elements
+        if any(str(element.get(key)) == args.item for key in ("index", "id", "resource_id", "item"))
+    ]
+    if not keyed and args.item.isdecimal():
+        position = int(args.item)
+        if 1 <= position <= len(elements):
+            keyed = [elements[position - 1]]
+    if not keyed:
+        print(f"item {args.item!r} not found in {r['resource']['key']}", file=sys.stderr)
+        return 1
+    if len(keyed) != 1:
+        print(f"item {args.item!r} is ambiguous in {r['resource']['key']}", file=sys.stderr)
+        return 1
+    print(json.dumps({"resource": r["resource"]["key"], "item": keyed[0]}, indent=2,
+                     ensure_ascii=False, sort_keys=True))
+    return 0
+
+
+def cmd_raw(args: argparse.Namespace) -> int:
+    """Hexdump an explicit bounded byte range from one original payload."""
+    r = load_metadata(args.type, args.id)
+    path = ROOT / r["evidence"]["binary_path"]
+    payload = path.read_bytes()
+    if args.offset < 0 or args.length <= 0 or args.offset + args.length > len(payload):
+        print(
+            f"invalid raw range offset={args.offset} length={args.length}; payload bytes={len(payload)}",
+            file=sys.stderr,
+        )
+        return 1
+    end = args.offset + args.length
+    print(f"{path.relative_to(ROOT)} bytes {args.offset:#x}:{end:#x} of {len(payload):#x}")
+    for offset in range(args.offset, end, 16):
+        chunk = payload[offset:min(offset + 16, end)]
+        hex_bytes = " ".join(f"{value:02x}" for value in chunk)
+        ascii_bytes = "".join(chr(value) if 32 <= value < 127 else "." for value in chunk)
+        print(f"{offset:08x}  {hex_bytes:<47}  |{ascii_bytes}|")
+    return 0
+
+
 def cmd_unknown(_: argparse.Namespace) -> int:
     for path in sorted(RESEDIT.glob("*/*.json")):
         r = json.loads(path.read_text(encoding="utf-8"))
@@ -1474,7 +1518,10 @@ def parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_inspect)
     p = sub.add_parser("search", help="search generated metadata"); p.add_argument("query"); p.set_defaults(func=cmd_search)
     p = sub.add_parser("references", help="show bidirectional relationships"); p.add_argument("type", choices=REQUIRED_TYPES); p.add_argument("id", type=int); p.set_defaults(func=cmd_references)
+    p = sub.add_parser("item", help="show one decoded child item"); p.add_argument("type", choices=REQUIRED_TYPES); p.add_argument("id", type=int); p.add_argument("item"); p.set_defaults(func=cmd_item)
+    p = sub.add_parser("raw", help="show an explicit bounded raw-byte range"); p.add_argument("type", choices=REQUIRED_TYPES); p.add_argument("id", type=int); p.add_argument("--offset", type=lambda value: int(value, 0), default=0); p.add_argument("--length", type=lambda value: int(value, 0), default=64); p.set_defaults(func=cmd_raw)
     sub.add_parser("unknown", help="list unresolved resources").set_defaults(func=cmd_unknown)
+    sub.add_parser("unresolved", help="list unresolved resources").set_defaults(func=cmd_unknown)
     sub.add_parser("verify", help="verify source slices, hashes, parsers and metadata drift").set_defaults(func=cmd_verify)
     return ap
 
