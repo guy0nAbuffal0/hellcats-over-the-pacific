@@ -64,6 +64,16 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
    slot, the buffer is refilled, registers are restored and `RTS` jumps to
    the previous handler (chaining).
 
+## Sound resources (iteration 218)
+
+| ID02 file | Name | Role |
+|---|---|---|
+| 0x1edc | `load_named_sound_into_slot` | GetNamedResource('snd ', name), memory check (0x3000 bytes), mark purgeable, store in slot `A5-0xd62[i]` |
+| 0x1e68 | `release_sound_slots` | 20 slots: RecoverHandle(slot - 0x14), HPurge, HUnlock, clear |
+| 0x1dd4 | `show_sound_error_dialog_once` | DLOG 139 "Sound Error", shown once |
+| 0x1f8e | `load_game_sounds` | 11 named sounds into slots 0, 1, 2, 5–12 (slot 0 variant chosen by free memory > 0x2e400); `A5-0x112a` = &slots for the overlay |
+| 0x20be | `lock_sound_slots` | HLock each handle, slot = data pointer *h + 0x14 |
+
 ## Open questions
 
 - Exact difference between the two channel-0 handler variants.

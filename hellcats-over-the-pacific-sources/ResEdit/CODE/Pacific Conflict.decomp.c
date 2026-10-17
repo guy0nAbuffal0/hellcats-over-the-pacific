@@ -1082,7 +1082,11 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
 
 
 
-undefined4 FUN_00000334(void)
+/* Original: FUN_00000334; source: Pacific Conflict.c. Recovered name: any_mission_kills_recorded [STRONG INFERENCE] (iteration 227).
+ * Ghidra C reviewed (function at overlay offset 0x334).
+ * Returns 1 when any of the twelve words at mission base DAT_0001b5a0 + 0xba .. + 0xd0 is non-zero, else 0 (complete Ghidra C). Those words are the per-target-type kill counters filled by tally_destroyed_entity (type t at +0xb8 + 2t, t >= 1). Caller: the mission-end logic near Pacific Conflict.c 8000 (an outcome is only chosen when kills exist).
+ */
+undefined4 any_mission_kills_recorded /* Original: FUN_00000334 */ (void)
 
 {
   int iVar1;
@@ -1155,7 +1159,11 @@ undefined4 probe_nearest_facility_kind(void) /* Original: FUN_00000354 */
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_000003fa(void)
+/* Original: FUN_000003fa; source: Pacific Conflict.c. Recovered name: load_player_fuel_and_bombs [STRONG INFERENCE] (iteration 227).
+ * Ghidra C reviewed (function at overlay offset 0x3fa).
+ * Player aircraft = DAT_0001b738. Fuel: units = type-record capacity (*(aircraft + 4) + 0x1c) * mission fuel percentage (DAT_0001b5a0 + 0xb6) / 100, split in two halves stored in the bytes +0x67d / +0x67e (at least 1 unit); +0x680 = 0. Bombs: +0x67c = byte DAT_0001b5a0 + 0xb9; +0x634 = type-record word +0x1a + bombs * 16 (load-dependent value, weight?) [HYPOTHESIS for +0x634]; +0x682 = 0x2a3; +0x674 = 0; +0x684 &= 0xfc01; _DAT_0001b73c = 1. The mission words are the inverse of the code near Pacific Conflict.c 8008, which writes back fuel % = (fuel1 + fuel2) * 100 / capacity into +0xb6 and the bomb count +0x19f into +0xb8 - matching the host Refuel / Scenario dialogs (fuel % A5-0x12d2, bombs A5-0x12d0) [STRONG INFERENCE]. Complete Ghidra C.
+ */
+void load_player_fuel_and_bombs /* Original: FUN_000003fa */ (void)
 
 {
   int iVar1;
@@ -1185,7 +1193,11 @@ void FUN_000003fa(void)
 
 
 
-void FUN_00000488(int param_1)
+/* Original: FUN_00000488; source: Pacific Conflict.c. Recovered name: tally_destroyed_entity [STRONG INFERENCE] (iteration 227).
+ * Ghidra C reviewed (function at overlay offset 0x488).
+ * Arg: entity. When its target-type word +0x50 is >= 0 and probe_nearest_facility_kind() is not 0x200: type 0 counts nothing, type t >= 1 increments the mission counter at DAT_0001b5a0 + 0xb8 + 2t; otherwise (negative type = friendly unit, or destroyed near a kind-0x13 facility) increments DAT_0001b5a0 + 0xd2. Matches the host summary: per-type mission kills and the friendly-kill count that leads to warnings / discharge / treason [STRONG INFERENCE]. Complete Ghidra C. Callers: Pacific Conflict.c 19528, 21250, 21959.
+ */
+void tally_destroyed_entity /* Original: FUN_00000488 */ (int param_1)
 
 {
   short *psVar1;
@@ -1205,7 +1217,11 @@ void FUN_00000488(int param_1)
 
 
 
-void FUN_000004f8(int *param_1,short param_2,int param_3,undefined4 *param_4,undefined4 *param_5,
+/* Original: FUN_000004f8; source: Pacific Conflict.c. Recovered name: transform_through_node_chain [STRONG INFERENCE] (iteration 228).
+ * Ghidra C reviewed (function at overlay offset 0x4f8).
+ * Args: node-pointer stack top, count, object, out x / y / z, optional vertex output. Starts from the object position (+2 / +6 / +0xa); for each node popped from the stack: build_attitude_matrix_3ang from the node angles (+2, +4, +6), FUN_00002aba, then the vector transform at LAB_00001c3a_2 of the position with the node offset (+8, +0xc, +0x10); with a vertex buffer it also transforms the object vertex list (count +0x1a, scale shift +0x18, data at +0x22). Returns the world-space origin through the three out pointers [STRONG INFERENCE: hierarchical object placement]. Callers: FUN_000006ec (three calls) and FUN_00000aba. FUN_00000954 calls for_each_mission_scene_object(FUN_000006ec, ...), so FUN_000006ec is the per-object visitor.
+ */
+void transform_through_node_chain /* Original: FUN_000004f8 */ (int *param_1,short param_2,int param_3,undefined4 *param_4,undefined4 *param_5,
                  undefined4 *param_6,int param_7)
 
 {
@@ -1256,7 +1272,11 @@ void FUN_000004f8(int *param_1,short param_2,int param_3,undefined4 *param_4,und
 
 
 
-void FUN_000005fa(undefined *param_1,undefined4 param_2,int *param_3,int param_4,int param_5)
+/* Original: FUN_000005fa; source: Pacific Conflict.c. Recovered name: traverse_scene_tree [STRONG INFERENCE] (iteration 228).
+ * Ghidra C reviewed (function at overlay offset 0x5fa).
+ * Args: callback, context, path stack, depth, group node. For each of the group children (count +0x18, 0x18-byte entries at +0x1a; the entry is pushed on the path stack): node = world data base (DAT_0001b5a0 + 0x8c) + entry offset +0x14; a node of kind 3 is a sub-group and is visited recursively; otherwise each of its objects (count +0x1e; records follow the node header, the next one at + record byte +8 * 2 + 0xe) is passed to callback(context, node, object, path + 1, depth + 1). Complete Ghidra C.
+ */
+void traverse_scene_tree /* Original: FUN_000005fa */ (undefined *param_1,undefined4 param_2,int *param_3,int param_4,int param_5)
 
 {
   int iVar1;
@@ -1272,7 +1292,7 @@ void FUN_000005fa(undefined *param_1,undefined4 param_2,int *param_3,int param_4
       *param_3 = iVar1;
       pcVar4 = (char *)(*(int *)(DAT_0001b5a0 + 0x8c) + *(int *)(iVar1 + 0x14));
       if (*pcVar4 == '\x03') {
-        FUN_000005fa(param_1,param_2,param_3 + 1,param_4 + 1,(int)pcVar4);
+        traverse_scene_tree(param_1,param_2,param_3 + 1,param_4 + 1,(int)pcVar4);
       }
       else {
         pcVar5 = pcVar4 + *(short *)(pcVar4 + 0x1e) * 0xc + *(short *)(pcVar4 + 0x1a) * 0xc + 0x22;
@@ -1293,12 +1313,16 @@ void FUN_000005fa(undefined *param_1,undefined4 param_2,int *param_3,int param_4
 
 
 
-void FUN_000006a6(undefined *param_1,undefined4 param_2)
+/* Original: FUN_000006a6; source: Pacific Conflict.c. Recovered name: for_each_mission_scene_object [STRONG INFERENCE] (iteration 228).
+ * Ghidra C reviewed (function at overlay offset 0x6a6).
+ * Calls traverse_scene_tree(callback, context, local path stack[10], 0, root) with root = world base (DAT_0001b5a0 + 0x8c) + the offset stored in the scene table entry of the current mission (DAT_0001b5a0 + 0x90, 0x18-byte entries at +0x8e). Complete Ghidra C.
+ */
+void for_each_mission_scene_object /* Original: FUN_000006a6 */ (undefined *param_1,undefined4 param_2)
 
 {
   int aiStack_2c [10];
   
-  FUN_000005fa(param_1,param_2,aiStack_2c,0,
+  traverse_scene_tree(param_1,param_2,aiStack_2c,0,
                *(int *)(DAT_0001b5a0 + 0x8c) +
                *(int *)(*(int *)(DAT_0001b5a0 + 0x8c) + *(short *)(DAT_0001b5a0 + 0x90) * 0x18 +
                        0x8e));
@@ -1307,7 +1331,11 @@ void FUN_000006a6(undefined *param_1,undefined4 param_2)
 
 
 
-void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,short param_5)
+/* Original: FUN_000006ec; source: Pacific Conflict.c. Recovered name: collect_map_features [STRONG INFERENCE] (iteration 229).
+ * Ghidra C reviewed (function at overlay offset 0x6ec).
+ * Scene visitor used by plot_mission_map_symbols (through for_each_mission_scene_object); arg 1 is the plotter context (int[0] = map scale). For land objects (flag 0x10 set and 0x240 clear in the node word +0x16): transforms the vertices with transform_through_node_chain, makes them relative to the player position (translate_int3_vecs with -(player +0x18), -(player +0x20)), divides x / z by the scale, clips the outline through FUN_0000b190 / b242 / b2f4 / b3aa (four Sutherland-Hodgman edge clippers; the y-max bound DAT_0001b73e is temporarily replaced by DAT_0001b740 for the last one, FUN_0000b3aa; correction iteration 230) and hands the polygon to the hook DAT_0001b5a0 + 0x292 (map outline drawing). Objects whose type nibble (+9 & 0xf0) is 0x70 append a position triple to the first list (count word at context + 0xb58, entries from context + 4). Kinds 0x12 / 0x13 (node byte +1) append position, radius (+0xe) and kind to the second list (count at context + 0xb5a) [PROVEN data flow, STRONG INFERENCE roles].
+ */
+void collect_map_features /* Original: FUN_000006ec */ (int *param_1,int param_2,undefined4 *param_3,int *param_4,short param_5)
 
 {
   int *piVar1;
@@ -1328,7 +1356,7 @@ void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,shor
   iVar5 = *DAT_0001b738;
   if (((*(byte *)(param_2 + 0x16) & 0x10) == 0) || ((*(ushort *)(param_2 + 0x16) & 0x240) != 0)) {
     if ((*(byte *)((int)param_3 + 9) & 0xf0) == 0x70) {
-      FUN_000004f8(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
+      transform_through_node_chain(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
       piVar1 = param_1 + 0x2d6;
       piVar6 = param_1 + *(short *)piVar1 * 3 + 1;
       *(short *)piVar1 = *(short *)piVar1 + 1;
@@ -1339,7 +1367,7 @@ void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,shor
       if ((*(char *)(param_2 + 1) != '\x13') && (*(char *)(param_2 + 1) != '\x12')) {
         return;
       }
-      FUN_000004f8(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,0);
+      transform_through_node_chain(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,0);
       param_1[*(short *)((int)param_1 + 0xb5a) + 0x272] = *(int *)(param_2 + 0xe);
       *(undefined1 *)((int)param_1 + *(short *)((int)param_1 + 0xb5a) + 0x964) =
            *(undefined1 *)(param_2 + 1);
@@ -1352,7 +1380,7 @@ void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,shor
     piVar6[2] = local_f60;
   }
   else {
-    FUN_000004f8(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
+    transform_through_node_chain(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
     translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(param_2 + 0x1a),local_694,local_694,-*(int *)(iVar5 + 0x18),0,
                  -*(int *)(iVar5 + 0x20));
     sVar4 = 0;
@@ -1369,16 +1397,16 @@ void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,shor
       local_af4[iVar5 * 2] = local_694[*(short *)((int)param_3 + iVar5 * 2 + 0xe) * 3];
       local_af4[iVar5 * 2 + 1] = local_694[*(short *)((int)param_3 + iVar5 * 2 + 0xe) * 3 + 2];
     }
-    iVar5 = FUN_0000b190(local_af4,(int)(short)(ushort)*(byte *)(param_3 + 2),aiStack_f54);
+    iVar5 = clip_polygon_x_min(local_af4,(int)(short)(ushort)*(byte *)(param_3 + 2),aiStack_f54);
     if ((short)iVar5 != 0) {
-      iVar5 = FUN_0000b242(aiStack_f54,(int)(short)iVar5,local_af4);
+      iVar5 = clip_polygon_x_max(aiStack_f54,(int)(short)iVar5,local_af4);
       if ((short)iVar5 != 0) {
-        iVar5 = FUN_0000b2f4(local_af4,(int)(short)iVar5,aiStack_f54);
+        iVar5 = clip_polygon_y_min(local_af4,(int)(short)iVar5,aiStack_f54);
         uVar3 = DAT_0001b73e;
         DAT_0001b73e = uVar3;
         if ((short)iVar5 != 0) {
           DAT_0001b73e = DAT_0001b740._0_2_;
-          iVar5 = FUN_0000b3aa(aiStack_f54,(int)(short)iVar5,local_af4);
+          iVar5 = clip_polygon_y_max(aiStack_f54,(int)(short)iVar5,local_af4);
           DAT_0001b73e = uVar3;
           if ((short)iVar5 != 0) {
             (**(code **)(DAT_0001b5a0 + 0x292))(local_af4,(int)(short)iVar5,*param_3);
@@ -1392,7 +1420,11 @@ void FUN_000006ec(int *param_1,int param_2,undefined4 *param_3,int *param_4,shor
 
 
 
-void FUN_00000954(int param_1,undefined *param_2)
+/* Original: FUN_00000954; source: Pacific Conflict.c. Recovered name: plot_mission_map_symbols [STRONG INFERENCE] (iteration 229).
+ * Ghidra C reviewed (function at overlay offset 0x954).
+ * Args: map scale, plot callback (host plot_map_symbol_callback, JT $72; this function is the target of the host pointer A5-0x1052 used by draw_map_view_item). Collects features with for_each_mission_scene_object(collect_map_features, context). Then for each first-list position (type-0x70 objects): symbol A, but C when a kind-0x12/0x13 facility is within range and the position y > 0, B when the nearest in-range facility is kind 0x13, none when it is kind 0x12; plots callback(symbol, (x - player x) / scale, (player z - z) / scale). Missions 3 and 4 (DAT_0001b5a0 + 0x90) also plot T (0x54) at fixed world positions (-0x3bcd3, 0x2b246a) / (-0xf2bf12, 0xb242d8). The letters match the DLOG 137 legend: A Airfield, B Friendly Base, C Friendly Carrier, T Primary Target [PROVEN letters, STRONG INFERENCE mapping].
+ */
+void plot_mission_map_symbols /* Original: FUN_00000954 */ (int param_1,undefined *param_2)
 
 {
   int iVar1;
@@ -1416,7 +1448,7 @@ void FUN_00000954(int param_1,undefined *param_2)
   local_b60 = param_1;
   local_6 = 0;
   local_8 = 0;
-  FUN_000006a6(FUN_000006ec,&local_b60);
+  for_each_mission_scene_object(FUN_000006ec,&local_b60);
   sVar5 = 0;
   if (0 < local_8) {
     do {
@@ -1468,7 +1500,11 @@ void FUN_00000954(int param_1,undefined *param_2)
 
 
 
-void FUN_00000aba(int *param_1,int param_2,int param_3,int *param_4,short param_5)
+/* Original: FUN_00000aba; source: Pacific Conflict.c. Recovered name: nearest_type80_centroid_visitor [STRONG INFERENCE mechanics] (iteration 231).
+ * Ghidra C reviewed (function at overlay offset 0xaba).
+ * Scene visitor (for_each_mission_scene_object). For objects whose type nibble (+9 & 0xf0) is 0x80: transform_through_node_chain of the vertices; centroid of the face vertex list (count byte +8, indices from +0xe), each vertex shifted right by the object scale (+0x18), y + 100; if FUN_00003be0 ranks it nearer than the current best, stores it in the context triple (context[0..2]). Complete Ghidra C apart from the FUN_00003be0 register interface. What type 0x80 objects are is open [UNKNOWN].
+ */
+void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *param_1,int param_2,int param_3,int *param_4,short param_5)
 
 {
   int iVar1;
@@ -1484,7 +1520,7 @@ void FUN_00000aba(int *param_1,int param_2,int param_3,int *param_4,short param_
   int aiStack_694 [420];
   
   if ((*(byte *)(param_3 + 9) & 0xf0) == 0x80) {
-    FUN_000004f8(param_4,param_5,param_2,&uStack_6a4,&uStack_6a8,&uStack_6ac,(int)aiStack_694);
+    transform_through_node_chain(param_4,param_5,param_2,&uStack_6a4,&uStack_6a8,&uStack_6ac,(int)aiStack_694);
     iVar1 = param_3 + 0xe;
     local_698 = 0;
     local_69c = 0;
@@ -1514,7 +1550,11 @@ void FUN_00000aba(int *param_1,int param_2,int param_3,int *param_4,short param_
 
 
 
-undefined4 FUN_00000bea(int *param_1)
+/* Original: FUN_00000bea; source: Pacific Conflict.c. Recovered name: point_near_camera_or_type80_object [HYPOTHESIS name] (iteration 231).
+ * Ghidra C reviewed (function at overlay offset 0xbea).
+ * Arg: point record (caller passes DAT_0001d824). Returns 1 when compute_camera_abs_metric() < 0x33900; otherwise searches the nearest type-0x80 centroid (context initialised to 1000000000, nearest_type80_centroid_visitor) and returns 1 when one exists and the metric is then < 0x40741, else 0. Complete Ghidra C. Caller: Pacific Conflict.c ~9080. Meaning of the two thresholds [UNKNOWN].
+ */
+undefined4 point_near_camera_or_type80_object /* Original: FUN_00000bea */ (int *param_1)
 
 {
   int iVar1;
@@ -1527,7 +1567,7 @@ LAB_00000c46:
   }
   else {
     *param_1 = 1000000000;
-    FUN_000006a6(FUN_00000aba,param_1);
+    for_each_mission_scene_object(FUN_00000aba,param_1);
     if (*param_1 != 1000000000) {
       iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
       if (iVar1 < 0x40741) goto LAB_00000c46;
@@ -1539,7 +1579,11 @@ LAB_00000c46:
 
 
 
-void FUN_00000c4c(int *param_1,int param_2,int param_3,int *param_4,short param_5)
+/* Original: FUN_00000c4c; source: Pacific Conflict.c. Recovered name: anchor_point_visitor [STRONG INFERENCE mechanics] (iteration 231).
+ * Ghidra C reviewed (function at overlay offset 0xc4c).
+ * Scene visitor used by find_anchor_point. Context: [0] output record pointer, [8] best key, word +0x1e mode. Mode 0: for nodes of kind 1 (node byte +1), keeps the one with the smallest path depth: output = world position (transform_through_node_chain) and the parent node angles (+2 / +4 / +6) as longs at +0xc / +0x10 / +0x14. Mode 1: for type-0x70 objects (airfields, see plot_mission_map_symbols) whose reference vertex y is <= 0, keeps the nearest (approx_dist3_xyz): output x, y = 0x43 (67), z. Sets the output word +0x18 = 1 when anything was found. Complete Ghidra C.
+ */
+void anchor_point_visitor /* Original: FUN_00000c4c */ (int *param_1,int param_2,int param_3,int *param_4,short param_5)
 
 {
   int iVar1;
@@ -1558,7 +1602,7 @@ void FUN_00000c4c(int *param_1,int param_2,int param_3,int *param_4,short param_
       return;
     }
     param_1[8] = (int)param_5;
-    FUN_000004f8(param_4,param_5,param_2,local_6a4,&local_6a8,&local_6ac,0);
+    transform_through_node_chain(param_4,param_5,param_2,local_6a4,&local_6a8,&local_6ac,0);
     *(undefined4 *)*param_1 = local_6a4[0];
     *(undefined4 *)(*param_1 + 4) = local_6a8;
     *(undefined4 *)(*param_1 + 8) = local_6ac;
@@ -1571,7 +1615,7 @@ void FUN_00000c4c(int *param_1,int param_2,int param_3,int *param_4,short param_
     if ((*(byte *)(param_3 + 9) & 0xf0) != 0x70) {
       return;
     }
-    FUN_000004f8(param_4,param_5,param_2,local_6a4,&local_6a8,&local_6ac,(int)auStack_694);
+    transform_through_node_chain(param_4,param_5,param_2,local_6a4,&local_6a8,&local_6ac,(int)auStack_694);
     if (0 < aiStack_690[*(short *)(param_3 + 0xe) * 3]) {
       return;
     }
@@ -1590,7 +1634,11 @@ void FUN_00000c4c(int *param_1,int param_2,int param_3,int *param_4,short param_
 
 
 
-void FUN_00000d6a(undefined4 *param_1,undefined2 param_2)
+/* Original: FUN_00000d6a; source: Pacific Conflict.c. Recovered name: find_anchor_point [HYPOTHESIS name] (iteration 231).
+ * Ghidra C reviewed (function at overlay offset 0xd6a).
+ * Arg: output record (7 longs: x, y, z, three angles, found flag word +0x18), short mode. Copies the record into a visitor context with best key 1000000000 and mode, then for_each_mission_scene_object(anchor_point_visitor, ...). Callers: Pacific Conflict.c ~5444 (mode 1) and ~5517 (mode 0), both on DAT_0001d83c. Mode 0 gives the kind-1 node position and attitude (a start position?), mode 1 the nearest airfield ground point at height 67 (a landing / respawn point?) [HYPOTHESIS].
+ */
+void find_anchor_point /* Original: FUN_00000d6a */ (undefined4 *param_1,undefined2 param_2)
 
 {
   undefined4 *local_28;
@@ -1614,13 +1662,17 @@ void FUN_00000d6a(undefined4 *param_1,undefined2 param_2)
   uStack_14 = param_1[4];
   uStack_10 = param_1[5];
   local_c = *(undefined2 *)(param_1 + 6);
-  FUN_000006a6(FUN_00000c4c,&local_28);
+  for_each_mission_scene_object(FUN_00000c4c,&local_28);
   return;
 }
 
 
 
-bool FUN_00000db0(int *param_1,undefined4 param_2)
+/* Original: FUN_00000db0; source: Pacific Conflict.c. Recovered name: ensure_handle_allocated [STRONG INFERENCE] (iteration 232).
+ * Ghidra C reviewed (function at overlay offset 0xdb0).
+ * Args: Handle *slot, long size. If *slot is NULL: *slot = new_handle_clear_or_die(size) (service +0x2c6). If the handle is empty (purged, *h == NULL): realloc_and_clear_handle(h, size) (service +0x2ce). Then hnopurge(h) (service +0x2de). Returns true when the block had to be allocated or reallocated (contents must be rebuilt). DAT_0001b5a0 is the host A5 world at A5-0x1388 (iteration 232), so DAT_0001b5a0 + 0x2c6 / 0x2ce / 0x2d2 / 0x2d6 / 0x2da / 0x2de / 0x2e2 are the host overlay-service slots A5-0x10c2 new_handle_clear_or_die / A5-0x10ba realloc_and_clear_handle / A5-0x10b6 hlock / A5-0x10b2 hunlock / A5-0x10ae hpurge / A5-0x10aa hnopurge / A5-0x10a6 freemem (docs/OVERLAY_SERVICE_TABLE.md) [STRONG INFERENCE].
+ */
+bool ensure_handle_allocated /* Original: FUN_00000db0 */ (int *param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -1642,7 +1694,11 @@ bool FUN_00000db0(int *param_1,undefined4 param_2)
 
 
 
-void FUN_00000e0a(undefined4 param_1)
+/* Original: FUN_00000e0a; source: Pacific Conflict.c. Recovered name: lock_handle_nopurge [STRONG INFERENCE] (iteration 232).
+ * Ghidra C reviewed (function at overlay offset 0xe0a).
+ * hlock(h) (service +0x2d2) then hnopurge(h) (service +0x2de). DAT_0001b5a0 is the host A5 world at A5-0x1388 (iteration 232), so DAT_0001b5a0 + 0x2c6 / 0x2ce / 0x2d2 / 0x2d6 / 0x2da / 0x2de / 0x2e2 are the host overlay-service slots A5-0x10c2 new_handle_clear_or_die / A5-0x10ba realloc_and_clear_handle / A5-0x10b6 hlock / A5-0x10b2 hunlock / A5-0x10ae hpurge / A5-0x10aa hnopurge / A5-0x10a6 freemem (docs/OVERLAY_SERVICE_TABLE.md) [STRONG INFERENCE].
+ */
+void lock_handle_nopurge /* Original: FUN_00000e0a */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_0001b5a0 + 0x2d2))(param_1);
@@ -1652,7 +1708,11 @@ void FUN_00000e0a(undefined4 param_1)
 
 
 
-void FUN_00000e32(undefined4 param_1)
+/* Original: FUN_00000e32; source: Pacific Conflict.c. Recovered name: unlock_handle_purgeable [STRONG INFERENCE] (iteration 232).
+ * Ghidra C reviewed (function at overlay offset 0xe32).
+ * hunlock(h) (service +0x2d6) then hpurge(h) (service +0x2da) - the inverse of lock_handle_nopurge. DAT_0001b5a0 is the host A5 world at A5-0x1388 (iteration 232), so DAT_0001b5a0 + 0x2c6 / 0x2ce / 0x2d2 / 0x2d6 / 0x2da / 0x2de / 0x2e2 are the host overlay-service slots A5-0x10c2 new_handle_clear_or_die / A5-0x10ba realloc_and_clear_handle / A5-0x10b6 hlock / A5-0x10b2 hunlock / A5-0x10ae hpurge / A5-0x10aa hnopurge / A5-0x10a6 freemem (docs/OVERLAY_SERVICE_TABLE.md) [STRONG INFERENCE].
+ */
+void unlock_handle_purgeable /* Original: FUN_00000e32 */ (undefined4 param_1)
 
 {
   (**(code **)(DAT_0001b5a0 + 0x2d6))(param_1);
@@ -1662,7 +1722,11 @@ void FUN_00000e32(undefined4 param_1)
 
 
 
-void FUN_00000e5a(void)
+/* Original: FUN_00000e5a; source: Pacific Conflict.c. Recovered name: lock_overlay_buffers [STRONG INFERENCE] (iteration 232).
+ * Ghidra C reviewed (function at overlay offset 0xe5a).
+ * hlock (service +0x2d2) of the four handles stored at DAT_0001b5a0 + 0x192, + 0x1ac, + 0x1b4 and + 0xd8 (host A5-0x11f6, A5-0x11dc, A5-0x11d4 and A5-0x12b0: the cached panel bitmaps "HorizonInstrument", "GyroInstrument", "GyroFlags" and "Bitmap") [STRONG INFERENCE from the A5-0x1388 base].
+ */
+void lock_overlay_buffers /* Original: FUN_00000e5a */ (void)
 
 {
   (**(code **)(DAT_0001b5a0 + 0x2d2))(*(undefined4 *)(DAT_0001b5a0 + 0x192));
@@ -1676,7 +1740,11 @@ void FUN_00000e5a(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00000ea0(void)
+/* Original: FUN_00000ea0; source: Pacific Conflict.c. Recovered name: allocate_session_buffers [STRONG INFERENCE] (iteration 233).
+ * Ghidra C reviewed (function at overlay offset 0xea0).
+ * Host hook A5-0x1082 (begin_overlay_session; installed by overlay_main_entry as 0xe80 + 0x20). Sizes from free memory (service +0x2e2): <= 0x7d000 bytes -> 550 entries and 20, else 800 and 30. When *DAT_0001b5a0 is set, ensure_handle_allocated(&DAT_0001b744, entries * 0x1c); unless +0xe == 1, for slots 1..3 (slot 1 always, others when +0xb4) ensure_handle_allocated(&DAT_0001b74c[i], n * (+0xc) * 4) and (&DAT_0001b75c + 2i, same size); _DAT_00020c4c = 1 when any block was (re)allocated. Complete Ghidra C.
+ */
+void allocate_session_buffers /* Original: FUN_00000ea0 */ (void)
 
 {
   undefined3 extraout_var;
@@ -1697,20 +1765,20 @@ void FUN_00000ea0(void)
     sVar4 = 0x1e;
   }
   if (*DAT_0001b5a0 != '\0') {
-    FUN_00000db0(&DAT_0001b744,sVar2 * 0x1c);
+    ensure_handle_allocated(&DAT_0001b744,sVar2 * 0x1c);
   }
   if (*(short *)(DAT_0001b5a0 + 0xe) != 1) {
     sVar2 = 1;
     do {
       if ((sVar2 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-        bVar3 = FUN_00000db0((int *)(&DAT_0001b74c + sVar2 * 4),
+        bVar3 = ensure_handle_allocated((int *)(&DAT_0001b74c + sVar2 * 4),
                              (int)sVar4 * (int)*(short *)(DAT_0001b5a0 + 0xc) * 4);
         if (CONCAT31(extraout_var,bVar3) != 0) {
           _DAT_00020c4c = 1;
         }
       }
       if ((sVar2 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-        bVar3 = FUN_00000db0((int *)(&DAT_0001b75c + sVar2 * 2),
+        bVar3 = ensure_handle_allocated((int *)(&DAT_0001b75c + sVar2 * 2),
                              (int)sVar4 * (int)*(short *)(DAT_0001b5a0 + 0xc) * 4);
         if (CONCAT31(extraout_var_00,bVar3) != 0) {
           _DAT_00020c4c = 1;
@@ -1724,14 +1792,18 @@ void FUN_00000ea0(void)
 
 
 
-void FUN_00000f92(void)
+/* Original: FUN_00000f92; source: Pacific Conflict.c. Recovered name: lock_session_buffers [STRONG INFERENCE] (iteration 233).
+ * Ghidra C reviewed (function at overlay offset 0xf92).
+ * Host hook A5-0x107e (installed as 0xf72 + 0x20). lock_handle_nopurge on the buffers allocated by allocate_session_buffers and stores their data pointers in DAT_0001b76c / DAT_0001b774[i] / DAT_0001b784 + 2i (masked to 24 bits when the host word +0x76 is set - 24-bit addressing); DAT_0001b794 / DAT_0001b798 = slot-1 pointers; then FUN_00006ed6. Complete Ghidra C.
+ */
+void lock_session_buffers /* Original: FUN_00000f92 */ (void)
 
 {
   short sVar1;
   int iVar2;
   
   if (*DAT_0001b5a0 != '\0') {
-    FUN_00000e0a(DAT_0001b744);
+    lock_handle_nopurge(DAT_0001b744);
     DAT_0001b76c = *DAT_0001b744;
     if (*(short *)(DAT_0001b5a0 + 0x76) != 0) {
       DAT_0001b76c = DAT_0001b76c & 0xffffff;
@@ -1742,7 +1814,7 @@ void FUN_00000f92(void)
     do {
       if ((sVar1 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
         iVar2 = (int)sVar1;
-        FUN_00000e0a(*(undefined4 *)(&DAT_0001b74c + iVar2 * 4));
+        lock_handle_nopurge(*(undefined4 *)(&DAT_0001b74c + iVar2 * 4));
         *(undefined4 *)(&DAT_0001b774 + iVar2 * 4) = **(undefined4 **)(&DAT_0001b74c + iVar2 * 4);
         if (*(short *)(DAT_0001b5a0 + 0x76) != 0) {
           *(uint *)(&DAT_0001b774 + iVar2 * 4) = *(uint *)(&DAT_0001b774 + iVar2 * 4) & 0xffffff;
@@ -1750,7 +1822,7 @@ void FUN_00000f92(void)
       }
       if ((sVar1 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
         iVar2 = (int)sVar1;
-        FUN_00000e0a(*(undefined4 *)(&DAT_0001b75c + iVar2 * 2));
+        lock_handle_nopurge(*(undefined4 *)(&DAT_0001b75c + iVar2 * 2));
         *(undefined4 *)(&DAT_0001b784 + iVar2 * 2) = **(undefined4 **)(&DAT_0001b75c + iVar2 * 2);
         if (*(short *)(DAT_0001b5a0 + 0x76) != 0) {
           *(uint *)(&DAT_0001b784 + iVar2 * 2) = *(uint *)(&DAT_0001b784 + iVar2 * 2) & 0xffffff;
@@ -1761,32 +1833,36 @@ void FUN_00000f92(void)
     DAT_0001b794 = DAT_0001b788;
     DAT_0001b798 = DAT_0001b778;
   }
-  FUN_00006ed6();
+  update_view_clip_bounds();
   return;
 }
 
 
 
-void FUN_00001094(void)
+/* Original: FUN_00001094; source: Pacific Conflict.c. Recovered name: unlock_session_buffers [STRONG INFERENCE] (iteration 233).
+ * Ghidra C reviewed (function at overlay offset 0x1094).
+ * Host hook A5-0x1076 (end_overlay_session; installed as 0x1074 + 0x20). unlock_handle_purgeable on the same buffers and clears their cached pointers. Complete Ghidra C.
+ */
+void unlock_session_buffers /* Original: FUN_00001094 */ (void)
 
 {
   short sVar1;
   int iVar2;
   
   if (DAT_0001b744 != 0) {
-    FUN_00000e32(DAT_0001b744);
+    unlock_handle_purgeable(DAT_0001b744);
     DAT_0001b76c = 0;
   }
   sVar1 = 1;
   do {
     iVar2 = (int)sVar1;
     if (*(int *)(&DAT_0001b74c + iVar2 * 4) != 0) {
-      FUN_00000e32(*(undefined4 *)(&DAT_0001b74c + iVar2 * 4));
+      unlock_handle_purgeable(*(undefined4 *)(&DAT_0001b74c + iVar2 * 4));
       *(undefined4 *)(&DAT_0001b774 + iVar2 * 4) = 0;
     }
     iVar2 = (int)sVar1;
     if (*(int *)(&DAT_0001b75c + iVar2 * 2) != 0) {
-      FUN_00000e32(*(undefined4 *)(&DAT_0001b75c + iVar2 * 2));
+      unlock_handle_purgeable(*(undefined4 *)(&DAT_0001b75c + iVar2 * 2));
       *(undefined4 *)(&DAT_0001b784 + iVar2 * 2) = 0;
     }
     sVar1 = sVar1 + 1;
@@ -1798,13 +1874,17 @@ void FUN_00001094(void)
 
 
 
-void FUN_00001112(int param_1,undefined4 param_2)
+/* Original: FUN_00001112; source: Pacific Conflict.c. Recovered name: overlay_main_entry [STRONG INFERENCE] (iteration 233).
+ * Ghidra C reviewed (function at overlay offset 0x1112).
+ * Called by the host (reset_overlay_state, ID02 0x212a) with (A5-0x1388, TickCount): DAT_0001b5a0 = host globals (A5-0x1388); FUN_000018d6(ticks) [probably RNG seeding]; host word +0x92 (A5-0x12f6) = 9; then fills the host hook slots A5-0x10a2 .. A5-0x104e (+0x2e6 .. +0x33a) with overlay entry points. The stored values are overlay addresses minus 0x20 (the CODE-style header in front of the overlay code): +0x2e6 A5-0x10a2 -> 0x6ff6, +0x2ea A5-0x109e (redraw callback) -> 0x6ed6, +0x2ee A5-0x109a (start mission) -> 0x3ac4, +0x2f2 A5-0x1096 -> 0x4210, +0x2f6 A5-0x1092 -> 0x44e8 (run_simulation_tick), +0x2fa A5-0x108e -> 0x3fa (load_player_fuel_and_bombs), +0x2fe A5-0x108a -> 0x38f4, +0x302 A5-0x1086 -> 0x4d0, +0x306 A5-0x1082 -> 0xea0 (allocate_session_buffers), +0x30a A5-0x107e -> 0xf92 (lock_session_buffers), +0x30e A5-0x107a (frame step) -> 0x6598, +0x312 A5-0x1076 -> 0x1094 (unlock_session_buffers), +0x316 A5-0x1072 -> 0xd25a, +0x31a A5-0x106e -> 0x7310, +0x31e A5-0x106a (key handler) -> 0x740a, +0x322 A5-0x1066 = FUN_00001d56 + 0x20 = 0x1d76 sin_fixed14 (host copies it to A5-0x211c), +0x326 A5-0x1062 = FUN_00001db8 + 0x20 = 0x1dd8 cos_fixed14 (A5-0x2118), +0x32a A5-0x105e -> 0x28a6 rotate_int3_vecs_by_3ang, +0x32e A5-0x105a = LAB_0000e350 + 0x20 = 0xe370 (square root used by the map distance) [iteration 237: the code-pointer stores follow the same +0x20 rule], +0x332 A5-0x1056 -> 0x1f22 (angle used by the map bearing), +0x336 A5-0x1052 -> 0x954 (plot_mission_map_symbols), +0x33a A5-0x104e -> 0x640c [PROVEN stores; the +0x20 rule is STRONG INFERENCE, confirmed by 0x954 / 0xea0 / 0xf92 / 0x1094 / 0x3fa / 0x44e8].
+ */
+void overlay_main_entry /* Original: FUN_00001112 */ (int param_1,undefined4 param_2)
 
 {
   int iVar1;
   
   DAT_0001b5a0 = param_1;
-  FUN_000018d6(param_2);
+  overlay_initialise(param_2);
   iVar1 = DAT_0001b5a0;
   *(undefined2 *)(DAT_0001b5a0 + 0x92) = 9;
   *(undefined4 *)(iVar1 + 0x2e6) = 0x6fd6;
@@ -1834,7 +1914,11 @@ void FUN_00001112(int param_1,undefined4 param_2)
 
 
 
-undefined1 * FUN_000011e6(char *param_1)
+/* Original: FUN_000011e6; source: Pacific Conflict.c. Recovered name: widen_printf_format [PROVEN] (iteration 241).
+ * Ghidra C reviewed (function at overlay offset 0x11e6).
+ * Copies the C format string into the static buffer DAT_00020b4c, rewriting every %d as %ld and every %x as %lx, and returns the buffer - so formats written for 16-bit ints can be used with 32-bit arguments. Complete Ghidra C.
+ */
+undefined1 * widen_printf_format /* Original: FUN_000011e6 */ (char *param_1)
 
 {
   char *pcVar1;
@@ -1867,7 +1951,11 @@ undefined1 * FUN_000011e6(char *param_1)
 
 
 
-void FUN_00001254(char *param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,
+/* Original: FUN_00001254; source: Pacific Conflict.c. Recovered name: overlay_printf [STRONG INFERENCE] (iteration 241).
+ * Ghidra C reviewed (function at overlay offset 0x1254).
+ * Formats through a host service: widen_printf_format(format), then (*(host +0x262))(widened, five args). Host +0x262 = A5-0x1126, a slot just below the documented service table (not written by the host installer seen so far) [UNKNOWN target; presumably a debug / message printf]. Complete Ghidra C.
+ */
+void overlay_printf /* Original: FUN_00001254 */ (char *param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,
                  undefined4 param_5,undefined4 param_6)
 
 {
@@ -1875,14 +1963,18 @@ void FUN_00001254(char *param_1,undefined4 param_2,undefined4 param_3,undefined4
   undefined1 *puVar2;
   
   iVar1 = DAT_0001b5a0;
-  puVar2 = FUN_000011e6(param_1);
+  puVar2 = widen_printf_format(param_1);
   (**(code **)(iVar1 + 0x262))(puVar2,param_2,param_3,param_4,param_5,param_6);
   return;
 }
 
 
 
-void FUN_00001294(void)
+/* Original: FUN_00001294; source: Pacific Conflict.c. Recovered name: reset_palette_owner_tables [STRONG INFERENCE] (iteration 241).
+ * Ghidra C reviewed (function at overlay offset 0x1294).
+ * Frees (heap_free_coalesce) and reallocates (heap_alloc_cleared(0x400): 256 longs) the palette-slot owner tables DAT_0001da70[1..3] - slot 1 always, the others only with the multi-monitor flag host +0xb4 - and makes DAT_0001da7c point at the first. These are the tables queue_face_palette_entry / assign_face_colour use. Complete Ghidra C.
+ */
+void reset_palette_owner_tables /* Original: FUN_00001294 */ (void)
 
 {
   uint *puVar1;
@@ -1916,10 +2008,14 @@ void FUN_00001294(void)
 
 
 
-void FUN_00001300(void)
+/* Original: FUN_00001300; source: Pacific Conflict.c. Recovered name: init_depth8_colour_state [STRONG INFERENCE] (iteration 241).
+ * Ghidra C reviewed (function at overlay offset 0x1300).
+ * Depth-8 set-up called by configure_renderer_for_display: reset_palette_owner_tables; DAT_0001da8a = 0; DAT_0001daa0 = word +0x1a0 of the host slot-to-index table (host +0x34). Complete Ghidra C.
+ */
+void init_depth8_colour_state /* Original: FUN_00001300 */ (void)
 
 {
-  FUN_00001294();
+  reset_palette_owner_tables();
   DAT_0001da8a = 0;
   DAT_0001daa0 = *(undefined2 *)(*(int *)(DAT_0001b5a0 + 0x34) + 0x1a0);
   return;
@@ -1927,7 +2023,11 @@ void FUN_00001300(void)
 
 
 
-void FUN_0000131c(void)
+/* Original: FUN_0000131c; source: Pacific Conflict.c. Recovered name: init_depth4_colour_state [STRONG INFERENCE] (iteration 241).
+ * Ghidra C reviewed (function at overlay offset 0x131c).
+ * Depth-4 set-up called by configure_renderer_for_display and refresh_object_colours_for_depth: reset_palette_owner_tables, then for each device record 1..3 (host +0x1e + 0x16 * i, i.e. the host device records from scan_display_devices) with an owner table, fills the table from the device colours (body not fully decoded here).
+ */
+void init_depth4_colour_state /* Original: FUN_0000131c */ (void)
 
 {
   int iVar1;
@@ -1939,7 +2039,7 @@ void FUN_0000131c(void)
   int iVar7;
   uint local_8;
   
-  FUN_00001294();
+  reset_palette_owner_tables();
   iVar7 = 1;
   do {
     iVar2 = *(int *)(&DAT_0001da6c + iVar7 * 4);
@@ -1986,7 +2086,11 @@ void FUN_0000131c(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_0000147a(int param_1)
+/* Original: FUN_0000147a; source: Pacific Conflict.c. Recovered name: queue_face_palette_entry [STRONG INFERENCE] (iteration 240).
+ * Ghidra C reviewed (function at overlay offset 0x147a).
+ * Arg: face record. Slot = face byte +0xf; owner table DAT_0001da7c[slot] = face. When _DAT_0001d85a is 0: pixel index = word DAT_0001d85c[slot] (the slot -> palette index map copied from host +0x34), face +4 = index in both bytes; appends a ColorSpec (index, R * 256 - 1, G * 256 - 1, B * 256 - 1, clamped at 0) to the colour table at host +0x72 (A5-0x1316) and increments its count word +6 - the pending entries the host applies with apply_pending_color_entries_a5safe (overlay service A5-0x1122) [STRONG INFERENCE]. Ghidra C (tail truncated in this view).
+ */
+void queue_face_palette_entry /* Original: FUN_0000147a */ (int param_1)
 
 {
   byte bVar1;
@@ -2043,14 +2147,18 @@ void FUN_0000147a(int param_1)
 
 
 
-uint FUN_00001548(int param_1)
+/* Original: FUN_00001548; source: Pacific Conflict.c. Recovered name: write_face_palette_slot [STRONG INFERENCE] (iteration 240).
+ * Ghidra C reviewed (function at overlay offset 0x1548).
+ * queue_face_palette_entry(face); when the multi-monitor flag host +0xb4 is set, also writes -face into the slot entry of the other device owner tables DAT_0001da70[1..3] (marking the slot as used on those screens). Complete Ghidra C.
+ */
+uint write_face_palette_slot /* Original: FUN_00001548 */ (int param_1)
 
 {
   uint uVar1;
   int iVar2;
   int *piVar3;
   
-  uVar1 = FUN_0000147a(param_1);
+  uVar1 = queue_face_palette_entry(param_1);
   if (*(short *)(DAT_0001b5a0 + 0xb4) != 0) {
     iVar2 = 1;
     uVar1 = 0;
@@ -2072,7 +2180,11 @@ uint FUN_00001548(int param_1)
 // WARNING: Removing unreachable block (ram,0x000015da)
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-undefined4 FUN_0000159e(int param_1)
+/* Original: FUN_0000159e; source: Pacific Conflict.c. Recovered name: assign_face_colour [STRONG INFERENCE] (iteration 240).
+ * Ghidra C reviewed (function at overlay offset 0x159e).
+ * Converts a face RGB (+0xc..+0xe) to something drawable for the current depth DAT_0001b826. Depth 1: luminance (19 R + 38 G + 7 B) / 64, contrast-stretched by 16 / 12 around 0x80, clamped 0..255, face +4 = host pattern table (+0x88 = A5-0x1300)[luminance] (a dither pattern). Depth 4: face +4 = entry of the DAT_0001da7c table indexed from the RGB bytes (fixed colours). Depth 8: if the face already owns its slot, re-queues it (queue_face_palette_entry); otherwise looks round-robin (DAT_0001bd80, 200 slots) for a slot not marked in either per-frame usage map DAT_0001d860 / DAT_0001d864, returns 1 when none is free, else stores the slot in +0xf, write_face_palette_slot and sets _DAT_0001daa2 (palette changed). Returns 0 on success. Ghidra C (one unreachable block removed by Ghidra).
+ */
+undefined4 assign_face_colour /* Original: FUN_0000159e */ (int param_1)
 
 {
   int iVar1;
@@ -2094,7 +2206,7 @@ undefined4 FUN_0000159e(int param_1)
   else {
     if (DAT_0001b826 != 4) {
       if (-*(int *)(DAT_0001da7c + (uint)*(byte *)(param_1 + 0xf) * 4) == param_1) {
-        FUN_0000147a(param_1);
+        queue_face_palette_entry(param_1);
       }
       else {
         iVar1 = 0;
@@ -2110,7 +2222,7 @@ undefined4 FUN_0000159e(int param_1)
           }
         }
         *(undefined1 *)(param_1 + 0xf) = (undefined1)DAT_0001bd80;
-        FUN_00001548(param_1);
+        write_face_palette_slot(param_1);
         _DAT_0001daa2 = 1;
       }
       return 0;
@@ -2200,14 +2312,14 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
   }
   /* Publish selected child object pointers as globals, then run setup hooks. */
   DAT_0001bdb4 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x14); /* child[0] */
-  FUN_00004e4e();
-  FUN_00001be4();
+  reset_object_to_template_pose_tail();
+  heap_realloc_grow_only_tail();
   DAT_0001bdb0 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x2c); /* child[1] @ +0x18+0x14 */
-  FUN_00004e4e();
-  FUN_00001be4();
+  reset_object_to_template_pose_tail();
+  heap_realloc_grow_only_tail();
   if (*(short *)(DAT_0001b5a0 + 0x90) == 2) {
     DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x5c); /* child[3] */
-    FUN_00004e4e();
+    reset_object_to_template_pose_tail();
   }
   else {
     DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x44); /* child[2] */
@@ -2216,7 +2328,7 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
   DAT_0001bda8 = *(undefined4 *)(DAT_0001bdac + 0x48);
   DAT_0001bda4 = *(char **)(DAT_0001d6fc[0xc] + 0x74); /* child[4] */
   activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001bda4);
-  FUN_00001c04((int)DAT_0001bda4);
+  copy_object_vertex_buffer((int)DAT_0001bda4);
   DAT_0001b734 = 0;
   /* Index window around *(short*)(root+0x2C): publish three neighboring child objs. */
   iVar4 = (int)*(short *)(DAT_0001d6fc + 0xb); /* Ghidra: uint*+0xB ⇒ +0x2C */
@@ -2232,31 +2344,39 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_000018d6(undefined4 param_1)
+/* Original: FUN_000018d6; source: Pacific Conflict.c. Recovered name: overlay_initialise [STRONG INFERENCE] (iteration 243).
+ * Ghidra C reviewed (function at overlay offset 0x18d6).
+ * Called by overlay_main_entry with the host TickCount: overlay_rng_init(ticks); per-frame palette-slot usage maps DAT_0001d864 = &DAT_0001d96c, DAT_0001d860 = &DAT_0001d86c; subsystem initialisers FUN_00003734, FUN_00003732 (twice), FUN_00003266, FUN_00003412, FUN_000035b4; light vector DAT_0001bd8c / -8a / -88 = 0xd983 / 0x69d8 / 0xc330 (the shade_object_faces light direction); _DAT_0001bd84 = 1; palette cursor DAT_0001bd80 = 0; DAT_0001b838 = 0x4c; FUN_0001771a(0xc15c0). Complete Ghidra C.
+ */
+void overlay_initialise /* Original: FUN_000018d6 */ (undefined4 param_1)
 
 {
   overlay_rng_init(param_1); /* Original: FUN_0001150a */
   DAT_0001d864 = &DAT_0001d96c;
   DAT_0001d860 = &DAT_0001d86c;
-  FUN_00003734();
-  FUN_00003732();
-  FUN_00003732();
-  FUN_00003266();
-  FUN_00003412();
-  FUN_000035b4();
+  init_code_pointer_tables();
+  overlay_init_noop();
+  overlay_init_noop();
+  init_span_table_32ba();
+  init_span_table_3466();
+  init_span_table_3608();
   DAT_0001bd8c = 0xd983;
   DAT_0001bd8a = 0x69d8;
   DAT_0001bd88 = 0xc330;
   _DAT_0001bd84 = 1;
   DAT_0001bd80 = 0;
   DAT_0001b838 = 0x4c;
-  FUN_0001771a(0xc15c0);
+  set_view_distance(0xc15c0);
   return;
 }
 
 
 
-int FUN_00001958(int param_1)
+/* Original: FUN_00001958; source: Pacific Conflict.c. Recovered name: heap_sbrk [STRONG INFERENCE] (iteration 243).
+ * Ghidra C reviewed (function at overlay offset 0x1958).
+ * Returns the current break address = arena base (host +0x348 = A5-0x1040, the overlay work buffer allocated by the host with NewPtrClear) + break offset DAT_00020c50, then advances the break by the argument. No limit check in this function. Complete Ghidra C.
+ */
+int heap_sbrk /* Original: FUN_00001958 */ (int param_1)
 
 {
   int iVar1;
@@ -2268,12 +2388,16 @@ int FUN_00001958(int param_1)
 
 
 
-undefined1 * FUN_00001974(uint param_1)
+/* Original: FUN_00001974; source: Pacific Conflict.c. Recovered name: heap_new_size_class_block [STRONG INFERENCE] (iteration 243).
+ * Ghidra C reviewed (function at overlay offset 0x1974).
+ * Arg: size class n. Takes 1 << n bytes from heap_sbrk; returns -1 on failure (heap_sbrk itself never fails here), else stores n in the header byte and returns the payload (block + 4). Complete Ghidra C.
+ */
+undefined1 * heap_new_size_class_block /* Original: FUN_00001974 */ (uint param_1)
 
 {
   undefined1 *puVar1;
   
-  puVar1 = (undefined1 *)FUN_00001958(1 << (param_1 & 0x3f));
+  puVar1 = (undefined1 *)heap_sbrk(1 << (param_1 & 0x3f));
   if (puVar1 == (undefined1 *)0xffffffff) {
     puVar1 = (undefined1 *)0xffffffff;
   }
@@ -2286,13 +2410,17 @@ undefined1 * FUN_00001974(uint param_1)
 
 
 
-undefined4 FUN_0000199a(int param_1)
+/* Original: FUN_0000199a; source: Pacific Conflict.c. Recovered name: heap_add_large_block [STRONG INFERENCE] (iteration 243).
+ * Ghidra C reviewed (function at overlay offset 0x199a).
+ * Arg: size in 8-byte units. Takes n * 8 bytes from heap_sbrk; header long = n, tag byte +4 = 0xff (large block), then heap_free_coalesce(payload) puts it into the large-block list; returns the list head DAT_00020c60 (0 on failure). Complete Ghidra C.
+ */
+undefined4 heap_add_large_block /* Original: FUN_0000199a */ (int param_1)
 
 {
   int *piVar1;
   undefined4 uVar2;
   
-  piVar1 = (int *)FUN_00001958(param_1 << 3);
+  piVar1 = (int *)heap_sbrk(param_1 << 3);
   if (piVar1 == (int *)0xffffffff) {
     uVar2 = 0;
   }
@@ -2307,7 +2435,11 @@ undefined4 FUN_0000199a(int param_1)
 
 
 
-undefined4 FUN_000019b0(void)
+/* Original: FUN_000019b0; source: Pacific Conflict.c. Recovered name: heap_add_large_block_tail [STRONG INFERENCE] (iteration 243).
+ * Ghidra C reviewed (function at overlay offset 0x19b0).
+ * Not a real function: Ghidra split the tail of heap_add_large_block at 0x19b0 (register inputs A0 / D2 / Z flag are the values left by the code before it). Same effect as the end of heap_add_large_block. Name kept for traceability only.
+ */
+undefined4 heap_add_large_block_tail /* Original: FUN_000019b0 */ (void)
 
 {
   undefined4 uVar1;
@@ -2442,7 +2574,7 @@ uint * heap_alloc(int param_1) /* Original: FUN_00001a68 */
   if (uVar5 < 6) {
     puVar1 = *(undefined1 **)(&DAT_00020c64 + uVar5 * 4);
     if (puVar1 == (undefined1 *)0x0) {
-      puVar3 = (uint *)FUN_00001974(uVar5);
+      puVar3 = (uint *)heap_new_size_class_block(uVar5);
     }
     else {
       *(undefined4 *)(&DAT_00020c64 + uVar5 * 4) = **(undefined4 **)(&DAT_00020c64 + uVar5 * 4);
@@ -2461,7 +2593,7 @@ uint * heap_alloc(int param_1) /* Original: FUN_00001a68 */
     puVar4 = DAT_00020c60;
     while (*puVar3 < uVar5) {
       puVar4 = puVar3;
-      if ((puVar3 == DAT_00020c60) && (puVar4 = (uint *)FUN_0000199a(uVar5), puVar4 == (uint *)0x0))
+      if ((puVar3 == DAT_00020c60) && (puVar4 = (uint *)heap_add_large_block(uVar5), puVar4 == (uint *)0x0))
       {
         return (uint *)0x0;
       }
@@ -2513,7 +2645,11 @@ void heap_zero_payload(undefined4 *payload) /* Original: FUN_00001b38 */
 
 
 
-void FUN_00001b4c(void)
+/* Original: FUN_00001b4c; source: Pacific Conflict.c. Recovered name: heap_zero_payload_tail [STRONG INFERENCE] (iteration 246).
+ * Ghidra C reviewed (function at overlay offset 0x1b4c).
+ * Not a real function: the tail of heap_zero_payload (0x1b38) that Ghidra split at 0x1b4c; it clears A0 for D0 * 8 bytes (memzero) with registers set by the preceding code. Name kept for traceability.
+ */
+void heap_zero_payload_tail /* Original: FUN_00001b4c */ (void)
 
 {
   int in_D0;
@@ -2601,7 +2737,11 @@ uint * heap_realloc_grow_only(uint *param_1,undefined4 *param_2) /* Original: FU
 
 
 
-void FUN_00001be4(void)
+/* Original: FUN_00001be4; source: Pacific Conflict.c. Recovered name: heap_realloc_grow_only_tail [STRONG INFERENCE] (iteration 246).
+ * Ghidra C reviewed (function at overlay offset 0x1be4).
+ * Not a real function: the tail of heap_realloc_grow_only split at 0x1be4 (memmove_block(old, new, old capacity) then heap_free_coalesce(old), with A2 / D2 / D3 from the preceding code). Name kept for traceability.
+ */
+void heap_realloc_grow_only_tail /* Original: FUN_00001be4 */ (void)
 
 {
   undefined4 *unaff_D2;
@@ -2615,7 +2755,11 @@ void FUN_00001be4(void)
 
 
 
-void FUN_00001c04(int param_1)
+/* Original: FUN_00001c04; source: Pacific Conflict.c. Recovered name: copy_object_vertex_buffer [STRONG INFERENCE] (iteration 246).
+ * Ghidra C reviewed (function at overlay offset 0x1c04).
+ * Copies (+0x3a + +0x36) vertices of 12 bytes from the object vertex array +0x44 to the second array +0x4c (three longs each). Complete Ghidra C.
+ */
+void copy_object_vertex_buffer /* Original: FUN_00001c04 */ (int param_1)
 
 {
   int iVar1;
@@ -4453,7 +4597,11 @@ int abs_int(int param_1) /* Original: FUN_00002e08 */
 
 
 
-void FUN_00002e12(void)
+/* Original: FUN_00002e12; source: Pacific Conflict.c. Recovered name: noop_stub_2e12 [PROVEN] (iteration 247).
+ * Ghidra C reviewed (function at overlay offset 0x2e12).
+ * Empty function (RTS only). Complete Ghidra C.
+ */
+void noop_stub_2e12 /* Original: FUN_00002e12 */ (void)
 
 {
   return;
@@ -4840,7 +4988,11 @@ LAB_000030e4:
 
 
 
-void FUN_00003266(void)
+/* Original: FUN_00003266; source: Pacific Conflict.c. Recovered name: init_span_table_32ba [STRONG INFERENCE mechanics] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x3266).
+ * Writes code addresses into the nine-entry table stored inside the code at 0x3242..0x3262 (self-modifying: the first entry is a branch target, the others data / handler addresses, the last four identical) used by the span routine that follows (FUN_000032ba). Called once by overlay_initialise. Complete Ghidra C.
+ */
+void init_span_table_32ba /* Original: FUN_00003266 */ (void)
 
 {
   DAT_00003242 = 0x3354;
@@ -4857,7 +5009,11 @@ void FUN_00003266(void)
 
 
 
-void FUN_000032ba(int *param_1,int *param_2,int param_3,byte *param_4,int param_5)
+/* Original: FUN_000032ba; source: Pacific Conflict.c. Recovered name: fill_span_rows_4bit_a [STRONG INFERENCE] (iteration 245).
+ * Ghidra C reviewed (function at overlay offset 0x32ba).
+ * 4-bit span row filler (variant a). Args: two run-list cursors (in / out), row count, destination byte pointer, row stride. For each row it merges two lists of (colour, end-x) runs (16-bit fields of longs) and writes 4-bit pixels: whole bytes or longs (colour byte replicated) for long runs, a masked nibble write (byte ^ ((byte ^ dst) & 0xf0)) for odd edges, and jumps into the per-length tail table patched by init_span_table_32ba; advances the destination by the stride and stores the list cursors back at the end. configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
+ */
+void fill_span_rows_4bit_a /* Original: FUN_000032ba */ (int *param_1,int *param_2,int param_3,byte *param_4,int param_5)
 
 {
   uint uVar1;
@@ -4982,7 +5138,11 @@ LAB_000033c6:
 
 
 
-void FUN_00003412(void)
+/* Original: FUN_00003412; source: Pacific Conflict.c. Recovered name: init_span_table_3466 [STRONG INFERENCE mechanics] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x3412).
+ * Writes code addresses into the nine-entry table stored inside the code at 0x33ee..0x340e (self-modifying: the first entry is a branch target, the others data / handler addresses, the last four identical) used by the span routine that follows (FUN_00003466). Called once by overlay_initialise. Complete Ghidra C.
+ */
+void init_span_table_3466 /* Original: FUN_00003412 */ (void)
 
 {
   DAT_000033ee = 0x34f6;
@@ -4999,7 +5159,11 @@ void FUN_00003412(void)
 
 
 
-void FUN_00003466(undefined4 *param_1,int *param_2,int param_3,byte *param_4,int param_5)
+/* Original: FUN_00003466; source: Pacific Conflict.c. Recovered name: fill_span_rows_4bit_b [STRONG INFERENCE] (iteration 245).
+ * Ghidra C reviewed (function at overlay offset 0x3466).
+ * 4-bit span row filler (variant b). Args: two run-list cursors (in / out), row count, destination byte pointer, row stride. For each row it merges two lists of (colour, end-x) runs (16-bit fields of longs) and writes 4-bit pixels: whole bytes or longs (colour byte replicated) for long runs, a masked nibble write (byte ^ ((byte ^ dst) & 0xf0)) for odd edges, and jumps into the per-length tail table patched by init_span_table_3466; advances the destination by the stride and stores the list cursors back at the end. configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
+ */
+void fill_span_rows_4bit_b /* Original: FUN_00003466 */ (undefined4 *param_1,int *param_2,int param_3,byte *param_4,int param_5)
 
 {
   ushort uVar1;
@@ -5120,7 +5284,11 @@ LAB_00003568:
 
 
 
-void FUN_000035b4(void)
+/* Original: FUN_000035b4; source: Pacific Conflict.c. Recovered name: init_span_table_3608 [STRONG INFERENCE mechanics] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x35b4).
+ * Writes code addresses into the nine-entry table stored inside the code at 0x3590..0x35b0 (self-modifying: the first entry is a branch target, the others data / handler addresses, the last four identical) used by the span routine that follows (FUN_00003608). Called once by overlay_initialise. Complete Ghidra C.
+ */
+void init_span_table_3608 /* Original: FUN_000035b4 */ (void)
 
 {
   DAT_00003590 = 0x3698;
@@ -5137,7 +5305,11 @@ void FUN_000035b4(void)
 
 
 
-void FUN_00003608(undefined4 *param_1,int *param_2,int param_3,byte *param_4,int param_5)
+/* Original: FUN_00003608; source: Pacific Conflict.c. Recovered name: fill_span_rows_4bit_c [STRONG INFERENCE] (iteration 245).
+ * Ghidra C reviewed (function at overlay offset 0x3608).
+ * 4-bit span row filler (variant c). Args: two run-list cursors (in / out), row count, destination byte pointer, row stride. For each row it merges two lists of (colour, end-x) runs (16-bit fields of longs) and writes 4-bit pixels: whole bytes or longs (colour byte replicated) for long runs, a masked nibble write (byte ^ ((byte ^ dst) & 0xf0)) for odd edges, and jumps into the per-length tail table patched by init_span_table_3608; advances the destination by the stride and stores the list cursors back at the end. configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
+ */
+void fill_span_rows_4bit_c /* Original: FUN_00003608 */ (undefined4 *param_1,int *param_2,int param_3,byte *param_4,int param_5)
 
 {
   ushort uVar1;
@@ -5258,7 +5430,11 @@ LAB_0000370a:
 
 
 
-void FUN_00003732(void)
+/* Original: FUN_00003732; source: Pacific Conflict.c. Recovered name: overlay_init_noop [PROVEN] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x3732).
+ * Empty function (RTS only); overlay_initialise calls it twice. Complete Ghidra C.
+ */
+void overlay_init_noop /* Original: FUN_00003732 */ (void)
 
 {
   return;
@@ -5266,7 +5442,11 @@ void FUN_00003732(void)
 
 
 
-void FUN_00003734(void)
+/* Original: FUN_00003734; source: Pacific Conflict.c. Recovered name: init_code_pointer_tables [STRONG INFERENCE mechanics] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x3734).
+ * Fills two tables of code addresses: DAT_00020cec .. DAT_00020d00 with six entries and then 0x7fa copies of 0x3858 from DAT_00020d04; DAT_00022cec .. with seven entries and then 0x7f9 copies from DAT_00022d08 - default handlers for a large (2048-entry) dispatch table. Iteration 246: fill_span_rows_8bit (0x37b4) indexes both tables (DAT_00020cec / DAT_00022cec) - they are the per-run-length entry points of the depth-8 span filler [STRONG INFERENCE]. Called once by overlay_initialise. Ghidra C (tail truncated in this view).
+ */
+void init_code_pointer_tables /* Original: FUN_00003734 */ (void)
 
 {
   short sVar1;
@@ -5304,7 +5484,11 @@ void FUN_00003734(void)
 
 
 
-void FUN_000037b4(int *param_1,int *param_2,int param_3)
+/* Original: FUN_000037b4; source: Pacific Conflict.c. Recovered name: fill_span_rows_8bit [STRONG INFERENCE] (iteration 246).
+ * Ghidra C reviewed (function at overlay offset 0x37b4).
+ * Depth-8 counterpart of fill_span_rows_4bit_a / b / c: configure_renderer_for_display points all three span-filler slots at 0x37b4 (stored 0x3794 + 0x20) at depth 8. Args: two run-list cursors, row count. Merges the two run lists row by row like the 4-bit fillers and dispatches each run through the 2048-entry code tables DAT_00020cec / DAT_00022cec filled by init_code_pointer_tables (one entry per run length). Ghidra C (dispatch jumps unrecovered).
+ */
+void fill_span_rows_8bit /* Original: FUN_000037b4 */ (int *param_1,int *param_2,int param_3)
 
 {
   short sVar1;
@@ -5400,7 +5584,11 @@ LAB_000038c0:
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_000038f4(void)
+/* Original: FUN_000038f4; source: Pacific Conflict.c. Recovered name: respawn_player_at_anchor [STRONG INFERENCE] (iteration 235).
+ * Ghidra C reviewed (function at overlay offset 0x38f4).
+ * Host hook A5-0x108a (run_flight_session restart path after conclude_mission). When the player object exists: unless DAT_0001d854 is set, find_anchor_point(&DAT_0001d83c, mode 1) - the nearest airfield ground point; player position = anchor x / y / z, angles = anchor angles (+0x20 / +0x22 / +0x24), +0x626 = type-record +0x42; rebuilds its matrix (FUN_0000df98 / FUN_0000df5e), copy_player_pose_to_camera; then resets many state fields (+0x679 = 0x2d, +0x67a |= 2, +0x63e = 1, height above ground +0x2e, velocities +8 / +0xc / +0x10 = 0, +0x684 = 0x4000 via FUN_0000dfd2, counters cleared) [STRONG INFERENCE: puts the aircraft back on an airfield, ready to fly].
+ */
+void respawn_player_at_anchor /* Original: FUN_000038f4 */ (void)
 
 {
   int iVar1;
@@ -5409,7 +5597,7 @@ void FUN_000038f4(void)
   
   if ((DAT_0001b738 != (int *)0x0) && (iVar1 = *DAT_0001b738, iVar1 != 0)) {
     if (DAT_0001d854 == 0) {
-      FUN_00000d6a(&DAT_0001d83c,1);
+      find_anchor_point(&DAT_0001d83c,1);
     }
     *(undefined4 *)(iVar1 + 0x18) = DAT_0001d83c;
     *(undefined4 *)(iVar1 + 0x1c) = DAT_0001d840;
@@ -5423,7 +5611,7 @@ void FUN_000038f4(void)
                  *(undefined2 *)((int)piVar3 + 0x22),*(undefined2 *)(piVar3 + 9));
     FUN_0000df5e((int)DAT_0001b738 + 0x36,*(undefined4 *)(iVar1 + 0x18),
                  *(undefined4 *)(iVar1 + 0x1c),*(undefined4 *)(iVar1 + 0x20));
-    FUN_0000739a();
+    copy_player_pose_to_camera();
     piVar3 = DAT_0001b738;
     *(undefined1 *)((int)DAT_0001b738 + 0x679) = 0x2d;
     *(byte *)((int)piVar3 + 0x67a) = *(byte *)((int)piVar3 + 0x67a) | 2;
@@ -5475,14 +5663,18 @@ void FUN_000038f4(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00003ac4(int param_1)
+/* Original: FUN_00003ac4; source: Pacific Conflict.c. Recovered name: start_mission_scene [STRONG INFERENCE] (iteration 234).
+ * Ghidra C reviewed (function at overlay offset 0x3ac4).
+ * Host hook A5-0x109a, called by start_new_mission with the mission number. Releases the previous scene (FUN_000052dc on DAT_0001d700); DAT_0001d700 = scene table entry of the mission (*(DAT_0001d6fc + 0x30) + mission * 0x18 + 0x74); find_anchor_point(&DAT_0001d83c, mode 0) and copies the anchor position into the camera position DAT_0001d838 / -834 / -830; sets DAT_0001d858 / _DAT_0001d856 / _DAT_0001b73c = 1 and DAT_0001d824 = 1000000000; reset_distance_base_globals; activate_near_range_object(scene); DAT_0001b838 += 0x4b; FUN_0000df98 on the player attitude (+0x20 / +0x22 / +0x24); copy_player_pose_to_camera; FUN_0000640c; FUN_00009550. Complete Ghidra C.
+ */
+void start_mission_scene /* Original: FUN_00003ac4 */ (int param_1)
 
 {
   if (DAT_0001d700 != (char *)0x0) {
     FUN_000052dc(DAT_0001d700);
   }
   DAT_0001d700 = *(char **)(*(int *)(DAT_0001d6fc + 0x30) + param_1 * 0x18 + 0x74);
-  FUN_00000d6a(&DAT_0001d83c,0);
+  find_anchor_point(&DAT_0001d83c,0);
   DAT_0001d838 = DAT_0001d83c;
   DAT_0001d834 = DAT_0001d840;
   DAT_0001d830 = DAT_0001d844;
@@ -5495,8 +5687,8 @@ void FUN_00003ac4(int param_1)
   DAT_0001b838 = DAT_0001b838 + 0x4b;
   FUN_0000df98(DAT_0001b738 + 0x36,*(undefined2 *)(DAT_0001b738 + 0x20),
                *(undefined2 *)(DAT_0001b738 + 0x22),*(undefined2 *)(DAT_0001b738 + 0x24));
-  FUN_0000739a();
-  FUN_0000640c();
+  copy_player_pose_to_camera();
+  spawn_cloud_layer();
   FUN_00009550();
   return;
 }
@@ -5716,7 +5908,11 @@ int FUN_00003cca(void)
 
 
 
-undefined4 FUN_00003da8(int param_1,int param_2)
+/* Original: FUN_00003da8; source: Pacific Conflict.c. Recovered name: update_object_distance_band [STRONG INFERENCE] (iteration 239).
+ * Ghidra C reviewed (function at overlay offset 0x3da8).
+ * Distance-band update: band = object word +0x30; thresholds = ascending longs at DAT_0001b190 (band i covers [DAT_0001b18c[i], DAT_0001b190[i]) ). If the distance (arg 2; callers pass object +0x10, the camera metric) is still inside the current band returns 0; otherwise steps the band index up or down until it contains the distance, stores it and returns 1. Complete Ghidra C. The band selects the haze level in shade_object_faces.
+ */
+undefined4 update_object_distance_band /* Original: FUN_00003da8 */ (int param_1,int param_2)
 
 {
   short sVar1;
@@ -5743,7 +5939,11 @@ undefined4 FUN_00003da8(int param_1,int param_2)
 
 
 
-undefined4 FUN_00003e02(int param_1,int param_2)
+/* Original: FUN_00003e02; source: Pacific Conflict.c. Recovered name: update_record_distance_band [STRONG INFERENCE] (iteration 239).
+ * Ghidra C reviewed (function at overlay offset 0x3e02).
+ * Distance-band update: band = record word +4; thresholds = ascending longs at DAT_0001b190 (band i covers [DAT_0001b18c[i], DAT_0001b190[i]) ). If the distance (arg 2) is still inside the current band returns 0; otherwise steps the band index up or down until it contains the distance, stores it and returns 1. Complete Ghidra C. Same algorithm as update_object_distance_band for a different record layout.
+ */
+undefined4 update_record_distance_band /* Original: FUN_00003e02 */ (int param_1,int param_2)
 
 {
   short sVar1;
@@ -5770,7 +5970,11 @@ undefined4 FUN_00003e02(int param_1,int param_2)
 
 
 
-void FUN_00003e5c(int param_1)
+/* Original: FUN_00003e5c; source: Pacific Conflict.c. Recovered name: snapshot_face_colours [HYPOTHESIS name] (iteration 239).
+ * Ghidra C reviewed (function at overlay offset 0x3e5c).
+ * For each face of the object (count +0x3a, 0x20-byte records from +0x48): copies the long at face +0xc (the RGB bytes +0xc..+0xe and the palette slot +0xf) into a 6-byte entry of an array placed after the faces (at +0x48 + faces * 0x20 + (+0x38) * 2) with a zero word. Called by shade_object_faces when haze is on and object flag (+6 & 2) is set. Complete Ghidra C.
+ */
+void snapshot_face_colours /* Original: FUN_00003e5c */ (int param_1)
 
 {
   int iVar1;
@@ -5796,7 +6000,11 @@ void FUN_00003e5c(int param_1)
 // WARNING: Removing unreachable block (ram,0x000040ba)
 // WARNING: Removing unreachable block (ram,0x000040dc)
 
-void FUN_00003ea0(char *param_1)
+/* Original: FUN_00003ea0; source: Pacific Conflict.c. Recovered name: shade_object_faces [STRONG INFERENCE] (iteration 239).
+ * Ghidra C reviewed (function at overlay offset 0x3ea0).
+ * Flat shading of a kind-2 object (not flagged +7 & 2). For each face (0x20-byte records from +0x48; base RGB bytes from the object definition reached through +0x24 / +0x28 and the scene data DAT_0001b5a0 + 0x8c): unless face flag +0x13 & 4, intensity = dot(face normal vector, light vector DAT_0001bd88 / -8a / -8c) >> 13, mapped to a 16-bit factor (0x4000..0xffff: 0.25 for faces turned away up to 1.0); face RGB +0xc..+0xe = base * factor. Depth 1 -> FUN_0000159e(face) (dither pattern); depth 4 -> rounded variant then FUN_0000159e; depth 8 -> when the haze option host +0xaa (A5-0x12de) is on and the object is not flagged (+4 & 0x1280), blends toward (0x7d, 0x84, 0xa8) by the distance band +0x30 (32 steps), then FUN_00001548(face) when the face owns its palette slot (+0xf) in DAT_0001da7c, else slot = 0. Afterwards snapshot_face_colours when haze is on and +6 & 2. The light vector and the bluish haze colour are [STRONG INFERENCE]; FUN_0000159e / FUN_00001548 are the depth-specific colour lookups [HYPOTHESIS].
+ */
+void shade_object_faces /* Original: FUN_00003ea0 */ (char *param_1)
 
 {
   undefined4 uVar1;
@@ -5893,7 +6101,7 @@ void FUN_00003ea0(char *param_1)
         uVar12 = (undefined1)(pbVar18[2] * uVar16 >> 0x10);
 LAB_000040ea:
         *(undefined1 *)(iVar17 + 0xe) = uVar12;
-        FUN_0000159e(iVar17);
+        assign_face_colour(iVar17);
       }
       else {
         if (sVar7 == 4) {
@@ -5944,7 +6152,7 @@ LAB_000040ea:
         *(byte *)(iVar17 + 0xd) = bVar13;
         *(byte *)(iVar17 + 0xe) = bVar14;
         if (iVar17 == *(int *)(DAT_0001da7c + (uint)*(byte *)(iVar17 + 0xf) * 4)) {
-          FUN_00001548(iVar17);
+          write_face_palette_slot(iVar17);
         }
         else {
           *(undefined1 *)(iVar17 + 0xf) = 0;
@@ -5954,7 +6162,7 @@ LAB_000040ea:
       iVar17 = iVar17 + 0x20;
     }
     if ((sVar6 != 0) && ((param_1[6] & 2U) != 0)) {
-      FUN_00003e5c((int)param_1);
+      snapshot_face_colours((int)param_1);
     }
   }
   return;
@@ -5962,19 +6170,27 @@ LAB_000040ea:
 
 
 
-void FUN_000041ec(char *param_1)
+/* Original: FUN_000041ec; source: Pacific Conflict.c. Recovered name: recolour_kind2_object [HYPOTHESIS name] (iteration 238).
+ * Ghidra C reviewed (function at overlay offset 0x41ec).
+ * For an object whose kind byte is 2: FUN_00003da8(object, object +0x10) then FUN_00003ea0(object) [UNKNOWN callees; called by refresh_object_colours_for_depth for colour depths, so presumably recomputes face colours]. Complete Ghidra C.
+ */
+void recolour_kind2_object /* Original: FUN_000041ec */ (char *param_1)
 
 {
   if (*param_1 == '\x02') {
-    FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
-    FUN_00003ea0(param_1);
+    update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
+    shade_object_faces(param_1);
   }
   return;
 }
 
 
 
-void FUN_00004210(void)
+/* Original: FUN_00004210; source: Pacific Conflict.c. Recovered name: refresh_object_colours_for_depth [STRONG INFERENCE] (iteration 238).
+ * Ghidra C reviewed (function at overlay offset 0x4210).
+ * Host hook A5-0x1096 (refresh_display_if_changed and start_new_mission at depth 1). With the current pixel depth DAT_0001b826 (host A5-0x137a): depth 4 first calls FUN_0000131c; clears the 256-byte table DAT_0001d96c (and, at depth 8, the 256 longs at DAT_0001da7c); the four special objects DAT_0001bdb4 / -bdac / -bdb0 / -bda4: at depth 1 the first two get pattern entries from the host table (host +0x88 = A5-0x1300, ID06 get_pattern_table) at 0x180 / 0x80, otherwise recolour_kind2_object; then every object of the two entity arrays (DAT_0001d4a4, count DAT_0001c1e0; DAT_0001b5a4, count DAT_0001b734): at depth 1, flagged objects (+6 & 0x10) or kinds 3..4 get set_object_faces_bw_pattern(object, 0x80 / 0), the others recolour_kind2_object. Complete Ghidra C.
+ */
+void refresh_object_colours_for_depth /* Original: FUN_00004210 */ (void)
 
 {
   int iVar1;
@@ -5985,7 +6201,7 @@ void FUN_00004210(void)
   int *piVar6;
   
   if (DAT_0001b826 == 4) {
-    FUN_0000131c();
+    init_depth4_colour_state();
   }
   iVar3 = 0;
   puVar4 = &DAT_0001d96c;
@@ -6007,20 +6223,20 @@ void FUN_00004210(void)
     *(int *)(*(int *)(DAT_0001bdac + 0x48) + 4) = (int)*(short *)(*(int *)(iVar1 + 0x88) + 0x80);
   }
   else {
-    FUN_000041ec(DAT_0001bdb4);
-    FUN_000041ec(DAT_0001bdac);
+    recolour_kind2_object(DAT_0001bdb4);
+    recolour_kind2_object(DAT_0001bdac);
   }
-  FUN_000041ec(DAT_0001bdb0);
-  FUN_000041ec(DAT_0001bda4);
+  recolour_kind2_object(DAT_0001bdb0);
+  recolour_kind2_object(DAT_0001bda4);
   iVar3 = 0;
   if (0 < DAT_0001c1e0) {
     piVar6 = &DAT_0001d4a4;
     do {
       if ((DAT_0001b826 == 1) && ((*(byte *)(*piVar6 + 6) & 0x10) != 0)) {
-        FUN_00004916(*piVar6,0x80);
+        set_object_faces_bw_pattern(*piVar6,0x80);
       }
       else {
-        FUN_000041ec((char *)*piVar6);
+        recolour_kind2_object((char *)*piVar6);
       }
       piVar6 = piVar6 + 1;
       iVar3 = iVar3 + 1;
@@ -6034,11 +6250,11 @@ void FUN_00004210(void)
         iVar1 = *(int *)(*piVar6 + 8);
         if (((iVar1 == 0) || (psVar2 = *(short **)(iVar1 + 4), *psVar2 < 3)) || (4 < *psVar2))
         goto LAB_00004340;
-        FUN_00004916(*piVar6,0);
+        set_object_faces_bw_pattern(*piVar6,0);
       }
       else {
 LAB_00004340:
-        FUN_000041ec((char *)*piVar6);
+        recolour_kind2_object((char *)*piVar6);
       }
       piVar6 = piVar6 + 1;
       iVar3 = iVar3 + 1;
@@ -6506,7 +6722,11 @@ void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004
 
 
 
-void FUN_00004916(int param_1,int param_2)
+/* Original: FUN_00004916; source: Pacific Conflict.c. Recovered name: set_object_faces_bw_pattern [STRONG INFERENCE] (iteration 238).
+ * Ghidra C reviewed (function at overlay offset 0x4916).
+ * Args: object, pattern index. For each of the object faces (count +0x3a, 0x20-byte records from the pointer +0x48): face +4 = host pattern table word (host +0x88 = A5-0x1300)[index], face +0xf = 0xff. Used at depth 1 by refresh_object_colours_for_depth. Complete Ghidra C.
+ */
+void set_object_faces_bw_pattern /* Original: FUN_00004916 */ (int param_1,int param_2)
 
 {
   int iVar1;
@@ -6618,28 +6838,28 @@ LAB_00004aee:
       }
       else {
         DAT_00020aee = -param_4;
-        iVar19 = FUN_0000b190(local_464,(int)sVar9,aiStack_8c4);
+        iVar19 = clip_polygon_x_min(local_464,(int)sVar9,aiStack_8c4);
         uVar4 = DAT_00020aec;
         sVar9 = 0;
         DAT_00020aec = uVar4;
         DAT_00020aee = uVar5;
         if ((short)iVar19 != 0) {
           DAT_00020aec = param_4;
-          iVar19 = FUN_0000b242(aiStack_8c4,(int)(short)iVar19,local_464);
+          iVar19 = clip_polygon_x_max(aiStack_8c4,(int)(short)iVar19,local_464);
           uVar5 = DAT_00020aea;
           sVar9 = 0;
           DAT_00020aea = uVar5;
           DAT_00020aec = uVar4;
           if ((short)iVar19 != 0) {
             DAT_00020aea = -param_4;
-            iVar19 = FUN_0000b2f4(local_464,(int)(short)iVar19,aiStack_8c4);
+            iVar19 = clip_polygon_y_min(local_464,(int)(short)iVar19,aiStack_8c4);
             uVar4 = DAT_0001b73e;
             sVar9 = 0;
             DAT_0001b73e = uVar4;
             DAT_00020aea = uVar5;
             if ((short)iVar19 != 0) {
               DAT_0001b73e = param_4;
-              iVar19 = FUN_0000b3aa(aiStack_8c4,(int)(short)iVar19,local_464);
+              iVar19 = clip_polygon_y_max(aiStack_8c4,(int)(short)iVar19,local_464);
               sVar9 = (short)iVar19;
               DAT_0001b73e = uVar4;
             }
@@ -6741,7 +6961,11 @@ LAB_00004cb8:
 
 
 
-void FUN_00004e06(int param_1)
+/* Original: FUN_00004e06; source: Pacific Conflict.c. Recovered name: reset_object_to_template_pose [STRONG INFERENCE] (iteration 247).
+ * Ghidra C reviewed (function at overlay offset 0x4e06).
+ * Arg: object. Unless its flag (+7 & 2) is set, looks up its template entry in the scene data (DAT_0001b5a0 + 0x8c + offset at +0x2e + object byte +1 * 0x18 of the descriptor reached through +0x24 / +0x28), copies the template position (+2 / +6 / +0xa) into the object x / y / z (+0x18 / +0x1c / +0x20) and the template long +0x12 into +0x14, then apply_template_chain_xform(object, 1, NULL, NULL). Complete Ghidra C. Callers: Pacific Conflict.decomp.c ~7278, ~7784.
+ */
+void reset_object_to_template_pose /* Original: FUN_00004e06 */ (int param_1)
 
 {
   int iVar1;
@@ -6761,7 +6985,11 @@ void FUN_00004e06(int param_1)
 
 
 
-void FUN_00004e4e(void)
+/* Original: FUN_00004e4e; source: Pacific Conflict.c. Recovered name: reset_object_to_template_pose_tail [STRONG INFERENCE] (iteration 247).
+ * Ghidra C reviewed (function at overlay offset 0x4e4e).
+ * Not a real function: the last two steps of reset_object_to_template_pose (+0x14 = template +0x12; apply_template_chain_xform) split off by Ghidra at 0x4e4e, with A0 / A3 set by the preceding code. Name kept for traceability.
+ */
+void reset_object_to_template_pose_tail /* Original: FUN_00004e4e */ (void)
 
 {
   int in_A0;
@@ -6871,17 +7099,17 @@ void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
       if ((param_1[5] & 0x10U) == 0) {
         apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)param_1,(int)sVar12,puVar4,*(uint **)(param_1 + 0x44));
         apply_entity_mission_rates(param_1,0);
-        FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
+        update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
         goto LAB_00005056;
       }
       translate_int3_vecs( /* Original: FUN_00001c5c */(int)sVar12,(int *)puVar4,*(int **)(param_1 + 0x44),0,0,0);
       apply_entity_mission_rates(param_1,0);
-      FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
-      FUN_00003ea0(param_1);
+      update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
+      shade_object_faces(param_1);
     }
     else {
       apply_entity_mission_rates(param_1,0);
-      FUN_00003da8((int)param_1,*(int *)(param_1 + 0x10));
+      update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
       iVar5 = *(int *)(param_1 + 8);
       if (((iVar5 == 0) || (**(short **)(iVar5 + 4) < 0x15)) || (0x19 < **(short **)(iVar5 + 4))) {
         sVar12 = 0;
@@ -6901,11 +7129,11 @@ void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
   else {
     FUN_00004958((int)param_1,0xb4e1,0,0x7fe4);
     if (*(short *)(DAT_0001b5a0 + 0xe) == 1) {
-      FUN_00004916((int)param_1,0x80);
+      set_object_faces_bw_pattern((int)param_1,0x80);
     }
     else {
 LAB_00005056:
-      FUN_00003ea0(param_1);
+      shade_object_faces(param_1);
     }
   }
   if ((param_1[6] & 2U) == 0) {
@@ -7059,10 +7287,10 @@ void FUN_000052dc(char *param_1)
   cVar2 = *param_1;
   if (cVar2 == '\x02') {
     if ((param_1[6] & 0x10U) != 0) {
-      FUN_00004e06((int)param_1);
+      reset_object_to_template_pose((int)param_1);
     }
-    FUN_000019b0();
-    FUN_000019b0();
+    heap_add_large_block_tail();
+    heap_add_large_block_tail();
     param_1[0x44] = '\0';
     param_1[0x45] = '\0';
     param_1[0x46] = '\0';
@@ -7333,7 +7561,11 @@ LAB_00005800:
 
 
 
-void FUN_00005832(int *param_1,int param_2)
+/* Original: FUN_00005832; source: Pacific Conflict.c. Recovered name: dispatch_overlap_collisions [STRONG INFERENCE] (iteration 249).
+ * Ghidra C reviewed (function at overlay offset 0x5832).
+ * Args: object pointer list, list header (count word +2). Walks the list (ordered by the distance metric +0x10, see update_object_camera_metric) keeping a running minimum of (metric - radius +0xc) in each object +0x28; for each object whose interval [metric - radius, metric + radius] reaches back over earlier objects, calls the collision handler of each type record (*(object +8) +4 -> +0x16) as handler(self, other) in both directions while the intervals overlap - a one-dimensional sweep that only dispatches nearby pairs to their type-specific contact code. Clears DAT_0001b888 unless DAT_0001b870 == 3. Complete Ghidra C.
+ */
+void dispatch_overlap_collisions /* Original: FUN_00005832 */ (int *param_1,int param_2)
 
 {
   int iVar1;
@@ -7396,7 +7628,11 @@ LAB_000058d0:
 
 
 
-void FUN_000058ec(void)
+/* Original: FUN_000058ec; source: Pacific Conflict.c. Recovered name: build_visible_object_list [STRONG INFERENCE] (iteration 249).
+ * Ghidra C reviewed (function at overlay offset 0x58ec).
+ * transform_int3_vecs_asr_by_1d744 of the candidate centres (DAT_0001c1d0 of them) into view space at DAT_0001c43c; then two passes over the candidates DAT_0001c9dc: objects flagged +7 & 4 are always kept; objects closer than their extent (metric - metric / 4 < +0x14) are kept and flagged +4 |= 8; the others are kept only when in front (z > 0) and inside the view pyramid (max(|x|, |y|) minus the scaled radius, times 1.5, below z + radius). Kept objects are compacted at the start of DAT_0001c9dc; DAT_0001c1d4 = kept count, DAT_0001c1c0 = first-pass count, DAT_0001c1d0 = 0. Complete Ghidra C.
+ */
+void build_visible_object_list /* Original: FUN_000058ec */ (void)
 
 {
   int iVar1;
@@ -7565,7 +7801,7 @@ void FUN_00005a14(void)
       iVar1 = *piVar15;
       piVar15 = piVar12;
       if ((*(byte *)(iVar1 + 6) & 0x10) != 0) {
-        FUN_00004e06(iVar1);
+        reset_object_to_template_pose(iVar1);
         FUN_00004958(iVar1,(iVar9 >> 0xc) << ((int)(short)uVar6 & 0x3fU),uVar6,
                      (short)((iVar10 * 9) / 10));
       }
@@ -7893,8 +8129,8 @@ joined_r0x000061c6:
                              (int *)(iVar3 + 0x22),*(int **)(pcVar1 + 0x44),0,0,0);
               }
               update_object_camera_metric( /* Original: FUN_00003b98 */(int)pcVar1);
-              FUN_00003da8((int)pcVar1,*(int *)(pcVar1 + 0x10));
-              FUN_00003ea0(pcVar1);
+              update_object_distance_band((int)pcVar1,*(int *)(pcVar1 + 0x10));
+              shade_object_faces(pcVar1);
             }
             else {
               dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
@@ -7936,7 +8172,11 @@ LAB_000063f0:
 
 
 
-void FUN_0000640c(void)
+/* Original: FUN_0000640c; source: Pacific Conflict.c. Recovered name: spawn_cloud_layer [STRONG INFERENCE] (iteration 242).
+ * Ghidra C reviewed (function at overlay offset 0x640c).
+ * Host hook A5-0x104e, also called by start_mission_scene. When the host option +0xae (A5-0x12da) is 0: retires every entity of type 0x1d (retire_entity). Otherwise places ten objects around the camera: bearing = random byte << 6 (1/0x4000 turns), redrawn until it is at least 0x280 from all previous ones (fold_angle_pm_0x2000 / abs_int); class = random % 5; class 4: distance factor 15..24 and height 300000 + random * 10, classes 0..3: factor 35..44 and height 0xcc4c + random % 1000; offset = factor * (sin, cos)(bearing) * 0x339 >> 6; spawn_camera_relative_object(class, x, height, z, 0, heading, 0) with heading 0x4000 - bearing (0 for class 4). The type-0x1d objects kept at fixed camera offsets and at cloud heights suggest a cloud layer, the host option being a clouds setting [STRONG INFERENCE]. Complete Ghidra C.
+ */
+void spawn_cloud_layer /* Original: FUN_0000640c */ (void)
 
 {
   uint uVar1;
@@ -7996,7 +8236,7 @@ void FUN_0000640c(void)
       if (sVar10 == 4) {
         sVar9 = 0;
       }
-      FUN_00019aa2((int)sVar10,(int)sVar7 * (short)iVar4 * 0x339 >> 6,iVar3,
+      spawn_camera_relative_object((int)sVar10,(int)sVar7 * (short)iVar4 * 0x339 >> 6,iVar3,
                    (short)iVar5 * 0x339 * (int)sVar7 >> 6,0,0x4000U - sVar9 & 0x3fff,0);
       sVar8 = sVar8 + 1;
     } while (sVar8 < 10);
@@ -8008,7 +8248,11 @@ void FUN_0000640c(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00006598(int param_1,int param_2)
+/* Original: FUN_00006598; source: Pacific Conflict.c. Recovered name: overlay_frame_step [STRONG INFERENCE] (iteration 234).
+ * Ghidra C reviewed (function at overlay offset 0x6598).
+ * Host hook A5-0x107a, called once per frame by run_flight_session with (1, 1). With arg 2 == 1 swaps the two 0x100-byte (64-long) buffers DAT_0001d860 / DAT_0001d864, clears the new one and increments one byte in it; resets the distance base every 20 frames (DAT_00024cf0 > 0x13); then the frame body (FUN_00005a14 and the following update / render calls, not yet decoded). A local flag is set when the host word +0x76 (24-bit mode) is set and +0x9e is clear. Header written from the first part of the Ghidra C only.
+ */
+void overlay_frame_step /* Original: FUN_00006598 */ (int param_1,int param_2)
 
 {
   undefined4 uVar1;
@@ -8092,9 +8336,9 @@ void FUN_00006598(int param_1,int param_2)
     *(uint *)(DAT_0001bdb0 + 4) = *(uint *)(DAT_0001bdb0 + 4) | 4;
     transform_vecs12_by_matrix3((int)*(short *)(iVar14 + 0x36),*(int *)(iVar14 + 0x44),*(int *)(iVar14 + 0x4c),
                  &DAT_0001d744);
-    iVar14 = FUN_00003da8((int)DAT_0001bdac,DAT_0001d834 << 1);
+    iVar14 = update_object_distance_band((int)DAT_0001bdac,DAT_0001d834 << 1);
     if (iVar14 != 0) {
-      FUN_00003ea0(DAT_0001bdac);
+      shade_object_faces(DAT_0001bdac);
     }
     (&DAT_0001c9dc)[DAT_0001c1d4] = DAT_0001bdac;
   }
@@ -8206,9 +8450,9 @@ LAB_00006964:
   DAT_0001c1c4 = 0;
   DAT_0001c1c0 = DAT_0001c1d4._2_2_;
   FUN_0000555a(&DAT_0001b5a4,&DAT_0001b734);
-  FUN_00005832((int *)&DAT_0001c1e4,0x1c1c4);
+  dispatch_overlap_collisions((int *)&DAT_0001c1e4,0x1c1c4);
   FUN_0001377a();
-  FUN_000058ec();
+  build_visible_object_list();
   if (DAT_0001b826 == 1) {
     sVar9 = DAT_0001b73e;
     if (_DAT_00020ae4 != 0) {
@@ -8218,7 +8462,7 @@ LAB_00006964:
   }
   FUN_0000ac72();
   if (_DAT_0001daa2 != 0) {
-    FUN_00002e12();
+    noop_stub_2e12();
     _DAT_0001daa2 = 0;
   }
   if (DAT_0001b826 != 1) {
@@ -8278,14 +8522,14 @@ LAB_00006964:
       if (sVar8 != 0) {
         (**(code **)(DAT_0001b5a0 + 0x2c2))();
       }
-      FUN_00001094();
+      unlock_session_buffers();
       _DAT_00020ae4 = 1;
       (**(code **)(DAT_0001b5a0 + 0x26a))();
       bVar15 = _DAT_00020ae4 == 0;
       _DAT_00020ae4 = 0;
-      FUN_00000ea0();
-      FUN_00000f92();
-      FUN_00000e5a();
+      allocate_session_buffers();
+      lock_session_buffers();
+      lock_overlay_buffers();
       if (sVar8 != 0) {
         (**(code **)(DAT_0001b5a0 + 0x2c2))();
       }
@@ -8355,7 +8599,11 @@ LAB_00006964:
 
 
 
-void FUN_00006e74(int param_1)
+/* Original: FUN_00006e74; source: Pacific Conflict.c. Recovered name: reset_span_row_lists [STRONG INFERENCE] (iteration 248).
+ * Ghidra C reviewed (function at overlay offset 0x6e74).
+ * Arg: device slot (1..3) or 0 for all. For each locked span buffer DAT_0001b778[i] (set by lock_session_buffers) selected by the argument: one 8-byte run per view row (DAT_0001b828 rows): (0, 1, view width DAT_0001b82a, background colour DAT_0001daa0) - each row starts as a single full-width background span that the span fillers later split. Called first by update_view_clip_bounds. Complete Ghidra C.
+ */
+void reset_span_row_lists /* Original: FUN_00006e74 */ (int param_1)
 
 {
   int iVar1;
@@ -8386,7 +8634,11 @@ void FUN_00006e74(int param_1)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00006ece(void)
+/* Original: FUN_00006ece; source: Pacific Conflict.c. Recovered name: clear_flag_00020ae4 [PROVEN] (iteration 248).
+ * Ghidra C reviewed (function at overlay offset 0x6ece).
+ * _DAT_00020ae4 = 0 (the same word update_view_clip_bounds clears; meaning [UNKNOWN]). Complete Ghidra C.
+ */
+void clear_flag_00020ae4 /* Original: FUN_00006ece */ (void)
 
 {
   _DAT_00020ae4 = 0;
@@ -8397,12 +8649,16 @@ void FUN_00006ece(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00006ed6(void)
+/* Original: FUN_00006ed6; source: Pacific Conflict.c. Recovered name: update_view_clip_bounds [STRONG INFERENCE] (iteration 235).
+ * Ghidra C reviewed (function at overlay offset 0x6ed6).
+ * Host hook A5-0x109e (redraw callback) and called by lock_session_buffers. FUN_00006e74(0); _DAT_0001daa2 = 1; half view height DAT_00020ae8 = DAT_0001b828 / 2 (rounded toward zero) and DAT_00020ae6 = DAT_0001b828; unless the view mode DAT_0001d858 is 1 or 8 or host +0xa2 is 0, both are reduced by 20 and DAT_00020ae2 = 4; clears _DAT_00020ae4 / _DAT_00020ae0; picks DAT_00020b28 / -b26 from the tables at DAT_00020b14 / DAT_00020afc (index DAT_00020af4 in view mode 6, else entry 0); DAT_0001da8a = 0; the polygon clip y-max DAT_0001b73e = DAT_00020ae8 (see clip_polygon_y_max). Complete Ghidra C.
+ */
+void update_view_clip_bounds /* Original: FUN_00006ed6 */ (void)
 
 {
   short sVar1;
   
-  FUN_00006e74(0);
+  reset_span_row_lists(0);
   _DAT_0001daa2 = 1;
   DAT_0001da8c = 0;
   sVar1 = DAT_0001b828;
@@ -8465,7 +8721,11 @@ void reset_distance_base_globals(void) /* Original: FUN_00006fb8 */
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00006ff6(void)
+/* Original: FUN_00006ff6; source: Pacific Conflict.c. Recovered name: configure_renderer_for_display [STRONG INFERENCE] (iteration 237).
+ * Ghidra C reviewed (function at overlay offset 0x6ff6).
+ * Host hook A5-0x10a2 (called by layout_game_window_and_view). Reads the host display globals through DAT_0001b5a0 (= A5-0x1388): view height DAT_0001b828 = +0x18 (A5-0x1370), view width DAT_0001b82a = +0x16 (A5-0x1372), +0x12 / +0x14 (A5-0x1376 / -0x1374); half sizes DAT_00020b2c / DAT_00020b2a, a 16.16 centre value DAT_00020af0, and 3/4 of the half width as the default horizon row (DAT_00020afc, -b14, -b26, -b28). When the pixel depth +0xe (A5-0x137a: 1, 4 or 8) or the multi-monitor flag +0xb4 (A5-0x12d4) changed, selects depth-specific renderer routines and tables (depth 8: FUN_00001300 and one set of addresses, depth 4: FUN_0000131c and another, depth 1: host +0x276 and a third), records the new depth / flag in DAT_0001b826 / DAT_0001b824, copies host +0x34 / +0x38, builds the object tables once (init_mission_object_tables) and, at depth 1, patches the templates (overlay_patch_template_u16_pair(0x195)). NOTE: older comments in this file that read +0xe as a "mission mode" refer to this pixel depth (iteration 237 correction). Header from the first part of the Ghidra C.
+ */
+void configure_renderer_for_display /* Original: FUN_00006ff6 */ (void)
 
 {
   byte *pbVar1;
@@ -8497,7 +8757,7 @@ void FUN_00006ff6(void)
   if ((DAT_0001b826 != *(short *)(DAT_0001b5a0 + 0xe)) ||
      (DAT_0001b824 != *(short *)(DAT_0001b5a0 + 0xb4))) {
     if (*(short *)(DAT_0001b5a0 + 0xe) == 8) {
-      FUN_00001300();
+      init_depth8_colour_state();
       DAT_00020ac0 = 0x3794;
       _DAT_00020abc = 0x3794;
       _DAT_00020ab8 = 0x3794;
@@ -8510,7 +8770,7 @@ void FUN_00006ff6(void)
       DAT_00020ab4 = 0xa14e;
     }
     if (*(short *)(DAT_0001b5a0 + 0xe) == 4) {
-      FUN_0000131c();
+      init_depth4_colour_state();
       DAT_00020ac0 = 0x329a;
       _DAT_00020abc = 0x3446;
       _DAT_00020ab8 = 0x35e8;
@@ -8589,7 +8849,7 @@ void FUN_00006ff6(void)
   DAT_00020aea = (undefined2)(iVar5 >> 1);
   DAT_0001b740._0_2_ = DAT_0001b73e;
   DAT_00020ae8 = DAT_0001b73e;
-  FUN_00006ed6();
+  update_view_clip_bounds();
   return;
 }
 
@@ -8597,7 +8857,11 @@ void FUN_00006ff6(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_00007310(int param_1)
+/* Original: FUN_00007310; source: Pacific Conflict.c. Recovered name: begin_flight_for_rank [STRONG INFERENCE] (iteration 234).
+ * Ghidra C reviewed (function at overlay offset 0x7310).
+ * Host hook A5-0x106e, called at the start of run_flight_session with the pilot rank. DAT_0001b878 = DAT_0001b876 = word table DAT_0001b2b4[rank] (a rank-dependent parameter, e.g. difficulty [HYPOTHESIS]); when host +0xa4 is 0, player +0x32 = 0xe772; when +0xe == 1, FUN_00004210 and DAT_0001da88 = **(host +0x88); clears _DAT_00024d2c / -d2e and DAT_0001b858; when _DAT_00024d34, copies host words +0x33e / +0x340 into DAT_00024d32 / -d30. Complete Ghidra C.
+ */
+void begin_flight_for_rank /* Original: FUN_00007310 */ (int param_1)
 
 {
   DAT_0001b878 = *(undefined2 *)(&DAT_0001b2b4 + param_1 * 2);
@@ -8606,7 +8870,7 @@ void FUN_00007310(int param_1)
     *(undefined4 *)(DAT_0001b738 + 0x32) = 0xe772;
   }
   if (*(short *)(DAT_0001b5a0 + 0xe) == 1) {
-    FUN_00004210();
+    refresh_object_colours_for_depth();
     DAT_0001da88 = **(undefined2 **)(DAT_0001b5a0 + 0x88);
   }
   _DAT_00024d2c = 0;
@@ -8621,7 +8885,11 @@ void FUN_00007310(int param_1)
 
 
 
-void FUN_0000739a(void)
+/* Original: FUN_0000739a; source: Pacific Conflict.c. Recovered name: copy_player_pose_to_camera [STRONG INFERENCE] (iteration 234).
+ * Ghidra C reviewed (function at overlay offset 0x739a).
+ * Camera globals from the player object (*DAT_0001b738): position DAT_0001d838 / -834 / -830 = x / y / z (+0x18 / +0x1c / +0x20); angles DAT_0001d810 / -80e / -80c = negated player angles (& 0x3fff, 0x4000 per turn); DAT_0001d808 = type-record +0x44 - player +0x626 (& 0x3fff). DAT_0001d838 / -834 / -830 are the camera position that compute_camera_abs_metric measures against. Complete Ghidra C.
+ */
+void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
 
 {
   DAT_0001d838 = *(undefined4 *)(*DAT_0001b738 + 0x18);
@@ -8639,7 +8907,11 @@ void FUN_0000739a(void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-uint FUN_0000740a(int param_1,int param_2)
+/* Original: FUN_0000740a; source: Pacific Conflict.c. Recovered name: process_flight_input_and_outcome [STRONG INFERENCE] (iteration 236).
+ * Ghidra C reviewed (function at overlay offset 0x740a).
+ * Host hook A5-0x106a, called by run_flight_session as (char, event kind) for key events (kind 3 = keyDown, 4 = keyUp) and (0, 0) between frames; a non-zero result ends the flight and is the outcome code that run_flight_session passes to conclude_mission. Outline from the Ghidra C (Pacific Conflict.decomp.c lines 8746..9545): host mode +0x98 / view modes DAT_0001d858 7..9 gate early exits; in modes 8 / 9 only Esc / quote / backquote end the flight (result 3). Key switch (param_1, characters): 0x1c / 0x1d and 0x1e / 0x1f (the arrow keys) step the view angles DAT_00024cfc by 0x800 and DAT_00024cf8 by 0x540; + / = and - / _ (throttle up / down?), . > Z z and / ? X x (paired controls), digits 0..9 (view or instrument selection; 5 stores DAT_00020b2a into host +0x33e), letters A B C E F G J M R T V (and lower case), P / p -> result 4 (the host shows the Paused dialog), Esc / backquote / tilde -> result 3; space on keyUp. After the keys: view offsets saved to host +0x33e / +0x340 / +0x342; then the outcome logic: probe_nearest_facility_kind (0x100 / 0x200 near facilities) combined with the host status word +0xd4 (1, 3, 4, 5), +0xce and the player state builds codes such as 0x201 / 0x10a; on landing the fuel % and bomb count are written back to host +0xb6 / +0xb8 (see load_player_fuel_and_bombs); a final switch (1..9) handles the remaining codes. Exact per-key actions and outcome codes are not fully decoded [STRONG INFERENCE role, HYPOTHESIS for the individual key meanings].
+ */
+uint process_flight_input_and_outcome /* Original: FUN_0000740a */ (int param_1,int param_2)
 
 {
   uint *puVar1;
@@ -8680,7 +8952,7 @@ LAB_0000744c:
       else {
         DAT_0001d858 = 9;
       }
-      FUN_00006ed6();
+      update_view_clip_bounds();
       DAT_0001b884 = 0;
     }
   }
@@ -8699,7 +8971,7 @@ LAB_0000744c:
          (iVar5 = (**(code **)(DAT_0001b5a0 + 0x2b6))(0), iVar5 != 0)) {
         (**(code **)(DAT_0001b5a0 + 0x2be))(0);
       }
-      FUN_00006ed6();
+      update_view_clip_bounds();
       DAT_0001d858 = 8;
       DAT_0001b870 = 3;
       DAT_0001b86e = 0x1e;
@@ -8713,7 +8985,7 @@ LAB_0000744c:
       DAT_0001d830 = *(int *)(*DAT_0001b738 + 0x20) + (int)local_6;
     }
     if ((DAT_0001b86c == 0) && (DAT_0001b86e == 0)) {
-      FUN_00008784((uint)(*(char *)((int)DAT_0001b738 + 0x63e) == '\0'));
+      set_state_word_1b86c((uint)(*(char *)((int)DAT_0001b738 + 0x63e) == '\0'));
     }
   }
   if ((DAT_0001b86c != 0) && (DAT_0001b86e == 0)) {
@@ -8743,7 +9015,7 @@ switchD_00007684_caseD_1b:
        ((param_1 != 0x3f && (param_1 != 0x2f)))))))) goto switchD_00007684_caseD_a;
   switch(param_1) {
   case 9:
-    FUN_00017736();
+    cycle_view_distance();
     break;
   case 0x13:
     *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;
@@ -8983,7 +9255,7 @@ LAB_00007b9e:
       FUN_000137da(*piVar14);
     }
 LAB_00007ba8:
-    FUN_00006ed6();
+    update_view_clip_bounds();
     break;
   case 0x46:
   case 0x66:
@@ -9045,7 +9317,7 @@ LAB_00007ba8:
   case 0x54:
   case 0x74:
     if (DAT_0001d858 == 6) goto switchD_00007684_caseD_56;
-    iVar5 = FUN_00000bea(&DAT_0001d824);
+    iVar5 = point_near_camera_or_type80_object(&DAT_0001d824);
     if (iVar5 != 0) {
       DAT_0001d858 = 6;
       DAT_0001d838 = DAT_0001d824;
@@ -9271,7 +9543,7 @@ LAB_0000824c:
           }
         }
         else {
-          iVar5 = FUN_00000334();
+          iVar5 = any_mission_kills_recorded();
           if (iVar5 == 0) goto LAB_00008324;
         }
       }
@@ -9296,7 +9568,7 @@ LAB_00008324:
   switch(DAT_0001d858) {
   case 1:
   case 2:
-    FUN_0000739a();
+    copy_player_pose_to_camera();
     piVar14 = DAT_0001b738;
     if ((DAT_0001d858 == 1) && ((DAT_00024cf8 != 0 || (DAT_00024cfc != 0)))) {
       DAT_0001d858 = 2;
@@ -9305,7 +9577,7 @@ LAB_00008324:
         *puVar1 = *puVar1 | 0x40;
         FUN_000137da(*piVar14);
       }
-      FUN_00006ed6();
+      update_view_clip_bounds();
     }
     if (DAT_0001d858 == 2) {
       if (*(short *)(DAT_0001b5a0 + 0xa0) == 0) {
@@ -9336,7 +9608,7 @@ LAB_00008324:
           *puVar1 = *puVar1 | 0x40;
           FUN_000137da(*piVar14);
         }
-        FUN_00006ed6();
+        update_view_clip_bounds();
       }
     }
     break;
@@ -9444,7 +9716,11 @@ switchD_0000833a_caseD_3:
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-uint FUN_0000823e(void)
+/* Original: FUN_0000823e; source: Pacific Conflict.c. Recovered name: process_flight_input_tail [STRONG INFERENCE] (iteration 248).
+ * Ghidra C reviewed (function at overlay offset 0x823e).
+ * Not a real function: a piece of process_flight_input_and_outcome (0x740a) that Ghidra split at 0x823e. With registers / flags from the preceding code it sets host +0xd4 = 3 on the Z flag, mirrors the camera pitch DAT_0001d810 when it lies between 0x1000 and 0x3000 (turning the heading DAT_0001d80e by half a turn), clears player +0x641 / _DAT_0001b872 / DAT_00024cf6 and flags a view change (_DAT_0001d856) when the view mode DAT_0001d858 changed; returns D6 | 8. Name kept for traceability.
+ */
+uint process_flight_input_tail /* Original: FUN_0000823e */ (void)
 
 {
   uint unaff_D6;
@@ -9478,7 +9754,11 @@ uint FUN_0000823e(void)
 
 
 
-void FUN_00008784(int param_1)
+/* Original: FUN_00008784; source: Pacific Conflict.c. Recovered name: set_state_word_1b86c [HYPOTHESIS name] (iteration 248).
+ * Ghidra C reviewed (function at overlay offset 0x8784).
+ * DAT_0001b86c = 2 when the argument is 0, else 1. Called by process_flight_input_and_outcome with (player +0x63e == 0). Meaning of DAT_0001b86c [UNKNOWN]. Complete Ghidra C.
+ */
+void set_state_word_1b86c /* Original: FUN_00008784 */ (int param_1)
 
 {
   if (param_1 == 0) {
@@ -9843,7 +10123,7 @@ void FUN_00008ff4(void)
     *puVar1 = *puVar1 & 0xffffffbf;
     FUN_000137da(*piVar4);
   }
-  FUN_00006ed6();
+  update_view_clip_bounds();
   piVar4 = (int *)((int)DAT_0001b738 + *(short *)((int)DAT_0001b738 + 0x612) * 0x14 + 0x36);
   local_a = 0;
   local_e = 0;
@@ -10442,7 +10722,7 @@ void FUN_00009b8c(undefined2 *param_1)
       *(undefined1 *)(DAT_0001d864 + uVar4) = 1;
     }
     else {
-      iVar2 = FUN_0000159e((int)param_1);
+      iVar2 = assign_face_colour((int)param_1);
       if (iVar2 != 0) {
         return;
       }
@@ -10748,7 +11028,7 @@ undefined4 FUN_0000a07e(int param_1)
   
   uVar1 = DAT_0001b73e;
   DAT_0001b73e = DAT_0001b740._0_2_;
-  iVar2 = FUN_0000b3aa((int *)&DAT_00025252,param_1,&DAT_00024df2);
+  iVar2 = clip_polygon_y_max((int *)&DAT_00025252,param_1,&DAT_00024df2);
   DAT_0001b73e = uVar1;
   if (iVar2 == 0) {
     uVar3 = 0;
@@ -10810,15 +11090,15 @@ undefined4 FUN_0000a16e(undefined2 *param_1)
   int iVar1;
   short sVar2;
   
-  iVar1 = FUN_0000b190(&DAT_00024df2,(int)DAT_00025b1a,(int *)&DAT_00025252);
+  iVar1 = clip_polygon_x_min(&DAT_00024df2,(int)DAT_00025b1a,(int *)&DAT_00025252);
   if ((short)iVar1 != 0) {
-    iVar1 = FUN_0000b242((int *)&DAT_00025252,(int)(short)iVar1,&DAT_00024df2);
+    iVar1 = clip_polygon_x_max((int *)&DAT_00025252,(int)(short)iVar1,&DAT_00024df2);
     if ((short)iVar1 != 0) {
-      iVar1 = FUN_0000b2f4(&DAT_00024df2,(int)(short)iVar1,(int *)&DAT_00025252);
+      iVar1 = clip_polygon_y_min(&DAT_00024df2,(int)(short)iVar1,(int *)&DAT_00025252);
       sVar2 = (short)iVar1;
       if ((sVar2 != 0) &&
          ((param_1 != DAT_0001bda8 || (iVar1 = FUN_0000a07e((int)sVar2), iVar1 != 0)))) {
-        iVar1 = FUN_0000b3aa((int *)&DAT_00025252,(int)sVar2,&DAT_00024df2);
+        iVar1 = clip_polygon_y_max((int *)&DAT_00025252,(int)sVar2,&DAT_00024df2);
         DAT_00025b1a = (short)iVar1;
         if (DAT_00025b1a != 0) {
           FUN_00009b8c(param_1);
@@ -10838,15 +11118,15 @@ undefined4 FUN_0000a220(int param_1)
   int iVar1;
   short sVar2;
   
-  iVar1 = FUN_0000b190(&DAT_00024df2,(int)DAT_00025b1a,(int *)&DAT_00025252);
+  iVar1 = clip_polygon_x_min(&DAT_00024df2,(int)DAT_00025b1a,(int *)&DAT_00025252);
   if ((short)iVar1 != 0) {
-    iVar1 = FUN_0000b242((int *)&DAT_00025252,(int)(short)iVar1,&DAT_00024df2);
+    iVar1 = clip_polygon_x_max((int *)&DAT_00025252,(int)(short)iVar1,&DAT_00024df2);
     if ((short)iVar1 != 0) {
-      iVar1 = FUN_0000b2f4(&DAT_00024df2,(int)(short)iVar1,(int *)&DAT_00025252);
+      iVar1 = clip_polygon_y_min(&DAT_00024df2,(int)(short)iVar1,(int *)&DAT_00025252);
       sVar2 = (short)iVar1;
       if ((sVar2 != 0) &&
          ((param_1 != DAT_0001bda8 || (iVar1 = FUN_0000a07e((int)sVar2), iVar1 != 0)))) {
-        iVar1 = FUN_0000b3aa((int *)&DAT_00025252,(int)sVar2,&DAT_00024df2);
+        iVar1 = clip_polygon_y_max((int *)&DAT_00025252,(int)sVar2,&DAT_00024df2);
         DAT_00025b1a = (short)iVar1;
         if (DAT_00025b1a != 0) {
           (**(code **)(DAT_0001b5a0 + 0x7c))
@@ -11191,8 +11471,8 @@ undefined4 FUN_0000a75e(void)
       if (((DAT_00025b24[6] & 1U) == 0) || (sVar13 == 0)) {
         transform_vecs12_by_matrix3(1,(int)auStack_28,(int)auStack_28,(short *)&DAT_0001d72c);
         if ((sVar14 != 0) &&
-           (iVar20 = FUN_00003da8((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10)), iVar20 != 0)) {
-          FUN_00003ea0(DAT_00025b24);
+           (iVar20 = update_object_distance_band((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10)), iVar20 != 0)) {
+          shade_object_faces(DAT_00025b24);
         }
       }
       else {
@@ -11204,9 +11484,9 @@ undefined4 FUN_0000a75e(void)
         DAT_0001bd8a = local_16;
         DAT_0001bd88 = local_12;
         if (sVar14 != 0) {
-          FUN_00003da8((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10));
+          update_object_distance_band((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10));
         }
-        FUN_00003ea0(DAT_00025b24);
+        shade_object_faces(DAT_00025b24);
         DAT_0001bd88 = uVar4;
         DAT_0001bd8a = uVar5;
         DAT_0001bd8c = uVar6;
@@ -11221,8 +11501,8 @@ undefined4 FUN_0000a75e(void)
     }
   }
   if ((sVar14 != 0) &&
-     (iVar20 = FUN_00003da8((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10)), iVar20 != 0)) {
-    FUN_00003ea0(DAT_00025b24);
+     (iVar20 = update_object_distance_band((int)DAT_00025b24,*(int *)(DAT_00025b24 + 0x10)), iVar20 != 0)) {
+    shade_object_faces(DAT_00025b24);
   }
 LAB_0000aa5e:
   DAT_00025b20 = *(int *)(DAT_00025b24 + 0x4c);
@@ -11579,7 +11859,11 @@ LAB_0000b166:
 
 
 
-int FUN_0000b190(int *param_1,int param_2,int *param_3)
+/* Original: FUN_0000b190; source: Pacific Conflict.c. Recovered name: clip_polygon_x_min [PROVEN] (iteration 230).
+ * Ghidra C reviewed (function at overlay offset 0xb190).
+ * Sutherland-Hodgman clip of a polygon (array of (x, y) long pairs, count) against one edge: keep x >= DAT_00020aee. For each edge from the previous vertex to the current one it emits the current vertex when inside, the intersection point when the edge crosses the boundary (interpolated with a 32 x 32 -> 64-bit multiply and divide), or both when entering; returns the output vertex count (bytes / 8) [PROVEN, complete Ghidra C]. Used in the order x-min, x-max, y-min, y-max by collect_map_features (and by other polygon paths, e.g. Pacific Conflict.c 6645, 10837).
+ */
+int clip_polygon_x_min /* Original: FUN_0000b190 */ (int *param_1,int param_2,int *param_3)
 
 {
   int iVar1;
@@ -11642,7 +11926,11 @@ LAB_0000b228:
 
 
 
-int FUN_0000b242(int *param_1,int param_2,int *param_3)
+/* Original: FUN_0000b242; source: Pacific Conflict.c. Recovered name: clip_polygon_x_max [PROVEN] (iteration 230).
+ * Ghidra C reviewed (function at overlay offset 0xb242).
+ * Sutherland-Hodgman clip of a polygon (array of (x, y) long pairs, count) against one edge: keep x <= DAT_00020aec. For each edge from the previous vertex to the current one it emits the current vertex when inside, the intersection point when the edge crosses the boundary (interpolated with a 32 x 32 -> 64-bit multiply and divide), or both when entering; returns the output vertex count (bytes / 8) [PROVEN, complete Ghidra C]. Used in the order x-min, x-max, y-min, y-max by collect_map_features (and by other polygon paths, e.g. Pacific Conflict.c 6645, 10837).
+ */
+int clip_polygon_x_max /* Original: FUN_0000b242 */ (int *param_1,int param_2,int *param_3)
 
 {
   int iVar1;
@@ -11705,7 +11993,11 @@ LAB_0000b2da:
 
 
 
-int FUN_0000b2f4(int *param_1,int param_2,int *param_3)
+/* Original: FUN_0000b2f4; source: Pacific Conflict.c. Recovered name: clip_polygon_y_min [STRONG INFERENCE] (iteration 230).
+ * Ghidra C reviewed (function at overlay offset 0xb2f4).
+ * Sutherland-Hodgman clip of a polygon (array of (x, y) long pairs, count) against one edge: keep the second coordinate >= DAT_00020aea. For each edge from the previous vertex to the current one it emits the current vertex when inside, the intersection point when the edge crosses the boundary (interpolated with a 32 x 32 -> 64-bit multiply and divide), or both when entering; returns the output vertex count (bytes / 8) [PROVEN, complete Ghidra C]. Used in the order x-min, x-max, y-min, y-max by collect_map_features (and by other polygon paths, e.g. Pacific Conflict.c 6645, 10837).
+ */
+int clip_polygon_y_min /* Original: FUN_0000b2f4 */ (int *param_1,int param_2,int *param_3)
 
 {
   longlong lVar1;
@@ -11759,7 +12051,11 @@ LAB_0000b390:
 
 
 
-int FUN_0000b3aa(int *param_1,int param_2,int *param_3)
+/* Original: FUN_0000b3aa; source: Pacific Conflict.c. Recovered name: clip_polygon_y_max [STRONG INFERENCE] (iteration 230).
+ * Ghidra C reviewed (function at overlay offset 0xb3aa).
+ * Sutherland-Hodgman clip of a polygon (array of (x, y) long pairs, count) against one edge: keep the second coordinate <= DAT_0001b73e. For each edge from the previous vertex to the current one it emits the current vertex when inside, the intersection point when the edge crosses the boundary (interpolated with a 32 x 32 -> 64-bit multiply and divide), or both when entering; returns the output vertex count (bytes / 8) [PROVEN, complete Ghidra C]. Used in the order x-min, x-max, y-min, y-max by collect_map_features (and by other polygon paths, e.g. Pacific Conflict.c 6645, 10837).
+ */
+int clip_polygon_y_max /* Original: FUN_0000b3aa */ (int *param_1,int param_2,int *param_3)
 
 {
   longlong lVar1;
@@ -13373,7 +13669,7 @@ void FUN_0000d27c(void)
 {
   _DAT_00025ffc = 1;
   if (*(short *)(DAT_0001b5a0 + 0x9e) != 0) {
-    FUN_00006ece();
+    clear_flag_00020ae4();
   }
   return;
 }
@@ -13393,7 +13689,7 @@ void FUN_0000d298(undefined4 param_1,undefined4 param_2,uint param_3,undefined4 
   
   iVar2 = param_6;
   uVar1 = param_3;
-  FUN_00006e74(param_6);
+  reset_span_row_lists(param_6);
   puVar3 = heap_alloc(0x2000);
   uVar6 = (uint)(0x2000 / (short)(DAT_0001b82a / (8 / DAT_0001b826)));
   uVar5 = uVar1;
@@ -16222,7 +16518,7 @@ LAB_0000f47c:
         *puVar2 = *puVar2 & 0xffffffbf;
         FUN_000137da(*piVar4);
       }
-      psVar11 = (short *)FUN_00006ed6();
+      psVar11 = (short *)update_view_clip_bounds();
     }
   }
   /*
@@ -17182,7 +17478,7 @@ LAB_00010700:
     if (uVar8 == 0) {
       if (((*(byte *)(param_1 + 0x1a1) & 4) != 0) && ((*(byte *)((int)param_1 + 0x686) & 4) == 0)) {
         if (param_1 == DAT_0001b738) {
-          FUN_00008784((uint)((*(byte *)(param_1 + 0x1a1) & 8) == 0));
+          set_state_word_1b86c((uint)((*(byte *)(param_1 + 0x1a1) & 8) == 0));
           if (DAT_0001b870 == 0) {
             *(undefined2 *)(DAT_0001b5a0 + 0x98) = 2;
           }
@@ -18957,7 +19253,7 @@ undefined4 FUN_00012296(int *param_1)
         *(char *)(iVar6 + 0xd) = (char)((int)((uint)*(byte *)(iVar6 + 0xd) * 6) >> 3);
         *(char *)(iVar6 + 0xe) = (char)((int)((uint)*(byte *)(iVar6 + 0xe) * 6) >> 3);
         if (iVar6 == *(int *)(DAT_0001da7c + (uint)*(byte *)(iVar6 + 0xf) * 4)) {
-          FUN_00001548(iVar6);
+          write_face_palette_slot(iVar6);
         }
         else {
           *(undefined1 *)(iVar6 + 0xf) = 0;
@@ -19189,7 +19485,7 @@ LAB_0001258c:
           *(char *)(iVar7 + 0xd) = (char)((int)((uint)*(byte *)(iVar7 + 0xd) * 7) >> 3);
           *(char *)(iVar7 + 0xe) = (char)((int)((uint)*(byte *)(iVar7 + 0xe) * 7) >> 3);
           if (iVar7 == *(int *)(DAT_0001da7c + (uint)*(byte *)(iVar7 + 0xf) * 4)) {
-            FUN_00001548(iVar7);
+            write_face_palette_slot(iVar7);
           }
           else {
             *(undefined1 *)(iVar7 + 0xf) = 0;
@@ -19525,7 +19821,7 @@ LAB_00012c74:
       }
       FUN_00011db4((int)pcVar1,iVar4);
       if (in_stack_00000014 != 0) {
-        FUN_00000488((int)pcVar1);
+        tally_destroyed_entity((int)pcVar1);
       }
       dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
     }
@@ -20797,7 +21093,7 @@ void FUN_0001443a(int param_1)
         pbVar1 = (byte *)(psVar16 + (int)sVar13 + sVar3 * 3);
         iVar10 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
         *local_426 = iVar10;
-        iVar10 = FUN_00003e02((int)pbVar1,iVar10);
+        iVar10 = update_record_distance_band((int)pbVar1,iVar10);
         if (iVar10 != 0) {
           iVar10 = sVar3 * 0x20 + iVar2;
           sVar3 = *(short *)(pbVar1 + 4);
@@ -20806,7 +21102,7 @@ void FUN_0001443a(int param_1)
           *(char *)(iVar10 + 0xd) = (char)(sVar3 * 0x84 + iVar19 * (uint)pbVar1[1] >> 5);
           *(char *)(iVar10 + 0xe) = (char)(sVar3 * 0xa8 + (uint)pbVar1[2] * iVar19 >> 5);
           if (iVar10 == *(int *)(DAT_0001da7c + (uint)*(byte *)(iVar10 + 0xf) * 4)) {
-            FUN_00001548(iVar10);
+            write_face_palette_slot(iVar10);
           }
           else {
             *(undefined1 *)(iVar10 + 0xf) = 0;
@@ -21118,7 +21414,7 @@ void FUN_00014af2(int param_1)
           }
         }
         if (*psVar1 != 0) {
-          FUN_00001254(s_____Deactivating_Fractal__but_st_00014aba,unaff_D2,unaff_D3,unaff_A2,
+          overlay_printf(s_____Deactivating_Fractal__but_st_00014aba,unaff_D2,unaff_D3,unaff_A2,
                        unaff_A3,unaff_A4);
         }
         heap_free_coalesce((int)psVar1);
@@ -21247,7 +21543,7 @@ void FUN_00014d86(undefined4 *param_1)
     if (CONCAT22(extraout_D0u,uVar4) == 0) {
       FUN_00014bea((int)pcVar1,0,0,0,0,1);
       if (*(short *)((int)param_1 + 0x4e) != 0) {
-        FUN_00000488((int)pcVar1);
+        tally_destroyed_entity((int)pcVar1);
       }
       if (*(short *)param_1[1] == 0x15) {
         iVar3 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
@@ -21808,7 +22104,7 @@ LAB_00015a4a:
       } while (sVar5 < *(short *)(param_1 + 0x3a));
     }
   }
-  FUN_00003ea0(param_1);
+  shade_object_faces(param_1);
   return uStack_333a;
 }
 
@@ -21956,7 +22252,7 @@ void FUN_00015dc8(int *param_1)
     }
     FUN_00011db4((int)pcVar2,iVar3);
     if (*(short *)((int)param_1 + 0x36) != 0) {
-      FUN_00000488((int)pcVar2);
+      tally_destroyed_entity((int)pcVar2);
     }
     dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar2);
     retire_entity( /* Original: FUN_000051ec */iVar1);
@@ -22264,7 +22560,7 @@ LAB_00016358:
     }
     else {
       if (DAT_0001da8a == 0) {
-        iVar4 = FUN_0000159e(iVar12);
+        iVar4 = assign_face_colour(iVar12);
         if (iVar4 != 0) {
           return;
         }
@@ -23403,7 +23699,11 @@ void FUN_000176b2(int param_1)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_0001771a(int param_1)
+/* Original: FUN_0001771a; source: Pacific Conflict.c. Recovered name: set_view_distance [STRONG INFERENCE] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x1771a).
+ * Arg: range. _DAT_0002666e = 1 (changed), DAT_0002666a = range, DAT_00026666 = 2 * range. Set to 0xc15c0 by overlay_initialise; cycled by FUN_00017736 (0xc15c0 -> 0x26ac0 -> 0xce40 -> 0xc15c0), which the Tab key (character 9) calls in process_flight_input_and_outcome - a visibility / detail range toggle [STRONG INFERENCE]. Complete Ghidra C.
+ */
+void set_view_distance /* Original: FUN_0001771a */ (int param_1)
 
 {
   _DAT_0002666e = 1;
@@ -23414,7 +23714,11 @@ void FUN_0001771a(int param_1)
 
 
 
-void FUN_00017736(void)
+/* Original: FUN_00017736; source: Pacific Conflict.c. Recovered name: cycle_view_distance [STRONG INFERENCE] (iteration 244).
+ * Ghidra C reviewed (function at overlay offset 0x17736).
+ * Cycles the view distance: 0xc15c0 -> 0x26ac0, 0xce40 -> 0xc15c0, anything else -> 0xce40, through set_view_distance. Called for the Tab key by process_flight_input_and_outcome. Complete Ghidra C.
+ */
+void cycle_view_distance /* Original: FUN_00017736 */ (void)
 
 {
   undefined *puVar1;
@@ -23428,7 +23732,7 @@ void FUN_00017736(void)
   else {
     puVar1 = (undefined *)0xce40;
   }
-  FUN_0001771a((int)puVar1);
+  set_view_distance((int)puVar1);
   return;
 }
 
@@ -23916,14 +24220,14 @@ int * FUN_00018040(int param_1,int param_2)
   int *piVar2;
   undefined2 *puVar3;
   
-  piVar2 = (int *)FUN_00001b4c();
+  piVar2 = (int *)heap_zero_payload_tail();
   *piVar2 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x130040;
   piVar2[1] = *(int *)(&DAT_0001b524 + param_2 * 4);
   *(undefined2 *)((int)piVar2 + 0x32) = 10;
   piVar2[0xd] = DAT_0001b838 + 0x546;
   if (*(short *)(DAT_0001b5a0 + 0x90) == 7) {
-    puVar3 = (undefined2 *)FUN_00001b4c();
+    puVar3 = (undefined2 *)heap_zero_payload_tail();
     uVar1 = *(undefined2 *)((int)piVar2 + 0x32);
     DAT_00020adc = puVar3;
     puVar3[1] = uVar1;
@@ -25154,7 +25458,11 @@ undefined4 FUN_00019a54(undefined4 param_1,int param_2)
 
 
 
-int FUN_00019aa2(int param_1,int param_2,int param_3,int param_4,undefined2 param_5,
+/* Original: FUN_00019aa2; source: Pacific Conflict.c. Recovered name: spawn_camera_relative_object [STRONG INFERENCE] (iteration 242).
+ * Ghidra C reviewed (function at overlay offset 0x19aa2).
+ * Args: class 0..4, dx, dy, dz, three angles. spawn_mission_pool_object(pool DAT_00026784[class], camera position DAT_0001d838 / -834 / -830 + offset); on success the new object gets the angles (+0x20 / +0x22 / +0x24), the offset (+0x32 / +0x36 / +0x3a) and the class (+0x3e); returns it (0 on failure). Complete Ghidra C.
+ */
+int spawn_camera_relative_object /* Original: FUN_00019aa2 */ (int param_1,int param_2,int param_3,int param_4,undefined2 param_5,
                 undefined2 param_6,undefined2 param_7)
 
 {
@@ -25180,7 +25488,11 @@ int FUN_00019aa2(int param_1,int param_2,int param_3,int param_4,undefined2 para
 
 
 
-void FUN_00019b30(int *param_1)
+/* Original: FUN_00019b30; source: Pacific Conflict.c. Recovered name: follow_camera_offset [STRONG INFERENCE] (iteration 242).
+ * Ghidra C reviewed (function at overlay offset 0x19b30).
+ * Per-object update for camera-relative objects: velocity +8 / +0x10 = (camera + stored offset) - position in x / z; +0xc = camera y - position y only while the camera is above offset y - 10000, else 0 - so the object keeps its place around the camera (horizontally always, vertically only near it). Complete Ghidra C.
+ */
+void follow_camera_offset /* Original: FUN_00019b30 */ (int *param_1)
 
 {
   int iVar1;

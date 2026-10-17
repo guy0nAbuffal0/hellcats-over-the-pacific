@@ -40,7 +40,11 @@ int abs_long /* Original: FUN_0000001e */ (int param_1)
 
 
 
-void FUN_00000038(undefined4 *param_1,undefined4 param_2)
+/* Original: FUN_00000038; source: ID02.c. Recovered name: ansi_div [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x38.
+ * div(): stores {numer / denom, numer % denom} (16-bit quotient and remainder, DIVS) through the result pointer +8 (struct return). Complete Ghidra C.
+ */
+void ansi_div /* Original: FUN_00000038 */ (undefined4 *param_1,undefined4 param_2)
 
 {
   undefined4 local_8;
@@ -52,7 +56,11 @@ void FUN_00000038(undefined4 *param_1,undefined4 param_2)
 
 
 
-void FUN_00000066(undefined4 *param_1,undefined4 param_2,undefined4 param_3)
+/* Original: FUN_00000066; source: ID02.c. Recovered name: ansi_ldiv [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x66.
+ * ldiv(): result {quot, rem} from the long division helpers JT $5a / $62 (ID01 0x152 / 0x172) stored through the result pointer. Complete Ghidra C.
+ */
+void ansi_ldiv /* Original: FUN_00000066 */ (undefined4 *param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 uVar1;
@@ -68,7 +76,11 @@ void FUN_00000066(undefined4 *param_1,undefined4 param_2,undefined4 param_3)
 
 
 
-ushort FUN_0000009a(undefined4 param_1)
+/* Original: FUN_0000009a; source: ID02.c. Recovered name: ansi_isalnum [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x9a.
+ * C runtime ctype test: returns _ctype[c] & 0xd0, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+ushort ansi_isalnum /* Original: FUN_0000009a */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -78,7 +90,11 @@ ushort FUN_0000009a(undefined4 param_1)
 
 
 
-ushort FUN_000000b6(undefined4 param_1)
+/* Original: FUN_000000b6; source: ID02.c. Recovered name: ansi_isalpha [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0xb6.
+ * C runtime ctype test: returns _ctype[c] & 0xc0, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+ushort ansi_isalpha /* Original: FUN_000000b6 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -88,7 +104,11 @@ ushort FUN_000000b6(undefined4 param_1)
 
 
 
-byte FUN_000000d2(undefined4 param_1)
+/* Original: FUN_000000d2; source: ID02.c. Recovered name: ansi_iscntrl [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0xd2.
+ * C runtime ctype test: returns _ctype[c] & 0x03, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+byte ansi_iscntrl /* Original: FUN_000000d2 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -98,7 +118,11 @@ byte FUN_000000d2(undefined4 param_1)
 
 
 
-byte FUN_000000ee(undefined4 param_1)
+/* Original: FUN_000000ee; source: ID02.c. Recovered name: ansi_isdigit [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0xee.
+ * C runtime ctype test: returns _ctype[c] & 0x10, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+byte ansi_isdigit /* Original: FUN_000000ee */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -108,7 +132,11 @@ byte FUN_000000ee(undefined4 param_1)
 
 
 
-ushort FUN_0000010a(undefined4 param_1)
+/* Original: FUN_0000010a; source: ID02.c. Recovered name: ansi_isgraph [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x10a.
+ * C runtime ctype test: returns _ctype[c] & 0xd8, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+ushort ansi_isgraph /* Original: FUN_0000010a */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -118,7 +146,11 @@ ushort FUN_0000010a(undefined4 param_1)
 
 
 
-ushort FUN_00000126(undefined4 param_1)
+/* Original: FUN_00000126; source: ID02.c. Recovered name: ansi_islower [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x126.
+ * C runtime ctype test: returns _ctype[c] & 0x80, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+ushort ansi_islower /* Original: FUN_00000126 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -128,7 +160,11 @@ ushort FUN_00000126(undefined4 param_1)
 
 
 
-ushort FUN_00000142(undefined4 param_1)
+/* Original: FUN_00000142; source: ID02.c. Recovered name: ansi_isprint [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x142.
+ * C runtime ctype test: returns _ctype[c] & 0xdc, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+ushort ansi_isprint /* Original: FUN_00000142 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -138,7 +174,11 @@ ushort FUN_00000142(undefined4 param_1)
 
 
 
-byte FUN_0000015e(undefined4 param_1)
+/* Original: FUN_0000015e; source: ID02.c. Recovered name: ansi_ispunct [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x15e.
+ * C runtime ctype test: returns _ctype[c] & 0x08, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+byte ansi_ispunct /* Original: FUN_0000015e */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -148,7 +188,11 @@ byte FUN_0000015e(undefined4 param_1)
 
 
 
-byte FUN_0000017a(undefined4 param_1)
+/* Original: FUN_0000017a; source: ID02.c. Recovered name: ansi_isspace [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x17a.
+ * C runtime ctype test: returns _ctype[c] & 0x06, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+byte ansi_isspace /* Original: FUN_0000017a */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -158,7 +202,11 @@ byte FUN_0000017a(undefined4 param_1)
 
 
 
-byte FUN_00000196(undefined4 param_1)
+/* Original: FUN_00000196; source: ID02.c. Recovered name: ansi_isupper [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x196.
+ * C runtime ctype test: returns _ctype[c] & 0x40, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+byte ansi_isupper /* Original: FUN_00000196 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -168,7 +216,11 @@ byte FUN_00000196(undefined4 param_1)
 
 
 
-byte FUN_000001b2(undefined4 param_1)
+/* Original: FUN_000001b2; source: ID02.c. Recovered name: ansi_isxdigit [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x1b2.
+ * C runtime ctype test: returns _ctype[c] & 0x30, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
+ */
+byte ansi_isxdigit /* Original: FUN_000001b2 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -178,7 +230,11 @@ byte FUN_000001b2(undefined4 param_1)
 
 
 
-ushort FUN_000001ce(undefined4 param_1)
+/* Original: FUN_000001ce; source: ID02.c. Recovered name: ansi_toupper [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x1ce.
+ * toupper(): if _ctype[c] & 0x80 (lower case) returns c ^ 0x20, else c. Complete Ghidra C.
+ */
+ushort ansi_toupper /* Original: FUN_000001ce */ (undefined4 param_1)
 
 {
   ushort uVar1;
@@ -193,7 +249,11 @@ ushort FUN_000001ce(undefined4 param_1)
 
 
 
-ushort FUN_00000200(undefined4 param_1)
+/* Original: FUN_00000200; source: ID02.c. Recovered name: ansi_tolower [STRONG INFERENCE] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x200.
+ * tolower(): if _ctype[c] & 0x40 (upper case) returns c ^ 0x20, else c. Complete Ghidra C.
+ */
+ushort ansi_tolower /* Original: FUN_00000200 */ (undefined4 param_1)
 
 {
   ushort uVar1;
@@ -208,7 +268,11 @@ ushort FUN_00000200(undefined4 param_1)
 
 
 
-void FUN_00000232(undefined1 *param_1,undefined1 *param_2,int param_3)
+/* Original: FUN_00000232; source: ID02.c. Recovered name: ansi_memcpy [PROVEN] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x232.
+ * memcpy(dst, src, n): forward byte copy of n bytes. Complete Ghidra C.
+ */
+void ansi_memcpy /* Original: FUN_00000232 */ (undefined1 *param_1,undefined1 *param_2,int param_3)
 
 {
   for (; param_3 != 0; param_3 = param_3 + -1) {
@@ -221,7 +285,11 @@ void FUN_00000232(undefined1 *param_1,undefined1 *param_2,int param_3)
 
 
 
-void FUN_0000024a(undefined1 *param_1,undefined1 *param_2,int param_3)
+/* Original: FUN_0000024a; source: ID02.c. Recovered name: ansi_memmove [PROVEN] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x24a.
+ * memmove(dst, src, n): copies backwards when dst >= src (overlap safe), else forwards. Complete Ghidra C; reached through JT $4fa (used by ID07 load_str129_string_table).
+ */
+void ansi_memmove /* Original: FUN_0000024a */ (undefined1 *param_1,undefined1 *param_2,int param_3)
 
 {
   undefined1 *puVar1;
@@ -257,7 +325,11 @@ Low-level Error: Cannot properly adjust input varnodes
 */
 
 
-char * FUN_000002c8(char *param_1,char *param_2)
+/* Original: FUN_000002c8; source: ID02.c. Recovered name: ansi_strcpy [PROVEN] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x2c8.
+ * strcpy(dst, src): copies bytes up to and including the NUL, returns dst (bytes 0x2c8..0x2d6, iteration 185). Reached through JT $52a.
+ */
+char * ansi_strcpy /* Original: FUN_000002c8 */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -275,7 +347,11 @@ char * FUN_000002c8(char *param_1,char *param_2)
 
 
 
-char * FUN_000002d8(char *param_1,char *param_2)
+/* Original: FUN_000002d8; source: ID02.c. Recovered name: ansi_strcat [PROVEN] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x2d8.
+ * strcat(dst, src): finds the NUL of dst, appends src including its NUL, returns dst (bytes 0x2d8..0x2ec, iteration 185). Reached through JT $512.
+ */
+char * ansi_strcat /* Original: FUN_000002d8 */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -298,7 +374,11 @@ char * FUN_000002d8(char *param_1,char *param_2)
 
 
 
-int FUN_000002ee(byte *param_1,byte *param_2)
+/* Original: FUN_000002ee; source: ID02.c. Recovered name: ansi_strcmp [PROVEN] (iteration 213).
+ * Decoded from ID02.bin bytes at file 0x2ee.
+ * strcmp(a, b): unsigned byte compare; returns -1 / 0 / 1 at the first difference or 0 at a common NUL. Complete Ghidra C.
+ */
+int ansi_strcmp /* Original: FUN_000002ee */ (byte *param_1,byte *param_2)
 
 {
   byte bVar1;
@@ -321,7 +401,11 @@ int FUN_000002ee(byte *param_1,byte *param_2)
 
 
 
-char * FUN_0000030c(char *param_1,undefined4 param_2)
+/* Original: FUN_0000030c; source: ID02.c. Recovered name: ansi_strchr [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x30c.
+ * strchr(s, c): first occurrence of the character (high byte of the word argument) including the terminating NUL, else NULL. Complete Ghidra C.
+ */
+char * ansi_strchr /* Original: FUN_0000030c */ (char *param_1,undefined4 param_2)
 
 {
   char cVar1;
@@ -338,7 +422,11 @@ char * FUN_0000030c(char *param_1,undefined4 param_2)
 
 
 
-int FUN_00000324(char *param_1,char *param_2)
+/* Original: FUN_00000324; source: ID02.c. Recovered name: ansi_strcspn [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x324.
+ * strcspn(s, reject): length of the initial segment of s containing no character of reject. Complete Ghidra C.
+ */
+int ansi_strcspn /* Original: FUN_00000324 */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -370,7 +458,11 @@ int FUN_00000324(char *param_1,char *param_2)
 
 
 
-char * FUN_0000033e(char *param_1,char *param_2)
+/* Original: FUN_0000033e; source: ID02.c. Recovered name: ansi_strpbrk [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x33e.
+ * strpbrk(s, accept): first character of s that is in accept, else NULL. Complete Ghidra C.
+ */
+char * ansi_strpbrk /* Original: FUN_0000033e */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -397,7 +489,11 @@ char * FUN_0000033e(char *param_1,char *param_2)
 
 
 
-char * FUN_0000035a(char *param_1,undefined4 param_2)
+/* Original: FUN_0000035a; source: ID02.c. Recovered name: ansi_strrchr [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x35a.
+ * strrchr(s, c): last occurrence of the character (NUL included), else NULL. Complete Ghidra C.
+ */
+char * ansi_strrchr /* Original: FUN_0000035a */ (char *param_1,undefined4 param_2)
 
 {
   char cVar1;
@@ -416,7 +512,11 @@ char * FUN_0000035a(char *param_1,undefined4 param_2)
 
 
 
-int FUN_00000370(char *param_1,char *param_2)
+/* Original: FUN_00000370; source: ID02.c. Recovered name: ansi_strspn [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x370.
+ * strspn(s, accept): length of the initial segment of s made only of characters of accept. Complete Ghidra C.
+ */
+int ansi_strspn /* Original: FUN_00000370 */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -443,7 +543,11 @@ int FUN_00000370(char *param_1,char *param_2)
 
 
 
-char * FUN_0000038c(char *param_1,char *param_2)
+/* Original: FUN_0000038c; source: ID02.c. Recovered name: ansi_strstr [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x38c.
+ * strstr(s, sub): first occurrence of sub in s (s itself when sub is empty), else NULL; restarts one past the previous start on a mismatch. Complete Ghidra C.
+ */
+char * ansi_strstr /* Original: FUN_0000038c */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -473,7 +577,11 @@ char * FUN_0000038c(char *param_1,char *param_2)
 
 
 
-char * FUN_000003aa(char *param_1,char *param_2)
+/* Original: FUN_000003aa; source: ID02.c. Recovered name: ansi_strtok [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x3aa.
+ * strtok(s, delims): with s == NULL continues from the saved pointer A5-0x1508; skips leading delimiters, NUL-terminates the token and saves the next position in A5-0x1508 (0 when the string ends). Complete Ghidra C.
+ */
+char * ansi_strtok /* Original: FUN_000003aa */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -527,7 +635,11 @@ LAB_000003b6:
 
 
 
-void FUN_000003f6(char *param_1,char *param_2,int param_3)
+/* Original: FUN_000003f6; source: ID02.c. Recovered name: ansi_strncpy [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x3f6.
+ * strncpy(dst, src, n): copies n bytes, padding with NULs once src ends (the source pointer stops advancing at its NUL). Complete Ghidra C.
+ */
+void ansi_strncpy /* Original: FUN_000003f6 */ (char *param_1,char *param_2,int param_3)
 
 {
   char cVar1;
@@ -545,7 +657,11 @@ void FUN_000003f6(char *param_1,char *param_2,int param_3)
 
 
 
-void FUN_00000412(char *param_1,char *param_2,int param_3)
+/* Original: FUN_00000412; source: ID02.c. Recovered name: ansi_strncat [PROVEN] (iteration 214).
+ * Decoded from ID02.bin bytes at file 0x412.
+ * strncat(dst, src, n): appends at most n bytes of src to dst and always NUL-terminates. Complete Ghidra C.
+ */
+void ansi_strncat /* Original: FUN_00000412 */ (char *param_1,char *param_2,int param_3)
 
 {
   char cVar1;
@@ -575,9 +691,13 @@ void FUN_00000412(char *param_1,char *param_2,int param_3)
 
 
 
+/* Original: FUN_0000045a; source: ID02.c. Recovered name: begin_overlay_session [STRONG INFERENCE mechanics / HYPOTHESIS role] (iteration 215).
+ * Decoded from ID02.bin bytes at file 0x45a.
+ * Ghidra could not decode this body; bytes 0x45a..0x4a2 [PROVEN]: UnloadSeg(JT $a2, i.e. CODE 4) ($A9F1); ensure_free_memory_and_init_sound (0x4c6); calls the overlay hook A5-0x1082; JSR 0x1f8e; if FreeMem() (JT $212 = ID09 0x1b2, $A01C) < 100000 then MaxMem(&grow) (JT $21a = ID09 0x1bc, $A11D) to compact the heap; calls the overlay hook A5-0x107e; JSR 0x95a; JSR 0x20be. The bytes that follow (0x4a4..0x4c4, not exported) are the matching end_overlay_session: if sound is enabled (A5-0x12ee) shutdown_sound (0x4318); overlay hook A5-0x1076; JSR 0x1e68; JSR 0x9fa; if A5-0x1028 DrawMenuBar ($A937). Callers: 0x558 (inside FUN_000004fc), 0x700, 0x7be, 0x7dc; end_overlay_session from 0x6e2, 0x7c4, 0x84c. The pair brackets running the game overlay (Pacific Conflict) [HYPOTHESIS].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000045a(void)
+void begin_overlay_session /* Original: FUN_0000045a */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -586,7 +706,11 @@ void FUN_0000045a(void)
 
 
 
-undefined4 * FUN_000004c6(void)
+/* Original: FUN_000004c6; source: ID02.c. Recovered name: ensure_free_memory_and_init_sound [PROVEN] (iteration 215).
+ * Decoded from ID02.bin bytes at file 0x4c6.
+ * If FreeMem() (JT $212, $A01C) < 500000, calls MaxMem(&grow) (JT $21a, $A11D) to compact / purge the heap; then, when sound is enabled (word A5-0x12ee), init_sound_system(0) (0x3dd0). Caller: begin_overlay_session (0x468). Complete Ghidra C apart from the trap glue.
+ */
+undefined4 * ensure_free_memory_and_init_sound /* Original: FUN_000004c6 */ (void)
 
 {
   undefined4 *puVar1;
@@ -616,9 +740,13 @@ undefined4 * FUN_000004c6(void)
 
 
 
+/* Original: FUN_000004fc; source: ID02.c. Recovered name: run_flight_session [STRONG INFERENCE] (iteration 216).
+ * Decoded from ID02.bin bytes at file 0x4fc.
+ * Ghidra could not decode this body; outline from bytes 0x4fc..0x92e [PROVEN control flow, roles STRONG INFERENCE]. Set-up (0x51a, also the restart point): HiliteMenu(0) ($A938); screen base / rowBytes / depth copied into A5-0x1382 / -0x1378 / -0x1312; $AA31 on A5-0x1036; JSR 0x197c; ShowWindow or (when already shown) $A91F + JSR 0x4d34 on the window A5-0x14ca; begin_overlay_session; HideCursor ($A852); JT $1fa(-7) (ID09 0x18a, event flush glue); overlay hook A5-0x106e(pilot rank record +0x22); A5-0x1504 = TickCount(); frame counters A5-0x14fc / -0x1500 = 0. Main loop (0x5c0..0x848): frame timing from TickCount, GetMouse / StillDown into A5-0x14f8.. / -0x104a / -0x1048 / -0x1046; GetNextEvent(keyDown | keyUp) - command keys go through a JT $32 table at 0x650 (two of them toggle settings bits +3 / +5 of A5-0x13ac around end_overlay_session / apply_settings_to_live_options / begin_overlay_session), other keys to the overlay key hook A5-0x106a(char, modifiers), whose non-zero result ends the flight; then GetNextEvent(everything but keys): update -> 0x4d6a, a mouse / window path that suspends the session (end_overlay_session, JSR 0x2fa0 with the event, begin_overlay_session), others to the key hook; optional hook A5-0x1086; per-frame step hook A5-0x107a(1, 1); A5-0x14fc += 1 and loop while the result is 0. Exit (0x84c): end_overlay_session; JSR 0x4d96; JT $1fa(-1); InitCursor ($A850); copies the pilot status A5-0x12b4 into the roster record +0x20 (ChangedResource + UpdateResFile when it changed); switch on (result & 0xff) through JT $3a (table at 0x8a6, -1..10): conclude_mission (JT $da) with A5-0xde6 (STR# 129 slot 88 "Resume", the summary button title) and the result - restarting at 0x51a unless it returns 3 (or the result is 9 / 1, with JT $9a, hooks A5-0x108e / -0x108a and redraw_main_window 0x4db0 in between), quit_application (0x2eaa), or show_paused_dialog (JT $122) and restart. Callers: 0x369a, 0x376e, 0x377c (menu command code).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000004fc(void)
+void run_flight_session /* Original: FUN_000004fc */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -627,7 +755,11 @@ void FUN_000004fc(void)
 
 
 
-void FUN_00000930(undefined4 param_1,undefined4 param_2)
+/* Original: FUN_00000930; source: ID02.c. Recovered name: call_overlay_session_hooks [PROVEN] (iteration 215).
+ * Decoded from ID02.bin bytes at file 0x930.
+ * Calls the overlay hook pointers in order: A5-0x1082(), A5-0x107e(), A5-0x107a(arg1, arg2), A5-0x1076() - the same hooks begin_overlay_session / end_overlay_session use (begin, after memory set-up, run, end) [STRONG INFERENCE for the roles]. Caller: ID02 0x4e0a. Complete Ghidra C.
+ */
+void call_overlay_session_hooks /* Original: FUN_00000930 */ (undefined4 param_1,undefined4 param_2)
 
 {
   int unaff_A5;
@@ -1098,7 +1230,11 @@ void swap_mmu_mode_a5safe /* Original: FUN_000014e6 */ (void)
 
 
 
-int FUN_0000150a(void)
+/* Original: FUN_0000150a; source: ID02.c. Recovered name: get_blended_fill_pattern [STRONG INFERENCE] (iteration 217).
+ * Decoded from ID02.bin bytes at file 0x150a.
+ * Returns a Pattern pointer. Depth 1 (A5-0x137a == 1): takes the 6-byte RGB entries of the current foreground index A5-0x13ba and background index A5-0x13b8 (indices <= 8 from the table at A5-0x350, higher ones from *A5-0x14a6 + (index - 8) * 6), averages the two colours component by component (LSR #1) and returns the dither pattern from ID06 rgb_to_bw_pattern (JT $1ca) [PROVEN, bytes 0x150a..0x15ca]. Other depths: returns the QuickDraw gray pattern A5-0x1624. Reached through JT $3e2 (FillPoly callers in ID03 draw_bevelled_frame).
+ */
+int get_blended_fill_pattern /* Original: FUN_0000150a */ (void)
 
 {
   int iVar1;
@@ -1203,9 +1339,13 @@ int design_y_to_screen /* Original: FUN_00001680 */ (undefined4 param_1)
 
 
 
+/* Original: FUN_000016aa; source: ID02.c. Recovered name: draw_view_frame_outline [STRONG INFERENCE mechanics] (iteration 217).
+ * Decoded from ID02.bin bytes at file 0x16aa.
+ * No arguments; Ghidra truncated it. Depth 1: MoveTo / LineTo ($A893 / $A891) around the design rectangle x -3200..3200, y 670..2400 (design_x_to_screen 0x1656 / design_y_to_screen 0x1680) - a rectangle outline; other depths (0x1764..): a longer outline starting at (-3200, 2400) and (-3200, 1200) [PROVEN, bytes 0x16aa..0x17a0+]. The rectangle matches the out-the-window view area above the instrument panel [HYPOTHESIS]. Caller: ID02 0x1894.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000016aa(void)
+void draw_view_frame_outline /* Original: FUN_000016aa */ (void)
 
 {
   int iVar1;
@@ -1591,9 +1731,13 @@ void show_caution_alert_with_number /* Original: FUN_00001d48 */ (int param_1,un
 
 
 
+/* Original: FUN_00001dd4; source: ID02.c. Recovered name: show_sound_error_dialog_once [PROVEN] (iteration 218).
+ * Decoded from ID02.bin bytes at file 0x1dd4.
+ * Only when the flag A5-0xd12 is 0: GetNewDialog(0x8b = DLOG 139 "Sound Error", NULL, (WindowPtr)-1) ($A97C); FUN_0000435e(dialog); ShowWindow; DrawDialog ($A981); waits for the mouse button to go down (Button $A974) then DisposDialog and waits for it to be released; sets A5-0xd12 = 1 so it is shown only once. Ghidra could not decode the body.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001dd4(void)
+void show_sound_error_dialog_once /* Original: FUN_00001dd4 */ (void)
 
 {
   int unaff_A5;
@@ -1607,9 +1751,13 @@ void FUN_00001dd4(void)
 
 
 
+/* Original: FUN_00001e32; source: ID02.c. Recovered name: show_creating_panel_dialog [PROVEN] (iteration 218).
+ * Decoded from ID02.bin bytes at file 0x1e32.
+ * GetNewDialog(0x80 = DLOG 128 "Creating Instrument Panel", NULL, (WindowPtr)-1); FUN_0000435e(dialog); ShowWindow; DrawDialog; returns the dialog (the caller disposes it once the panel is built). Ghidra could not decode the body.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001e32(void)
+void show_creating_panel_dialog /* Original: FUN_00001e32 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1618,7 +1766,11 @@ void FUN_00001e32(void)
 
 
 
-void FUN_00001e68(void)
+/* Original: FUN_00001e68; source: ID02.c. Recovered name: release_sound_slots [PROVEN] (iteration 218).
+ * Decoded from ID02.bin bytes at file 0x1e68.
+ * For the 20 sound slots at A5-0xd62 (one long each): when non-zero, h = RecoverHandle(slot - 0x14) (JT $262 = ID09 glue $A128); if h, HPurge(h) (JT $282, $A049) and HUnlock(h) (JT $27a, $A02A); slot = 0. A slot therefore holds a pointer 0x14 bytes into a locked snd handle (presumably past its header). Callers: end_overlay_session (0x4b4), FUN_00001f8e (0x1f9e).
+ */
+void release_sound_slots /* Original: FUN_00001e68 */ (void)
 
 {
   int unaff_A5;
@@ -1655,9 +1807,13 @@ void FUN_00001e68(void)
 
 
 
+/* Original: FUN_00001edc; source: ID02.c. Recovered name: load_named_sound_into_slot [PROVEN] (iteration 218).
+ * Decoded from ID02.bin bytes at file 0x1edc.
+ * C args: +8 Pascal name, +0xc short slot. h = GetNamedResource('snd ', name) ($A9A1); none -> return 1. HNoPurge (JT $28a, $A04A); HUnlock (JT $27a); if FreeMem() < 0x3000 and MaxMem(&grow) < 0x3000: HUnlock, HPurge, ReleaseResource ($A9A3), return 1 (out of memory). Makes sure the resource is marked purgeable (GetResAttrs $A9A6; if bit 0x20 is clear, SetResAttrs | 0x20 $A9A7 and ChangedResource); A5-0xd62[slot] = h; returns 0. Callers: FUN_00001f8e (0x1fc8.. eight calls).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001edc(void)
+void load_named_sound_into_slot /* Original: FUN_00001edc */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1666,7 +1822,11 @@ void FUN_00001edc(void)
 
 
 
-void FUN_00001f8e(void)
+/* Original: FUN_00001f8e; source: ID02.c. Recovered name: load_game_sounds [STRONG INFERENCE] (iteration 219).
+ * Decoded from ID02.bin bytes at file 0x1f8e.
+ * A5-0x112a = &sound slots (A5-0xd62, for the overlay); release_sound_slots; MaxMem(&grow); slot 0 = the sound named at A5-0xd00 when FreeMem() > 0x2e400 (190 KB), else the one named at A5-0xcf8 (presumably a smaller variant); then load_named_sound_into_slot for the names at A5-0xcea, -0xce6, -0xce2, -0xcd0, -0xcca, -0xcc4, -0xcc0, -0xcba, -0xcb4, -0xcae into slots 5, 2, 9, 6, 7, 1, 12, 11, 10, 8; if the slot-8 load fails, retries slot 8 with the name at A5-0xca4 (and sets bit 0 of a local flag word). Any failure (OR of the results) -> show_sound_error_dialog_once [PROVEN, bytes 0x1f8e..0x20bc]. The Pascal names are A5 initial data, not yet read. Caller: begin_overlay_session (0x472).
+ */
+void load_game_sounds /* Original: FUN_00001f8e */ (void)
 
 {
   ushort uVar1;
@@ -1677,52 +1837,56 @@ void FUN_00001f8e(void)
   
   local_a = 0;
   *(int *)(unaff_A5 + -0x112a) = unaff_A5 + -0xd62;
-  FUN_00001e68();
+  release_sound_slots();
   local_6 = 0;
   (**(code **)(unaff_A5 + 0x21a))((short)&local_a,0);
   uVar1 = 0;
   (**(code **)(unaff_A5 + 0x212))();
   if (uVar1 < 0x2e401) {
-    uVar1 = FUN_00001edc();
+    uVar1 = load_named_sound_into_slot();
     local_6 = uVar1 | local_6;
   }
   else {
-    uVar1 = FUN_00001edc();
+    uVar1 = load_named_sound_into_slot();
     local_6 = uVar1 | local_6;
   }
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  uVar1 = FUN_00001edc();
+  uVar1 = load_named_sound_into_slot();
   local_6 = uVar1 | local_6;
-  sVar2 = FUN_00001edc();
+  sVar2 = load_named_sound_into_slot();
   if (sVar2 != 0) {
     local_6 = local_6 | 1;
-    uVar1 = FUN_00001edc();
+    uVar1 = load_named_sound_into_slot();
     local_6 = uVar1 | local_6;
   }
   if (local_6 != 0) {
-    FUN_00001dd4();
+    show_sound_error_dialog_once();
   }
   return;
 }
 
 
 
-void FUN_000020be(void)
+/* Original: FUN_000020be; source: ID02.c. Recovered name: lock_sound_slots [PROVEN] (iteration 219).
+ * Decoded from ID02.bin bytes at file 0x20be.
+ * For each of the 20 slots at A5-0xd62 that holds a handle: HLock (JT $272) and replace the slot by the data pointer *h + 0x14 - the inverse of release_sound_slots (RecoverHandle(slot - 0x14)). Caller: begin_overlay_session (0x49c).
+ */
+void lock_sound_slots /* Original: FUN_000020be */ (void)
 
 {
   int unaff_A5;
@@ -1749,9 +1913,13 @@ void FUN_000020be(void)
 
 
 
+/* Original: FUN_0000212a; source: ID02.c. Recovered name: reset_overlay_state [HYPOTHESIS name] (iteration 219).
+ * Decoded from ID02.bin bytes at file 0x212a.
+ * Clears two memory areas with the 0x2b0 runtime routine (memset-like: address, 0, length): A5-0x101a for A5-0x1006 + A5-0x1022 + A5-0x101e bytes, and A5-0x1040 for GetPtrSize of it (JT $242, ID09 0x222, $A021); then calls the function at A5-0x1006 + A5-0x1012 (an overlay entry: base + offset) with (&A5-0x1388, TickCount()); then JSR 0x4d24 and apply_settings_to_live_options (0x2a44) [PROVEN calls]. The TickCount argument suggests a random seed [HYPOTHESIS].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000212a(void)
+void reset_overlay_state /* Original: FUN_0000212a */ (void)
 
 {
   int unaff_A5;
@@ -1769,9 +1937,13 @@ void FUN_0000212a(void)
 
 
 
+/* Original: FUN_00002192; source: ID02.c. Recovered name: scan_display_devices [STRONG INFERENCE] (iteration 220).
+ * Decoded from ID02.bin bytes at file 0x2192.
+ * Ghidra could not decode the body; bytes 0x2192..0x2332 [PROVEN]. A5-0x1036 = GetMainDevice ($AA2A); main bounds = (*(*gd)->gdPMap)->bounds. Clears three 0x16-byte device records A5-0x1358 (main), A5-0x1342 (right neighbour), A5-0x132c (left neighbour). Walks GetDeviceList / GetNextDevice ($AA29 / $AA2B): a device qualifies when its bounds have the same top and bottom and the same width as the main screen and the same pixelSize (pixmap +0x20); the main device itself fills A5-0x1358, a device whose left edge is the main right edge fills A5-0x1342, one whose right edge is the main left edge fills A5-0x132c. Record: +0 GDHandle, +4 Ptr NewPtr(0x200) (allocated once, JT $232), +8 = (pmRowBytes word +4 != 0), +0xa baseAddr, +0xe rowBytes & 0x1fff, +0x10 = 1 when the ID09 0x3ba glue (low-memory byte $0CB2, meaning UNKNOWN) is 0 and gdFlags bit 0 is set, else 0. Finally clears A5-0x1032. So the game looks for identical monitors on either side of the main screen [STRONG INFERENCE: side views]. Callers: 0x27ea, 0x2846, 0x2a02, 0x2c54.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002192(void)
+void scan_display_devices /* Original: FUN_00002192 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1780,9 +1952,13 @@ void FUN_00002192(void)
 
 
 
+/* Original: FUN_00002334; source: ID02.c. Recovered name: layout_game_window_and_view [STRONG INFERENCE] (iteration 222).
+ * Decoded from ID02.bin bytes at file 0x2334.
+ * Ghidra could not decode the body; outline from bytes 0x2334..0x27e2 [PROVEN calls and constants]. View-size option = settings word +0xe (handle A5-0x13ac), forced to 1 when settings +0x1c (multi-monitor) is on and A5-0x1032 is set; switch through JT $3a (table at 0x2378, 1..4): view width = screen width A5-0x137e, 1/2, 3/4 or 1/4 of it. When the menu bar is hidden (A5-0x1028) the device base addresses (A5-0x136e records, 0x16 bytes) are moved down by MBarHeight ($0BAA) rows and the height reduced; a special case for size 1 on a 512 x (342 - MBarHeight) screen (the compact Mac) hides / restores the menu bar the other way and sets A5-0x1028. Computes the view height and byte offsets with the depth A5-0x137a, stores the view size in A5-0x1372 (width) / A5-0x1370 (height). Creates the game window once: NewCWindow (procID 2, behind -1) ($AA45) -> A5-0x14ca, two palettes ($AA91 with 13 and 217 entries) -> A5-0x14ae / -0x14aa with FUN_00004738(4 / 8), FUN_0000462c; otherwise HideWindow, MoveWindow / SizeWindow ($A91B / $A91D), FUN_0000462c, ShowWindow. Sets the origin for a right-hand device (A5-0x1342); disposes the old buffer A5-0x103a (0xd24); ID06 JT $1b2 (file 0x858); overlay hook A5-0x10a2 when A5-0x102e; at depth 1 ID06 init_raster_target (JT $1aa) on the screen base A5-0x1346 / rowBytes A5-0x134a with height 127, JSR 0x19e2 and A5-0x1300 = ID06 JT $1d2 (file 0xee). Caller: configure_display_from_main_device (0x29e6).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002334(void)
+void layout_game_window_and_view /* Original: FUN_00002334 */ (void)
 
 {
   int unaff_A5;
@@ -1794,9 +1970,13 @@ void FUN_00002334(void)
 
 
 
+/* Original: FUN_000027e4; source: ID02.c. Recovered name: configure_display_from_main_device [STRONG INFERENCE] (iteration 221).
+ * Decoded from ID02.bin bytes at file 0x27e4.
+ * Ghidra could not decode the body; bytes 0x27e4..0x29f0 [PROVEN]. scan_display_devices; depth = pixelSize of the main device pixmap. While it is not 1, 4 or 8: hides the game window A5-0x14ca when visible (HideWindow $A916, A5-0xd10 = 1), shows STR# 129 slot 116 "Hellcats requires black and white,16 or 256 colors." with show_caution_alert_with_number (0x1d48), rescans. Then A5-0x137a = depth; A5-0x102e = window state (ShowWindow when it was hidden and a mission A5-0x12f8 is set); A5-0x13ae = -1 (no panel configuration yet); A5-0x1386 = the main PixMap handle; A5-0x137a / -0x137c / -0x137e = depth / screen height / width; A5-0x1378 = rowBytes & 0x1fff; A5-0x12d4 = settings +0x1c; A5-0x1000 / A5-0x1312 from the low-memory byte $0CB2 glue and gdFlags bit 0; subtracts the menu-bar height ($0BAA) from the view rects (A5-0x136e records) and the height; A5-0x1028 = 0; then FUN_00002334 (layout). Callers: refresh_display_if_changed, 0x2d92, 0x35dc.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000027e4(void)
+void configure_display_from_main_device /* Original: FUN_000027e4 */ (void)
 
 {
   int iVar1;
@@ -1816,7 +1996,7 @@ void FUN_000027e4(void)
   undefined2 local_6;
   
   uVar8 = (ushort)((uint)unaff_A2 >> 0x10);
-  FUN_00002192();
+  scan_display_devices();
   sVar5 = *(short *)(**(int **)(**(int **)(unaff_A5 + -0x1036) + 0x16) + 0x20);
   if (((sVar5 != 1) && (sVar5 != 4)) && (sVar5 != 8)) {
     if ((*(int *)(unaff_A5 + -0x14ca) != 0) &&
@@ -1826,7 +2006,7 @@ void FUN_000027e4(void)
       halt_baddata();
     }
     show_caution_alert_with_number(*(int *)(unaff_A5 + -0xd76),(uint)uVar8);
-    FUN_00002192();
+    scan_display_devices();
     *(short *)(unaff_A5 + -0x137a) = sVar5;
     sVar5 = *(short *)(**(int **)(**(int **)(unaff_A5 + -0x1036) + 0x16) + 0x20);
     if ((sVar5 != 1) && ((sVar5 != 4 && (sVar5 != 8)))) {
@@ -1882,15 +2062,19 @@ LAB_000028a2:
   }
   *(short *)(unaff_A5 + -0x137c) = *(short *)(unaff_A5 + -0x137c) - sVar5;
   *(undefined2 *)(unaff_A5 + -0x1028) = 0;
-  FUN_00002334();
+  layout_game_window_and_view();
   return;
 }
 
 
 
+/* Original: FUN_000029f2; source: ID02.c. Recovered name: refresh_display_if_changed [PROVEN] (iteration 221).
+ * Decoded from ID02.bin bytes at file 0x29f2.
+ * If GetMainDevice ($AA2A) differs from A5-0x1036, rescans (scan_display_devices); if the main pixmap depth differs from A5-0x137a: configure_display_from_main_device, apply_settings_to_live_options (0x2a44), JSR 0x4d24, and when A5-0x102e, the overlay base A5-0x1006 and the window flag A5-0x14c6 are all set, calls the overlay hook A5-0x1096 [PROVEN, bytes 0x29f2..0x2a42]. Callers: 0x2dd2, 0x2ffa, 0x305c (event handling).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000029f2(void)
+void refresh_display_if_changed /* Original: FUN_000029f2 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -2121,7 +2305,11 @@ void show_resource_file_error_box /* Original: FUN_00002e36 */ (void)
 
 
 
-void FUN_00002ee4(char *param_1,char *param_2)
+/* Original: FUN_00002ee4; source: ID02.c. Recovered name: copy_pascal_string [PROVEN] (iteration 225).
+ * Decoded from ID02.bin bytes at file 0x2ee4.
+ * Copies the length byte and then that many bytes from src (+8) to dst (+0xc). Complete Ghidra C. Caller: 0x2d26.
+ */
+void copy_pascal_string /* Original: FUN_00002ee4 */ (char *param_1,char *param_2)
 
 {
   char cVar1;
@@ -2283,9 +2471,13 @@ void main /* Original: FUN_0000309a */ (void)
 
 
 
+/* Original: FUN_000030fa; source: ID02.c. Recovered name: install_menus [PROVEN] (iteration 223).
+ * Decoded from ID02.bin bytes at file 0x30fa.
+ * For MENU ids 1..5: GetMenu(id) ($A9BF) -> A5-0xc4e, -0xc4a, -0xc46, -0xc42, -0xc3e, InsertMenu(menu, 0) ($A935); AddResMenu(menu 1, 'DRVR') ($A94D) fills the Apple menu with desk accessories; DrawMenuBar ($A937). Caller: 0x30dc (start-up). Ghidra could not decode the body.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000030fa(void)
+void install_menus /* Original: FUN_000030fa */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -2294,9 +2486,13 @@ void FUN_000030fa(void)
 
 
 
+/* Original: FUN_00003174; source: ID02.c. Recovered name: update_menu_items [STRONG INFERENCE] (iteration 223).
+ * Decoded from ID02.bin bytes at file 0x3174.
+ * FrontWindow ($A924); the front window is a desk accessory when its windowKind (+0x6c) is negative; then enables / disables menu items through set_menu_item_enabled (0x3590, called at 0x31e2 .. 0x32d4) according to that flag and the state words A5-0x1032 / A5-0x12d4 and others. Caller: 0x2fde (before menu tracking). Item-by-item conditions not yet decoded. Ghidra truncated the body.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003174(void)
+void update_menu_items /* Original: FUN_00003174 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -2305,9 +2501,13 @@ void FUN_00003174(void)
 
 
 
+/* Original: FUN_00003590; source: ID02.c. Recovered name: set_menu_item_enabled [PROVEN] (iteration 223).
+ * Decoded from ID02.bin bytes at file 0x3590.
+ * C args: +8 MenuHandle, +0xc short item, +0xe short enable. EnableItem ($A939) when enable != 0, else DisableItem ($A93A); item 0 means the whole menu, then DrawMenuBar ($A937). Callers: update_menu_items (0x31e2 ...).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003590(undefined4 param_1,short param_2)
+void set_menu_item_enabled /* Original: FUN_00003590 */ (undefined4 param_1,short param_2)
 
 {
   if (param_2 != 0) {
@@ -2320,23 +2520,31 @@ void FUN_00003590(undefined4 param_1,short param_2)
 
 
 
-void FUN_000035bc(undefined4 param_1)
+/* Original: FUN_000035bc; source: ID02.c. Recovered name: set_view_size_option [PROVEN] (iteration 223).
+ * Decoded from ID02.bin bytes at file 0x35bc.
+ * C arg +8 short size (1..4). When it differs from settings word +0xe (handle A5-0x13ac): stores it and calls configure_display_from_main_device (0x27e4) to relayout the view. Complete Ghidra C apart from the call.
+ */
+void set_view_size_option /* Original: FUN_000035bc */ (undefined4 param_1)
 
 {
   int unaff_A5;
   
   if (*(short *)(**(int **)(unaff_A5 + -0x13ac) + 0xe) != param_1._0_2_) {
     *(short *)(**(int **)(unaff_A5 + -0x13ac) + 0xe) = param_1._0_2_;
-    FUN_000027e4();
+    configure_display_from_main_device();
   }
   return;
 }
 
 
 
+/* Original: FUN_000035e4; source: ID02.c. Recovered name: start_new_mission [STRONG INFERENCE] (iteration 225).
+ * Decoded from ID02.bin bytes at file 0x35e4.
+ * Ghidra could not decode the body; bytes 0x35e4..0x36a0 [PROVEN]: returns unless run_duty_roster_dialog (JT $132, ID04 0x644) and run_scenario_selection_dialog (JT $82, ID04 0xc02) are both confirmed (non-zero); overlay hook A5-0x109a(mission A5-0x12f8); when the game window is up, SetPort + InvalRect(portRect) ($A928); clears A5-0x12f0, the 12 words of mission kills A5-0x12ce and of A5-0x13a2, the pilot status A5-0x12b4, the friendly-kill count A5-0x12b6, A5-0x12b2, the mission-over flag A5-0x14c4, A5-0x14c2 and the objective words A5-0x14c0; at depth 1 with the overlay loaded and the window shown, calls the hook A5-0x1096; then run_flight_session (0x4fc). Callers: 0x30ec (start-up) and 0x3742 (menu command).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000035e4(void)
+void start_new_mission /* Original: FUN_000035e4 */ (void)
 
 {
   short sVar1;
@@ -2367,7 +2575,7 @@ void FUN_000035e4(void)
           (*(short *)(unaff_A5 + -0x137a) == 1)) && (*(short *)(unaff_A5 + -0x14c6) != 0)) {
         (**(code **)(unaff_A5 + -0x1096))();
       }
-      FUN_000004fc();
+      run_flight_session();
     }
   }
   return;
@@ -3269,9 +3477,13 @@ void shutdown_sound /* Original: FUN_00004318 */ (void)
 
 
 
+/* Original: FUN_0000435e; source: ID02.c. Recovered name: position_window_on_screen [PROVEN] (iteration 219).
+ * Decoded from ID02.bin bytes at file 0x435e.
+ * Arg: WindowPtr w. Window size from portRect (+0x10..+0x16); screen size from screenBits.bounds (A5-0x1680..-0x167a) minus MBarHeight ($0BAA). Horizontally centred; vertically centred when the window is taller than the free height, otherwise placed one third down ((screen - window) / 3); MoveWindow(w, h, v, true) ($A91B). Callers: show_sound_error_dialog_once, show_creating_panel_dialog and others.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000435e(int param_1)
+void position_window_on_screen /* Original: FUN_0000435e */ (int param_1)
 
 {
   int unaff_A5;
@@ -3287,9 +3499,13 @@ void FUN_0000435e(int param_1)
 
 
 
+/* Original: FUN_0000442e; source: ID02.c. Recovered name: position_alert_template [PROVEN] (iteration 224).
+ * Decoded from ID02.bin bytes at file 0x442e.
+ * C arg +8 short ALRT id. GetResource('ALRT', id) ($A9A0); window size from the template boundsRect; screen size from screenBits.bounds (A5-0x1680..-0x167a). SetRect ($A8A7) of the template rect: centred horizontally; vertically one third down ((screen - height) / 3) when the screen height / 3 is at least half the alert height, otherwise centred. So the next Alert / StopAlert / CautionAlert with that id appears centred on the current screen. Reached through JT $47a (e.g. ID04 confirm_end_mission, show_scenery_open_error_alert); direct caller ID02 0x1db4. Complete in the bytes 0x442e..0x4580.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000442e(void)
+void position_alert_template /* Original: FUN_0000442e */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -3298,9 +3514,13 @@ void FUN_0000442e(void)
 
 
 
+/* Original: FUN_00004582; source: ID02.c. Recovered name: centre_window_on_screen [PROVEN] (iteration 224).
+ * Decoded from ID02.bin bytes at file 0x4582.
+ * Arg: WindowPtr w. MoveWindow(w, (screen width - window width) / 2, (screen height - window height) / 2 + MBarHeight / 2, true) ($A91B) using screenBits.bounds and MBarHeight ($0BAA). Reached through JT $472 - called before ShowWindow by the ID04 dialogs (Mission Summary, Scenario Selection, Refuel, Map, Duty Roster, High Scores, About).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004582(void)
+void centre_window_on_screen /* Original: FUN_00004582 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -3309,9 +3529,13 @@ void FUN_00004582(void)
 
 
 
+/* Original: FUN_00004610; source: ID02.c. Recovered name: detach_window_palette [PROVEN] (iteration 224).
+ * Decoded from ID02.bin bytes at file 0x4610.
+ * If the game window A5-0x14ca exists: SetPalette(window, NULL, false) ($AA95) and A5-0x2cc = 0 (no palette depth selected).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004610(void)
+void detach_window_palette /* Original: FUN_00004610 */ (void)
 
 {
   int unaff_A5;
@@ -3325,9 +3549,13 @@ void FUN_00004610(void)
 
 
 
+/* Original: FUN_0000462c; source: ID02.c. Recovered name: select_palette_for_depth [PROVEN] (iteration 224).
+ * Decoded from ID02.bin bytes at file 0x462c.
+ * When the screen depth A5-0x137a differs from the palette depth A5-0x2cc: depth 4 -> SetPalette(window A5-0x14ca, palette A5-0x14ae, false), RGB table A5-0x14a6 = &A5-0x320, A5-0x14a2 = 5; depth 8 -> palette A5-0x14aa, table &A5-0x302, A5-0x14a2 = 9; depth 1 -> table &A5-0x320, A5-0x14a2 = 5 (no SetPalette); A5-0x2cc = depth. A5-0x14a6 is the RGB table that get_blended_fill_pattern reads for colour indices > 8 [PROVEN link]. Callers: layout_game_window_and_view (0x26f4, 0x2742), 0x4d24.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000462c(void)
+void select_palette_for_depth /* Original: FUN_0000462c */ (void)
 
 {
   int unaff_A5;
@@ -3697,9 +3925,13 @@ void process_pending_update_events /* Original: FUN_00004d34 */ (void)
 
 
 
+/* Original: FUN_00004d6a; source: ID02.c. Recovered name: handle_update_event [PROVEN] (iteration 225).
+ * Decoded from ID02.bin bytes at file 0x4d6a.
+ * Arg: EventRecord *. When the game window is enabled (A5-0x14c6) and event->message (+2) is that window (A5-0x14ca): BeginUpdate ($A922), redraw_main_window (0x4db0), EndUpdate ($A923). Reached through JT $492 (the updateEvt branch of the ID04 dialog filters). The following bytes 0x4d96..0x4dae (not exported) are restore_screen_globals: SetGDevice(A5-0x1036) ($AA31) and copies the screen base / rowBytes / depth A5-0x1346 / -0x134a / -0x1348 into A5-0x1382 / -0x1378 / -0x1312 [PROVEN].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004d6a(int param_1)
+void handle_update_event /* Original: FUN_00004d6a */ (int param_1)
 
 {
   int unaff_A5;

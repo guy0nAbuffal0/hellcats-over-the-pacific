@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 207
+**Last iteration:** 249
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -10,17 +10,17 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 58 | 0 | 0 | 67 | 0 | 0 |
-| ID03.c | 45 | 7 | 0 | 0 | 38 | 0 | 0 |
+| ID01.c | 6 | 0 | 0 | 0 | 6 | 0 | 0 |
+| ID02.c | 125 | 0 | 0 | 0 | 125 | 0 | 0 |
+| ID03.c | 45 | 0 | 0 | 0 | 45 | 0 | 0 |
 | ID04.c | 59 | 0 | 0 | 0 | 59 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **402** | **0** | **0** | **328** | **0** | **6** |
+| Pacific Conflict.c | 443 | 253 | 0 | 0 | 184 | 0 | 6 |
+| **TOTAL** | **736** | **253** | **0** | **0** | **477** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 402 NOT_STARTED + 6 BLOCKED (iteration 207);
-328 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 253 NOT_STARTED + 6 BLOCKED (iteration 249);
+477 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -367,6 +367,123 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00001844` (ID03) | `finish_instrument_supersample` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | SetPort(panel), composite, dispose_offscreen_bw_port | — | 206 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
 | `FUN_00003f24` (ID03) | `draw_bevelled_frame` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | four shaded polygons between outer and inner rects | — | 207 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
 | `FUN_00004110` (ID03) | `draw_numbered_bevel_box` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | black box, bevel, vector-font number | — | 207 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00004790` (ID03) | `draw_percent_scale_gauge` | ID03 | RENAMED | STRONG INFERENCE (HYPOTHESIS role) | `ID03.c` | `ID03.decomp.c` | vertical 0–100 scale, ten ticks, labels 100 / 0; record A5-0x1186 | which control | 208 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00004b32` (ID03) | `draw_split_display_box` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | framed box split into halves A5-0x119c / A5-0x1194 (used by ID02 overlay drawing) | which indicator | 209 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00004304` (ID03) | `draw_panel_section_with_numbered_boxes` | ID03 | RENAMED | STRONG INFERENCE mechanics / UNKNOWN purpose | `ID03.c` | `ID03.decomp.c` | dark area A5-0x11aa, line loops, bevel, boxes 1 / 3 / 15 -> A5-0x11c6 / -0x11be / -0x11b6 | meaning | 210 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_000054fe` (ID03) | `draw_landing_gear_indicator` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | STR# 78 "GEAR" label, three lamp positions A5-0x1174..-0x1164 | — | 211 (2026-10-17) | Ghidra C + dis.py; token diff = renames |
+| `FUN_00005718` (ID03) | `dial_point_at_angle` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | degrees -> 1/0x4000 turn; cos A5-0x2118 / sin A5-0x211c, 4.12 | — | 211 (2026-10-17) | Ghidra C + dis.py; token diff = renames |
+| `FUN_00005158` (ID03) | `draw_arc_scale_ticks` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | 10-degree arc ticks via cos / sin pointers; documents unexported gauge 0x532e | — | 212 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_000071a2` (ID03) | `remap_panel_colours_identity` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | identity 256-entry table -> remap_cached_panel_colours | — | 212 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00000038`..`FUN_000002ee` (ID02, 20 functions) | `ansi_div`, `ansi_ldiv`, `ansi_isalnum` … `ansi_isxdigit`, `ansi_toupper`, `ansi_tolower`, `ansi_memcpy`, `ansi_memmove`, `ansi_strcpy`, `ansi_strcat`, `ansi_strcmp` | ID02 | RENAMED | PROVEN (mem/str) / STRONG INFERENCE (ctype names) | `ID02.c` | `ID02.decomp.c` | C runtime; ctype table A5-0x1608 | — | 213 (2026-10-17) | complete Ghidra C + iteration 185 bytes; token diff = renames |
+| `FUN_0000030c`..`FUN_00000412` (ID02, 9 functions) | `ansi_strchr`, `ansi_strcspn`, `ansi_strpbrk`, `ansi_strrchr`, `ansi_strspn`, `ansi_strstr`, `ansi_strtok`, `ansi_strncpy`, `ansi_strncat` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | C runtime; strtok save pointer A5-0x1508 | — | 214 (2026-10-17) | complete Ghidra C; token diff = renames |
+| `FUN_0000045a` (ID02) | `begin_overlay_session` | ID02 | RENAMED | STRONG INFERENCE mechanics | `ID02.c` | `ID02.decomp.c` | UnloadSeg 4, memory + sound, hooks A5-0x1082 / -0x107e; documents end_overlay_session 0x4a4 | hook targets in the overlay | 215 (2026-10-17) | dis.py on ID02.bin / ID09 glue; token diff = renames |
+| `FUN_000004c6` (ID02) | `ensure_free_memory_and_init_sound` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | FreeMem < 500000 -> MaxMem; init_sound_system | hook targets in the overlay | 215 (2026-10-17) | dis.py on ID02.bin / ID09 glue; token diff = renames |
+| `FUN_00000930` (ID02) | `call_overlay_session_hooks` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | hooks A5-0x1082, -0x107e, -0x107a(a, b), -0x1076 | hook targets in the overlay | 215 (2026-10-17) | dis.py on ID02.bin / ID09 glue; token diff = renames |
+| `FUN_000004fc` (ID02) | `run_flight_session` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` (halt_baddata) | `ID02.decomp.c` | overlay hooks -0x106e / -0x106a / -0x1086 / -0x107a; result switch -> conclude_mission / quit / pause | per-key table at 0x650 | 216 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_0000150a` (ID02) | `get_blended_fill_pattern` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | depth 1: dither of the fg / bg colour average; else gray | — | 217 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_000016aa` (ID02) | `draw_view_frame_outline` | ID02 | RENAMED | STRONG INFERENCE mechanics | `ID02.c` | `ID02.decomp.c` | outline of the design rect x ±3200, y 670..2400 | — | 217 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_00001dd4` (ID02) | `show_sound_error_dialog_once` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | DLOG 139 "Sound Error", once (A5-0xd12) | — | 218 (2026-10-17) | dis.py on ID02.bin; ID09 glue; DLOG dump; token diff = renames |
+| `FUN_00001e32` (ID02) | `show_creating_panel_dialog` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | DLOG 128 "Creating Instrument Panel" | — | 218 (2026-10-17) | dis.py on ID02.bin; ID09 glue; DLOG dump; token diff = renames |
+| `FUN_00001e68` (ID02) | `release_sound_slots` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | 20 slots A5-0xd62: RecoverHandle(p - 0x14), HPurge, HUnlock | — | 218 (2026-10-17) | dis.py on ID02.bin; ID09 glue; DLOG dump; token diff = renames |
+| `FUN_00001edc` (ID02) | `load_named_sound_into_slot` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | GetNamedResource snd, memory check 0x3000, purgeable, slot store | — | 218 (2026-10-17) | dis.py on ID02.bin; ID09 glue; DLOG dump; token diff = renames |
+| `FUN_00001f8e` (ID02) | `load_game_sounds` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | loads 11 named sounds into slots; memory-dependent slot 0; error dialog | — | 219 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_000020be` (ID02) | `lock_sound_slots` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | HLock + slot = *h + 0x14 | — | 219 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_0000212a` (ID02) | `reset_overlay_state` | ID02 | RENAMED | HYPOTHESIS name | `ID02.c` | `ID02.decomp.c` | clears overlay data areas, calls overlay entry (A5-0x1388, TickCount) | — | 219 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_0000435e` (ID02) | `position_window_on_screen` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | centre horizontally, 1/3 down under the menu bar, MoveWindow | — | 219 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_00002192` (ID02) | `scan_display_devices` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` (halt_baddata) | `ID02.decomp.c` | main / right / left device records A5-0x1358 / -0x1342 / -0x132c | low-memory $0CB2 meaning | 220 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_000027e4` (ID02) | `configure_display_from_main_device` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | depth 1 / 4 / 8 check (STR# 116 alert), screen globals, menu-bar adjustment | layout routine 0x2334 | 221 (2026-10-17) | dis.py; STR# dump; token diff = renames |
+| `FUN_000029f2` (ID02) | `refresh_display_if_changed` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | main device / depth change -> reconfigure, hook A5-0x1096 | — | 221 (2026-10-17) | dis.py; token diff = renames |
+| `FUN_00002334` (ID02) | `layout_game_window_and_view` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` (halt_baddata) | `ID02.decomp.c` | view size option 1..4 (full, 1/2, 3/4, 1/4 width), menu bar hiding, NewCWindow, palettes, ID06 raster set-up | exact height arithmetic | 222 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_000030fa` (ID02) | `install_menus` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | MENU 1..5, Apple menu DRVR, DrawMenuBar | — | 223 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_00003174` (ID02) | `update_menu_items` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | FrontWindow DA test, enable / disable items | — | 223 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_00003590` (ID02) | `set_menu_item_enabled` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | EnableItem / DisableItem, DrawMenuBar for item 0 | — | 223 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_000035bc` (ID02) | `set_view_size_option` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | settings +0xe, relayout | — | 223 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_0000442e` (ID02) | `position_alert_template` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | JT $47a; centres ALRT template rect | — | 224 (2026-10-17) | dis.py on ID02.bin; CODE0 JT; token diff = renames |
+| `FUN_00004582` (ID02) | `centre_window_on_screen` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | JT $472; MoveWindow centred | — | 224 (2026-10-17) | dis.py on ID02.bin; CODE0 JT; token diff = renames |
+| `FUN_00004610` (ID02) | `detach_window_palette` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | SetPalette(window, NULL) | — | 224 (2026-10-17) | dis.py on ID02.bin; CODE0 JT; token diff = renames |
+| `FUN_0000462c` (ID02) | `select_palette_for_depth` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | palette + RGB table per depth 1 / 4 / 8 | — | 224 (2026-10-17) | dis.py on ID02.bin; CODE0 JT; token diff = renames |
+| `FUN_00002ee4` (ID02) | `copy_pascal_string` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | length byte + bytes | — | 225 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_000035e4` (ID02) | `start_new_mission` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | roster + scenario dialogs, reset mission state, run_flight_session | — | 225 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_00004d6a` (ID02) | `handle_update_event` | ID02 | RENAMED | PROVEN | `ID02.c` | `ID02.decomp.c` | JT $492; Begin/EndUpdate around redraw_main_window; documents restore_screen_globals 0x4d96 | — | 225 (2026-10-17) | dis.py on ID02.bin; token diff = renames |
+| `FUN_00000110`..`FUN_000001c2` (ID01, 6 functions) | `rt_udiv32`, `rt_umod32`, `rt_sdiv32`, `rt_smod32`, `rt_sdivmod32_core`, `rt_udivmod32_core` | ID01 | RENAMED | PROVEN | `ID01.c` | `ID01.decomp.c` | 32-bit divide runtime; header documents start-up, A5-world DATA / ZERO / DREL loading, switch helpers, multiply | — | 226 (2026-10-17) | dis.py on ID01.bin; token diff = renames |
+| `FUN_00000334` | `any_mission_kills_recorded` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 12 kill words DAT_0001b5a0+0xba..+0xd0 | — | 227 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000003fa` | `load_player_fuel_and_bombs` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | fuel % +0xb6 -> two tanks +0x67d/+0x67e; bombs +0xb9 -> +0x67c | — | 227 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00000488` | `tally_destroyed_entity` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | kill counter +0xb8 + 2*type; friendly kills +0xd2 | — | 227 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000004f8` | `transform_through_node_chain` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hierarchical transform of an object through its parent nodes | — | 228 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000005fa` | `traverse_scene_tree` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | recursive scene graph walk with callback | — | 228 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000006a6` | `for_each_mission_scene_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | walk from the current mission scene root | — | 228 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000006ec` | `collect_map_features` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | scene visitor: land outlines (hook +0x292), type-0x70 list, facility 0x12/0x13 list | — | 229 (2026-10-17) | Ghidra C; DITL 137 legend; token diff vs HEAD = renames |
+| `FUN_00000954` | `plot_mission_map_symbols` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | target of host A5-0x1052; plots A / B / C / T | — | 229 (2026-10-17) | Ghidra C; DITL 137 legend; token diff vs HEAD = renames |
+| `FUN_0000b190` | `clip_polygon_x_min` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | Sutherland-Hodgman edge clip, x >= DAT_00020aee | — | 230 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000b242` | `clip_polygon_x_max` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | Sutherland-Hodgman edge clip, x <= DAT_00020aec | — | 230 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000b2f4` | `clip_polygon_y_min` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | Sutherland-Hodgman edge clip, y >= DAT_00020aea | — | 230 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000b3aa` | `clip_polygon_y_max` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | Sutherland-Hodgman edge clip, y <= DAT_0001b73e | — | 230 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00000aba` | `nearest_type80_centroid_visitor` | Pacific Conflict | RENAMED | STRONG INFERENCE mechanics | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | nearest face centroid of type-0x80 objects | role | 231 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00000bea` | `point_near_camera_or_type80_object` | Pacific Conflict | RENAMED | HYPOTHESIS name | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | metric thresholds 0x33900 / 0x40741 | role | 231 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00000c4c` | `anchor_point_visitor` | Pacific Conflict | RENAMED | STRONG INFERENCE mechanics | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | kind-1 node pose or nearest ground airfield point | role | 231 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00000d6a` | `find_anchor_point` | Pacific Conflict | RENAMED | HYPOTHESIS name | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | mode 0 / 1 over the scene | role | 231 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00000db0` | `ensure_handle_allocated` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | NewHandleClear / realloc when purged, HNoPurge via host services | — | 232 (2026-10-17) | Ghidra C + service table; token diff vs HEAD = renames |
+| `FUN_00000e0a` | `lock_handle_nopurge` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | HLock + HNoPurge via host services | — | 232 (2026-10-17) | Ghidra C + service table; token diff vs HEAD = renames |
+| `FUN_00000e32` | `unlock_handle_purgeable` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | HUnlock + HPurge via host services | — | 232 (2026-10-17) | Ghidra C + service table; token diff vs HEAD = renames |
+| `FUN_00000e5a` | `lock_overlay_buffers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | HLock of the four panel bitmap handles via host services | — | 232 (2026-10-17) | Ghidra C + service table; token diff vs HEAD = renames |
+| `FUN_00000ea0` | `allocate_session_buffers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | host hook A5-0x1082 | — | 233 (2026-10-17) | Ghidra C; hook table; token diff vs HEAD = renames |
+| `FUN_00000f92` | `lock_session_buffers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | host hook A5-0x107e | — | 233 (2026-10-17) | Ghidra C; hook table; token diff vs HEAD = renames |
+| `FUN_00001094` | `unlock_session_buffers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | host hook A5-0x1076 | — | 233 (2026-10-17) | Ghidra C; hook table; token diff vs HEAD = renames |
+| `FUN_00001112` | `overlay_main_entry` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | installs the overlay hook table A5-0x10a2..-0x104e | — | 233 (2026-10-17) | Ghidra C; hook table; token diff vs HEAD = renames |
+| `FUN_00003ac4` | `start_mission_scene` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x109a; scene entry, anchor point, camera | — | 234 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000739a` | `copy_player_pose_to_camera` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | camera position / angles from the player | — | 234 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00006598` | `overlay_frame_step` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x107a per frame; body partly decoded | — | 234 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00007310` | `begin_flight_for_rank` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x106e; rank table DAT_0001b2b4 | — | 234 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00006ed6` | `update_view_clip_bounds` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x109e; view half height, clip y-max DAT_0001b73e | — | 235 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000038f4` | `respawn_player_at_anchor` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x108a; player back on the nearest airfield | — | 235 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000740a` | `process_flight_input_and_outcome` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x106a; key switch (arrows, + -, digits, letters, P = 4, Esc = 3) and outcome code builder | per-key actions; outcome codes | 236 (2026-10-17) | Ghidra C outline; token diff vs HEAD = renames |
+| `FUN_00006ff6` | `configure_renderer_for_display` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x10a2; view size and depth-specific renderer selection | depth-specific tables | 237 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00004210` | `refresh_object_colours_for_depth` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x1096; per-depth object colouring | — | 238 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000041ec` | `recolour_kind2_object` | Pacific Conflict | RENAMED | HYPOTHESIS name | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | kind-2 objects: FUN_00003da8 + FUN_00003ea0 | — | 238 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00004916` | `set_object_faces_bw_pattern` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | face +4 = host pattern table [index] | — | 238 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003da8` | `update_object_distance_band` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | band +0x30 from thresholds DAT_0001b190 | — | 239 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003e02` | `update_record_distance_band` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | same for record +4 | — | 239 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003e5c` | `snapshot_face_colours` | Pacific Conflict | RENAMED | HYPOTHESIS name | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | copy face colours after the face list | — | 239 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003ea0` | `shade_object_faces` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | flat shading with light vector, haze blend at depth 8 | — | 239 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000147a` | `queue_face_palette_entry` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | owner table + pending ColorSpec at host +0x72 | — | 240 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001548` | `write_face_palette_slot` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | queue + mark slot on other monitors | — | 240 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000159e` | `assign_face_colour` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | depth 1 luminance pattern, depth 4 table, depth 8 dynamic palette slot (200, round-robin) | — | 240 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000011e6` | `widen_printf_format` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | %d -> %ld, %x -> %lx into DAT_00020b4c | — | 241 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001254` | `overlay_printf` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | host service +0x262 (A5-0x1126) | — | 241 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001294` | `reset_palette_owner_tables` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 0x400-byte owner tables per device | — | 241 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001300` | `init_depth8_colour_state` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | depth-8 set-up | — | 241 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000131c` | `init_depth4_colour_state` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | depth-4 set-up from device records | — | 241 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000640c` | `spawn_cloud_layer` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hook A5-0x104e; ten camera-relative objects or retire type 0x1d | cloud reading | 242 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00019aa2` | `spawn_camera_relative_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | pool spawn at camera + offset | cloud reading | 242 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00019b30` | `follow_camera_offset` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | keep object at camera + offset | cloud reading | 242 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000018d6` | `overlay_initialise` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | RNG seed, subsystem init, light vector | — | 243 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001958` | `heap_sbrk` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | arena = host A5-0x1040 work buffer | — | 243 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001974` | `heap_new_size_class_block` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 1 << n bytes, header = class | — | 243 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000199a` | `heap_add_large_block` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | n * 8 bytes into the large-block list | — | 243 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000019b0` | `heap_add_large_block_tail` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | false split of heap_add_large_block | — | 243 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003732` | `overlay_init_noop` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | empty | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003734` | `init_code_pointer_tables` | Pacific Conflict | RENAMED | STRONG INFERENCE mechanics | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | two 2048-entry code-address tables | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003266` | `init_span_table_32ba` | Pacific Conflict | RENAMED | STRONG INFERENCE mechanics | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | self-modifying table at 0x3242 | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00003412` | `init_span_table_3466` | Pacific Conflict | RENAMED | STRONG INFERENCE mechanics | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | table at 0x33ee | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000035b4` | `init_span_table_3608` | Pacific Conflict | RENAMED | STRONG INFERENCE mechanics | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | table at 0x3590 | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001771a` | `set_view_distance` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | range + 2 * range | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00017736` | `cycle_view_distance` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | Tab key: 0xc15c0 / 0x26ac0 / 0xce40 | — | 244 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000032ba` | `fill_span_rows_4bit_a` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | depth-4 run-list span filler | variant differences | 245 (2026-10-17) | Ghidra C; renderer selection in configure_renderer_for_display; token diff vs HEAD = renames |
+| `FUN_00003466` | `fill_span_rows_4bit_b` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | variant b | variant differences | 245 (2026-10-17) | Ghidra C; renderer selection in configure_renderer_for_display; token diff vs HEAD = renames |
+| `FUN_00003608` | `fill_span_rows_4bit_c` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | variant c | variant differences | 245 (2026-10-17) | Ghidra C; renderer selection in configure_renderer_for_display; token diff vs HEAD = renames |
+| `FUN_000037b4` | `fill_span_rows_8bit` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | depth-8 span filler via the 2048-entry code tables | — | 246 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001b4c` | `heap_zero_payload_tail` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | false split | — | 246 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001be4` | `heap_realloc_grow_only_tail` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | false split | — | 246 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00001c04` | `copy_object_vertex_buffer` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x44 -> +0x4c, 12-byte vertices | — | 246 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00002e12` | `noop_stub_2e12` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | empty | — | 247 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00004e06` | `reset_object_to_template_pose` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | position from the scene template, template chain transform | — | 247 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00004e4e` | `reset_object_to_template_pose_tail` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | false split | — | 247 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_00006e74` | `reset_span_row_lists` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | one background span per row | — | 248 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00006ece` | `clear_flag_00020ae4` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | one store | — | 248 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000823e` | `process_flight_input_tail` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | false split of the key handler | — | 248 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00008784` | `set_state_word_1b86c` | Pacific Conflict | RENAMED | HYPOTHESIS name | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 2 / 1 by argument | — | 248 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00005832` | `dispatch_overlap_collisions` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 1-D sweep over metric +/- radius, type handler +0x16 | — | 249 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000058ec` | `build_visible_object_list` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | view-space transform and pyramid cull into DAT_0001c9dc | — | 249 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -2196,9 +2313,456 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Validation: token diff = renames only (38 ID03 renames); warnings intact;
   32 hashes OK; git diff --check clean.
 
-**Next iteration target:** ID03 `FUN_00004304`, then `FUN_00004790`,
-`FUN_00004b32`, `FUN_00005158`, `FUN_000054fe`, `FUN_00005718`,
-`FUN_000071a2`.
+### Iteration 208 — 2026-10-17
+
+- Several queued loop prompts arrived together; ran one iteration.
+- Verified 32 protected hashes; uncommitted iteration 204–207 work preserved.
+- ID03 `FUN_00004790` = draw_percent_scale_gauge (vertical 0–100 scale with
+  ten ticks and vector-font labels, drawn by the panel redraw path at
+  0x681e; role open).
+- Validation: token diff = renames only (39 ID03 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 209 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204–208 work preserved.
+- ID03 `FUN_00004b32` = draw_split_display_box: framed panel box whose inset
+  rect is split into the halves A5-0x119c (drawn by ID02
+  draw_notched_frame_pair_a5safe) and A5-0x1194 (read by ID02 0x1206).
+- Validation: token diff = renames only (40 ID03 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 210 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204–209 work preserved.
+- ID03 `FUN_00004304` = draw_panel_section_with_numbered_boxes (descriptive
+  name): dark panel area A5-0x11aa, two 26-step line loops, bevel, and three
+  numbered bevel boxes 1 / 3 / 15 stored at A5-0x11c6 / -0x11be / -0x11b6;
+  meaning open.
+- Validation: token diff = renames only (41 ID03 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 211 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204–210 work preserved.
+- ID03 `FUN_000054fe` = draw_landing_gear_indicator (label STR# 78 "GEAR",
+  three lamp positions); `FUN_00005718` = dial_point_at_angle (answers the
+  open question on A5-0x2118: with A5-0x211c they are the cosine / sine
+  function pointers, 4.12 fixed point, 0x4000 per turn).
+- Validation: token diff = renames only (43 ID03 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 212 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204–211 work preserved.
+- ID03 `FUN_00005158` = draw_arc_scale_ticks (documents the unexported
+  two-arc gauge at 0x532e); `FUN_000071a2` = remap_panel_colours_identity.
+- ID03 is now fully renamed (45 / 45).
+- Validation: token diff = renames only (45 ID03 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 213 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–212 work preserved.
+- ID02 0x38..0x2ee is the C runtime library: div, ldiv, the eleven ANSI
+  ctype tests on the class table A5-0x1608 (bits 0x80 lower, 0x40 upper,
+  0x20 hex letter, 0x10 digit, 0x08 punct, 0x04 space char, 0x02 white
+  space, 0x01 control), toupper, tolower, memcpy, memmove, strcpy, strcat,
+  strcmp - renamed with an `ansi_` prefix (20 functions).
+- Validation: token diff = renames only (87 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 214 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–213 work preserved.
+- ID02 0x30c..0x412: strchr, strcspn, strpbrk, strrchr, strspn, strstr,
+  strtok (save pointer A5-0x1508), strncpy, strncat - `ansi_` prefix,
+  9 functions, all complete Ghidra C.
+- Validation: token diff = renames only (96 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 215 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–214 work preserved.
+- ID02 `FUN_0000045a` = begin_overlay_session (UnloadSeg 4, heap check,
+  sound start, overlay hooks A5-0x1082 / -0x107e; documents the matching
+  end at 0x4a4: shutdown_sound, hook A5-0x1076, DrawMenuBar);
+  `FUN_000004c6` = ensure_free_memory_and_init_sound (ID09 glue: JT $212 =
+  FreeMem $A01C, JT $21a = MaxMem $A11D); `FUN_00000930` =
+  call_overlay_session_hooks.
+- Validation: token diff = renames only (99 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 216 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–215 work preserved.
+- ID02 `FUN_000004fc` = run_flight_session: the game loop around the overlay
+  (set-up, begin_overlay_session, per-frame hook A5-0x107a(1, 1) with key /
+  event dispatch to the hook A5-0x106a, frame counter A5-0x14fc), then
+  end_overlay_session, pilot status saved to the roster, and a switch on the
+  result (conclude_mission with "Resume", quit_application,
+  show_paused_dialog, restart).
+- Validation: token diff = renames only (100 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 217 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–216 work preserved.
+- ID02 `FUN_0000150a` = get_blended_fill_pattern (JT $3e2; RGB tables
+  A5-0x350 / *A5-0x14a6, 6 bytes per index); `FUN_000016aa` =
+  draw_view_frame_outline.
+- Validation: token diff = renames only (102 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 218 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–217 work preserved.
+- ID02 sound resources and dialogs: `FUN_00001dd4` =
+  show_sound_error_dialog_once (DLOG 139), `FUN_00001e32` =
+  show_creating_panel_dialog (DLOG 128), `FUN_00001e68` =
+  release_sound_slots, `FUN_00001edc` = load_named_sound_into_slot (20 slots
+  at A5-0xd62). ID09 glue: JT $262 RecoverHandle, $272 HLock, $27a HUnlock,
+  $282 HPurge, $28a HNoPurge.
+- Validation: token diff = renames only (106 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 219 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–218 work preserved.
+- ID02 `FUN_00001f8e` = load_game_sounds, `FUN_000020be` = lock_sound_slots,
+  `FUN_0000212a` = reset_overlay_state (hypothesis name), `FUN_0000435e` =
+  position_window_on_screen. ID09 JT $242 = GetPtrSize ($A021).
+- Validation: token diff = renames only (110 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 220 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–219 work preserved.
+- ID02 `FUN_00002192` = scan_display_devices: GetMainDevice / GetDeviceList
+  walk; records for the main screen and for identical monitors directly to
+  its right and left (A5-0x1358 / -0x1342 / -0x132c, 0x16 bytes each).
+- Validation: token diff = renames only (111 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 221 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–220 work preserved.
+- ID02 `FUN_000027e4` = configure_display_from_main_device (rejects depths
+  other than 1 / 4 / 8 with STR# 116, then sets the screen globals);
+  `FUN_000029f2` = refresh_display_if_changed.
+- Validation: token diff = renames only (113 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 222 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–221 work preserved.
+- ID02 `FUN_00002334` = layout_game_window_and_view: view size from settings
+  +0xe (1 full, 2 half, 3 three quarters, 4 quarter of the screen width),
+  menu-bar handling incl. the 512 x 342 compact-Mac case, game window
+  NewCWindow A5-0x14ca and palettes A5-0x14ae / -0x14aa, view size
+  A5-0x1372 / -0x1370, ID06 rasterizer set-up at depth 1.
+- Validation: token diff = renames only (114 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 223 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–222 work preserved.
+- ID02 menus: `FUN_000030fa` = install_menus (MENU 1..5 at A5-0xc4e..-0xc3e),
+  `FUN_00003174` = update_menu_items, `FUN_00003590` =
+  set_menu_item_enabled, `FUN_000035bc` = set_view_size_option.
+- Validation: token diff = renames only (118 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 224 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–223 work preserved.
+- ID02 `FUN_0000442e` = position_alert_template (JT $47a), `FUN_00004582` =
+  centre_window_on_screen (JT $472, used by every ID04 dialog),
+  `FUN_00004610` = detach_window_palette, `FUN_0000462c` =
+  select_palette_for_depth (RGB table A5-0x14a6 = &A5-0x320 or &A5-0x302).
+- Validation: token diff = renames only (122 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 225 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–224 work preserved.
+- ID02 `FUN_00002ee4` = copy_pascal_string, `FUN_000035e4` =
+  start_new_mission (Duty Roster -> Scenario Selection -> reset of the
+  mission globals incl. 12 kill words -> run_flight_session),
+  `FUN_00004d6a` = handle_update_event (JT $492; documents the unexported
+  restore_screen_globals at 0x4d96).
+- ID02 is now fully renamed (125 / 125). All CODE segments ID02..ID09 are
+  renamed; remaining work: ID01 (6) and Pacific Conflict (331 + 6 BLOCKED).
+- Validation: token diff = renames only (125 ID02 renames); warnings intact;
+  32 hashes OK.
+
+### Iteration 226 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–225 work preserved.
+- ID01 (6 / 6): rt_udiv32, rt_umod32, rt_sdiv32 (JT $5a), rt_smod32 (JT
+  $62), rt_sdivmod32_core, rt_udivmod32_core (DIVU.W-based 32 / 32 divide).
+  The rt_udivmod32_core header also documents the unexported runtime code:
+  start-up (A5 world built from DATA 0 / ZERO 0, DREL 0 relocations,
+  ExitToShell), the three switch helpers (JT $2a / $32 / $3a) and the
+  32 x 32 multiply at 0xda.
+- All CODE segments ID01..ID09 are now fully renamed. Remaining: Pacific
+  Conflict (331 NOT_STARTED + 6 BLOCKED).
+- Validation: token diff = renames only (6 ID01 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 227 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–226 work preserved.
+- Pacific Conflict `FUN_00000334` = any_mission_kills_recorded,
+  `FUN_000003fa` = load_player_fuel_and_bombs, `FUN_00000488` =
+  tally_destroyed_entity. Mission block DAT_0001b5a0: +0xb6 fuel %, +0xb8
+  bombs (word; byte +0xb9), +0xba.. kill counters by type, +0xd2 friendly
+  kills - the overlay side of the host summary data.
+- Validation note: this file carries earlier parameter renames, so the token
+  check is done against the HEAD version of Pacific Conflict.decomp.c (equal
+  modulo the three new names); warnings intact; 32 hashes OK.
+
+### Iteration 228 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–227 work preserved.
+- Pacific Conflict scene graph: `FUN_000004f8` = transform_through_node_chain,
+  `FUN_000005fa` = traverse_scene_tree (kind-3 nodes are groups),
+  `FUN_000006a6` = for_each_mission_scene_object (root from the mission
+  scene table DAT_0001b5a0 + 0x8c / + 0x90). FUN_00000954 visits every
+  object with FUN_000006ec.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 229 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–228 work preserved.
+- Pacific Conflict `FUN_00000954` = plot_mission_map_symbols: the overlay
+  side of the host Map dialog (target of A5-0x1052). Plots A (airfield),
+  C (carrier: elevated airfield near a facility), B (friendly base, kind
+  0x13), and T (primary target) in missions 3 / 4, matching the DLOG 137
+  legend; positions relative to the player and divided by the map scale.
+  `FUN_000006ec` = collect_map_features (land outlines through the clippers
+  FUN_0000b190..b3aa to hook +0x292, airfield and facility lists).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 230 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–229 work preserved.
+- Pacific Conflict clippers: `FUN_0000b190` / `b242` / `b2f4` / `b3aa` =
+  clip_polygon_x_min / x_max / y_min / y_max (Sutherland-Hodgman against
+  the clip rectangle DAT_00020aee / aec / aea / DAT_0001b73e). Corrected the
+  collect_map_features note: the y-max bound is swapped for the last clipper.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 231 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–230 work preserved.
+- Pacific Conflict scene queries: `FUN_00000aba` =
+  nearest_type80_centroid_visitor, `FUN_00000bea` =
+  point_near_camera_or_type80_object (hypothesis name), `FUN_00000c4c` =
+  anchor_point_visitor, `FUN_00000d6a` = find_anchor_point (mode 0: kind-1
+  node pose; mode 1: nearest ground airfield point at height 67).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 232 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–231 work preserved.
+- Key link: the overlay pointer DAT_0001b5a0 is the host A5 world at
+  A5-0x1388 (the address passed by reset_overlay_state to the overlay entry).
+  Checks: +0x90 = A5-0x12f8 mission, +0xb6 = A5-0x12d2 fuel %, +0xb8 =
+  A5-0x12d0 bombs, +0xba = A5-0x12ce kills, +0xd2 = A5-0x12b6 friendly kills,
+  +0x192 / +0x1ac / +0x1b4 / +0xd8 = the panel bitmap handles, +0x2c6.. +0x2e2
+  = the host memory services A5-0x10c2 .. A5-0x10a6 [STRONG INFERENCE: every
+  offset checked so far agrees].
+- Pacific Conflict `FUN_00000db0` = ensure_handle_allocated, `FUN_00000e0a` =
+  lock_handle_nopurge, `FUN_00000e32` = unlock_handle_purgeable,
+  `FUN_00000e5a` = lock_overlay_buffers.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 233 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–232 work preserved.
+- Pacific Conflict `FUN_00001112` = overlay_main_entry: stores the host
+  globals pointer and fills the host hook slots A5-0x10a2 .. A5-0x104e with
+  overlay entry points (stored as address - 0x20). Resolves the host hooks
+  used by begin / end_overlay_session, run_flight_session, start_new_mission
+  and the map dialog (sine / cosine / sqrt / angle / map plotter). Table in
+  docs/OVERLAY_SERVICE_TABLE.md.
+- `FUN_00000ea0` = allocate_session_buffers (hook A5-0x1082), `FUN_00000f92`
+  = lock_session_buffers (A5-0x107e), `FUN_00001094` =
+  unlock_session_buffers (A5-0x1076).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 234 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–233 work preserved.
+- Pacific Conflict hook targets: `FUN_00003ac4` = start_mission_scene
+  (A5-0x109a), `FUN_00007310` = begin_flight_for_rank (A5-0x106e),
+  `FUN_00006598` = overlay_frame_step (A5-0x107a, body partly decoded),
+  `FUN_0000739a` = copy_player_pose_to_camera (camera DAT_0001d838 / -834 /
+  -830 and angles).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 235 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–234 work preserved.
+- Pacific Conflict `FUN_00006ed6` = update_view_clip_bounds (hook A5-0x109e;
+  sets the clip y-max DAT_0001b73e from the view height, 20 lines less when
+  the instrument panel is shown), `FUN_000038f4` = respawn_player_at_anchor
+  (hook A5-0x108a; after conclude_mission the aircraft restarts at the
+  nearest airfield).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 236 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–235 work preserved.
+- Pacific Conflict `FUN_0000740a` = process_flight_input_and_outcome (hook
+  A5-0x106a): flight key handling and the outcome code returned to
+  run_flight_session. Esc / ` / ~ -> 3 (the "mission in progress" summary
+  outcome), P -> 4 (Paused); on landing it writes fuel % and bombs back to
+  the host. Header is an outline; per-key meanings remain hypotheses.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 237 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–236 work preserved.
+- Pacific Conflict `FUN_00006ff6` = configure_renderer_for_display (hook
+  A5-0x10a2): view size from host +0x16 / +0x18 (A5-0x1372 / -0x1370) and
+  renderer set-up per pixel depth.
+- Corrections: (1) host +0xe is A5-0x137a, the pixel depth 1 / 4 / 8 - the
+  older "mission mode" reading of DAT_0001b5a0 + 0xe (e.g. in
+  overlay_patch_template_u16_pair notes) means depth; (2) the code-pointer
+  entries of the overlay hook table also follow the +0x20 rule:
+  FUN_00001d56 -> 0x1d76 sin_fixed14, FUN_00001db8 -> 0x1dd8 cos_fixed14,
+  LAB_0000e350 -> 0xe370; 0x28a6 is rotate_int3_vecs_by_3ang (already named).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 238 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–237 work preserved.
+- Pacific Conflict `FUN_00004210` = refresh_object_colours_for_depth (hook
+  A5-0x1096), `FUN_000041ec` = recolour_kind2_object (hypothesis name),
+  `FUN_00004916` = set_object_faces_bw_pattern (host pattern table +0x88 =
+  A5-0x1300, the ID06 pattern table).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 239 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–238 work preserved.
+- Pacific Conflict object shading: `FUN_00003da8` =
+  update_object_distance_band (distance bands DAT_0001b190),
+  `FUN_00003e02` = update_record_distance_band, `FUN_00003e5c` =
+  snapshot_face_colours (hypothesis name), `FUN_00003ea0` =
+  shade_object_faces (face normal . light vector DAT_0001bd88..8c gives a
+  0.25..1.0 factor; at depth 8 a haze blend toward (0x7d, 0x84, 0xa8) by
+  distance band when host option +0xaa is on). recolour_kind2_object =
+  distance band update + shading.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 240 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–239 work preserved.
+- Pacific Conflict colour assignment: `FUN_0000159e` = assign_face_colour
+  (depth 1: luminance (19 R + 38 G + 7 B) / 64 -> host dither pattern; depth
+  4: fixed table; depth 8: dynamic palette slot out of 200, round-robin,
+  avoiding slots used in either of the two last frames), `FUN_00001548` =
+  write_face_palette_slot, `FUN_0000147a` = queue_face_palette_entry (pending
+  ColorSpec list at host +0x72, applied by the host).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 241 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–240 work preserved.
+- Pacific Conflict `FUN_000011e6` = widen_printf_format, `FUN_00001254` =
+  overlay_printf (host +0x262 = A5-0x1126, target unknown), `FUN_00001294` =
+  reset_palette_owner_tables, `FUN_00001300` / `FUN_0000131c` =
+  init_depth8_colour_state / init_depth4_colour_state (the depth-specific
+  set-ups chosen by configure_renderer_for_display).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 242 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–241 work preserved.
+- Pacific Conflict `FUN_0000640c` = spawn_cloud_layer (hook A5-0x104e; host
+  option +0xae = A5-0x12da), `FUN_00019aa2` = spawn_camera_relative_object,
+  `FUN_00019b30` = follow_camera_offset. The "cloud" reading is a strong
+  inference from the camera-relative placement and heights.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 243 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–242 work preserved.
+- Pacific Conflict `FUN_000018d6` = overlay_initialise (RNG seed from the
+  host TickCount, subsystem initialisers, light vector 0xd983 / 0x69d8 /
+  0xc330). Overlay heap: `FUN_00001958` = heap_sbrk (arena = host
+  A5-0x1040, the 220 / 320 KB work buffer allocated by the host),
+  `FUN_00001974` = heap_new_size_class_block, `FUN_0000199a` =
+  heap_add_large_block, `FUN_000019b0` = heap_add_large_block_tail (Ghidra
+  false split).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 244 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–243 work preserved.
+- Pacific Conflict initialisers: `FUN_00003732` = overlay_init_noop,
+  `FUN_00003734` = init_code_pointer_tables, `FUN_00003266` / `3412` /
+  `35b4` = init_span_table_32ba / 3466 / 3608 (self-modifying tables inside
+  the code), `FUN_0001771a` = set_view_distance and `FUN_00017736` =
+  cycle_view_distance (the Tab key cycles 0xc15c0 / 0x26ac0 / 0xce40).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 245 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–244 work preserved.
+- Pacific Conflict `FUN_000032ba` / `3466` / `3608` = fill_span_rows_4bit_a /
+  b / c: depth-4 span fillers (two merged run lists per row, nibble writes),
+  selected by configure_renderer_for_display through DAT_00020ac0 /
+  _DAT_00020abc / _DAT_00020ab8 (stored as address - 0x20); depth 8 uses
+  0x37b4 for all three.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 246 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–245 work preserved.
+- Pacific Conflict `FUN_000037b4` = fill_span_rows_8bit (uses the two
+  2048-entry code tables from init_code_pointer_tables - note added there),
+  `FUN_00001b4c` / `FUN_00001be4` = heap_zero_payload_tail /
+  heap_realloc_grow_only_tail (Ghidra false splits), `FUN_00001c04` =
+  copy_object_vertex_buffer.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 247 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–246 work preserved.
+- Pacific Conflict `FUN_00002e12` = noop_stub_2e12, `FUN_00004e06` =
+  reset_object_to_template_pose, `FUN_00004e4e` =
+  reset_object_to_template_pose_tail (false split). Left the earlier-flagged
+  false mid-labels FUN_00002aba / FUN_00003be0 untouched, and deferred the
+  large FUN_00002e14, FUN_00003cca (register-argument distance minimum) and
+  FUN_00004958.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 248 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–247 work preserved.
+- Pacific Conflict `FUN_00006e74` = reset_span_row_lists (each view row
+  starts as one background span), `FUN_00006ece` = clear_flag_00020ae4,
+  `FUN_0000823e` = process_flight_input_tail (false split),
+  `FUN_00008784` = set_state_word_1b86c (hypothesis name). FUN_00004958
+  (builds a clipped, de-duplicated face outline per object) deferred.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 249 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 211–248 work preserved.
+- Pacific Conflict `FUN_00005832` = dispatch_overlap_collisions (sweep over
+  the metric-sorted object list, type collision handlers at type record
+  +0x16), `FUN_000058ec` = build_visible_object_list (view-pyramid cull);
+  both called back to back near Pacific Conflict.decomp.c 8445.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict `FUN_0000555a`, `FUN_00005a14`
+(called by overlay_frame_step), `FUN_00005e28`, and the caller of the two
+functions above (~line 8445).
 
 ## Resuming the five-minute workflow
 

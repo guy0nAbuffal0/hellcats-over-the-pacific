@@ -907,9 +907,13 @@ void draw_numbered_bevel_box /* Original: FUN_00004110 */ (void)
 
 
 
+/* Original: FUN_00004304; source: ID03.c. Recovered name: draw_panel_section_with_numbered_boxes [STRONG INFERENCE mechanics] (iteration 210).
+ * Decoded from ID03.bin bytes at file 0x4304.
+ * No arguments. Caller: the panel redraw path of prepare_instrument_panel (0x67fa, after A5-0x2114 = 40). PaintRect of the design rect (-400, 750)-(400, 1560) in colour level 0, then (depth 1 or 4: level 0, else level (0, 1, 0)) InsetRect(2, 2) and PaintRect again; the inset rect -> A5-0x11aa; design point (-10, 1150) -> A5-0x11a0 / -0x119e; A5-0x11c8 = depth A5-0x137a; then two 26-step line loops (MoveTo / LineTo, design coordinates through JT $3ca / $382; counters compared with 0x19 and 0x1a) and draw_bevelled_frame around the area; finally three draw_numbered_bevel_box boxes stacked at design x 490..610, y 720..840, 900..1020, 1080..1200 (SetRect $A8A7) with the numbers 1, 3 and 15, their inner rects stored at A5-0x11c6, -0x11be, -0x11b6 [PROVEN, bytes 0x4304..0x478e]. What this panel section shows (and the meaning of 1 / 3 / 15) is not yet known [UNKNOWN]; the name only describes what is drawn.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004304(void)
+void draw_panel_section_with_numbered_boxes /* Original: FUN_00004304 */ (void)
 
 {
   int unaff_A5;
@@ -926,9 +930,13 @@ void FUN_00004304(void)
 
 
 
+/* Original: FUN_00004790; source: ID03.c. Recovered name: draw_percent_scale_gauge [STRONG INFERENCE] (iteration 208).
+ * Decoded from ID03.bin bytes at file 0x4790.
+ * Caller: the panel redraw path of prepare_instrument_panel (0x681e) with design arguments (0x14a, 0x258, 7, scale_design_480_min10(10), 0x794, 0x898). Converts its box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800), PaintRect in colour level 0 and FrameRect ($A8A1) in level 3 (depth 1) or 2; draws ten tick marks (loop i = 0..9, MoveTo / LineTo, y step = height / 9); then into a 3x black-and-white port (new_offscreen_bw_port 0x2a8, SetOrigin(-2, -2)) draws the vector-font numbers 100 and 0 at the top and bottom of the scale (draw_vector_number 0x912), composites it with antialias_downsample_bw_3x (0xa3c) into the panel port A5-0x1496 and disposes the port (0x33c); stores its geometry in the record at A5-0x1186 [PROVEN calls and constants]. A vertical 0-100 percentage scale; which control it shows (throttle?) is open [HYPOTHESIS].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004790(void)
+void draw_percent_scale_gauge /* Original: FUN_00004790 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -937,9 +945,13 @@ void FUN_00004790(void)
 
 
 
+/* Original: FUN_00004b32; source: ID03.c. Recovered name: draw_split_display_box [STRONG INFERENCE] (iteration 209).
+ * Decoded from ID03.bin bytes at file 0x4b32.
+ * Caller: the panel redraw path of prepare_instrument_panel (0x6846) with design arguments (0x17c, 0x17c, 7, scale_design_480_min10(10), 0x474, -0x2a8). PenSize(1, 1); converts the box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800); PaintRect in colour level 0; FrameRect ($A8A1) in level 2; InsetRect(3, 3); then splits the inset rect at its horizontal centre into a left half stored at A5-0x119c and a right half stored at A5-0x1194 (8-byte Rects) [PROVEN, bytes 0x4b32..0x4c40]. A5-0x119c is the rect that ID02 draw_notched_frame_pair_a5safe (overlay service slot -0x10ea) draws into, and A5-0x1194 is read by ID02 0x1206 / 0x1222 - so this lays out a two-part indicator box on the panel whose contents the overlay draws; which indicator is open [UNKNOWN].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004b32(void)
+void draw_split_display_box /* Original: FUN_00004b32 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1004,7 +1016,12 @@ void draw_ammo_counter /* Original: FUN_00004ecc */ (undefined4 param_1,undefine
 // WARNING: Removing unreachable block (ram,0x000051c0)
 // WARNING: Removing unreachable block (ram,0x0000532a)
 
-void FUN_00005158(void)
+/* Original: FUN_00005158; source: ID03.c. Recovered name: draw_arc_scale_ticks [STRONG INFERENCE] (iteration 212).
+ * Decoded from ID03.bin bytes at file 0x5158.
+ * C args (words): +8, +0xa length, +0xc size, +0xe x, +0x10 y, +0x12 side flag. Loop over tick i: angle a = (i * 0x1555 / 12 - 0xaab) & 0x3fff in 1/0x4000 turns (10-degree steps starting at -60 degrees); every fourth tick is a major tick (PenSize(size / 10, size / 10), length 4 * len), the others minor (PenSize(2 * size / 30, ...), length 2 * len); the end points come from the cosine / sine pointers A5-0x2118 / A5-0x211c (4.12) with the side flag selecting the mirrored arc, scaled with scale_design_4800_pen_centred (0xa6) and drawn with MoveTo / LineTo [PROVEN, bytes 0x5158..0x532c]. Callers: the unexported gauge at 0x532e (0x53b0 with flag 1, 0x53e8 with flag 0) - a gauge with a left and a right arc scale.
+ * The following bytes 0x532e..0x54fc (not exported by Ghidra) are that gauge, called by the panel redraw path at 0x69c6: bezel (draw_ring_with_status_indicators flags 0x0f), begin_instrument_supersample, the two arcs above, a 24-point label (set_scaled_text_style, DrawString), positions stored at A5-0x1162..-0x1158, finish_instrument_supersample. Its label string and identity are not decoded yet [UNKNOWN].
+ */
+void draw_arc_scale_ticks /* Original: FUN_00005158 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1031,17 +1048,21 @@ void draw_fuel_gauge /* Original: FUN_0000532e */ (undefined4 param_1,undefined4
   FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
   begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
                CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
-  FUN_00005158();
-  FUN_00005158();
+  draw_arc_scale_ticks();
+  draw_arc_scale_ticks();
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
 }
 
 
 
+/* Original: FUN_000054fe; source: ID03.c. Recovered name: draw_landing_gear_indicator [STRONG INFERENCE] (iteration 211).
+ * Decoded from ID03.bin bytes at file 0x54fe.
+ * C args: +8 short size, +0xa short x, +0xc short y, +0xe, +0x10 (caller: the panel redraw path at 0x697e with 0x258, 7, scale_design_480_min10(10), 0x7a8, -0xb2c). draw_ring_with_status_indicators(size, flags 0x0f) (0x514); begin_instrument_supersample; PenSize; stroke drawing from the point table A5-0x1f80 (MoveTo / LineTo with scale_design_4800_pen_centred); TextFont(1), set_scaled_text_style(24) (0x6), GetFontInfo, StringWidth and DrawString of the label held at local -0x1a, loaded from A5-0xe0e = STR# 129 slot 78 "GEAR" (0x5628) [PROVEN]; then stores three screen points and radii at A5-0x1174 / -0x1172, -0x116e / -0x116c, -0x1168 / -0x1166 with radius scale_design_4800(75) in -0x1170, -0x116a, -0x1164 - three indicator lamps, presumably one per landing-gear leg, lit later by the overlay [STRONG INFERENCE]; finish_instrument_supersample (0x1844).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000054fe(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void draw_landing_gear_indicator /* Original: FUN_000054fe */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];
@@ -1058,7 +1079,11 @@ void FUN_000054fe(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 // WARNING: Control flow encountered bad instruction data
 // WARNING: Removing unreachable block (ram,0x0000583a)
 
-void FUN_00005718(short *param_1,undefined4 param_2,short *param_3,short *param_4)
+/* Original: FUN_00005718; source: ID03.c. Recovered name: dial_point_at_angle [STRONG INFERENCE] (iteration 211).
+ * Decoded from ID03.bin bytes at file 0x5718.
+ * C args: +8 Rect *dial, +0xc short angle in degrees, +0xe short radial offset, +0x10 short *x (out), +0x12 short *y (out). r = half the dial width; step = +5 or -5 by the sign of the offset; returns at once when offset + step == 0. a = (angle - 90) * 0x4000 / 360, normalised into 0..0x4000 (0x4000 = one turn); x = centre x + (A5-0x2118)(a) * r >> 12, y = centre y + (A5-0x211c)(a) * r >> 12 (4.12 fixed point) [PROVEN, Ghidra C]. With 0 degrees at the top (a = 270 degrees), A5-0x2118 behaves as cosine and A5-0x211c as sine [STRONG INFERENCE]; both are copied from A5-0x1062 / A5-0x1066 by prepare_instrument_panel. The truncated tail draws a radial tick (MoveTo / LineTo at 0x5836 / 0x5842). Callers: 0x6468, 0x6532, 0x674c, 0x67c6 (panel redraw path).
+ */
+void dial_point_at_angle /* Original: FUN_00005718 */ (short *param_1,undefined4 param_2,short *param_3,short *param_4)
 
 {
   short sVar1;
@@ -1260,7 +1285,11 @@ void remap_cached_panel_colours /* Original: FUN_00006c1c */ (void)
 
 
 
-void FUN_000071a2(void)
+/* Original: FUN_000071a2; source: ID03.c. Recovered name: remap_panel_colours_identity [STRONG INFERENCE] (iteration 212).
+ * Decoded from ID03.bin bytes at file 0x71a2.
+ * Builds an identity table of 256 words on the stack (t[i] = i) and calls remap_cached_panel_colours(t, A5-0x1354) (0x6c1c). Note for remap_cached_panel_colours: its first argument is this 256-entry index table and its second is A5-0x1354 [PROVEN, bytes 0x71a2..0x71d2]. Callers: 0x60e2 and 0x6ba8 (prepare_instrument_panel).
+ */
+void remap_panel_colours_identity /* Original: FUN_000071a2 */ (void)
 
 {
   short sVar1;

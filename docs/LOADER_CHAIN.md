@@ -167,3 +167,23 @@ Only the following loader targets are supported by **byte-level evidence** (UNLK
 | **ID07** | 1402 | 0x018c | 0x0190 | +4 | FUN_00000190 |
 
 **[PROVEN]** counts: ID02 one, ID05 one, ID06 three, ID07 one. All others (including the six unresolved ID06 entries in §7) remain **[UNKNOWN]** until the same byte-level check is applied.
+
+## Host globals seen from the overlay (iteration 232)
+
+`DAT_0001b5a0` holds the address `A5 - 0x1388` that the host passes to the
+overlay entry (`reset_overlay_state`, ID02 0x212a). An overlay access
+`DAT_0001b5a0 + k` is therefore the host global `A5 - 0x1388 + k`:
+
+| Overlay offset | Host global | Meaning |
+|---|---|---|
+| +0xe | A5-0x137a | pixel depth 1 / 4 / 8 (iteration 237; older notes call it a mission mode) |
+| +0x16 / +0x18 | A5-0x1372 / A5-0x1370 | view width / height |
+| +0x90 | A5-0x12f8 | mission number |
+| +0xb6 / +0xb8 | A5-0x12d2 / A5-0x12d0 | fuel % / bombs |
+| +0xba.. | A5-0x12ce.. | kill counters by target type |
+| +0xd2 | A5-0x12b6 | friendly units destroyed |
+| +0xd8, +0x192, +0x1ac, +0x1b4 | A5-0x12b0, -0x11f6, -0x11dc, -0x11d4 | cached panel bitmap handles |
+| +0x2c6 .. +0x2e2 | A5-0x10c2 .. A5-0x10a6 | host memory services (new / realloc / lock / unlock / purge / nopurge / freemem) |
+
+**[STRONG INFERENCE]** — every offset checked so far agrees with the host
+side; the A5-0x1388 argument itself is **[PROVEN]** (ID02 0x217a).

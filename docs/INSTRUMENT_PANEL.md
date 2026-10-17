@@ -91,7 +91,7 @@ slot orientation from screw to screw.
   reuses a stored cache entry when its key (+0 1-bit mode, +2 / +4,
   +6 / +8 view width / height) matches, restoring the per-instrument records
   (`A5-0x12a2`) from entry +0x12.
-- The needle function pointer `A5-0x2118` and the per-type record at
-  `A5-0x12a2`.
+- ~~The needle function pointer `A5-0x2118`~~ — cosine (with `A5-0x211c` sine), used by `dial_point_at_angle` (iteration 211). The per-type record at `A5-0x12a2` is still open.
+- GEAR: `draw_landing_gear_indicator` (ID03 0x54fe, label STR# 78) lays out three lamps.
 - ID04 slot users decoded in iteration 172; the panel-store path (ID04 0x432,
   ID02 0x4d34) is not yet fully understood.

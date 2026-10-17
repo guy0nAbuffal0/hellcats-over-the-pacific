@@ -65,3 +65,36 @@ The function-pointer slots called by ID02 (`A5-0x1092`, `-0x104e`, `-0x1096`,
 `-0x109e`, `-0x10a2`) are outside this range and have no `d16(A5)` writer in
 any CODE segment (iteration 117). They are presumably written by the overlay
 (overlay → application callbacks). **[STRONG INFERENCE]**
+
+## Overlay hooks (the other direction) — iteration 233
+
+`overlay_main_entry` (Pacific Conflict `FUN_00001112`) receives the host
+globals pointer (A5-0x1388) and writes overlay entry points into the host
+slots below. Stored values are the overlay address minus 0x20; the column
+"Overlay function" gives the Ghidra address. **[PROVEN stores; +0x20 rule
+STRONG INFERENCE]**
+
+| Host slot | Overlay offset | Overlay function | Host user |
+|---|---|---|---|
+| A5-0x10a2 | +0x2e6 | 0x6ff6 `configure_renderer_for_display` | layout_game_window_and_view (depth change) |
+| A5-0x109e | +0x2ea | 0x6ed6 `update_view_clip_bounds` | redraw_main_window callback |
+| A5-0x109a | +0x2ee | 0x3ac4 `start_mission_scene` | start_new_mission (mission number) |
+| A5-0x1096 | +0x2f2 | 0x4210 `refresh_object_colours_for_depth` | refresh_display_if_changed / start_new_mission |
+| A5-0x1092 | +0x2f6 | 0x44e8 `run_simulation_tick` | — |
+| A5-0x108e | +0x2fa | 0x3fa `load_player_fuel_and_bombs` | run_flight_session restart path |
+| A5-0x108a | +0x2fe | 0x38f4 `respawn_player_at_anchor` | run_flight_session restart path |
+| A5-0x1086 | +0x302 | 0x4d0 | run_flight_session optional poll |
+| A5-0x1082 | +0x306 | 0xea0 `allocate_session_buffers` | begin_overlay_session |
+| A5-0x107e | +0x30a | 0xf92 `lock_session_buffers` | begin_overlay_session |
+| A5-0x107a | +0x30e | 0x6598 `overlay_frame_step` | run_flight_session per-frame step |
+| A5-0x1076 | +0x312 | 0x1094 `unlock_session_buffers` | end_overlay_session |
+| A5-0x1072 | +0x316 | 0xd25a | — |
+| A5-0x106e | +0x31a | 0x7310 `begin_flight_for_rank` | run_flight_session start (rank) |
+| A5-0x106a | +0x31e | 0x740a `process_flight_input_and_outcome` | run_flight_session key / event handler (result = outcome code) |
+| A5-0x1066 | +0x322 | 0x1d76 `sin_fixed14` (stored as FUN_00001d56) | copied to A5-0x211c (instrument panel) |
+| A5-0x1062 | +0x326 | 0x1dd8 `cos_fixed14` (stored as FUN_00001db8) | copied to A5-0x2118 |
+| A5-0x105e | +0x32a | 0x28a6 `rotate_int3_vecs_by_3ang` | — |
+| A5-0x105a | +0x32e | 0xe370 (square root; stored as LAB_0000e350) | map bearing / distance tool |
+| A5-0x1056 | +0x332 | 0x1f22 (angle) | map bearing / distance tool |
+| A5-0x1052 | +0x336 | 0x954 `plot_mission_map_symbols` | draw_map_view_item |
+| A5-0x104e | +0x33a | 0x640c `spawn_cloud_layer` | — |
