@@ -475,7 +475,17 @@ void FUN_0000146a(undefined4 param_1,undefined4 param_2)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001538(undefined2 *param_1,short *param_2,short *param_3,undefined4 param_4,
+/*
+ * Original: FUN_00001538; source: ID03.c:327.
+ * Recovered name: begin_instrument_supersample [STRONG INFERENCE] (iteration 168).
+ * Exported C kept (two truncated branches). Args: short *size, *x, *y, ...,
+ * GrafPtr *out_port. If mode A5-0x137a == 1 (1-bit screen): creates a 1x B&W
+ * port with new_offscreen_bw_port(scaled size). Otherwise multiplies x and y
+ * by 3 and creates a port of 3 * scaled size + 6 for 3x supersampling
+ * (consumed later by antialias_downsample_bw_3x) [STRONG INFERENCE].
+ * Callers: instrument drawers (e.g. draw_altimeter).
+ */
+void begin_instrument_supersample /* Original: FUN_00001538 */ (undefined2 *param_1,short *param_2,short *param_3,undefined4 param_4,
                  undefined4 *param_5)
 
 {
@@ -527,12 +537,28 @@ void FUN_00001844(void)
 // WARNING: Removing unreachable block (ram,0x00001910)
 // WARNING: Removing unreachable block (ram,0x00001ac0)
 
-void FUN_00001876(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00001876; source: ID03.c:379.
+ * Recovered name: draw_altimeter [STRONG INFERENCE] (iteration 168).
+ * Instrument type 0 of draw_instrument. Exported C kept (truncated). Bytes
+ * 0x1876..0x1b46 [PROVEN, condensed]: begin_instrument_supersample(...);
+ * tick/needle geometry through function pointer long A5-0x2118 (JSR (A0)) in
+ * loops of 12 steps; a 20-iteration loop of draw_vector_number labels;
+ * TextFont(1) $A887, set_scaled_text_style(20), GetFontInfo $A88B; label
+ * string = long A5-0xe42 = STR# 129 slot 65 (A5-0xf46 + 65*4) -> centred with
+ * StringWidth $A88C, MoveTo, DrawString $A884; finish via FUN_00001844.
+ * Label text [PROVEN from resource dump]: slot 65 = "\pALTITUDE"
+ * (artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app,
+ * file index 64; files are 0-based, game slots 1-based - calibrated with
+ * slot 93 = "Out of memory.  Sorry" used by ID02 fatal_memory_error_exit).
+ * Hence the altimeter gauge [STRONG INFERENCE].
+ */
+void draw_altimeter /* Original: FUN_00001876 */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_36);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -548,7 +574,7 @@ void FUN_00001b48(undefined4 param_1,undefined2 param_2,undefined4 param_3)
   undefined4 auStack_36 [12];
   short local_6;
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_36);
   local_6 = 0;
   while( true ) {
@@ -581,7 +607,7 @@ void FUN_00001fee(undefined4 param_1,undefined2 param_2,undefined4 param_3)
   undefined4 auStack_36 [12];
   short local_6;
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_36);
   local_6 = 0;
   while( true ) {
@@ -611,7 +637,7 @@ void FUN_000022fe(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 {
   undefined4 auStack_38 [13];
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_38);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -627,7 +653,7 @@ void FUN_00002600(undefined4 param_1,undefined2 param_2,undefined4 param_3)
   undefined4 auStack_38 [12];
   short local_6;
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_38);
   local_6 = 0;
   while( true ) {
@@ -657,7 +683,7 @@ void FUN_00002950(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 {
   undefined4 auStack_38 [13];
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_38);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -672,7 +698,7 @@ void FUN_00002d1c(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 {
   undefined4 auStack_38 [13];
   
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&stack0x00000008,
                CONCAT22(param_2,param_3._0_2_),auStack_38);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -727,7 +753,7 @@ void FUN_000038fc(void)
  *     0x1b if type == 6, else 0x0f   (bezel + corner screws, see below);
  *   colour (4,4,4) via lookup_palette_index_for_rgb_level / set_draw_color_index;
  *   switch (type) [ID01 switch helper, 0..9, table parsed by script]:
- *     0 -> FUN_00001876   1 -> FUN_00001b48   2 -> FUN_00002d1c
+ *     0 -> draw_altimeter (FUN_00001876)   1 -> FUN_00001b48   2 -> FUN_00002d1c
  *     3 -> FUN_00001fee   4 -> FUN_00002600   5 -> FUN_000022fe
  *     6 -> FUN_00002950   7 -> (none)         8 -> FUN_000032b8(..., 1)
  *     9 -> FUN_000038fc(..., 1)       (each called with $a, $c, $e, $10, $12);
@@ -847,7 +873,7 @@ void FUN_00004c42(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   undefined4 auStack_36 [12];
   
   FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
                CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -865,7 +891,7 @@ void FUN_00004ecc(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   undefined4 auStack_36 [12];
   
   FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
                CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -894,7 +920,7 @@ void FUN_0000532e(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   undefined4 auStack_36 [12];
   
   FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
                CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
   FUN_00005158();
   FUN_00005158();
@@ -912,7 +938,7 @@ void FUN_000054fe(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   undefined4 auStack_36 [12];
   
   FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  FUN_00001538((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
+  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
                CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();

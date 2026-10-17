@@ -84,6 +84,9 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | STRONG INFERENCE mechanics | Iter 164: ring + up to 5 diagonal spinning indicators by flag bits. |
 | `FUN_00000a3c` (ID03) | `antialias_downsample_bw_3x` | STRONG INFERENCE | Iter 166: 3× Gaussian (7×7, /969) downsample of 1-bit bitmap into grey palette pixels. |
 | `FUN_00003c02` (ID03) | `draw_instrument` | STRONG INFERENCE | Iter 167: bezel + type-switch (0..9) to per-gauge drawers; record A5−0x12a2. |
+| `FUN_00001876` (ID03) | `draw_altimeter` | STRONG INFERENCE | Iter 168: instrument type 0; label STR#129[65] "ALTITUDE". |
+| `FUN_00001538` (ID03) | `begin_instrument_supersample` | STRONG INFERENCE | Iter 168: 1× or 3× B&W port for anti-aliased gauge drawing. |
+| STR# 129 text | `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/` | PROVEN (dump) | Files 0-based; game slot n ↔ file n−1. Slot 93 = out-of-memory message; slot 65 = ALTITUDE. |
 | ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
