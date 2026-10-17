@@ -82,6 +82,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00000912` (ID03) | `draw_vector_number` | STRONG INFERENCE | Iter 161: stroke-font digits from A5−0x1fde. |
 | `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | STRONG INFERENCE mechanics | Iter 163: grey disc + 4-phase rotating spoke (A5−0x2112), size A5−0x2114. |
 | `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | STRONG INFERENCE mechanics | Iter 164: ring + up to 5 diagonal spinning indicators by flag bits. |
+| `FUN_00000a3c` (ID03) | UNKNOWN (INVESTIGATING) | HYPOTHESIS | Iter 165: 1-bit bitmap neighbourhood filter (anti-alias?). |
 | ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |

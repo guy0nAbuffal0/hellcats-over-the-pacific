@@ -415,6 +415,22 @@ void draw_vector_number /* Original: FUN_00000912 */ (undefined4 param_1,undefin
 
 // WARNING: Control flow encountered bad instruction data
 
+/*
+ * Original: FUN_00000a3c; source: ID03.c:294.
+ * Status: INVESTIGATING (iteration 165); identifier retained. Ghidra exported
+ * no body; code spans file 0xa3c to about 0x146a.
+ * Partial byte reading [PROVEN for the decoded part]:
+ *   PenPat(QD black A5-0x161c); src = GrafPtr arg [8(A6)]: rowBytes = word +6,
+ *   base = long +2 (portBits); seven row pointers base + k*rowBytes (k = 0..6);
+ *   if (long $14 != 0) clear $12 bytes at $14 (output buffer);
+ *   for each x: mask = word table A5-0x1fb6[x & 7] (bit within byte x >> 3);
+ *     sum weighted bits of the rows at x (weights 1, 3, 4, 3, 1 ... seen);
+ *     same for x + 1, ...  [loop continues beyond 0xbf0, not yet read].
+ * [HYPOTHESIS] Supersampling filter: converts a 1-bit offscreen bitmap (drawn
+ * by the caller, e.g. FUN_000032b8 via new_offscreen_bw_port) into
+ * multi-level (grey) values for anti-aliased output.
+ * Callers [PROVEN, BSR scan]: ID03 file 0x152c, 0x37fc (FUN_000032b8), 0x4b02.
+ */
 void FUN_00000a3c(void)
 
 {
