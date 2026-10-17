@@ -274,8 +274,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003266` (Pacific Conflict) | `init_span_table_32ba` | STRONG INFERENCE mechanics | Iter 244: self-modifying table at 0x3242. |
 | `FUN_00003412` (Pacific Conflict) | `init_span_table_3466` | STRONG INFERENCE mechanics | Iter 244: table at 0x33ee. |
 | `FUN_000035b4` (Pacific Conflict) | `init_span_table_3608` | STRONG INFERENCE mechanics | Iter 244: table at 0x3590. |
-| `FUN_0001771a` (Pacific Conflict) | `set_view_distance` (iteration 280: actually the radar range) | STRONG INFERENCE | Iter 244: range + 2 * range. |
-| `FUN_00017736` (Pacific Conflict) | `cycle_view_distance` | STRONG INFERENCE | Iter 244: Tab key: 0xc15c0 / 0x26ac0 / 0xce40. |
+| `FUN_0001771a` (Pacific Conflict) | `set_view_distance` (iteration 280: actually the radar range) | VERIFIED | Iter 244: range + 2 * range. |
+| `FUN_00017736` (Pacific Conflict) | `cycle_view_distance` | VERIFIED | Iter 244: Tab key: 0xc15c0 / 0x26ac0 / 0xce40. |
 | `FUN_000032ba` (Pacific Conflict) | `fill_span_rows_4bit_a` | STRONG INFERENCE | Iter 245: depth-4 run-list span filler. |
 | `FUN_00003466` (Pacific Conflict) | `fill_span_rows_4bit_b` | STRONG INFERENCE | Iter 245: variant b. |
 | `FUN_00003608` (Pacific Conflict) | `fill_span_rows_4bit_c` | STRONG INFERENCE | Iter 245: variant c. |
@@ -298,11 +298,11 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00004958` (Pacific Conflict) | `build_land_outline_at_detail` | STRONG INFERENCE | Iter 251: drops vertices within tolerance, clips, de-duplicates into template vertex table. |
 | `FUN_00005e28` (Pacific Conflict) | `update_ground_scatter_objects` | STRONG INFERENCE | Iter 252: 64 ground points DAT_0001b924, 7 object slots DAT_0001bc64, gated by +0xac and height < 0x26ad. |
 | `FUN_00013346` (Pacific Conflict) | `surface_type_at_point` | STRONG INFERENCE | Iter 252: face code (+0x16) of nearby land face containing (x, z); default DAT_0001bda8+0x16. |
-| `FUN_00013070` (Pacific Conflict) | `point_in_polygon_xz` | STRONG INFERENCE | Iter 253: even-odd crossing test on vertex words +2 / +10. |
-| `FUN_0001310e` (Pacific Conflict) | `point_in_polygon_yz` | STRONG INFERENCE | Iter 253: same on +6 / +10. |
-| `FUN_0001320a` (Pacific Conflict) | `project_face_vertices_xz` | STRONG INFERENCE | Iter 253: (v >> shift) - origin into +2 / +10. |
-| `FUN_000131ac` (Pacific Conflict) | `project_face_vertices_xy` | STRONG INFERENCE | Iter 253: into +2 / +6. |
-| `FUN_00013268` (Pacific Conflict) | `project_face_vertices_yz` | STRONG INFERENCE | Iter 253: into +6 / +10. |
+| `FUN_00013070` (Pacific Conflict) | `point_in_polygon_xz` | VERIFIED | Iter 253: even-odd crossing test on vertex words +2 / +10. |
+| `FUN_0001310e` (Pacific Conflict) | `point_in_polygon_yz` | VERIFIED | Iter 253: same on +6 / +10. |
+| `FUN_0001320a` (Pacific Conflict) | `project_face_vertices_xz` | VERIFIED | Iter 253: (v >> shift) - origin into +2 / +10. |
+| `FUN_000131ac` (Pacific Conflict) | `project_face_vertices_xy` | VERIFIED | Iter 253: into +2 / +6. |
+| `FUN_00013268` (Pacific Conflict) | `project_face_vertices_yz` | VERIFIED | Iter 253: into +6 / +10. |
 | `FUN_00014af2` (Pacific Conflict) | `release_fractal_reference` | STRONG INFERENCE | Iter 253: decrements / frees shared block +0x2c; "Deactivating Fractal" message. |
 | `FUN_000132c8` (Pacific Conflict) | `point_over_face_xz` | STRONG INFERENCE | Iter 254: entity x / z origin, project_face_vertices_xz + point_in_polygon_xz. |
 | `FUN_00014bea` (Pacific Conflict) | `carry_attached_objects` | STRONG INFERENCE | Iter 254: rotates / lowers or removes nearby entities of template types 7 / 8 / 0x1a / 0x1b. |
@@ -320,8 +320,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000947c` (Pacific Conflict) | `apply_controller_velocities` | STRONG INFERENCE | Iter 259: saves position, adds controller +8..+0x10 velocity. |
 | `FUN_000094d2` (Pacific Conflict) | `tick_flagged_object_controllers` | STRONG INFERENCE | Iter 259: DAT_0001b870 == 3: ticks only objects with +5 & 4. |
 | `FUN_0001429c` (Pacific Conflict) | `handle_player_contact` | STRONG INFERENCE | Iter 259: player overlap; contact record; definition +0x12 handler. |
-| `FUN_0001358c` (Pacific Conflict) | `contact_pair_hash` | PROVEN | Iter 260: low byte of a ^ (b << 2). |
-| `FUN_000135a0` (Pacific Conflict) | `find_contact_record` | PROVEN | Iter 260: linear probe of DAT_0001bdbc (256 slots) for (a, b). |
+| `FUN_0001358c` (Pacific Conflict) | `contact_pair_hash` | VERIFIED | Iter 260: low byte of a ^ (b << 2). |
+| `FUN_000135a0` (Pacific Conflict) | `find_contact_record` | VERIFIED | Iter 260: linear probe of DAT_0001bdbc (256 slots) for (a, b). |
 | `FUN_000135e8` (Pacific Conflict) | `create_shape_contact_record` | STRONG INFERENCE | Iter 260: 0x10 + 6 * faces record for plain shapes. |
 | `FUN_0001383c` (Pacific Conflict) | `create_fractal_contact_record` | STRONG INFERENCE | Iter 260: 0x3e-byte record for fractal objects. |
 | `FUN_00013980` (Pacific Conflict) | `fractal_height_at` | STRONG INFERENCE | Iter 260: height of fractal terrain at relative (x, z). |
@@ -332,7 +332,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00013eae` (Pacific Conflict) | `test_player_vs_type0e_proximity` | STRONG INFERENCE | Iter 261: player vs template type 0xe. |
 | `FUN_00014348` (Pacific Conflict) | `dispatch_collision` | STRONG INFERENCE | Iter 262: definition +0x12 handlers; pair table DAT_0001b43c (10 × 8 bytes). |
 | `FUN_0001346c` (Pacific Conflict) | `point_in_face_by_axis` | STRONG INFERENCE | Iter 262: projects on yz / xz / xy by axis code, point-in-polygon. |
-| `FUN_00012fd2` (Pacific Conflict) | `point_in_polygon_xy` | STRONG INFERENCE | Iter 262: even-odd crossing test on words +2 / +6. |
+| `FUN_00012fd2` (Pacific Conflict) | `point_in_polygon_xy` | VERIFIED | Iter 262: even-odd crossing test on words +2 / +6. |
 | `FUN_000167f4` (Pacific Conflict) | `bullet_hits_aircraft` | STRONG INFERENCE | Iter 263: 1/8: damage roll + retire bullet; player hit 1/2 → _DAT_0001b842. |
 | `FUN_0001665a` (Pacific Conflict) | `bullet_hits_shape` | STRONG INFERENCE | Iter 263: retire bullet; type 0x1b controller +0x46 = 1 at 1/16. |
 | `FUN_00016724` (Pacific Conflict) | `apply_random_aircraft_damage` | STRONG INFERENCE | Iter 263: one random damage bit in controller +0x684 (bit 15 set from the bullet word +0x36 [UNKNOWN meaning]). |
@@ -343,7 +343,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00010650` (Pacific Conflict) | `update_aircraft_damage_state` | STRONG INFERENCE | Iter 266: damage stages in +0x684; player bit 0 → A5-0x12b4 = 1 (Dead), Ugh. |
 | `FUN_00011b96` (Pacific Conflict) | `replay_logged_effects` | STRONG INFERENCE | Iter 267: DAT_0001b870 = -1 while re-spawning logged effects of the current frame. |
 | `FUN_00011c2c` (Pacific Conflict) | `mark_effect_log_end` | STRONG INFERENCE | Iter 267: 0x7fffffff frame sentinel. |
-| `FUN_00011b48` (Pacific Conflict) | `register_effect_template` | STRONG INFERENCE | Iter 267: fills DAT_0002626e[0..3]; then create handler := 0x11ade (+0x20 = FUN_00011afe). |
+| `FUN_00011b48` (Pacific Conflict) | `register_effect_template` | VERIFIED | Iter 267: fills DAT_0002626e[0..3]; then create handler := 0x11ade (+0x20 = FUN_00011afe). |
 | `FUN_0001203a` (Pacific Conflict) | `init_effect_kind0_flat_ring` | STRONG INFERENCE | Iter 268: kind 0: 6 vertices, x / z outward velocities; iter 286: water splash ring. |
 | `FUN_000120ca` (Pacific Conflict) | `init_effect_kind1_column` | STRONG INFERENCE | Iter 268: kind 1: 3 spreading vertices, vertex 2 rising (+0x76). |
 | `FUN_00011efc` (Pacific Conflict) | `init_effect_kind2_burst` | STRONG INFERENCE | Iter 268: kind 2: 12 vertices, jittered outward velocities. |
@@ -354,10 +354,10 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00012486` (Pacific Conflict) | `animate_effect_kind1_column` | STRONG INFERENCE | Iter 269: vertex 2 up with gravity 0x5b; ends below 0. |
 | `FUN_00012296` (Pacific Conflict) | `animate_effect_kind2_burst` | STRONG INFERENCE | Iter 269: velocities halved; faces darkened 6/8 at depth 8. |
 | `FUN_00012528` (Pacific Conflict) | `animate_effect_kind3_debris` | STRONG INFERENCE | Iter 269: gravity, ground clamp; FUN_000175de / FUN_000115fc at the end. |
-| `FUN_00012738` (Pacific Conflict) | `face_object_to_camera` | STRONG INFERENCE | Iter 269: attitude = −camera angles. |
+| `FUN_00012738` (Pacific Conflict) | `face_object_to_camera` | VERIFIED | Iter 269: attitude = −camera angles. |
 | `FUN_000127aa` (Pacific Conflict) | `effect_pre_render_hook` | STRONG INFERENCE | Iter 270: definition +0xe of effects; DAT_0001b42c[kind]. |
 | `FUN_000115fc` (Pacific Conflict) | `spawn_smoke_plume` | HYPOTHESIS | Iter 270: template DAT_000260e8; sizes +0x36 / +0x34; end frame +0x38. |
-| `FUN_000115da` (Pacific Conflict) | `register_smoke_template` | STRONG INFERENCE | Iter 270: DAT_000260e8 = template; create handler → 0x115b0. |
+| `FUN_000115da` (Pacific Conflict) | `register_smoke_template` | VERIFIED | Iter 270: DAT_000260e8 = template; create handler → 0x115b0. |
 | `FUN_00011670` (Pacific Conflict) | `attach_trailing_plume` | STRONG INFERENCE | Iter 270: plume linked to an aircraft (+0x3c), 8 trail points. |
 | `FUN_000175de` (Pacific Conflict) | `spawn_ground_mark` | HYPOTHESIS | Iter 270: template DAT_00026660 scaled, expiry +2700 frames. |
 | `FUN_0000a75e` (Pacific Conflict) | `transform_and_project_object` | STRONG INFERENCE | Iter 271: +0xe hook phases 1 / 2; vertices of faces with bit 0x20 → camera space → DAT_000256b2. |
@@ -392,8 +392,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000ce1c` (Pacific Conflict) | `update_ammo_needle` | STRONG INFERENCE | Iter 279: needle 15 from +0x682 (675 rounds). |
 | `FUN_0000cec4` (Pacific Conflict) | `update_fuel_needles` | STRONG INFERENCE | Iter 279: needles 16 / 17 from +0x67d / +0x67e. |
 | `FUN_00017b68` (Pacific Conflict) | `update_radar_scope` | STRONG INFERENCE | Iter 279: tracked objects rotated by heading into the scope rectangle. |
-| `FUN_000176b2` (Pacific Conflict) | `add_radar_track` | STRONG INFERENCE | Iter 280: DAT_0001b51c[≤ 6] (x, z, two words, flag) when metric ≤ DAT_00026666. |
-| `FUN_0001776a` (Pacific Conflict) | `reset_radar_tracks` | STRONG INFERENCE | Iter 280: DAT_00026672 = DAT_00026676 = 0. |
+| `FUN_000176b2` (Pacific Conflict) | `add_radar_track` | VERIFIED | Iter 280: DAT_0001b51c[≤ 6] (x, z, two words, flag) when metric ≤ DAT_00026666. |
+| `FUN_0001776a` (Pacific Conflict) | `reset_radar_tracks` | VERIFIED | Iter 280: DAT_00026672 = DAT_00026676 = 0. |
 | `FUN_0000c1aa` (Pacific Conflict) | `update_heading_tape` | STRONG INFERENCE | Iter 280: strip at host +0x1b8 scrolled by DAT_0001d80e. |
 | `FUN_0000ba2a` (Pacific Conflict) | `draw_panel_frame_lines` | HYPOTHESIS | Iter 280: colour runs from host +0x238..+0x258. |
 | `FUN_0000fe96` (Pacific Conflict) | `aircraft_notice_object` | STRONG INFERENCE | Iter 281: aircraft definition +0x16; radar tracks for the player, target acquisition for AI. |
@@ -405,7 +405,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000110f4` (Pacific Conflict) | `ai_attack_or_fly` | STRONG INFERENCE | Iter 282: AI state 0x110d4 (+0x20). |
 | `FUN_00011182` (Pacific Conflict) | `ai_fly` | STRONG INFERENCE | Iter 282: AI state 0x11162 (+0x20). |
 | `FUN_0000dff0` (Pacific Conflict) | `init_aircraft_controller` | STRONG INFERENCE | Iter 283: 0x6b0 bytes; ammo 0x2a3, bombs 2, tanks def+0x1c/2, gear 0x2d. |
-| `FUN_0000df5e` (Pacific Conflict) | `fill_pose_history` | STRONG INFERENCE | Iter 283: 75 × 0x14 ring filled with a position. |
+| `FUN_0000df5e` (Pacific Conflict) | `fill_pose_history` | VERIFIED | Iter 283: 75 × 0x14 ring filled with a position. |
 | `FUN_0000fb2a` (Pacific Conflict) | `animate_landing_gear` | STRONG INFERENCE | Iter 283: aircraft definition +0xe; gear faces (+0x17 == 1) by +0x679. |
 | `FUN_0000f810` (Pacific Conflict) | `player_slew_mode` | STRONG INFERENCE | Iter 284: state 0xf7f0 (+0x20), control-S toggle; keypad axis moves with accelerating speed. |
 | `FUN_00012b66` (Pacific Conflict) | `apply_blast_damage` | STRONG INFERENCE | Iter 285: objects within blast radius destroyed / damaged (stack args). |
@@ -416,37 +416,37 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00012a2a` (Pacific Conflict) | `ordnance_tick` | STRONG INFERENCE | Iter 287: definition key 0xc +2; replay ring +0x60e. |
 | `FUN_00012d34` (Pacific Conflict) | `ordnance_detonation` | STRONG INFERENCE | Iter 287: impact effect; host +0xcc / +0xd2 / +0xce; blast after 5 / 15 frames. |
 | `FUN_00018c96` (Pacific Conflict) | `tick_flak_gun` | STRONG INFERENCE | Iter 287: definition key 0x1a +2; timed bursts at +0x5a / +0xd2. |
-| `FUN_0001281e` (Pacific Conflict) | `register_ordnance_template` | STRONG INFERENCE | Iter 288: DAT_00026280 (spawn_weapon_entity template). |
+| `FUN_0001281e` (Pacific Conflict) | `register_ordnance_template` | VERIFIED | Iter 288: DAT_00026280 (spawn_weapon_entity template). |
 | `FUN_000127c6` (Pacific Conflict) | `create_ordnance_controller` | STRONG INFERENCE | Iter 288: 0x620 bytes, flags 0x122000, pose ring +0x32. |
 | `FUN_000128b6` (Pacific Conflict) | `ordnance_ballistic_step` | STRONG INFERENCE | Iter 288: speed +0x610, gravity -0x5b, impact bit 0x400 in +0x61c. |
 | `FUN_00012f52` (Pacific Conflict) | `ordnance_collision` | STRONG INFERENCE | Iter 288: impact; ship target → +0x616 direct hit. |
 | `FUN_00018b52` (Pacific Conflict) | `create_flak_controller` | STRONG INFERENCE | Iter 289: type 0x1a +6; range 0x26ac0. |
-| `FUN_00018b98` (Pacific Conflict) | `destroy_flak_controller` | STRONG INFERENCE | Iter 289: type 0x1a +0xa; drops +0x36 / +0x32 refs. |
+| `FUN_00018b98` (Pacific Conflict) | `destroy_flak_controller` | VERIFIED | Iter 289: type 0x1a +0xa; drops +0x36 / +0x32 refs. |
 | `FUN_00016b4c` (Pacific Conflict) | `attach_smoke_trail` | STRONG INFERENCE | Iter 289: kind-0 trail; aircraft +0x68c count. |
 | `FUN_00016b9e` (Pacific Conflict) | `attach_burning_trail` | HYPOTHESIS | Iter 289: kind-1 trail; explosion sound countdowns. |
 | `FUN_00017102` (Pacific Conflict) | `attach_ground_fire` | HYPOTHESIS | Iter 289: FUN_000170ba object linked to owner. |
 | `FUN_000173fe` (Pacific Conflict) | `spawn_debris_fragment` | STRONG INFERENCE | Iter 289: template DAT_0002665c, random velocity, 45 frames. |
 | `FUN_00016ae8` (Pacific Conflict) | `spawn_trail` | STRONG INFERENCE | Iter 290: DAT_00026650[kind] + init DAT_0001b50c[kind]. |
-| `FUN_0001702a` (Pacific Conflict) | `tick_trail` | STRONG INFERENCE | Iter 290: animate DAT_0001b514[kind]; lifetime +0x34. |
-| `FUN_00016ac4` (Pacific Conflict) | `init_trail_kind0` | STRONG INFERENCE | Iter 290: 75 frames, state 1. |
-| `FUN_00016ad6` (Pacific Conflict) | `init_trail_kind1` | STRONG INFERENCE | Iter 290: 75 frames, state 1. |
+| `FUN_0001702a` (Pacific Conflict) | `tick_trail` | VERIFIED | Iter 290: animate DAT_0001b514[kind]; lifetime +0x34. |
+| `FUN_00016ac4` (Pacific Conflict) | `init_trail_kind0` | VERIFIED | Iter 290: 75 frames, state 1. |
+| `FUN_00016ad6` (Pacific Conflict) | `init_trail_kind1` | VERIFIED | Iter 290: 75 frames, state 1. |
 | `FUN_00016c6a` (Pacific Conflict) | `animate_smoke_trail` | STRONG INFERENCE | Iter 290: 4-vertex ribbon ±0x22 following a damaged aircraft. |
 | `FUN_00016e06` (Pacific Conflict) | `animate_burning_trail` | STRONG INFERENCE | Iter 290: ribbon ±100 following its owner. |
-| `FUN_000170ba` (Pacific Conflict) | `spawn_ground_fire_object` | HYPOTHESIS | Iter 290: template DAT_00026658, +0x32 = 45. |
-| `FUN_00016a78` (Pacific Conflict) | `register_trail_templates` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_000170ba` (Pacific Conflict) | `spawn_ground_fire_object` | VERIFIED | Iter 290: template DAT_00026658, +0x32 = 45. |
+| `FUN_00016a78` (Pacific Conflict) | `register_trail_templates` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_00016a3a` (Pacific Conflict) | `create_trail_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_00016c24` (Pacific Conflict) | `destroy_trail_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00017098` (Pacific Conflict) | `register_ground_fire_template` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_00017098` (Pacific Conflict) | `register_ground_fire_template` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_0001706a` (Pacific Conflict) | `create_ground_fire_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_0001713c` (Pacific Conflict) | `destroy_ground_fire_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_0001713c` (Pacific Conflict) | `destroy_ground_fire_controller` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_00017150` (Pacific Conflict) | `animate_ground_fire` | HYPOTHESIS | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00017380` (Pacific Conflict) | `tick_ground_fire` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000173dc` (Pacific Conflict) | `register_debris_template` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_00017380` (Pacific Conflict) | `tick_ground_fire` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_000173dc` (Pacific Conflict) | `register_debris_template` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_000173a2` (Pacific Conflict) | `create_debris_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_000174c4` (Pacific Conflict) | `tick_debris_fragment` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_0001759e` (Pacific Conflict) | `register_ground_mark_template` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_0001759e` (Pacific Conflict) | `register_ground_mark_template` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_00017566` (Pacific Conflict) | `create_ground_mark_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000175c0` (Pacific Conflict) | `tick_ground_mark` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
+| `FUN_000175c0` (Pacific Conflict) | `tick_ground_mark` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_000168ae` (Pacific Conflict) | `impact_one_time_in_16` | HYPOTHESIS | Iter 292: 1/16 chance ordnance_collision. |
 | `FUN_000168d2` (Pacific Conflict) | `alloc_transformed_vertex_block` | STRONG INFERENCE | Iter 292: header + 12-byte points via template xform. |
 | `FUN_0001691c` (Pacific Conflict) | `alloc_copied_vertex_block` | STRONG INFERENCE | Iter 292: same, copied. |
@@ -468,17 +468,17 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00017a60` (Pacific Conflict) | `draw_radar_blip_bw` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
 | `FUN_00018040` (Pacific Conflict) | `create_wave_spawner_controller` | STRONG INFERENCE | Iter 295: key 0x14 create; mission 7 target list. |
 | `FUN_000180c8` (Pacific Conflict) | `tick_wave_spawner` | STRONG INFERENCE | Iter 295: key 0x14 tick; timed far-away aircraft launches. |
-| `FUN_000188f4` (Pacific Conflict) | `register_shadow_templates` | STRONG INFERENCE | Iter 295: shadow template slots. |
+| `FUN_000188f4` (Pacific Conflict) | `register_shadow_templates` | VERIFIED | Iter 295: shadow template slots. |
 | `FUN_000188ba` (Pacific Conflict) | `create_shadow_controller` | STRONG INFERENCE | Iter 295: 0x36-byte controller. |
-| `FUN_00018942` (Pacific Conflict) | `destroy_shadow_controller` | STRONG INFERENCE | Iter 295: owner reference. |
+| `FUN_00018942` (Pacific Conflict) | `destroy_shadow_controller` | VERIFIED | Iter 295: owner reference. |
 | `FUN_000189d0` (Pacific Conflict) | `tick_shadow` | STRONG INFERENCE | Iter 295: key 5 tick; follows owner at ground height. |
 | `FUN_00018bba` (Pacific Conflict) | `flak_notice_object` | STRONG INFERENCE | Iter 295: key 0x1a +0x16; flak target pick. |
-| `FUN_0001940e` (Pacific Conflict) | `register_parachute_template` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_0001940e` (Pacific Conflict) | `register_parachute_template` | VERIFIED | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_000193b6` (Pacific Conflict) | `create_parachute_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_00019938` (Pacific Conflict) | `parachute_tick` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_0001952e` (Pacific Conflict) | `parachute_descend` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_0001951a` (Pacific Conflict) | `destroy_parachute_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_0001910e` (Pacific Conflict) | `register_turret_template` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_0001951a` (Pacific Conflict) | `destroy_parachute_controller` | VERIFIED | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_0001910e` (Pacific Conflict) | `register_turret_template` | VERIFIED | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_000190c0` (Pacific Conflict) | `create_turret_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_00019130` (Pacific Conflict) | `spawn_turret_on_object` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_00019394` (Pacific Conflict) | `turret_pre_render` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
@@ -496,24 +496,24 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000e340` (Pacific Conflict) | `create_enemy_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
 | `FUN_000111ae` (Pacific Conflict) | `ai_fly_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
 | `FUN_000111da` (Pacific Conflict) | `ai_dive_at_target` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
-| `FUN_000100bc` (Pacific Conflict) | `release_ai_target` | STRONG INFERENCE | Iter 299: AI / turret handler. |
+| `FUN_000100bc` (Pacific Conflict) | `release_ai_target` | VERIFIED | Iter 299: AI / turret handler. |
 | `FUN_000100d4` (Pacific Conflict) | `enemy_fighter_notice_object` | STRONG INFERENCE | Iter 299: AI / turret handler. |
 | `FUN_000112e0` (Pacific Conflict) | `ai_bombing_run` | STRONG INFERENCE | Iter 299: AI / turret handler. |
 | `FUN_0001917c` (Pacific Conflict) | `tick_turret` | STRONG INFERENCE | Iter 299: AI / turret handler. |
 | `FUN_0000e262` (Pacific Conflict) | `spawn_enemy_fighter` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
 | `FUN_00011796` (Pacific Conflict) | `shape_free_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
 | `FUN_00011940` (Pacific Conflict) | `shape_trailing_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
-| `FUN_00019a54` (Pacific Conflict) | `register_cloud_templates` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
+| `FUN_00019a54` (Pacific Conflict) | `register_cloud_templates` | VERIFIED | Iter 300: spawn / plume / cloud handler. |
 | `FUN_00019a1a` (Pacific Conflict) | `create_cloud_controller` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
 | `FUN_0000879e` (Pacific Conflict) | `resolve_bailout_outcome` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
 | `FUN_00008972` (Pacific Conflict) | `update_bailout_view` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
 | `FUN_000088a0` (Pacific Conflict) | `place_camera_behind_object` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
 | `FUN_00008abe` (Pacific Conflict) | `turn_camera_toward_point` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
-| `FUN_00009550` (Pacific Conflict) | `stop_all_sound_channels` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_00009550` (Pacific Conflict) | `stop_all_sound_channels` | VERIFIED | Iter 301: bail-out / camera / sound. |
 | `FUN_0000923e` (Pacific Conflict) | `apply_player_mouse_controls` | STRONG INFERENCE | Iter 302: player input / camera. |
 | `FUN_00008ff4` (Pacific Conflict) | `begin_replay_view` | STRONG INFERENCE | Iter 302: player input / camera. |
 | `FUN_00008c30` (Pacific Conflict) | `update_tracking_camera` | STRONG INFERENCE | Iter 302: player input / camera. |
-| `FUN_00015bd4` (Pacific Conflict) | `register_bullet_template` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_00015bd4` (Pacific Conflict) | `register_bullet_template` | VERIFIED | Iter 303: bullet family / contact records. |
 | `FUN_00015b92` (Pacific Conflict) | `create_bullet_controller` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
 | `FUN_00015dc8` (Pacific Conflict) | `tick_bullet` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
 | `FUN_00015e62` (Pacific Conflict) | `bullet_pre_render` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
@@ -524,24 +524,26 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000c17e` (Pacific Conflict) | `end_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
 | `FUN_0000cac6` (Pacific Conflict) | `update_bomb_indicator` | STRONG INFERENCE | Iter 304: panel helper. |
 | `FUN_0000cb62` (Pacific Conflict) | `update_throttle_gauge` | STRONG INFERENCE | Iter 304: panel helper. |
-| `FUN_0001a75e` (Pacific Conflict) | `bounded_strlen` | STRONG INFERENCE | Iter 304: panel helper. |
+| `FUN_0001a75e` (Pacific Conflict) | `c_strlen` | VERIFIED | Iter 304 (renamed from bounded_strlen in 315): panel helper. |
 | `FUN_0000d3bc` (Pacific Conflict) | `draw_line_depth8` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
 | `FUN_0000d5b0` (Pacific Conflict) | `draw_line_depth4` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
 | `FUN_0000d91a` (Pacific Conflict) | `restore_line_depth8` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
 | `FUN_0000db60` (Pacific Conflict) | `restore_line_depth4` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000d27c` (Pacific Conflict) | `mark_view_overlays_drawn` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000d27c` (Pacific Conflict) | `mark_view_overlays_drawn` | VERIFIED | Iter 305: line / frame output / pose ring. |
 | `FUN_0000d298` (Pacific Conflict) | `present_spans_to_window` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
 | `FUN_0000d34c` (Pacific Conflict) | `present_bw_frame` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000df98` (Pacific Conflict) | `fill_pose_history_angles` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000dfd2` (Pacific Conflict) | `fill_pose_history_flags` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
+| `FUN_0000df98` (Pacific Conflict) | `fill_pose_history_angles` | VERIFIED | Iter 305: line / frame output / pose ring. |
+| `FUN_0000dfd2` (Pacific Conflict) | `fill_pose_history_flags` | VERIFIED | Iter 305: line / frame output / pose ring. |
 | `FUN_0000bca8` (Pacific Conflict) | `copy_rect_depth4` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
 | `FUN_0000bfb0` (Pacific Conflict) | `copy_rect_depth8` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
 | `FUN_00014830` (Pacific Conflict) | `lift_object_onto_terrain` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
 | `FUN_00011486` (Pacific Conflict) | `create_spinner_controller` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
-| `FUN_000114b4` (Pacific Conflict) | `spin_object_heading` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
+| `FUN_000114b4` (Pacific Conflict) | `spin_object_heading` | VERIFIED | Iter 307: definition handler / radar buttons. |
 | `FUN_00018a34` (Pacific Conflict) | `shadow_pre_render` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
 | `FUN_00017a8c` (Pacific Conflict) | `update_radar_range_buttons` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
 | `FUN_00012f92` (Pacific Conflict) | `create_singleton_type10_controller` | HYPOTHESIS | Iter 307: definition handler / radar buttons. |
+| `FUN_00003cca` (Pacific Conflict) | `segment_point_min_distance` | PROVEN | Iter 308: from bytes; bisection of segment (start + word deltas) against a point. |
+| `FUN_0000e512` (Pacific Conflict) | `compute_template_force_from_626_tail` | PROVEN | Iter 308: false split inside FUN_0000e4a4. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
@@ -675,7 +677,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000044e8` | `run_simulation_tick` | PROVEN structure | `@0x44E8`: gate on `DAT_0001b5a0+0xac/+0xa8`; four entity-array passes via `dispatch_entity_tick` (path 0,0,1,1); then `FUN_00006fb8`. |
 | `FUN_000044a4` | `dispatch_entity_tick` | STRONG INFERENCE | `@0x44A4`: call `apply_entity_mission_rates`; optional `entity+4` bit `0x40` from linked type word `5` vs mission `+0xB0`. |
 | `FUN_0000435a` | `apply_entity_mission_rates` | STRONG INFERENCE | `@0x435A`: scale mission-table rates into `entity+0xC`; kind-2 path-0 updates `*(entity+0x48)+0x1C` slots. |
-| `FUN_00005df8` | `clear_pending_entity_slots` | STRONG INFERENCE | `@0x5DF8`: for `i=0..6`, if `DAT_0001bc64[i]` non-null call `dispatch_entity_cleanup` then clear slot. |
+| `FUN_00005df8` | `clear_pending_entity_slots` | VERIFIED | `@0x5DF8`: for `i=0..6`, if `DAT_0001bc64[i]` non-null call `dispatch_entity_cleanup` then clear slot. |
 | `FUN_0000528a` | `dispatch_entity_cleanup` | STRONG INFERENCE | `@0x528A`: skip if `flags_07&2`; else `retire_entity` or type-2 soft (`flags\|0x42`, `field_3c=DAT_0001b838`). |
 | `FUN_000051ec` | `retire_entity` | STRONG INFERENCE | `@0x51EC`: clear b880/bc64/table; `+0x18=1e9`; `flags\|2`; null `**(+8)`; `DAT_00024cf0++`. |
 | `FUN_00005116` | `spawn_mission_pool_object` | STRONG INFERENCE | `@0x5116`: free `0x18` slot in `*(DAT_0001d6fc+0x30)`; fill xyz/att; `instantiate_mission_pool_slot`; gate on `world+0x44`. |

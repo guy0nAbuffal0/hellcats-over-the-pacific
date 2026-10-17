@@ -5876,7 +5876,11 @@ int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 
 
 
-int FUN_00003cca(void)
+/* Original: FUN_00003cca; source: Pacific Conflict.c. Recovered name: segment_point_min_distance [PROVEN from bytes] (iteration 308).
+ * Ghidra C reviewed (function at overlay offset 0x3cca).
+ * Disassembled at 0x3cca (Ghidra lost the stack arguments and shows a void signature). Stack arguments: start point x / y / z longs at 8(a6) / 0xc(a6) / 0x10(a6), segment deltas as words at 0x16 / 0x1a / 0x1e (sign-extended by adda.w), target point x / y / z at 0x20 / 0x24 / 0x28. Computes the distance (approx_dist3_xyz, 0x3c68) from the target to both segment ends, then five times (dbra d5 from 4) takes the midpoint, measures it and replaces the farther end - a bisection that returns the approximate minimum distance between the segment and the point (word in D0). Used by bullet_hits_aircraft / bullet_hits_shape with the path the bullet covered this frame, so fast bullets cannot skip over their target.
+ */
+int segment_point_min_distance /* Original: FUN_00003cca */ (void)
 
 {
   uint uVar1;
@@ -7941,6 +7945,7 @@ LAB_00005d94:
 
 /*
  * Original: FUN_00005df8
+ * VERIFIED (iteration 315): checked against an independent capstone disassembly of the overlay bytes at 0x5df8: d2 = 0..6 (ble); non-zero slot $1bc64[d2] -> bsr $528a (dispatch_entity_cleanup), clr.l slot - identical.
  * Source: Pacific Conflict.c:6434 / binary @0x5DF8
  * Proposed name: clear_pending_entity_slots
  * Confidence: [STRONG INFERENCE]
@@ -10465,6 +10470,7 @@ void tick_flagged_object_controllers /* Original: FUN_000094d2 */ (void)
 
 
 /* Original: FUN_00009550; source: Pacific Conflict.c. Recovered name: stop_all_sound_channels [STRONG INFERENCE] (iteration 301).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x9550: host +0x25e tested; for channels 0 and 1: jsr host +0x2b6 (is playing) then jsr host +0x2be (silence) when non-zero; moveq #-1 -> $24d14 - identical.
  * Ghidra C reviewed (function at overlay offset 0x9550).
  * When sounds are loaded (host +0x25e), silences each of the two channels that is playing (is_channel_playing / silence_sound_channel through host +0x2b6 / +0x2be) and resets the engine-sound choice DAT_00024d14 = -1. Used by update_game_sounds outside flight states. Complete Ghidra C.
  */
@@ -13862,7 +13868,7 @@ LAB_0000d11c:
         }
         iVar10 = (int)(short)uVar7;
         uVar12 = 0;
-        pcVar3 = bounded_strlen(acStack_68 + (short)(sVar9 + 1));
+        pcVar3 = c_strlen(acStack_68 + (short)(sVar9 + 1));
         (**(code **)(iVar2 + 0x27a))
                   (acStack_68 + (short)(sVar9 + 1),(int)DAT_00025ff2,0,pcVar3,uVar12,iVar10);
       }
@@ -13901,6 +13907,7 @@ LAB_0000d11c:
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
 /* Original: FUN_0000d27c; source: Pacific Conflict.c. Recovered name: mark_view_overlays_drawn [STRONG INFERENCE] (iteration 305).
+ * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0xd27c: move.w #1,$25ffc; if host +0x9e != 0 bsr $6ece (clear_flag_00020ae4) - identical.
  * Ghidra C reviewed (function at overlay offset 0xd27c).
  * Called from overlay_frame_step after the overlays: _DAT_00025ffc = 1 (readouts / needles now only redraw on change, cf. reset_overlay_display_state); with host option +0x9e also clear_flag_00020ae4. Complete Ghidra C.
  */
@@ -15336,6 +15343,7 @@ LAB_0000de74:
 
 
 /* Original: FUN_0000df5e; source: Pacific Conflict.c. Recovered name: fill_pose_history [STRONG INFERENCE] (iteration 283).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0xdf5e: d1 from 0 to 0x4a (ble), entry = base + d1 * 0x14, three longs stored at +0 / +4 / +8 - identical (75 entries).
  * Ghidra C reviewed (function at overlay offset 0xdf5e).
  * Writes (x, y, z) into all 75 entries (0x14 bytes) of a pose ring - the replay history of aircraft_tick. Complete Ghidra C.
  */
@@ -15359,6 +15367,7 @@ void fill_pose_history /* Original: FUN_0000df5e */ (int param_1,undefined4 para
 
 
 /* Original: FUN_0000df98; source: Pacific Conflict.c. Recovered name: fill_pose_history_angles [STRONG INFERENCE] (iteration 305).
+ * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0xdf98: d1 from 0 to 0x4a, three words stored at +0xc / +0xe / +0x10 of each 0x14-byte entry - identical.
  * Ghidra C reviewed (function at overlay offset 0xdf98).
  * Writes the three attitude words into all 75 entries (+0xc / +0xe / +0x10 of each 0x14-byte entry) of a pose ring, companion of fill_pose_history. Complete Ghidra C.
  */
@@ -15382,6 +15391,7 @@ void fill_pose_history_angles /* Original: FUN_0000df98 */ (int param_1,undefine
 
 
 /* Original: FUN_0000dfd2; source: Pacific Conflict.c. Recovered name: fill_pose_history_flags [STRONG INFERENCE] (iteration 305).
+ * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0xdfd2: d0 from 0 to 0x4a, word stored at +0x12 of each entry - identical.
  * Ghidra C reviewed (function at overlay offset 0xdfd2).
  * Writes the flag word into all 75 entries (+0x12) of a pose ring. Complete Ghidra C.
  */
@@ -15817,7 +15827,11 @@ int compute_template_force_from_626(short param_1,short param_2,undefined1 *para
 
 
 
-int FUN_0000e512(void)
+/* Original: FUN_0000e512; source: Pacific Conflict.c. Recovered name: compute_template_force_from_626_tail [PROVEN false split] (iteration 308).
+ * Ghidra C reviewed (function at overlay offset 0xe512).
+ * Bytes: 0xe512 is inside compute_template_force_from_626 (LINK a6 at 0xe4a4, UNLK / RTS at 0xe56c / 0xe56e); Ghidra started a function at the branch target and lost the registers (in_A0, unaff_D2w, unaff_A2w, unaff_A6). Kept for traceability; it is not a real entry point. Ghidra C.
+ */
+int compute_template_force_from_626_tail /* Original: FUN_0000e512 */ (void)
 
 {
   short in_D0w;
@@ -17335,6 +17349,7 @@ LAB_0001007c:
 
 
 /* Original: FUN_000100bc; source: Pacific Conflict.c. Recovered name: release_ai_target [STRONG INFERENCE] (iteration 299).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0x100bc: tst.l / beq / movea.l / addq.w #3 / subq.b #1 - decrement of the reference byte +3 of the held object at +0x692, then clr.l $692 - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x100bc).
  * Drops the AI target reference (+0x692 object +3 count) and clears +0x692. Complete Ghidra C.
  */
@@ -18689,6 +18704,7 @@ void ai_bombing_run /* Original: FUN_000112e0 */ (int *param_1)
 
 
 /* Original: FUN_00011486; source: Pacific Conflict.c. Recovered name: create_spinner_controller [STRONG INFERENCE] (iteration 307).
+ * Not VERIFIED (iteration 311): the stores match the bytes, but the function leaves the new controller in D0 (the heap_alloc_cleared result) and its callers use it, while the Ghidra C is void - the return value is lost.
  * Ghidra C reviewed (function at overlay offset 0x11486).
  * Definition +6 of key 6 (file 0x1a8f2: +2 spin_object_heading, +6 this) [PROVEN bytes]: cleared 0x3a-byte controller, definition at +4, +0x36 = 0. Complete Ghidra C.
  */
@@ -18707,6 +18723,7 @@ void create_spinner_controller /* Original: FUN_00011486 */ (uint param_1,int pa
 
 
 /* Original: FUN_000114b4; source: Pacific Conflict.c. Recovered name: spin_object_heading [STRONG INFERENCE] (iteration 307).
+ * VERIFIED (iteration 309): checked against an independent capstone disassembly of the overlay bytes at 0x114b4: move.w $22(a0),d0; addi.w #$40; andi.w #$3fff; move.w d0,$22(a0); rts - identical.
  * Ghidra C reviewed (function at overlay offset 0x114b4).
  * Definition +2 of key 6: heading +0x22 += 0x40 per frame (a full turn every 256 frames) [STRONG INFERENCE: rotating scenery such as a radar antenna; UNKNOWN which]. Complete Ghidra C.
  */
@@ -18855,6 +18872,7 @@ void create_plume_controller /* Original: FUN_000115b0 */ (uint param_1)
 
 
 /* Original: FUN_000115da; source: Pacific Conflict.c. Recovered name: register_smoke_template [STRONG INFERENCE] (iteration 270).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x115da: move.l arg1 -> $260e8; definition = $1b524[arg2]; move.l #$11590,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x115da).
  * Create handler (definition +6, via instantiate_object_from_desc): stores the template object in DAT_000260e8 for spawn_smoke_plume and replaces the create handler with 0x11590 (Ghidra 0x115b0) for later instances; returns 0. Complete Ghidra C.
  */
@@ -19205,6 +19223,7 @@ uint * create_effect_controller /* Original: FUN_00011afe */ (uint param_1,int p
 
 
 /* Original: FUN_00011b48; source: Pacific Conflict.c. Recovered name: register_effect_template [STRONG INFERENCE] (iteration 267).
+ * VERIFIED (iteration 313): checked against an independent capstone disassembly of the overlay bytes at 0x11b48: slot loop d0 = 0..3 over $2626e (first empty slot takes arg1, bls exit), redirect definition +6 = #$11ade when d0 > 2, clr.l d0 - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x11b48).
  * Create handler (definition +6, called by instantiate_object_from_desc as (object, key)) for effect templates: stores the object in the first free of the four slots DAT_0002626e[0..3] used by spawn_effect, and once three are taken replaces the definition create handler with 0x11ade, i.e. code at 0x11afe under the stored-address + 0x20 rule (bytes there start with LINK A6) = FUN_00011afe [PROVEN bytes] = create_effect_controller (iteration 297). Returns 0 (no controller). Complete Ghidra C.
  */
@@ -19990,6 +20009,7 @@ LAB_0001258c:
 
 
 /* Original: FUN_00012738; source: Pacific Conflict.c. Recovered name: face_object_to_camera [STRONG INFERENCE] (iteration 269).
+ * VERIFIED (iteration 309): checked against an independent capstone disassembly of the overlay bytes at 0x12738: move.w $1d80e.l / neg.w / andi.w #$3fff -> $22(a0); same for $1d810 -> $20(a0); clr.l d0; rts - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x12738).
  * Sets the object attitude words +0x22 / +0x20 to minus the camera angles DAT_0001d80e / DAT_0001d810 (& 0x3fff) so it faces the viewer (billboard); returns 0. Entry of table DAT_0001b42c. Complete Ghidra C.
  */
@@ -20061,8 +20081,9 @@ uint * create_ordnance_controller /* Original: FUN_000127c6 */ (uint param_1,int
 
 
 /* Original: FUN_0001281e; source: Pacific Conflict.c. Recovered name: register_ordnance_template [STRONG INFERENCE] (iteration 288).
+ * VERIFIED (iteration 311; corrects the iteration 310 note, which missed the "return 0;" of the C body): bytes store the template in $26280, set definition +6 = #$127a6 and return 0 (clr.l d0) - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x1281e).
- * Create handler (definition +6) for the ordnance template: stores the object in DAT_00026280 (used by spawn_weapon_entity) and replaces the create handler with 0x127a6 (Ghidra 0x127c6 = create_ordnance_controller). Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C (Ghidra omits the return value 0).
+ * Create handler (definition +6) for the ordnance template: stores the object in DAT_00026280 (used by spawn_weapon_entity) and replaces the create handler with 0x127a6 (Ghidra 0x127c6 = create_ordnance_controller). Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C.
  */
 undefined4 register_ordnance_template /* Original: FUN_0001281e */ (undefined4 param_1,int param_2)
 
@@ -20459,6 +20480,7 @@ void create_singleton_type10_controller /* Original: FUN_00012f92 */ (uint param
 
 
 /* Original: FUN_00012fd2; source: Pacific Conflict.c. Recovered name: point_in_polygon_xy [STRONG INFERENCE] (iteration 262).
+ * VERIFIED (iteration 316): checked against an independent capstone disassembly of the overlay bytes at 0x12fd2: previous vertex = list[count - 1] (extension word 0x52fe = d5.w * 2; capstone prints it without the scale), dbra over count, straddle test on the second coordinate, shortcut / interpolated crossing (muls.w, divs.l) on the first, crossing counted when > 0, result = parity (btst #0 / sne / and #1) - identical to the C; same sequence with the second coordinate at +6 instead of +10.
  * Ghidra C reviewed (function at overlay offset 0x12fd2).
  * Same even-odd crossing test as point_in_polygon_xz, on vertex words +2 (x) and +6 (y). Used by point_in_face_by_axis. Ghidra C.
  */
@@ -20504,6 +20526,7 @@ LAB_00013058:
 
 
 /* Original: FUN_00013070; source: Pacific Conflict.c. Recovered name: point_in_polygon_xz [STRONG INFERENCE] (iteration 253).
+ * VERIFIED (iteration 316): checked against an independent capstone disassembly of the overlay bytes at 0x13070: previous vertex = list[count - 1] (extension word 0x52fe = d5.w * 2; capstone prints it without the scale), dbra over count, straddle test on the second coordinate, shortcut / interpolated crossing (muls.w, divs.l) on the first, crossing counted when > 0, result = parity (btst #0 / sne / and #1) - identical to the C; coordinates +2 / +10.
  * Ghidra C reviewed (function at overlay offset 0x13070).
  * Uses vertex words +2 (x) and +10 (z) [the layout written by project_face_vertices_xz]. Args: point a, point b, vertex buffer (12-byte entries), vertex count, index list. Even-odd crossing test: for each polygon edge (previous vertex, current vertex) that straddles b, counts a crossing when the edge meets the line at a coordinate greater than 0 (the vertices are already relative to the point; callers pass 0, 0), with the shortcut that edges fully on one side of a are decided without the division. Returns the parity (1 = inside). [PROVEN structure; STRONG INFERENCE point-in-polygon] Complete Ghidra C. Called by surface_type_at_point and FUN_000132c8.
  */
@@ -20549,6 +20572,7 @@ LAB_000130f6:
 
 
 /* Original: FUN_0001310e; source: Pacific Conflict.c. Recovered name: point_in_polygon_yz [STRONG INFERENCE] (iteration 253).
+ * VERIFIED (iteration 316): checked against an independent capstone disassembly of the overlay bytes at 0x1310e: previous vertex = list[count - 1] (extension word 0x52fe = d5.w * 2; capstone prints it without the scale), dbra over count, straddle test on the second coordinate, shortcut / interpolated crossing (muls.w, divs.l) on the first, crossing counted when > 0, result = parity (btst #0 / sne / and #1) - identical to the C; same instruction sequence as point_in_polygon_xz with the first coordinate at +6 instead of +2 (51 instructions, only the offsets differ).
  * Ghidra C reviewed (function at overlay offset 0x1310e).
  * Same algorithm as point_in_polygon_xz on vertex words +6 (y) and +10 (z). Args: point a, point b, vertex buffer (12-byte entries), vertex count, index list. Even-odd crossing test: for each polygon edge (previous vertex, current vertex) that straddles b, counts a crossing when the edge meets the line at a coordinate greater than 0 (the vertices are already relative to the point; callers pass 0, 0), with the shortcut that edges fully on one side of a are decided without the division. Returns the parity (1 = inside). [PROVEN structure; STRONG INFERENCE point-in-polygon] Complete Ghidra C.
  */
@@ -20594,6 +20618,7 @@ LAB_00013194:
 
 
 /* Original: FUN_000131ac; source: Pacific Conflict.c. Recovered name: project_face_vertices_xy [STRONG INFERENCE] (iteration 253).
+ * VERIFIED (iteration 314): checked against an independent capstone disassembly of the overlay bytes at 0x131ac: same loop as project_face_vertices_xz with x (+0) -> out +2 and y (+4) -> out +6 - identical.
  * Ghidra C reviewed (function at overlay offset 0x131ac).
  * Writes x to +2 and y to +6. Args: object, shift, face, origin a, origin b, output vertex buffer (12-byte entries). For each of the face vertex indices (count face +0x14, list face +0x18) takes the object vertex (+0x44, 12-byte x / y / z longs), shifts it right by the shift and subtracts the origin, storing 16-bit coordinates at the same index in the output buffer. [PROVEN from the Ghidra C] Complete Ghidra C.
  */
@@ -20622,6 +20647,7 @@ void project_face_vertices_xy /* Original: FUN_000131ac */ (int param_1,short pa
 
 
 /* Original: FUN_0001320a; source: Pacific Conflict.c. Recovered name: project_face_vertices_xz [STRONG INFERENCE] (iteration 253).
+ * VERIFIED (iteration 313): checked against an independent capstone disassembly of the overlay bytes at 0x1320a: dbra over the face vertex count (+0x14) and index list (+0x18); entry = index * 12; out +2 = (x asr.l shift) - origin a, out +10 = (z asr.l shift) - origin b (68000 shift count mod 64 = the C "& 0x3f") - identical.
  * Ghidra C reviewed (function at overlay offset 0x1320a).
  * Writes x to +2 and z to +10. Args: object, shift, face, origin a, origin b, output vertex buffer (12-byte entries). For each of the face vertex indices (count face +0x14, list face +0x18) takes the object vertex (+0x44, 12-byte x / y / z longs), shifts it right by the shift and subtracts the origin, storing 16-bit coordinates at the same index in the output buffer. [PROVEN from the Ghidra C] Complete Ghidra C.
  */
@@ -20650,6 +20676,7 @@ void project_face_vertices_xz /* Original: FUN_0001320a */ (int param_1,short pa
 
 
 /* Original: FUN_00013268; source: Pacific Conflict.c. Recovered name: project_face_vertices_yz [STRONG INFERENCE] (iteration 253).
+ * VERIFIED (iteration 314): checked against an independent capstone disassembly of the overlay bytes at 0x13268: same loop with y (+4) -> out +6 and z (+8) -> out +10 - identical.
  * Ghidra C reviewed (function at overlay offset 0x13268).
  * Writes y to +6 and z to +10. Args: object, shift, face, origin a, origin b, output vertex buffer (12-byte entries). For each of the face vertex indices (count face +0x14, list face +0x18) takes the object vertex (+0x44, 12-byte x / y / z longs), shifts it right by the shift and subtracts the origin, storing 16-bit coordinates at the same index in the output buffer. [PROVEN from the Ghidra C] Complete Ghidra C.
  */
@@ -20678,6 +20705,7 @@ void project_face_vertices_yz /* Original: FUN_00013268 */ (int param_1,short pa
 
 
 /* Original: FUN_000132c8; source: Pacific Conflict.c. Recovered name: point_over_face_xz [STRONG INFERENCE] (iteration 254).
+ * Not VERIFIED (iteration 315): the bytes confirm the shift / projection / point_in_polygon_xz sequence and that the result of point_in_polygon_xz is left in D0 as the return value, which the void Ghidra C drops.
  * Ghidra C reviewed (function at overlay offset 0x132c8).
  * Args: record (+0 entity, +4 shape object, word +0xc signed shift, word +0xe vertex shift), face. Takes the entity x / z (+0x18 / +0x20) shifted right (negative word +0xc) or left by word +0xc as the origin, projects the face vertices relative to it with project_face_vertices_xz and runs point_in_polygon_xz(0, 0, ...). Ghidra types the function void and drops the test result (in D0 on return) [STRONG INFERENCE: it returns whether the entity is above the face]. Same pattern as the inner loop of surface_type_at_point. No caller in the exported C (reached through a pointer or unexported code) [UNKNOWN]. Ghidra C.
  */
@@ -20841,6 +20869,7 @@ undefined4 point_in_face_by_axis /* Original: FUN_0001346c */ (int param_1,int p
 
 
 /* Original: FUN_0001358c; source: Pacific Conflict.c. Recovered name: contact_pair_hash [PROVEN] (iteration 260).
+ * VERIFIED (iteration 309): checked against an independent capstone disassembly of the overlay bytes at 0x1358c: d0 = (b << 2) ^ a; andi.l #$ff - the C byte expression gives the same low byte, identical result.
  * Ghidra C reviewed (function at overlay offset 0x1358c).
  * Returns the low byte of a ^ (b << 2) for the two object pointers (only the low bytes are used): the start slot in the contact table DAT_0001bdbc. Contact records live in the 256-slot open-addressing hash table DAT_0001bdbc keyed by the (object a, object b) pair: slot = contact_pair_hash(a, b), linear probing modulo 256 [PROVEN]. Complete Ghidra C.
  */
@@ -20853,6 +20882,7 @@ byte contact_pair_hash /* Original: FUN_0001358c */ (byte param_1,char param_2)
 
 
 /* Original: FUN_000135a0; source: Pacific Conflict.c. Recovered name: find_contact_record [PROVEN] (iteration 260).
+ * VERIFIED (iteration 309): checked against an independent capstone disassembly of the overlay bytes at 0x135a0: bsr contact_pair_hash; d1 = #$100 with dbra entered at the test (256 probes); slot (a1 = $1bdbc + 4 * index), compare (a0) with a and 4(a0) with b; index = (index + 1) & 0xff; returns 0 after 256 - identical.
  * Ghidra C reviewed (function at overlay offset 0x135a0).
  * Args: object a, object b. Probes up to 256 slots of DAT_0001bdbc from contact_pair_hash(a, b) and returns the record whose +0 / +4 are a / b, or 0. Contact records live in the 256-slot open-addressing hash table DAT_0001bdbc keyed by the (object a, object b) pair: slot = contact_pair_hash(a, b), linear probing modulo 256 [PROVEN]. Complete Ghidra C.
  */
@@ -22794,6 +22824,7 @@ void create_bullet_controller /* Original: FUN_00015b92 */ (uint param_1,int par
 
 
 /* Original: FUN_00015bd4; source: Pacific Conflict.c. Recovered name: register_bullet_template [STRONG INFERENCE] (iteration 303).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x15bd4: move.l arg1 -> $2664a; definition = $1b524[arg2]; move.l #$15b72,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x15bd4).
  * DAT_0002664a = template; create handler -> 0x15b72 (Ghidra 0x15b92). Bullet definition key 0xe (file 0x1a9e2): +2 tick_bullet, +6 register_bullet_template -> create_bullet_controller, +0xe bullet_pre_render [PROVEN bytes]; the bullet template DAT_0002664a is the one spawn_ordnance_scattered uses. Ghidra C.
  */
@@ -23389,7 +23420,7 @@ uint bullet_hits_shape /* Original: FUN_0001665a */ (int param_1,int param_2)
   uint uVar4;
   
   iVar1 = *(int *)(param_1 + 8);
-  uVar3 = FUN_00003cca();
+  uVar3 = segment_point_min_distance();
   if ((int)uVar3 <= *(int *)(param_2 + 0x14)) {
     if ((*(byte *)(param_2 + 6) & 4) == 0) {
       if (*(int *)(param_2 + 8) != 0) {
@@ -23494,7 +23525,7 @@ uint bullet_hits_aircraft /* Original: FUN_000167f4 */ (int param_1,int param_2)
   uint uVar4;
   
   iVar1 = *(int *)(param_1 + 8);
-  uVar3 = FUN_00003cca();
+  uVar3 = segment_point_min_distance();
   if ((int)uVar3 <= *(int *)(param_2 + 0x14)) {
     iVar2 = *(int *)(param_2 + 8);
     uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
@@ -23626,6 +23657,7 @@ void create_trail_controller /* Original: FUN_00016a3a */ (uint param_1,int para
 
 
 /* Original: FUN_00016a78; source: Pacific Conflict.c. Recovered name: register_trail_templates [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 313): checked against an independent capstone disassembly of the overlay bytes at 0x16a78: slot loop d0 = 0..1 over $26650 (first empty slot takes arg1, bls exit), redirect definition +6 = #$16a1a when d0 != 0, clr.l d0 - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x16a78).
  * Stores the trail template objects in DAT_00026650[0..1] (spawn_trail) and, once the first is taken, redirects the create handler to 0x16a1a (Ghidra 0x16a3a, create_trail_controller). Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Ghidra C.
  */
@@ -23651,6 +23683,7 @@ undefined4 register_trail_templates /* Original: FUN_00016a78 */ (undefined4 par
 
 
 /* Original: FUN_00016ac4; source: Pacific Conflict.c. Recovered name: init_trail_kind0 [STRONG INFERENCE] (iteration 290).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0x16ac4: move.w #$4b,$34(a0); move.w #1,$36(a0) on the second argument - identical.
  * Ghidra C reviewed (function at overlay offset 0x16ac4).
  * Lifetime +0x34 = 0x4b (75 frames), state +0x36 = 1. Trail tables [PROVEN bytes, + 0x20 rule]: templates DAT_00026650[kind], init DAT_0001b50c (kind 0 -> 0x16ac4, kind 1 -> 0x16ad6), animate DAT_0001b514 (kind 0 -> 0x16c6a, kind 1 -> 0x16e06) - the same layout as the effect tables of spawn_effect / tick_effect. A trail is a ribbon whose head vertices follow the owner (+0x52) and whose state word +0x36 goes 1 (start) -> 2 (following) -> 4 (owner gone or replay rewind: fade, then finished). Complete Ghidra C.
  */
@@ -23665,6 +23698,7 @@ void init_trail_kind0 /* Original: FUN_00016ac4 */ (undefined4 param_1,int param
 
 
 /* Original: FUN_00016ad6; source: Pacific Conflict.c. Recovered name: init_trail_kind1 [STRONG INFERENCE] (iteration 290).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0x16ad6: same instructions as init_trail_kind0 - identical.
  * Ghidra C reviewed (function at overlay offset 0x16ad6).
  * Same as init_trail_kind0 (lifetime 0x4b, state 1). Trail tables [PROVEN bytes, + 0x20 rule]: templates DAT_00026650[kind], init DAT_0001b50c (kind 0 -> 0x16ac4, kind 1 -> 0x16ad6), animate DAT_0001b514 (kind 0 -> 0x16c6a, kind 1 -> 0x16e06) - the same layout as the effect tables of spawn_effect / tick_effect. A trail is a ribbon whose head vertices follow the owner (+0x52) and whose state word +0x36 goes 1 (start) -> 2 (following) -> 4 (owner gone or replay rewind: fade, then finished). Complete Ghidra C.
  */
@@ -24052,6 +24086,7 @@ LAB_00016f3a:
 
 
 /* Original: FUN_0001702a; source: Pacific Conflict.c. Recovered name: tick_trail [STRONG INFERENCE] (iteration 290).
+ * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0x1702a: jsr animator $1b514[+0x32]; +0x34 == 0 -> object flags |= 0x40 else +0x34 -= 1; animator result != 0 -> bsr $51ec (retire_entity) - identical.
  * Ghidra C reviewed (function at overlay offset 0x1702a).
  * Per-frame trail tick: runs the animator DAT_0001b514[kind], counts the lifetime word +0x34 down (hiding the object at 0, flag 0x40) and retires the object when the animator returns non-zero. Trail tables [PROVEN bytes, + 0x20 rule]: templates DAT_00026650[kind], init DAT_0001b50c (kind 0 -> 0x16ac4, kind 1 -> 0x16ad6), animate DAT_0001b514 (kind 0 -> 0x16c6a, kind 1 -> 0x16e06) - the same layout as the effect tables of spawn_effect / tick_effect. A trail is a ribbon whose head vertices follow the owner (+0x52) and whose state word +0x36 goes 1 (start) -> 2 (following) -> 4 (owner gone or replay rewind: fade, then finished). Complete Ghidra C.
  */
@@ -24095,6 +24130,7 @@ void create_ground_fire_controller /* Original: FUN_0001706a */ (uint param_1)
 
 
 /* Original: FUN_00017098; source: Pacific Conflict.c. Recovered name: register_ground_fire_template [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x17098: move.l arg1 -> $26658; definition = $1b524[arg2]; move.l #$1704a,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x17098).
  * DAT_00026658 = template (spawn_ground_fire_object); create handler -> 0x1704a (Ghidra 0x1706a). Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Ghidra C.
  */
@@ -24109,6 +24145,7 @@ undefined4 register_ground_fire_template /* Original: FUN_00017098 */ (undefined
 
 
 /* Original: FUN_000170ba; source: Pacific Conflict.c. Recovered name: spawn_ground_fire_object [HYPOTHESIS] (iteration 290).
+ * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0x170ba: spawn_mission_pool_object(DAT_00026658, x, y, z, 0, 0, 0, 0); 0 on failure, else controller +0x34 = 1, +0x32 = 0x2d, returned - identical.
  * Ghidra C reviewed (function at overlay offset 0x170ba).
  * Spawns the template DAT_00026658 at (x, y, z) with controller words +0x34 = 1 and +0x32 = 0x2d (45); used by attach_ground_fire. Complete Ghidra C.
  */
@@ -24154,6 +24191,7 @@ int * attach_ground_fire /* Original: FUN_00017102 */ (uint param_1,uint param_2
 
 
 /* Original: FUN_0001713c; source: Pacific Conflict.c. Recovered name: destroy_ground_fire_controller [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0x1713c: tst.l / beq / movea.l / addq.w #3 / subq.b #1 - decrement of the reference byte +3 of the held object at +0x50 - identical.
  * Ghidra C reviewed (function at overlay offset 0x1713c).
  * Drops the owner reference (+0x50 object +3). Complete Ghidra C.
  */
@@ -24303,6 +24341,7 @@ undefined2 animate_ground_fire /* Original: FUN_00017150 */ (int *param_1)
 
 
 /* Original: FUN_00017380; source: Pacific Conflict.c. Recovered name: tick_ground_fire [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x17380: bsr $17150 (animate_ground_fire); result != 0 -> bsr $51ec (retire_entity) on the object - identical.
  * Ghidra C reviewed (function at overlay offset 0x17380).
  * Runs animate_ground_fire and retires the object when it is finished. Complete Ghidra C.
  */
@@ -24339,6 +24378,7 @@ void create_debris_controller /* Original: FUN_000173a2 */ (uint param_1,int par
 
 
 /* Original: FUN_000173dc; source: Pacific Conflict.c. Recovered name: register_debris_template [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x173dc: move.l arg1 -> $2665c; definition = $1b524[arg2]; move.l #$17382,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x173dc).
  * DAT_0002665c = template (spawn_debris_fragment); create handler -> 0x17382 (Ghidra 0x173a2). Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Ghidra C.
  */
@@ -24439,6 +24479,7 @@ void create_ground_mark_controller /* Original: FUN_00017566 */ (uint param_1,in
 
 
 /* Original: FUN_0001759e; source: Pacific Conflict.c. Recovered name: register_ground_mark_template [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x1759e: move.l arg1 -> $26660; definition = $1b524[arg2]; move.l #$17546,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x1759e).
  * DAT_00026660 = template (spawn_ground_mark); create handler -> 0x17546 (Ghidra 0x17566). Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Ghidra C.
  */
@@ -24453,6 +24494,7 @@ undefined4 register_ground_mark_template /* Original: FUN_0001759e */ (undefined
 
 
 /* Original: FUN_000175c0; source: Pacific Conflict.c. Recovered name: tick_ground_mark [STRONG INFERENCE] (iteration 291).
+ * VERIFIED (iteration 309): checked against an independent capstone disassembly of the overlay bytes at 0x175c0: d1 = $3c((a0)); cmp.l $1b838,d1; bgt skip; bsr $51ec (retire_entity) - retire when expiry <= frame, identical.
  * Ghidra C reviewed (function at overlay offset 0x175c0).
  * Retires the mark when the frame counter reaches its expiry frame (object +0x3c, set by spawn_ground_mark). Complete Ghidra C.
  */
@@ -24513,6 +24555,7 @@ undefined4 spawn_ground_mark /* Original: FUN_000175de */ (int param_1,uint para
 
 
 /* Original: FUN_000176b2; source: Pacific Conflict.c. Recovered name: add_radar_track [STRONG INFERENCE] (iteration 280).
+ * VERIFIED (iteration 314): checked against an independent capstone disassembly of the overlay bytes at 0x176b2: count $26676 <= 5 (cmp with 5, blt skip) and object metric +0x10 <= $26666; entry = $1b51c + count * 0x14, count + 1; stores x (+0x18), z (+0x20), the sign-extended words +0xa / +0x12 of the controller, 0 - identical.
  * Ghidra C reviewed (function at overlay offset 0x176b2).
  * Adds an object to the radar list when fewer than 6 are tracked and its distance metric (+0x10) is within DAT_00026666: stores its x / z (+0x18 / +0x20) and the controller words +10 / +0x12, visible flag 0. Radar state [STRONG INFERENCE]: DAT_0001b51c up to 6 tracks of 0x14 bytes (x, z, two words from the object controller +10 / +0x12, visible flag) counted by DAT_00026676, drawn by update_radar_scope; DAT_0002666a range with DAT_00026666 = 2 * range (set_view_distance / cycle_view_distance, Tab key - so that "view distance" is the radar range). Complete Ghidra C.
  */
@@ -24544,6 +24587,7 @@ void add_radar_track /* Original: FUN_000176b2 */ (int param_1)
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
 /* Original: FUN_0001771a; source: Pacific Conflict.c. Recovered name: set_view_distance [STRONG INFERENCE] (iteration 244).
+ * VERIFIED (iteration 315): checked against an independent capstone disassembly of the overlay bytes at 0x1771a: moveq #1 -> $2666e; arg -> $2666a; arg asl 1 -> $26666 - identical.
  * Ghidra C reviewed (function at overlay offset 0x1771a).
  * Arg: range. _DAT_0002666e = 1 (changed), DAT_0002666a = range, DAT_00026666 = 2 * range. Set to 0xc15c0 by overlay_initialise; cycled by FUN_00017736 (0xc15c0 -> 0x26ac0 -> 0xce40 -> 0xc15c0), which the Tab key (character 9) calls in process_flight_input_and_outcome - a range toggle; iteration 280: DAT_00026666 is the radar track limit (add_radar_track), so this is the radar range [STRONG INFERENCE] - the name set_view_distance is kept but radar range is meant. Complete Ghidra C.
  */
@@ -24559,6 +24603,7 @@ void set_view_distance /* Original: FUN_0001771a */ (int param_1)
 
 
 /* Original: FUN_00017736; source: Pacific Conflict.c. Recovered name: cycle_view_distance [STRONG INFERENCE] (iteration 244).
+ * VERIFIED (iteration 315): checked against an independent capstone disassembly of the overlay bytes at 0x17736: compare $2666a with #$c15c0 / #$ce40, push #$26ac0 / #$c15c0 / #$ce40, bsr set_view_distance - identical.
  * Ghidra C reviewed (function at overlay offset 0x17736).
  * Cycles the view distance: 0xc15c0 -> 0x26ac0, 0xce40 -> 0xc15c0, anything else -> 0xce40, through set_view_distance. Called for the Tab key by process_flight_input_and_outcome. Complete Ghidra C.
  */
@@ -24585,6 +24630,7 @@ void cycle_view_distance /* Original: FUN_00017736 */ (void)
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
 /* Original: FUN_0001776a; source: Pacific Conflict.c. Recovered name: reset_radar_tracks [STRONG INFERENCE] (iteration 280).
+ * VERIFIED (iteration 314): checked against an independent capstone disassembly of the overlay bytes at 0x1776a: clr.l $26672; clr.l $26676; moveq #1 -> $2666e - identical.
  * Ghidra C reviewed (function at overlay offset 0x1776a).
  * Clears both radar lists (DAT_00026672 blips to erase, DAT_00026676 tracks) and sets the changed flag _DAT_0002666e. Radar state [STRONG INFERENCE]: DAT_0001b51c up to 6 tracks of 0x14 bytes (x, z, two words from the object controller +10 / +0x12, visible flag) counted by DAT_00026676, drawn by update_radar_scope; DAT_0002666a range with DAT_00026666 = 2 * range (set_view_distance / cycle_view_distance, Tab key - so that "view distance" is the radar range). Complete Ghidra C.
  */
@@ -25466,6 +25512,7 @@ void create_shadow_controller /* Original: FUN_000188ba */ (uint param_1,int par
 
 
 /* Original: FUN_000188f4; source: Pacific Conflict.c. Recovered name: register_shadow_templates [STRONG INFERENCE] (iteration 295).
+ * VERIFIED (iteration 313): checked against an independent capstone disassembly of the overlay bytes at 0x188f4: slot loop d0 = 0..3 over $2676c (first empty slot takes arg1, bls exit), redirect definition +6 = #$1889a when d0 > 2, clr.l d0 - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x188f4).
  * Create handler of the shadow templates: fills the four slots DAT_00026768 + 4.. (DAT_0002676c[0..3], spawn_object_shadow uses DAT_00026768[kind]) and, once three are taken, redirects the create handler to 0x1889a (Ghidra 0x188ba, create_shadow_controller). Ghidra C.
  */
@@ -25491,6 +25538,7 @@ undefined4 register_shadow_templates /* Original: FUN_000188f4 */ (undefined4 pa
 
 
 /* Original: FUN_00018942; source: Pacific Conflict.c. Recovered name: destroy_shadow_controller [STRONG INFERENCE] (iteration 295).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0x18942: tst.l / beq / movea.l / addq.w #3 / subq.b #1 - decrement of the reference byte +3 of the held object at +0x32 - identical.
  * Ghidra C reviewed (function at overlay offset 0x18942).
  * Drops the reference on the owner (+0x32 object +3). Complete Ghidra C.
  */
@@ -25656,6 +25704,7 @@ void create_flak_controller /* Original: FUN_00018b52 */ (uint param_1,int param
 
 
 /* Original: FUN_00018b98; source: Pacific Conflict.c. Recovered name: destroy_flak_controller [STRONG INFERENCE] (iteration 289).
+ * VERIFIED (iteration 310): checked against an independent capstone disassembly of the overlay bytes at 0x18b98: tst.l / beq / movea.l / addq.w #3 / subq.b #1 - decrement of the reference byte +3 of the held objects at +0x36 then +0x32 - identical.
  * Ghidra C reviewed (function at overlay offset 0x18b98).
  * Definition +0xa of type 0x1a: drops the references held on the target (+0x36) and on +0x32. Complete Ghidra C.
  */
@@ -25931,6 +25980,7 @@ uint * create_turret_controller /* Original: FUN_000190c0 */ (uint param_1,int p
 
 
 /* Original: FUN_0001910e; source: Pacific Conflict.c. Recovered name: register_turret_template [STRONG INFERENCE] (iteration 296).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x1910e: move.l arg1 -> $2677c; definition = $1b524[arg2]; move.l #$190a0,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x1910e).
  * DAT_0002677c = template; create handler -> 0x190a0 (Ghidra 0x190c0). Type 0x1b (file 0x1ab24: +2 0x1917c, +0xe turret_pre_render) [PROVEN bytes] is one of the types carried on ships (carry_attached_objects) and is hit by bullets (bullet_hits_shape sets its +0x46) [STRONG INFERENCE: ship gun turret]. Ghidra C.
  */
@@ -26111,6 +26161,7 @@ uint * create_parachute_controller /* Original: FUN_000193b6 */ (uint param_1,in
 
 
 /* Original: FUN_0001940e; source: Pacific Conflict.c. Recovered name: register_parachute_template [STRONG INFERENCE] (iteration 296).
+ * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x1940e: move.l arg1 -> $26780; definition = $1b524[arg2]; move.l #$19396,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x1940e).
  * DAT_00026780 = template (spawn_special_weapon_entity); create handler -> 0x19396 (Ghidra 0x193b6). Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
  */
@@ -26183,6 +26234,7 @@ int spawn_special_weapon_entity(undefined2 param_1,uint param_2,uint param_3,uin
 
 
 /* Original: FUN_0001951a; source: Pacific Conflict.c. Recovered name: destroy_parachute_controller [STRONG INFERENCE] (iteration 296).
+ * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0x1951a: cmp.l $1b87c with the argument; equal -> clr.l $1b87c - identical.
  * Ghidra C reviewed (function at overlay offset 0x1951a).
  * Clears DAT_0001b87c when it is this parachute. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Complete Ghidra C.
  */
@@ -26429,6 +26481,7 @@ void create_cloud_controller /* Original: FUN_00019a1a */ (uint param_1,int para
 
 
 /* Original: FUN_00019a54; source: Pacific Conflict.c. Recovered name: register_cloud_templates [STRONG INFERENCE] (iteration 300).
+ * VERIFIED (iteration 313): checked against an independent capstone disassembly of the overlay bytes at 0x19a54: slot loop d0 = 0..4 over $26784 (first empty slot takes arg1, bls exit), redirect definition +6 = #$199fa when d0 > 3, clr.l d0 - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x19a54).
  * Fills the five template slots DAT_00026784[0..4] and, once four are taken, redirects the create handler to 0x199fa (Ghidra 0x19a1a, create_cloud_controller). Cloud definition key 0x1d (file 0x1ab58): +2 follow_camera_offset (0x19b30), +6 register_cloud_templates [PROVEN bytes]; the five templates DAT_00026784[0..4] are the classes spawned by spawn_camera_relative_object for spawn_cloud_layer. Ghidra C.
  */
@@ -27239,11 +27292,12 @@ undefined4 memzero(undefined4 *dst, uint nbytes) /* Original: FUN_0001a716 */
 
 
 
-/* Original: FUN_0001a75e; source: Pacific Conflict.c. Recovered name: bounded_strlen [STRONG INFERENCE] (iteration 304).
+/* Original: FUN_0001a75e; source: Pacific Conflict.c. Recovered name: c_strlen [STRONG INFERENCE] (iteration 304).
+ * VERIFIED (iteration 315): checked against an independent capstone disassembly of the overlay bytes at 0x1a75e: tst.b (a0)+ / dbeq d0 / bne loop; length = end - start - 1 - identical to the C (unbounded scan).
  * Ghidra C reviewed (function at overlay offset 0x1a75e).
- * Returns the length of the C string, scanning at most the count passed in D0 (register argument in_D0w). Used by update_view_readouts_and_overlays for the readout text. Ghidra C.
+ * Returns the length of the C string (renamed from bounded_strlen in iteration 315: the D0 count of the dbeq loop is only an inner counter - when it runs out without a zero byte, bne restarts the loop, so the scan is unbounded; the Ghidra C has the same behaviour). Used by update_view_readouts_and_overlays for the readout text. Ghidra C.
  */
-char * bounded_strlen /* Original: FUN_0001a75e */ (char *param_1)
+char * c_strlen /* Original: FUN_0001a75e */ (char *param_1)
 
 {
   char cVar1;
