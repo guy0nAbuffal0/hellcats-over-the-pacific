@@ -18700,7 +18700,11 @@ uint overlay_rng_next(void) /* Original: FUN_00011564 */
 
 
 
-void FUN_000115b0(uint param_1)
+/* Original: FUN_000115b0; source: Pacific Conflict.c. Recovered name: create_plume_controller [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x115b0).
+ * Cleared 0xa2-byte plume controller, object flags | 0x112000, definition = PTR_DAT_0001b540 (key 7). Target of register_smoke_template (0x11590 + 0x20). Plume definition key 7 (file 0x1a90c): +2 tick_smoke_plume, +0xa destroy_plume_controller, +0xe plume_pre_render [PROVEN bytes]; created through register_smoke_template -> create_plume_controller. Complete Ghidra C.
+ */
+void create_plume_controller /* Original: FUN_000115b0 */ (uint param_1)
 
 {
   uint *puVar1;
@@ -18788,7 +18792,11 @@ void attach_trailing_plume /* Original: FUN_00011670 */ (uint param_1,uint param
 
 
 
-void FUN_000116e8(int param_1)
+/* Original: FUN_000116e8; source: Pacific Conflict.c. Recovered name: destroy_plume_controller [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x116e8).
+ * Drops the reference on the aircraft the plume trails (+0x3c, set by attach_trailing_plume). Plume definition key 7 (file 0x1a90c): +2 tick_smoke_plume, +0xa destroy_plume_controller, +0xe plume_pre_render [PROVEN bytes]; created through register_smoke_template -> create_plume_controller. Complete Ghidra C.
+ */
+void destroy_plume_controller /* Original: FUN_000116e8 */ (int param_1)
 
 {
   char *pcVar1;
@@ -18802,7 +18810,11 @@ void FUN_000116e8(int param_1)
 
 
 
-void FUN_000116fc(int *param_1)
+/* Original: FUN_000116fc; source: Pacific Conflict.c. Recovered name: tick_smoke_plume [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x116fc).
+ * Free plume: does nothing until its end frame (+0x38) arrives. Trailing plume (+0x3c set): while the aircraft exists and still has damage bit 0 (outside a replay rewind) pushes the aircraft position into an 8-entry ring of trail points (+0x40, index +0xa0) and moves the plume object along; otherwise winds down. Ghidra C (partly read). Plume definition key 7 (file 0x1a90c): +2 tick_smoke_plume, +0xa destroy_plume_controller, +0xe plume_pre_render [PROVEN bytes]; created through register_smoke_template -> create_plume_controller.
+ */
+void tick_smoke_plume /* Original: FUN_000116fc */ (int *param_1)
 
 {
   int *piVar1;
@@ -18978,7 +18990,11 @@ undefined4 FUN_00011940(int *param_1)
 
 
 
-void FUN_00011a90(int *param_1)
+/* Original: FUN_00011a90; source: Pacific Conflict.c. Recovered name: plume_pre_render [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x11a90).
+ * Definition +0xe hook: shapes the plume before drawing with FUN_00011796 (free plume) or FUN_00011940 (trailing plume, from its trail points). Plume definition key 7 (file 0x1a90c): +2 tick_smoke_plume, +0xa destroy_plume_controller, +0xe plume_pre_render [PROVEN bytes]; created through register_smoke_template -> create_plume_controller. Complete Ghidra C.
+ */
+void plume_pre_render /* Original: FUN_00011a90 */ (int *param_1)
 
 {
   if (param_1[0xf] == 0) {
@@ -18992,7 +19008,11 @@ void FUN_00011a90(int *param_1)
 
 
 
-void FUN_00011aae(uint param_1,int param_2)
+/* Original: FUN_00011aae; source: Pacific Conflict.c. Recovered name: create_camera_facing_controller [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x11aae).
+ * Definition +6 of key 0xf (file 0x1aa00; +0xe face_camera_heading) [PROVEN bytes]: cleared 0x32-byte controller, object flag +5 | 0x10 (template pose kept). Complete Ghidra C.
+ */
+void create_camera_facing_controller /* Original: FUN_00011aae */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -19006,7 +19026,11 @@ void FUN_00011aae(uint param_1,int param_2)
 
 
 
-undefined4 FUN_00011ae6(int param_1)
+/* Original: FUN_00011ae6; source: Pacific Conflict.c. Recovered name: face_camera_heading [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x11ae6).
+ * Definition +0xe of key 0xf: heading +0x22 = - camera heading DAT_0001d80e, so the object always shows the same side to the viewer (a heading-only billboard, cf. face_object_to_camera) [UNKNOWN which scenery uses key 0xf]. Complete Ghidra C.
+ */
+undefined4 face_camera_heading /* Original: FUN_00011ae6 */ (int param_1)
 
 {
   *(ushort *)(param_1 + 0x22) = -DAT_0001d80e & 0x3fff;
@@ -19015,7 +19039,11 @@ undefined4 FUN_00011ae6(int param_1)
 
 
 
-uint * FUN_00011afe(uint param_1,int param_2)
+/* Original: FUN_00011afe; source: Pacific Conflict.c. Recovered name: create_effect_controller [STRONG INFERENCE] (iteration 297).
+ * Ghidra C reviewed (function at overlay offset 0x11afe).
+ * Cleared 0xd6-byte effect controller (the per-vertex velocities of the init_effect_kind* functions live in it), object flags | 0x170000, flag 0x2000 for the template DAT_0002627a; target of register_effect_template once its template slots are filled. Ghidra C.
+ */
+uint * create_effect_controller /* Original: FUN_00011afe */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -19034,7 +19062,7 @@ uint * FUN_00011afe(uint param_1,int param_2)
 
 /* Original: FUN_00011b48; source: Pacific Conflict.c. Recovered name: register_effect_template [STRONG INFERENCE] (iteration 267).
  * Ghidra C reviewed (function at overlay offset 0x11b48).
- * Create handler (definition +6, called by instantiate_object_from_desc as (object, key)) for effect templates: stores the object in the first free of the four slots DAT_0002626e[0..3] used by spawn_effect, and once three are taken replaces the definition create handler with 0x11ade, i.e. code at 0x11afe under the stored-address + 0x20 rule (bytes there start with LINK A6) = FUN_00011afe [PROVEN bytes; role UNKNOWN]. Returns 0 (no controller). Complete Ghidra C.
+ * Create handler (definition +6, called by instantiate_object_from_desc as (object, key)) for effect templates: stores the object in the first free of the four slots DAT_0002626e[0..3] used by spawn_effect, and once three are taken replaces the definition create handler with 0x11ade, i.e. code at 0x11afe under the stored-address + 0x20 rule (bytes there start with LINK A6) = FUN_00011afe [PROVEN bytes] = create_effect_controller (iteration 297). Returns 0 (no controller). Complete Ghidra C.
  */
 undefined4 register_effect_template /* Original: FUN_00011b48 */ (undefined4 param_1,int param_2)
 

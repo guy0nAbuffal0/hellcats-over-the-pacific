@@ -484,6 +484,13 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00019394` (Pacific Conflict) | `turret_pre_render` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_00019b82` (Pacific Conflict) | `create_view_attached_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
 | `FUN_00019bbc` (Pacific Conflict) | `tick_view_attached_object` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_000115b0` (Pacific Conflict) | `create_plume_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_000116e8` (Pacific Conflict) | `destroy_plume_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_000116fc` (Pacific Conflict) | `tick_smoke_plume` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011a90` (Pacific Conflict) | `plume_pre_render` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011afe` (Pacific Conflict) | `create_effect_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011aae` (Pacific Conflict) | `create_camera_facing_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011ae6` (Pacific Conflict) | `face_camera_heading` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |

@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 296
+**Last iteration:** 297
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 60 | 0 | 0 | 377 | 0 | 6 |
-| **TOTAL** | **736** | **60** | **0** | **0** | **670** | **0** | **6** |
+| Pacific Conflict.c | 443 | 53 | 0 | 0 | 384 | 0 | 6 |
+| **TOTAL** | **736** | **53** | **0** | **0** | **677** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 60 NOT_STARTED + 6 BLOCKED (iteration 296);
-670 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 53 NOT_STARTED + 6 BLOCKED (iteration 297);
+677 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -677,6 +677,13 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00019394` | `turret_pre_render` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 0x1b / 0x1c / 0x1e) | — | 296 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00019b82` | `create_view_attached_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 0x1b / 0x1c / 0x1e) | — | 296 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00019bbc` | `tick_view_attached_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 0x1b / 0x1c / 0x1e) | — | 296 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000115b0` | `create_plume_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000116e8` | `destroy_plume_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000116fc` | `tick_smoke_plume` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00011a90` | `plume_pre_render` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00011afe` | `create_effect_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00011aae` | `create_camera_facing_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00011ae6` | `face_camera_heading` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -3496,9 +3503,23 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   tick_view_attached_object).
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
-**Next iteration target:** Pacific Conflict turret tick `FUN_0001917c`,
-`FUN_00019a1a` / `FUN_00019a54` (templates DAT_00026784[5]), block
-0x115b0..0x11afe, aircraft variants 0xe1e6 / 0xe2a4 / 0xe340.
+### Iteration 297 — 2026-10-17
+
+- The user committed iterations 290–296 (HEAD 1e03669); validation re-based.
+  Untracked BNDL resources of the user left untouched.
+- Verified 32 protected hashes.
+- Pacific Conflict plume family (key 7): `FUN_000115b0` =
+  create_plume_controller, `FUN_000116e8` = destroy_plume_controller,
+  `FUN_000116fc` = tick_smoke_plume, `FUN_00011a90` = plume_pre_render;
+  `FUN_00011afe` = create_effect_controller (key 8); key 0xf:
+  `FUN_00011aae` = create_camera_facing_controller, `FUN_00011ae6` =
+  face_camera_heading.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict plume shapers `FUN_00011796` /
+`FUN_00011940`, turret tick `FUN_0001917c`, `FUN_00019a1a` / `FUN_00019a54`,
+aircraft variants 0xe1e6 / 0xe2a4 / 0xe340, AI states 0x111ae / 0x111da /
+0x112e0.
 
 ## Resuming the five-minute workflow
 
