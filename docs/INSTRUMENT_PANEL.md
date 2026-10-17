@@ -95,3 +95,28 @@ slot orientation from screw to screw.
 - GEAR: `draw_landing_gear_indicator` (ID03 0x54fe, label STR# 78) lays out three lamps.
 - ID04 slot users decoded in iteration 172; the panel-store path (ID04 0x432,
   ID02 0x4d34) is not yet fully understood.
+
+## Live needles (overlay, iteration 278)
+
+The panel bitmaps are static; the overlay draws the needles each frame from
+`update_view_readouts_and_overlays`. Each needle uses words +0xa / +0xc / +0xe
+(centre x, centre y, length) of the per-type 16-byte record at `A5-0x12a2`
+(overlay +0xe6 + 0x10·type) **[PROVEN by the offsets]** and is redrawn by
+`draw_gauge_needle` (erase from the saved panel, redraw; overlay 0xc572).
+
+| Type | Overlay function | Value |
+|---|---|---|
+| 0 | `update_altimeter_needles` (0xc664) | two hands (long + 2/3) |
+| 1 | `update_airspeed_needle` (0xc80c) | player +0x62a, non-linear scale |
+| 3 | `update_climb_needle` (0xc948) | `DAT_0001bc80` (rate of climb) |
+| 4 | `update_manifold_needle` (0xca44) | player +0x672 |
+| 5 | `update_tachometer_needle` (0xc9c2) | player +0x66a (engine RPM) |
+| 6 | `update_direction_needle` (0xc8d6) | camera heading `DAT_0001d80e` |
+| flaps | `update_flaps_needle` (0xcc12) | player +0x67b (0..0xf) |
+| gear | `update_gear_needles` (0xccca) | player +0x679 (0..0x2d), three legs |
+| ammo | `update_ammo_needle` (0xce1c) | player +0x682 (675 rounds full scale) |
+| fuel | `update_fuel_needles` (0xcec4) | player +0x67d / +0x67e (two tanks) |
+
+The extra items use host panel words overlay +0x20e..+0x236 (iteration 279);
+`update_radar_scope` (0x17b68) draws heading-up blips in the rectangle at
+host +0x1de..+0x1ea.

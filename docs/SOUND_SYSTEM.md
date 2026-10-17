@@ -82,3 +82,38 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
   (depends on handler end-of-buffer logic).
 - ~~How the three-node sustain loop is released~~ — `release_channel_loop`
   (iteration 144) rewrites continuations to break self-loops.
+
+## Overlay sound driver (Pacific Conflict, iteration 264)
+
+The overlay reaches the services above through its globals block (offset k
+= host A5-0x1388 + k): +0x25e sound slots, +0x2aa play, +0x2b2 rate, +0x2b6
+is-playing, +0x2ba release loop, +0x2be silence.
+
+| Function | Role |
+|---|---|
+| `play_game_sound` (0x95ac) | play sound n on channel 1 unless a sound with a number <= the current one (`DAT_00024d10`) is playing; some numbers loop (sample +0xc / +0x10) |
+| `stop_game_sound` (0x96ae) | release the loop of sound n if it is current |
+| `update_game_sounds` (0x96f4) | per frame: event flags `_DAT_0001b83c`..`_DAT_0001b856` → sounds 1..12 / 100; engine on channel 0 from player +0x66a (slot 0 or 10, rate via set_sound_playback_rate); options +0x9a (sound) / +0x9c (engine) |
+
+Lower sound numbers have priority **[STRONG INFERENCE]**.
+
+### Sound slots (iteration 265) [PROVEN]
+
+`load_game_sounds` takes the `'snd '` names from A5 initial data (DATA 0 in
+`artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/`; A5-x
+is at DATA offset size − (x − 0xba0), checked on 13 names).
+
+| Slot / sound | Name | Overlay trigger |
+|---|---|---|
+| 0 | Engine (Short Engine if free memory ≤ 0x2e400) | engine loop, channel 0, while player +0x669 is set |
+| 1 | Ugh | `_DAT_0001b844`: player pilot killed (damage bit 0, `update_aircraft_damage_state`) |
+| 2 | Hit | `_DAT_0001b842` (player hit by a bullet) |
+| 3, 4 | — (no sample) | `_DAT_0001b83c`, `_DAT_0001b83e` |
+| 5 | Gun | `_DAT_0001b852`: player firing with ammo (+0x682 > 1) and guns not damaged (flags_685 bit 4) |
+| 6 | Wheel | `_DAT_0001b856`: gentle ground contact (update_aircraft_entity) |
+| 7 | Gear | player bytes +0x679 / +0x67b between end values; 100 = same slot, offset 0x48c0 (`_DAT_0001b846`: player weapon released by update_aircraft_entity) |
+| 8 | Explosion (Distant Explosion if missing) | countdown `DAT_0001b84a` = 30 frames, set by `spawn_effect` when the camera is < 10000 away |
+| 9 | Distant Explosion | countdown `DAT_0001b848` = 15 frames, `spawn_effect` at < 40000 |
+| 10 | Wind | channel 0 when the engine is off and player +0x66a (engine RPM, the tachometer value) > 0x2710 |
+| 11 | Ditch | `_DAT_0001b850` (update_aircraft_entity, two ground-contact paths; condition not yet decoded) |
+| 12 | Grass | `_DAT_0001b854` (update_aircraft_entity, random while rolling on rough ground) |

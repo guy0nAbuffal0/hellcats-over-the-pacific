@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 249
+**Last iteration:** 279
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 253 | 0 | 0 | 184 | 0 | 6 |
-| **TOTAL** | **736** | **253** | **0** | **0** | **477** | **0** | **6** |
+| Pacific Conflict.c | 443 | 152 | 0 | 0 | 285 | 0 | 6 |
+| **TOTAL** | **736** | **152** | **0** | **0** | **578** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 253 NOT_STARTED + 6 BLOCKED (iteration 249);
-477 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 152 NOT_STARTED + 6 BLOCKED (iteration 279);
+578 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -484,6 +484,107 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00008784` | `set_state_word_1b86c` | Pacific Conflict | RENAMED | HYPOTHESIS name | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 2 / 1 by argument | — | 248 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00005832` | `dispatch_overlap_collisions` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 1-D sweep over metric +/- radius, type handler +0x16 | — | 249 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
 | `FUN_000058ec` | `build_visible_object_list` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | view-space transform and pyramid cull into DAT_0001c9dc | — | 249 (2026-10-17) | complete Ghidra C; token diff vs HEAD = renames |
+| `FUN_000053f8` | `collect_near_objects` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | active array: view candidates, deactivation / retirement | — | 250 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000555a` | `collect_far_objects` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | world array: view candidates, collision list | — | 250 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00005a14` | `update_altitude_detail_bands` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | power-of-two altitude band; land outline rebuild | DAT_0001bdac / DAT_0001bdb0 shape roles | 251 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00004958` | `build_land_outline_at_detail` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | tolerance-simplified, clipped, de-duplicated outline | shift / limit argument roles | 251 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00005e28` | `update_ground_scatter_objects` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 64 ground points near a low camera; up to 7 scenery objects | option +0xac meaning | 252 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000052dc` | `deactivate_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | frees shape buffers / group child list | FUN_00014af2 role | 252 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013346` | `surface_type_at_point` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | face code under (x, z), default DAT_0001bda8+0x16 | FUN_0001320a / FUN_00013070 internals | 252 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013070` | `point_in_polygon_xz` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | even-odd crossing test, words +2 / +10 | — | 253 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001310e` | `point_in_polygon_yz` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | same on words +6 / +10 | called by point_in_face_by_axis (iteration 262) | 253 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001320a` | `project_face_vertices_xz` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | shifted, origin-relative x / z | — | 253 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000131ac` | `project_face_vertices_xy` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | x / y variant | called by point_in_face_by_axis (iteration 262) | 253 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013268` | `project_face_vertices_yz` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | y / z variant | called by point_in_face_by_axis (iteration 262) | 253 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00014af2` | `release_fractal_reference` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | refcounted shared block at +0x2c ("Deactivating Fractal") | _DAT_0001c1bc role | 253 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000132c8` | `point_over_face_xz` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | entity x / z inside a face (result dropped by Ghidra) | no caller in exported C | 254 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00014bea` | `carry_attached_objects` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | rotate / lower nearby type 7 / 8 / 0x1a / 0x1b entities with an object | ship reading [HYPOTHESIS] | 254 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001562e` | `clip_polygon_y_nonneg` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | Sutherland-Hodgman clip at y = 0 | — | 255 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00015762` | `sink_object_shape_at_waterline` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | rotate / lower template shape, clip faces at y = 0, 1 if anything remains | — | 255 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00014d86` | `step_sinking_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | timed angle / drop steps, removal and mission flags when sunk | controller layout partly inferred | 255 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00015580` | `create_sinking_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 0x56-byte controller, definition DAT_0001b524[key] | how the controller is linked / called | 256 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000155d8` | `tick_sinking_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | step when word +0x4c set | caller (handler table) | 256 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00014f48` | `apply_hit_to_sinkable_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hit counter +0x32; list / capsize rates; 15 steps after 30 frames | 1-hit branch structure | 257 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001530e` | `create_firing_ship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 300-byte record, 20 shots | caller | 257 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00015356` | `tick_firing_ship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | gun faces (+0x17 == 1), 1/256 random fire, else sinking | AA reading [HYPOTHESIS] | 257 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000150c8` | `create_flagship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create entry of type 0x15 (3 hits); first kept in _DAT_0001b864 | which ship [HYPOTHESIS] | 258 (2026-10-17) | Ghidra C + definition table bytes; token diff vs HEAD = renames |
+| `FUN_000155ec` | `create_basic_ship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create entry of types 0x18 / 0x17 | — | 258 (2026-10-17) | Ghidra C + definition table bytes; token diff vs HEAD = renames |
+| `FUN_000092e4` | `advance_frame_and_tick_controllers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | frame counter, time-window flags, controller ticks (definition +2) | DAT_0001b870 states | 259 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000947c` | `apply_controller_velocities` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | position += controller velocity (+6 & 0x20) | — | 259 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000094d2` | `tick_flagged_object_controllers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | DAT_0001b870 == 3 variant, objects +5 & 4 only | state 3 meaning | 259 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001429c` | `handle_player_contact` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | player overlap → contact record, definition +0x12 handler | FUN_000135a0 / 135e8 / 14198 | 259 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001358c` | `contact_pair_hash` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | a ^ (b << 2), low byte | — | 260 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000135a0` | `find_contact_record` | Pacific Conflict | RENAMED | PROVEN | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 256-slot linear probe of DAT_0001bdbc | — | 260 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000135e8` | `create_shape_contact_record` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | per-face record for plain shapes | face entry fields | 260 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001383c` | `create_fractal_contact_record` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 0x3e-byte record for fractal objects | — | 260 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013980` | `fractal_height_at` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | height from fractal data at (x, z) | interpolation details | 260 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00014198` | `handle_terrain_contact` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | player ground height → controller +0x2e | — | 260 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013ee0` | `test_object_collision` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | face-plane crossing test via contact records | FUN_0001665a, FUN_0001346c | 261 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013cdc` | `test_terrain_collision` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | below fractal ground → collision | FUN_00014830 | 261 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013e4e` | `test_proximity_collision` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | both 0x100000, 3/4 distance < range | — | 261 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013eae` | `test_player_vs_type0e_proximity` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | player vs template type 0xe | type 0xe identity | 261 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00014348` | `dispatch_collision` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition +0x12 handlers; pair table DAT_0001b43c | handler 0x14346 | 262 (2026-10-17) | Ghidra C (+ pair table bytes); token diff vs HEAD = renames |
+| `FUN_0001346c` | `point_in_face_by_axis` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | axis code 0 / 1 / 2 → yz / xz / xy test | axis word source (in_stack) | 262 (2026-10-17) | Ghidra C (+ pair table bytes); token diff vs HEAD = renames |
+| `FUN_00012fd2` | `point_in_polygon_xy` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | even-odd test on +2 / +6 | — | 262 (2026-10-17) | Ghidra C (+ pair table bytes); token diff vs HEAD = renames |
+| `FUN_000167f4` | `bullet_hits_aircraft` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 0xe vs 1..4: 1/8 damage + retire | — | 263 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001665a` | `bullet_hits_shape` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | retire bullet; type 0x1b 1/16 flag | controller +0x3c use | 263 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00016724` | `apply_random_aircraft_damage` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | random damage bit in +0x684 (flags_685) | meaning of each bit | 263 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000095ac` | `play_game_sound` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | priority play on channel 1 via host play_sample_on_channel | switch grouping | 264 (2026-10-17) | Ghidra C + host A5 mapping; token diff vs HEAD = renames |
+| `FUN_000096ae` | `stop_game_sound` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | release_channel_loop when current | — | 264 (2026-10-17) | Ghidra C + host A5 mapping; token diff vs HEAD = renames |
+| `FUN_000096f4` | `update_game_sounds` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | event flags → sounds; engine pitch on channel 0 | event meanings | 264 (2026-10-17) | Ghidra C + host A5 mapping; token diff vs HEAD = renames |
+| `FUN_00011c58` | `spawn_effect` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | effect pool object, kind init table, explosion sound countdowns, 16-entry event log | log use (replay?) | 266 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00010650` | `update_aircraft_damage_state` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | damage stages → smoke / fire effects; player bit 0 → pilot Dead + Ugh | stage bits 6..9 exact | 266 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00011b96` | `replay_logged_effects` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | re-spawns logged effects of the current frame | — | 267 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00011c2c` | `mark_effect_log_end` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 0x7fffffff sentinel in the effect log | — | 267 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00011b48` | `register_effect_template` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create handler: effect template slots DAT_0002626e[0..3] | FUN_00011afe role | 267 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_0001203a` | `init_effect_kind0_flat_ring` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 6-vertex expanding ring | visual identity | 268 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000120ca` | `init_effect_kind1_column` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 3 spreading + 1 rising vertex | splash? [HYPOTHESIS] | 268 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00011efc` | `init_effect_kind2_burst` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 12-vertex random burst | — | 268 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001217e` | `init_effect_kind3_debris_explosion` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | burst + 13 debris vertices | +0x36 / +0x33 use | 268 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00012768` | `tick_effect` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | animator, lifetime +0x36, retire | — | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_000123ce` | `animate_effect_kind0_ring` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | ring; spawns kind 1 at lifetime 0x47 | — | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00012466` | `animate_effect_kind0_ring_tail` | Pacific Conflict | RENAMED | PROVEN (false split) | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | tail of 0x123ce | — | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00012486` | `animate_effect_kind1_column` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | rising vertex with gravity | — | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00012296` | `animate_effect_kind2_burst` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | halving velocities, colour fade | FUN_000115fc | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00012528` | `animate_effect_kind3_debris` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | debris with gravity until grounded | FUN_000175de | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_00012738` | `face_object_to_camera` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | billboard attitude | — | 269 (2026-10-17) | Ghidra C + table bytes; token diff vs HEAD = renames |
+| `FUN_000127aa` | `effect_pre_render_hook` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition +0xe of key 8; kind 2 billboard | — | 270 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000115fc` | `spawn_smoke_plume` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | timed plume from template DAT_000260e8 | visual identity | 270 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000115da` | `register_smoke_template` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create handler storing DAT_000260e8 | FUN_000115b0 | 270 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00011670` | `attach_trailing_plume` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | plume with 8 trail points linked to an aircraft | — | 270 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000175de` | `spawn_ground_mark` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 6-vertex scaled mark, expires after 2700 frames | visual identity | 270 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000a75e` | `transform_and_project_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | pre-render hook, object→camera matrix, transform + project used vertices | — | 271 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000a676` | `project_prepared_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | project already transformed vertices | who fills +0x4c | 271 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000ac72` | `render_visible_objects` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | three render passes; polygon emit FUN_00009ef8 / 9da6, flush FUN_0000a2f2 | pass details | 271 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00009ae0` | `face_is_back_facing` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | normal · (camera − v0) < 1 | — | 272 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00009da6` | `emit_faces_bsp` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | back-to-front BSP traversal | — | 272 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00009d34` | `emit_face_chain` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | chain +0x12 emission | — | 272 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00009ef8` | `emit_faces_in_order` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | root faces + chains | — | 272 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00009fc4` | `emit_faces_unnumbered` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | as above, no draw order | — | 272 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000a2f2` | `submit_object_faces` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | clip / output / camera-penetration collision | FUN_0000b028, FUN_0000a512, *DAT_00020ab4 | 272 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000a512` | `transform_face_vertices` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | lazy per-vertex transform + projection | — | 273 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000b028` | `clip_face_near_plane` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | clip at z = 5, project intersections | — | 273 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000a16e` | `output_face_colour` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | screen clip → FUN_00009b8c | FUN_0000a07e | 273 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000a220` | `output_face_bw` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | screen clip → host add_polygon_edges | — | 273 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00009b8c` | `add_face_edges_to_rows` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | edge records into row buckets DAT_0001eaac | — | 274 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000a07e` | `track_ground_plane_horizon` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | ground-plane corners + horizon edge | users of DAT_0001bd90 / 0001bda0.. | 274 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000b4b6` | `draw_sky_and_ground` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | horizon edge → sky / ground background fill | fill loop details | 275 (2026-10-17) | Ghidra C (partial read for 0xb4b6); token diff vs HEAD = renames |
+| `FUN_0000b460` | `reset_background_rows` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | default span per row | — | 275 (2026-10-17) | Ghidra C (partial read for 0xb4b6); token diff vs HEAD = renames |
+| `FUN_00002e14` | `scan_convert_edge_rows` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | active edge list per row, draw-order resolve, runs to DAT_0001b794 / 798 | inner loop not yet annotated block by block (degraded Ghidra C) | 276 (2026-10-17) | Ghidra C structure + globals; token diff vs HEAD = renames |
+| `FUN_0000d00c` | `update_view_readouts_and_overlays` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 4 numeric readouts via host +0x27a, or sky + HUD drawers | readout 3; FUN_0000ba2a..ccca roles | 277 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001443a` | `sort_group_parts_by_distance` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | distance sort, haze blend (0x7d, 0x84, 0xa8), draw order | — | 277 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000c572` | `draw_gauge_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | erase / redraw a needle line, cached ends | — | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000c664` | `update_altimeter_needles` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 0, two hands | FUN_00001db8 / 1d56 register args | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000c80c` | `update_airspeed_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 1, +0x62a | — | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000c8d6` | `update_direction_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 6, camera heading | — | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000c948` | `update_climb_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 3, DAT_0001bc80 | — | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000c9c2` | `update_tachometer_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 5, +0x66a RPM | — | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000ca44` | `update_manifold_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 4, +0x672 | — | 278 (2026-10-17) | Ghidra C + instrument record offsets; token diff vs HEAD = renames |
+| `FUN_0000cc12` | `update_flaps_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x67b | flaps vs gear assignment by needle count | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000ccca` | `update_gear_needles` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x679, three needles | — | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000ce1c` | `update_ammo_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x682 | — | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000cec4` | `update_fuel_needles` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x67d / +0x67e | — | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00017b68` | `update_radar_scope` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | heading-up blips from DAT_0001b51c | which objects are tracked | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -2760,9 +2861,357 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   both called back to back near Pacific Conflict.decomp.c 8445.
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
-**Next iteration target:** Pacific Conflict `FUN_0000555a`, `FUN_00005a14`
-(called by overlay_frame_step), `FUN_00005e28`, and the caller of the two
-functions above (~line 8445).
+### Iteration 250 — 2026-10-17
+
+- Many queued loop prompts arrived together; ran one iteration.
+- Verified 32 protected hashes; uncommitted iteration 211–249 work preserved.
+- Pacific Conflict `FUN_000053f8` = collect_near_objects, `FUN_0000555a` =
+  collect_far_objects: the two per-frame passes in overlay_frame_step that
+  feed build_visible_object_list (candidates DAT_0001c43c) and
+  dispatch_overlap_collisions (list DAT_0001c1e4), and deactivate / retire
+  near objects that left the active range.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 251 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250 work preserved
+  (earlier work committed by the user; validation re-based on HEAD).
+- Pacific Conflict `FUN_00005a14` = update_altitude_detail_bands: keeps the
+  camera height in a power-of-two band (DAT_0001d70c, log2 DAT_0001d704),
+  lifts vertices of the shapes DAT_0001bdac / DAT_0001bdb0 by a value
+  interpolated from DAT_0001b214, and when the band changes or the camera has
+  moved far enough rebuilds land objects with tolerance DAT_0001b264[band].
+  `FUN_00004958` = build_land_outline_at_detail (previously deferred).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 252 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–251 work preserved.
+- Pacific Conflict `FUN_00005e28` = update_ground_scatter_objects (when
+  option DAT_0001b5a0+0xac is set and the camera is low, keeps 64 random
+  ground points around / ahead of the camera and places up to 7 scenery
+  objects DAT_0001bc64 on visible ones, template chosen by surface type),
+  `FUN_00013346` = surface_type_at_point, `FUN_000052dc` = deactivate_object.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 253 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–252 work preserved.
+- Pacific Conflict point-in-face helpers: `FUN_0001320a` / `FUN_000131ac` /
+  `FUN_00013268` = project_face_vertices_xz / _xy / _yz (shift + origin
+  subtract into a 12-byte vertex buffer), `FUN_00013070` / `FUN_0001310e` =
+  point_in_polygon_xz / _yz (even-odd crossing count). `FUN_00014af2` =
+  release_fractal_reference (string "*** Deactivating Fractal, but st...").
+  The xy / yz projection and yz test have no caller in the exported C.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 254 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–253 work preserved.
+- Pacific Conflict `FUN_000132c8` = point_over_face_xz (Ghidra drops its
+  boolean result), `FUN_00014bea` = carry_attached_objects (moves or removes
+  entities of template types 7 / 8 / 0x1a / 0x1b near an object that is
+  rotating / dropping; called twice by FUN_00014d86).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 255 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–254 work preserved.
+- Pacific Conflict sinking path: `FUN_0001562e` = clip_polygon_y_nonneg,
+  `FUN_00015762` = sink_object_shape_at_waterline (returns 0 once no face is
+  above y = 0), `FUN_00014d86` = step_sinking_object (callers FUN_00015580,
+  FUN_000155d8).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 256 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–255 work preserved.
+- Pacific Conflict `FUN_00015580` = create_sinking_controller (0x56-byte
+  record, interval 3, object flags 0x102000), `FUN_000155d8` =
+  tick_sinking_controller. Neither has a caller in the exported C (handler
+  table). The neighbouring `FUN_000155ec` (0x50-byte record, interval 7)
+  and the larger tick before FUN_00015580 (random fire via
+  spawn_weapon_entity, else step_sinking_object) are left for the next pass.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 257 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–256 work preserved.
+- Pacific Conflict `FUN_00014f48` = apply_hit_to_sinkable_object (hit
+  counter, list / capsize rates, starts the sinking schedule),
+  `FUN_0001530e` / `FUN_00015356` = create_ / tick_firing_ship_controller
+  (random fire from marked faces until sinking). `FUN_000150c8` (0x56-byte
+  record, object flag 0x4000, first one kept in _DAT_0001b864) and
+  `FUN_000155ec` (0x50-byte record) left for later: role not yet clear.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 258 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–257 work preserved.
+- Decoded the ship controller definition table (runtime 0x1aa5e, file
+  0x1aa7e, five 0x1c-byte records copied into DAT_0001b524[key] by
+  overlay_main_entry): key, tick, create, extra handler, hits. This gives the
+  callers of the controller functions renamed in iterations 255–257.
+- Pacific Conflict `FUN_000150c8` = create_flagship_controller (type 0x15,
+  provisional name), `FUN_000155ec` = create_basic_ship_controller (types
+  0x18 / 0x17). New doc `docs/SHIP_CONTROLLERS.md`.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 259 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–258 work preserved.
+- Found the callers of the controller definition handlers:
+  instantiate_object_from_desc calls create (+6); `FUN_000092e4` =
+  advance_frame_and_tick_controllers and `FUN_000094d2` =
+  tick_flagged_object_controllers call tick (+2) over the list DAT_0001c25c;
+  `FUN_0001429c` = handle_player_contact calls the +0x12 contact handler.
+  `FUN_0000947c` = apply_controller_velocities. The definition table is
+  general (instantiate_object_from_desc uses it for every keyed template),
+  not ship-only; docs/SHIP_CONTROLLERS.md updated.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 260 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–259 work preserved.
+- Pacific Conflict contact records: hash table DAT_0001bdbc (256 slots,
+  linear probing) keyed by (object a, object b) — `FUN_0001358c` =
+  contact_pair_hash, `FUN_000135a0` = find_contact_record, `FUN_000135e8` /
+  `FUN_0001383c` = create_shape_ / create_fractal_contact_record.
+  `FUN_00014198` = handle_terrain_contact stores the height from
+  `FUN_00013980` = fractal_height_at into player controller +0x2e (the
+  ground height used for altitude above ground elsewhere).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 261 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–260 work preserved.
+- Pacific Conflict collision tests called by collect_far_objects:
+  `FUN_00013ee0` = test_object_collision (per-face plane-crossing test
+  using the contact records' stored signs), `FUN_00013cdc` =
+  test_terrain_collision, `FUN_00013e4e` = test_proximity_collision,
+  `FUN_00013eae` = test_player_vs_type0e_proximity. All end in
+  FUN_00014348 (collision response).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 262 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–261 work preserved.
+- Pacific Conflict `FUN_00014348` = dispatch_collision: per-type collision
+  handlers at definition +0x12, with a 10-entry pair table DAT_0001b43c
+  (file 0x1b45c, decoded: type 0xe vs 1..4 → FUN_000167f4; pairs with 0xc →
+  0x14346). `FUN_0001346c` = point_in_face_by_axis, `FUN_00012fd2` =
+  point_in_polygon_xy; the xy / yz helpers of iteration 253 now have a
+  caller.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 263 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–262 work preserved.
+- Pacific Conflict bullet hits: `FUN_000167f4` = bullet_hits_aircraft (pair
+  handler type 0xe vs 1..4), `FUN_0001665a` = bullet_hits_shape,
+  `FUN_00016724` = apply_random_aircraft_damage (random damage bit in
+  controller word +0x684, whose low byte flags_685 degrades the controls).
+  Template type 0xe identified as a bullet [STRONG INFERENCE].
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 264 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–263 work preserved.
+- Pacific Conflict sound driver: `FUN_000095ac` = play_game_sound,
+  `FUN_000096ae` = stop_game_sound, `FUN_000096f4` = update_game_sounds.
+  Host services mapped through overlay offsets +0x25e / +0x2aa..+0x2be
+  (= A5-0x112a / -0x10de..-0x10ca); section added to docs/SOUND_SYSTEM.md.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 265 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–264 work preserved.
+- Annotation only (no new renames; counts unchanged): read the `'snd '`
+  names of load_game_sounds from A5 initial data (DATA 0, A5-x at offset
+  size - (x - 0xba0), 13 names matched) and mapped every sound slot: 0
+  Engine, 1 Ugh, 2 Hit, 5 Gun, 6 Wheel, 7 Gear, 8 Explosion, 9 Distant
+  Explosion, 10 Wind, 11 Ditch, 12 Grass. Confirms independently that sound
+  2 (bullet_hits_aircraft) is Hit; the channel-0 slot 10 is Wind, so player
+  +0x66a is a speed-like value rather than RPM (corrected in
+  update_game_sounds). Comments updated in `Pacific Conflict.decomp.c`
+  (play_game_sound, update_game_sounds) and `ID02.decomp.c`
+  (load_game_sounds); table added to docs/SOUND_SYSTEM.md.
+- Validation: comment-stripped tokens of both files equal HEAD (plus earlier
+  renames); warnings intact; 32 hashes OK.
+
+### Iteration 266 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–265 work preserved.
+- Traced the setters of the sound events: Gun in
+  process_flight_input_and_outcome, Wheel / Ditch / Grass / weapon release
+  in update_aircraft_entity, explosion countdowns in `FUN_00011c58` =
+  spawn_effect, Ugh in `FUN_00010650` = update_aircraft_damage_state
+  (player damage bit 0 sets the host pilot status A5-0x12b4 = 1 Dead).
+  spawn_effect logs its calls in a 16-entry ring only when DAT_0001b870 ==
+  0 (replay / playback hypothesis for DAT_0001b870). SOUND_SYSTEM.md table
+  filled in.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 267 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–266 work preserved.
+- DAT_0001b870 identified as the instant-replay state [STRONG INFERENCE]:
+  0 = live (spawn_effect logs every effect in a 16-entry ring), 1 = replay
+  start (frame counter back 0x4a frames, `FUN_00011c2c` =
+  mark_effect_log_end), != 0 = replaying (`FUN_00011b96` =
+  replay_logged_effects re-spawns the logged effects frame by frame).
+  `FUN_00011b48` = register_effect_template (create handler filling the
+  effect template slots DAT_0002626e[0..3]).
+- Effect initialiser table DAT_0001b40c read from bytes (file 0x1b42c, +0x20
+  rule): kinds 0..11 -> 0x1203a, 0x120ca, 0x11efc, 0x1217e, 0x123ce, 0x12486,
+  0x12296, 0x12528, 0x12760, 0x12764, 0x12738, 0x12760 (all but 0x12760 /
+  0x12764 are Ghidra functions).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 268 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–267 work preserved.
+- Pacific Conflict effect initialisers kinds 0..3 (size word +0x34 in
+  percent scales the template; per-vertex velocities in the controller):
+  `FUN_0001203a` = init_effect_kind0_flat_ring, `FUN_000120ca` =
+  init_effect_kind1_column, `FUN_00011efc` = init_effect_kind2_burst,
+  `FUN_0001217e` = init_effect_kind3_debris_explosion.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 269 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–268 work preserved.
+- **Correction to iteration 267:** DAT_0001b40c is not one 12-kind table but
+  three 4-entry tables: DAT_0001b40c init, DAT_0001b41c animate, DAT_0001b42c
+  (used by FUN_000127aa). **Address convention clarified [PROVEN]:** Ghidra
+  function addresses are file offsets; data labels and stored code pointers
+  are runtime addresses (file offset − 0x20). Re-checking with this rule:
+  pair handler 0x14346 (iteration 262) is a lone RTS (collisions ignored),
+  and the type 0x15 handler 0x15154 starts with LINK A6 (an unexported
+  function). Comments in dispatch_collision and docs/SHIP_CONTROLLERS.md
+  corrected.
+- Pacific Conflict effects: `FUN_00012768` = tick_effect, animators
+  `FUN_000123ce` / `FUN_00012486` / `FUN_00012296` / `FUN_00012528` =
+  animate_effect_kind0_ring / kind1_column / kind2_burst / kind3_debris,
+  `FUN_00012466` = animate_effect_kind0_ring_tail (false split),
+  `FUN_00012738` = face_object_to_camera.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 270 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–269 work preserved.
+- Decoded the effect definition (key 8, runtime 0x1a93a): +2 tick_effect,
+  +6 register_effect_template, +0xe `FUN_000127aa` =
+  effect_pre_render_hook. Definition hook slots now known: +2 tick, +6
+  create, +0xa destroy (called before the controller is freed), +0xe
+  pre-render (FUN_0000a75e, phases 1 / 2), +0x12 collision.
+- `FUN_000115fc` = spawn_smoke_plume [HYPOTHESIS], `FUN_000115da` =
+  register_smoke_template, `FUN_00011670` = attach_trailing_plume,
+  `FUN_000175de` = spawn_ground_mark [HYPOTHESIS].
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 271 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–270 work preserved.
+- Pacific Conflict render pipeline: `FUN_0000ac72` = render_visible_objects
+  (called by overlay_frame_step), `FUN_0000a75e` =
+  transform_and_project_object (calls the definition +0xe pre-render hook),
+  `FUN_0000a676` = project_prepared_object. Render-state globals documented
+  in the headers (DAT_00025b24 current object, DAT_000256b2 screen points,
+  DAT_00020b28 / 26 projection scales).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 272 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–271 work preserved.
+- Pacific Conflict face emission: `FUN_00009ae0` = face_is_back_facing,
+  `FUN_00009da6` = emit_faces_bsp (painter-order BSP), `FUN_00009d34` =
+  emit_face_chain, `FUN_00009ef8` = emit_faces_in_order, `FUN_00009fc4` =
+  emit_faces_unnumbered, `FUN_0000a2f2` = submit_object_faces (also the
+  fly-through-a-face collision test via dispatch_collision). Face record
+  layout documented; new doc docs/OVERLAY_RENDERER.md.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 273 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–272 work preserved.
+- Pacific Conflict face output: `FUN_0000a512` = transform_face_vertices,
+  `FUN_0000b028` = clip_face_near_plane, and the two DAT_00020ab4 targets
+  set by configure_renderer_for_display: `FUN_0000a16e` =
+  output_face_colour (depths 8 / 4, overlay span renderer FUN_00009b8c),
+  `FUN_0000a220` = output_face_bw (depth 1, host ID06 add_polygon_edges via
+  overlay +0x7c = A5-0x130c). docs/OVERLAY_RENDERER.md updated.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 274 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–273 work preserved.
+- Pacific Conflict `FUN_00009b8c` = add_face_edges_to_rows (colour path:
+  edge records in per-row buckets for the span fillers), `FUN_0000a07e` =
+  track_ground_plane_horizon (ground-plane face DAT_0001bda8: covered
+  corners DAT_0001bd90 and horizon edge DAT_0001bda0..94).
+  docs/OVERLAY_RENDERER.md updated.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 275 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–274 work preserved.
+- Pacific Conflict `FUN_0000b4b6` = draw_sky_and_ground (consumer of the
+  horizon edge and corner bits from track_ground_plane_horizon; host colours
+  +0x18e / +0x190), `FUN_0000b460` = reset_background_rows. The row-bucket
+  consumer is the earlier-deferred FUN_00002e14 (only other user of
+  DAT_0001eaac / DAT_0001daa4). docs/OVERLAY_RENDERER.md updated.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 276 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–275 work preserved.
+- Pacific Conflict `FUN_00002e14` (deferred since iteration 247) =
+  scan_convert_edge_rows: colour-depth scan conversion between
+  render_visible_objects and the span fillers (active edge lists, draw-order
+  visibility, runs into DAT_0001b794 / DAT_0001b798). Header only; the
+  degraded inner loop is not annotated line by line.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 277 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–276 work preserved.
+- Pacific Conflict `FUN_0000d00c` = update_view_readouts_and_overlays
+  (altitude / speed / heading° / unknown readouts through host +0x27a, or
+  sky + a dozen overlay drawers), `FUN_0001443a` =
+  sort_group_parts_by_distance (haze colour RGB 0x7d / 0x84 / 0xa8).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 278 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–277 work preserved.
+- Pacific Conflict live instrument needles (records A5-0x12a2 = overlay
+  +0xe6 + 0x10·type, types from docs/INSTRUMENT_PANEL.md): `FUN_0000c572` =
+  draw_gauge_needle and needles for types 0 / 1 / 6 / 3 / 5 / 4
+  (`FUN_0000c664`, `FUN_0000c80c`, `FUN_0000c8d6`, `FUN_0000c948`,
+  `FUN_0000c9c2`, `FUN_0000ca44`).
+- **Correction to iteration 265:** player +0x66a drives the tachometer, so it
+  is engine RPM (Wind = windmilling propeller with the engine off), not a
+  speed; DAT_0001bc80 (climb needle) is the rate of climb, which identifies
+  readout 3. Comments in update_game_sounds /
+  update_view_readouts_and_overlays and SOUND_SYSTEM.md corrected;
+  INSTRUMENT_PANEL.md gains a live-needles table.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 279 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–278 work preserved.
+- Pacific Conflict panel extras: `FUN_0000cc12` = update_flaps_needle
+  (+0x67b), `FUN_0000ccca` = update_gear_needles (+0x679, three legs),
+  `FUN_0000ce1c` = update_ammo_needle (+0x682), `FUN_0000cec4` =
+  update_fuel_needles (+0x67d / +0x67e), `FUN_00017b68` = update_radar_scope.
+  Flaps vs gear assigned by needle count (one vs three, matching the ID03
+  panel items) [STRONG INFERENCE]. INSTRUMENT_PANEL.md updated.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict `FUN_0000c1aa`, `FUN_0000ba2a`
+(last two drawers of update_view_readouts_and_overlays), the radar track
+list DAT_0001b51c producer, `FUN_00001db8` / `FUN_00001d56`.
 
 ## Resuming the five-minute workflow
 

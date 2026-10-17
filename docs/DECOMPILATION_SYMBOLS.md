@@ -292,6 +292,109 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00008784` (Pacific Conflict) | `set_state_word_1b86c` | HYPOTHESIS name | Iter 248: 2 / 1 by argument. |
 | `FUN_00005832` (Pacific Conflict) | `dispatch_overlap_collisions` | STRONG INFERENCE | Iter 249: 1-D sweep over metric +/- radius, type handler +0x16. |
 | `FUN_000058ec` (Pacific Conflict) | `build_visible_object_list` | STRONG INFERENCE | Iter 249: view-space transform and pyramid cull into DAT_0001c9dc. |
+| `FUN_000053f8` (Pacific Conflict) | `collect_near_objects` | STRONG INFERENCE | Iter 250: active array: view candidates, deactivation / retirement. |
+| `FUN_0000555a` (Pacific Conflict) | `collect_far_objects` | STRONG INFERENCE | Iter 250: world array: view candidates, collision list. |
+| `FUN_00005a14` (Pacific Conflict) | `update_altitude_detail_bands` | STRONG INFERENCE | Iter 251: power-of-two altitude band, tables DAT_0001b214 / DAT_0001b264, land rebuild. |
+| `FUN_00004958` (Pacific Conflict) | `build_land_outline_at_detail` | STRONG INFERENCE | Iter 251: drops vertices within tolerance, clips, de-duplicates into template vertex table. |
+| `FUN_00005e28` (Pacific Conflict) | `update_ground_scatter_objects` | STRONG INFERENCE | Iter 252: 64 ground points DAT_0001b924, 7 object slots DAT_0001bc64, gated by +0xac and height < 0x26ad. |
+| `FUN_00013346` (Pacific Conflict) | `surface_type_at_point` | STRONG INFERENCE | Iter 252: face code (+0x16) of nearby land face containing (x, z); default DAT_0001bda8+0x16. |
+| `FUN_00013070` (Pacific Conflict) | `point_in_polygon_xz` | STRONG INFERENCE | Iter 253: even-odd crossing test on vertex words +2 / +10. |
+| `FUN_0001310e` (Pacific Conflict) | `point_in_polygon_yz` | STRONG INFERENCE | Iter 253: same on +6 / +10. |
+| `FUN_0001320a` (Pacific Conflict) | `project_face_vertices_xz` | STRONG INFERENCE | Iter 253: (v >> shift) - origin into +2 / +10. |
+| `FUN_000131ac` (Pacific Conflict) | `project_face_vertices_xy` | STRONG INFERENCE | Iter 253: into +2 / +6. |
+| `FUN_00013268` (Pacific Conflict) | `project_face_vertices_yz` | STRONG INFERENCE | Iter 253: into +6 / +10. |
+| `FUN_00014af2` (Pacific Conflict) | `release_fractal_reference` | STRONG INFERENCE | Iter 253: decrements / frees shared block +0x2c; "Deactivating Fractal" message. |
+| `FUN_000132c8` (Pacific Conflict) | `point_over_face_xz` | STRONG INFERENCE | Iter 254: entity x / z origin, project_face_vertices_xz + point_in_polygon_xz. |
+| `FUN_00014bea` (Pacific Conflict) | `carry_attached_objects` | STRONG INFERENCE | Iter 254: rotates / lowers or removes nearby entities of template types 7 / 8 / 0x1a / 0x1b. |
+| `FUN_0001562e` (Pacific Conflict) | `clip_polygon_y_nonneg` | STRONG INFERENCE | Iter 255: clip against y = 0 (keep y >= 0), returns clipped flag. |
+| `FUN_00015762` (Pacific Conflict) | `sink_object_shape_at_waterline` | STRONG INFERENCE | Iter 255: rotated / lowered template shape, faces clipped at y = 0. |
+| `FUN_00014d86` (Pacific Conflict) | `step_sinking_object` | STRONG INFERENCE | Iter 255: timed sink steps; on completion removes riders, tallies, mission +0xce. |
+| `FUN_00015580` (Pacific Conflict) | `create_sinking_controller` | STRONG INFERENCE | Iter 256: 0x56-byte record, +4 = DAT_0001b524[key], interval 3, object flags 0x102000. |
+| `FUN_000155d8` (Pacific Conflict) | `tick_sinking_controller` | STRONG INFERENCE | Iter 256: step_sinking_object when +0x4c != 0. |
+| `FUN_00014f48` (Pacific Conflict) | `apply_hit_to_sinkable_object` | STRONG INFERENCE | Iter 257: decrements hits +0x32, random list / capsize rates, schedules 15 sinking steps. |
+| `FUN_0001530e` (Pacific Conflict) | `create_firing_ship_controller` | STRONG INFERENCE | Iter 257: 300-byte controller, 20 shots. |
+| `FUN_00015356` (Pacific Conflict) | `tick_firing_ship_controller` | STRONG INFERENCE | Iter 257: random spawn_weapon_entity from faces with +0x17 == 1; sinking afterwards. |
+| `FUN_000150c8` (Pacific Conflict) | `create_flagship_controller` | STRONG INFERENCE | Iter 258: create entry of definition key 0x15 (table at runtime 0x1aa5e); 0x56-byte record; first in _DAT_0001b864. |
+| `FUN_000155ec` (Pacific Conflict) | `create_basic_ship_controller` | STRONG INFERENCE | Iter 258: create entry of keys 0x18 / 0x17; 0x50-byte record. |
+| `FUN_000092e4` (Pacific Conflict) | `advance_frame_and_tick_controllers` | STRONG INFERENCE | Iter 259: DAT_0001b838++, appear / expiry flags 0x40 / 0x42, ticks DAT_0001c25c via definition +2. |
+| `FUN_0000947c` (Pacific Conflict) | `apply_controller_velocities` | STRONG INFERENCE | Iter 259: saves position, adds controller +8..+0x10 velocity. |
+| `FUN_000094d2` (Pacific Conflict) | `tick_flagged_object_controllers` | STRONG INFERENCE | Iter 259: DAT_0001b870 == 3: ticks only objects with +5 & 4. |
+| `FUN_0001429c` (Pacific Conflict) | `handle_player_contact` | STRONG INFERENCE | Iter 259: player overlap; contact record; definition +0x12 handler. |
+| `FUN_0001358c` (Pacific Conflict) | `contact_pair_hash` | PROVEN | Iter 260: low byte of a ^ (b << 2). |
+| `FUN_000135a0` (Pacific Conflict) | `find_contact_record` | PROVEN | Iter 260: linear probe of DAT_0001bdbc (256 slots) for (a, b). |
+| `FUN_000135e8` (Pacific Conflict) | `create_shape_contact_record` | STRONG INFERENCE | Iter 260: 0x10 + 6 * faces record for plain shapes. |
+| `FUN_0001383c` (Pacific Conflict) | `create_fractal_contact_record` | STRONG INFERENCE | Iter 260: 0x3e-byte record for fractal objects. |
+| `FUN_00013980` (Pacific Conflict) | `fractal_height_at` | STRONG INFERENCE | Iter 260: height of fractal terrain at relative (x, z). |
+| `FUN_00014198` (Pacific Conflict) | `handle_terrain_contact` | STRONG INFERENCE | Iter 260: sets player controller +0x2e ground height. |
+| `FUN_00013ee0` (Pacific Conflict) | `test_object_collision` | STRONG INFERENCE | Iter 261: summed-range check; fractal → test_terrain_collision; shape face sign flip + FUN_0001346c → FUN_00014348. |
+| `FUN_00013cdc` (Pacific Conflict) | `test_terrain_collision` | STRONG INFERENCE | Iter 261: a below fractal_height_at → FUN_00014348; sets controller +0x2e. |
+| `FUN_00013e4e` (Pacific Conflict) | `test_proximity_collision` | STRONG INFERENCE | Iter 261: flag 0x100000 on both; 3/4 distance below a range. |
+| `FUN_00013eae` (Pacific Conflict) | `test_player_vs_type0e_proximity` | STRONG INFERENCE | Iter 261: player vs template type 0xe. |
+| `FUN_00014348` (Pacific Conflict) | `dispatch_collision` | STRONG INFERENCE | Iter 262: definition +0x12 handlers; pair table DAT_0001b43c (10 × 8 bytes). |
+| `FUN_0001346c` (Pacific Conflict) | `point_in_face_by_axis` | STRONG INFERENCE | Iter 262: projects on yz / xz / xy by axis code, point-in-polygon. |
+| `FUN_00012fd2` (Pacific Conflict) | `point_in_polygon_xy` | STRONG INFERENCE | Iter 262: even-odd crossing test on words +2 / +6. |
+| `FUN_000167f4` (Pacific Conflict) | `bullet_hits_aircraft` | STRONG INFERENCE | Iter 263: 1/8: damage roll + retire bullet; player hit 1/2 → _DAT_0001b842. |
+| `FUN_0001665a` (Pacific Conflict) | `bullet_hits_shape` | STRONG INFERENCE | Iter 263: retire bullet; type 0x1b controller +0x46 = 1 at 1/16. |
+| `FUN_00016724` (Pacific Conflict) | `apply_random_aircraft_damage` | STRONG INFERENCE | Iter 263: one random damage bit in controller +0x684 (bit 15 set from the bullet word +0x36 [UNKNOWN meaning]). |
+| `FUN_000095ac` (Pacific Conflict) | `play_game_sound` | STRONG INFERENCE | Iter 264: priority (DAT_00024d10) play of slot n via host play_sample_on_channel. |
+| `FUN_000096ae` (Pacific Conflict) | `stop_game_sound` | STRONG INFERENCE | Iter 264: release_channel_loop(1) when n is current. |
+| `FUN_000096f4` (Pacific Conflict) | `update_game_sounds` | STRONG INFERENCE | Iter 264: per-frame event flags → sounds; engine sound from player +0x66a. |
+| `FUN_00011c58` (Pacific Conflict) | `spawn_effect` | STRONG INFERENCE | Iter 266: pool object DAT_0002626e[kind], init DAT_0001b40c[kind], explosion sound countdowns, event ring DAT_000260ee. |
+| `FUN_00010650` (Pacific Conflict) | `update_aircraft_damage_state` | STRONG INFERENCE | Iter 266: damage stages in +0x684; player bit 0 → A5-0x12b4 = 1 (Dead), Ugh. |
+| `FUN_00011b96` (Pacific Conflict) | `replay_logged_effects` | STRONG INFERENCE | Iter 267: DAT_0001b870 = -1 while re-spawning logged effects of the current frame. |
+| `FUN_00011c2c` (Pacific Conflict) | `mark_effect_log_end` | STRONG INFERENCE | Iter 267: 0x7fffffff frame sentinel. |
+| `FUN_00011b48` (Pacific Conflict) | `register_effect_template` | STRONG INFERENCE | Iter 267: fills DAT_0002626e[0..3]; then create handler := 0x11ade (+0x20 = FUN_00011afe). |
+| `FUN_0001203a` (Pacific Conflict) | `init_effect_kind0_flat_ring` | STRONG INFERENCE | Iter 268: kind 0: 6 vertices, x / z outward velocities. |
+| `FUN_000120ca` (Pacific Conflict) | `init_effect_kind1_column` | STRONG INFERENCE | Iter 268: kind 1: 3 spreading vertices, vertex 2 rising (+0x76). |
+| `FUN_00011efc` (Pacific Conflict) | `init_effect_kind2_burst` | STRONG INFERENCE | Iter 268: kind 2: 12 vertices, jittered outward velocities. |
+| `FUN_0001217e` (Pacific Conflict) | `init_effect_kind3_debris_explosion` | STRONG INFERENCE | Iter 268: kind 3: kind-2 burst at size / 4 + 13 vertices with 3-D velocities. |
+| `FUN_00012768` (Pacific Conflict) | `tick_effect` | STRONG INFERENCE | Iter 269: animate DAT_0001b41c[kind]; lifetime +0x36; retire when done. |
+| `FUN_000123ce` (Pacific Conflict) | `animate_effect_kind0_ring` | STRONG INFERENCE | Iter 269: x / z expansion; kind-1 spawn at 0x47. |
+| `FUN_00012466` (Pacific Conflict) | `animate_effect_kind0_ring_tail` | PROVEN | Iter 269: false split of 0x123ce. |
+| `FUN_00012486` (Pacific Conflict) | `animate_effect_kind1_column` | STRONG INFERENCE | Iter 269: vertex 2 up with gravity 0x5b; ends below 0. |
+| `FUN_00012296` (Pacific Conflict) | `animate_effect_kind2_burst` | STRONG INFERENCE | Iter 269: velocities halved; faces darkened 6/8 at depth 8. |
+| `FUN_00012528` (Pacific Conflict) | `animate_effect_kind3_debris` | STRONG INFERENCE | Iter 269: gravity, ground clamp; FUN_000175de / FUN_000115fc at the end. |
+| `FUN_00012738` (Pacific Conflict) | `face_object_to_camera` | STRONG INFERENCE | Iter 269: attitude = −camera angles. |
+| `FUN_000127aa` (Pacific Conflict) | `effect_pre_render_hook` | STRONG INFERENCE | Iter 270: definition +0xe of effects; DAT_0001b42c[kind]. |
+| `FUN_000115fc` (Pacific Conflict) | `spawn_smoke_plume` | HYPOTHESIS | Iter 270: template DAT_000260e8; sizes +0x36 / +0x34; end frame +0x38. |
+| `FUN_000115da` (Pacific Conflict) | `register_smoke_template` | STRONG INFERENCE | Iter 270: DAT_000260e8 = template; create handler → 0x115b0. |
+| `FUN_00011670` (Pacific Conflict) | `attach_trailing_plume` | STRONG INFERENCE | Iter 270: plume linked to an aircraft (+0x3c), 8 trail points. |
+| `FUN_000175de` (Pacific Conflict) | `spawn_ground_mark` | HYPOTHESIS | Iter 270: template DAT_00026660 scaled, expiry +2700 frames. |
+| `FUN_0000a75e` (Pacific Conflict) | `transform_and_project_object` | STRONG INFERENCE | Iter 271: +0xe hook phases 1 / 2; vertices of faces with bit 0x20 → camera space → DAT_000256b2. |
+| `FUN_0000a676` (Pacific Conflict) | `project_prepared_object` | STRONG INFERENCE | Iter 271: projects +0x4c camera-space vertices; face bits 0x60. |
+| `FUN_0000ac72` (Pacific Conflict) | `render_visible_objects` | STRONG INFERENCE | Iter 271: per-frame draw of the visible list in three passes. |
+| `FUN_00009ae0` (Pacific Conflict) | `face_is_back_facing` | STRONG INFERENCE | Iter 272: stored normal vs camera vector, dot < 1. |
+| `FUN_00009da6` (Pacific Conflict) | `emit_faces_bsp` | STRONG INFERENCE | Iter 272: far child, node + chain, near child. |
+| `FUN_00009d34` (Pacific Conflict) | `emit_face_chain` | STRONG INFERENCE | Iter 272: front-facing faces of a +0x12 chain. |
+| `FUN_00009ef8` (Pacific Conflict) | `emit_faces_in_order` | STRONG INFERENCE | Iter 272: object +0x38 root faces with chains. |
+| `FUN_00009fc4` (Pacific Conflict) | `emit_faces_unnumbered` | STRONG INFERENCE | Iter 272: same, without draw-order numbers. |
+| `FUN_0000a2f2` (Pacific Conflict) | `submit_object_faces` | STRONG INFERENCE | Iter 272: output via *DAT_00020ab4; camera crossing a face → dispatch_collision. |
+| `FUN_0000a512` (Pacific Conflict) | `transform_face_vertices` | STRONG INFERENCE | Iter 273: transform / project unmarked vertices of one face. |
+| `FUN_0000b028` (Pacific Conflict) | `clip_face_near_plane` | STRONG INFERENCE | Iter 273: Sutherland-Hodgman at z = 5. |
+| `FUN_0000a16e` (Pacific Conflict) | `output_face_colour` | STRONG INFERENCE | Iter 273: DAT_00020ab4 at depth 8 / 4; screen clip, FUN_00009b8c. |
+| `FUN_0000a220` (Pacific Conflict) | `output_face_bw` | STRONG INFERENCE | Iter 273: DAT_00020ab4 at depth 1; screen clip, host add_polygon_edges. |
+| `FUN_00009b8c` (Pacific Conflict) | `add_face_edges_to_rows` | STRONG INFERENCE | Iter 274: 0x1c-byte edge records (pool DAT_0001b76c) sorted into DAT_0001eaac[row]. |
+| `FUN_0000a07e` (Pacific Conflict) | `track_ground_plane_horizon` | STRONG INFERENCE | Iter 274: DAT_0001bd90 corner bits, horizon edge DAT_0001bda0..94. |
+| `FUN_0000b4b6` (Pacific Conflict) | `draw_sky_and_ground` | STRONG INFERENCE | Iter 275: horizon edge scaled to window; colours host +0x18e / +0x190 by corner bits DAT_0001bd90. |
+| `FUN_0000b460` (Pacific Conflict) | `reset_background_rows` | STRONG INFERENCE | Iter 275: DAT_00020ad4 rows = (0, 1, DAT_0001b82a, DAT_0001daa0). |
+| `FUN_00002e14` (Pacific Conflict) | `scan_convert_edge_rows` | STRONG INFERENCE | Iter 276: row buckets DAT_0001eaac → active edges → runs in DAT_0001b794 / 798 by draw order. |
+| `FUN_0000d00c` (Pacific Conflict) | `update_view_readouts_and_overlays` | STRONG INFERENCE | Iter 277: readouts 0..3 cached in DAT_00025ff4, host +0x27a; else sky + HUD drawers. |
+| `FUN_0001443a` (Pacific Conflict) | `sort_group_parts_by_distance` | STRONG INFERENCE | Iter 277: per-part distance sort, haze blend, draw-order numbers. |
+| `FUN_0000c572` (Pacific Conflict) | `draw_gauge_needle` | STRONG INFERENCE | Iter 278: erase previous end (cache DAT_00025f4a / 92), draw via *DAT_0001da9c or host +0x272. |
+| `FUN_0000c664` (Pacific Conflict) | `update_altimeter_needles` | STRONG INFERENCE | Iter 278: instrument type 0, two hands. |
+| `FUN_0000c80c` (Pacific Conflict) | `update_airspeed_needle` | STRONG INFERENCE | Iter 278: type 1 from +0x62a. |
+| `FUN_0000c8d6` (Pacific Conflict) | `update_direction_needle` | STRONG INFERENCE | Iter 278: type 6 from DAT_0001d80e. |
+| `FUN_0000c948` (Pacific Conflict) | `update_climb_needle` | STRONG INFERENCE | Iter 278: type 3 from DAT_0001bc80 (rate of climb). |
+| `FUN_0000c9c2` (Pacific Conflict) | `update_tachometer_needle` | STRONG INFERENCE | Iter 278: type 5 from +0x66a (engine RPM). |
+| `FUN_0000ca44` (Pacific Conflict) | `update_manifold_needle` | STRONG INFERENCE | Iter 278: type 4 from +0x672. |
+| `FUN_0000cc12` (Pacific Conflict) | `update_flaps_needle` | STRONG INFERENCE | Iter 279: needle 10 from +0x67b. |
+| `FUN_0000ccca` (Pacific Conflict) | `update_gear_needles` | STRONG INFERENCE | Iter 279: needles 11..13 from +0x679. |
+| `FUN_0000ce1c` (Pacific Conflict) | `update_ammo_needle` | STRONG INFERENCE | Iter 279: needle 15 from +0x682 (675 rounds). |
+| `FUN_0000cec4` (Pacific Conflict) | `update_fuel_needles` | STRONG INFERENCE | Iter 279: needles 16 / 17 from +0x67d / +0x67e. |
+| `FUN_00017b68` (Pacific Conflict) | `update_radar_scope` | STRONG INFERENCE | Iter 279: tracked objects rotated by heading into the scope rectangle. |
+| `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
+| `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
+| `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
 | DAT_0001c9dc / DAT_0001c1d4 | visible object list / its count | STRONG INFERENCE | Iter 249. |
 | DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 | selected span-filler routines (address − 0x20) | STRONG INFERENCE | Iter 245. |
 | host +0x348 (A5−0x1040) | overlay heap arena (host NewPtrClear work buffer) | STRONG INFERENCE | Iter 243. |
