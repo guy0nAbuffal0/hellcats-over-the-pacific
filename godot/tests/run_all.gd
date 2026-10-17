@@ -4,6 +4,8 @@ extends SceneTree
 ##   godot --headless --path . --script res://tests/run_all.gd
 
 const TEST_PATHS := [
+	"res://tests/strict_port/test_c68k.gd",
+	"res://tests/strict_port/test_contact_pair_hash.gd",
 	"res://tests/unit/test_rng.gd",
 	"res://tests/unit/test_rng_overlay_11564.gd",
 	"res://tests/unit/test_flight_math.gd",

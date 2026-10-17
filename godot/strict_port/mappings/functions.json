@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "functions": [
+    {
+      "source_file": "sources/resedit/CODE/Pacific Conflict.decomp.c",
+      "source_function": "contact_pair_hash",
+      "original_function": "FUN_0001358c",
+      "source_address": "0x1358c",
+      "source_sha256": "fa41c0aada81d2539a8cbd569e991e53a254c5f0f7915d042d3bcccc7e74cf86",
+      "target_file": "godot/strict_port/code/pacific_conflict.gd",
+      "target_function": "contact_pair_hash",
+      "translation_status": "VERIFIED",
+      "structurally_verified": true,
+      "behaviorally_verified": true,
+      "integrated": false,
+      "runtime_verified": false,
+      "deterministic_test": "godot/tests/strict_port/test_contact_pair_hash.gd",
+      "renamed_from": "FUN_0001358c",
+      "blocked_by": []
+    }
+  ]
+}
