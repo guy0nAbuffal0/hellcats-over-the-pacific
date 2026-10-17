@@ -263,7 +263,7 @@ void dispose_offscreen_bw_port /* Original: FUN_0000033c */ (void)
  *   SetClip(saved); DisposeRgn(ring); DisposeRgn(saved).
  * A grey disc with a spoke that rotates 45 degrees per call [STRONG INFERENCE];
  * e.g. propeller / activity indicator [HYPOTHESIS]. Callers: 5 BSRs inside
- * FUN_00000514 (file 0x624, 0x684, 0x6e2, 0x742, 0x774).
+ * draw_ring_with_status_indicators (FUN_00000514; file 0x624, 0x684, 0x6e2, 0x742, 0x774).
  */
 void draw_spinning_disc_indicator /* Original: FUN_0000035e */ (void)
 
@@ -276,7 +276,24 @@ void draw_spinning_disc_indicator /* Original: FUN_0000035e */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000514(undefined4 param_1)
+/*
+ * Original: FUN_00000514; source: ID03.c:186.
+ * Recovered name: draw_ring_with_status_indicators [STRONG INFERENCE mechanics /
+ * HYPOTHESIS purpose] (iteration 164). Exported C kept (truncated at $A8B8).
+ * Bytes 0x514..0x77c [PROVEN]. Words: d [8], w [$a], cy [$c], cx [$e];
+ * flags = long [$10] (bits tested on byte $11).
+ *   r.left = design_x_to_screen(cx - d/2); r.top = design_y_to_screen(cy - d/2);
+ *   r.right/bottom = + scale_design_4800(d);
+ *   black (0,0,0) -> PaintOval(&r); grey (2,2,2); PenSize(w/10, w/10);
+ *   FrameOval(&r);
+ *   o = ((d/2) * 0xb50) >> 12   (0xb50/4096 = 0.7071 = cos 45 deg);
+ *   bit 0 -> draw_spinning_disc_indicator(cx - o - 30, cy - o - 30);
+ *   bit 1 -> (cx + o + 30, cy - o - 30);  bit 2 -> (cx + o + 30, cy + o + 30);
+ *   bit 3 -> (cx - o - 30, cy + o + 30);  bit 4 -> (..., cy + o + 30)
+ *   [bit-4 x term not traced]. Indicators sit on the diagonals outside the ring.
+ * Note: Ghidra's in_stack_fffffff0 halves are pushed-word artifacts.
+ */
+void draw_ring_with_status_indicators /* Original: FUN_00000514 */ (undefined4 param_1)
 
 {
   int unaff_A5;
