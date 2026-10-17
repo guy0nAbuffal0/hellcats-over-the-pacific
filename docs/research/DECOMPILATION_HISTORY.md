@@ -4595,3 +4595,36 @@ handle only after activation; a shell printing ticks alone does not wake this ag
 - apply_random_aircraft_damage header updated with the iteration-352 flag
   meaning.
 - Comment / doc only.
+
+### Iteration 357 — 2026-10-18
+
+- Definition key 0x1b = gun turret (file 0x1ab24).
+- Its controller word +0x46 is only tested in the turret code (tst.w at
+  0x19220 / 0x1939e, byte scan of 0x1917c..0x19430). The only known writer is
+  bullet_hits_shape (1 hit in 16).
+- So +0x46 = knocked out by gunfire (permanent), not "reloading".
+- tick_turret / turret_pre_render / bullet_hits_shape comments corrected.
+  Comment / doc only.
+
+### Iteration 358 — 2026-10-18
+
+- tick_turret firing path decoded against the bytes 0x192ca..0x1937a [PROVEN].
+  - A burst starts 1 frame in 16 and lasts 7..14 frames.
+  - Aim errors are ±0x80 at the start and shrink by 7/8 per shot.
+  - One round every 2nd frame (shot timer +0x48 reset to 2).
+  - No firing while replaying (DAT_0001b870 != 0).
+  - Turret rounds carry no player flag, so they earn no kill credit.
+- Comment / doc only.
+
+### Iteration 359 — 2026-10-18
+
+- The gun turret (key 0x1b) shares flak_notice_object and destroy_flak_controller
+  with the flak gun (definition record 0x1ab24, +0x16 = 0x18b9a, +0xa = 0x18b78)
+  [PROVEN].
+- Turret side +0x3e:
+  - 0x200 targets enemy types 3–4;
+  - 0x100 targets types < 3;
+  - 0 (no base in range on its first tick) never targets.
+- +0x40 is the turret's "initialised" flag, which doubles as the flak shells
+  gate.
+- Comment / doc only.

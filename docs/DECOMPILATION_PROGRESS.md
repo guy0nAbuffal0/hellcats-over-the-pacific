@@ -5,9 +5,10 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 356 (2026-10-18)
-**Next target:** definition key 0x1b: identify the type whose controller word
-`+0x46` bullets set (1/16 per hit in `bullet_hits_shape`) and what reads it.
+**Last iteration:** 359 (2026-10-18)
+**Next target:** `flak_notice_object` (FUN_00018bba): verify the rest of its target
+choice against the bytes (1/64 roll, 0x339000 / distance odds, halved when it already
+has a target, the "twice as close" switch rule).
 
 ## Current coverage
 

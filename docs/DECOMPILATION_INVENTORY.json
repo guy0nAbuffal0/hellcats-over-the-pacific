@@ -18520,6 +18520,12 @@
         "sources/resedit/CODE/Pacific Conflict.decomp.c:5919-5951",
         "docs/research/DECOMPILATION_HISTORY.md:743",
         "docs/DECOMPILATION_SYMBOLS.md:545",
+        "docs/DECOMPILATION_SYMBOLS.md:956",
+        "docs/DECOMPILATION_SYMBOLS.md:957",
+        "docs/DECOMPILATION_SYMBOLS.md:958",
+        "docs/DECOMPILATION_SYMBOLS.md:955",
+        "docs/DECOMPILATION_SYMBOLS.md:953",
+        "docs/DECOMPILATION_SYMBOLS.md:954",
         "docs/DECOMPILATION_SYMBOLS.md:946",
         "docs/DECOMPILATION_SYMBOLS.md:947",
         "docs/DECOMPILATION_SYMBOLS.md:948",
@@ -30424,6 +30430,9 @@
         "sources/resedit/CODE/Pacific Conflict.decomp.c:23821-23853",
         "docs/research/DECOMPILATION_HISTORY.md:535",
         "docs/DECOMPILATION_SYMBOLS.md:337",
+        "docs/DECOMPILATION_SYMBOLS.md:958",
+        "docs/DECOMPILATION_SYMBOLS.md:957",
+        "docs/DECOMPILATION_SYMBOLS.md:955",
         "docs/DECOMPILATION_SYMBOLS.md:948",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:23810-23842",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:23796-23828"
@@ -30525,6 +30534,9 @@
         "sources/resedit/CODE/Pacific Conflict.decomp.c:23939-23962",
         "docs/research/DECOMPILATION_HISTORY.md:534",
         "docs/DECOMPILATION_SYMBOLS.md:336",
+        "docs/DECOMPILATION_SYMBOLS.md:956",
+        "docs/DECOMPILATION_SYMBOLS.md:955",
+        "docs/DECOMPILATION_SYMBOLS.md:953",
         "docs/DECOMPILATION_SYMBOLS.md:946",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:23928-23951",
         "docs/DECOMPILATION_SYMBOLS.md:945",
@@ -33339,8 +33351,8 @@
       "semantic_name": "flak_notice_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26161,
-        "line_end": 26213,
+        "line_start": 26169,
+        "line_end": 26221,
         "function_sha256": "ab18d7f64e445985b60fda05143500754641f3cbaa956121dc0521dbbaccab40"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33350,9 +33362,10 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22666",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26161-26213",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26169-26221",
         "docs/research/DECOMPILATION_HISTORY.md:673",
         "docs/DECOMPILATION_SYMBOLS.md:475",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26161-26213",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26150-26202",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26136-26188",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26123-26175"
@@ -33388,8 +33401,8 @@
       "semantic_name": "tick_flak_gun",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26221,
-        "line_end": 26384,
+        "line_start": 26229,
+        "line_end": 26392,
         "function_sha256": "be87b4b59feff8371f8e0fc10bf4d293e7d42bfe6f6197ee41241a79d14c1642"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33399,9 +33412,10 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22722",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26221-26384",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26229-26392",
         "docs/research/DECOMPILATION_HISTORY.md:616",
         "docs/DECOMPILATION_SYMBOLS.md:418",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26221-26384",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26210-26373",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26196-26359",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26183-26346"
@@ -33439,8 +33453,8 @@
       "semantic_name": "create_turret_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26392,
-        "line_end": 26406,
+        "line_start": 26400,
+        "line_end": 26414,
         "function_sha256": "8da7afb19a5c031ab78d63ee56d27548d3b38fddb27420475696979c51366d02"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33450,9 +33464,10 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22889",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26392-26406",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26400-26414",
         "docs/research/DECOMPILATION_HISTORY.md:680",
         "docs/DECOMPILATION_SYMBOLS.md:482",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26392-26406",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26381-26395",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26367-26381",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26354-26368"
@@ -33488,8 +33503,8 @@
       "semantic_name": "register_turret_template",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26415,
-        "line_end": 26421,
+        "line_start": 26423,
+        "line_end": 26429,
         "function_sha256": "c8d1c2f3cea1566fe985e0f5c3195d1cac1d030fed8bdefe59cf074d0b49ecac"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33499,9 +33514,10 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22907",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26415-26421",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26423-26429",
         "docs/research/DECOMPILATION_HISTORY.md:679",
         "docs/DECOMPILATION_SYMBOLS.md:481",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26415-26421",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26404-26410",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26390-26396",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26377-26383"
@@ -33537,8 +33553,8 @@
       "semantic_name": "spawn_turret_on_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26429,
-        "line_end": 26447,
+        "line_start": 26437,
+        "line_end": 26455,
         "function_sha256": "77b14d7ad805f9fdf071fc620afbfc6d83dd056d439c1271674f194b865c131f"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33548,9 +33564,10 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22917",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26429-26447",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26437-26455",
         "docs/research/DECOMPILATION_HISTORY.md:681",
         "docs/DECOMPILATION_SYMBOLS.md:483",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26429-26447",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26418-26436",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26404-26422",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26391-26409"
@@ -33586,8 +33603,8 @@
       "semantic_name": "tick_turret",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26455,
-        "line_end": 26552,
+        "line_start": 26477,
+        "line_end": 26574,
         "function_sha256": "aacfd0b19e34544b86ad1b5ada5c4db89f8f7410251010d22b8c4857e4080ce7"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33597,9 +33614,11 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22939",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26455-26552",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26477-26574",
         "docs/research/DECOMPILATION_HISTORY.md:700",
         "docs/DECOMPILATION_SYMBOLS.md:502",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26469-26566",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26455-26552",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26444-26541",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26430-26527",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26417-26514"
@@ -33635,8 +33654,8 @@
       "semantic_name": "turret_pre_render",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26560,
-        "line_end": 26567,
+        "line_start": 26583,
+        "line_end": 26590,
         "function_sha256": "2fd2b561ff50e15e08800b0af2c32dafa2e62b005d11a03bb3980d4ee26bc7ae"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33646,9 +33665,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23040",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26560-26567",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26583-26590",
         "docs/research/DECOMPILATION_HISTORY.md:682",
         "docs/DECOMPILATION_SYMBOLS.md:484",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26575-26582",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26561-26568",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26560-26567",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26549-26556",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26535-26542",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26522-26529"
@@ -33684,8 +33706,8 @@
       "semantic_name": "create_parachute_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26575,
-        "line_end": 26587,
+        "line_start": 26598,
+        "line_end": 26610,
         "function_sha256": "19243c0142b5f0cd459cd3e55eb463f8c388c1a9ddecbc93fb95ee23a0e415d8"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33695,9 +33717,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23051",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26575-26587",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26598-26610",
         "docs/research/DECOMPILATION_HISTORY.md:675",
         "docs/DECOMPILATION_SYMBOLS.md:477",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26590-26602",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26576-26588",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26575-26587",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26564-26576",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26550-26562",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26537-26549"
@@ -33733,8 +33758,8 @@
       "semantic_name": "register_parachute_template",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26596,
-        "line_end": 26602,
+        "line_start": 26619,
+        "line_end": 26625,
         "function_sha256": "735f39c2a327edbff45cbef100205a52bbe99d306859452487bf7dd19c463713"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33744,9 +33769,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23067",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26596-26602",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26619-26625",
         "docs/research/DECOMPILATION_HISTORY.md:674",
         "docs/DECOMPILATION_SYMBOLS.md:476",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26611-26617",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26597-26603",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26596-26602",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26585-26591",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26571-26577",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26558-26564"
@@ -33782,8 +33810,8 @@
       "semantic_name": "spawn_bailout_parachute",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26627,
-        "line_end": 26664,
+        "line_start": 26650,
+        "line_end": 26687,
         "function_sha256": "dcc19a9c590f3edc957385c98464b72e952d9a6ab2c53783525c73e0ad540ebf"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33793,9 +33821,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23077",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26627-26664",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26650-26687",
         "docs/research/DECOMPILATION_HISTORY.md:157",
         "docs/DECOMPILATION_SYMBOLS.md:689",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26642-26679",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26628-26665",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26627-26664",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26616-26653",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26602-26639",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26589-26626"
@@ -33833,8 +33864,8 @@
       "semantic_name": "destroy_parachute_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26673,
-        "line_end": 26680,
+        "line_start": 26696,
+        "line_end": 26703,
         "function_sha256": "53801c996c5786b504f9dec5424dc87f430d21217b24f88187e65f441db3b90e"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33844,9 +33875,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23119",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26673-26680",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26696-26703",
         "docs/research/DECOMPILATION_HISTORY.md:678",
         "docs/DECOMPILATION_SYMBOLS.md:480",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26688-26695",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26674-26681",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26673-26680",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26662-26669",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26648-26655",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26635-26642"
@@ -33882,8 +33916,8 @@
       "semantic_name": "parachute_descend",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26688,
-        "line_end": 26843,
+        "line_start": 26711,
+        "line_end": 26866,
         "function_sha256": "5fa34c95e2fde7256487a33a041ffeb07670877cfd27d11243730176980a030e"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33893,9 +33927,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23130",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26688-26843",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26711-26866",
         "docs/research/DECOMPILATION_HISTORY.md:677",
         "docs/DECOMPILATION_SYMBOLS.md:479",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26703-26858",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26689-26844",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26688-26843",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26677-26832",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26663-26818",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26650-26805"
@@ -33931,8 +33968,8 @@
       "semantic_name": "parachute_tick",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26851,
-        "line_end": 26893,
+        "line_start": 26874,
+        "line_end": 26916,
         "function_sha256": "dd4cea867efda619fc7f67a9e0067913c4caf715b3457e6d0856995f6536a0a4"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33942,9 +33979,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23289",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26851-26893",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26874-26916",
         "docs/research/DECOMPILATION_HISTORY.md:676",
         "docs/DECOMPILATION_SYMBOLS.md:478",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26866-26908",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26852-26894",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26851-26893",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26840-26882",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26826-26868",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26813-26855"
@@ -33980,8 +34020,8 @@
       "semantic_name": "create_cloud_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26902,
-        "line_end": 26912,
+        "line_start": 26925,
+        "line_end": 26935,
         "function_sha256": "3e04ca8dde0675b8d35ab36911a5fffe7329c22b4f8b9af584c7b710c8e12ef7"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -33991,9 +34031,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23335",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26902-26912",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26925-26935",
         "docs/research/DECOMPILATION_HISTORY.md:705",
         "docs/DECOMPILATION_SYMBOLS.md:507",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26917-26927",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26903-26913",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26902-26912",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26891-26901",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26877-26887",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26864-26874"
@@ -34029,8 +34072,8 @@
       "semantic_name": "register_cloud_templates",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26921,
-        "line_end": 26938,
+        "line_start": 26944,
+        "line_end": 26961,
         "function_sha256": "d6b78a8c82402577a60b0bf77d6c931c21f54ba10267e2f4666c98fb9dee45ad"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34040,9 +34083,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23349",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26921-26938",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26944-26961",
         "docs/research/DECOMPILATION_HISTORY.md:704",
         "docs/DECOMPILATION_SYMBOLS.md:506",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26936-26953",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26922-26939",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26921-26938",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26910-26927",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26896-26913",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26883-26900"
@@ -34078,8 +34124,8 @@
       "semantic_name": "spawn_camera_relative_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26946,
-        "line_end": 26968,
+        "line_start": 26969,
+        "line_end": 26991,
         "function_sha256": "3c5bd1c0dddb08d1f9b67fcbd18b0a953bb20778c48bc5090ce237eab0ab16e5"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34089,9 +34135,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23370",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26946-26968",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26969-26991",
         "docs/research/DECOMPILATION_HISTORY.md:462",
         "docs/DECOMPILATION_SYMBOLS.md:265",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26961-26983",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26947-26969",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26946-26968",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26935-26957",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26921-26943",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26908-26930"
@@ -34129,8 +34178,8 @@
       "semantic_name": "follow_camera_offset",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26976,
-        "line_end": 26991,
+        "line_start": 26999,
+        "line_end": 27014,
         "function_sha256": "40f2661e6c4ab60819235330ea2c85f8a90a14c6d4804afd766965e4dbc19ac6"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34140,9 +34189,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23396",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26976-26991",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26999-27014",
         "docs/research/DECOMPILATION_HISTORY.md:463",
         "docs/DECOMPILATION_SYMBOLS.md:266",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26991-27006",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26977-26992",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26976-26991",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26965-26980",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26951-26966",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26938-26953"
@@ -34180,8 +34232,8 @@
       "semantic_name": "create_view_attached_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27000,
-        "line_end": 27010,
+        "line_start": 27023,
+        "line_end": 27033,
         "function_sha256": "65a808d97f25236afe0eccaaf015a1daf040a604a196b581749c7fcd5429b86d"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34191,9 +34243,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23415",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27000-27010",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27023-27033",
         "docs/research/DECOMPILATION_HISTORY.md:683",
         "docs/DECOMPILATION_SYMBOLS.md:485",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27015-27025",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27001-27011",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27000-27010",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26989-26999",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26975-26985",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26962-26972"
@@ -34229,8 +34284,8 @@
       "semantic_name": "tick_view_attached_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27018,
-        "line_end": 27030,
+        "line_start": 27041,
+        "line_end": 27053,
         "function_sha256": "afe661bdcf3afaa936a1d5cd47b0d7e1c221856d75e13b03e62d39e98edf1d26"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34240,9 +34295,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23429",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27018-27030",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27041-27053",
         "docs/research/DECOMPILATION_HISTORY.md:684",
         "docs/DECOMPILATION_SYMBOLS.md:486",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27033-27045",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27019-27031",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27018-27030",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27007-27019",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26993-27005",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:26980-26992"
@@ -34278,8 +34336,8 @@
       "semantic_name": "store_xyz_asr",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27043,
-        "line_end": 27051,
+        "line_start": 27066,
+        "line_end": 27074,
         "function_sha256": "b9f599c15079eb715f21551205ccb9e9b1f0f3c2f8840b2c86b853941b7cff2c"
       },
       "renaming_confidence": "PROVEN",
@@ -34289,9 +34347,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23445",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27043-27051",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27066-27074",
         "docs/research/DECOMPILATION_HISTORY.md:147",
         "docs/DECOMPILATION_SYMBOLS.md:730",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27058-27066",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27044-27052",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27043-27051",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27032-27040",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27018-27026",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27005-27013"
@@ -34327,8 +34388,8 @@
       "semantic_name": "find_nearest_runway_approach_ends",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27070,
-        "line_end": 27226,
+        "line_start": 27093,
+        "line_end": 27249,
         "function_sha256": "925f2f1a06dcc497852003a8439e0552f24efd25b326e1579369497ea7d773a4"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34338,9 +34399,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23458",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27070-27226",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27093-27249",
         "docs/research/DECOMPILATION_HISTORY.md:146",
         "docs/DECOMPILATION_SYMBOLS.md:729",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27085-27241",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27071-27227",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27070-27226",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27059-27215",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27045-27201",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27032-27188"
@@ -34378,8 +34442,8 @@
       "semantic_name": "try_begin_landing_approach",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27244,
-        "line_end": 27313,
+        "line_start": 27267,
+        "line_end": 27336,
         "function_sha256": "56f5755c2e1f2bbaef0029a2ffa3a96ba62d08b2703e0dec352b02df5555e573"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34389,9 +34453,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23619",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27244-27313",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27267-27336",
         "docs/research/DECOMPILATION_HISTORY.md:145",
         "docs/DECOMPILATION_SYMBOLS.md:728",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27259-27328",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27245-27314",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27244-27313",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27233-27302",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27219-27288",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27206-27275"
@@ -34429,8 +34496,8 @@
       "semantic_name": "tick_landing_approach_glide",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27329,
-        "line_end": 27532,
+        "line_start": 27352,
+        "line_end": 27555,
         "function_sha256": "d696573c4327663dbc20f79cb5d3eaca44eafed7776afa3c8b5a23ac850c8cc5"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34440,9 +34507,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23693",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27329-27532",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27352-27555",
         "docs/research/DECOMPILATION_HISTORY.md:148",
         "docs/DECOMPILATION_SYMBOLS.md:731",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27344-27547",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27330-27533",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27329-27532",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27318-27521",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27304-27507",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27291-27494"
@@ -34480,8 +34550,8 @@
       "semantic_name": "memmove_block",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27549,
-        "line_end": 27669,
+        "line_start": 27572,
+        "line_end": 27692,
         "function_sha256": "9f0319f02fc6cc9928dbbd436dcebe802ea413a8eba4c8c32f3ebfdf1d463d49"
       },
       "renaming_confidence": "PROVEN",
@@ -34491,10 +34561,13 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23890",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27549-27669",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27572-27692",
         "docs/research/DECOMPILATION_HISTORY.md:159",
         "docs/DECOMPILATION_SYMBOLS.md:669",
         "docs/DECOMPILATION_SYMBOLS.md:691",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27564-27684",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27550-27670",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27549-27669",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27538-27658",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27524-27644",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27511-27631"
@@ -34532,8 +34605,8 @@
       "semantic_name": "memzero",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27685,
-        "line_end": 27725,
+        "line_start": 27708,
+        "line_end": 27748,
         "function_sha256": "c1f3519931b9d023da79a6644047b324087e4dbb773e551611dc9355e04210f0"
       },
       "renaming_confidence": "PROVEN",
@@ -34543,9 +34616,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:24014",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27685-27725",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27708-27748",
         "docs/research/DECOMPILATION_HISTORY.md:73",
         "docs/DECOMPILATION_SYMBOLS.md:676",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27700-27740",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27686-27726",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27685-27725",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27674-27714",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27660-27700",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27647-27687"
@@ -34581,8 +34657,8 @@
       "semantic_name": "c_strlen",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27734,
-        "line_end": 27756,
+        "line_start": 27757,
+        "line_end": 27779,
         "function_sha256": "3a55047a196412f955e95cec369a022ad15da59f4ebffecb527723985fb68dbd"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -34592,9 +34668,12 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:24059",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27734-27756",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27757-27779",
         "docs/research/DECOMPILATION_HISTORY.md:725",
         "docs/DECOMPILATION_SYMBOLS.md:527",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27749-27771",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27735-27757",
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27734-27756",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27723-27745",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27709-27731",
         "sources/resedit/CODE/Pacific Conflict.decomp.c:27696-27718"

@@ -23813,8 +23813,8 @@ LAB_00016358:
  * is flag-long bit 10 (0x400):
  *   set   -> 1/8 per hit: bullet controller +0x3c = target; tick_bullet destroys it
  *            on its next tick (destruction effect, kill credit for player rounds);
- *   clear -> solid: a bullet target is ignored; a type-0x1b target's controller +0x46
- *            = 1 one time in 16 [UNKNOWN role]; the bullet is retired.
+ *   clear -> solid: a bullet target is ignored; a type-0x1b target (gun turret) gets controller +0x46
+ *            = 1 one time in 16 = knocked out (iteration 357); the bullet is retired.
  * So flag bit 10 = destructible by gunfire [STRONG_INFERENCE]. Not VERIFIED because the
  * C call lost its arguments.
  */
@@ -26157,6 +26157,14 @@ void destroy_flak_controller /* Original: FUN_00018b98 */ (int param_1)
 /* Original: FUN_00018bba; source: Pacific Conflict.c. Recovered name: flak_notice_object [STRONG INFERENCE] (iteration 295).
  * Ghidra C reviewed (function at overlay offset 0x18bba).
  * Definition +0x16 notice handler of key 0x1a (flak gun) [PROVEN bytes]: for a gun with shells (+0x40) of side 0x200 (friendly; targets the enemy types 3..4) or side 0x100 (enemy; targets types < 3) - side labels corrected in iteration 298, with probability 1/64 and a chance falling with distance (0x339000 / distance, halved when it already has a target) picks the aircraft as its target (+0x36), as aircraft_notice_object does for AI aircraft. Ghidra C (tail not shown here).
+ *
+ * Iteration 359 [PROVEN bytes, definition record at file 0x1ab24]: this handler is
+ * SHARED with the gun turret (key 0x1b): its +0x16 slot also points to 0x18b9a (= this
+ * function - 0x20), and its +0xa slot to destroy_flak_controller (0x18b78). For a turret,
+ * +0x3e is the side set on its first tick from probe_nearest_facility_kind, and +0x40 is
+ * its "initialised" flag (1 after the first tick), so a turret never runs out of shells.
+ * Consequence [PROVEN flow]: a turret whose first tick finds no base in range gets side 0
+ * and never acquires a target.
  */
 uint flak_notice_object /* Original: FUN_00018bba */ (int param_1,int param_2)
 
@@ -26450,7 +26458,21 @@ int spawn_turret_on_object /* Original: FUN_00019130 */ (int param_1)
 
 /* Original: FUN_0001917c; source: Pacific Conflict.c. Recovered name: tick_turret [STRONG INFERENCE] (iteration 299).
  * Ghidra C reviewed (function at overlay offset 0x1917c).
- * Definition +2 of key 0x1b. First call: side from the nearest facility (+0x3e). Follows its carrier (+0x32: bomber or ship) and is cleaned up when the carrier is gone or its guns are damaged (flags_685 bit 4); with a target (+0x36) within range (+0x42) and not reloading (+0x46), computes the aim direction (isqrt_floor of the scaled offset) for turret_pre_render and fires (further down). Ghidra C (partly read).
+ * Definition +2 of key 0x1b. First call: side from the nearest facility (+0x3e). Follows its carrier (+0x32: bomber or ship) and is cleaned up when the carrier is gone or its guns are damaged (flags_685 bit 4); with a target (+0x36) within range (+0x42) and not knocked out (+0x46 == 0; iteration 356/357 correction: not "reloading" - see turret_pre_render), computes the aim direction (isqrt_floor of the scaled offset) for turret_pre_render and fires (further down). Ghidra C (partly read).
+ *
+ * Iteration 358, firing path [PROVEN, bytes 0x192ca..0x1937a; the C matches]: only
+ * when DAT_0001b870 == 0 (not replaying). Fields (Ghidra index × 4 on undefined4 *):
+ * +0x40 initialised flag, +0x3e side (probe_nearest_facility_kind on the first tick),
+ * +0x48 shot timer, +0x4a burst frames, +0x4c / +0x4e aim angles from
+ * attitude_from_velocity, +0x50 / +0x52 aim errors.
+ *   idle (+0x4a == 0): 1/16 per frame starts a burst: +0x4a = 7..14 frames
+ *     (rng & 7) + 7, errors = 0x80 - (rng & 0xff) on both angles (+-0x80);
+ *   bursting: --timer; when <= 0 fire spawn_ordnance_oriented_3ang(0, 0, turret
+ *     position, aim + error per angle & 0x3fff, 0), errors *= 7/8 (truncating, +7
+ *     bias) so the burst walks onto the target, timer = 2 (one round every 2nd
+ *     frame); --burst every frame.
+ * Turret rounds never get bullet +0x36 = 1, so they give no kill credit. Turret aiming
+ * and firing stop for good once +0x46 is set (knocked out, iteration 357).
  */
 void tick_turret /* Original: FUN_0001917c */ (undefined4 *param_1)
 
@@ -26555,7 +26577,8 @@ void tick_turret /* Original: FUN_0001917c */ (undefined4 *param_1)
 
 /* Original: FUN_00019394; source: Pacific Conflict.c. Recovered name: turret_pre_render [STRONG INFERENCE] (iteration 296).
  * Ghidra C reviewed (function at overlay offset 0x19394).
- * Definition +0xe: when the turret has a target (+0x36) and is not reloading (+0x46 == 0), sets its heading +0x22 to the aim angle +0x4e (& 0x3fff). Type 0x1b (file 0x1ab24: +2 0x1917c, +0xe turret_pre_render) [PROVEN bytes] is one of the types carried on ships (carry_attached_objects) and is hit by bullets (bullet_hits_shape sets its +0x46) [STRONG INFERENCE: ship gun turret]. Ghidra C.
+ * Definition +0xe: when the turret has a target (+0x36) and is not knocked out (+0x46 == 0), sets its heading +0x22 to the aim angle +0x4e (& 0x3fff).
+ * Iteration 357 correction [PROVEN by a byte scan of 0x1917c..0x19430: only tst.w $46 at 0x19220 / 0x1939e]: the turret code never writes +0x46; its only known writer is bullet_hits_shape (move.w #1,$46 at 0x1670e, 1 hit in 16). The controller starts zeroed, so +0x46 = 1 is a permanent KNOCKED-OUT flag (no aiming, no firing), not a reload timer [STRONG_INFERENCE]. Type 0x1b (file 0x1ab24: +2 0x1917c, +0xe turret_pre_render) [PROVEN bytes] is one of the types carried on ships (carry_attached_objects) and is hit by bullets (bullet_hits_shape sets its +0x46) [STRONG INFERENCE: ship gun turret]. Ghidra C.
  */
 undefined4 turret_pre_render /* Original: FUN_00019394 */ (int param_1)
 
