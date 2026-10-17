@@ -487,7 +487,15 @@ short DAT_00024d32;
 short DAT_00024d30;
 undefined DAT_00024cf4;
 undefined DAT_0001b852;
-short DAT_0001b868;
+short DAT_0001b868; /* player_landing_state (iteration 328) [STRONG_INFERENCE name; PROVEN
+   values and widths, all accesses are word ops: clr.w 0x3a36 / 0xf0e8, cmpi.w #1 0xf02e,
+   move.w #2 0xf038, move.w #1 0xf1b6, cmpi.w #2 0x8110]. 0 = airborne / reset
+   (respawn_player_at_anchor, leaving the ground); 1 = player touched down
+   (update_aircraft_entity touchdown, not hard); 2 = rolled to a stop (speed reached 0
+   while 1 and +0x62a != 0). process_flight_input_and_outcome evaluates the landing
+   when the engine is off (+0x66a == 0) and the state is 2, then resets it to 0;
+   landing surfaces there are the surface codes '0' / '`' / 'p' (player +0x2c).
+   Also declared above as undefined2 (Ghidra duplicate, same 16-bit global). */
 undefined DAT_0001b86a;
 uint DAT_00024cf8;
 uint DAT_00024cfc;
@@ -6492,7 +6500,24 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
  * Kind tags [PROVEN]:
  *   2 → heap_alloc_cleared(0x52), copy fields from desc (coords/flags/shorts…)
  *   3 → heap_alloc_cleared(0x34), copy fields; store desc ptr at obj+0x28
- * Other tags: fall through without allocation [UNKNOWN / possible Ghidra gap].
+ * Other tags: no allocation; the function returns whatever D1 held on entry
+ * (move.l d1,d0 at 0x468a with D1 untouched) - the C's uninitialised in_D1
+ * reproduces this exactly [PROVEN, bytes; iteration 321].
+ *
+ * VERIFIED (iteration 321): checked against an independent capstone
+ * disassembly of the overlay bytes (sources/hellcats/Pacific Conflict) at
+ * 0x45ba. Width facts [PROVEN]: the kind tag is compared as a byte (cmpi.b
+ * #2 / #3); desc +0x16 is ZERO-extended (clr.l d0; move.w) into the object
+ * flag long +4; positions / metric / range are long copies (+2/+6/+0xa ->
+ * +0x18/+0x1c/+0x20, +0xe -> +0xc, +0x12 -> +0x14); +0x34 / +0x36 / +0x38 /
+ * +0x3a / +0x50 are word copies; the "+0x38 == 0 -> 1" test uses the flags
+ * of the MOVE.W; +0x40 = frame DAT_0001b838. Type 3: 0x34 bytes, words
+ * +0x16 -> +0x2c and +0x18 -> +0x2e, descriptor pointer at +0x28. Identical
+ * to the C.
+ * Big-endian consequence [PROVEN]: btst #5,$6(a0) tests byte +6 of the flag
+ * long, i.e. bits 8..15 of the zero-extended word, so the condition is
+ * desc +0x16 bit 13 (0x2000) and it sets flag-long bit 20 (byte +5 |= 0x10).
+ * Byte +6 is NOT always zero.
  */
 uint * alloc_object_from_desc(char *desc) /* Original: FUN_000045ba */
 {
@@ -6555,6 +6580,16 @@ uint * alloc_object_from_desc(char *desc) /* Original: FUN_000045ba */
  *   obj[2] (+8) = aux; if aux: *aux = 0
  *
  * Ties overlay_init_template_pointer_tables directly to object construction.
+ *
+ * VERIFIED (iteration 320): checked against an independent capstone
+ * disassembly of the overlay bytes (sources/hellcats/Pacific Conflict) at
+ * 0x4690: bsr alloc_object_from_desc ($45ba); tst.b 1(desc) / beq; move.b
+ * 1(desc),d0 + extb.l (the type byte is SIGNED, matching the C `char`);
+ * definition = $1b524[d0 * 4] (extension word 0x0c00, scale 4); pushes
+ * (object, (long) type, 0) - two longs and a long zero, matching the create
+ * handlers' (uint, int, ...) parameters; jsr definition +6; the result is
+ * stored at object +8 and, when non-zero (flags of that MOVE), its first
+ * long is cleared; returns the object in D0. Identical to the C.
  */
 uint * instantiate_object_from_desc(char *desc) /* Original: FUN_00004690 */
 {
@@ -7428,7 +7463,45 @@ LAB_00005532:
 
 /* Original: FUN_0000555a; source: Pacific Conflict.c. Recovered name: collect_far_objects [STRONG INFERENCE] (iteration 250).
  * Ghidra C reviewed (function at overlay offset 0x555a).
- * Per-frame pass over the world entity array DAT_0001b5a4 (count DAT_0001b734). For each object in the metric-sorted array (count *arg2) whose distance metric +0x10 is within its range +0xc and that is not flagged (+7 & 2): appends its camera-relative centre ((pos - camera DAT_0001d838 / -834 / -830) >> object scale) to the candidate list DAT_0001c43c (count DAT_0001c1d0) for build_visible_object_list, or directly to the visible list DAT_0001c9dc when very close (metric + metric / 4 below its extent); objects not flagged 0x2800 are also added to the collision list DAT_0001c1e4 (count DAT_0001c1c4) used by dispatch_overlap_collisions, and pairs whose ranges overlap are checked with FUN_00013ee0 / FUN_0001429c. Ghidra C.
+ * "far" = the world entity array DAT_0001b5a4 / count DAT_0001b734 (the
+ * counterpart of collect_near_objects' DAT_0001d4a4), not distant objects.
+ *
+ * Iteration 323 header correction (the iteration-250 summary mixed up two
+ * flags): per object of the metric-sorted array (param_1, count = low word of
+ * *param_2), in order [PROVEN, bytes]:
+ * 1. Out of range (metric +0x10 > range +0xc, signed) or flag bit 1: if
+ *    metric - range < 0x19c80 and bit 1 clear, go to step 3 (collisions only).
+ *    Otherwise, if DAT_0001b838 - +0x3c <= 0x4b, keep it unchanged (step 5).
+ *    Otherwise retire_entity (when +0x3c != 0), deactivate_object, append to
+ *    DAT_0001d0e4[DAT_0001c1dc++], and drop it from the output array.
+ * 2. In range, flag bit 6 clear: +0x32 = shift count making
+ *    ((metric + metric/4 + extent +0x14) << +0x34) fit in 15 bits; unless
+ *    bit 2, append the camera-relative centre >> +0x32 to DAT_0001c43c; always
+ *    append to the visible list DAT_0001c9dc[DAT_0001c1d4++].
+ * 3. Flag bit 15 (tst.w): append to DAT_0001c1e4[DAT_0001c1c4++]. (The old
+ *    summary said "not flagged 0x2800"; that is wrong.)
+ * 4. One-dimensional sweep on [metric - extent, metric + extent]:
+ *    - flags & 0x2800 (bits 11 / 13): clear bit 11 (andi.w #$f7ff,$6), test
+ *      against every earlier kept object without bit 1, then push itself on
+ *      the local mover list local_374 (220 longs, not bounds-checked);
+ *    - otherwise: test only against the mover list.
+ *    The tested pair uses the proximity tests when the passive object has
+ *    flag bit 20 (test_player_vs_type0e_proximity if the mover has bit 6,
+ *    else test_proximity_collision), otherwise the shape tests
+ *    (handle_player_contact if the mover has bit 6, else
+ *    test_object_collision). Mover first in every call. A scan stops at an object whose running minimum +0x28 is above
+ *    metric + extent.
+ * 5. +0x28 = running minimum of metric - extent; object kept (compacted) in
+ *    param_1. At the end DAT_0001c1d0 = candidate count (divs.l by 12) and
+ *    *param_2 = kept count.
+ * The bit-15 list is filled even for objects that go through step 1's
+ * collision-only path. The 15-bit loop would not end for a negative value
+ * (asr.l of a negative number never reaches 0); the C reproduces this.
+ *
+ * VERIFIED (iteration 323): checked against an independent capstone
+ * disassembly of 0x555a..0x5830, branch by branch; signed compares, word
+ * loop counters (dbra), shift counts (register asl/asr, mod 64), argument
+ * order and list updates are identical to the C.
  */
 void collect_far_objects /* Original: FUN_0000555a */ (uint *param_1,int *param_2)
 
@@ -7588,6 +7661,21 @@ LAB_00005800:
 /* Original: FUN_00005832; source: Pacific Conflict.c. Recovered name: dispatch_overlap_collisions [STRONG INFERENCE] (iteration 249).
  * Ghidra C reviewed (function at overlay offset 0x5832).
  * Args: object pointer list, list header (count word +2). Walks the list (ordered by the distance metric +0x10, see update_object_camera_metric) keeping a running minimum of (metric - radius +0xc) in each object +0x28; for each object whose interval [metric - radius, metric + radius] reaches back over earlier objects, calls the definition +0x16 handler of each object (*(object +8) +4 -> +0x16) as handler(self, other) in both directions while the intervals overlap - a one-dimensional sweep that only dispatches nearby pairs. Iteration 281 correction: +0x16 is not the collision handler (that is +0x12, see dispatch_collision) but a proximity / notice handler, e.g. aircraft_notice_object (radar tracks, AI targeting). Clears DAT_0001b888 unless DAT_0001b870 == 3. Complete Ghidra C.
+ *
+ * VERIFIED (iteration 324): checked against an independent capstone
+ * disassembly of 0x5832..0x58ea. Facts [PROVEN]:
+ * - Only call site (overlay_frame_step): (&DAT_0001c1e4, 0x1c1c4). The list is
+ *   the flag-bit-15 list built by collect_far_objects; the count is the low
+ *   word (+2) of the long DAT_0001c1c4.
+ * - The sweep uses range +0xc (not extent +0x14 as in collect_far_objects):
+ *   interval [metric - range, metric + range], signed long compares.
+ * - +0x28 is scratch: rewritten with this sweep's running minimum, after
+ *   collect_far_objects used it for its own sweep in the same frame.
+ * - For each earlier pair still overlapping, the +0x16 handlers are called
+ *   (self, other) then (other, self); each is skipped when object +8 or the
+ *   handler is 0. The backward scan stops at the first object whose +0x28
+ *   is above metric + range.
+ * - Word loop counters (dbra) for both the list count and the backward scan.
  */
 void dispatch_overlap_collisions /* Original: FUN_00005832 */ (int *param_1,int param_2)
 
@@ -8284,6 +8372,35 @@ void spawn_cloud_layer /* Original: FUN_0000640c */ (void)
 /* Original: FUN_00006598; source: Pacific Conflict.c. Recovered name: overlay_frame_step [STRONG INFERENCE] (iteration 234).
  * Ghidra C reviewed (function at overlay offset 0x6598).
  * Host hook A5-0x107a, called once per frame by run_flight_session with (1, 1). With arg 2 == 1 swaps the two 0x100-byte (64-long) buffers DAT_0001d860 / DAT_0001d864, clears the new one and increments one byte in it; resets the distance base every 20 frames (DAT_00024cf0 > 0x13); then the frame body (FUN_00005a14 and the following update / render calls, not yet decoded). A local flag is set when the host word +0x76 (24-bit mode) is set and +0x9e is clear. Header written from the first part of the Ghidra C only.
+ *
+ * Iteration 324/325, world sort and sweeps (0x68e4..0x6a80) [PROVEN, bytes]:
+ * - DAT_0001bdb8 = visible count after the near array's metric pass.
+ * - World array DAT_0001b5a4 (count DAT_0001b734) is insertion-sorted by
+ *   metric +0x10, DESCENDING (ble stops when new metric <= previous: farthest
+ *   first). The inner counter is a 32-bit loop built from
+ *   dbra / clr.w / subq.l / bcc; Ghidra's CONCAT22 condition models it
+ *   exactly.
+ * - With carried pairs (DAT_0001b85c != 0): metrics are computed first, then
+ *   for each 8-byte pair {carrier, rider} in DAT_0001b860 the rider's metric
+ *   is saved in rider +0x28 and biased by the carrier's extent +0x14 before
+ *   sorting. Let h = sign-extended word +0x54 of the carrier's controller
+ *   (carrier +8). Camera y DAT_0001d834 > h: the rider metric is increased
+ *   (sorted farther) when rider y +0x1c < h, else decreased. Otherwise it is
+ *   increased only when h <= rider y. After sorting the metrics are restored
+ *   from +0x28 and DAT_0001b85c is cleared (clr.w), so the list is rebuilt
+ *   every frame. Purpose: draw-order of objects on a carrier relative to the
+ *   deck, depending on the camera side [STRONG_INFERENCE]; h = deck height
+ *   [HYPOTHESIS].
+ * - The list is filled only by the unexported definition extra handler at
+ *   0x15154 (type 0x15): when its controller +0x54 > 0 it appends
+ *   {a4, d4} (move.l a4,(a1,a0.l*8) / move.l d4,4(a1,a0.l*8)), growing
+ *   capacity DAT_0001b85a by 4 (heap 0x1a68 / 0x1ba8, cap * 8 bytes).
+ * - Then: collect_near_objects(&DAT_0001d4a4, &DAT_0001c1e0); DAT_0001c1c4 = 0;
+ *   DAT_0001c1c0 = low word of DAT_0001c1d4 (visible count before the world
+ *   objects); collect_far_objects(&DAT_0001b5a4, &DAT_0001b734);
+ *   dispatch_overlap_collisions(&DAT_0001c1e4, &DAT_0001c1c4);
+ *   age_contact_records (0x1377a). The descending order is what both
+ *   sweeps' running minimum (+0x28) relies on.
  */
 void overlay_frame_step /* Original: FUN_00006598 */ (int param_1,int param_2)
 
@@ -13072,6 +13189,7 @@ uint copy_rect_depth8 /* Original: FUN_0000bfb0 */ (uint *param_1,undefined1 *pa
 
 
 /* Original: FUN_0000c11e; source: Pacific Conflict.c. Recovered name: begin_offscreen_drawing [HYPOTHESIS] (iteration 304).
+ * SIGNATURE CORRECTION (iteration 319) [PROVEN, bytes; meaning STRONG_INFERENCE]: returns the D0 result of the last host call (+0x286) unchanged (move.l / unlk / RTS); update_heading_tape keeps it (movea.l d0,a3 at 0xc242). +0x286 is also called by end_offscreen_drawing with its second argument, so the value is most likely the previous port, restored there [STRONG_INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0xc11e).
  * Clears a 0x6c-byte port / pixmap record, sets it up through the host service +0x282 (with base address, row bytes and the host depth word +0x16) and makes it current with +0x286. Used by update_heading_tape at depth 8 (paired with end_offscreen_drawing). Complete Ghidra C.
  */
@@ -16442,9 +16560,17 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    * [PROVEN] Add dir/67b-scaled template+0x20 thrust into 636; remainder/%
    * vs sVar12 adjusts iVar25 (speed accum / movement_62a related).
    * If field_63e: update field_18e and subtract from iVar25.
-   * [PROVEN] field_190 (Ghidra param_1+400): ==1 penalize −0xB6; then add
-   * (local_34<<2)/sVar12; if iVar25<1 → stall field_190=2, maybe DAT_0001b868=2.
-   * Evidence: NOTES e4a4/drag, quadratic+636, local_34/stall.
+   * [PROVEN] byte +0x640 (Ghidra param_1+400): ==1 subtracts 0xB6 from the
+   * forward speed iVar25 each frame; then add (local_34<<2)/sVar12; if
+   * iVar25<1 → speed 0, +0x640=2, maybe DAT_0001b868=2.
+   * Iteration 327 correction: +0x640 is not a stall latch. It is the carrier
+   * ARREST latch [STRONG_INFERENCE]: set to 1 only on the grounded path
+   * (0xf420) when +0x63f is set (aircraft over the carrier's tag-3 face, set
+   * each frame by carrier_deck_contact at 0x15286 and cleared at 0xf47c), the
+   * touchdown was not rough / gear not fully down (bVar6 false) and the latch
+   * is 0. It then brakes by 0xB6 per frame until the speed is 0 (latch 2) and
+   * is cleared when airborne (0xf478). Tag 3 = arresting-wire zone
+   * [STRONG_INFERENCE].
    */
   sVar17 = *(short *)(DAT_00026004 + 0x20);
   iVar9 = 0;
@@ -16500,13 +16626,13 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
     }
     iVar25 = iVar25 - (iVar19 >> 0xc);
   }
-  if (*(char *)(param_1 + 400) == '\x01') { /* field_190 == 1 */
+  if (*(char *)(param_1 + 400) == '\x01') { /* +0x640 == 1: arresting (adda.w #$ff4a at 0xeffe) */
     iVar25 = iVar25 + -0xb6;
   }
   iVar25 = (local_34 << 2) / (int)sVar12 + iVar25;
   if (iVar25 < 1) {
     iVar25 = 0;
-    *(undefined1 *)(param_1 + 400) = 2; /* stall → field_190 = 2 */
+    *(undefined1 *)(param_1 + 400) = 2; /* speed reached 0 → +0x640 = 2 (stopped) */
     if (((*(int *)((int)param_1 + 0x62a) != 0) && (param_1 == DAT_0001b738)) && (DAT_0001b868 == 1))
     {
       DAT_0001b868 = 2;
@@ -16589,7 +16715,7 @@ LAB_0000f192:
     iVar20 = (int)(short)iVar20;
     attitude_from_velocity( /* Original: FUN_00001f22 */local_e,local_a,local_6,iVar20,iVar25,&local_28,&local_2a);
     if (*(char *)(param_1 + 400) == '\x02') {
-      *(undefined1 *)(param_1 + 400) = 0; /* clear stall latch */
+      *(undefined1 *)(param_1 + 400) = 0; /* airborne: clear the arrest latch */
     }
     goto LAB_0000f47c;
   }
@@ -16704,7 +16830,7 @@ LAB_0000f402:
   }
   if (((!bVar6) && (*(char *)((int)param_1 + 0x63f) != '\0')) && (*(char *)(param_1 + 400) == '\0'))
   {
-    *(undefined1 *)(param_1 + 400) = 1; /* prestall → field_190 */
+    *(undefined1 *)(param_1 + 400) = 1; /* over the carrier's tag-3 face → arrest */
   }
   /*
    * ---- Block 6c: LAB_0000f47c attitude/speed commit epilogue -------------
@@ -18704,6 +18830,7 @@ void ai_bombing_run /* Original: FUN_000112e0 */ (int *param_1)
 
 
 /* Original: FUN_00011486; source: Pacific Conflict.c. Recovered name: create_spinner_controller [STRONG INFERENCE] (iteration 307).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_spinner_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Not VERIFIED (iteration 311): the stores match the bytes, but the function leaves the new controller in D0 (the heap_alloc_cleared result) and its callers use it, while the Ghidra C is void - the return value is lost.
  * Ghidra C reviewed (function at overlay offset 0x11486).
  * Definition +6 of key 6 (file 0x1a8f2: +2 spin_object_heading, +6 this) [PROVEN bytes]: cleared 0x3a-byte controller, definition at +4, +0x36 = 0. Complete Ghidra C.
@@ -18854,6 +18981,7 @@ uint overlay_rng_next(void) /* Original: FUN_00011564 */
 
 
 /* Original: FUN_000115b0; source: Pacific Conflict.c. Recovered name: create_plume_controller [STRONG INFERENCE] (iteration 297).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_plume_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x115b0).
  * Cleared 0xa2-byte plume controller, object flags | 0x112000, definition = PTR_DAT_0001b540 (key 7). Target of register_smoke_template (0x11590 + 0x20). Plume definition key 7 (file 0x1a90c): +2 tick_smoke_plume, +0xa destroy_plume_controller, +0xe plume_pre_render [PROVEN bytes]; created through register_smoke_template -> create_plume_controller. Complete Ghidra C.
  */
@@ -19171,6 +19299,7 @@ void plume_pre_render /* Original: FUN_00011a90 */ (int *param_1)
 
 
 /* Original: FUN_00011aae; source: Pacific Conflict.c. Recovered name: create_camera_facing_controller [STRONG INFERENCE] (iteration 297).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_camera_facing_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x11aae).
  * Definition +6 of key 0xf (file 0x1aa00; +0xe face_camera_heading) [PROVEN bytes]: cleared 0x32-byte controller, object flag +5 | 0x10 (template pose kept). Complete Ghidra C.
  */
@@ -20464,6 +20593,7 @@ void ordnance_collision /* Original: FUN_00012f52 */ (int param_1,int param_2)
 
 
 /* Original: FUN_00012f92; source: Pacific Conflict.c. Recovered name: create_singleton_type10_controller [HYPOTHESIS] (iteration 307).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_singleton_type10_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x12f92).
  * Definition +6 of key 0x10 (file 0x1aa16; no tick, no other handler) [PROVEN bytes]: cleared 0x32-byte controller kept in the single global DAT_00020b40, object flags | 0x112100 [UNKNOWN which object type 0x10 is]. Complete Ghidra C.
  */
@@ -20705,6 +20835,7 @@ void project_face_vertices_yz /* Original: FUN_00013268 */ (int param_1,short pa
 
 
 /* Original: FUN_000132c8; source: Pacific Conflict.c. Recovered name: point_over_face_xz [STRONG INFERENCE] (iteration 254).
+ * SIGNATURE CORRECTION (iteration 319) [PROVEN, bytes]: returns the point_in_polygon_xz result (0 / 1) - the last call (bsr $13070) is followed only by MOVEM / UNLK / RTS, and both call sites (0x15236, 0x1527a) test D0 (tst.l d0). Real signature: int point_over_face_xz(record, face). C body kept as exported.
  * Not VERIFIED (iteration 315): the bytes confirm the shift / projection / point_in_polygon_xz sequence and that the result of point_in_polygon_xz is left in D0 as the return value, which the void Ghidra C drops.
  * Ghidra C reviewed (function at overlay offset 0x132c8).
  * Args: record (+0 entity, +4 shape object, word +0xc signed shift, word +0xe vertex shift), face. Takes the entity x / z (+0x18 / +0x20) shifted right (negative word +0xc) or left by word +0xc as the origin, projects the face vertices relative to it with project_face_vertices_xz and runs point_in_polygon_xz(0, 0, ...). Ghidra types the function void and drops the test result (in D0 on return) [STRONG INFERENCE: it returns whether the entity is above the face]. Same pattern as the inner loop of surface_type_at_point. No caller in the exported C (reached through a pointer or unexported code) [UNKNOWN]. Ghidra C.
@@ -20736,6 +20867,30 @@ void point_over_face_xz /* Original: FUN_000132c8 */ (int *param_1,int param_2)
 /* Original: FUN_00013346; source: Pacific Conflict.c. Recovered name: surface_type_at_point [STRONG INFERENCE] (iteration 252).
  * Ghidra C reviewed (function at overlay offset 0x13346).
  * Args x, (unused), z. Walks the active object array DAT_0001d4a4 from the end; for each object near the camera (metric within its range +0x14, not flagged 0x42, approx_dist3_xyz) tests the faces with a non-zero code (face +0x16) with FUN_0001320a / FUN_00013070 [STRONG INFERENCE: point-in-face test] and returns the code of the first face containing (x, z); otherwise returns the default code DAT_0001bda8 + 0x16 [STRONG INFERENCE: open sea]. Used by update_ground_scatter_objects to pick scenery for a ground point. Ghidra C.
+ *
+ * Surface codes (face byte +0x16; default = ground-plane face DAT_0001bda8 +0x16),
+ * iteration 329. The consumers are update_aircraft_entity grounded switch (player
+ * +0x2c), process_flight_input_and_outcome, spawn_destruction_effect,
+ * ordnance_detonation and find_nearest_runway_approach_ends:
+ *   0x10      ground contact sets status |0x1000 (cleared on leaving the ground); a
+ *             crash (|0x400) if gear is out or the pitch is below -0x80; explosion
+ *             effect 0x4b -> WATER [STRONG_INFERENCE: ditching / splash].
+ *   0x20 ' '  bad contact (bVar6) unless status +0x1a1 bit 3 [UNKNOWN surface].
+ *   0x30 '0'  hard surface: valid landing in process_flight_input_and_outcome;
+ *             effects sit at the controller deck height +0x2e; effect 0x2d. Also
+ *             compared at 0x11e04 [STRONG_INFERENCE: paved / deck-like].
+ *   0x40 '@'  random pitch / yaw bumps that grow with speed, high rolling drag,
+ *             player Grass sound (_DAT_0001b854) -> GRASS / ROUGH FIELD
+ *             [STRONG_INFERENCE].
+ *   0x50 'P'  smooth (no bumps), extra drag like the +0x641 brake, no wheel sound,
+ *             but not a valid landing surface [UNKNOWN].
+ *   0x60 '`'  same treatment as 0x30 [UNKNOWN which hard surface].
+ *   0x70 'p'  same as 0x30, and find_nearest_runway_approach_ends looks for
+ *             4-vertex faces coded 'p' on a facility of kind 0x200 -> RUNWAY
+ *             [STRONG_INFERENCE].
+ * Values and compares are PROVEN (C and bytes cmpi.w #$30 etc.); the surface names
+ * are inferences. The carrier deck uses whatever its deck face +0x16 holds (data,
+ * not yet read).
  */
 int surface_type_at_point /* Original: FUN_00013346 */ (int param_1,undefined4 param_2,int param_3)
 
@@ -20793,6 +20948,7 @@ LAB_00013446:
 
 
 /* Original: FUN_00013452; source: Pacific Conflict.c. Recovered name: surface_type_under_object [STRONG INFERENCE] (iteration 286).
+ * SIGNATURE CORRECTION (iteration 319) [PROVEN, bytes]: returns the surface_type_at_point code in D0 (bsr $13346, adda, RTS); callers store it as a byte (move.b d0,$2c(a3) at 0xf148 / 0xf1d0) or compare it (cmpi.w #$30,d0 at 0x11e04). Real signature: int surface_type_under_object(object).
  * Ghidra C reviewed (function at overlay offset 0x13452).
  * surface_type_at_point(object x, y, z). Complete Ghidra C (Ghidra types it void; the code is returned in D0).
  */
@@ -21012,6 +21168,7 @@ LAB_00013764:
 
 
 /* Original: FUN_0001377a; source: Pacific Conflict.c. Recovered name: age_contact_records [STRONG INFERENCE] (iteration 303).
+ * VERIFIED (iteration 317): checked against an independent capstone disassembly of the overlay bytes (sources/hellcats/Pacific Conflict) at 0x1377a: record with mark word +8 == 0 freed (frees the record with heap_free_coalesce $19d0 after releasing a fractal reference through release_fractal_reference $14af2 when b is a group (+6 bit 1) and a holds one (+6 bit 5, +0x2c)), 256 slots of $1bdbc via dbra from #$100, else subq.w #1 on +8 - identical.
  * Ghidra C reviewed (function at overlay offset 0x1377a).
  * For each contact record: if its touched mark (+8) is 0 frees it (releasing a fractal reference held by a moving object with +0x2c) and clears the slot, else decrements the mark - records of pairs no longer in contact expire. Contact records: hash table DAT_0001bdbc (see find_contact_record); record word +8 is the "touched" mark set by the collision tests. Ghidra C.
  */
@@ -21049,6 +21206,7 @@ void age_contact_records /* Original: FUN_0001377a */ (void)
 
 
 /* Original: FUN_000137da; source: Pacific Conflict.c. Recovered name: drop_contact_records_for_object [STRONG INFERENCE] (iteration 303).
+ * VERIFIED (iteration 317): checked against an independent capstone disassembly of the overlay bytes (sources/hellcats/Pacific Conflict) at 0x137da: record freed when a == record +0 or a == record +4 (frees the record with heap_free_coalesce $19d0 after releasing a fractal reference through release_fractal_reference $14af2 when b is a group (+6 bit 1) and a holds one (+6 bit 5, +0x2c)), 256 slots of $1bdbc via dbra from #$100 - identical to the C.
  * Ghidra C reviewed (function at overlay offset 0x137da).
  * Frees every contact record whose a or b is the object (with the same fractal-reference release); eight call sites, e.g. begin_replay_view for the player and the object clean-up paths. Contact records: hash table DAT_0001bdbc (see find_contact_record); record word +8 is the "touched" mark set by the collision tests. Complete Ghidra C.
  */
@@ -21372,6 +21530,16 @@ void test_terrain_collision /* Original: FUN_00013cdc */ (uint param_1,uint para
 /* Original: FUN_00013e4e; source: Pacific Conflict.c. Recovered name: test_proximity_collision [STRONG INFERENCE] (iteration 261).
  * Ghidra C reviewed (function at overlay offset 0x13e4e).
  * Args: objects a, b. When both have flag 0x100000 (+4) and 3/4 of their distance (approx_dist3_xyz) is below either range +0x14, calls FUN_00014348. FUN_00014348 = dispatch_collision (iteration 262). Complete Ghidra C.
+ * Iteration 322, flag-long bit 20 (0x100000 = byte +5 & 0x10) [PROVEN, bytes]:
+ * here `move.l $4(a3),d0; and.l $4(a2),d0; btst #$14,d0` (both objects). The
+ * bit is set at creation from descriptor +0x16 bit 13 (alloc_object_from_desc)
+ * and cleared by attach_trailing_plume (andi.l #$ffefffff at 0x116ca).
+ * collect_far_objects (btst #4,$5(a0) at 0x570c; btst #$14,d4 at 0x5796)
+ * sends bit-20 objects here or to test_player_vs_type0e_proximity, and
+ * clear ones to test_object_collision / handle_player_contact. So bit 20
+ * selects distance-based collision instead of shape collision [STRONG
+ * INFERENCE]. Other readers: lift_object_onto_terrain skips translate_int3_vecs
+ * when it is set (0x14882); release_fractal_reference needs it clear (0x14b06).
  */
 void test_proximity_collision /* Original: FUN_00013e4e */ (int param_1,int param_2)
 
@@ -22320,11 +22488,12 @@ LAB_00015082:
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-/* Original: FUN_000150c8; source: Pacific Conflict.c. Recovered name: create_flagship_controller [STRONG INFERENCE] (iteration 258).
+/* Original: FUN_000150c8; source: Pacific Conflict.c. Recovered name: create_carrier_controller [PROVEN identity, iteration 326; was create_flagship_controller, iteration 258].
+ * RENAME (iteration 326): the type-0x15 extra handler at 0x15154 prints "Can't find deck tag on carrier" (string at 0x15134) when no face has tag 1, so type 0x15 is the aircraft carrier [PROVEN].
  * Ghidra C reviewed (function at overlay offset 0x150c8).
  * Create entry of controller type 0x15 (3 hits). Allocates a cleared 0x56-byte controller: +0 object (object flag word +6 |= 0x4000), +4 definition DAT_0001b524[key], words +0x50 / +0x52 = -1, +0x48 = 1000000000, word +0x44 = 7, word +0x32 = definition +0x1a; the first one created is kept in _DAT_0001b864. Returns the controller. Type 0x15 alone has the extra handler and the mission checks in step_sinking_object (probe_nearest_facility_kind, missions 7 / 8 / 9) [HYPOTHESIS: the mission ship, e.g. the carrier; the name "flagship" is provisional]. Controller definition table [PROVEN, bytes]: overlay_main_entry Block C copies five 0x1c-byte records from 0x1aa5e (file 0x1aa7e) into DAT_0001b524[key]; record = key word, +2 tick, +6 create, +0x12 extra (code pointers stored as address - 0x20), +0x1a hits. Key 0x15: step_sinking_object / FUN_000150c8 / extra 0x15154 (unexported), 3 hits; 0x19: tick_firing_ship_controller / create_firing_ship_controller, 2 hits; 0x18 and 0x17: step_sinking_object / FUN_000155ec, 2 and 1 hits; 0x16: tick_sinking_controller / create_sinking_controller, 1 hit. The keys match the template types 0x15..0x19 that the entity update path sends to sink_object_shape_at_waterline [STRONG INFERENCE: ship classes]. Complete Ghidra C.
  */
-uint * create_flagship_controller /* Original: FUN_000150c8 */ (uint param_1,int param_2)
+uint * create_carrier_controller /* Original: FUN_000150c8 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -22345,8 +22514,54 @@ uint * create_flagship_controller /* Original: FUN_000150c8 */ (uint param_1,int
 }
 
 
+/* Unexported function at overlay offset 0x15154 (not in Ghidra's export; LINK A6 #-4).
+ * Recovered name (comment only): carrier_deck_contact [STRONG INFERENCE] (iteration 326).
+ * Definition extra slot +0x12 of key 0x15 (carrier). Called by handle_player_contact as
+ * handler(carrier_obj, player_obj, contact_record) when the carrier has flag bit 14
+ * (+6 & 0x40, set by create_carrier_controller). Reconstruction from the bytes
+ * 0x15154..0x1530c [PROVEN]; ctrl = carrier +8, pc = player +8:
+ *
+ *   if (pc == 0) return;
+ *   if (ctrl->w50 == -1) {                     // first contact: find tagged faces
+ *     for (i = 0; i < carrier->w3a; i++)       // dbra over the 0x20-byte faces at +0x48
+ *       { if (face[i].b17 == 1) ctrl->w50 = i;     // deck tag
+ *         if (face[i].b17 == 3) ctrl->w52 = i; }   // second tag [UNKNOWN role]
+ *     deck = face[ctrl->w50];
+ *     if (ctrl->w50 == -1) overlay_printf("Can't find deck tag on carrier");
+ *     v = *(short *)deck->vertex_list;          // first vertex index (sign-extended)
+ *     ctrl->w54 = (short)(vertices(+0x44)[v].y(+4) >> carrier->w34);   // deck height
+ *   }
+ *   deck = face[ctrl->w50];
+ *   if (abs_int(fold_angle_pm_0x2000(ctrl->w20)) <= 0x4ff &&   // movea.w $20(a3): carrier
+ *       point_over_face_xz(contact_record, deck)) {
+ *     pc->l2e = (long)ctrl->w54;               // ground height under the aircraft
+ *     if (DAT_0001b870 == 0) pc->b2c = deck->b16;   // surface byte of the deck face
+ *   }
+ *   if (*(short *)pc->definition(+4) <= 4 && ctrl->w52 != -1 &&
+ *       point_over_face_xz(contact_record, face[ctrl->w52]))
+ *     pc->b63f = 1;                           // over the tag-3 face: arrest request (iteration 327)
+ *   if (ctrl->w54 > 0) {                       // append {carrier, player} to the carried pairs
+ *     if (DAT_0001b85a <= DAT_0001b85c) {      // grow by 4 (heap_alloc 0x1a68 / realloc 0x1ba8)
+ *       DAT_0001b85a += 4;
+ *       DAT_0001b860 = DAT_0001b860 ? realloc(DAT_0001b860, DAT_0001b85a * 8)
+ *                                   : heap_alloc(DAT_0001b85a * 8);
+ *     }
+ *     DAT_0001b860[DAT_0001b85c] = {carrier_obj, player_obj};
+ *     DAT_0001b85c++;
+ *   }
+ *
+ * Certainty: control flow, offsets and widths PROVEN (signed word compares: cmpi.w #-1,
+ * tst.w / ble, movea.w sign extension; cmpi.l #$4ff / bgt signed). "deck" / "carrier"
+ * PROVEN by the string. ctrl->w20 (carrier controller word +0x20) is folded as an
+ * angle: the deck counts only while the carrier is within +-0x4ff of level, i.e. not
+ * heeled over while sinking (cf. the +0x34..+0x40 attitude fields) [STRONG_INFERENCE]; iteration 327: tag 3 = arresting-wire zone, +0x63f
+ * = arrest request consumed by update_aircraft_entity (sets the +0x640 latch) [STRONG_INFERENCE].
+ */
+
+
 
 /* Original: FUN_0001530e; source: Pacific Conflict.c. Recovered name: create_firing_ship_controller [STRONG INFERENCE] (iteration 257).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_firing_ship_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x1530e).
  * Allocates a cleared 300-byte controller: +0 object, +4 definition DAT_0001b524[key], word +0x50 = 0x14 (shots), +0x48 = 1000000000, word +0x44 = 7, word +0x32 = definition +0x1a (hits). Room for the 12-byte gun positions at +0x54 and 6-byte aim angles at +0xe4 used by tick_firing_ship_controller. No caller in the exported C [UNKNOWN]. Complete Ghidra C.
  */
@@ -22484,6 +22699,7 @@ void tick_firing_ship_controller /* Original: FUN_00015356 */ (int *param_1)
 
 
 /* Original: FUN_00015580; source: Pacific Conflict.c. Recovered name: create_sinking_controller [STRONG INFERENCE] (iteration 256).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_sinking_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x15580).
  * Args: object, definition key, word. Allocates a cleared 0x56-byte controller (heap_alloc_cleared): +0 object, +4 definition DAT_0001b524[key] (ID-keyed record table), +0x54 the word argument, +0x48 next step frame = 1000000000 (not scheduled), word +0x44 = 3 (step interval), word +0x32 = definition +0x1a; sets object flags 0x102000 (+4). The fields match those read by step_sinking_object [STRONG INFERENCE]. The new controller is not returned in the Ghidra C (void) [UNKNOWN how it is linked]. No caller in the exported C (reached through a handler table) [UNKNOWN]. Complete Ghidra C.
  */
@@ -22521,6 +22737,7 @@ void tick_sinking_controller /* Original: FUN_000155d8 */ (undefined4 *param_1)
 
 
 /* Original: FUN_000155ec; source: Pacific Conflict.c. Recovered name: create_basic_ship_controller [STRONG INFERENCE] (iteration 258).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_basic_ship_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x155ec).
  * Create entry of controller types 0x18 and 0x17 (2 and 1 hits). Allocates a cleared 0x50-byte controller: +0 object, +4 definition DAT_0001b524[key], +0x48 = 1000000000, word +0x44 = 7, word +0x32 = definition +0x1a; ticked directly by step_sinking_object. Controller definition table [PROVEN, bytes]: overlay_main_entry Block C copies five 0x1c-byte records from 0x1aa5e (file 0x1aa7e) into DAT_0001b524[key]; record = key word, +2 tick, +6 create, +0x12 extra (code pointers stored as address - 0x20), +0x1a hits. Key 0x15: step_sinking_object / FUN_000150c8 / extra 0x15154 (unexported), 3 hits; 0x19: tick_firing_ship_controller / create_firing_ship_controller, 2 hits; 0x18 and 0x17: step_sinking_object / FUN_000155ec, 2 and 1 hits; 0x16: tick_sinking_controller / create_sinking_controller, 1 hit. The keys match the template types 0x15..0x19 that the entity update path sends to sink_object_shape_at_waterline [STRONG INFERENCE: ship classes]. Complete Ghidra C.
  */
@@ -22805,6 +23022,7 @@ LAB_00015a4a:
 
 
 /* Original: FUN_00015b92; source: Pacific Conflict.c. Recovered name: create_bullet_controller [STRONG INFERENCE] (iteration 303).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_bullet_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x15b92).
  * Cleared 0x52-byte bullet controller, object flags | 0x122000, range +0x14 = 0x9c4. Bullet definition key 0xe (file 0x1a9e2): +2 tick_bullet, +6 register_bullet_template -> create_bullet_controller, +0xe bullet_pre_render [PROVEN bytes]; the bullet template DAT_0002664a is the one spawn_ordnance_scattered uses. Complete Ghidra C.
  */
@@ -23564,6 +23782,7 @@ uint impact_one_time_in_16 /* Original: FUN_000168ae */ (int param_1,int param_2
 
 
 /* Original: FUN_000168d2; source: Pacific Conflict.c. Recovered name: alloc_transformed_vertex_block [STRONG INFERENCE] (iteration 292).
+ * VERIFIED (iteration 317): checked against an independent capstone disassembly of the overlay bytes (sources/hellcats/Pacific Conflict) at 0x168d2: heap_alloc_cleared(header + 12 * count), count word at header - 2, apply_template_chain_xform_always($2d10)(object, count, source, block + header), returns the block - identical.
  * Ghidra C reviewed (function at overlay offset 0x168d2).
  * Args: object, header size, vertex count, source vertices. Allocates header + 12 * count bytes (cleared), stores the count in the word just before the vertex area and fills it through apply_template_chain_xform_always. Returns the block. Used by the AI script set-up (ensure_ai_script_*). Ghidra C.
  */
@@ -23581,6 +23800,7 @@ uint * alloc_transformed_vertex_block /* Original: FUN_000168d2 */ (int param_1,
 
 
 /* Original: FUN_0001691c; source: Pacific Conflict.c. Recovered name: alloc_copied_vertex_block [STRONG INFERENCE] (iteration 292).
+ * VERIFIED (iteration 317): checked against an independent capstone disassembly of the overlay bytes (sources/hellcats/Pacific Conflict) at 0x1691c: heap_alloc_cleared($1b6c)(header + 12 * count), count word stored at header - 2, memmove_block($1a63e)(source, block + header, 12 * count), returns the block - identical.
  * Ghidra C reviewed (function at overlay offset 0x1691c).
  * Same layout as alloc_transformed_vertex_block but copies the 12-byte points unchanged (memmove_block). Ghidra C.
  */
@@ -23638,6 +23858,7 @@ int * advance_route_waypoint /* Original: FUN_00016966 */ (int param_1,short *pa
 
 
 /* Original: FUN_00016a3a; source: Pacific Conflict.c. Recovered name: create_trail_controller [STRONG INFERENCE] (iteration 291).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_trail_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x16a3a).
  * Cleared 0x58-byte trail controller, object flags | 0x12000, object word +0x34 = 0, definition at +4. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
  */
@@ -24111,6 +24332,7 @@ void tick_trail /* Original: FUN_0001702a */ (int *param_1)
 
 
 /* Original: FUN_0001706a; source: Pacific Conflict.c. Recovered name: create_ground_fire_controller [STRONG INFERENCE] (iteration 291).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_ground_fire_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x1706a).
  * Cleared 0x54-byte controller, object flags | 0x12040 (starts hidden), object word +0x34 = 0. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
  */
@@ -24360,6 +24582,7 @@ void tick_ground_fire /* Original: FUN_00017380 */ (int *param_1)
 
 
 /* Original: FUN_000173a2; source: Pacific Conflict.c. Recovered name: create_debris_controller [STRONG INFERENCE] (iteration 291).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_debris_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x173a2).
  * Cleared 0x38-byte controller, object flags | 0x152000, definition at +4. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
  */
@@ -24461,6 +24684,7 @@ void tick_debris_fragment /* Original: FUN_000174c4 */ (int *param_1)
 
 
 /* Original: FUN_00017566; source: Pacific Conflict.c. Recovered name: create_ground_mark_controller [STRONG INFERENCE] (iteration 291).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_ground_mark_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x17566).
  * Cleared 0x32-byte controller, object flag +5 | 2, definition at +4. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
  */
@@ -25494,6 +25718,7 @@ LAB_000188a6:
 
 
 /* Original: FUN_000188ba; source: Pacific Conflict.c. Recovered name: create_shadow_controller [STRONG INFERENCE] (iteration 295).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_shadow_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x188ba).
  * Cleared 0x36-byte shadow controller, object flags | 0x112000, definition at +4. Complete Ghidra C.
  */
@@ -25684,6 +25909,7 @@ undefined4 shadow_pre_render /* Original: FUN_00018a34 */ (int *param_1)
 
 
 /* Original: FUN_00018b52; source: Pacific Conflict.c. Recovered name: create_flak_controller [STRONG INFERENCE] (iteration 289).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_flak_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x18b52).
  * Definition +6 of type 0x1a (flak gun): cleared 0xfa-byte controller, +0 object, +4 definition DAT_0001b524[key], word +0x46 = 0x3c (60), long +0x42 = 0x26ac0 [STRONG INFERENCE: engagement range; the same value as the middle radar range], object flag +5 | 2. Complete Ghidra C.
  */
@@ -26463,6 +26689,7 @@ void parachute_tick /* Original: FUN_00019938 */ (int *param_1)
 
 
 /* Original: FUN_00019a1a; source: Pacific Conflict.c. Recovered name: create_cloud_controller [STRONG INFERENCE] (iteration 300).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_cloud_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x19a1a).
  * Cleared 0x40-byte controller, object flags | 0x132000, definition at +4. Cloud definition key 0x1d (file 0x1ab58): +2 follow_camera_offset (0x19b30), +6 register_cloud_templates [PROVEN bytes]; the five templates DAT_00026784[0..4] are the classes spawned by spawn_camera_relative_object for spawn_cloud_layer. Complete Ghidra C.
  */
@@ -26560,6 +26787,7 @@ void follow_camera_offset /* Original: FUN_00019b30 */ (int *param_1)
 
 
 /* Original: FUN_00019b82; source: Pacific Conflict.c. Recovered name: create_view_attached_controller [STRONG INFERENCE] (iteration 296).
+ * SIGNATURE CORRECTION (iteration 318) [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_view_attached_controller(object, definition key, ...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x19b82).
  * Definition +6 of key 0x1e (file 0x1ab72) [PROVEN bytes]: cleared 0x32-byte controller, object flags | 0x132000. Complete Ghidra C.
  */

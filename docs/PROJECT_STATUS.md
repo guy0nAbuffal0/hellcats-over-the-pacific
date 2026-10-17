@@ -1,5 +1,11 @@
 # Hellcats Over the Pacific — Project Status
 
+> **Architecture update:** new source-faithful Godot work now starts in the
+> isolated strict-port namespace described in
+> [`STRICT_PORT_FOUNDATION.md`](STRICT_PORT_FOUNDATION.md). The playable Mission
+> 01 prototype below is preserved for comparison, but it is not the architectural
+> source of truth for new simulation logic.
+
 Latest assessment: 17 October 2026. The dated update below supersedes conflicting claims in the older assessment, retained afterward for context.
 
 ## Port improvement assessment — 17 October 2026

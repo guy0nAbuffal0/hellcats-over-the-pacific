@@ -17,6 +17,23 @@
       "deterministic_test": "godot/tests/strict_port/test_contact_pair_hash.gd",
       "renamed_from": "FUN_0001358c",
       "blocked_by": []
+    },
+    {
+      "source_file": "sources/resedit/CODE/Pacific Conflict.decomp.c",
+      "source_function": "find_contact_record",
+      "original_function": "FUN_000135a0",
+      "source_address": "0x135a0",
+      "source_sha256": "ee4e9790611dee337813e13020c586284ba106fe754452865d76c446bde82efe",
+      "target_file": "godot/strict_port/code/pacific_conflict.gd",
+      "target_function": "find_contact_record",
+      "translation_status": "VERIFIED",
+      "structurally_verified": true,
+      "behaviorally_verified": true,
+      "integrated": false,
+      "runtime_verified": false,
+      "deterministic_test": "godot/tests/strict_port/test_find_contact_record.gd",
+      "renamed_from": "FUN_000135a0",
+      "blocked_by": []
     }
   ]
 }

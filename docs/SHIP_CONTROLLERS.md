@@ -22,7 +22,7 @@ file offsets; data labels are runtime addresses, at file offset + 0x20).
 
 | Key | Tick | Create | Extra | Hits |
 |---|---|---|---|---|
-| 0x15 | `step_sinking_object` | `create_flagship_controller` | 0x15154 (starts with LINK A6: a function Ghidra did not export; iteration 269) | 3 |
+| 0x15 | `step_sinking_object` | `create_carrier_controller` | 0x15154 `carrier_deck_contact` (unexported; decoded in iteration 326) | 3 |
 | 0x19 | `tick_firing_ship_controller` | `create_firing_ship_controller` | — | 2 |
 | 0x18 | `step_sinking_object` | `create_basic_ship_controller` | — | 2 |
 | 0x17 | `step_sinking_object` | `create_basic_ship_controller` | — | 1 |
@@ -35,7 +35,8 @@ types carried on ships.
 Template types 0x15..0x19 are the ones the entity update path sends to
 `sink_object_shape_at_waterline` **[PROVEN]**; reading them as ship classes is
 **[STRONG INFERENCE]**. Type 0x15 alone has mission checks in
-`step_sinking_object` (missions 7 / 8 / 9) **[HYPOTHESIS: the mission ship]**.
+`step_sinking_object` (missions 7 / 8 / 9). Type 0x15 is the aircraft carrier
+**[PROVEN, iteration 326: "Can't find deck tag on carrier" in its handler]**.
 
 ## Who calls the handlers (iteration 259)
 

@@ -96,8 +96,16 @@ def check(manifest_path: Path, source_root: Path) -> tuple[dict, list[str]]:
         integrated += int(bool(row.get("integrated")))
         runtime += int(bool(row.get("runtime_verified")))
 
+    inventory_path = source_root / "docs/DECOMPILATION_INVENTORY.json"
+    decompiled_total = 0
+    if inventory_path.is_file():
+        inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        decompiled_total = int(inventory.get("total", 0))
+
     report = {
+        "decompiled_functions": decompiled_total,
         "mapped_functions": len(rows),
+        "not_ported_functions": max(0, decompiled_total - len(rows)),
         "status_counts": counts,
         "with_deterministic_tests": tested,
         "structurally_verified": structural,

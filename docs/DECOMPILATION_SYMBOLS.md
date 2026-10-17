@@ -290,10 +290,10 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00006ece` (Pacific Conflict) | `clear_flag_00020ae4` | PROVEN | Iter 248: one store. |
 | `FUN_0000823e` (Pacific Conflict) | `process_flight_input_tail` | STRONG INFERENCE | Iter 248: false split of the key handler. |
 | `FUN_00008784` (Pacific Conflict) | `set_state_word_1b86c` | HYPOTHESIS name | Iter 248: 2 / 1 by argument. |
-| `FUN_00005832` (Pacific Conflict) | `dispatch_overlap_collisions` | STRONG INFERENCE | Iter 249: 1-D sweep over metric +/- radius, type handler +0x16. |
+| `FUN_00005832` (Pacific Conflict) | `dispatch_overlap_collisions` | STRONG INFERENCE | Iter 249: 1-D sweep over metric +/- radius, type handler +0x16. Iter 324: VERIFIED; walks the bit-15 list DAT_0001c1e4 (count DAT_0001c1c4), range +0xc, +0x28 scratch. |
 | `FUN_000058ec` (Pacific Conflict) | `build_visible_object_list` | STRONG INFERENCE | Iter 249: view-space transform and pyramid cull into DAT_0001c9dc. |
 | `FUN_000053f8` (Pacific Conflict) | `collect_near_objects` | STRONG INFERENCE | Iter 250: active array: view candidates, deactivation / retirement. |
-| `FUN_0000555a` (Pacific Conflict) | `collect_far_objects` | STRONG INFERENCE | Iter 250: world array: view candidates, collision list. |
+| `FUN_0000555a` (Pacific Conflict) | `collect_far_objects` | STRONG INFERENCE (name) / VERIFIED (iter 323) | Iter 250: world array: view candidates, collision list. Iter 323: DAT_0001c1e4 gets flag bit 15, not "!0x2800"; 0x2800 = mover side of the sweep; retires out-of-range objects older than 0x4b frames. |
 | `FUN_00005a14` (Pacific Conflict) | `update_altitude_detail_bands` | STRONG INFERENCE | Iter 251: power-of-two altitude band, tables DAT_0001b214 / DAT_0001b264, land rebuild. |
 | `FUN_00004958` (Pacific Conflict) | `build_land_outline_at_detail` | STRONG INFERENCE | Iter 251: drops vertices within tolerance, clips, de-duplicates into template vertex table. |
 | `FUN_00005e28` (Pacific Conflict) | `update_ground_scatter_objects` | STRONG INFERENCE | Iter 252: 64 ground points DAT_0001b924, 7 object slots DAT_0001bc64, gated by +0xac and height < 0x26ad. |
@@ -314,7 +314,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00014f48` (Pacific Conflict) | `apply_hit_to_sinkable_object` | STRONG INFERENCE | Iter 257: decrements hits +0x32, random list / capsize rates, schedules 15 sinking steps. |
 | `FUN_0001530e` (Pacific Conflict) | `create_firing_ship_controller` | STRONG INFERENCE | Iter 257: 300-byte controller, 20 shots. |
 | `FUN_00015356` (Pacific Conflict) | `tick_firing_ship_controller` | STRONG INFERENCE | Iter 257: random spawn_weapon_entity from faces with +0x17 == 1; sinking afterwards. |
-| `FUN_000150c8` (Pacific Conflict) | `create_flagship_controller` | STRONG INFERENCE | Iter 258: create entry of definition key 0x15 (table at runtime 0x1aa5e); 0x56-byte record; first in _DAT_0001b864. |
+| `FUN_000150c8` (Pacific Conflict) | `create_carrier_controller` (was `create_flagship_controller`) | PROVEN (identity, iter 326) | Iter 258: create entry of definition key 0x15 (table at runtime 0x1aa5e); 0x56-byte record; first in _DAT_0001b864. Iter 326: renamed; type 0x15 = carrier, string "Can't find deck tag on carrier" at 0x15134. |
 | `FUN_000155ec` (Pacific Conflict) | `create_basic_ship_controller` | STRONG INFERENCE | Iter 258: create entry of keys 0x18 / 0x17; 0x50-byte record. |
 | `FUN_000092e4` (Pacific Conflict) | `advance_frame_and_tick_controllers` | STRONG INFERENCE | Iter 259: DAT_0001b838++, appear / expiry flags 0x40 / 0x42, ticks DAT_0001c25c via definition +2. |
 | `FUN_0000947c` (Pacific Conflict) | `apply_controller_velocities` | STRONG INFERENCE | Iter 259: saves position, adds controller +8..+0x10 velocity. |
@@ -328,7 +328,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00014198` (Pacific Conflict) | `handle_terrain_contact` | STRONG INFERENCE | Iter 260: sets player controller +0x2e ground height. |
 | `FUN_00013ee0` (Pacific Conflict) | `test_object_collision` | STRONG INFERENCE | Iter 261: summed-range check; fractal → test_terrain_collision; shape face sign flip + FUN_0001346c → FUN_00014348. |
 | `FUN_00013cdc` (Pacific Conflict) | `test_terrain_collision` | STRONG INFERENCE | Iter 261: a below fractal_height_at → FUN_00014348; sets controller +0x2e. |
-| `FUN_00013e4e` (Pacific Conflict) | `test_proximity_collision` | STRONG INFERENCE | Iter 261: flag 0x100000 on both; 3/4 distance below a range. |
+| `FUN_00013e4e` (Pacific Conflict) | `test_proximity_collision` | STRONG INFERENCE | Iter 261: flag 0x100000 on both; 3/4 distance below a range. Iter 322: `and.l` of both flag longs, `btst #20` [PROVEN]; bit 20 = distance-collision mode (see object flag long). |
 | `FUN_00013eae` (Pacific Conflict) | `test_player_vs_type0e_proximity` | STRONG INFERENCE | Iter 261: player vs template type 0xe. |
 | `FUN_00014348` (Pacific Conflict) | `dispatch_collision` | STRONG INFERENCE | Iter 262: definition +0x12 handlers; pair table DAT_0001b43c (10 × 8 bytes). |
 | `FUN_0001346c` (Pacific Conflict) | `point_in_face_by_axis` | STRONG INFERENCE | Iter 262: projects on yz / xz / xy by axis code, point-in-polygon. |
@@ -448,8 +448,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00017566` (Pacific Conflict) | `create_ground_mark_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_000175c0` (Pacific Conflict) | `tick_ground_mark` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
 | `FUN_000168ae` (Pacific Conflict) | `impact_one_time_in_16` | HYPOTHESIS | Iter 292: 1/16 chance ordnance_collision. |
-| `FUN_000168d2` (Pacific Conflict) | `alloc_transformed_vertex_block` | STRONG INFERENCE | Iter 292: header + 12-byte points via template xform. |
-| `FUN_0001691c` (Pacific Conflict) | `alloc_copied_vertex_block` | STRONG INFERENCE | Iter 292: same, copied. |
+| `FUN_000168d2` (Pacific Conflict) | `alloc_transformed_vertex_block` | VERIFIED | Iter 292: header + 12-byte points via template xform. |
+| `FUN_0001691c` (Pacific Conflict) | `alloc_copied_vertex_block` | VERIFIED | Iter 292: same, copied. |
 | `FUN_00016966` (Pacific Conflict) | `advance_route_waypoint` | STRONG INFERENCE | Iter 292: next waypoint within 5000. |
 | `FUN_00017d16` (Pacific Conflict) | `create_aircraft_spawner_controller` | STRONG INFERENCE | Iter 292: key 0x12 create; object kind unknown. |
 | `FUN_00017db8` (Pacific Conflict) | `destroy_aircraft_spawner_controller` | STRONG INFERENCE | Iter 292: releases 3 refs. |
@@ -518,8 +518,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00015dc8` (Pacific Conflict) | `tick_bullet` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
 | `FUN_00015e62` (Pacific Conflict) | `bullet_pre_render` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
 | `FUN_00015d78` (Pacific Conflict) | `spawn_ordnance_oriented_3ang` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
-| `FUN_0001377a` (Pacific Conflict) | `age_contact_records` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
-| `FUN_000137da` (Pacific Conflict) | `drop_contact_records_for_object` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
+| `FUN_0001377a` (Pacific Conflict) | `age_contact_records` | VERIFIED | Iter 303: bullet family / contact records. |
+| `FUN_000137da` (Pacific Conflict) | `drop_contact_records_for_object` | VERIFIED | Iter 303: bullet family / contact records. |
 | `FUN_0000c11e` (Pacific Conflict) | `begin_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
 | `FUN_0000c17e` (Pacific Conflict) | `end_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
 | `FUN_0000cac6` (Pacific Conflict) | `update_bomb_indicator` | STRONG INFERENCE | Iter 304: panel helper. |
@@ -669,8 +669,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00000032` | `copy_block_return_dst` | STRONG INFERENCE | Binary @ `0x32`: saves D2, calls `FUN_0001a63e(src,dst,n)` (args reordered), returns `dst` in D0. Used throughout `FUN_00000054` after `FUN_00001a48` with lengths `0x4A`/`0x1A`/`0x1C`/`0x20`. |
 | `FUN_00000054` | `overlay_init_template_pointer_tables` | STRONG INFERENCE | Capstone `@0x54`–`0x332`: Block A 4×`0x4A` keyed; Block B 16 fixed `0x1A`/`0x20`→`DAT_0001b538`…`1b574`; Block C 5×`0x1C` keyed from `$1AA5E`; Block D five `0x1A`→`DAT_0001b58c`…`1b59c`. Caller `init_mission_object_tables`. |
 | `FUN_000016e2` | `init_mission_object_tables` | STRONG INFERENCE | `@0x16E2`: BSR `$54` then `instantiate_object_from_desc`/`heap_alloc`; builds count×`0x18` child table; publishes `DAT_0001d6fc`, `1bdb4`/`b0`/`ac`/`a8`/`a4`, `bc28`/`34`/`38`. |
-| `FUN_00004690` | `instantiate_object_from_desc` | STRONG INFERENCE | `@0x4690`: `alloc_object_from_desc`; if `desc[1]!=0` call `*(DAT_0001b524[type]+6)(obj,type,0)` → store at `obj+8`. |
-| `FUN_000045ba` | `alloc_object_from_desc` | STRONG INFERENCE | `@0x45BA`: kind 2→size `0x52`, kind 3→size `0x34` via `heap_alloc_cleared`; copies descriptor fields. |
+| `FUN_00004690` | `instantiate_object_from_desc` | VERIFIED (iter 320; type byte signed, extb.l) | `@0x4690`: `alloc_object_from_desc`; if `desc[1]!=0` call `*(DAT_0001b524[type]+6)(obj,type,0)` → store at `obj+8`. |
+| `FUN_000045ba` | `alloc_object_from_desc` | VERIFIED (iter 321) | `@0x45BA`: kind 2→size `0x52`, kind 3→size `0x34` via `heap_alloc_cleared`; desc +0x16 zero-extended to +4; desc bit 13 → flag bit 20 (big-endian byte +6); unknown tags return D1. |
 | `FUN_00001b6c` | `heap_alloc_cleared` | STRONG INFERENCE | `@0x1B6C`: `heap_alloc` then `heap_zero_payload`. |
 | `FUN_00001b38` | `heap_zero_payload` | PROVEN | `@0x1B38`: derive payload size from heap header (`0xFF` large vs size-class); call `memzero`. |
 | `FUN_0001a716` | `memzero` | PROVEN | `@0x1A716`: aligned CLR.B/CLR.L zero-fill of `nbytes` at `dst`. |
@@ -793,6 +793,15 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001a68` | `heap_alloc` | PROVEN prologue | `@0x1A68`: `MOVEM D2-D3/A2`; size `$10(a7)`; bins/`01974`/`0199a`; D0=payload. Godot stand-in for kind2/B572 call sites. |
 | `DAT_00020c60` | `heap_roving_cursor` | STRONG INFERENCE | Large-block freelist cursor; written at `@0x1A48` / read throughout alloc/free. |
 | `DAT_00020c64` | `heap_size_class_bins` | STRONG INFERENCE | Array of freelist heads indexed by size class (×4). |
+| `DAT_0001b85c` (Pacific Conflict) | carried-pair count (word) | PROVEN (use) | Iter 325: cleared every frame by overlay_frame_step; incremented by the unexported 0x15154 handler. |
+| `DAT_0001b860` (Pacific Conflict) | carried-pair array, 8 bytes {carrier object, rider object} | PROVEN (layout) / STRONG_INFERENCE (meaning) | Iter 325: rider metric biased by carrier extent around controller +0x54 before the world sort. |
+| `DAT_0001b85a` (Pacific Conflict) | carried-pair capacity (word, grows by 4) | PROVEN | Iter 325: 0x152a0. |
+| `DAT_0001c1c0` (Pacific Conflict) | visible-list count before world objects (word) | PROVEN (value) | Iter 325: = low word of DAT_0001c1d4 after collect_near_objects. |
+| `unexported 0x15154` (Pacific Conflict) | `carrier_deck_contact` (comment-only reconstruction) | STRONG INFERENCE (name) / PROVEN (body) | Iter 326: definition key 0x15 slot +0x12; deck face = tag 1 (face +0x17), deck height in controller +0x54; sets aircraft controller +0x2e / +0x2c, +0x63f (tag 3), appends carried pair. |
+| carrier controller +0x50 / +0x52 / +0x54 (Pacific Conflict) | deck face index / tag-3 face index / deck height (words; -1 = not found) | PROVEN (layout) | Iter 326, 0x15178..0x15200. |
+| aircraft controller +0x63f / +0x640 (Pacific Conflict) | arrest request (byte, per frame) / arrest latch (byte: 0 none, 1 braking -0xB6 per frame, 2 stopped) | PROVEN (flow) / STRONG_INFERENCE (arresting wire) | Iter 327: 0x15286 sets +0x63f over carrier tag-3 face; 0xf420 latches; 0xeffe brakes; 0xf01a stop; 0xf478 clear airborne; 0xf47c clears +0x63f. Replaces the "stall latch / field_190" reading. |
+| `DAT_0001b868` (Pacific Conflict) | `player_landing_state` (comment-only name) | STRONG INFERENCE (name) / PROVEN (values, word) | Iter 328: 0 airborne/reset, 1 touchdown, 2 stopped; consumed by process_flight_input_and_outcome when engine off (0x8110). |
+| face +0x16 / aircraft controller +0x2c (Pacific Conflict) | surface code: 0x10 water, 0x20 ?, 0x30 hard, 0x40 grass, 0x50 ?, 0x60 hard, 0x70 runway | PROVEN (values) / STRONG_INFERENCE (0x10, 0x40, 0x70) / UNKNOWN (0x20, 0x50, 0x60 identity) | Iter 329: table at surface_type_at_point; 0x30/0x60/0x70 valid landings; 'p' quads = runway approach ends. |
 
 ## Rejected / superseded interpretations
 
@@ -805,3 +814,30 @@ Do not treat example names from planning docs as approved until revalidated here
 | Location | Artifact | Correction in `.decomp.c` |
 |---|---|---|
 | `FUN_00000054` copy length | `pcVar5 = FUN_00000020` | Replaced with `(code *)0x20` — function address equals byte count 32. |
+
+## Signature corrections (iteration 318)
+
+| Symbols | Ghidra signature | Corrected | Confidence | Evidence | Downstream |
+|---|---|---|---|---|---|
+| create_*_controller (16 functions, see DECOMPILATION_PROGRESS iteration 318) | `void f(...)` | returns the new controller (`uint *`) in D0 | PROVEN | D0 = heap_alloc_cleared result untouched to RTS; instantiate_object_from_desc stores it at object +8 | Godot `sim_core.gd` `_call_fun_00004690` / create handlers: review |
+| point_over_face_xz (FUN_000132c8) | `void` | returns int (point_in_polygon_xz result) | PROVEN | D0 untouched after the last bsr; call sites 0x15236 / 0x1527a test D0 | none found in godot/ |
+| surface_type_under_object (FUN_00013452) | `void` | returns the surface code | PROVEN | bsr surface_type_at_point then RTS; callers use D0 at 0xf148 / 0xf1d0 / 0x11e04 | godot sim_core.gd / flight_math.gd reference FUN_00013452: review |
+| begin_offscreen_drawing (FUN_0000c11e) | `void` | returns the host +0x286 result (previous port?) | PROVEN (return) / STRONG_INFERENCE (meaning) | caller keeps D0 in a3 at 0xc242 | none found in godot/ |
+
+## Object flag long (+4) — iteration 322
+
+The low word is copied (zero-extended) from descriptor +0x16 by
+`alloc_object_from_desc`; big-endian byte +7 = bits 0–7, +6 = bits 8–15,
++5 = bits 16–23.
+
+| Bit | Mask | Byte test | Meaning | Certainty | Evidence |
+|---|---|---|---|---|---|
+| 13 | 0x2000 | +6 & 0x20 | moving object (the collision handler of a is chosen first) | STRONG_INFERENCE | dispatch_collision, apply_controller_velocities |
+| 14 | 0x4000 | +6 & 0x40 | player-contact handler | STRONG_INFERENCE | handle_player_contact |
+| 19 | 0x80000 | +5 & 0x08 | needed by release_fractal_reference, tested by lift_object_onto_terrain | UNKNOWN | 0x14afe, 0x148b6 |
+| 1 | 0x2 | +7 & 0x02 | excluded from view and collision (sent to the out-of-range path) | PROVEN (flow) | collect_far_objects 0x55c4 / 0x56f8 |
+| 2 | 0x4 | +7 & 0x04 | no camera-relative candidate entry | PROVEN (flow) | 0x5600 |
+| 6 | 0x40 | +7 & 0x40 | not put on the visible list; uses the player tests (handle_player_contact / test_player_vs_type0e_proximity); set on the player (DAT_0001b738) | PROVEN (flow) / STRONG_INFERENCE (meaning) | 0x55cc, 0x56f0, 0x579c |
+| 11 | 0x800 | +6 & 0x08 | one-frame mover flag, cleared by the sweep | PROVEN (flow) | 0x56d2 |
+| 15 | 0x8000 | +6 & 0x80 | added to DAT_0001c1e4 each frame; that list gets the +0x16 notice handlers (dispatch_overlap_collisions) | PROVEN (flow) | 0x56ac, 0x5832 |
+| 20 | 0x100000 | +5 & 0x10 | distance-based (proximity) collision instead of shape collision; set from bit 13 at creation | PROVEN (bit flow) / STRONG_INFERENCE (meaning) | 0x13e62, 0x570c, 0x5796, 0x116ca, alloc 0x45ba |

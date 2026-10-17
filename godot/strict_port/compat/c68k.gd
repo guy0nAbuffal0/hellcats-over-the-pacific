@@ -36,7 +36,7 @@ static func asr32(value: int, count: int) -> int:
 ## C89-style signed division: truncate toward zero, unlike floor division.
 static func divs_trunc(numerator: int, denominator: int) -> int:
 	assert(denominator != 0, "C division by zero is undefined")
-	var magnitude := abs(numerator) / abs(denominator)
+	var magnitude: int = abs(numerator) / abs(denominator)
 	return -magnitude if (numerator < 0) != (denominator < 0) else magnitude
 
 static func rems_trunc(numerator: int, denominator: int) -> int:

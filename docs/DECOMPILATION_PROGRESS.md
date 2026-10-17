@@ -2,9 +2,9 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 316
+**Last iteration:** 329
 **Last iteration date:** 2026-10-17
-**Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
+**Loop:** session-only CronCreate job `ee7d927a` (`*/5 * * * *`, activated 2026-10-17 after `f156ee33` was cancelled) in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
 ## Inventory summary
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 0 | 0 | 0 | 393 | 44 | 6 |
-| **TOTAL** | **736** | **0** | **0** | **0** | **686** | **44** | **6** |
+| Pacific Conflict.c | 443 | 0 | 0 | 0 | 385 | 52 | 6 |
+| **TOTAL** | **736** | **0** | **0** | **0** | **678** | **52** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 0 NOT_STARTED + 6 BLOCKED (iteration 316);
-686 RENAMED + 44 VERIFIED; the RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 0 NOT_STARTED + 6 BLOCKED (iteration 320);
+681 RENAMED + 49 VERIFIED; the RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -61,7 +61,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00001a48` | `heap_roving_cursor_store` | Pacific Conflict | BLOCKED | PROVEN body / BLOCKED ABI | `:2128` / `@0x1A48` | `Pacific Conflict.decomp.c` | mid-label of `FUN_000019d0` | Call sites expect malloc(D0); bytes only store A1→cursor | 4 | Body proven; allocator ABI unresolved |
 | `FUN_00001a68` | `heap_alloc` | Pacific Conflict | RENAMED | STRONG INFERENCE | `:2139` / `@0x1A68` | `Pacific Conflict.decomp.c` | freelists `DAT_00020c64`, cursor `DAT_00020c60` | — | 4 | Capstone size-class + large-block paths |
 | `FUN_000016e2` | `init_mission_object_tables` | Pacific Conflict | RENAMED | STRONG INFERENCE | `:1917` / `@0x16E2` | `Pacific Conflict.decomp.c` | templates, `instantiate_object_from_desc`, `heap_alloc` | Child schemas; setup hooks | 6 | Capstone BSR.L chain |
-| `FUN_00004690` | `instantiate_object_from_desc` | Pacific Conflict | RENAMED | STRONG INFERENCE | `:5195` / `@0x4690` | `Pacific Conflict.decomp.c` | `alloc_object_from_desc`, `DAT_0001b524[type]+6` factory | Factory payload schema | 7 | Capstone; ties to template table |
+| `FUN_00004690` | `instantiate_object_from_desc` | Pacific Conflict | VERIFIED | STRONG INFERENCE | `:5195` / `@0x4690` | `Pacific Conflict.decomp.c` | `alloc_object_from_desc`, `DAT_0001b524[type]+6` factory | Factory payload schema | 7 | Capstone; ties to template table; VERIFIED iter 320 (disassembly) |
 | `FUN_000045ba` | `alloc_object_from_desc` | Pacific Conflict | RENAMED | STRONG INFERENCE | `:5149` / `@0x45BA` | `Pacific Conflict.decomp.c` | `heap_alloc_cleared`; kinds 2/3 | Other kind tags; field meanings | 7 | Capstone kind switch |
 | `FUN_00001b6c` | `heap_alloc_cleared` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x1B6C` | `Pacific Conflict.decomp.c` | `heap_alloc` + `heap_zero_payload` | — | 7–8 | Clear path proven |
 | `FUN_00001b38` | `heap_zero_payload` | Pacific Conflict | RENAMED | PROVEN | `:2197` / `@0x1B38` | `Pacific Conflict.decomp.c` | heap headers; `memzero` | — | 8 | Header size rules + CLR fill |
@@ -507,7 +507,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00014f48` | `apply_hit_to_sinkable_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | hit counter +0x32; list / capsize rates; 15 steps after 30 frames | 1-hit branch structure | 257 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0001530e` | `create_firing_ship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 300-byte record, 20 shots | caller | 257 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00015356` | `tick_firing_ship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | gun faces (+0x17 == 1), 1/256 random fire, else sinking | AA reading [HYPOTHESIS] | 257 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
-| `FUN_000150c8` | `create_flagship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create entry of type 0x15 (3 hits); first kept in _DAT_0001b864 | which ship [HYPOTHESIS] | 258 (2026-10-17) | Ghidra C + definition table bytes; token diff vs HEAD = renames |
+| `FUN_000150c8` | `create_carrier_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create entry of type 0x15 (3 hits); first kept in _DAT_0001b864 | which ship [HYPOTHESIS] | 258 (2026-10-17) | Ghidra C + definition table bytes; token diff vs HEAD = renames |
 | `FUN_000155ec` | `create_basic_ship_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | create entry of types 0x18 / 0x17 | — | 258 (2026-10-17) | Ghidra C + definition table bytes; token diff vs HEAD = renames |
 | `FUN_000092e4` | `advance_frame_and_tick_controllers` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | frame counter, time-window flags, controller ticks (definition +2) | DAT_0001b870 states | 259 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0000947c` | `apply_controller_velocities` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | position += controller velocity (+6 & 0x20) | — | 259 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
@@ -641,8 +641,8 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00017566` | `create_ground_mark_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | effect-family template / controller handler | — | 291 (2026-10-17) | Ghidra C + create pointers; token diff vs HEAD = renames |
 | `FUN_000175c0` | `tick_ground_mark` | Pacific Conflict | VERIFIED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | effect-family template / controller handler | — | 291 (2026-10-17) | Ghidra C + create pointers; token diff vs HEAD = renames; VERIFIED iter 309 (disassembly) |
 | `FUN_000168ae` | `impact_one_time_in_16` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 1/16 chance ordnance_collision | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames |
-| `FUN_000168d2` | `alloc_transformed_vertex_block` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | header + 12-byte points via template xform | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames |
-| `FUN_0001691c` | `alloc_copied_vertex_block` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | same, copied | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames |
+| `FUN_000168d2` | `alloc_transformed_vertex_block` | Pacific Conflict | VERIFIED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | header + 12-byte points via template xform | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames; VERIFIED iter 317 (disassembly) |
+| `FUN_0001691c` | `alloc_copied_vertex_block` | Pacific Conflict | VERIFIED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | same, copied | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames; VERIFIED iter 317 (disassembly) |
 | `FUN_00016966` | `advance_route_waypoint` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | next waypoint within 5000 | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames |
 | `FUN_00017d16` | `create_aircraft_spawner_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | key 0x12 create; object kind unknown | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames |
 | `FUN_00017db8` | `destroy_aircraft_spawner_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | releases 3 refs | — | 292 (2026-10-17) | Ghidra C (+ definition bytes); token diff vs HEAD = renames |
@@ -711,8 +711,8 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00015dc8` | `tick_bullet` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00015e62` | `bullet_pre_render` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00015d78` | `spawn_ordnance_oriented_3ang` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
-| `FUN_0001377a` | `age_contact_records` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
-| `FUN_000137da` | `drop_contact_records_for_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0001377a` | `age_contact_records` | Pacific Conflict | VERIFIED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames; VERIFIED iter 317 (disassembly) |
+| `FUN_000137da` | `drop_contact_records_for_object` | Pacific Conflict | VERIFIED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | bullet family / contact records | — | 303 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames; VERIFIED iter 317 (disassembly) |
 | `FUN_0000c11e` | `begin_offscreen_drawing` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | panel helper | — | 304 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0000c17e` | `end_offscreen_drawing` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | panel helper | — | 304 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0000cac6` | `update_bomb_indicator` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | panel helper | — | 304 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
@@ -3802,10 +3802,271 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Validation is in `tools/qa/test_resedit.py` and `tools/resedit.py verify`; see
   `docs/RESOURCE_ANALYSIS.md` for format coverage and remaining uncertainty.
 
-**Next iteration target:** continue the VERIFIED pass: create_shape /
-fractal contact records, age_contact_records, drop_contact_records_for_object,
-release_fractal_reference, shape helpers (alloc_*_vertex_block), then the ID0x
-segments.
+### Iteration 317 — 2026-10-17
+
+- Repository reorganised by the user (sources under `sources/resedit/CODE`,
+  overlay binary `sources/hellcats/Pacific Conflict`); loop restarted as
+  job `ee7d927a` with the extended "Continuous C Decompilation & Semantic
+  Recovery" instructions. 32 protected hashes OK from the new CODE path.
+- VERIFIED by disassembly: drop_contact_records_for_object,
+  age_contact_records, alloc_copied_vertex_block,
+  alloc_transformed_vertex_block (48 VERIFIED). No renames, so no Godot sync
+  impact.
+- Validation: comment-only changes; comment-stripped tokens identical to HEAD;
+  `git diff --check` clean.
+
+### Iteration 318 — 2026-10-17
+
+- HEAD is now 0fff3ac (the user's strict-port commit); the uncommitted
+  iteration 317 work is preserved. 32 protected hashes OK.
+- **P0 signature correction [PROVEN, bytes]:** all 16 create handlers that the
+  Ghidra C declares `void` (create_spinner_controller, create_plume_controller,
+  create_camera_facing_controller, create_singleton_type10_controller,
+  create_firing_ship_controller, create_sinking_controller,
+  create_basic_ship_controller, create_bullet_controller,
+  create_trail_controller, create_ground_fire_controller,
+  create_debris_controller, create_ground_mark_controller,
+  create_shadow_controller, create_flak_controller, create_cloud_controller,
+  create_view_attached_controller) leave the heap_alloc_cleared result in D0
+  untouched up to RTS (checked per function in the disassembly), and
+  instantiate_object_from_desc stores that value at object +8. Real return
+  type: the new controller pointer. Recorded as a SIGNATURE CORRECTION note in
+  each header; C tokens unchanged.
+- **Godot sync impact:** `godot/hellcats/core/sim_core.gd`
+  `_call_fun_00004690` (instantiate_object_from_desc, object +8) depends on
+  these handlers returning the controller - review the strict port's create
+  handlers for this return value (not edited here).
+- Validation: comment-only; comment-stripped tokens identical to HEAD;
+  `git diff --check` clean.
+
+### Iteration 319 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 317–318 work preserved.
+- Scanned every `bsr` call site in the overlay (linear disassembly with
+  resynchronisation) whose target the decomp declares `void`, looking for a
+  D0 read before D0 is rewritten. Three functions return a used value:
+  point_over_face_xz (point_in_polygon_xz result, tested at 0x15236 /
+  0x1527a) [PROVEN], surface_type_under_object (surface code, stored at
+  0xf148 / 0xf1d0, compared at 0x11e04) [PROVEN], begin_offscreen_drawing
+  (host +0x286 result kept in a3 at 0xc242; likely the previous port)
+  [PROVEN return / STRONG_INFERENCE meaning]. Signature-correction notes added.
+  Limitation: `jsr` through pointers (definition handlers) is not covered by
+  this scan; the create handlers were handled in iteration 318.
+- Godot sync impact: FUN_00013452 (surface_type_under_object) is referenced in `godot/hellcats/core/sim_core.gd` (lines ~1064-1092, ~3344-3351), `godot/hellcats/core/flight_math.gd` (~3587, ~4243) and `godot/tests/integration/test_sim_tick_ordering.gd` - review that the port uses its return value; no references found for the other two.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+### Iteration 320 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 317–319 work preserved.
+- P0 widths / P2 Godot dependency: instantiate_object_from_desc
+  (FUN_00004690, ported as `sim_core.gd` `_call_fun_00004690`) VERIFIED
+  against the bytes. Width facts [PROVEN]: the descriptor type byte is read
+  with `extb.l` (signed char); the create handler is called with three longs
+  (object, type, 0); the handler result is stored at object +8 and its first
+  long cleared when non-zero; the function returns the object.
+- Godot sync impact: the port should treat the type byte as signed and must
+  rely on the create handler's return value (iteration 318 correction).
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 321 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 317–320 work preserved.
+- P0 widths / P2 Godot dependency: alloc_object_from_desc (FUN_000045ba)
+  VERIFIED against the bytes. Width facts [PROVEN]: kind tag compared as a
+  byte; desc +0x16 zero-extended into the flag long +4; long copies for
+  position / metric / range; word copies for +0x34..+0x3a and +0x50; +0x38
+  defaults to 1 when the word is 0; +0x40 = frame `DAT_0001b838`. Unknown
+  tags return the caller's D1 unchanged (no allocation).
+- Big-endian finding [PROVEN]: `btst #5,$6(a0)` tests bits 8..15 of the
+  zero-extended word, so the rule is "desc +0x16 bit 13 → flag-long bit 20".
+- Godot sync impact (review required, not edited): `flight_math.gd`
+  `apply_045ba_from_desc` takes byte +6 as `(flags04 >> 16) & 0xFF`, which
+  is always 0 and drops the rule; it should be `(flags04 >> 8) & 0xFF`. Its
+  comment "+6 is 0" is wrong. The +0x38 test (`_to_s16 == 0`) is equivalent.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 322 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 317–321 work preserved.
+- P1 shared state: object flag long (+4), bit 20 (0x100000). Flow [PROVEN,
+  bytes]: set at creation from descriptor +0x16 bit 13; cleared by
+  attach_trailing_plume (0x116ca). It is tested by test_proximity_collision
+  (both objects, 0x13e62), collect_far_objects (0x570c / 0x5796: proximity
+  tests vs shape tests), lift_object_onto_terrain (0x14882) and
+  release_fractal_reference (0x14b06). Meaning: distance-based collision
+  mode [STRONG_INFERENCE]. Flag-long bit table added to
+  DECOMPILATION_SYMBOLS.md.
+- No renames; no VERIFIED change (no whole function re-checked).
+- Godot sync impact: makes the iteration-321 `flight_math.gd` drift
+  (byte +6 read as `>> 16`) matter, because it never sets bit 20, so
+  ported objects would always take shape collision.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 323 — 2026-10-17
+
+- Verified 32 protected hashes. Uncommitted work by others (godot/strict_port,
+  tools/, docs/PROJECT_STATUS.md, docs/STRICT_PORT_FOUNDATION.md) was
+  left untouched.
+- P0 / P1: collect_far_objects (FUN_0000555a) VERIFIED against the bytes
+  0x555a..0x5830, branch by branch.
+- Header corrected: DAT_0001c1e4 receives objects with flag bit 15 (tst.w), not
+  "objects not flagged 0x2800"; 0x2800 marks the mover side of the
+  one-dimensional collision sweep (bit 11 cleared every frame). Out-of-range
+  objects (metric - range >= 0x19c80, or bit 1) older than 0x4b frames
+  (+0x3c) are retired and dropped from the array.
+- Name review: kept. "far" pairs with collect_near_objects (world array
+  vs near array), so the name is not misleading.
+- Flag-long table extended (bits 1, 2, 6, 11, 15).
+- Godot sync impact: no symbol renamed; no Godot reference to this function.
+  A port of the sweep must keep the mover-first argument order and the
+  unchecked 220-entry mover list.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 324 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tools work
+  untouched.
+- P1: dispatch_overlap_collisions (FUN_00005832) VERIFIED against the bytes
+  0x5832..0x58ea. Its only call passes the flag-bit-15 list DAT_0001c1e4
+  (count = low word of DAT_0001c1c4) [PROVEN], so bit 15 = "receives +0x16
+  notice calls" (radar / AI awareness, iteration 281). The sweep uses range
+  +0xc; object +0x28 is per-sweep scratch, rewritten after
+  collect_far_objects in the same frame.
+- Name kept ("collisions" is loose: it dispatches the +0x16 notice handler,
+  not +0x12 collision, as the iteration-281 note already says).
+  STRONG_INFERENCE unchanged.
+- Godot sync impact: none (no rename). A port must treat +0x28 as scratch
+  shared by the two sweeps and keep the (self, other) then (other, self)
+  order.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 325 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tools work
+  untouched.
+- P1: overlay_frame_step (FUN_00006598) section 0x68e4..0x6a80 checked
+  against the bytes; the C matches. The world array is insertion-sorted by
+  metric DESCENDING (farthest first) [PROVEN], which is the order both sweeps
+  need. Call order collect_near_objects -> (DAT_0001c1c4 = 0, DAT_0001c1c0 =
+  visible count) -> collect_far_objects -> dispatch_overlap_collisions ->
+  age_contact_records [PROVEN].
+- Carried pairs: DAT_0001b860 (8-byte {carrier, rider}) / count DAT_0001b85c
+  / capacity DAT_0001b85a, filled only by the unexported type-0x15 extra
+  handler at 0x15154 and cleared each frame. The rider's metric is biased by
+  the carrier's extent around controller word +0x54, depending on the camera
+  side, then restored after the sort [PROVEN mechanics; deck draw order
+  STRONG_INFERENCE].
+- Section-level check only: overlay_frame_step stays RENAMED (not VERIFIED).
+  DAT_0001c1d0 / DAT_0001c1dc are not reset in this section (they are reset
+  elsewhere; open).
+- Godot sync impact: none (no rename). A port of the sort must keep the
+  descending order and the carried-pair bias.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 326 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tools work
+  untouched.
+- Unexported 0x15154 (key 0x15 extra slot +0x12, called by
+  handle_player_contact as (carrier, player, contact record)) decoded from the
+  bytes into a comment-only reconstruction `carrier_deck_contact`, placed after
+  FUN_000150c8 in the decomp. On first use it finds the face tagged 1 (deck) and
+  the face tagged 3 (face byte +0x17), storing their indices in controller
+  +0x50 / +0x52 and the deck height (first deck vertex y >> scale) in +0x54. When
+  the carrier is within +-0x4ff of level and the contact point is over the
+  deck: aircraft controller +0x2e = deck height, +0x2c = deck surface byte
+  (unless DAT_0001b870 != 0). For aircraft keys <= 4 over the tag-3 face:
+  +0x63f = 1. When +0x54 > 0 it appends {carrier, player} to the carried pairs.
+- RENAME [PROVEN]: create_flagship_controller → create_carrier_controller
+  (FUN_000150c8). The error string at 0x15134, "Can't find deck tag on
+  carrier", proves type 0x15 is the carrier. No callers by name (definition
+  table only); one declaration line changed.
+- Godot sync impact: no Godot file references either name. Any port docs that
+  say "flagship" for key 0x15 should read "carrier". A port of landing must
+  use deck height +0x54 as the aircraft's ground height (+0x2e) while it is
+  over the deck.
+- Validation: tokens identical to HEAD with the one mapped rename;
+  `git diff --check` clean.
+
+
+### Iteration 327 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tools work
+  untouched.
+- P0 wrong interpretation: aircraft controller byte +0x640 (Ghidra
+  `param_1 + 400`, inline-commented "field_190 / stall latch" in
+  update_aircraft_entity) is the carrier ARREST latch [STRONG_INFERENCE;
+  flow PROVEN, bytes 0xeff6 / 0xf01a / 0xf414..0xf420 / 0xf470..0xf47c]:
+  - set to 1 on the grounded path when +0x63f (set each frame by
+    carrier_deck_contact over the carrier's tag-3 face) is set, the landing
+    was clean (bVar6 false) and the latch is 0;
+  - while 1, the forward speed loses 0xB6 per frame (adda.w #$ff4a);
+  - 2 once the speed reaches 0;
+  - cleared when airborne; +0x63f is cleared every frame at 0xf47c.
+- Tag 3 = arresting-wire zone [STRONG_INFERENCE].
+- Changes: inline comments only (five corrected), plus the 0x15154 note
+  updated.
+- Godot sync impact (review required, not edited):
+  - `godot/hellcats/core/entity_state.gd:60` maps `"field_190": 0x190`.
+    Ghidra's `param_1` is `int *`, so `param_1 + 400` is byte offset 0x640
+    [PROVEN: `$640(a3)` in the bytes]. Any byte-addressed field access there
+    hits the wrong byte.
+  - The "stall" labels (entity_state.gd:39 / :60, sim_core.gd
+    `set_field_190_prestall`) should describe the carrier arrest latch.
+- Validation: comment-only; tokens identical to HEAD (rename map from 326);
+  `git diff --check` clean.
+
+
+### Iteration 328 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tools work
+  untouched.
+- P1 shared state: DAT_0001b868 = player landing state [STRONG_INFERENCE
+  name]. All seven byte references were checked and every one is a word op
+  [PROVEN]:
+  - writers: respawn_player_at_anchor (clr.w 0x3a36) and
+    update_aircraft_entity (touchdown 1 at 0xf1b6, stopped 2 at 0xf038 when
+    it was 1, leave-ground 0 at 0xf0e8);
+  - reader: process_flight_input_and_outcome (cmpi.w #2 at 0x8110), which
+    evaluates the landing outcome when the engine is off, then resets the
+    state to 0.
+- Annotated at the `short` declaration. Also noted Ghidra's duplicate
+  `undefined2` declaration of the same global (no token change).
+- Godot sync impact: none (no rename). A port must keep it a 16-bit word.
+- Validation: comment-only; tokens identical to HEAD (iteration-326 rename
+  mapped); `git diff --check` clean.
+
+
+### Iteration 329 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tests /
+  tools work (new untracked godot/strict_port and tests files) untouched.
+- P1 shared state: surface codes (face +0x16, copied to aircraft +0x2c).
+  Values come from model data; the default is the ground-plane face. The
+  meanings come from five consumers:
+  - 0x10 = water (ditch/crash rule, splash effect 0x4b) [STRONG_INFERENCE];
+  - 0x40 = grass / rough field (speed-scaled bumps, Grass sound)
+    [STRONG_INFERENCE];
+  - 0x70 = runway (find_nearest_runway_approach_ends picks 'p' quads)
+    [STRONG_INFERENCE];
+  - 0x30 / 0x60 / 0x70 = valid landing surfaces [PROVEN];
+  - 0x20 / 0x50 / 0x60 identities: UNKNOWN.
+- Table added to the surface_type_at_point header and to the symbols doc.
+  Comment-only.
+- Godot sync impact: none (no rename). A port must keep the codes as signed
+  bytes, compared as words after sign extension.
+- Validation: comment-only; tokens identical to HEAD (iteration-326 rename
+  mapped); `git diff --check` clean.
+
+**Next iteration target:** the carrier deck face's surface code: locate the
+carrier model data (template / shape for key 0x15) and read the +0x16 bytes of
+its tag-1 / tag-3 faces, to settle 0x30 vs 0x60 for the deck.
 
 ## Resuming the five-minute workflow
 

@@ -23,17 +23,23 @@ class StrictPortSyncTest(unittest.TestCase):
     def test_current_source_is_synchronized(self) -> None:
         report, errors = SYNC.check(MANIFEST, REPO_ROOT)
         self.assertEqual(errors, [])
-        self.assertEqual(report["mapped_functions"], 1)
-        self.assertEqual(report["behaviorally_verified"], 1)
+        self.assertEqual(report["decompiled_functions"], 736)
+        self.assertEqual(report["mapped_functions"], 2)
+        self.assertEqual(report["not_ported_functions"], 734)
+        self.assertEqual(report["behaviorally_verified"], 2)
 
     def test_changed_source_is_reported_without_rewriting_manifest(self) -> None:
         manifest_before = MANIFEST.read_bytes()
-        mapping = json.loads(MANIFEST.read_text(encoding="utf-8"))["functions"][0]
+        mappings = json.loads(MANIFEST.read_text(encoding="utf-8"))["functions"]
+        mapping = mappings[0]
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            for key in ("source_file", "target_file", "deterministic_test"):
-                source = REPO_ROOT / mapping[key]
-                target = root / mapping[key]
+            paths = {"docs/DECOMPILATION_INVENTORY.json"}
+            for row in mappings:
+                paths.update(row[key] for key in ("source_file", "target_file", "deterministic_test"))
+            for relative_path in paths:
+                source = REPO_ROOT / relative_path
+                target = root / relative_path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(source.read_bytes())
             source_copy = root / mapping["source_file"]
