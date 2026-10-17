@@ -505,7 +505,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00011940` (Pacific Conflict) | `shape_trailing_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
 | `FUN_00019a54` (Pacific Conflict) | `register_cloud_templates` | VERIFIED | Iter 300: spawn / plume / cloud handler. |
 | `FUN_00019a1a` (Pacific Conflict) | `create_cloud_controller` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
-| `FUN_0000879e` (Pacific Conflict) | `resolve_bailout_outcome` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
+| `FUN_0000879e` (Pacific Conflict) | `resolve_bailout_outcome` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. Iter 336: VERIFIED; outcome 7; no-base odds are Dead 1/4 first, then POW 3/16. |
 | `FUN_00008972` (Pacific Conflict) | `update_bailout_view` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
 | `FUN_000088a0` (Pacific Conflict) | `place_camera_behind_object` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
 | `FUN_00008abe` (Pacific Conflict) | `turn_camera_toward_point` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
@@ -686,7 +686,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00015d20` | `spawn_ordnance_oriented` | STRONG INFERENCE | `@0x15D20`: `build_attitude_matrix_x` then `spawn_ordnance_scattered`. |
 | `FUN_00015bf6` | `spawn_ordnance_scattered` | STRONG INFERENCE | `@0x15BF6`: RNG±0x20 scatter; pool `DAT_0002664a`; write vel/`0x3a`/`+0x40` matrix. |
 | `FUN_0000262e` | `build_attitude_matrix_x` | PROVEN chain | `@0x262E`: `0202a`→`025d6` (X-axis sibling of `025a8`). |
-| `FUN_00019430` | `spawn_special_weapon_entity` (iteration 296: actually spawns the parachute) | STRONG INFERENCE | `@0x19430`: pool `DAT_00026780`; fields `610/614/618/61c`; 0xD verts `>>3` → `622/656/68a`. |
+| `FUN_00019430` | `spawn_bailout_parachute` (was `spawn_special_weapon_entity`; renamed iter 337) (iteration 296: actually spawns the parachute) | STRONG INFERENCE | `@0x19430`: pool `DAT_00026780`; fields `610/614/618/61c`; 0xD verts `>>3` → `622/656/68a`. |
 | `FUN_0000e40c` | `fold_angle_pm_0x2000` | PROVEN | `@0xE40C`: if `>0x2000` −`0x4000`; if `<−0x2000` +`0x4000`. |
 | `FUN_0001a63e` | `memmove_block` | PROVEN | `@0x1A63E`: `(src,dst,n)` overlap-aware copy; longword fast path when `n>0x19`. |
 | `FUN_00001ba8` | `heap_realloc_grow_only` | PROVEN | `@0x1BA8`: if request > header capacity → `heap_calloc`+`memmove_block`+`heap_free_coalesce`. |
@@ -803,6 +803,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `DAT_0001b868` (Pacific Conflict) | `player_landing_state` (comment-only name) | STRONG INFERENCE (name) / PROVEN (values, word) | Iter 328: 0 airborne/reset, 1 touchdown, 2 stopped; consumed by process_flight_input_and_outcome when engine off (0x8110). |
 | face +0x16 / aircraft controller +0x2c (Pacific Conflict) | surface code (packed face byte +9 high nibble; low nibble = face tag +0x17): 0x10 water, 0x20 ?, 0x30 / 0x60 deck-type hard (carrier decks, iter 330), 0x40 grass, 0x50 ?, 0x70 runway, 0x80 unused by compares | PROVEN (values) / STRONG_INFERENCE (0x10, 0x40, 0x70) / UNKNOWN (0x20, 0x50, 0x60 identity) | Iter 329: table at surface_type_at_point; 0x30/0x60/0x70 valid landings; 'p' quads = runway approach ends. |
 | definition keys 0x12 / 0x13 (Pacific Conflict) | enemy air base / friendly air base (aircraft spawners) | PROVEN (code mapping 0x12->0x100, 0x13->0x200) / STRONG_INFERENCE (enemy / friendly) | Iter 331: probe_nearest_facility_kind; POW on landing near 0x100; friendly kill and runway guidance near 0x200. |
+| `_DAT_0001b87a` (Pacific Conflict) | `player_abandoned_intact_aircraft` (comment-only name, word) | PROVEN (writer, readers) / STRONG_INFERENCE (name) | Iter 337: set 1 at 0xf766 when the player bails out with no damage bits and fuel; read by resolve_bailout_outcome and update_aircraft_damage_state -> Discharged (4). Never cleared in code (3 references) [UNKNOWN reset]. |
+| aircraft controller +0x677 (Pacific Conflict) | bail-out state (byte): 0 none, 1 requested, 2 parachute spawned | PROVEN | Iter 338: clr 0x39ec (respawn); 1 from the 'J'/'j' key (0x7d08: airborne +0x63e == 0, _DAT_0001b874 == 0) or AI (0x1093c: damage word bit 8, rng & 0x1f == 0, state handler +0x32 != 0x111ba, host +0x90 != 2, not the player); 2 at 0xf722 after spawn_bailout_parachute, which also sets word +0x684 bit 0 (byte +0x685 bit 0 = pilot gone, the spawn gate). |
 
 ## Rejected / superseded interpretations
 

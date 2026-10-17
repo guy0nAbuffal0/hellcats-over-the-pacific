@@ -9085,6 +9085,17 @@ void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
  * Ghidra C reviewed (function at overlay offset 0x740a).
  * Host hook A5-0x106a, called by run_flight_session as (char, event kind) for key events (kind 3 = keyDown, 4 = keyUp) and (0, 0) between frames; a non-zero result ends the flight and is the outcome code that run_flight_session passes to conclude_mission. Outline from the Ghidra C (Pacific Conflict.decomp.c lines 8746..9545): host mode +0x98 / view modes DAT_0001d858 7..9 gate early exits; in modes 8 / 9 only Esc / quote / backquote end the flight (result 3). Key switch (param_1, characters): 0x1c / 0x1d and 0x1e / 0x1f (the arrow keys) step the view angles DAT_00024cfc by 0x800 and DAT_00024cf8 by 0x540; + / = and - / _ (throttle up / down?), . > Z z and / ? X x (paired controls), digits 0..9 (view or instrument selection; 5 stores DAT_00020b2a into host +0x33e), letters A B C E F G J M R T V (and lower case), P / p -> result 4 (the host shows the Paused dialog), Esc / backquote / tilde -> result 3; space on keyUp. After the keys: view offsets saved to host +0x33e / +0x340 / +0x342; then the outcome logic: probe_nearest_facility_kind (0x100 / 0x200 near facilities) combined with the host status word +0xd4 (1, 3, 4, 5), +0xce and the player state builds codes such as 0x201 / 0x10a; on landing the fuel % and bomb count are written back to host +0xb6 / +0xb8 (see load_player_fuel_and_bombs); a final switch (1..9) handles the remaining codes. Exact per-key actions and outcome codes are not fully decoded [STRONG INFERENCE role, HYPOTHESIS for the individual key meanings].
  *
+ * Stopped-on-ground block 0x8020..0x8102, iteration 335 [PROVEN bytes; the C matches]:
+ * only when view mode DAT_0001d858 <= 7, player speed +0x62a == 0 and grounded +0x63e.
+ * uVar6 = probe_nearest_facility_kind(player object) - the bytes push *DAT_0001b738
+ * (move.l (a0),-(a7) at 0x803e), an argument the Ghidra C drops. Then:
+ *   host +0xd4 == 1 (pilot already Dead)      -> |1;
+ *   status +0x684 bit 12 (0x1000, set on surface code 0x10 = water) -> |6 DITCHED:
+ *     undamaged (+0x684 & 0x3fe == 0) with fuel left -> +0xd4 = 4 (Discharged);
+ *     else enemy base: 1/2 POW (3), else 1/8 Dead (1); friendly: 1/8 Dead;
+ *     none: 1/4 Dead, else 3/16 POW.
+ * The bail-out is code |7 (resolve_bailout_outcome), not |6.
+ *
  * Landing-outcome block 0x8108..0x8322, iteration 332 (checked against the bytes; the C
  * matches). Ghidra's LAB_00008324 sits after the `clr.l d6` at 0x8322, and the C puts
  * `uVar6 = 0` right after the label, so the two are equivalent.
@@ -9494,7 +9505,7 @@ LAB_00007ba8:
   case 0x6a:
     if (((_DAT_0001b874 == 0) && (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) &&
        (*(char *)((int)DAT_0001b738 + 0x677) == '\0')) {
-      *(undefined1 *)((int)DAT_0001b738 + 0x677) = 1;
+      *(undefined1 *)((int)DAT_0001b738 + 0x677) = 1; /* 'J' / 'j' = bail out (iter 338, 0x7d08) */
     }
     break;
   case 0x4d:
@@ -9979,6 +9990,20 @@ void set_state_word_1b86c /* Original: FUN_00008784 */ (int param_1)
 /* Original: FUN_0000879e; source: Pacific Conflict.c. Recovered name: resolve_bailout_outcome [STRONG INFERENCE] (iteration 301).
  * Ghidra C reviewed (function at overlay offset 0x879e).
  * Ends a bail-out: host +0xd6 = 1 (bailed out); a parachute still falling low after more than 0x5a0 frames means Dead; otherwise by the nearest facility under the pilot: enemy (0x100) -> POW with probability 1/2, else Dead 1 time in 4; friendly (0x200) -> Dead 1 time in 8; at sea -> POW 1 time in 4, else Dead 1 time in 4 (the rest stay Active); removes the parachute; and when the player abandoned an undamaged aircraft that still had fuel (_DAT_0001b87a, set in update_aircraft_entity) a surviving pilot is Discharged (4). Pilot status values (docs/PILOT_ROSTER.md, host +0xd4 = A5-0x12b4): 0 Active, 1 Dead, 3 POW, 4 Discharged. Ghidra C (branch structure follows the gotos).
+ *
+ * VERIFIED (iteration 336): checked against an independent capstone disassembly of
+ * 0x879e..0x889e; identical to the C. Facts [PROVEN]:
+ * - probe_nearest_facility_kind gets the player object (move.l (a0),-(a7) at 0x87a8);
+ *   result r = kind | 7 (outcome 7 = bail-out).
+ * - Parachute check: parachute controller DAT_0001b87c, its object height +0x1c <= 0x372
+ *   (cmpi.l #$372 / bgt) and controller word +0x614 > 0x5a0 frames -> Dead, r = (kind
+ *   & 0xff00) | 1 (andi.w #$ff00: the low byte only).
+ * - Odds (when still Active): enemy base 1/2 POW, else 1/8 Dead; friendly base 1/8 Dead;
+ *   no base nearby: 1/4 DEAD first, else 3/16 POW. Correction: the summary above says
+ *   "POW 1 time in 4, else Dead 1 time in 4" for that case, which is the wrong order;
+ *   "at sea" is also only an inference for "no base".
+ * - Removes the parachute (dispatch_entity_cleanup on its object); _DAT_0001b87a (word)
+ *   with status still 0 -> 4 Discharged; returns r.
  */
 uint resolve_bailout_outcome /* Original: FUN_0000879e */ (void)
 
@@ -16945,7 +16970,7 @@ LAB_0000f47c:
    * [PROVEN] 19d+19f: when 19d==1 spawn_weapon_entity (FUN_00012840; player
    * latch DAT_0001b880); 19f--; 18d-=0x10 unless mission+0x90==2; 19d++ wrap@4.
    * [PROVEN] 676: phase==1 && 682>1 && !(flags_685&0x10) → spawn_ordnance_oriented,
-   * 682-=2; phase++ wrap@2. 677==1 && !(flags_685&1) → spawn_special_weapon_entity,
+   * 682-=2; phase++ wrap@2. 677==1 && !(flags_685&1) → spawn_bailout_parachute,
    * status|=1, 677←2; player globals b874/d858/b87c (+ deferred 137da/06ed6).
    */
   if ((*(char *)(param_1 + 0x19d) != '\0') && (*(char *)(param_1 + 0x19f) != '\0')) {
@@ -16996,11 +17021,11 @@ LAB_0000f47c:
     }
   }
   if ((*(char *)((int)param_1 + 0x677) == '\x01') && ((*(byte *)((int)param_1 + 0x685) & 1) == 0)) {
-    psVar11 = (short *)spawn_special_weapon_entity( /* Original: FUN_00019430 */(short)*(undefined4 *)((int)param_1 + 0x62a),
+    psVar11 = (short *)spawn_bailout_parachute( /* Original: FUN_00019430 */(short)*(undefined4 *)((int)param_1 + 0x62a),
                                     *(uint *)(iVar1 + 0x18),*(uint *)(iVar1 + 0x1c),
                                     *(uint *)(iVar1 + 0x20),*(undefined2 *)(param_1 + 8),
                                     *(undefined2 *)((int)param_1 + 0x22),
-                                    *(undefined2 *)(param_1 + 9)); /* special weapon */
+                                    *(undefined2 *)(param_1 + 9)); /* bail-out parachute */
     *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) | 1;
     *(undefined1 *)((int)param_1 + 0x677) = 2;
     piVar4 = DAT_0001b738;
@@ -17010,7 +17035,7 @@ LAB_0000f47c:
       DAT_0001d858 = 9;
       if (((*(ushort *)(param_1 + 0x1a1) & 0x3fe) == 0) &&
          ((*(char *)((int)param_1 + 0x67d) != '\0' || (*(char *)((int)param_1 + 0x67e) != '\0')))) {
-        _DAT_0001b87a = 1;
+        _DAT_0001b87a = 1; /* player_abandoned_intact_aircraft (iter 337): no damage bits (+0x684 & 0x3fe), fuel left; 0xf766 */
       }
       DAT_0001b87c = psVar11;
       if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) != 0) {
@@ -18067,7 +18092,7 @@ LAB_00010700:
         in_D0 = (int *)(uVar6 & 0xffff001f);
         if ((((uVar6 & 0x1f) == 0) && (*(int *)((int)param_1 + 0x32) != 0x111ba)) &&
            (*(short *)(DAT_0001b5a0 + 0x90) != 2)) {
-          *(undefined1 *)((int)param_1 + 0x677) = 1;
+          *(undefined1 *)((int)param_1 + 0x677) = 1; /* AI bail-out: damage word bit 8 (btst #0,$684 at 0x10902), 1/32 per frame (iter 338) */
         }
       }
       if (((param_1 == DAT_0001b738) && ((*(byte *)((int)param_1 + 0x685) & 1) != 0)) &&
@@ -26425,7 +26450,7 @@ undefined4 turret_pre_render /* Original: FUN_00019394 */ (int param_1)
 
 /* Original: FUN_000193b6; source: Pacific Conflict.c. Recovered name: create_parachute_controller [STRONG INFERENCE] (iteration 296).
  * Ghidra C reviewed (function at overlay offset 0x193b6).
- * Cleared 0x6be-byte controller (aircraft-sized, with a 75-entry pose ring at +0x32), object flags | 0x132000. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
+ * Cleared 0x6be-byte controller (aircraft-sized, with a 75-entry pose ring at +0x32), object flags | 0x132000. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_bailout_parachute (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
  */
 uint * create_parachute_controller /* Original: FUN_000193b6 */ (uint param_1,int param_2)
 
@@ -26446,7 +26471,7 @@ uint * create_parachute_controller /* Original: FUN_000193b6 */ (uint param_1,in
 /* Original: FUN_0001940e; source: Pacific Conflict.c. Recovered name: register_parachute_template [STRONG INFERENCE] (iteration 296).
  * VERIFIED (iteration 312): checked against an independent capstone disassembly of the overlay bytes at 0x1940e: move.l arg1 -> $26780; definition = $1b524[arg2]; move.l #$19396,$6(definition); clr.l d0 - identical to the C (store, create redirect, return 0).
  * Ghidra C reviewed (function at overlay offset 0x1940e).
- * DAT_00026780 = template (spawn_special_weapon_entity); create handler -> 0x19396 (Ghidra 0x193b6). Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
+ * DAT_00026780 = template (spawn_bailout_parachute); create handler -> 0x19396 (Ghidra 0x193b6). Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_bailout_parachute (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
  */
 undefined4 register_parachute_template /* Original: FUN_0001940e */ (undefined4 param_1,int param_2)
 
@@ -26460,8 +26485,12 @@ undefined4 register_parachute_template /* Original: FUN_0001940e */ (undefined4 
 
 /*
  * Original: FUN_00019430
- * Proposed name: spawn_special_weapon_entity
+ * Recovered name: spawn_bailout_parachute (iteration 337; was spawn_special_weapon_entity)
  * Confidence: [STRONG INFERENCE]
+ * RENAME (iteration 337): the only call (bsr $19430 at 0xf716, update_aircraft_entity
+ * bail-out path, +0x677 == 1) stores the result in DAT_0001b87c, the parachute that
+ * resolve_bailout_outcome tests; the template DAT_00026780 is set by
+ * register_parachute_template (type 0x1c). "Special weapon" was misleading.
  *
  * Special-weapon spawn for e792 field_677: spawn_mission_pool_object
  * (DAT_00026780, xyz, att, 0). On success entity=*(world+8):
@@ -26475,7 +26504,7 @@ undefined4 register_parachute_template /* Original: FUN_0001940e */ (undefined4 
  * (register_parachute_template, parachute_tick, parachute_descend) - the
  * "special weapon" reading is superseded [STRONG INFERENCE]; name kept.
  */
-int spawn_special_weapon_entity(undefined2 param_1,uint param_2,uint param_3,uint param_4,
+int spawn_bailout_parachute(undefined2 param_1,uint param_2,uint param_3,uint param_4,
                 undefined2 param_5,undefined2 param_6,undefined2 param_7) /* Original: FUN_00019430 */
 {
   int iVar1;
@@ -26519,7 +26548,7 @@ int spawn_special_weapon_entity(undefined2 param_1,uint param_2,uint param_3,uin
 /* Original: FUN_0001951a; source: Pacific Conflict.c. Recovered name: destroy_parachute_controller [STRONG INFERENCE] (iteration 296).
  * VERIFIED (iteration 311): checked against an independent capstone disassembly of the overlay bytes at 0x1951a: cmp.l $1b87c with the argument; equal -> clr.l $1b87c - identical.
  * Ghidra C reviewed (function at overlay offset 0x1951a).
- * Clears DAT_0001b87c when it is this parachute. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Complete Ghidra C.
+ * Clears DAT_0001b87c when it is this parachute. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_bailout_parachute (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Complete Ghidra C.
  */
 void destroy_parachute_controller /* Original: FUN_0001951a */ (int param_1)
 
@@ -26534,7 +26563,7 @@ void destroy_parachute_controller /* Original: FUN_0001951a */ (int param_1)
 
 /* Original: FUN_0001952e; source: Pacific Conflict.c. Recovered name: parachute_descend [STRONG INFERENCE] (iteration 296).
  * Ghidra C reviewed (function at overlay offset 0x1952e).
- * From 16 frames after the bail-out (+0x612 = frame) adds a shadow (spawn_object_shadow kind 3) and, until frame 30, unfolds the 13 canopy vertices with velocities * 3 / 4 per frame; then descends (further down). Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C (partly read).
+ * From 16 frames after the bail-out (+0x612 = frame) adds a shadow (spawn_object_shadow kind 3) and, until frame 30, unfolds the 13 canopy vertices with velocities * 3 / 4 per frame; then descends (further down). Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_bailout_parachute (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C (partly read).
  */
 void parachute_descend /* Original: FUN_0001952e */ (undefined4 *param_1)
 
@@ -26697,7 +26726,7 @@ void parachute_descend /* Original: FUN_0001952e */ (undefined4 *param_1)
 
 /* Original: FUN_00019938; source: Pacific Conflict.c. Recovered name: parachute_tick [STRONG INFERENCE] (iteration 296).
  * Ghidra C reviewed (function at overlay offset 0x19938).
- * Same replay-ring tick as aircraft_tick / ordnance_tick (index +0x60e): live, runs parachute_descend and records the pose; in replay plays it back. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_special_weapon_entity (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
+ * Same replay-ring tick as aircraft_tick / ordnance_tick (index +0x60e): live, runs parachute_descend and records the pose; in replay plays it back. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_bailout_parachute (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
  */
 void parachute_tick /* Original: FUN_00019938 */ (int *param_1)
 

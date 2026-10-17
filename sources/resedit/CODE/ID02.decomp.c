@@ -743,6 +743,26 @@ undefined4 * ensure_free_memory_and_init_sound /* Original: FUN_000004c6 */ (voi
 /* Original: FUN_000004fc; source: ID02.c. Recovered name: run_flight_session [STRONG INFERENCE] (iteration 216).
  * Decoded from ID02.bin bytes at file 0x4fc.
  * Ghidra could not decode this body; outline from bytes 0x4fc..0x92e [PROVEN control flow, roles STRONG INFERENCE]. Set-up (0x51a, also the restart point): HiliteMenu(0) ($A938); screen base / rowBytes / depth copied into A5-0x1382 / -0x1378 / -0x1312; $AA31 on A5-0x1036; JSR 0x197c; ShowWindow or (when already shown) $A91F + JSR 0x4d34 on the window A5-0x14ca; begin_overlay_session; HideCursor ($A852); JT $1fa(-7) (ID09 0x18a, event flush glue); overlay hook A5-0x106e(pilot rank record +0x22); A5-0x1504 = TickCount(); frame counters A5-0x14fc / -0x1500 = 0. Main loop (0x5c0..0x848): frame timing from TickCount, GetMouse / StillDown into A5-0x14f8.. / -0x104a / -0x1048 / -0x1046; GetNextEvent(keyDown | keyUp) - command keys go through a JT $32 table at 0x650 (two of them toggle settings bits +3 / +5 of A5-0x13ac around end_overlay_session / apply_settings_to_live_options / begin_overlay_session), other keys to the overlay key hook A5-0x106a(char, modifiers), whose non-zero result ends the flight; then GetNextEvent(everything but keys): update -> 0x4d6a, a mouse / window path that suspends the session (end_overlay_session, JSR 0x2fa0 with the event, begin_overlay_session), others to the key hook; optional hook A5-0x1086; per-frame step hook A5-0x107a(1, 1); A5-0x14fc += 1 and loop while the result is 0. Exit (0x84c): end_overlay_session; JSR 0x4d96; JT $1fa(-1); InitCursor ($A850); copies the pilot status A5-0x12b4 into the roster record +0x20 (ChangedResource + UpdateResFile when it changed); switch on (result & 0xff) through JT $3a (table at 0x8a6, -1..10): conclude_mission (JT $da) with A5-0xde6 (STR# 129 slot 88 "Resume", the summary button title) and the result - restarting at 0x51a unless it returns 3 (or the result is 9 / 1, with JT $9a, hooks A5-0x108e / -0x108a and redraw_main_window 0x4db0 in between), quit_application (0x2eaa), or show_paused_dialog (JT $122) and restart. Callers: 0x369a, 0x376e, 0x377c (menu command code).
+ * Iteration 333, exit switch decoded [PROVEN bytes]: `jsr $3a(a5)` at 0x8a2 with
+ * (result & 0xff), inline table at 0x8a6: bounds ffff / 000a, then 13 self-relative
+ * word offsets resolving to 0x92c, 0x92c, 0x92c, 0x8c4, 0x910, 0x92c, 0x924, 0x91e,
+ * 0x8c4, 0x8c4, 0x8c4, 0x8c4, 0x8c4. Entry 0 is the default and entries 1..12 are
+ * values -1..10 [PROVEN, iteration 334: the JT $3a helper at ID01 file 0xbe pops the
+ * table address, reads lo / hi, keeps the default entry when the word value is out of
+ * range (signed bgt / blt), else selects entry 1 + (value - lo), and jumps via the
+ * self-relative word; a zero word hangs (beq *)]. Since the value is masked with
+ * & 0xff, -1 never occurs and codes > 10 take the default (return):
+ *   -1, 0, 3 -> return (0x92c, no summary); 1, 6..10 -> conclude_mission (0x8c4);
+ *   2 -> JT $9a + hook A5-0x108e, restart the flight with no summary (0x910; the
+ *   overlay's |2 refuel / rearm snapshot); 4 -> show_paused_dialog (0x924) and
+ *   restart; 5 -> quit_application (0x91e).
+ * After conclude_mission: a result != 3 returns; 3 ("Resume", A5-0xde6) restarts at
+ * 0x51a - directly for code 9, after JT $9a + hook -0x108e for code 1, else after
+ * hooks -0x108e / -0x108a and redraw_main_window. The overlay codes (0x100 enemy /
+ * 0x200 friendly base | low bits) reach here masked to their low byte: 1 friendly-base
+ * landing (or pilot already dead), 2 refuel snapshot, 6 stopped in water (ditched),
+ * 7 bail-out (resolve_bailout_outcome), 8 crash off a hard surface, 9 landing end,
+ * 0xa captured (iteration 335 correction: 6 is not the bail-out).
  */
 // WARNING: Control flow encountered bad instruction data
 

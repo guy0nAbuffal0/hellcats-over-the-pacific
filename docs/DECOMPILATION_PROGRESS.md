@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 332
+**Last iteration:** 338
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `ee7d927a` (`*/5 * * * *`, activated 2026-10-17 after `f156ee33` was cancelled) in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 0 | 0 | 0 | 385 | 52 | 6 |
-| **TOTAL** | **736** | **0** | **0** | **0** | **678** | **52** | **6** |
+| Pacific Conflict.c | 443 | 0 | 0 | 0 | 384 | 53 | 6 |
+| **TOTAL** | **736** | **0** | **0** | **0** | **677** | **53** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -149,7 +149,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00015d20` | `spawn_ordnance_oriented` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x15D20` | `Pacific Conflict.decomp.c` | `build_attitude_matrix_x` → `spawn_ordnance_scattered` | — | 23 | NOTES; e792 field_676 |
 | `FUN_00015bf6` | `spawn_ordnance_scattered` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x15BF6` | `Pacific Conflict.decomp.c` | `DAT_0002664a`; RNG scatter; `1a63e` | `1a63e` body | 23 | NOTES spawn fields |
 | `FUN_0000262e` | `build_attitude_matrix_x` | Pacific Conflict | RENAMED | PROVEN chain | `@0x262E` | `Pacific Conflict.decomp.c` | `0202a`→`025d6` (X-axis) | — | 23 | Sibling of `025a8` |
-| `FUN_00019430` | `spawn_special_weapon_entity` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x19430` | `Pacific Conflict.decomp.c` | `DAT_00026780`; vertex `>>3`×0x1c6/0x255 | Exact munition class | 24 | NOTES spawn+vertex; 1 call site |
+| `FUN_00019430` | `spawn_bailout_parachute` | Pacific Conflict | RENAMED | STRONG INFERENCE | `@0x19430` | `Pacific Conflict.decomp.c` | `DAT_00026780`; vertex `>>3`×0x1c6/0x255 | Exact munition class | 24 | NOTES spawn+vertex; 1 call site |
 | `FUN_0000e40c` | `fold_angle_pm_0x2000` | Pacific Conflict | RENAMED | PROVEN | `@0xE40C` | `Pacific Conflict.decomp.c` | — | — | 25 | Body + all call sites |
 | `FUN_0001a63e` | `memmove_block` | Pacific Conflict | RENAMED | PROVEN | `@0x1A63E` | `Pacific Conflict.decomp.c` | (src,dst,n); overlap fwd/back | Exact return-reg meaning | 26 | Body annotated; call sites |
 | `FUN_00001ba8` | `heap_realloc_grow_only` | Pacific Conflict | RENAMED | PROVEN | `@0x1BA8` | `Pacific Conflict.decomp.c` | header capacity; `heap_calloc`+`memmove_block` | — | 27 | NOTES; pool grow path |
@@ -4135,9 +4135,141 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   OR-composition of facility kind and outcome bits.
 - Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
 
-**Next iteration target:** conclude_mission (ID02) handling of the outcome
-code: map the low nibbles 1 / 2 / 8 / 9 / 0xa and facility bits to the host
-summary paths, to confirm the meanings inferred here.
+
+### Iteration 333 — 2026-10-17
+
+- HEAD moved to e081032 (user commits including iterations up to 332); the
+  baselines for Pacific Conflict and ID02 were regenerated. 32 protected
+  hashes OK; working tree was clean.
+- P1 / P2: run_flight_session (ID02, header around decomp line 745) exit
+  switch decoded from ID02.bin 0x89a..0x92e. The 13 table entries resolve
+  to: return (0x92c), conclude_mission (0x8c4), no-summary restart (0x910),
+  show_paused_dialog (0x924) or quit (0x91e) [PROVEN].
+- With ascending order (default, then -1..10) [STRONG_INFERENCE]:
+  - outcome 2 (overlay refuel / rearm snapshot) resumes the flight with no
+    summary;
+  - outcomes 1 / 6 / 8 / 9 / 0xa go to the Mission Summary;
+  - "Resume" (3) restarts the flight.
+  These match the iteration-332 overlay meanings. The facility bits are
+  dropped by `& 0xff` (only the overlay's pilot-status writes carry them).
+- conclude_mission (ID04) itself is unchanged; its Ghidra C is truncated.
+- Comment-only (ID02.decomp.c header).
+- Godot sync impact: none (no rename). A port of the session loop must mask
+  the outcome to its low byte.
+- Validation: tokens identical to HEAD for ID02 and Pacific Conflict;
+  `git diff --check` clean.
+
+
+### Iteration 334 — 2026-10-17
+
+- 32 protected hashes OK; only my iteration-333 changes uncommitted.
+- JT $3a (CODE 0 entry at A5+0x38: offset 0x00ba, segment 1, i.e. ID01 file
+  0xbe after the 4-byte CODE header) disassembled [PROVEN]:
+  - it pops the table address and reads lo / hi;
+  - out of range (signed word compares): it keeps entry 0, the default;
+  - in range: it takes entry 1 + (value - lo);
+  - it jumps through the entry's self-relative word.
+- So the run_flight_session exit mapping from iteration 333 is now PROVEN:
+  - 1 / 6..10 -> conclude_mission;
+  - 2 -> resume with no summary;
+  - 4 -> paused dialog;
+  - 5 -> quit;
+  - 0 / 3 / > 10 -> return.
+  -1 cannot occur because the value is masked with & 0xff.
+- Comment-only (ID02.decomp.c header).
+- Godot sync impact: none (no rename).
+- Validation: tokens identical to HEAD for ID02 and Pacific Conflict;
+  `git diff --check` clean.
+
+
+### Iteration 335 — 2026-10-17
+
+- 32 protected hashes OK; only my iteration 333–334 changes uncommitted.
+- process_flight_input_and_outcome stopped-on-ground block 0x8020..0x8102
+  checked against the bytes; the C matches.
+  - |1 when the pilot is already Dead.
+  - |6 = DITCHED: stopped with status bit 12 (water contact).
+    - Undamaged with fuel: pilot status 4, Discharged.
+    - Otherwise a random fate: enemy base 1/2 POW, else 1/8 Dead;
+      friendly 1/8 Dead; none 1/4 Dead, else 3/16 POW [PROVEN odds].
+- Correction: the iteration-333 ID02 note called 6 "bail-out". The bail-out is
+  |7 from resolve_bailout_outcome. Fixed in ID02.decomp.c.
+- Signature note: probe_nearest_facility_kind receives the player object
+  (pushed at 0x803e), as its header already says [PROVEN at this call site].
+- Comment-only.
+- Godot sync impact: none (no rename). Any port mapping of outcome 6 should
+  read "ditched in water".
+- Validation: tokens identical to HEAD for ID02 and Pacific Conflict;
+  `git diff --check` clean.
+
+
+### Iteration 336 — 2026-10-17
+
+- 32 protected hashes OK; only my iteration 333–335 changes uncommitted.
+- P0 / P1: resolve_bailout_outcome (FUN_0000879e) VERIFIED against the bytes
+  0x879e..0x889e.
+  - Outcome |7 = bail-out.
+  - Dead when the parachute is still at or below height 0x372 after more than
+    0x5a0 frames.
+  - Odds as in the ditch block: enemy 1/2 POW, else 1/8 Dead; friendly 1/8 Dead;
+    no base 1/4 Dead, else 3/16 POW.
+  - Discharged (4) via _DAT_0001b87a.
+- Header text corrected: the no-base case was described with POW and Dead
+  swapped. The C was already right.
+- PILOT_ROSTER.md (iteration 301 line, "sea: POW / Dead 1/4 each") has the
+  same simplification; noted here, that doc was not edited.
+- Godot sync impact: none (no rename). A port must test Dead (1/4) before POW
+  in the no-base case.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 337 — 2026-10-17
+
+- 32 protected hashes OK; only my iteration 333–336 changes uncommitted.
+- _DAT_0001b87a: there are 3 byte references [PROVEN].
+  - The only writer, at 0xf766, sets 1 in the player's bail-out path when
+    +0x684 & 0x3fe == 0 and either fuel tank is non-empty.
+  - Readers: resolve_bailout_outcome and update_aircraft_damage_state set
+    pilot status 4, Discharged.
+  - Comment name: player_abandoned_intact_aircraft. Its reset is UNKNOWN
+    (no code clears it).
+- RENAME (review of an existing name): FUN_00019430 spawn_special_weapon_entity ->
+  spawn_bailout_parachute.
+  - Its only call (0xf716) stores the result in the parachute pointer
+    DAT_0001b87c, and its template is register_parachute_template's type
+    0x1c.
+  - The iteration-296 note had already superseded "special weapon" but kept
+    the name.
+  - One declaration and one call changed, plus comments.
+- Godot sync impact: Godot refers to FUN_00019430 by id only (sim_core.gd
+  `last_19430_*`, `last_weapon_677_need_19430`, entity_state.gd comments).
+  Labels calling it a weapon should read "bail-out parachute". No Godot file
+  was edited.
+- Validation: tokens identical to HEAD with the one mapped rename;
+  `git diff --check` clean.
+
+
+### Iteration 338 — 2026-10-17
+
+- 32 protected hashes OK; only my iteration 333–337 changes uncommitted.
+- Aircraft +0x677 = bail-out state. All six byte references were found by a
+  scan [PROVEN]:
+  - 0x39ec: clr on respawn.
+  - 0x7d08: 1 from the 'J'/'j' key, only airborne and not already out.
+  - 0x1093c: 1 for AI aircraft, at random 1 frame in 32 while damage-word
+    bit 8 is set, except state handler 0x111ba or host +0x90 == 2.
+  - 0xf6dc / 0xf722: 1 -> spawn_bailout_parachute -> 2.
+- The +0x685 bit 0 gate is word +0x684 bit 0, set by the spawn itself
+  (0xf71c): "pilot gone".
+- Comment-only (two inline notes, symbols row).
+- Godot sync impact: none (no rename). The input map must bind J/j to the
+  bail-out request.
+- Validation: tokens identical to HEAD with the iteration-337 rename mapped;
+  `git diff --check` clean.
+
+**Next iteration target:** damage word +0x684 bits (mask 0x3fe, bit 8 = AI
+bail-out trigger, 0x400 hard landing, 0x1000 water, 0x4000 respawn value): build
+the bit table from update_aircraft_damage_state with byte evidence.
 
 ## Resuming the five-minute workflow
 
