@@ -1,15 +1,5 @@
 # Godot 4 ignored files
 .godot/
-.godot-home/
 
 # Godot editor-specific metadata
 *.uid
-
-# Exported projects
-/export/
-
-# macOS metadata
-.DS_Store
-
-# REA evaluation disposable outputs (Node tarball, Evidence JSON, logs)
-/artifacts/
