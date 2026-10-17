@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 287
+**Last iteration:** 288
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 128 | 0 | 0 | 309 | 0 | 6 |
-| **TOTAL** | **736** | **128** | **0** | **0** | **602** | **0** | **6** |
+| Pacific Conflict.c | 443 | 124 | 0 | 0 | 313 | 0 | 6 |
+| **TOTAL** | **736** | **124** | **0** | **0** | **606** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 128 NOT_STARTED + 6 BLOCKED (iteration 287);
-602 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 124 NOT_STARTED + 6 BLOCKED (iteration 288);
+606 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -606,9 +606,13 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_0001820a` | `ai_pursue_target` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aim at the target pose N frames ago (rank lag); manoeuvre states | second half of the function | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00011db4` | `spawn_destruction_effect` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | air burst / water splash / ground debris by surface | surface codes other than 0x10 | 286 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00013452` | `surface_type_under_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | surface code at the object position | — | 286 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
-| `FUN_00012a2a` | `bomb_tick` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 0xc tick with replay ring | FUN_000128b6 motion | 287 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
-| `FUN_00012d34` | `bomb_detonation` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | impact effect, target / friendly counters, delayed blast | FUN_00016b9e | 287 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00012a2a` | `ordnance_tick` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 0xc tick with replay ring | FUN_000128b6 motion | 287 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00012d34` | `ordnance_detonation` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | impact effect, target / friendly counters, delayed blast | FUN_00016b9e | 287 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00018c96` | `tick_flak_gun` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | type 0x1a: scheduled flak bursts + blast damage | targeting maths | 287 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0001281e` | `register_ordnance_template` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | DAT_00026280 = template; create → 0x127c6 | — | 288 (2026-10-17) | Ghidra C + entry bytes; token diff vs HEAD = renames |
+| `FUN_000127c6` | `create_ordnance_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 0x620-byte controller, pose ring | — | 288 (2026-10-17) | Ghidra C + entry bytes; token diff vs HEAD = renames |
+| `FUN_000128b6` | `ordnance_ballistic_step` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | gravity -0x5b, nose follows velocity, ground impact | — | 288 (2026-10-17) | Ghidra C + entry bytes; token diff vs HEAD = renames |
+| `FUN_00012f52` | `ordnance_collision` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | impact bit; ship = direct hit | — | 288 (2026-10-17) | Ghidra C + entry bytes; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -3314,17 +3318,29 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 ### Iteration 287 — 2026-10-17
 
 - Verified 32 protected hashes; uncommitted iteration 250–286 work preserved.
-- The other apply_blast_damage callers: `FUN_00012d34` = bomb_detonation
-  and its tick `FUN_00012a2a` = bomb_tick (definition key 0xc, file
+- The other apply_blast_damage callers: `FUN_00012d34` = bomb_detonation (renamed ordnance_detonation in iteration 288)
+  and its tick `FUN_00012a2a` = bomb_tick (renamed ordnance_tick in iteration 288) (definition key 0xc, file
   0x1a9a8: template type 0xc = dropped bomb [STRONG INFERENCE]; host +0xcc
   counts target hits, +0xd2 friendly kills, mission 3 / 4 objective +0xce),
   `FUN_00018c96` = tick_flak_gun (definition key 0x1a, the record not
   copied by Block C; flak bursts with blast damage).
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
-**Next iteration target:** Pacific Conflict bomb create 0x1281e, motion
-`FUN_000128b6`, collision 0x12f52; flak create / destroy 0x18b52 / 0x18b98;
-rest of ai_pursue_target.
+### Iteration 288 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–287 work preserved.
+- Type 0xc widened from "bomb" to ballistic ordnance: its template
+  DAT_00026280 is also the one spawn_weapon_entity spawns (ship shells,
+  player releases). Iteration 287 names changed (not in HEAD):
+  bomb_tick -> ordnance_tick, bomb_detonation -> ordnance_detonation.
+- Pacific Conflict `FUN_0001281e` = register_ordnance_template,
+  `FUN_000127c6` = create_ordnance_controller, `FUN_000128b6` =
+  ordnance_ballistic_step, `FUN_00012f52` = ordnance_collision.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict flak create / destroy 0x18b52 /
+0x18b98, rest of ai_pursue_target, `FUN_00016b9e`, `FUN_00016b4c`,
+`FUN_00017102`, `FUN_000173fe`.
 
 ## Resuming the five-minute workflow
 

@@ -17655,7 +17655,7 @@ LAB_00010700:
         if (uVar3 == 0x40) {
           sVar11 = 0xff;
           if ((uVar9 & 0x40) == 0) {
-            piVar5 = FUN_00016b4c(*(uint *)(pcVar1 + 0x18),*(uint *)(pcVar1 + 0x1c),
+            piVar5 = attach_smoke_trail(*(uint *)(pcVar1 + 0x18),*(uint *)(pcVar1 + 0x1c),
                                   *(uint *)(pcVar1 + 0x20),param_1);
           }
           else {
@@ -17749,7 +17749,7 @@ LAB_00010700:
       }
       if (((*(byte *)(param_1 + 0x1a1) & 0x10) != 0) &&
          ((*(byte *)((int)param_1 + 0x686) & 0x10) == 0)) {
-        in_D0 = FUN_00017102(*(uint *)(pcVar1 + 0x18),*(uint *)((int)param_1 + 0x2e),
+        in_D0 = attach_ground_fire(*(uint *)(pcVar1 + 0x18),*(uint *)((int)param_1 + 0x2e),
                              *(uint *)(pcVar1 + 0x20),param_1);
       }
       if ((((*(byte *)(param_1 + 0x1a1) & 1) != 0) && (*(char *)((int)param_1 + 0x677) == '\0')) &&
@@ -19151,7 +19151,7 @@ int spawn_effect /* Original: FUN_00011c58 */ (int param_1,undefined2 param_2,un
   sVar3 = 3;
   if (param_5 != 0) {
     while (sVar3 = sVar3 + -1, sVar3 != -1) {
-      FUN_000173fe(param_6,param_7,param_8);
+      spawn_debris_fragment(param_6,param_7,param_8);
     }
     return iVar1;
   }
@@ -19868,7 +19868,11 @@ void effect_pre_render_hook /* Original: FUN_000127aa */ (int param_1)
 
 
 
-uint * FUN_000127c6(uint param_1,int param_2)
+/* Original: FUN_000127c6; source: Pacific Conflict.c. Recovered name: create_ordnance_controller [STRONG INFERENCE] (iteration 288).
+ * Ghidra C reviewed (function at overlay offset 0x127c6).
+ * Allocates the cleared 0x620-byte ordnance controller: +0 object (object flags | 0x122000), +4 definition DAT_0001b524[key], and fills its 75-entry pose ring (+0x32) with the start position (fill_pose_history). Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C.
+ */
+uint * create_ordnance_controller /* Original: FUN_000127c6 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -19884,7 +19888,11 @@ uint * FUN_000127c6(uint param_1,int param_2)
 
 
 
-undefined4 FUN_0001281e(undefined4 param_1,int param_2)
+/* Original: FUN_0001281e; source: Pacific Conflict.c. Recovered name: register_ordnance_template [STRONG INFERENCE] (iteration 288).
+ * Ghidra C reviewed (function at overlay offset 0x1281e).
+ * Create handler (definition +6) for the ordnance template: stores the object in DAT_00026280 (used by spawn_weapon_entity) and replaces the create handler with 0x127a6 (Ghidra 0x127c6 = create_ordnance_controller). Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C (Ghidra omits the return value 0).
+ */
+undefined4 register_ordnance_template /* Original: FUN_0001281e */ (undefined4 param_1,int param_2)
 
 {
   DAT_00026280 = param_1;
@@ -19931,7 +19939,11 @@ int spawn_weapon_entity(undefined2 param_1,int param_2,uint param_3,uint param_4
 
 
 
-void FUN_000128b6(int *param_1)
+/* Original: FUN_000128b6; source: Pacific Conflict.c. Recovered name: ordnance_ballistic_step [STRONG INFERENCE] (iteration 288).
+ * Ghidra C reviewed (function at overlay offset 0x128b6).
+ * Motion of ordnance (called by ordnance_tick): rotates the forward speed word +0x610 by the attitude into a velocity, adds gravity -0x5b to the vertical component, stores velocity >> 6, then points the nose along the new velocity (isqrt_floor, attitude_from_velocity) with a roll following the heading change, and keeps the speed in +0x610. On reaching the ground height (+0x2e) it clamps to it and sets the impact bit 0x400 in +0x61c; when the ground is raised (> 0) on surface 0x30 / 0x60 / 0x70 it also sets the direct-hit word +0x616 = 1. Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C.
+ */
+void ordnance_ballistic_step /* Original: FUN_000128b6 */ (int *param_1)
 
 {
   int iVar1;
@@ -19991,11 +20003,11 @@ void FUN_000128b6(int *param_1)
 
 
 
-/* Original: FUN_00012a2a; source: Pacific Conflict.c. Recovered name: bomb_tick [STRONG INFERENCE] (iteration 287).
+/* Original: FUN_00012a2a; source: Pacific Conflict.c. Recovered name: ordnance_tick [STRONG INFERENCE] (iteration 287).
  * Ghidra C reviewed (function at overlay offset 0x12a2a).
- * Definition +2 of type 0xc. Same 75-frame replay ring as aircraft_tick (index +0x60e): live, runs the motion FUN_000128b6 unless it has hit (flag word +0x61c bit 2, this and last frame), then bomb_detonation, and records the pose; during a replay plays the ring back. Type 0xc definition (file 0x1a9a8): +2 bomb_tick (0x12a2a), +6 0x1281e, +0x12 0x12f52 [PROVEN bytes]; the collision pair table makes type 0xc ignore bullets and aircraft (0x14346 RTS). Template type 0xc = dropped bomb [STRONG INFERENCE]. Ghidra C.
+ * Definition +2 of type 0xc. Same 75-frame replay ring as aircraft_tick (index +0x60e): live, runs the motion FUN_000128b6 unless it has hit (flag word +0x61c bit 2, this and last frame), then ordnance_detonation, and records the pose; during a replay plays the ring back. Type 0xc definition (file 0x1a9a8): +2 ordnance_tick (0x12a2a), +6 0x1281e, +0x12 0x12f52 [PROVEN bytes]; the collision pair table makes type 0xc ignore bullets and aircraft (0x14346 RTS). Template type 0xc = ballistic ordnance [STRONG INFERENCE; iteration 288: its pool template DAT_00026280 is the one spawn_weapon_entity uses, so it covers bombs released by the player and shells fired by ships]. Ghidra C.
  */
-void bomb_tick /* Original: FUN_00012a2a */ (int *param_1)
+void ordnance_tick /* Original: FUN_00012a2a */ (int *param_1)
 
 {
   int *piVar1;
@@ -20012,14 +20024,14 @@ void bomb_tick /* Original: FUN_00012a2a */ (int *param_1)
   }
   if (DAT_0001b870 == 0) {
     if (((*(byte *)(param_1 + 0x187) & 4) == 0) || ((*(byte *)((int)param_1 + 0x61e) & 4) == 0)) {
-      FUN_000128b6(param_1);
+      ordnance_ballistic_step(param_1);
     }
     else {
       param_1[4] = 0;
       param_1[3] = 0;
       param_1[2] = 0;
     }
-    bomb_detonation(param_1);
+    ordnance_detonation(param_1);
     *piVar1 = param_1[2] + *(int *)(iVar2 + 0x18);
     piVar1[1] = param_1[3] + *(int *)(iVar2 + 0x1c);
     piVar1[2] = param_1[4] + *(int *)(iVar2 + 0x20);
@@ -20050,7 +20062,7 @@ void bomb_tick /* Original: FUN_00012a2a */ (int *param_1)
     *(undefined2 *)((int)param_1 + 0x22) = *(undefined2 *)((int)piVar1 + 0xe);
     *(undefined2 *)(param_1 + 9) = *(undefined2 *)(piVar1 + 4);
     uVar3 = *(undefined2 *)(param_1 + 0x187);
-    bomb_detonation(param_1);
+    ordnance_detonation(param_1);
     *(undefined2 *)((int)param_1 + 0x61e) = uVar3;
   }
   return;
@@ -20160,11 +20172,11 @@ LAB_00012d1e:
 
 
 
-/* Original: FUN_00012d34; source: Pacific Conflict.c. Recovered name: bomb_detonation [STRONG INFERENCE] (iteration 287).
+/* Original: FUN_00012d34; source: Pacific Conflict.c. Recovered name: ordnance_detonation [STRONG INFERENCE] (iteration 287).
  * Ghidra C reviewed (function at overlay offset 0x12d34).
- * On the first frame of impact (+0x61c bit 2): spawns the impact effect (spawn_destruction_effect at size 200 when +0x616 is 0, else an air burst or a debris explosion by height), and for a bomb of kind +0x614 != 0 landing on surface 0x70 counts the hit by the nearby facility (probe_nearest_facility_kind): 0x100 -> host +0xcc (target hits) += 1 outside replay, and in missions 3 / 4 within 0xce40 sets the objective word +0xce = 1; 0x200 -> host +0xd2 (friendly units destroyed) += 1. Schedules the blast 5 frames later (15 when it hit something) in +0x618 and cleans the object up; on that frame calls apply_blast_damage. When bit 0x40 changes, FUN_00016b9e at the position. Type 0xc definition (file 0x1a9a8): +2 bomb_tick (0x12a2a), +6 0x1281e, +0x12 0x12f52 [PROVEN bytes]; the collision pair table makes type 0xc ignore bullets and aircraft (0x14346 RTS). Template type 0xc = dropped bomb [STRONG INFERENCE]. Ghidra C (apply_blast_damage stack arguments not shown).
+ * On the first frame of impact (+0x61c bit 2): spawns the impact effect (spawn_destruction_effect at size 200 when +0x616 is 0, else an air burst or a debris explosion by height), and for a bomb of kind +0x614 != 0 landing on surface 0x70 counts the hit by the nearby facility (probe_nearest_facility_kind): 0x100 -> host +0xcc (target hits) += 1 outside replay, and in missions 3 / 4 within 0xce40 sets the objective word +0xce = 1; 0x200 -> host +0xd2 (friendly units destroyed) += 1. Schedules the blast 5 frames later (15 when it hit something) in +0x618 and cleans the object up; on that frame calls apply_blast_damage. When bit 0x40 changes, FUN_00016b9e at the position. Type 0xc definition (file 0x1a9a8): +2 ordnance_tick (0x12a2a), +6 0x1281e, +0x12 0x12f52 [PROVEN bytes]; the collision pair table makes type 0xc ignore bullets and aircraft (0x14346 RTS). Template type 0xc = ballistic ordnance [STRONG INFERENCE; iteration 288: its pool template DAT_00026280 is the one spawn_weapon_entity uses, so it covers bombs released by the player and shells fired by ships]. Ghidra C (apply_blast_damage stack arguments not shown).
  */
-void bomb_detonation /* Original: FUN_00012d34 */ (int *param_1)
+void ordnance_detonation /* Original: FUN_00012d34 */ (int *param_1)
 
 {
   char *pcVar1;
@@ -20227,7 +20239,7 @@ void bomb_detonation /* Original: FUN_00012d34 */ (int *param_1)
     }
   }
   if (((*(ushort *)((int)param_1 + 0x61e) ^ *(ushort *)(param_1 + 0x187)) & 0x40) != 0) {
-    FUN_00016b9e(*(uint *)(pcVar1 + 0x18),*(uint *)(pcVar1 + 0x1c),*(uint *)(pcVar1 + 0x20),param_1)
+    attach_burning_trail(*(uint *)(pcVar1 + 0x18),*(uint *)(pcVar1 + 0x1c),*(uint *)(pcVar1 + 0x20),param_1)
     ;
   }
   *(undefined2 *)((int)param_1 + 0x61e) = *(undefined2 *)(param_1 + 0x187);
@@ -20236,7 +20248,11 @@ void bomb_detonation /* Original: FUN_00012d34 */ (int *param_1)
 
 
 
-void FUN_00012f52(int param_1,int param_2)
+/* Original: FUN_00012f52; source: Pacific Conflict.c. Recovered name: ordnance_collision [STRONG INFERENCE] (iteration 288).
+ * Ghidra C reviewed (function at overlay offset 0x12f52).
+ * Definition +0x12: in live play sets the impact bit 0x400 (+0x61c) and, when the other object is a ship (template type 0x15..0x19), the direct-hit word +0x616 = 1 - which makes ordnance_detonation use the debris explosion and the 15-frame blast. Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C.
+ */
+void ordnance_collision /* Original: FUN_00012f52 */ (int param_1,int param_2)
 
 {
   int iVar1;
@@ -23273,7 +23289,7 @@ uint FUN_000168ae(int param_1,int param_2)
   uVar1 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar2 = uVar1 & 0xffff000f;
   if ((uVar1 & 0xf) == 0) {
-    uVar2 = FUN_00012f52(param_2,param_1);
+    uVar2 = ordnance_collision(param_2,param_1);
   }
   return uVar2;
 }
@@ -23418,7 +23434,11 @@ int FUN_00016ae8(int param_1,uint param_2,uint param_3,uint param_4)
 
 
 
-int * FUN_00016b4c(uint param_1,uint param_2,uint param_3,int *param_4)
+/* Original: FUN_00016b4c; source: Pacific Conflict.c. Recovered name: attach_smoke_trail [STRONG INFERENCE] (iteration 289).
+ * Ghidra C reviewed (function at overlay offset 0x16b4c).
+ * Called by update_aircraft_damage_state at damage stage 0x40: spawns a trail of kind 0 at the aircraft, linked to it, and counts it in the aircraft word +0x68c. Both trail spawners use FUN_00016ae8(kind, x, y, z) and FUN_0001702a, link the trail to the owner object (+0x52, owner reference count +3) and mark it active (+0x56 = 1). [STRONG INFERENCE: smoke trail of a damaged aircraft] Complete Ghidra C.
+ */
+int * attach_smoke_trail /* Original: FUN_00016b4c */ (uint param_1,uint param_2,uint param_3,int *param_4)
 
 {
   int *piVar1;
@@ -23440,7 +23460,11 @@ int * FUN_00016b4c(uint param_1,uint param_2,uint param_3,int *param_4)
 
 
 
-int * FUN_00016b9e(uint param_1,uint param_2,uint param_3,int *param_4)
+/* Original: FUN_00016b9e; source: Pacific Conflict.c. Recovered name: attach_burning_trail [HYPOTHESIS] (iteration 289).
+ * Ghidra C reviewed (function at overlay offset 0x16b9e).
+ * Trail of kind 1 linked to an object (ordnance_detonation when bit 0x40 changes); also starts the explosion sound countdowns by camera distance (< 5000: DAT_0001b84a = 0x1e Explosion, < 20000: DAT_0001b848 = 0xf Distant Explosion). Both trail spawners use FUN_00016ae8(kind, x, y, z) and FUN_0001702a, link the trail to the owner object (+0x52, owner reference count +3) and mark it active (+0x56 = 1). [HYPOTHESIS: fire / burning debris trail] Complete Ghidra C.
+ */
+int * attach_burning_trail /* Original: FUN_00016b9e */ (uint param_1,uint param_2,uint param_3,int *param_4)
 
 {
   int *piVar1;
@@ -23581,7 +23605,7 @@ undefined2 FUN_00016c6a(int *param_1)
       uVar9 = (ushort)uVar6 & 3;
     }
     if (uVar9 == 0) {
-      FUN_00016b4c(*(uint *)(iVar1 + 0x18),*(uint *)(iVar1 + 0x1c),*(uint *)(iVar1 + 0x20),piVar2);
+      attach_smoke_trail(*(uint *)(iVar1 + 0x18),*(uint *)(iVar1 + 0x1c),*(uint *)(iVar1 + 0x20),piVar2);
       *(undefined2 *)((int)param_1 + 0x36) = 4;
     }
     break;
@@ -23811,7 +23835,11 @@ int FUN_000170ba(uint param_1,uint param_2,uint param_3)
 
 
 
-int * FUN_00017102(uint param_1,uint param_2,uint param_3,int *param_4)
+/* Original: FUN_00017102; source: Pacific Conflict.c. Recovered name: attach_ground_fire [HYPOTHESIS] (iteration 289).
+ * Ghidra C reviewed (function at overlay offset 0x17102).
+ * Called by update_aircraft_damage_state when damage bit 4 appears, at the ground height under the aircraft: spawns an object with FUN_000170ba and links it to the owner (+0x50, owner count +3). [HYPOTHESIS: a fire on the ground below] Complete Ghidra C.
+ */
+int * attach_ground_fire /* Original: FUN_00017102 */ (uint param_1,uint param_2,uint param_3,int *param_4)
 
 {
   int *piVar1;
@@ -24008,7 +24036,11 @@ undefined4 FUN_000173dc(undefined4 param_1,int param_2)
 
 
 
-int FUN_000173fe(uint param_1,uint param_2,uint param_3)
+/* Original: FUN_000173fe; source: Pacific Conflict.c. Recovered name: spawn_debris_fragment [STRONG INFERENCE] (iteration 289).
+ * Ghidra C reviewed (function at overlay offset 0x173fe).
+ * Spawns the template DAT_0002665c at (x, y, z) with a random velocity (each axis -0x7f..0x80, the vertical one also kept << 4 in +0x36), a random attitude and an expiry frame DAT_0001b838 + 0x2d (45 frames). Called three times by spawn_effect when its debris flag is set. Complete Ghidra C.
+ */
+int spawn_debris_fragment /* Original: FUN_000173fe */ (uint param_1,uint param_2,uint param_3)
 
 {
   int iVar1;
@@ -25203,7 +25235,11 @@ undefined4 FUN_00018a34(int *param_1)
 
 
 
-void FUN_00018b52(uint param_1,int param_2)
+/* Original: FUN_00018b52; source: Pacific Conflict.c. Recovered name: create_flak_controller [STRONG INFERENCE] (iteration 289).
+ * Ghidra C reviewed (function at overlay offset 0x18b52).
+ * Definition +6 of type 0x1a (flak gun): cleared 0xfa-byte controller, +0 object, +4 definition DAT_0001b524[key], word +0x46 = 0x3c (60), long +0x42 = 0x26ac0 [STRONG INFERENCE: engagement range; the same value as the middle radar range], object flag +5 | 2. Complete Ghidra C.
+ */
+void create_flak_controller /* Original: FUN_00018b52 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -25219,7 +25255,11 @@ void FUN_00018b52(uint param_1,int param_2)
 
 
 
-void FUN_00018b98(int param_1)
+/* Original: FUN_00018b98; source: Pacific Conflict.c. Recovered name: destroy_flak_controller [STRONG INFERENCE] (iteration 289).
+ * Ghidra C reviewed (function at overlay offset 0x18b98).
+ * Definition +0xa of type 0x1a: drops the references held on the target (+0x36) and on +0x32. Complete Ghidra C.
+ */
+void destroy_flak_controller /* Original: FUN_00018b98 */ (int param_1)
 
 {
   char *pcVar1;

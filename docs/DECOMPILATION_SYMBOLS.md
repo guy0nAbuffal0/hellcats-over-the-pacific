@@ -413,9 +413,13 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0001820a` (Pacific Conflict) | `ai_pursue_target` | STRONG INFERENCE | Iter 285: target pose delayed by DAT_0001b878 / 876 frames; manoeuvre +0x69a. |
 | `FUN_00011db4` (Pacific Conflict) | `spawn_destruction_effect` | STRONG INFERENCE | Iter 286: kind 2 in the air, kind 0 on water (0x10), kind 3 on ground. |
 | `FUN_00013452` (Pacific Conflict) | `surface_type_under_object` | STRONG INFERENCE | Iter 286: surface_type_at_point(object position). |
-| `FUN_00012a2a` (Pacific Conflict) | `bomb_tick` | STRONG INFERENCE | Iter 287: definition key 0xc +2; replay ring +0x60e. |
-| `FUN_00012d34` (Pacific Conflict) | `bomb_detonation` | STRONG INFERENCE | Iter 287: impact effect; host +0xcc / +0xd2 / +0xce; blast after 5 / 15 frames. |
+| `FUN_00012a2a` (Pacific Conflict) | `ordnance_tick` | STRONG INFERENCE | Iter 287: definition key 0xc +2; replay ring +0x60e. |
+| `FUN_00012d34` (Pacific Conflict) | `ordnance_detonation` | STRONG INFERENCE | Iter 287: impact effect; host +0xcc / +0xd2 / +0xce; blast after 5 / 15 frames. |
 | `FUN_00018c96` (Pacific Conflict) | `tick_flak_gun` | STRONG INFERENCE | Iter 287: definition key 0x1a +2; timed bursts at +0x5a / +0xd2. |
+| `FUN_0001281e` (Pacific Conflict) | `register_ordnance_template` | STRONG INFERENCE | Iter 288: DAT_00026280 (spawn_weapon_entity template). |
+| `FUN_000127c6` (Pacific Conflict) | `create_ordnance_controller` | STRONG INFERENCE | Iter 288: 0x620 bytes, flags 0x122000, pose ring +0x32. |
+| `FUN_000128b6` (Pacific Conflict) | `ordnance_ballistic_step` | STRONG INFERENCE | Iter 288: speed +0x610, gravity -0x5b, impact bit 0x400 in +0x61c. |
+| `FUN_00012f52` (Pacific Conflict) | `ordnance_collision` | STRONG INFERENCE | Iter 288: impact; ship target → +0x616 direct hit. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
