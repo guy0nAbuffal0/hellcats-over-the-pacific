@@ -313,9 +313,13 @@ void draw_ring_with_status_indicators /* Original: FUN_00000514 */ (undefined4 p
 
 
 
+/* Original: FUN_0000077e; source: ID03.c. Recovered name: draw_vector_glyph_string_centred [STRONG INFERENCE] (iteration 206).
+ * Decoded from ID03.bin bytes at file 0x77e.
+ * C args: +8 char *text, +0xc short scale, +0xe short x, +0x10 short y (design units). First pass: for each character found in the six-entry glyph table A5-0x20b0 (pointer per glyph; glyph byte 0 = character, byte 1 = width), x -= (width + 1) * scale / 2 - centres the string. Second pass: for each character, MoveTo / LineTo strokes ($A893 / $A891) from the glyph point list, scaled with scale_design_4800_pen_centred (0xa6) [PROVEN control flow; glyph data is A5 initial data, not read]. Caller: draw_direction_indicator (0x2bd6) - probably the compass letters [HYPOTHESIS]. Ghidra truncated the drawing loop.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000077e(char *param_1,undefined4 param_2,undefined4 param_3)
+void draw_vector_glyph_string_centred /* Original: FUN_0000077e */ (char *param_1,undefined4 param_2,undefined4 param_3)
 
 {
   int iVar1;
@@ -451,9 +455,13 @@ void antialias_downsample_bw_3x /* Original: FUN_00000a3c */ (void)
 
 
 
+/* Original: FUN_0000146a; source: ID03.c. Recovered name: composite_instrument_bitmap [PROVEN] (iteration 206).
+ * Decoded from ID03.bin bytes at file 0x146a.
+ * C args: +8 GrafPtr src (the instrument port), +0xc short size, +0xe short (0 from the caller), +0x10 short x, +0x12 short y. Computes the destination rect from scale_design_4800(size) and design_x_to_screen / design_y_to_screen (JT $3ca / $382). Depth 1 (A5-0x137a == 1): rect = src portRect offset to the destination (OffsetRect $A8A8), CopyBits(src bits, panel port A5-0x1496 bits, &src portRect, &rect, mode 3 = srcBic, NULL) ($A8EC). Otherwise antialias_downsample_bw_3x(src, rect ..., colour A5-0x1fa6) into the panel. Caller: finish_instrument_supersample (0x1860).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000146a(undefined4 param_1,undefined4 param_2)
+void composite_instrument_bitmap /* Original: FUN_0000146a */ (undefined4 param_1,undefined4 param_2)
 
 {
   int unaff_A5;
@@ -522,9 +530,13 @@ void begin_instrument_supersample /* Original: FUN_00001538 */ (undefined2 *para
 
 
 
+/* Original: FUN_00001844; source: ID03.c. Recovered name: finish_instrument_supersample [PROVEN] (iteration 206).
+ * Decoded from ID03.bin bytes at file 0x1844.
+ * C args: +8 GrafPtr port, +0xc short size, +0xe short x, +0x10 short y. SetPort(panel port A5-0x1496) ($A873); composite_instrument_bitmap(port, size, 0, x, y); dispose_offscreen_bw_port(port) (0x33c). Ends the begin_instrument_supersample sequence. Callers: draw_airspeed_indicator (0x1b3c), draw_climb_indicator (0x1fe2), draw_tachometer (0x22f2), draw_manifold_pressure_gauge (0x25f4).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001844(void)
+void finish_instrument_supersample /* Original: FUN_00001844 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -853,9 +865,13 @@ void draw_instrument /* Original: FUN_00003c02 */ (undefined4 param_1,undefined2
 
 
 
+/* Original: FUN_00003f24; source: ID03.c. Recovered name: draw_bevelled_frame [STRONG INFERENCE] (iteration 207).
+ * Decoded from ID03.bin bytes at file 0x3f24.
+ * C args: eight shorts at +8..+0x16 = outer top, left, bottom, right, then inner top, left, bottom, right (screen coordinates; caller draw_numbered_bevel_box passes outer = rect, inner = rect inset by the bevel). Draws four quadrilateral polygons between the outer and inner rectangles (OpenPoly $A8CB, MoveTo / LineTo, ClosePoly $A8CC; FillPoly $A8CA with the pattern from JT $3e2 (ID02 0x150a), or PaintPoly $A8C7 for the last side), each in its own grey from lookup_palette_index_for_rgb_level levels 1 / 0 / 2 set with set_draw_color_index / set_back_color_index; KillPoly ($A8CD) after each [PROVEN traps]. The side shading gives a raised / sunken 3-D bevel [STRONG INFERENCE]. Callers: draw_numbered_bevel_box (0x41de), FUN_00004304 (0x465e).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003f24(void)
+void draw_bevelled_frame /* Original: FUN_00003f24 */ (void)
 
 {
   int unaff_A5;
@@ -870,9 +886,13 @@ void FUN_00003f24(void)
 
 
 
+/* Original: FUN_00004110; source: ID03.c. Recovered name: draw_numbered_bevel_box [PROVEN] (iteration 207).
+ * Decoded from ID03.bin bytes at file 0x4110.
+ * C args: +8 Rect *r (in / out), +0xc short number. bevel = design_x_to_screen(20) - design_x_to_screen(0); inner = r inset by bevel; PaintRect(inner) in colour level 0 (black); draw_bevelled_frame(r, inner); *r = inner; colour level 4 at depth 1, else 3; pen = max(1, 10 * A5-0x149e / 480) and a size from scale_design_480_min10(12) (0x56) / 10; draw_vector_number(number, pen ..., centre of the rect converted back to design units: c * 4800 / A5-0x149e). Draws a black box with a bevelled border and a vector-font number in it. Callers: FUN_00004304 (0x46b6, 0x4718, 0x477a; rects A5-0x11c6, -0x11be, -0x11b6).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004110(void)
+void draw_numbered_bevel_box /* Original: FUN_00004110 */ (void)
 
 {
   int unaff_A5;
@@ -1081,7 +1101,11 @@ void FUN_00005718(short *param_1,undefined4 param_2,short *param_3,short *param_
 
 
 
-void FUN_00005860(void)
+/* Original: FUN_00005860; source: ID03.c. Recovered name: compute_panel_screen_addresses [STRONG INFERENCE] (iteration 205).
+ * Decoded from ID03.bin bytes at file 0x5860.
+ * No arguments (complete Ghidra C below). Converts fixed design coordinates with design_y_to_screen (JT $382) and design_x_to_screen (JT $3ca, rounded down to even) into a rectangle and four column / row values (A5-0x1150..-0x113e), then four screen byte addresses A5-0x113c / -0x1138 / -0x1134 / -0x1130 = base A5-0x1382 + y * rowBytes A5-0x1378 + x / (8 / depth), with depth = A5-0x137a [PROVEN arithmetic: 8 / depth = pixels per byte, so A5-0x137a is the pixel depth 1 / 4 / 8 - it is also compared with 4 in remap_cached_panel_colours]. Which panel areas these addresses delimit is not yet known [UNKNOWN]. Caller: prepare_instrument_panel (0x5d46; only BSR found in ID03).
+ */
+void compute_panel_screen_addresses /* Original: FUN_00005860 */ (void)
 
 {
   short sVar1;
@@ -1149,9 +1173,13 @@ void store_panel_bitmaps_as_resources /* Original: FUN_00005ab6 */ (void)
 
 
 
+/* Original: FUN_00005c36; source: ID03.c. Recovered name: open_cport_on_buffer [PROVEN] (iteration 204).
+ * Decoded from ID03.bin bytes at file 0x5c36.
+ * C args: +8 CGrafPort *port (0x6c bytes), +0xc short rowBytes, +0xe Ptr baseAddr, +0x12 Rect bounds (by value). Clears the 0x6c bytes (JT $4f2, ID02 0x2b0), OpenCPort(port) ($AA00), restores thePort; sets the port PixMap (handle at +2): rowBytes (+4), baseAddr (+0), bounds (+6) = bounds; portRect (+0x10) = bounds; RectRgn(visRgn +0x18, &bounds) ($A8DF); returns port. Caller: prepare_instrument_panel (0x5da8, port A5-0x1492 -> A5-0x1496).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00005c36(undefined4 param_1)
+void open_cport_on_buffer /* Original: FUN_00005c36 */ (undefined4 param_1)
 
 {
   int unaff_A5;
@@ -1163,9 +1191,13 @@ void FUN_00005c36(undefined4 param_1)
 
 
 
+/* Original: FUN_00005cb6; source: ID03.c. Recovered name: close_port_glue [PROVEN] (iteration 204).
+ * Decoded from ID03.bin bytes at file 0x5cb6.
+ * ClosePort(port +8) ($A87D). Callers: prepare_instrument_panel (0x5d72 for A5-0x11cc, 0x5d92 for A5-0x1496).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00005cb6(void)
+void close_port_glue /* Original: FUN_00005cb6 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1174,9 +1206,13 @@ void FUN_00005cb6(void)
 
 
 
+/* Original: FUN_00005cc4; source: ID03.c. Recovered name: prepare_instrument_panel [STRONG INFERENCE] (iteration 204).
+ * Decoded from ID03.bin bytes at file 0x5cc4.
+ * Reached through JT $17a (CODE 0 entry -> ID03 0x5cc4). Partly decoded [PROVEN, bytes 0x5cc4..0x5f20]: saves CurResFile ($A994) and UseResFile(A5-0x1002) ($A998); panel scale A5-0x149e = A5-0x149a = (w / 2 + w) / 2 for the half view width w = A5-0x1372 (the factor used by scale_design_4800); copies A5-0x1066 / -0x1062 to A5-0x211c / -0x2118; cache = GetResource(HEL2, 127) -> A5-0x13b2, or NewHandleClear(0x580) added as HEL2 127 "Bitmap Cache" (STR# 129 slot 83) - 4 entries of 0x160 bytes; calls FUN_00005860; closes the old ports A5-0x11cc / A5-0x1496 (close_port_glue) and disposes the region A5-0x13b6 ($A8D9); opens A5-0x1492 with open_cport_on_buffer; then searches the 4 cache entries for one whose +0 / +2 / +4 / +6 / +8 equal A5-0x137a (1-bit mode), A5-0x137e, A5-0x137c, A5-0x1372, A5-0x1370 (view size) and that is the current configuration A5-0x13ae or flagged stored (+0xc); for a stored entry it copies its ten 16-byte instrument records (+0x12) to A5-0x12a2 and 20 bytes (+0xb2) to A5-0x1202, releases the current bitmaps (0x59f4) and loads HEL2 300 + entry ... as A5-0x11f6 and the others. So rendered panels are reused from disk when the display configuration matches [STRONG INFERENCE]; the rest of the function (redraw path) is not yet decoded.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00005cc4(void)
+void prepare_instrument_panel /* Original: FUN_00005cc4 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1185,9 +1221,13 @@ void FUN_00005cc4(void)
 
 
 
+/* Original: FUN_00006c1c; source: ID03.c. Recovered name: remap_cached_panel_colours [STRONG INFERENCE] (iteration 205).
+ * Decoded from ID03.bin bytes at file 0x6c1c.
+ * Reached through JT $182 (CODE 0 entry -> ID03 0x6c1c). Returns at once unless the current configuration A5-0x13ae has a cache entry (A5-0x13b2) whose key (+0 depth, +2, +4, +6 / +8 view size) matches the display. In 1-bit mode calls JT $482 (ID02 0x4b62, the standard colour index set-up). Otherwise builds a 256-word translation table on the stack, keyed by the entry word +0xa & 0x1fff and a switch on the depth (JT $2a), walks the pixels of the panel bitmaps (A5-0x12b0, port A5-0x1496, A5-0x11dc with mask A5-0x11de and sizes A5-0x11e2 / -0x11e4) replacing bytes through the table, and refreshes many palette-index globals (A5-0x11fa, -0x11f8, -0x11ae, -0x11ac, -0x11a2, -0x118c, -0x118a, -0x1188, -0x117e, -0x117c, -0x112c, -0x12a4) with lookup_palette_index_for_rgb_level (JT $45a); at depth 4 some are OR-combined with themselves shifted (0x70a0 / 0x7184) [PROVEN calls]. So a panel loaded from the cache is re-coloured for the current palette [STRONG INFERENCE]. Exact table semantics not decoded.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00006c1c(void)
+void remap_cached_panel_colours /* Original: FUN_00006c1c */ (void)
 
 {
   short sVar1;
@@ -1229,7 +1269,7 @@ void FUN_000071a2(void)
   for (sVar1 = 0; sVar1 < 0x100; sVar1 = sVar1 + 1) {
     local_204[sVar1] = sVar1;
   }
-  FUN_00006c1c();
+  remap_cached_panel_colours();
   return;
 }
 

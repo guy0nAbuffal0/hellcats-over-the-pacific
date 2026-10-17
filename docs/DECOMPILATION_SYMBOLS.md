@@ -165,13 +165,25 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003832` (ID03) | `make_inset_face_oval_region` | STRONG INFERENCE | Iter 202: oval region of the face inside the bezel. |
 | `FUN_000038fc` (ID03) | `draw_artificial_horizon` | STRONG INFERENCE | Iter 202: type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument". |
 | `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | PROVEN | Iter 203: AddResource HEL2 200–500 + config. |
+| `FUN_00005c36` (ID03) | `open_cport_on_buffer` | PROVEN | Iter 204: OpenCPort on a caller buffer (rowBytes, baseAddr, bounds). |
+| `FUN_00005cb6` (ID03) | `close_port_glue` | PROVEN | Iter 204: ClosePort. |
+| `FUN_00005cc4` (ID03) | `prepare_instrument_panel` | STRONG INFERENCE | Iter 204: JT $17a; panel scale A5-0x149e; Bitmap Cache lookup by display configuration. |
+| `FUN_00005860` (ID03) | `compute_panel_screen_addresses` | STRONG INFERENCE | Iter 205: screen byte addresses base + y*rowBytes + x/(8/depth). |
+| `FUN_00006c1c` (ID03) | `remap_cached_panel_colours` | STRONG INFERENCE | Iter 205: JT $182; re-colours a cached panel; palette indices via lookup_palette_index_for_rgb_level. |
+| `FUN_0000077e` (ID03) | `draw_vector_glyph_string_centred` | STRONG INFERENCE | Iter 206: centred stroke-font string; glyph table A5-0x20b0 (6 glyphs). |
+| `FUN_0000146a` (ID03) | `composite_instrument_bitmap` | PROVEN | Iter 206: CopyBits (1-bit) or antialias_downsample_bw_3x into the panel port A5-0x1496. |
+| `FUN_00001844` (ID03) | `finish_instrument_supersample` | PROVEN | Iter 206: SetPort(panel), composite, dispose_offscreen_bw_port. |
+| `FUN_00003f24` (ID03) | `draw_bevelled_frame` | STRONG INFERENCE | Iter 207: four shaded polygons between outer and inner rects. |
+| `FUN_00004110` (ID03) | `draw_numbered_bevel_box` | PROVEN | Iter 207: black box, bevel, vector-font number. |
+| A5−0x149e | panel design-unit scale (0.75 × half view width) | PROVEN formula | Iter 204: set by prepare_instrument_panel; used by scale_design_4800. |
 | A5−0x14a0 | "panel store failed" flag (alert in ID04 0x432) | PROVEN | Iter 203. |
 | A5−0x13ae / A5−0x211e | panel configuration index (HEL2 id offset; cache entry) / configuration of the loaded bitmaps | STRONG INFERENCE | Iter 203. |
 | A5−0x12b0 / −0x11f6 / −0x11dc / −0x11d4 / −0x13b2 | cached panel bitmaps "Bitmap" / "HorizonInstrument" / "GyroInstrument" / "GyroFlags" / "Bitmap Cache" (HEL2 resources) | PROVEN names | Iter 202: AddResource in ID03 0x5b5e..0x5d44. |
 | ID04 0x137a (unexported, JT $102) | `run_high_scores_dialog` | STRONG INFERENCE | Iter 201. |
 | ID04 0x3614 (unexported) | `track_map_bearing_and_distance` | STRONG INFERENCE | Iter 200. |
 | ID04 0x3976 (unexported, JT $10a) | `run_map_dialog` | STRONG INFERENCE | Iter 200: DLOG 137. |
-| A5−0x137a | 1 = 1-bit (black and white) display mode | STRONG INFERENCE | Iter 200: DLOG 138 "About Hellcats 1-Bit". |
+| A5−0x137a | screen pixel depth (1 / 4 / 8); 1 = black and white | PROVEN arithmetic | Iter 200, corrected iter 205: x / (8 / depth) byte offsets. |
+| A5−0x1382 / A5−0x1378 | screen base address / rowBytes | STRONG INFERENCE | Iter 205. |
 | A5−0x1056 / A5−0x105a | angle (atan2-like, 1/0x4000 turns) / square-root function pointers | HYPOTHESIS | Iter 200: map bearing / distance. |
 | HEL1 127 settings +0x26 | map scale (miles per grid square) | STRONG INFERENCE | Iter 199: " mi./grid" text. |
 | A5−0x1052 | map object plotter function pointer (scale, callback) | PROVEN call / UNKNOWN target | Iter 199. |

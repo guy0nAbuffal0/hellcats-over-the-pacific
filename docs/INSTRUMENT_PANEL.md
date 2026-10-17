@@ -61,7 +61,7 @@ code; the table was parsed from the bytes.
 3. `antialias_downsample_bw_3x` (0xa3c): each output pixel is a 7×7
    weighted sum (total weight 969) of the 3× bitmap, converted to a grey
    palette index with `nearest_palette_index_rgb` (0xf4) and plotted.
-4. `dispose_offscreen_bw_port` (0x33c).
+4. `finish_instrument_supersample` (0x1844, iteration 206): SetPort(panel port `A5-0x1496`), `composite_instrument_bitmap` (0x146a: CopyBits at depth 1, else the 3× downsample into the panel), then `dispose_offscreen_bw_port` (0x33c).
 
 Coordinates are design units scaled by `scale_design_4800` (0x8a:
 `A5-0x149e · v / 4800`) and centred with ID02 `design_x_to_screen` /
@@ -86,6 +86,11 @@ slot orientation from screw to screw.
   entries per configuration with a "stored" flag at +0xc. A failure sets
   `A5-0x14a0`, reported by ID04 0x432 as "Unable to store instrument panel
   to disk".
+- Panel set-up (iteration 204): `prepare_instrument_panel` (ID03 0x5cc4,
+  JT $17a) sets the design scale `A5-0x149e` = 0.75 × half view width and
+  reuses a stored cache entry when its key (+0 1-bit mode, +2 / +4,
+  +6 / +8 view width / height) matches, restoring the per-instrument records
+  (`A5-0x12a2`) from entry +0x12.
 - The needle function pointer `A5-0x2118` and the per-type record at
   `A5-0x12a2`.
 - ID04 slot users decoded in iteration 172; the panel-store path (ID04 0x432,

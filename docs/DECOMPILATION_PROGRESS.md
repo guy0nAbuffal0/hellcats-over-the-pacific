@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 203
+**Last iteration:** 207
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -12,7 +12,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
 | ID02.c | 125 | 58 | 0 | 0 | 67 | 0 | 0 |
-| ID03.c | 45 | 17 | 0 | 0 | 28 | 0 | 0 |
+| ID03.c | 45 | 7 | 0 | 0 | 38 | 0 | 0 |
 | ID04.c | 59 | 0 | 0 | 0 | 59 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **412** | **0** | **0** | **318** | **0** | **6** |
+| **TOTAL** | **736** | **402** | **0** | **0** | **328** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 412 NOT_STARTED + 6 BLOCKED (iteration 203);
-318 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 402 NOT_STARTED + 6 BLOCKED (iteration 207);
+328 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -357,6 +357,16 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00003832` (ID03) | `make_inset_face_oval_region` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | oval region of the face inside the bezel | body details | 202 (2026-10-17) | dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames |
 | `FUN_000038fc` (ID03) | `draw_artificial_horizon` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument" | body details | 202 (2026-10-17) | dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames |
 | `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | HEL2 200–500 + config A5-0x13ae; error -> A5-0x14a0 (ID04 0x432 alert); documents release routine 0x59f4 | — | 203 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00005c36` (ID03) | `open_cport_on_buffer` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | OpenCPort on a caller buffer (rowBytes, baseAddr, bounds) | redraw path after 0x5f20 | 204 (2026-10-17) | dis.py on ID03.bin; CODE0 JT; token diff = renames |
+| `FUN_00005cb6` (ID03) | `close_port_glue` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | ClosePort | redraw path after 0x5f20 | 204 (2026-10-17) | dis.py on ID03.bin; CODE0 JT; token diff = renames |
+| `FUN_00005cc4` (ID03) | `prepare_instrument_panel` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | JT $17a; panel scale A5-0x149e; Bitmap Cache lookup by display configuration | redraw path after 0x5f20 | 204 (2026-10-17) | dis.py on ID03.bin; CODE0 JT; token diff = renames |
+| `FUN_00005860` (ID03) | `compute_panel_screen_addresses` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | screen byte addresses base + y*rowBytes + x/(8/depth) | — | 205 (2026-10-17) | Ghidra C / dis.py; token diff = renames |
+| `FUN_00006c1c` (ID03) | `remap_cached_panel_colours` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | JT $182; re-colours a cached panel; palette indices via lookup_palette_index_for_rgb_level | — | 205 (2026-10-17) | Ghidra C / dis.py; token diff = renames |
+| `FUN_0000077e` (ID03) | `draw_vector_glyph_string_centred` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | centred stroke-font string; glyph table A5-0x20b0 (6 glyphs) | — | 206 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_0000146a` (ID03) | `composite_instrument_bitmap` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | CopyBits (1-bit) or antialias_downsample_bw_3x into the panel port A5-0x1496 | — | 206 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00001844` (ID03) | `finish_instrument_supersample` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | SetPort(panel), composite, dispose_offscreen_bw_port | — | 206 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00003f24` (ID03) | `draw_bevelled_frame` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | four shaded polygons between outer and inner rects | — | 207 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
+| `FUN_00004110` (ID03) | `draw_numbered_bevel_box` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | black box, bevel, vector-font number | — | 207 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -2142,9 +2152,53 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Validation: token diff = renames only (28 ID03 renames); warnings intact;
   32 hashes OK; git diff --check clean.
 
-**Next iteration target:** ID03 `FUN_00005cc4` (cache set-up at 0x5cc4:
-OpenResFile / HEL2 127 "Bitmap Cache", calls FUN_00005860), then
-`FUN_00005860`, `FUN_00005c36`, `FUN_00005cb6`.
+### Iteration 204 — 2026-10-17
+
+- Phase A: iterations 180–203 staged by the user (index), working tree
+  otherwise clean; 32 protected hashes OK.
+- ID03 `FUN_00005c36` = open_cport_on_buffer, `FUN_00005cb6` =
+  close_port_glue, `FUN_00005cc4` = prepare_instrument_panel (JT $17a):
+  panel scale A5-0x149e = 0.75 × half view width; Bitmap Cache (HEL2 127,
+  4 × 0x160) entries keyed by 1-bit mode, A5-0x137e / -0x137c and view size;
+  a matching stored entry restores the instrument records (A5-0x12a2) and
+  reloads the HEL2 bitmaps instead of redrawing.
+- Validation: token diff = renames only (31 ID03 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 205 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204 work preserved.
+- ID03 `FUN_00005860` = compute_panel_screen_addresses (screen byte
+  addresses base A5-0x1382 + y × rowBytes A5-0x1378 + x / (8 / depth));
+  `FUN_00006c1c` = remap_cached_panel_colours (JT $182). Correction:
+  A5-0x137a is the pixel depth (1 / 4 / 8), "== 1" meaning 1-bit mode.
+- Validation: token diff = renames only (33 ID03 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 206 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204–205 work preserved.
+- ID03 `FUN_0000077e` = draw_vector_glyph_string_centred (stroke font,
+  glyph table A5-0x20b0; used by draw_direction_indicator);
+  `FUN_0000146a` = composite_instrument_bitmap; `FUN_00001844` =
+  finish_instrument_supersample (the end of the begin_instrument_supersample
+  sequence, used by four gauges).
+- Validation: token diff = renames only (36 ID03 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 207 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 204–206 work preserved.
+- ID03 `FUN_00003f24` = draw_bevelled_frame, `FUN_00004110` =
+  draw_numbered_bevel_box. `FUN_00004304` (caller of both, three numbered
+  boxes at A5-0x11c6 / -0x11be / -0x11b6, tick loops) left NOT_STARTED:
+  purpose not yet clear.
+- Validation: token diff = renames only (38 ID03 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+**Next iteration target:** ID03 `FUN_00004304`, then `FUN_00004790`,
+`FUN_00004b32`, `FUN_00005158`, `FUN_000054fe`, `FUN_00005718`,
+`FUN_000071a2`.
 
 ## Resuming the five-minute workflow
 
