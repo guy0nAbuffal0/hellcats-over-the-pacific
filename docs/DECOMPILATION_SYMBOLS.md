@@ -97,6 +97,50 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003d42` (ID04) | `check_system_requirements` | STRONG INFERENCE | Iter 172: Color QD + 68020 check; JT $f2. |
 | `FUN_000003c2` (ID04) | `run_with_temporary_window` | STRONG INFERENCE mechanics | Iter 172: "Hellcats" window around ID02 0x2db8. |
 | `FUN_000004f0` / `00000516` / `00000560` (ID04) | `ask_save_changes` / `confirm_end_mission` / `confirm_erase_high_scores` | STRONG INFERENCE | Iter 175: CautionAlert 257 / 259 / 260 (texts from DITL dump). |
+| `FUN_00000588` (ID04) | `compute_pilot_score` | STRONG INFERENCE | Iter 176: Σ record +0x28 tallies × A5−0xf5e weights. |
+| `FUN_00000f4e` / `00001106` / `00001a0e` (ID04) | `rank_pilots_by_score` / `reset_pilot_record` / `build_rank_and_name_string` | STRONG INFERENCE | Iter 177; see PILOT_ROSTER.md. |
+| `FUN_000031aa` (ID04) | `conclude_mission` | STRONG INFERENCE | Iter 178: mission-over flag + pilot status write; JT $da. |
+| `FUN_00003124` / `FUN_00003178` (ID04) | `play_named_sound_async` / `stop_named_sound` | STRONG INFERENCE | Iter 179: Sound Manager 'snd ' by name (A5−0x2128); channel A5−0x2152, handle A5−0x2156. |
+| `FUN_00002de6` (ID04) | `show_mission_summary_dialog` | STRONG INFERENCE | Iter 180: DLOG 133 "Mission Summary". |
+| `FUN_00000006` (ID04) | `disable_dialog_control` | PROVEN | Iter 181: bytes; HiliteControl 255. |
+| `FUN_0000002e` (ID04) | `enable_dialog_control` | PROVEN | Iter 181: bytes; HiliteControl 0. |
+| `FUN_00000054` (ID04) | `hide_dialog_control` | PROVEN | Iter 181: bytes; HideControl. |
+| `FUN_00000078` (ID04) | `show_dialog_control` | PROVEN | Iter 181: bytes; ShowControl. |
+| `FUN_0000009c` (ID04) | `set_dialog_item_text` | PROVEN | Iter 181: bytes; SetIText. |
+| `FUN_000000c4` (ID04) | `set_dialog_control_title` | PROVEN | Iter 181: bytes; SetCTitle. |
+| `FUN_000000ec` (ID04) | `set_dialog_user_item_proc` | PROVEN | Iter 181: bytes; SetDItem with a ProcPtr. |
+| `FUN_00000120` (ID04) | `frame_dialog_item_box` | PROVEN | Iter 181: bytes; InsetRect -2, PenSize 1, FrameRect. |
+| `FUN_0000016e` (ID04) | `draw_default_button_outline` | PROVEN | Iter 181: bytes; user item via JT $12a; item A5-0x225e; FrameRoundRect 16. |
+| `FUN_000001f2` (ID04) | `draw_grey_user_item` | PROVEN | Iter 181: bytes; user item via JT $142; FillRect gray A5-0x1624. |
+| `FUN_000017e6` (ID04) | `create_scrolling_text_item` | STRONG INFERENCE | Iter 182: bytes; TENew -> A5-0x223a; NewControl scrollBarProc -> A5-0x2236; user item JT $92. |
+| `FUN_0000189c` (ID04) | `dispose_scrolling_text_item` | PROVEN | Iter 182: bytes; TEDispose + DisposeControl. |
+| `FUN_000018b0` (ID04) | `append_line_to_scrolling_text` | STRONG INFERENCE | Iter 182: bytes; strlen (ID02 0x3e8) + TEInsert ×2 + 0x158c scroll update. |
+| `FUN_000014a0` (ID04) | `draw_scrolling_text_item` | PROVEN | Iter 183: bytes; EraseRect viewRect, TEUpdate, frame. |
+| `FUN_000014f2` (ID04) | `scrolling_text_user_item_proc` | PROVEN | Iter 183: bytes; Pascal user item, JT $92. |
+| `FUN_0000150e` (ID04) | `sync_text_scroll_to_control` | PROVEN | Iter 183: bytes; TEScroll by ctl value × lineHeight. |
+| `FUN_00001562` (ID04) | `update_scroll_bar_maximum` | PROVEN | Iter 183: bytes; SetCtlMax(nLines − visible). |
+| `FUN_0000158c` (ID04) | `scroll_text_to_show_selection` | STRONG INFERENCE | Iter 183: bytes; centre line holding selStart. |
+| `FUN_00001638` (ID04) | `fit_text_view_to_box` | PROVEN | Iter 183: bytes; viewRect = box − 16, whole lines, TECalText. |
+| `FUN_000016c4` (ID04) | `scroll_bar_action_proc` | PROVEN | Iter 183: bytes; JT $16a TrackControl action; parts 20..23; also documents unexported click handler 0x1752. |
+| `FUN_000018e0` (ID04) | `get_mission_kill_report_state` | STRONG INFERENCE | Iter 184: bytes; 0/1/2 from A5-0x12f8, -0x14c0, -0x12ba and ten kill words A5-0x12ce. |
+| `FUN_0000192e` (ID04) | `update_summary_dialog_buttons` | STRONG INFERENCE | Iter 184: bytes; enables items 1/3; moves default ring A5-0x225e to item 1. |
+| `FUN_00002d86` (ID04) | `set_score_item_text` | PROVEN | Iter 185: "Score: " + compute_pilot_score. |
+| `FUN_00001f5e` (ID04) | `draw_aircraft_kill_markers` | STRONG INFERENCE | Iter 186: tallies 0+1, red discs, under "Total Aircraft Destroyed". |
+| `FUN_000020e8` (ID04) | `aircraft_kill_markers_user_item_proc` | PROVEN | Iter 186: JT $ea user item. |
+| `FUN_00001bc8` (ID04) | `draw_targets_destroyed_row` | STRONG INFERENCE | Iter 187–188: per target type; skips 2/4/8; count and count × weight. |
+| A5−0xf5e | per-target-type point weights (words) | STRONG INFERENCE | Iter 188: count × weight in draw_targets_destroyed_row and compute_pilot_score. |
+| A5−0x2226 | pointer to the Mission Summary kill counts (local array) | PROVEN | Iter 188: set at ID04 0x2e00. |
+| `FUN_00001d9e` (ID04) | `draw_targets_destroyed_list` | PROVEN | Iter 187: JT $aa user item 6. |
+| ID04 0x1dde (unexported, JT $152) | `draw_mission_awards` | STRONG INFERENCE | Iter 187: record +0x26 bits -> cicn 512–519. |
+| ID04 0x1b3e (unexported, JT $15a) | `draw_rank_insignia` | STRONG INFERENCE | Iter 187: cicn 256 + rank. |
+| ID04 0x2104 (unexported, JT $ca) | `mission_summary_filter_proc` | STRONG INFERENCE | Iter 185: ModalDialog filter; comment block in ID04.decomp.c. |
+| ID04 0x21d6 (unexported) | `advance_mission_summary_text` | STRONG INFERENCE | Iter 185: state machine on A5-0x2222. |
+| A5−0x2222 / −0x2230 / −0x222c | summary text state / step delay (ticks) / last step tick | STRONG INFERENCE | Iter 185. |
+| ID02 0x2c8 / 0x2d8; ID09 0x416 | strcpy / strcat; C-to-Pascal string in place | PROVEN | Iter 185: bytes. |
+| A5−0x12ce | ten per-mission kill counters (one per target type) | STRONG INFERENCE | Iter 184: get_mission_kill_report_state; "No new kills to report." |
+| A5−0x12b4 / A5−0x14c4 | current pilot status / mission-over flag | STRONG INFERENCE | Iter 178. |
+| A5−0xffe / A5−0xfae / A5−0xf86 | rank / pilot-status / target-type string groups | PROVEN (dump) | Iter 176: STR#129 slots 94-99 / 100-105 / 106-115. |
+| HEL1 127 / HEL1 128 | "Hellcats Saved Settings" / "Player and Score Data" | PROVEN (dump names) | Iter 176. |
 | ALRT 258 "Error" ("^1 ^0.") | used by ID02 show_caution_alert_with_number | PROVEN (dump) | Iter 175. |
 | ID04 file 0x432 (unexported) | panel-store failure report (proposed) | PROVEN bytes | Iter 172: flag A5−0x14a0 → JT $462 + alert slot 1. |
 | STR# 129 text | `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/` | PROVEN (dump) | Files 0-based; game slot n ↔ file n−1. Slot 93 = out-of-memory message; slot 65 = ALTITUDE. |

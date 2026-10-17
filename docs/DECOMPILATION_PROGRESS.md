@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 175
+**Last iteration:** 188
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -13,14 +13,14 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
 | ID02.c | 125 | 58 | 0 | 0 | 67 | 0 | 0 |
 | ID03.c | 45 | 21 | 0 | 0 | 24 | 0 | 0 |
-| ID04.c | 59 | 54 | 0 | 0 | 5 | 0 | 0 |
+| ID04.c | 59 | 19 | 0 | 0 | 40 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **470** | **0** | **0** | **260** | **0** | **6** |
+| **TOTAL** | **736** | **435** | **0** | **0** | **295** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 470 NOT_STARTED + 6 BLOCKED (iteration 175);
-260 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 435 NOT_STARTED + 6 BLOCKED (iteration 187);
+295 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -299,6 +299,41 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_000004f0` (ID04) | `ask_save_changes` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | ALRT 257 Save / Cancel / Don't Save; JT $ba | — | 175 (2026-10-17) | Capstone + ALRT/DITL dump |
 | `FUN_00000516` (ID04) | `confirm_end_mission` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | ALRT 259 Cancel / End Mission; mission state A5−0x12f8 ≥ 3, A5−0x14c4 == 0; JT $13a | — | 175 (2026-10-17) | Capstone + ALRT/DITL dump |
 | `FUN_00000560` (ID04) | `confirm_erase_high_scores` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | ALRT 260 Cancel / Erase | — | 175 (2026-10-17) | Capstone + ALRT/DITL dump |
+| `FUN_00000588` (ID04) | `compute_pilot_score` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | 12 tallies ×12 weights (A5−0xf5e); HEL1 128 records | Tally 10/11 meaning | 176 (2026-10-17) | C complete + resource dump |
+| `FUN_00000f4e` (ID04) | `rank_pilots_by_score` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | scores + sorted order for 20 pilots | Tie-break / JT $512 role | 177 (2026-10-17) | C |
+| `FUN_00001106` (ID04) | `reset_pilot_record` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | clear +0x20..+0x26 and tallies | Tie-break / JT $512 role | 177 (2026-10-17) | C |
+| `FUN_00001a0e` (ID04) | `build_rank_and_name_string` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | rank group + separator + name | Tie-break / JT $512 role | 177 (2026-10-17) | C |
+| `FUN_000031aa` (ID04) | `conclude_mission` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | mission-over flag A5−0x14c4; status A5−0x12b4 → record +0x20; JT $da | FUN_00003124 / 2de6 / 3178 roles | 178 (2026-10-17) | C + JT callers |
+| `FUN_00003124` (ID04) | `play_named_sound_async` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | GetNamedResource('snd ', A5−0x2128); SndNewChannel; SndPlay async | Sound name | 179 (2026-10-17) | Capstone |
+| `FUN_00003178` (ID04) | `stop_named_sound` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | SndDisposeChannel; HUnlock; ReleaseResource | — | 179 (2026-10-17) | Capstone |
+| `FUN_00002de6` (ID04) | `show_mission_summary_dialog` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | DLOG 133 "Mission Summary"; 12-tally loop; local item helpers | Item helpers 0xec/0x06/0xc4/0x54/0x78/0x1b8/0x17e6 | 180 (2026-10-17) | Capstone + DLOG/DITL dump |
+| `FUN_00000006` (ID04) | `disable_dialog_control` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + HiliteControl 255 | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_0000002e` (ID04) | `enable_dialog_control` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + HiliteControl 0 | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_00000054` (ID04) | `hide_dialog_control` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + HideControl | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_00000078` (ID04) | `show_dialog_control` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + ShowControl | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_0000009c` (ID04) | `set_dialog_item_text` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + SetIText | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_000000c4` (ID04) | `set_dialog_control_title` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + SetCTitle | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_000000ec` (ID04) | `set_dialog_user_item_proc` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + SetDItem with a ProcPtr | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_00000120` (ID04) | `frame_dialog_item_box` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + InsetRect -2, PenSize 1, FrameRect | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_0000016e` (ID04) | `draw_default_button_outline` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + user item via JT $12a; item A5-0x225e; FrameRoundRect 16 | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_000001f2` (ID04) | `draw_grey_user_item` | ID04 | RENAMED | PROVEN (bytes) | `ID04.c` (halt_baddata stub) | `ID04.decomp.c` | GetDItem + user item via JT $142; FillRect gray A5-0x1624 | — | 181 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_000017e6` (ID04) | `create_scrolling_text_item` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` (halt_baddata) | `ID04.decomp.c` | TENew -> A5-0x223a; NewControl scrollBarProc -> A5-0x2236; user item JT $92 | Caller path for text fill; JT $92 proc (0x14f2) | 182 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_0000189c` (ID04) | `dispose_scrolling_text_item` | ID04 | RENAMED | PROVEN | `ID04.c` (halt_baddata) | `ID04.decomp.c` | TEDispose + DisposeControl | Callers | 182 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_000018b0` (ID04) | `append_line_to_scrolling_text` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` (halt_baddata) | `ID04.decomp.c` | strlen (ID02 0x3e8) + TEInsert ×2 + 0x158c scroll update | Separator byte A5-0x213a; callers | 182 (2026-10-17) | dis.py on ID04.bin; CODE0 JT parse; token diff = renames |
+| `FUN_000014a0` (ID04) | `draw_scrolling_text_item` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | EraseRect viewRect, TEUpdate, frame | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_000014f2` (ID04) | `scrolling_text_user_item_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | Pascal user item, JT $92 | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_0000150e` (ID04) | `sync_text_scroll_to_control` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | TEScroll by ctl value × lineHeight | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_00001562` (ID04) | `update_scroll_bar_maximum` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | SetCtlMax(nLines − visible) | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_0000158c` (ID04) | `scroll_text_to_show_selection` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | centre line holding selStart | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_00001638` (ID04) | `fit_text_view_to_box` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | viewRect = box − 16, whole lines, TECalText | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_000016c4` (ID04) | `scroll_bar_action_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $16a TrackControl action; parts 20..23; also documents unexported click handler 0x1752 | — | 183 (2026-10-17) | dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames |
+| `FUN_000018e0` (ID04) | `get_mission_kill_report_state` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | 0/1/2 from A5-0x12f8, -0x14c0, -0x12ba and ten kill words A5-0x12ce | State 2 meaning | 184 (2026-10-17) | dis.py on ID04.bin; STR# 129 / DITL 133 dump; token diff = renames |
+| `FUN_0000192e` (ID04) | `update_summary_dialog_buttons` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | enables items 1/3; moves default ring A5-0x225e to item 1 | A5-0x12f0 / -0x2228 / -0x2230 roles | 184 (2026-10-17) | dis.py on ID04.bin; STR# 129 / DITL 133 dump; token diff = renames |
+| `FUN_00002d86` (ID04) | `set_score_item_text` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | "Score: " (STR# 58) + compute_pilot_score; strcpy/strcat ID02 0x2c8/0x2d8; ID09 0x432/0x416 | — | 185 (2026-10-17) | dis.py; STR# dump; token diff = renames |
+| `FUN_00001f5e` (ID04) | `draw_aircraft_kill_markers` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | tally[0]+tally[1] (≤24) markers in a 6-column grid; red PaintOval in a frame | Lifetime vs mission count | 186 (2026-10-17) | dis.py; DITL 133 placement; token diff = renames |
+| `FUN_000020e8` (ID04) | `aircraft_kill_markers_user_item_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | Pascal user item, JT $ea, item 7 of DLOG 133 | — | 186 (2026-10-17) | dis.py; CODE0 JT |
+| `FUN_00001bc8` (ID04) | `draw_targets_destroyed_row` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | skips types 2/4/8; 7 rows; "name sep n … n×weight" right-aligned | Separator text A5-0x2136 | 188 (2026-10-17) | dis.py; token diff = renames |
+| `FUN_00001d9e` (ID04) | `draw_targets_destroyed_list` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $aa user item 6; also documents unexported draw_mission_awards (0x1dde, JT $152, cicn 512–519) | — | 187 (2026-10-17) | dis.py; CODE0 JT; DITL/cicn dump |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1733,8 +1768,170 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   Mission / proceed), confirm_erase_high_scores (0x560).
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID04 `FUN_00000588` (reads the HEL1 128 records
-A5−0x13a8 - likely the high-score / pilot roster) and neighbours.
+### Iteration 176 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 172-175); 32
+  protected hashes verified.
+- ID04 `FUN_00000588` = compute_pilot_score (Σ 12 record tallies × 12 weights).
+- Resource dump names HEL1 128 "Player and Score Data" (20 × 0x40 records;
+  shipped empty) and HEL1 127 "Hellcats Saved Settings". The ID07 string groups
+  are now identified: A5−0xffe = ranks (Ensign … Captain), A5−0xfae = pilot
+  status (Active, Dead, Retired, POW, Discharged, MIA), A5−0xf86 = 10 target
+  types (Fighter … Runway).
+- Validation: token diff = renames only; hashes OK.
+
+### Iteration 177 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 176 preserved.
+- Collected every pilot-record access in the exported C and wrote
+  `docs/PILOT_ROSTER.md` (20 × 0x40 layout: name +0x00, +0x20 word, rank
+  +0x22, +0x24/+0x26, 12 tallies +0x28; related string groups; functions).
+- Renamed ID04 rank_pilots_by_score (0xf4e), reset_pilot_record (0x1106),
+  build_rank_and_name_string (0x1a0e).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 178 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 177 preserved.
+- ID04 `FUN_000031aa` = conclude_mission (JT $da; called from ID02 0x8cc and
+  do_menu_command menu 2 item 5): one-shot FUN_00003124 when status == 1
+  (Dead) and an option is on, sets mission-over flag A5−0x14c4 for non-zero
+  status, calls FUN_00002de6 / FUN_00003178, writes status A5−0x12b4 into the
+  current pilot record +0x20. Record +0x20 = status now STRONG INFERENCE.
+- Validation: token diff = renames only; hashes OK.
+
+### Iteration 179 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 178 preserved.
+- ID04 `FUN_00003124` = play_named_sound_async (GetNamedResource 'snd ' by
+  the Pascal name at A5−0x2128, HLock, SndNewChannel, SndPlay async) and
+  `FUN_00003178` = stop_named_sound (SndDisposeChannel, HUnlock,
+  ReleaseResource). conclude_mission plays it once when the pilot dies.
+  The dump lists named 'snd ' resources (Hit, Ditch, Explosion, Gear, ugh,
+  Engine, ...); the exact name is in A5 initial data (not read).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 180 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 179 preserved.
+- ID04 `FUN_00002de6` = show_mission_summary_dialog: GetNewDialog(133);
+  DLOG 133 "Mission Summary" (dump) has End Mission / OK / Skip Text buttons and
+  "Mission Awards", "Targets Destroyed", "Total Aircraft Destroyed", "Score"
+  texts; the 12-iteration loop matches the 12 pilot tallies (supports tallies =
+  targets destroyed).
+- Validation: token diff = renames only; hashes OK.
+
+### Iteration 181 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180 work preserved.
+- Ghidra could not decode ID04 0x06..0x21a (halt_baddata stubs); decoded the
+  bytes. Ten Toolbox dialog wrappers built on GetDItem ($A98D):
+  disable/enable_dialog_control (HiliteControl 255/0), hide/show_dialog_control,
+  set_dialog_item_text (SetIText), set_dialog_control_title (SetCTitle),
+  set_dialog_user_item_proc (SetDItem with a ProcPtr), frame_dialog_item_box,
+  and two Pascal user-item procedures: draw_default_button_outline (JT $12a ->
+  0x16e; item number in A5-0x225e, set by the unexported installer at 0x1b8)
+  and draw_grey_user_item (JT $142 -> 0x1f2; FillRect with gray A5-0x1624).
+- Validation: token diff = renames only (4416 tokens); Ghidra warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 182 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–181 work preserved.
+- ID04 0x17e6 = create_scrolling_text_item (TextEdit record A5-0x223a +
+  scrollBarProc control A5-0x2236 beside the item box, user item JT $92 ->
+  0x14f2); 0x189c = dispose_scrolling_text_item; 0x18b0 =
+  append_line_to_scrolling_text (ID02 0x3e8 is strlen, then two TEInsert calls
+  and the 0x158c scroll update). Used by the Mission Summary dialog.
+- No direct JSR to 0x189c / 0x18b0 in ID04 bytes; caller path open.
+- Validation: token diff = renames only; Ghidra warnings intact; 32 hashes OK.
+
+### Iteration 183 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–182 work preserved.
+- Completed the ID04 scrolling-text component (TERec A5-0x223a, scroll bar
+  A5-0x2236, visible lines A5-0x2232): draw_scrolling_text_item,
+  scrolling_text_user_item_proc (JT $92), sync_text_scroll_to_control,
+  update_scroll_bar_maximum, scroll_text_to_show_selection,
+  fit_text_view_to_box, scroll_bar_action_proc (JT $16a; inline switch table
+  at 0x16fe, parts 20..23; Ghidra decoded it as `*unaff_A4 |= …` stores).
+- Documented the unexported click handler at 0x1752 (FindControl /
+  TrackControl) inside the scroll_bar_action_proc header.
+- Validation: token diff = renames only (33 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 184 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–183 work preserved.
+- ID04 0x18e0 = get_mission_kill_report_state: 0 when A5-0x12f8 == 2, 2 when
+  A5-0x14c0 == 0 and A5-0x12ba > 0, 1 when any of ten words at A5-0x12ce is
+  set. A 0 result makes confirm_end_mission skip its alert and makes the summary
+  append STR# slot 50 "No new kills to report."; the ten words match the ten
+  target types (kill counts, STRONG INFERENCE).
+- ID04 0x192e = update_summary_dialog_buttons: enables items 1 (End Mission)
+  and 3 (OK) by state; moves the default-button ring to item 1 with
+  EraseRect / InvalRect and A5-0x225e = 1.
+- Correction: the DITL dump numbers items from 0; Toolbox item n = dump item
+  n−1 (item 1 End Mission, 2 ring user item, 3 OK, 4 Skip Text).
+- Validation: token diff = renames only (35 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 185 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–184 work preserved.
+- Bytes 0x2104..0x2d84 sit inside Ghidra's `FUN_000020e8` range and hold two
+  unexported functions, documented in a comment block in `ID04.decomp.c`:
+  0x2104 (JT $ca) = Mission Summary ModalDialog filter (keyDown Return/Enter ->
+  default item, mouseDown -> scroll-text click handler, updateEvt -> ID02
+  0x4d6a, timer -> text step every A5-0x2230 ticks, A5-0x222c last tick);
+  0x21d6 = text step state machine on A5-0x2222 (states 0..5, 100 =
+  finished). Sparse switch-table format of ID01 JT $2a / $32: count, then
+  (offset, value) pairs, then default offset, offsets relative to their own
+  word.
+- ID04 `FUN_00002d86` = set_score_item_text ("Score: " + pilot score).
+- Validation: token diff = renames only (36 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 186 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–185 work preserved.
+- ID04 `FUN_00001f5e` = draw_aircraft_kill_markers: one framed red disc per
+  aircraft destroyed (pilot tallies 0 + 1, Fighter + Bomber, capped at 24) in a
+  6-column grid; drawn in item 7 of DLOG 133, directly under the "Total
+  Aircraft Destroyed" label (DITL dump item 6).
+- ID04 `FUN_000020e8` = aircraft_kill_markers_user_item_proc (JT $ea).
+- Validation: token diff = renames only (38 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 187 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–186 work preserved.
+- Mission Summary user items (show_mission_summary_dialog 0x2e34..0x2e90):
+  item 6 JT $aa = `draw_targets_destroyed_list` (`FUN_00001d9e`, rows via
+  `draw_targets_destroyed_row` = `FUN_00001bc8`, types 2/4/8 skipped);
+  item 5 JT $152 = unexported draw_mission_awards (0x1dde; record +0x26 bits
+  0..7 -> cicn 512..519); item 7 JT $ea = aircraft kill markers; item 9
+  JT $7a = `build_rank_and_name_string` (correction: it is a Pascal user item
+  that also draws the string); item 15 JT $15a = unexported draw_rank_insignia
+  (0x1b3e; cicn 256 + rank).
+- Validation: token diff = renames only (40 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 188 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 180–187 work preserved.
+- Decoded the body of `draw_targets_destroyed_row` (annotation only, no new
+  rename): 23-pixel rows; label = target name + separator + count; points =
+  count × weight[type] (A5-0xf5e, same weights as compute_pilot_score) drawn
+  right-aligned. Counts come from the summary's local array (A5-0x2226 ->
+  show_mission_summary_dialog -0x4a(A6)), which the text step increments
+  together with A5-0x13a2.
+- Validation: token diff unchanged (40 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+**Next iteration target:** ID04 summary text step at 0x21d6, state 0
+(0x21fc..0x28c2), and the kill-transfer code at 0x2a2e..0x2b74 (state 3,
+A5-0x13a2 / A5-0x2226 increments).
 
 ## Resuming the five-minute workflow
 
