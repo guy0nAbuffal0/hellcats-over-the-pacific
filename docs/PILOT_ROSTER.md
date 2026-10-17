@@ -16,9 +16,9 @@ listed); field meanings are marked.
 |---|---|---|---|
 | +0x00 | 32 bytes | name, Pascal string | converted with p2cstr / c2pstr in `build_rank_and_name_string` |
 | +0x20 | word | pilot status, set from `A5-0x12b4` by `conclude_mission` | **[STRONG INFERENCE]** index into the status strings; status 1 (Dead) triggers a one-shot path |
-| +0x22 | word | rank index into the rank strings | `build_rank_and_name_string` |
-| +0x24 | word | unknown | cleared by `reset_pilot_record` |
-| +0x26 | word | awards bitmask (bits 0–7 → cicn 512–519) | cleared by `reset_pilot_record`; drawn by `draw_mission_awards` (ID04 0x1dde, iteration 187) **[STRONG INFERENCE]** |
+| +0x22 | word | rank index into the rank strings | `build_rank_and_name_string`; raised by the Mission Summary promotion step (ID04 0x2b74, iteration 190) to the highest rank whose threshold (longs at `A5-0xfd6`) is ≤ the score |
+| +0x24 | word | friendly-fire offence count (1, 2 = warnings; 3 = dishonourable discharge, status 4) | cleared by `reset_pilot_record`; incremented by the Mission Summary state 0 (ID04 0x2798, iteration 192) **[STRONG INFERENCE from the texts]** |
+| +0x26 | word | awards bitmask (bits 0–7 → cicn 512–519; bit = mission `A5-0x12f8` − 3, set by summary state 2 when the mission succeeds, iteration 191); with missions 2..9 (iteration 196) the awards are for missions 3 Bomb Base … 9 The Duel (bits 0–6); Flight School (2) gives none and bit 7 has no mission [STRONG INFERENCE] | cleared by `reset_pilot_record`; drawn by `draw_mission_awards` (ID04 0x1dde, iteration 187) **[STRONG INFERENCE]** |
 | +0x28 | 12 words | tallies | weighted by 12 words at `A5-0xf5e` in `compute_pilot_score` |
 
 The current pilot's index is the word at `A5-0x13a4`.
@@ -48,11 +48,14 @@ tallies = destroyed targets per type **[STRONG INFERENCE]**.
 | 0xf4e | `rank_pilots_by_score` | scores and sorted order for all 20 pilots |
 | 0x1106 | `reset_pilot_record` | clear rank, words +0x20..+0x26 and tallies |
 | 0x1a0e | `build_rank_and_name_string` | "rank separator name" for the current pilot |
+| 0x116a | `prune_inactive_pilots_beyond_ten` | keeps the ten best non-Active pilots (iteration 197) |
+| 0x644 (unexported, JT $132) | `run_duty_roster_dialog` | DLOG 130 "Duty Roster": rank / name / score of up to ten Active pilots, Dossier… = pilot summary, OK saves edited names (iteration 198) |
+| 0x1200 | `draw_high_scores_table` | DLOG 134 "High Scores" table (iteration 201); runner 0x137a erases non-Active pilots |
 | 0x560 | `confirm_erase_high_scores` | ALRT 260 ("erase all non-active duty high scores") |
 | 0x516 | `confirm_end_mission` | ALRT 259 ("You will collect no points") |
 
 ## Open questions
 
 - Scoring weights at `A5-0xf5e` (A5 initial data, not yet read). Iteration 188: `draw_targets_destroyed_row` shows count × weight[type] per target type, so weights 0–9 are points per destroyed target of each type **[STRONG INFERENCE]**.
-- Meaning of +0x24 and tallies 10–11. Rank +0x22 also selects cicn 256 + rank (insignia, ID04 0x1b3e).
-- Where the roster is written back (WriteResource after a mission).
+- Meaning of tallies 10–11. Rank +0x22 also selects cicn 256 + rank (insignia, ID04 0x1b3e).
+- ~~Where the roster is written back~~ — Mission Summary state 3 (ID04 0x2a60, iteration 189): after adding each mission kill count A5-0x12ce[t] to tally[t], ChangedResource(roster handle) and UpdateResFile(A5-0x1002). This proves tallies 0–9 are lifetime kills per target type.

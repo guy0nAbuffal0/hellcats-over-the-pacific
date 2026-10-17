@@ -754,9 +754,13 @@ void draw_turn_and_bank_indicator /* Original: FUN_00002d1c */ (undefined4 param
 
 
 
+/* Original: FUN_000032b8; source: ID03.c. Recovered name: draw_gyro_instrument [STRONG INFERENCE] (iteration 202).
+ * Decoded from ID03.bin bytes at file 0x32b8.
+ * Instrument type 8 of draw_instrument (called with $a, $c, $e, $10, $12 and 1). Uses the handles A5-0x11dc and A5-0x11d4 (HLock / HUnlock through ID09 JT $26a / $272 / $27a), which ID03 0x5ba6..0x5bea saves with AddResource (HEL2, id base A5-0x13ae + 400 / 500) under the names STR# 129 slot 81 "GyroInstrument" and slot 82 "GyroFlags" [PROVEN]. Draws scale lines with design_x_to_screen / design_y_to_screen (JT $3ca / $382) and scale_design_4800, renders into a black-and-white port (new_offscreen_bw_port 0x2a8, SetOrigin), uses ID02 JT $402 (file 0xca6), PaintRect and CopyBits ($A8EC), then antialias_downsample_bw_3x (0xa3c) and dispose_offscreen_bw_port (0x33c) [PROVEN calls]. Which gyro instrument this is (and what the flags image shows) is not yet decoded [HYPOTHESIS name]. Ghidra truncated the body.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000032b8(void)
+void draw_gyro_instrument /* Original: FUN_000032b8 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -765,9 +769,13 @@ void FUN_000032b8(void)
 
 
 
+/* Original: FUN_00003832; source: ID03.c. Recovered name: make_inset_face_oval_region [STRONG INFERENCE] (iteration 202).
+ * Decoded from ID03.bin bytes at file 0x3832.
+ * C args: +8 Rect *r (out), +0xc short size, +0xe short y, +0x10 short x (design units). PenSize(1, 1); r = screen square from design_x_to_screen(x - size/2) + 1, design_y_to_screen(y - size/2) + 1, side scale_design_4800(size) - 2; InsetRect(r, scale(50), scale(50)); rgn = NewRgn ($A8D8); OpenRgn ($A8DA); FrameOval(r) ($A8B7); CloseRgn(rgn) ($A8DB); returns rgn [PROVEN, bytes 0x3832..0x38fa]: the oval of the instrument face inside the bezel. Caller: draw_artificial_horizon (0x3996).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003832(void)
+void make_inset_face_oval_region /* Original: FUN_00003832 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -776,9 +784,13 @@ void FUN_00003832(void)
 
 
 
+/* Original: FUN_000038fc; source: ID03.c. Recovered name: draw_artificial_horizon [STRONG INFERENCE] (iteration 202).
+ * Decoded from ID03.bin bytes at file 0x38fc.
+ * Instrument type 9 of draw_instrument. Builds an oval region of the face (NewRgn / OpenRgn / FrameOval / CloseRgn) and a second one with make_inset_face_oval_region, combines them with DiffRgn ($A8E6), saves the clip (GetClip $A87A) and clips to the face (SetClip $A879); computes a rotated line with sine / cosine values through function pointers (jsr (A0); MULU.L then ASR.L #12, 4.12 fixed point) and draws it with MoveTo / LineTo, plus an 8-step loop of marks; restores the clip; uses the handle A5-0x11f6, which ID03 0x5b82 saves with AddResource under STR# 129 slot 80 "HorizonInstrument" [PROVEN], and PtInRgn ($A8E8) tests. Interpreted as the artificial horizon (bank-rotated horizon line in a round face) [STRONG INFERENCE from the resource name and the rotation]. Ghidra truncated the body.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000038fc(void)
+void draw_artificial_horizon /* Original: FUN_000038fc */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1121,9 +1133,14 @@ void FUN_00005860(void)
 
 
 
+/* Original: FUN_00005ab6; source: ID03.c. Recovered name: store_panel_bitmaps_as_resources [PROVEN] (iteration 203).
+ * Decoded from ID03.bin bytes at file 0x5ab6.
+ * No arguments. With panel configuration c = A5-0x13ae: SetResLoad(false) ($A99B); for ids 200, 300, 400, 500 + c: GetResource(HEL2, id) ($A9A0) and RmveResource ($A9AD) of any old copy; SetResLoad(true); UpdateResFile(A5-0x1002) ($A999); then AddResource ($A9AB) of the handles A5-0x12b0, -0x11f6, -0x11dc, -0x11d4 as HEL2 200 / 300 / 400 / 500 + c with the names STR# 129 slots 79 "Bitmap", 80 "HorizonInstrument", 81 "GyroInstrument", 82 "GyroFlags", adding each ResError ($A9AF) to a local count. If any failed: cache entry flag +0xc = 0 (cache = HEL2 127 "Bitmap Cache" at A5-0x13b2, 0x160 bytes per configuration) and A5-0x14a0 = 1, which makes the ID04 routine at 0x432 show STR# 129 slot 1 "Unable to store instrument panel to disk"; otherwise flag +0xc = 1. Finally ChangedResource(cache) ($A9AA) and UpdateResFile. Caller: ID03 0x6ba4.
+ * Related (inside the Ghidra range of FUN_00005860, not exported): file 0x59f4..0x5ab4 releases the same four handles - ReleaseResource ($A9A3) when the cache entry of configuration A5-0x211e is flagged as stored, else DisposHandle (ID09 JT $25a) - and clears them [PROVEN, bytes]; callers 0x5ed2, 0x61d6.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00005ab6(void)
+void store_panel_bitmaps_as_resources /* Original: FUN_00005ab6 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here

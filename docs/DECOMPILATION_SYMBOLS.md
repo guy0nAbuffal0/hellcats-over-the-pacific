@@ -130,7 +130,60 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001bc8` (ID04) | `draw_targets_destroyed_row` | STRONG INFERENCE | Iter 187–188: per target type; skips 2/4/8; count and count × weight. |
 | A5−0xf5e | per-target-type point weights (words) | STRONG INFERENCE | Iter 188: count × weight in draw_targets_destroyed_row and compute_pilot_score. |
 | A5−0x2226 | pointer to the Mission Summary kill counts (local array) | PROVEN | Iter 188: set at ID04 0x2e00. |
+| A5−0x12ce | ten per-mission kill counters, cleared when added to the pilot tallies | PROVEN | Iter 189: summary state 3 (0x2a2e). |
+| A5−0x13a2 | ten per-type kill totals, incremented with the pilot tallies | STRONG INFERENCE | Iter 189: role beyond accumulation unknown. |
+| A5−0x1002 | resource file reference number used with UpdateResFile | STRONG INFERENCE | Iter 189: roster write-back. |
+| A5−0x2176 | summary kill-transfer index (target type) | PROVEN | Iter 189. |
+| A5−0xfd6 | rank point thresholds (one long per rank) | STRONG INFERENCE | Iter 190: summary state 4 promotion. |
+| A5−0x2220 | Mission Summary argument word from conclude_mission; low byte 1 grants the mission award | PROVEN flow / HYPOTHESIS meaning | Iter 191. |
+| A5−0x12f8 | current mission number; award bit = value − 3 | STRONG INFERENCE | Iter 191: summary state 2. |
+| A5−0x12b6 | friendly units destroyed this mission (≥ 5 → executed for treason) | STRONG INFERENCE | Iter 192: summary state 0. |
+| A5−0x12ba | mission objective state (> 0 done, 0 open, −1 failed by event, −2 original Hellcat lost) | STRONG INFERENCE | Iter 192. |
+| A5−0x221e + 4k | STR# 129 slot 2 + k pointer group (outcome texts) | PROVEN | Iter 192 (with ID07 init_string_pointer_groups). |
+| A5−0x21c6 / A5−0x21ca | summary line queue (string pointers) / cursor | PROVEN | Iter 190: states 0, 4, 5. |
 | `FUN_00001d9e` (ID04) | `draw_targets_destroyed_list` | PROVEN | Iter 187: JT $aa user item 6. |
+| `FUN_00000220` (ID04) | `draw_percent_bar_item` | PROVEN | Iter 193: bytes; percentage bar A5-0x225c (0..100), dkGray / white. |
+| `FUN_000002c0` (ID04) | `percent_bar_user_item_proc` | PROVEN | Iter 193: bytes; JT $8a user item; documents unexported set_radio_group_selection 0x2dc. |
+| `FUN_00000362` (ID04) | `get_radio_group_selection` | PROVEN | Iter 193: bytes; first set control of an item list, else -1. |
+| `FUN_00000a8e` (ID04) | `fuel_slider_dialog_filter` | STRONG INFERENCE | Iter 194: bytes; Return/Enter, slider tracking (StillDown/GetMouse), update events. |
+| `FUN_00000bda` (ID04) | `scenario_selection_filter_proc` | PROVEN | Iter 194: bytes; JT $112 filter, DLOG 129, slider item 5. |
+| `FUN_00000e48` (ID04) | `refuel_dialog_filter_proc` | PROVEN | Iter 194: bytes; JT $14a filter, DLOG 132, slider item 3. |
+| `FUN_000009ee` (ID04) | `draw_select_mission_title` | PROVEN | Iter 197: bytes; JT $11a user item 4 of DLOG 129; STR# 64 centred, size 24. |
+| `FUN_0000116a` (ID04) | `prune_inactive_pilots_beyond_ten` | STRONG INFERENCE | Iter 197: bytes; clears non-Active records after the best ten; WriteResource roster. |
+| `FUN_0000044e` (ID04) | `show_scenery_open_error_alert` | PROVEN | Iter 198: bytes; ParamText + StopAlert(256) "Unable to open Hellcats scenery file"; JT $fa. |
+| `FUN_00000478` (ID04) | `show_paused_dialog` | PROVEN | Iter 198: bytes; DLOG 131 "Paused", wait for key down + up; JT $122. |
+| `FUN_000005e4` (ID04) | `duty_roster_filter_proc` | PROVEN | Iter 198: bytes; JT $c2 filter; documents unexported run_duty_roster_dialog 0x644 (JT $132, DLOG 130). |
+| `FUN_00003260` (ID04) | `draw_map_grid_and_centre_mark` | PROVEN | Iter 199: bytes; 4 x 4 grid + centre cross; A5-0x214e = 1. |
+| `FUN_00003352` (ID04) | `plot_map_symbol_callback` | PROVEN | Iter 199: bytes; JT $72 callback: DrawChar at map coordinates (CurrentA5). |
+| `FUN_000033d6` (ID04) | `draw_map_view_item` | STRONG INFERENCE | Iter 199: bytes; blue sea, A5-0x1052(scale, JT $72), scale text " mi./grid" item 7. |
+| `FUN_000035f8` (ID04) | `map_view_user_item_proc` | PROVEN | Iter 200: bytes; JT $b2; documents unexported track_map_bearing_and_distance 0x3614. |
+| `FUN_00003902` (ID04) | `map_dialog_filter_proc` | PROVEN | Iter 200: bytes; JT $d2; documents unexported run_map_dialog 0x3976 (JT $10a, DLOG 137 zoom). |
+| `FUN_00003a56` (ID04) | `poll_click_or_key_event` | PROVEN | Iter 200: bytes; 1 for mouseDown / keyDown / autoKey. |
+| `FUN_00003a8c` (ID04) | `show_about_dialog` | STRONG INFERENCE | Iter 200: bytes; DLOG 127 / 138 (1-bit), vers 1 text; tail not decoded. |
+| `FUN_00001200` (ID04) | `draw_high_scores_table` | PROVEN | Iter 201: JT $e2; DLOG 134. |
+| `FUN_000032b8` (ID03) | `draw_gyro_instrument` | STRONG INFERENCE (HYPOTHESIS which gyro) | Iter 202: type 8; handles A5-0x11dc "GyroInstrument" / A5-0x11d4 "GyroFlags". |
+| `FUN_00003832` (ID03) | `make_inset_face_oval_region` | STRONG INFERENCE | Iter 202: oval region of the face inside the bezel. |
+| `FUN_000038fc` (ID03) | `draw_artificial_horizon` | STRONG INFERENCE | Iter 202: type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument". |
+| `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | PROVEN | Iter 203: AddResource HEL2 200–500 + config. |
+| A5−0x14a0 | "panel store failed" flag (alert in ID04 0x432) | PROVEN | Iter 203. |
+| A5−0x13ae / A5−0x211e | panel configuration index (HEL2 id offset; cache entry) / configuration of the loaded bitmaps | STRONG INFERENCE | Iter 203. |
+| A5−0x12b0 / −0x11f6 / −0x11dc / −0x11d4 / −0x13b2 | cached panel bitmaps "Bitmap" / "HorizonInstrument" / "GyroInstrument" / "GyroFlags" / "Bitmap Cache" (HEL2 resources) | PROVEN names | Iter 202: AddResource in ID03 0x5b5e..0x5d44. |
+| ID04 0x137a (unexported, JT $102) | `run_high_scores_dialog` | STRONG INFERENCE | Iter 201. |
+| ID04 0x3614 (unexported) | `track_map_bearing_and_distance` | STRONG INFERENCE | Iter 200. |
+| ID04 0x3976 (unexported, JT $10a) | `run_map_dialog` | STRONG INFERENCE | Iter 200: DLOG 137. |
+| A5−0x137a | 1 = 1-bit (black and white) display mode | STRONG INFERENCE | Iter 200: DLOG 138 "About Hellcats 1-Bit". |
+| A5−0x1056 / A5−0x105a | angle (atan2-like, 1/0x4000 turns) / square-root function pointers | HYPOTHESIS | Iter 200: map bearing / distance. |
+| HEL1 127 settings +0x26 | map scale (miles per grid square) | STRONG INFERENCE | Iter 199: " mi./grid" text. |
+| A5−0x1052 | map object plotter function pointer (scale, callback) | PROVEN call / UNKNOWN target | Iter 199. |
+| ID04 0x644 (unexported, JT $132) | `run_duty_roster_dialog` | STRONG INFERENCE | Iter 198: DLOG 130 "Duty Roster". |
+| A5−0x225c | fuel load percentage (0..100) of the Scenario Selection / Refuel dialogs | STRONG INFERENCE | Iter 194: DITL 132 "Fuel: E F". |
+| ID04 0xe70 (unexported, JT $9a) | `run_refuel_dialog` | STRONG INFERENCE | Iter 195: DLOG 132 runner. |
+| ID04 0xc02 (unexported, JT $82) | `run_scenario_selection_dialog` | STRONG INFERENCE | Iter 196: DLOG 129 runner; returns mission or 0. |
+| HEL1 127 settings +0x1e / +0x20 / +0x22 / +0x24 | mission / pilot index / fuel % / bombs | STRONG INFERENCE | Iter 196: written by the Scenario Selection runner. |
+| Mission numbers 2..9 | Flight School, Bomb Base, Capture Island, Flying Fortress, Scramble!, Divine Wind, Flattop, The Duel | STRONG INFERENCE | Iter 196: radio item − 7; consistent with summary failure texts. |
+| A5−0x12d2 / A5−0x12d0 | flight fuel load percentage / bomb count (0..2) | STRONG INFERENCE | Iter 195: written by run_refuel_dialog. |
+| A5−0x2240 | bomb radio item list (3 words) | STRONG INFERENCE | Iter 195. |
+| ID04 0x2dc (unexported) | `set_radio_group_selection` | PROVEN | Iter 193: SetCtlValue(item == selected). |
 | ID04 0x1dde (unexported, JT $152) | `draw_mission_awards` | STRONG INFERENCE | Iter 187: record +0x26 bits -> cicn 512–519. |
 | ID04 0x1b3e (unexported, JT $15a) | `draw_rank_insignia` | STRONG INFERENCE | Iter 187: cicn 256 + rank. |
 | ID04 0x2104 (unexported, JT $ca) | `mission_summary_filter_proc` | STRONG INFERENCE | Iter 185: ModalDialog filter; comment block in ID04.decomp.c. |

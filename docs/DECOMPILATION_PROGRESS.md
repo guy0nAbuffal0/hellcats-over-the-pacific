@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 188
+**Last iteration:** 203
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -12,15 +12,15 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
 | ID02.c | 125 | 58 | 0 | 0 | 67 | 0 | 0 |
-| ID03.c | 45 | 21 | 0 | 0 | 24 | 0 | 0 |
-| ID04.c | 59 | 19 | 0 | 0 | 40 | 0 | 0 |
+| ID03.c | 45 | 17 | 0 | 0 | 28 | 0 | 0 |
+| ID04.c | 59 | 0 | 0 | 0 | 59 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **435** | **0** | **0** | **295** | **0** | **6** |
+| **TOTAL** | **736** | **412** | **0** | **0** | **318** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 435 NOT_STARTED + 6 BLOCKED (iteration 187);
-295 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 412 NOT_STARTED + 6 BLOCKED (iteration 203);
+318 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -334,6 +334,29 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_000020e8` (ID04) | `aircraft_kill_markers_user_item_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | Pascal user item, JT $ea, item 7 of DLOG 133 | — | 186 (2026-10-17) | dis.py; CODE0 JT |
 | `FUN_00001bc8` (ID04) | `draw_targets_destroyed_row` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | skips types 2/4/8; 7 rows; "name sep n … n×weight" right-aligned | Separator text A5-0x2136 | 188 (2026-10-17) | dis.py; token diff = renames |
 | `FUN_00001d9e` (ID04) | `draw_targets_destroyed_list` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $aa user item 6; also documents unexported draw_mission_awards (0x1dde, JT $152, cicn 512–519) | — | 187 (2026-10-17) | dis.py; CODE0 JT; DITL/cicn dump |
+| `FUN_00000220` (ID04) | `draw_percent_bar_item` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | percentage bar A5-0x225c (0..100), dkGray / white | — | 193 (2026-10-17) | dis.py; CODE0 JT; token diff = renames |
+| `FUN_000002c0` (ID04) | `percent_bar_user_item_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $8a user item; documents unexported set_radio_group_selection 0x2dc | — | 193 (2026-10-17) | dis.py; CODE0 JT; token diff = renames |
+| `FUN_00000362` (ID04) | `get_radio_group_selection` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | first set control of an item list, else -1 | — | 193 (2026-10-17) | dis.py; CODE0 JT; token diff = renames |
+| `FUN_00000a8e` (ID04) | `fuel_slider_dialog_filter` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | Return/Enter, slider tracking (StillDown/GetMouse), update events | — | 194 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL 129 / 132 dump; token diff = renames |
+| `FUN_00000bda` (ID04) | `scenario_selection_filter_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $112 filter, DLOG 129, slider item 5 | — | 194 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL 129 / 132 dump; token diff = renames |
+| `FUN_00000e48` (ID04) | `refuel_dialog_filter_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $14a filter, DLOG 132, slider item 3 | — | 194 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL 129 / 132 dump; token diff = renames |
+| `FUN_000009ee` (ID04) | `draw_select_mission_title` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $11a user item 4 of DLOG 129; STR# 64 centred, size 24 | — | 197 (2026-10-17) | dis.py; CODE0 JT; token diff = renames |
+| `FUN_0000116a` (ID04) | `prune_inactive_pilots_beyond_ten` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | clears non-Active records after the best ten; WriteResource roster | — | 197 (2026-10-17) | dis.py; CODE0 JT; token diff = renames |
+| `FUN_0000044e` (ID04) | `show_scenery_open_error_alert` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | ParamText + StopAlert(256) "Unable to open Hellcats scenery file"; JT $fa | — | 198 (2026-10-17) | dis.py; CODE0 JT; ALRT/DLOG/DITL dump; token diff = renames |
+| `FUN_00000478` (ID04) | `show_paused_dialog` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | DLOG 131 "Paused", wait for key down + up; JT $122 | — | 198 (2026-10-17) | dis.py; CODE0 JT; ALRT/DLOG/DITL dump; token diff = renames |
+| `FUN_000005e4` (ID04) | `duty_roster_filter_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $c2 filter; documents unexported run_duty_roster_dialog 0x644 (JT $132, DLOG 130) | — | 198 (2026-10-17) | dis.py; CODE0 JT; ALRT/DLOG/DITL dump; token diff = renames |
+| `FUN_00003260` (ID04) | `draw_map_grid_and_centre_mark` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | 4 x 4 grid + centre cross; A5-0x214e = 1 | A5-0x1052 target | 199 (2026-10-17) | dis.py; CODE0 JT; STR# 59; token diff = renames |
+| `FUN_00003352` (ID04) | `plot_map_symbol_callback` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $72 callback: DrawChar at map coordinates (CurrentA5) | A5-0x1052 target | 199 (2026-10-17) | dis.py; CODE0 JT; STR# 59; token diff = renames |
+| `FUN_000033d6` (ID04) | `draw_map_view_item` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | blue sea, A5-0x1052(scale, JT $72), scale text " mi./grid" item 7 | A5-0x1052 target | 199 (2026-10-17) | dis.py; CODE0 JT; STR# 59; token diff = renames |
+| `FUN_000035f8` (ID04) | `map_view_user_item_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $b2; documents unexported track_map_bearing_and_distance 0x3614 | — | 200 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL dump; token diff = renames |
+| `FUN_00003902` (ID04) | `map_dialog_filter_proc` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $d2; documents unexported run_map_dialog 0x3976 (JT $10a, DLOG 137 zoom) | — | 200 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL dump; token diff = renames |
+| `FUN_00003a56` (ID04) | `poll_click_or_key_event` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | 1 for mouseDown / keyDown / autoKey | — | 200 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL dump; token diff = renames |
+| `FUN_00003a8c` (ID04) | `show_about_dialog` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | DLOG 127 / 138 (1-bit), vers 1 text; tail not decoded | — | 200 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL dump; token diff = renames |
+| `FUN_00001200` (ID04) | `draw_high_scores_table` | ID04 | RENAMED | PROVEN | `ID04.c` | `ID04.decomp.c` | JT $e2 user item 10 of DLOG 134; documents unexported run_high_scores_dialog 0x137a (JT $102) | — | 201 (2026-10-17) | dis.py; CODE0 JT; DLOG/DITL 134; token diff = renames |
+| `FUN_000032b8` (ID03) | `draw_gyro_instrument` | ID03 | RENAMED | STRONG INFERENCE (HYPOTHESIS which gyro) | `ID03.c` | `ID03.decomp.c` | type 8; handles A5-0x11dc "GyroInstrument" / A5-0x11d4 "GyroFlags" | body details | 202 (2026-10-17) | dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames |
+| `FUN_00003832` (ID03) | `make_inset_face_oval_region` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | oval region of the face inside the bezel | body details | 202 (2026-10-17) | dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames |
+| `FUN_000038fc` (ID03) | `draw_artificial_horizon` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument" | body details | 202 (2026-10-17) | dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames |
+| `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | ID03 | RENAMED | PROVEN | `ID03.c` | `ID03.decomp.c` | HEL2 200–500 + config A5-0x13ae; error -> A5-0x14a0 (ID04 0x432 alert); documents release routine 0x59f4 | — | 203 (2026-10-17) | dis.py on ID03.bin; token diff = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1929,9 +1952,199 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Validation: token diff unchanged (40 ID04 renames); warnings intact;
   32 hashes OK; git diff --check clean.
 
-**Next iteration target:** ID04 summary text step at 0x21d6, state 0
-(0x21fc..0x28c2), and the kill-transfer code at 0x2a2e..0x2b74 (state 3,
-A5-0x13a2 / A5-0x2226 increments).
+### Iteration 189 — 2026-10-17
+
+- Phase A: working tree clean (user committed iterations 180–188); 32
+  protected hashes OK.
+- Decoded state 3 of the ID04 summary text step (0x2a2e..0x2b70, annotation
+  in the iteration-185 comment block): for each target type with mission
+  kills A5-0x12ce[t] = n, adds n to pilot tally[t], A5-0x13a2[t] and the
+  summary counts, clears A5-0x12ce[t], appends "n name(s)" and redraws the
+  score (item 14), the targets row (item 6) and the kill markers (item 7).
+  After the last type: ChangedResource(roster) + UpdateResFile(A5-0x1002),
+  state 4. Answers the roster write-back question.
+- Validation: token diff unchanged (40 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 190 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189 work preserved.
+- Decoded states 4 and 5 of the ID04 summary text step (annotation in the
+  iteration-185 comment block): state 4 compares compute_pilot_score with the
+  rank thresholds (longs at A5-0xfd6), promotes (record +0x22 = highest rank
+  whose threshold <= score), saves the roster and queues STR# 53 or 54–55;
+  state 5 prints the queued lines, then "You are (posthumously) promoted to
+  the grade of <rank>" (STR# 56/57) and invalidates items 15 (insignia) and 9
+  (rank + name) so they redraw. No promotion -> state 100 (finished).
+- Validation: token diff unchanged (40 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 191 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–190 work preserved.
+- Decoded states 1 and 2 of the ID04 summary text step (annotation): state 1
+  prints queued lines, then goes to state 2 or ends with "Player's
+  Cumulative History" (A5-0x2228 != -1). State 2 grants mission award bit
+  (A5-0x12f8 - 3) in record +0x26 when the summary argument's low byte is 1
+  and the pilot is not dead (saves the roster, redraws item 5), then prints
+  "No new kills to report." (end) or "Now adding points…" / "==== Kills ===="
+  and enters state 3. Noted an unreachable branch at 0x29d8..0x29f0.
+- Validation: token diff unchanged (40 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 192 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–191 work preserved.
+- Decoded state 0 of the ID04 summary text step (outcome narrative,
+  annotation): outcome code = low byte of A5-0x2220 (switch 1..10: flight end,
+  mission-in-progress summary, ditching, bail-out, disabled landing, landing,
+  enemy-base landing); location / rescue lines from the high-byte flags and
+  pilot status; friendly-fire handling (A5-0x12b6, record +0x24 offence
+  count: warning, second warning, discharge; ≥ 5 friendly kills = executed);
+  lost-aircraft lines and A5-0x12ba objective state. The whole summary text
+  step (states 0–5) is now documented.
+- Validation: token diff unchanged (40 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 193 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–192 work preserved.
+- ID04 dialog helpers: `FUN_00000220` = draw_percent_bar_item (A5-0x225c,
+  0..100, set by mouse tracking at 0xb3c and stored in settings word +0x22 of
+  A5-0x13ac); `FUN_000002c0` = percent_bar_user_item_proc (JT $8a);
+  `FUN_00000362` = get_radio_group_selection; unexported 0x2dc =
+  set_radio_group_selection (documented in the 0x2c0 header).
+- Validation: token diff = renames only (43 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 194 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–193 work preserved.
+- ID04 `FUN_00000a8e` = fuel_slider_dialog_filter (shared ModalDialog filter
+  core: Return/Enter -> item 1, slider tracking, update events);
+  `FUN_00000bda` = scenario_selection_filter_proc (JT $112, DLOG 129
+  "Scenario Selection", slider item 5); `FUN_00000e48` =
+  refuel_dialog_filter_proc (JT $14a, DLOG 132 "Refuel", slider item 3).
+  The percentage bar A5-0x225c is the fuel load ("Fuel: E … F"); radio
+  buttons 0/1/2 are the bomb count.
+- Validation: token diff = renames only (46 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 195 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–194 work preserved.
+- Decoded the unexported Refuel dialog runner at ID04 0xe70 (JT $9a,
+  annotation in the refuel_dialog_filter_proc header): GetNewDialog(132),
+  default ring on user item 2, fuel bar item 3, bomb radio group (list at
+  A5-0x2240, always preset to item 6), ModalDialog loop until OK, then bomb
+  count A5-0x12d0 = selection - 4 and fuel A5-0x12d2 = A5-0x225c.
+- Validation: token diff unchanged (46 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 196 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–195 work preserved.
+- Decoded the unexported Scenario Selection runner at ID04 0xc02 (JT $82,
+  annotation in the scenario_selection_filter_proc header): mission radio
+  group (A5-0x2256, mission = item - 7), bomb group (A5-0x2246, bombs =
+  item - 6), fuel bar; Cancel returns 0; OK goes through confirm_end_mission
+  and writes settings +0x1e mission, +0x20 pilot, +0x22 fuel, +0x24 bombs
+  (dirty flag A5-0x138a), then apply_settings_to_live_options and
+  A5-0x12f8 = mission. Mission numbers: 2 Flight School, 3 Bomb Base,
+  4 Capture Island, 5 Flying Fortress, 6 Scramble!, 7 Divine Wind,
+  8 Flattop, 9 The Duel.
+- Validation: token diff unchanged (46 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 197 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–196 work preserved.
+- ID04 `FUN_000009ee` = draw_select_mission_title (JT $11a, "Select a
+  Mission" title of DLOG 129); `FUN_0000116a` =
+  prune_inactive_pilots_beyond_ten (keeps the ten best non-Active pilots,
+  clears the rest, WriteResource on the roster).
+- Validation: token diff = renames only (48 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 198 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–197 work preserved.
+- ID04 `FUN_0000044e` = show_scenery_open_error_alert (ALRT 256);
+  `FUN_00000478` = show_paused_dialog (DLOG 131); `FUN_000005e4` =
+  duty_roster_filter_proc (JT $c2). Documented the unexported Duty Roster
+  runner at 0x644 (JT $132, DLOG 130): ranks and prunes the roster, lists up
+  to ten Active pilots (rank, editable name, score), "Dossier…" opens
+  show_mission_summary_dialog for the selected pilot, OK saves renamed pilots
+  and selects the current pilot.
+- Validation: token diff = renames only (51 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 199 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–198 work preserved.
+- ID04 map view: `FUN_00003260` = draw_map_grid_and_centre_mark,
+  `FUN_00003352` = plot_map_symbol_callback (JT $72; DrawChar per object),
+  `FUN_000033d6` = draw_map_view_item (blue sea, plotting through the function
+  pointer A5-0x1052, scale text "<n> mi./grid" from settings +0x26).
+- Validation: token diff = renames only (54 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 200 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–199 work preserved.
+- ID04 map dialog (DLOG 137 "Map"): `FUN_000035f8` = map_view_user_item_proc
+  (JT $b2), `FUN_00003902` = map_dialog_filter_proc (JT $d2); documented the
+  unexported bearing / distance tool at 0x3614 (rubber-band line from the
+  centre, bearing via A5-0x1056, distance via A5-0x105a, items 5 / 6) and the
+  runner at 0x3976 (JT $10a; Zoom In / Out halve / double settings +0x26,
+  1..256; skipped in Flight School). Legend letters + T C B A from DITL 137.
+- `FUN_00003a56` = poll_click_or_key_event; `FUN_00003a8c` =
+  show_about_dialog (DLOG 127, or 138 when A5-0x137a == 1 = 1-bit mode).
+- Validation: token diff = renames only (58 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 201 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–200 work preserved.
+- ID04 `FUN_00001200` = draw_high_scores_table (DLOG 134 "High Scores":
+  rank, name, status, score for up to ten pilots); documented the unexported
+  runner at 0x137a (JT $102; "Erase Nonactive…" resets every non-Active
+  record after confirm_erase_high_scores and saves the roster).
+- ID04 is now fully renamed: 59 / 59 Ghidra functions, plus unexported routines
+  documented in comments (0x1b8, 0x2dc, 0x432, 0x644, 0xc02, 0xe70, 0x137a,
+  0x1752, 0x1b3e, 0x1dde, 0x2104, 0x21d6, 0x3614, 0x3976).
+- Validation: token diff = renames only (59 ID04 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 202 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–201 work preserved.
+- ID03 instrument types 8 and 9: the cached instrument bitmaps are saved by
+  ID03 0x5b5e..0x5d44 with AddResource (type HEL2) under STR# 129 names
+  "Bitmap" (A5-0x12b0), "HorizonInstrument" (A5-0x11f6), "GyroInstrument"
+  (A5-0x11dc), "GyroFlags" (A5-0x11d4), "Bitmap Cache" (A5-0x13b2). Type 9
+  (`FUN_000038fc`, uses A5-0x11f6) = draw_artificial_horizon; type 8
+  (`FUN_000032b8`, uses A5-0x11dc / -0x11d4) = draw_gyro_instrument;
+  `FUN_00003832` = make_inset_face_oval_region.
+- Validation: token diff = renames only (27 ID03 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+### Iteration 203 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 189–202 work preserved.
+- ID03 `FUN_00005ab6` = store_panel_bitmaps_as_resources: replaces HEL2
+  200 / 300 / 400 / 500 + configuration A5-0x13ae with the panel bitmaps
+  ("Bitmap", "HorizonInstrument", "GyroInstrument", "GyroFlags"); on any
+  ResError clears the "stored" flag +0xc of the "Bitmap Cache" entry
+  (0x160 bytes per configuration) and sets A5-0x14a0, which the ID04 routine
+  at 0x432 reports as "Unable to store instrument panel to disk" (closes the
+  question from iteration 172). Documented the release routine at 0x59f4.
+- Validation: token diff = renames only (28 ID03 renames); warnings intact;
+  32 hashes OK; git diff --check clean.
+
+**Next iteration target:** ID03 `FUN_00005cc4` (cache set-up at 0x5cc4:
+OpenResFile / HEL2 127 "Bitmap Cache", calls FUN_00005860), then
+`FUN_00005860`, `FUN_00005c36`, `FUN_00005cb6`.
 
 ## Resuming the five-minute workflow
 

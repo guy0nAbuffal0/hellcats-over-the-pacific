@@ -170,9 +170,13 @@ void draw_grey_user_item /* Original: FUN_000001f2 */ (void)
 
 
 
+/* Original: FUN_00000220; source: ID04.c. Recovered name: draw_percent_bar_item [PROVEN] (iteration 193).
+ * Decoded from ID04.bin bytes at file 0x220.
+ * C args: +8 DialogPtr, +0xc short item. GetDItem -> box; split = box.left + width * A5-0x225c / 100 (MULU.L / DIVS.L); FillRect(left part, dkGray A5-0x1634) ($A8A5), FillRect(right part from split + 1, white A5-0x1614); InsetRect(&box, -1, -1), PenSize(1, 1), FrameRect. A5-0x225c is a 0..100 value set by mouse tracking at 0xb3c..0xb9a (100 * (mouse - left) / width, clamped) and copied to/from settings word +0x22 of the handle A5-0x13ac and the live option A5-0x12d2 [PROVEN]. So this draws a percentage slider in the settings dialog [STRONG INFERENCE; which option it controls is open]. Callers: percent_bar_user_item_proc, 0xb9a.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000220(void)
+void draw_percent_bar_item /* Original: FUN_00000220 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -181,12 +185,17 @@ void FUN_00000220(void)
 
 
 
-void FUN_000002c0(void)
+/* Original: FUN_000002c0; source: ID04.c. Recovered name: percent_bar_user_item_proc [PROVEN] (iteration 193).
+ * Decoded from ID04.bin bytes at file 0x2c0.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes, which Ghidra read as an unrecoverable jump table): calls draw_percent_bar_item. Reached through JT $8a (CODE 0 entry -> ID04 0x2c0).
+ * The following bytes 0x2dc..0x360 (not exported by Ghidra) are set_radio_group_selection [PROVEN, bytes]: C args +8 DialogPtr, +0xc short *items, +0x10 short count, +0x12 short selected. If items[0] <= selected <= items[count - 1], for each item: GetDItem, SetCtlValue(handle, item == selected) ($A963; SEQ/NEG gives 1 or 0). Callers: 0xcc4, 0xcdc, 0xd2c, 0xd44, 0xeda, 0xf0a.
+ */
+void percent_bar_user_item_proc /* Original: FUN_000002c0 */ (void)
 
 {
   code *UNRECOVERED_JUMPTABLE;
   
-  FUN_00000220();
+  draw_percent_bar_item();
                     // WARNING: Could not recover jumptable at 0x000002da. Too many branches
                     // WARNING: Treating indirect jump as call
   (*UNRECOVERED_JUMPTABLE)();
@@ -195,9 +204,13 @@ void FUN_000002c0(void)
 
 
 
+/* Original: FUN_00000362; source: ID04.c. Recovered name: get_radio_group_selection [PROVEN] (iteration 193).
+ * Decoded from ID04.bin bytes at file 0x362.
+ * C args: +8 DialogPtr, +0xc short *items, +0x10 short count. Returns the first items[i] whose control value (GetCtlValue $A960) is non-zero, or -1 when none is set (and when count < 1, the case Ghidra decoded) [PROVEN, bytes 0x362..0x3c0]. Pairs with set_radio_group_selection (0x2dc). Callers: 0xd5a, 0xda2, 0xf20.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-undefined4 FUN_00000362(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+undefined4 get_radio_group_selection /* Original: FUN_00000362 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   if (param_3._0_2_ < 1) {
@@ -246,9 +259,13 @@ void run_with_temporary_window /* Original: FUN_000003c2 */ (void)
 
 
 
+/* Original: FUN_0000044e; source: ID04.c. Recovered name: show_scenery_open_error_alert [PROVEN] (iteration 198).
+ * Decoded from ID04.bin bytes at file 0x44e.
+ * C arg +8: Pascal string (file name). ParamText(name, NULL, NULL, NULL) ($A98B); JT $47a(0x100) (ID02 0x442e, also called before ALRT 259 by confirm_end_mission); returns StopAlert(256, NULL) ($A986). ALRT 256 is "Unable to Open Scenery": DITL 256 text "Unable to open Hellcats scenery file '^0'." with an OK button. Reached through JT $fa (CODE 0 entry -> ID04 0x44e).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000044e(void)
+void show_scenery_open_error_alert /* Original: FUN_0000044e */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -257,9 +274,13 @@ void FUN_0000044e(void)
 
 
 
+/* Original: FUN_00000478; source: ID04.c. Recovered name: show_paused_dialog [PROVEN] (iteration 198).
+ * Decoded from ID04.bin bytes at file 0x478.
+ * GetNewDialog(0x83 = DLOG 131 "Paused Dialog", NULL, (WindowPtr)-1) ($A97C); JT $48a (ID02 0x435e); ShowWindow; DrawDialog ($A981); then polls GetNextEvent(0x18 = keyDown | keyUp mask) ($A970) until it has seen a keyDown (what 3) followed by a keyUp (what 4); DisposDialog. DITL 131 text: "Paused ... Press any key to continue." Reached through JT $122 (-> ID04 0x478).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000478(void)
+void show_paused_dialog /* Original: FUN_00000478 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -390,9 +411,14 @@ int compute_pilot_score /* Original: FUN_00000588 */ (undefined4 param_1)
 
 
 
+/* Original: FUN_000005e4; source: ID04.c. Recovered name: duty_roster_filter_proc [PROVEN] (iteration 198).
+ * Decoded from ID04.bin bytes at file 0x5e4.
+ * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes, Boolean result). Switch on event->what through JT $2a (table at 0x5f2: keyDown 3 -> 0x5fe, updateEvt 6 -> 0x62c, default -> 0x636): keyDown Return (13) / Enter (3) -> *itemHit = 1, return true; updateEvt -> JT $492 (ID02 0x4d6a), false. Reached through JT $c2 (-> ID04 0x5e4).
+ * The following bytes 0x644..0x9ec (not exported by Ghidra) are run_duty_roster_dialog [STRONG INFERENCE name], JT $132 (-> ID04 0x644) [PROVEN, bytes]: GetNewDialog(0x82 = DLOG 130 "Duty Roster"); JT $472; rank_pilots_by_score(scores, order); prune_inactive_pilots_beyond_ten(order); for up to ten pilots in score order whose status +0x20 == 0 (Active), row r: SetIText item 5 + r = rank name (A5-0xffe[record +0x22]), item 15 + r = pilot name (editable), item 25 + r = decimal compute_pilot_score; row -> pilot map in a local array. Current pilot = settings +0x20 (A5-0x13ac) -> A5-0x13a4; the row whose pilot equals it (and whose name is set or score non-zero) gets SelIText(item 15 + r, 0, 1000) ($A97E). Default ring on user item 2 (default 1), grey user item 39 (JT $142); ShowWindow; loop ModalDialog(JT $c2): item 3 Cancel -> DisposDialog, return 0; item 4 "Dossier..." -> show_mission_summary_dialog(pilot of the active edit field (dialog->editField + 1 - 15 = row), 0, STR# 63 "OK") - shows that pilot's summary; item 1 OK: for each row GetIText ($A990), p2c both names (ID09 0x432), compare 30 bytes (JT $502, ID02 0x434) and copy when different (JT $50a, ID02 0x3f6), c2p; if any name changed, ChangedResource + WriteResource (roster); A5-0x13a4 = pilot of the active edit field; DisposDialog; return 1.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000005e4(void)
+void duty_roster_filter_proc /* Original: FUN_000005e4 */ (void)
 
 {
   int unaff_A5;
@@ -405,9 +431,13 @@ void FUN_000005e4(void)
 
 
 
+/* Original: FUN_000009ee; source: ID04.c. Recovered name: draw_select_mission_title [PROVEN] (iteration 197).
+ * Decoded from ID04.bin bytes at file 0x9ee.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). Text = STR# 129 slot 64 "Select a Mission" (pointer A5-0xe46, kept as a Pascal string by the loader). GetDItem -> box; TextSize(24) ($A88A); w = StringWidth ($A88C); GetFontInfo ($A88B); MoveTo(box.left + width / 2 - w / 2, box.top + height / 2 + ascent / 2) ($A893); DrawString ($A884); TextSize(0). Reached through JT $11a (CODE 0 entry -> ID04 0x9ee), installed for item 4 of DLOG 129 "Scenario Selection" by run_scenario_selection_dialog (0xc66).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000009ee(void)
+void draw_select_mission_title /* Original: FUN_000009ee */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -416,7 +446,11 @@ void FUN_000009ee(void)
 
 
 
-undefined4 FUN_00000a8e(undefined4 param_1,int param_2,undefined2 *param_3)
+/* Original: FUN_00000a8e; source: ID04.c. Recovered name: fuel_slider_dialog_filter [STRONG INFERENCE] (iteration 194).
+ * Decoded from ID04.bin bytes at file 0xa8e.
+ * C args: +8 DialogPtr, +0xc EventRecord *, +0x10 short *itemHit, +0x14 short slider item; returns 1 when the event is handled. Switch on event->what through JT $2a (sparse table at 0xa9c: keyDown 3 -> 0xaac, mouseDown 1 -> 0xae8, updateEvt 6 -> 0xbca, default -> 0xbd4) [PROVEN]: keyDown Return (13) / Enter (3) -> *itemHit = 1, return 1 (the case Ghidra decoded); mouseDown -> GetDItem(slider), SetPort, GlobalToLocal(where), PtInRect ($A8AD); if inside, while StillDown ($A973): GetMouse ($A972), value = 100 * (h - left) / (right - left) clamped to 0..100, and when it changes A5-0x225c = value and draw_percent_bar_item(dialog, slider); then *itemHit = slider, return 1; updateEvt -> JT $492 (ID02 0x4d6a), return 0. The slider is the fuel bar of DLOG 129 "Scenario Selection" and DLOG 132 "Refuel" (labels "Fuel:" "E" "F" in DITL 132), so A5-0x225c = fuel load percentage [STRONG INFERENCE].
+ */
+undefined4 fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (undefined4 param_1,int param_2,undefined2 *param_3)
 
 {
   undefined4 uVar1;
@@ -435,14 +469,50 @@ undefined4 FUN_00000a8e(undefined4 param_1,int param_2,undefined2 *param_3)
 
 
 
-void FUN_00000bda(undefined2 *param_1,int param_2,undefined4 param_3)
+/* Original: FUN_00000bda; source: ID04.c. Recovered name: scenario_selection_filter_proc [PROVEN] (iteration 194).
+ * Decoded from ID04.bin bytes at file 0xbda.
+ * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes and returns a Boolean byte, which Ghidra read as an unrecoverable jump table): fuel_slider_dialog_filter(dialog, event, itemHit, 5). Reached through JT $112 (CODE 0 entry -> ID04 0xbda), passed at 0xcea by the code that runs GetNewDialog(0x81 = DLOG 129 "Scenario Selection", call at 0xc38), whose item 5 (dump item 4) is the percent bar (JT $8a installed at 0xc8e).
+ * Iteration 196: the following bytes 0xc02..0xe46 (not exported by Ghidra)
+ * are run_scenario_selection_dialog [STRONG INFERENCE name], reached
+ * through JT $82 (CODE 0 entry -> ID04 0xc02); returns the chosen mission
+ * number, or 0 on Cancel [PROVEN, bytes]:
+ *   mission = settings word +0x1e (handle A5-0x13ac), 0 -> 1; fuel
+ *   A5-0x12d2, 0 -> 100; A5-0x225c = fuel;
+ *   dialog = GetNewDialog(0x81 = DLOG 129, NULL, (WindowPtr)-1); JT $472;
+ *   0x1b8(dialog, 2, 1) default ring on user item 2, default item 1;
+ *   user items: 4 -> JT $11a (ID04 0x9ee, FUN_000009ee), 19 -> JT $142
+ *   draw_grey_user_item, 5 -> JT $8a fuel bar;
+ *   mission 1 -> 2; set_radio_group_selection(dialog, A5-0x2256, 8,
+ *   mission + 7); set_radio_group_selection(dialog, A5-0x2246, 3, 8);
+ *   ShowWindow; loop ModalDialog(JT $112 scenario_selection_filter_proc):
+ *     item 3 (Cancel) -> DisposDialog, return 0;
+ *     item 1 (OK) -> confirm_end_mission() (0x516); leave the loop only
+ *       when it returns 2;
+ *     other items -> set both radio groups to the item;
+ *   bombs: sel(A5-0x2246) - 6 -> settings +0x24; mission: sel(A5-0x2256) - 7
+ *   -> settings +0x1e; fuel A5-0x225c -> settings +0x22; current pilot
+ *   A5-0x13a4 -> settings +0x20; each change sets A5-0x138a (settings
+ *   dirty);
+ *   DisposDialog; JT $4ca apply_settings_to_live_options (ID02 0x2a44);
+ *   A5-0x14c4 (mission over) = 0; A5-0x12f8 = settings +0x1e; JT $4c2
+ *   (ID02 0x212a, FUN_0000212a); return A5-0x12f8.
+ * DITL 129 radio items 9..16 (dump 8..15) are "Flight School", "Bomb Base",
+ * "Capture Island", "Flying Fortress", "Scramble!", "Divine Wind",
+ * "Flattop", "The Duel", so mission numbers 2..9 map to them in that order
+ * (item - 7) [PROVEN mapping arithmetic; STRONG INFERENCE that the A5-0x2256
+ * list holds items 9..16]. This matches the summary: mission 2 (Flight
+ * School) reports no kills, 5 Flying Fortress -> "The B17 has been
+ * destroyed", 6 Scramble! -> Henderson field bombed. Bomb radio items 6..8
+ * = "0", "1", "2" (bombs = item - 6).
+ */
+void scenario_selection_filter_proc /* Original: FUN_00000bda */ (undefined2 *param_1,int param_2,undefined4 param_3)
 
 {
   undefined4 uVar1;
   code *UNRECOVERED_JUMPTABLE;
   undefined1 uStack00000010;
   
-  uVar1 = FUN_00000a8e(param_3,param_2,param_1);
+  uVar1 = fuel_slider_dialog_filter(param_3,param_2,param_1);
   uStack00000010 = (undefined1)uVar1;
                     // WARNING: Could not recover jumptable at 0x00000c00. Too many branches
                     // WARNING: Treating indirect jump as call
@@ -452,14 +522,40 @@ void FUN_00000bda(undefined2 *param_1,int param_2,undefined4 param_3)
 
 
 
-void FUN_00000e48(undefined2 *param_1,int param_2,undefined4 param_3)
+/* Original: FUN_00000e48; source: ID04.c. Recovered name: refuel_dialog_filter_proc [PROVEN] (iteration 194).
+ * Decoded from ID04.bin bytes at file 0xe48.
+ * Pascal ModalDialog filter, as scenario_selection_filter_proc but with slider item 3: fuel_slider_dialog_filter(dialog, event, itemHit, 3). Reached through JT $14a (-> ID04 0xe48), passed at 0xee8 by the code that runs GetNewDialog(0x84 = DLOG 132 "Refuel", 0xe88..0xe92); item 3 (dump item 2) is the fuel bar, radio buttons "0" "1" "2" next to "Bombs:" [PROVEN placement].
+ * Iteration 195: the following bytes 0xe70..0xf4c (not exported by Ghidra)
+ * are run_refuel_dialog [STRONG INFERENCE name], reached through JT $9a
+ * (CODE 0 entry -> ID04 0xe70) [PROVEN, bytes]:
+ *   saves A5-0x12f8 and A5-0x12d0 in locals (never read again);
+ *   A5-0x225c = fuel A5-0x12d2;
+ *   dialog = GetNewDialog(0x84, NULL, (WindowPtr)-1) ($A97C);
+ *   JT $472 (ID02 0x4582, also called by show_mission_summary_dialog);
+ *   0x1b8(dialog, 2, 1): the default-button ring installer (user item 2,
+ *     default item 1 into A5-0x225e);
+ *   set_dialog_user_item_proc(dialog, 3, JT $8a percent_bar_user_item_proc);
+ *   set_radio_group_selection(dialog, A5-0x2240 item list, 3, 6) - always
+ *     starts with item 6 (bombs "2") selected, not with the saved count;
+ *   ShowWindow ($A915);
+ *   loop: ModalDialog(JT $14a refuel_dialog_filter_proc, &item) ($A991);
+ *     until item == 1 (OK): set_radio_group_selection(dialog, list, 3, item)
+ *     (slider hits, item 3, fall outside the radio range and do nothing);
+ *   sel = get_radio_group_selection(dialog, list, 3); if sel != -1:
+ *     A5-0x12d0 = sel - 4 (0..2 bombs);
+ *   A5-0x12d2 = A5-0x225c (fuel %); DisposDialog ($A983).
+ * So A5-0x12d2 = fuel load percentage and A5-0x12d0 = bomb count for the
+ * flight, and A5-0x2240 holds the bomb radio items 4, 5, 6 [STRONG
+ * INFERENCE; the list contents are A5 initial data].
+ */
+void refuel_dialog_filter_proc /* Original: FUN_00000e48 */ (undefined2 *param_1,int param_2,undefined4 param_3)
 
 {
   undefined4 uVar1;
   code *UNRECOVERED_JUMPTABLE;
   undefined1 uStack00000010;
   
-  uVar1 = FUN_00000a8e(param_3,param_2,param_1);
+  uVar1 = fuel_slider_dialog_filter(param_3,param_2,param_1);
   uStack00000010 = (undefined1)uVar1;
                     // WARNING: Could not recover jumptable at 0x00000e6e. Too many branches
                     // WARNING: Treating indirect jump as call
@@ -579,9 +675,13 @@ void reset_pilot_record /* Original: FUN_00001106 */ (undefined4 param_1)
 
 
 
+/* Original: FUN_0000116a; source: ID04.c. Recovered name: prune_inactive_pilots_beyond_ten [STRONG INFERENCE] (iteration 197).
+ * Decoded from ID04.bin bytes at file 0x116a.
+ * Arg +8: short order[20] (pilot indices sorted by rank_pilots_by_score). HLock(roster A5-0x13a8) (JT $272); walks order[0..19]; for each record whose status +0x20 != 0 (not Active), counts it, and every such record after the first ten is cleared with reset_pilot_record; HUnlock (JT $27a); if anything was cleared, ChangedResource ($A9AA) and WriteResource ($A9B0) on the roster [PROVEN, bytes 0x116a..0x11fe]. So the roster keeps at most ten retired / dead / POW / discharged / MIA pilots, the best scores first. Caller: ID04 0x678, right after rank_pilots_by_score at 0x66e. Ghidra stopped before the resource calls.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000116a(int param_1)
+void prune_inactive_pilots_beyond_ten /* Original: FUN_0000116a */ (int param_1)
 
 {
   bool bVar1;
@@ -613,9 +713,14 @@ void FUN_0000116a(int param_1)
 
 
 
+/* Original: FUN_00001200; source: ID04.c. Recovered name: draw_high_scores_table [PROVEN] (iteration 201).
+ * Decoded from ID04.bin bytes at file 0x1200.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). rank_pilots_by_score(scores, order); GetDItem -> box, EraseRect; column x = left edge of items 4..7 (DITL 134 labels "Rank", "Name", "Status", "Score"); HLock(roster) (JT $272); GetFontInfo; for pilots in score order whose name is set or whose score is non-zero, at most ten rows 20 pixels apart (baseline box.top + ascent + 20 * row): DrawString of the rank name (A5-0xffe[record +0x22]), the pilot name (record +0), the status name (A5-0xfae[record +0x20]) and the decimal score (JT $4a2); HUnlock (JT $27a) [PROVEN, bytes 0x1200..0x1378]. Reached through JT $e2 (CODE 0 entry -> ID04 0x1200); installed for item 10 of DLOG 134 "High Scores". Ghidra stopped after the first call.
+ * The following bytes 0x137a..0x149e (not exported by Ghidra) are run_high_scores_dialog [STRONG INFERENCE name], JT $102 (-> ID04 0x137a) [PROVEN, bytes]: GetNewDialog(0x86 = DLOG 134); JT $472; 0x1b8(dialog, 2, 1) default ring; grey user item 8 (JT $142); item 10 = this table (JT $e2); ShowWindow; loop ModalDialog(NULL): item 3 "Erase Nonactive..." -> if confirm_erase_high_scores() == 2: reset_pilot_record for every record whose status +0x20 != 0 (roster locked meanwhile); if any was cleared, ChangedResource + WriteResource and InvalRect(item 10) so the table redraws; until item 1 (OK); DisposDialog.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001200(void)
+void draw_high_scores_table /* Original: FUN_00001200 */ (void)
 
 {
   undefined1 auStack_98 [40];
@@ -1050,6 +1155,116 @@ void aircraft_kill_markers_user_item_proc /* Original: FUN_000020e8 */ (void)
  *     50 "No new kills to report.") and sets A5-0x2222 to the next state
  *     (100 = finished, returns 1 at 0x2d76..0x2d7e). Per-state decoding is
  *     still open.
+ *
+ *     Iteration 189 - state 3, 0x2a2e..0x2b70 ("kill transfer") [PROVEN, bytes]:
+ *     the index A5-0x2176 skips target types whose mission kill count
+ *     A5-0x12ce[t] is 0. When it reaches 10: ChangedResource(A5-0x13a8 roster
+ *     handle, HEL1 128) ($A9AA), UpdateResFile(A5-0x1002) ($A999), state = 4,
+ *     line cursor A5-0x21ca = &A5-0x21c6. Otherwise, for type t with n kills:
+ *       line = decimal n (JT $4a2, ID09 0x432) + text A5-0x212e + target name
+ *              A5-0xf86[t], plus text A5-0x212c when n > 1 [STRONG INFERENCE:
+ *              a space and a plural "s"; A5 initial data not read];
+ *       pilot record tally[t] (+0x28 + 2t) += n; A5-0x12ce[t] = 0;
+ *       A5-0x13a2[t] += n; summary counts (*A5-0x2226)[t] += n;
+ *       append_line_to_scrolling_text(line); set_score_item_text(dialog, 14);
+ *       draw_targets_destroyed_row(dialog, 6, t);
+ *       draw_aircraft_kill_markers(dialog, 7); return 0.
+ *     So pilot tallies 0..9 are lifetime kills per target type and A5-0x12ce
+ *     holds the kills of the current mission not yet added [PROVEN].
+ *
+ *     Iteration 190 - state 4, 0x2b74..0x2c4c ("promotion check") [PROVEN, bytes]:
+ *     score = compute_pilot_score(A5-0x13a4); thresholds = longs at A5-0xfd6
+ *     indexed by rank. If score < threshold[rank + 1]: state = 100, return 1
+ *     (summary finished). Otherwise queue STR# lines through the cursor
+ *     A5-0x21ca into the pointer queue at A5-0x21c6: slot 53 "Its not all bad
+ *     news though, you gained enough points to advance in rank!" when the
+ *     pilot status A5-0x12b4 == 1 (Dead), else slots 54 "Congratulations!" and
+ *     55 "You have gained enough points to advance in rank!"; new rank = the
+ *     last index with threshold <= score, stored in record +0x22;
+ *     ChangedResource(roster) + UpdateResFile(A5-0x1002); A5-0x2176 = number
+ *     of queued lines; cursor reset; state = 5; return 0.
+ *     So A5-0xfd6 = rank point thresholds (one long per rank) [STRONG
+ *     INFERENCE; values are A5 initial data].
+ *
+ *     State 5, 0x2c4e..0x2d7e ("promotion text"): while A5-0x2176-- != 0,
+ *     append the next queued line and return 0. Then line = slot 56 "You are
+ *     posthumously promoted to the grade of " (Dead) or slot 57 "You are
+ *     promoted to the grade of ", + new rank name (A5-0xffe[rank]) + text
+ *     A5-0x212a [STRONG INFERENCE: a full stop]; append it; SetPort(dialog);
+ *     for item 15 (rank insignia; InsetRect(-36, -4)) and item 9 (rank and
+ *     name title; InsetRect(-4, -4)) GetDItem, EraseRect, InvalRect so both
+ *     redraw with the new rank; restore the port; state = 100; return 1.
+ *
+ *     Iteration 191 - state 1, 0x28c2..0x291c [PROVEN, bytes]: while
+ *     A5-0x2176-- != 0, append the next queued line (cursor A5-0x21ca) and
+ *     return 0. Then, if A5-0x2228 == -1: state = 2; otherwise append STR#
+ *     slot 49 "Player's Cumulative History", state = 100, return 1.
+ *
+ *     State 2, 0x291e..0x2a28 [PROVEN, bytes]: append the text at A5-0x2130
+ *     [STRONG INFERENCE: an empty line]. If (arg +0xe & 0xff) == 1 and the
+ *     pilot status A5-0x12b4 != 1 (not Dead): record +0x26 |= 1 << (A5-0x12f8
+ *     - 3), ChangedResource(roster) + UpdateResFile(A5-0x1002), then
+ *     erase / invalidate item 5 (mission awards) so it redraws. So award bit
+ *     n is earned by succeeding in mission A5-0x12f8 = n + 3, and the eight
+ *     award icons (cicn 512..519) are one per mission [STRONG INFERENCE].
+ *     arg +0xe is A5-0x2220, the word argument that conclude_mission passes
+ *     to show_mission_summary_dialog (stored at 0x302c) [PROVEN]; its low
+ *     byte == 1 means "mission accomplished" [HYPOTHESIS].
+ *     Then k = get_mission_kill_report_state(): if k == 0, append slot 50
+ *     "No new kills to report.", state = 100, return 1 (the following test
+ *     of the same k that would select state 4 is never true - unreachable in
+ *     the original bytes 0x29d8..0x29f0); otherwise append slots 51 "Now
+ *     adding points to permanent score" and 52 "==== Kills ====", state = 3,
+ *     A5-0x2176 = 0, return 0.
+ *
+ *     Iteration 192 - state 0, 0x21fc..0x28c0 ("outcome narrative") [PROVEN
+ *     control flow, bytes; texts from the STR# 129 dump]. Lines are queued
+ *     through the cursor A5-0x21ca (reset to &A5-0x21c6) and printed by
+ *     state 1. "slot n" = STR# 129 slot; the pointer group A5-0x221e + 4k
+ *     (ID07 init_string_pointer_groups) is slot 2 + k.
+ *     Outcome code = arg +0xe & 0xff (low byte of A5-0x2220), switch through
+ *     JT $3a, table at 0x2210: lo 1, hi 10, default -> 0x272e:
+ *       1 (0x222a) flight ended [meaning HYPOTHESIS]: if pilot status A5-0x12b4 == 1: slot 23 (bailed
+ *         out without enough altitude) when A5-0x12b2 != 0, else slot 24
+ *         "POW!" and one of slots 25..28 chosen by (TickCount() >> 2) & 3
+ *         (JT $32 table at 0x2268); otherwise slot 29 (objectives achieved,
+ *         mission complete);
+ *       3 (0x2620) mission in progress: prints slot 30 directly, then slot
+ *         31 "You are dead." (status 1), 32 (unbanked points) when
+ *         get_mission_kill_report_state() == 1, or 33 (objectives done,
+ *         return to base) when it is 2; if A5-0x14c0 == 0: A5-0x12ba == -1
+ *         -> failure line by mission A5-0x12f8 (table at 0x26b4: 5 -> slot 34
+ *         B17, 6 -> 35 Henderson field, 7 and 9 -> 36 carrier, 8 -> none),
+ *         A5-0x12ba == -2 -> slot 37 (original Hellcat lost); state = 100,
+ *         return 1 (no queue);
+ *       6 (0x22d4) ditching (slot 2), 7 (0x23c6) bail-out (slot 21),
+ *         8 (0x24f2) disabled-aircraft landing (slot 3), 9 (0x25b8) landing
+ *         (slot 6), 10 (0x24b8) landing at an enemy base (slots 4, 5, 16, 17):
+ *         these set the local "aircraft lost" flag -0x48 (except 9) and add
+ *         location / rescue lines selected by the flag bits of arg +0xe
+ *         (high byte: bit 1 -> slot 12 friendly territory; else bit 0 ->
+ *         slot 10 enemy territory, else slot 11) and by the status
+ *         A5-0x12b4 (sub-switches at 0x233a, 0x2398, 0x242c, 0x248a, 0x2534,
+ *         0x2588: slots 13..20). Status 4 (Discharged) after an undamaged
+ *         ditch / bail-out adds slots 7 or 22 and 8;
+ *       2, 4, 5 (default 0x272e): no outcome text (local -0x46 = 1).
+ *     Friendly fire, 0x2734 (only when -0x46 == 0, status Active and the
+ *     friendly-kill count A5-0x12b6 != 0): slot 9; if A5-0x12b6 >= 5: slots
+ *     38, 39 (treason, executed), status = 1 (Dead), A5-0x14c4 = 1; else
+ *     record +0x24 += 1 (saved with ChangedResource / UpdateResFile) and by
+ *     its new value 1 -> slots 40, 41, 2 -> slots 42, 43, 3 -> slots 44, 8
+ *     with status = 4 (Discharged), A5-0x14c4 = 1; then A5-0x12b6 = 0.
+ *     Lost aircraft, 0x2828 (flag -0x48, A5-0x14c0 == 0, status Active): if
+ *     A5-0x12ba > 0 queue A5-0x2134 and slots 45, 46; if == 0 queue A5-0x2132
+ *     and slots 47, 48; then A5-0x12ba = -2.
+ *     Finally A5-0x2176 = number of queued lines, cursor reset, state = 1,
+ *     return 0.
+ *     So: record +0x24 = friendly-fire offence count, A5-0x12b6 = friendly
+ *     units destroyed this mission, A5-0x12ba = objective state (> 0 done,
+ *     0 open, -1 failed by mission event, -2 original Hellcat lost)
+ *     [STRONG INFERENCE from the texts]. Note slot 45 "By losing your
+ *     airplane..." is queued when A5-0x12ba > 0 and slot 47 "By losing your
+ *     original hellcat..." when it is 0, as the bytes say.
  */
 
 /* Original: FUN_00002d86; source: ID04.c. Recovered name: set_score_item_text [PROVEN] (iteration 185).
@@ -1231,9 +1446,13 @@ undefined4 conclude_mission /* Original: FUN_000031aa */ (undefined4 param_1)
 
 
 
+/* Original: FUN_00003260; source: ID04.c. Recovered name: draw_map_grid_and_centre_mark [PROVEN] (iteration 199).
+ * Decoded from ID04.bin bytes at file 0x3260.
+ * No arguments. SetOrigin(A5-0x2148, A5-0x2146) ($A878); OffsetRect(map rect A5-0x2144, width/2, height/2) ($A8A8) and ClipRect ($A87B); ForeColor 30 (whiteColor) when A5-0x137a == 1, else 33 (blackColor) ($A862); PenSize(1, 1); for i = 1..3 MoveTo / Line ($A893 / $A892) a vertical line at x = i * w / 4 and a horizontal line at y = i * h / 4 (w, h = A5-0x214c, A5-0x214a): a 4 x 4 grid; then PenSize(3, 3) and a small cross at the centre (Move / Line, $A894 / $A892); A5-0x214e = 1 (grid drawn). Callers: plot_map_symbol_callback (0x3368), draw_map_view_item (0x350a).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003260(void)
+void draw_map_grid_and_centre_mark /* Original: FUN_00003260 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1242,13 +1461,17 @@ void FUN_00003260(void)
 
 
 
+/* Original: FUN_00003352; source: ID04.c. Recovered name: plot_map_symbol_callback [PROVEN] (iteration 199).
+ * Decoded from ID04.bin bytes at file 0x3352.
+ * C-callable callback reached through JT $72 (CODE 0 entry -> ID04 0x3352), passed by draw_map_view_item to the function pointer A5-0x1052 (pea $72(A5) at 0x34f6). Saves A5 and D2, loads A5 from CurrentA5 ($0904). If A5-0x214e == 0 draws the grid first (draw_map_grid_and_centre_mark). Args: +0xb char symbol, +0xc long x, +0x10 long y; x and y are shifted from centre-relative to origin-relative coordinates (x - (A5-0x2148 - w/2) + A5-0x2148 ...); ForeColor 30 (whiteColor); MoveTo(x, y); DrawChar(symbol) ($A883, EXTB.L on the byte). Draws one map marker character per object [STRONG INFERENCE].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003352(void)
+void plot_map_symbol_callback /* Original: FUN_00003352 */ (void)
 
 {
   if (*(short *)(DAT_00000904 + -0x214e) == 0) {
-    FUN_00003260();
+    draw_map_grid_and_centre_mark();
   }
                     // WARNING: Bad instruction - Truncating control flow here
   halt_baddata();
@@ -1256,9 +1479,13 @@ void FUN_00003352(void)
 
 
 
+/* Original: FUN_000033d6; source: ID04.c. Recovered name: draw_map_view_item [STRONG INFERENCE] (iteration 199).
+ * Decoded from ID04.bin bytes at file 0x33d6.
+ * C args: +8 DialogPtr, +0xc short item. Saves thePort; A5-0x214e = 0; frame_dialog_item_box; SetPort(dialog); GetDItem -> A5-0x2144 (map rect); SetOrigin(-left, -top) and OffsetRect so the rect starts at 0, 0; A5-0x214c / -0x214a = width / height. Background: if A5-0x137a == 1, FillRect with the pattern / colour returned by JT $1ca (ID06 file 0x116) for local {-1, 0, 0}; else ForeColor 409 (blueColor) and PaintRect ($A8A2) - a blue sea. SetOrigin to the centre, ClipRect. Calls the function pointer A5-0x1052(scale, JT $72 plot_map_symbol_callback) with scale = settings +0x26 * 4 * 0xce40 / width (MULU.L / DIVS.L) - the plotting itself lives elsewhere (A5-0x1052 is set outside ID04) [PROVEN call; HYPOTHESIS: the overlay walks the world objects]. Draws the grid if the callback did not; ForeColor(black); PenSize(2, 2) and a short polyline near the top-right corner (a north arrow?) [HYPOTHESIS]; restores pen, origin, clip and port; item 7 text = decimal settings +0x26 + STR# 129 slot 59 " mi./grid" via set_dialog_item_text. So settings +0x26 = map scale in miles per grid square [STRONG INFERENCE]. Callers: 0x3604, 0x3a10, 0x3a3e.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000033d6(void)
+void draw_map_view_item /* Original: FUN_000033d6 */ (void)
 
 {
   int unaff_A5;
@@ -1271,12 +1498,17 @@ void FUN_000033d6(void)
 
 
 
-void FUN_000035f8(void)
+/* Original: FUN_000035f8; source: ID04.c. Recovered name: map_view_user_item_proc [PROVEN] (iteration 200).
+ * Decoded from ID04.bin bytes at file 0x35f8.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes): calls draw_map_view_item(dialog, item). Reached through JT $b2 (CODE 0 entry -> ID04 0x35f8); installed for item 8 of DLOG 137 "Map" by run_map_dialog (0x39a8).
+ * The following bytes 0x3614..0x3900 (not exported by Ghidra) are track_map_bearing_and_distance [STRONG INFERENCE name] [PROVEN, bytes]: C args +8 DialogPtr, +0xc EventRecord *. GetDItem(item 8), GlobalToLocal, PtInRect; while the button is down (StillDown $A974 / GetMouse $A972) and the mouse is inside the map: XOR-draws (PenMode 2, $A89C) a line from the map centre to the mouse, erasing the previous one; dx, dy from the centre; bearing via the function pointer A5-0x1056 (dx, -dy, dx*dx + dy*dy -> angle in 1/0x4000 turns) as 360 - angle * 360 / 0x4000, item 5 text = decimal + A5-0x2122 [STRONG INFERENCE: a degree sign]; distance = (A5-0x105a)(dx*dx + dy*dy) [STRONG INFERENCE: integer sqrt] * scale (settings +0x26) / (map width / 40), item 6 text = "<d / 10>" + A5-0x2120 [STRONG INFERENCE: a decimal point] + "<d % 10>" + STR# 129 slot 60 " mi."; on release the last line is erased. Caller: map_dialog_filter_proc (mouseDown).
+ */
+void map_view_user_item_proc /* Original: FUN_000035f8 */ (void)
 
 {
   code *UNRECOVERED_JUMPTABLE;
   
-  FUN_000033d6();
+  draw_map_view_item();
                     // WARNING: Could not recover jumptable at 0x00003612. Too many branches
                     // WARNING: Treating indirect jump as call
   (*UNRECOVERED_JUMPTABLE)();
@@ -1285,9 +1517,14 @@ void FUN_000035f8(void)
 
 
 
+/* Original: FUN_00003902; source: ID04.c. Recovered name: map_dialog_filter_proc [PROVEN] (iteration 200).
+ * Decoded from ID04.bin bytes at file 0x3902.
+ * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes, Boolean result). Switch on event->what through JT $2a (table at 0x3910: keyDown 3 -> 0x3920, updateEvt 6 -> 0x394e, mouseDown 1 -> 0x395a): keyDown Return / Enter -> *itemHit = default item A5-0x225e, true; updateEvt -> JT $492 (ID02 0x4d6a), false; mouseDown -> track_map_bearing_and_distance(dialog, event) (0x3614), false. Reached through JT $d2 (-> ID04 0x3902).
+ * The following bytes 0x3976..0x3a54 (not exported by Ghidra) are run_map_dialog [STRONG INFERENCE name], JT $10a (-> ID04 0x3976) [PROVEN, bytes]: does nothing in mission 2 (Flight School, A5-0x12f8 == 2); GetNewDialog(0x89 = DLOG 137 "Map"); JT $472; item 8 user item JT $b2 (map view); 0x1b8(dialog, 2, 1) default ring; ShowWindow; loop ModalDialog(JT $d2): item 3 "Zoom In" -> settings +0x26 /= 2 while > 1, redraw the map; item 4 "Zoom Out" -> settings +0x26 *= 2 while < 256, redraw; until item 1 (OK); DisposDialog. DITL 137 legend: "+ - Hellcat, T - Primary Target, C - Friendly Carrier, B - Friendly Base, A - Airfield" - the characters drawn by plot_map_symbol_callback [PROVEN text].
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003902(void)
+void map_dialog_filter_proc /* Original: FUN_00003902 */ (void)
 
 {
   int unaff_A5;
@@ -1300,9 +1537,13 @@ void FUN_00003902(void)
 
 
 
+/* Original: FUN_00003a56; source: ID04.c. Recovered name: poll_click_or_key_event [PROVEN] (iteration 200).
+ * Decoded from ID04.bin bytes at file 0x3a56.
+ * SystemTask ($A9B4); GetNextEvent(everyEvent = -1, &event) ($A970); switch on event.what through JT $3a (table at 0x3a72: lo 1, hi 5, default -> 0x3a86): returns 1 for mouseDown (1), keyDown (3) and autoKey (5), 0 for mouseUp (2), keyUp (4) and any other event. The event is consumed either way.
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003a56(void)
+void poll_click_or_key_event /* Original: FUN_00003a56 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -1311,9 +1552,13 @@ void FUN_00003a56(void)
 
 
 
+/* Original: FUN_00003a8c; source: ID04.c. Recovered name: show_about_dialog [STRONG INFERENCE] (iteration 200).
+ * Decoded from ID04.bin bytes at file 0x3a8c.
+ * GetNewDialog(0x8a = DLOG 138 "About Hellcats 1-Bit") when A5-0x137a == 1, else GetNewDialog(0x7f = DLOG 127 "About Hellcats"); returns at once when it fails. JT $472; ShowWindow; DrawDialog; SetPort; GetDItem(item 3), MoveTo its box, TextFont(1), TextSize(8); GetResource(vers, 1) ($A9A0) and builds the version text from its first word (major = high byte + 0x30 ...) - the rest (0x3b3c..0x3d3e) is not decoded yet. So A5-0x137a == 1 selects the 1-bit (black and white) variants, which matches draw_map_view_item (pattern fill instead of the blue sea) [STRONG INFERENCE]. Reached through JT $162 (-> ID04 0x3a8c).
+ */
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00003a8c(void)
+void show_about_dialog /* Original: FUN_00003a8c */ (void)
 
 {
   int unaff_A5;

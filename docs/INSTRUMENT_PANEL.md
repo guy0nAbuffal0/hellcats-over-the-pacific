@@ -41,8 +41,8 @@ strings by the loader.
 | 5 | `draw_tachometer` (0x22fe) | engine RPM |
 | 6 | `draw_direction_indicator` (0x2950) | heading |
 | 7 | — | nothing drawn |
-| 8 | `FUN_000032b8` | unidentified (no label string) |
-| 9 | `FUN_000038fc` | unidentified (no label string) |
+| 8 | `draw_gyro_instrument` (0x32b8) | gyro instrument; caches "GyroInstrument" / "GyroFlags" (iteration 202, which gyro is open) |
+| 9 | `draw_artificial_horizon` (0x38fc) | artificial horizon; caches "HorizonInstrument" (iteration 202) |
 
 `draw_instrument` first draws the bezel with
 `draw_ring_with_status_indicators` (flags `0x1b` for type 6, otherwise
@@ -79,7 +79,13 @@ slot orientation from screw to screw.
 
 ## Open questions
 
-- Types 8 and 9 (FLAPS / AMMO / Fuel turned out to be separate gauges).
+- Types 8 and 9: identified by their cached-bitmap resource names (iteration 202); bodies only partly decoded.
+- Panel cache (iteration 203): `store_panel_bitmaps_as_resources` (ID03
+  0x5ab6) saves the rendered bitmaps as HEL2 200 / 300 / 400 / 500 +
+  configuration (`A5-0x13ae`); HEL2 127 "Bitmap Cache" holds 0x160-byte
+  entries per configuration with a "stored" flag at +0xc. A failure sets
+  `A5-0x14a0`, reported by ID04 0x432 as "Unable to store instrument panel
+  to disk".
 - The needle function pointer `A5-0x2118` and the per-type record at
   `A5-0x12a2`.
 - ID04 slot users decoded in iteration 172; the panel-store path (ID04 0x432,
