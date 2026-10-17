@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 285
+**Last iteration:** 286
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 133 | 0 | 0 | 304 | 0 | 6 |
-| **TOTAL** | **736** | **133** | **0** | **0** | **597** | **0** | **6** |
+| Pacific Conflict.c | 443 | 131 | 0 | 0 | 306 | 0 | 6 |
+| **TOTAL** | **736** | **131** | **0** | **0** | **599** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 133 NOT_STARTED + 6 BLOCKED (iteration 285);
-597 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 131 NOT_STARTED + 6 BLOCKED (iteration 286);
+599 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -604,6 +604,8 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00012b66` | `apply_blast_damage` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | radius damage to world objects; tally with credit | stack args; other callers | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00018956` | `spawn_object_shadow` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | ground object linked to an aircraft; option +0xb0 | — | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0001820a` | `ai_pursue_target` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aim at the target pose N frames ago (rank lag); manoeuvre states | second half of the function | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00011db4` | `spawn_destruction_effect` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | air burst / water splash / ground debris by surface | surface codes other than 0x10 | 286 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00013452` | `surface_type_under_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | surface code at the object position | — | 286 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -3296,9 +3298,19 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   DAT_0001b2b4 is a reaction lag (difficulty) [STRONG INFERENCE].
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
-**Next iteration target:** Pacific Conflict rest of ai_pursue_target
-(manoeuvres 1..4, firing), other callers of apply_blast_damage (bombs?),
-`FUN_00011db4`.
+### Iteration 286 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–285 work preserved.
+- Pacific Conflict `FUN_00011db4` = spawn_destruction_effect (air: kind 2
+  burst; surface 0x10: kind 0 ring; else kind 3 debris), `FUN_00013452` =
+  surface_type_under_object. This confirms surface code 0x10 = water and
+  effect kinds 0 / 1 = water splash ring / column (hypotheses of iteration
+  268 raised to STRONG INFERENCE).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict apply_blast_damage callers
+`FUN_00012d34` and `FUN_00018c96`, rest of ai_pursue_target, surface codes
+0x20 / 0x30 / 0x40 / 0x60 / 0x70.
 
 ## Resuming the five-minute workflow
 

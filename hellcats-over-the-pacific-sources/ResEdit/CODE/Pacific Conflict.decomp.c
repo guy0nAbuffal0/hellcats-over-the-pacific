@@ -16425,7 +16425,7 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
         if (*(int *)((int)param_1 + 0x2e) != 0) {
           return psVar11;
         }
-        psVar11 = (short *)FUN_00013452(iVar1);
+        psVar11 = (short *)surface_type_under_object(iVar1);
         *(char *)(param_1 + 0xb) = (char)psVar11;
         return psVar11;
       }
@@ -16477,7 +16477,7 @@ LAB_0000f192:
    * ' '/0x10/'0'/'P'/... (NOTES grounded field_0b). Clamp local_28; prestall.
    */
   if (*(int *)((int)param_1 + 0x2e) == 0) {
-    uVar18 = FUN_00013452(iVar1);
+    uVar18 = surface_type_under_object(iVar1);
     *(undefined1 *)(param_1 + 0xb) = uVar18; /* field_0b */
   }
   iVar25 = isqrt_floor( /* Original: FUN_0000e372 */(int)local_e * (int)local_e + (int)local_6 * (int)local_6);
@@ -17721,7 +17721,7 @@ LAB_00010700:
         else {
           sVar7 = 100;
         }
-        FUN_00011db4((int)pcVar1,(int)sVar7);
+        spawn_destruction_effect((int)pcVar1,(int)sVar7);
         DAT_0001b870 = sVar4;
         if (sVar4 == 0) {
           if (((*(short *)(DAT_0001b5a0 + 0x90) == 5) && (*(short *)param_1[1] == 2)) &&
@@ -19160,7 +19160,11 @@ int spawn_effect /* Original: FUN_00011c58 */ (int param_1,undefined2 param_2,un
 
 
 
-bool FUN_00011db4(int param_1,int param_2)
+/* Original: FUN_00011db4; source: Pacific Conflict.c. Recovered name: spawn_destruction_effect [STRONG INFERENCE] (iteration 286).
+ * Ghidra C reviewed (function at overlay offset 0x11db4).
+ * Args: destroyed object, size. Picks the effect from where the object is: more than 100 above its ground height (controller +0x2e) -> kind 2 burst (lifetime 5, debris flag) in the air; otherwise by the surface code under it (controller byte +0x2c, or surface_type_under_object): 0x10 -> kind 0 ring, lifetime 0x4b, no debris [STRONG INFERENCE: water splash - 0x10 is water]; 0x30 / 0x60 / 0x70 (ground height kept) and all other codes -> kind 3 debris explosion at 3/4 size, lifetime 0x2d. Calls spawn_effect at the object position (plus the controller velocity). Returns whether it was on / near the surface. Used by apply_blast_damage. Ghidra C.
+ */
+bool spawn_destruction_effect /* Original: FUN_00011db4 */ (int param_1,int param_2)
 
 {
   bool bVar1;
@@ -19179,7 +19183,7 @@ bool FUN_00011db4(int param_1,int param_2)
     uVar5 = *(uint *)(param_1 + 0x18);
     uVar3 = 0;
     uVar4 = *(uint *)(param_1 + 0x20);
-    sVar2 = FUN_00013452(param_1);
+    sVar2 = surface_type_under_object(param_1);
   }
   else {
     uVar5 = *(int *)(iVar6 + 8) + *(int *)(param_1 + 0x18);
@@ -19189,7 +19193,7 @@ bool FUN_00011db4(int param_1,int param_2)
     sVar2 = (short)*(char *)(iVar6 + 0x2c);
     if (bVar1) {
       if (*(int *)(iVar6 + 0x2e) == 0) {
-        sVar2 = FUN_00013452(param_1);
+        sVar2 = surface_type_under_object(param_1);
       }
       if (((sVar2 == 0x30) || (sVar2 == 0x60)) || (sVar2 == 0x70)) {
         uVar3 = *(uint *)(iVar6 + 0x2e);
@@ -19328,7 +19332,7 @@ void init_effect_kind2_burst /* Original: FUN_00011efc */ (int param_1)
 
 /* Original: FUN_0001203a; source: Pacific Conflict.c. Recovered name: init_effect_kind0_flat_ring [STRONG INFERENCE] (iteration 268).
  * Ghidra C reviewed (function at overlay offset 0x1203a).
- * Kind 0: six vertices, x and z scaled; velocities = 2 * coordinate (x / z) * 0x100 - an expanding horizontal ring [HYPOTHESIS: shock wave / splash ring]. Effect initialiser (spawn_effect kind table DAT_0001b40c, iteration 267). Arg: effect object (+8 controller, +0x44 vertices of 12-byte x / y / z longs, +0x34 vertex shift, +0x14 range). Common part [PROVEN]: scale = controller word +0x34 (size, percent) * 256 / 100; each used vertex is shifted down by the object shift and multiplied by the scale, the per-vertex velocities are stored in the controller (x at +0x3a + 4i, second axis at +0x6e + 4i, third at +0xa2 + 4i), the object shift is cleared and the range scaled. Complete Ghidra C.
+ * Kind 0: six vertices, x and z scaled; velocities = 2 * coordinate (x / z) * 0x100 - an expanding horizontal ring [STRONG INFERENCE, iteration 286: water splash - spawn_destruction_effect uses kind 0 for surface code 0x10, and the ring spawns the kind-1 column]. Effect initialiser (spawn_effect kind table DAT_0001b40c, iteration 267). Arg: effect object (+8 controller, +0x44 vertices of 12-byte x / y / z longs, +0x34 vertex shift, +0x14 range). Common part [PROVEN]: scale = controller word +0x34 (size, percent) * 256 / 100; each used vertex is shifted down by the object shift and multiplied by the scale, the per-vertex velocities are stored in the controller (x at +0x3a + 4i, second axis at +0x6e + 4i, third at +0xa2 + 4i), the object shift is cleared and the range scaled. Complete Ghidra C.
  */
 void init_effect_kind0_flat_ring /* Original: FUN_0001203a */ (int param_1)
 
@@ -19371,7 +19375,7 @@ void init_effect_kind0_flat_ring /* Original: FUN_0001203a */ (int param_1)
 
 /* Original: FUN_000120ca; source: Pacific Conflict.c. Recovered name: init_effect_kind1_column [STRONG INFERENCE] (iteration 268).
  * Ghidra C reviewed (function at overlay offset 0x120ca).
- * Kind 1: vertices 0, 1, 3 scaled in x / z with velocities (coordinate << 9) / 3; vertex 2 (+0x1c) left at 0 with vertical velocity +0x76 = scale * 0x500 >> 8 - one point rising [HYPOTHESIS: water splash / column]. Effect initialiser (spawn_effect kind table DAT_0001b40c, iteration 267). Arg: effect object (+8 controller, +0x44 vertices of 12-byte x / y / z longs, +0x34 vertex shift, +0x14 range). Common part [PROVEN]: scale = controller word +0x34 (size, percent) * 256 / 100; each used vertex is shifted down by the object shift and multiplied by the scale, the per-vertex velocities are stored in the controller (x at +0x3a + 4i, second axis at +0x6e + 4i, third at +0xa2 + 4i), the object shift is cleared and the range scaled. Complete Ghidra C.
+ * Kind 1: vertices 0, 1, 3 scaled in x / z with velocities (coordinate << 9) / 3; vertex 2 (+0x1c) left at 0 with vertical velocity +0x76 = scale * 0x500 >> 8 - one point rising [STRONG INFERENCE, iteration 286: the splash column spawned by the kind-0 ring]. Effect initialiser (spawn_effect kind table DAT_0001b40c, iteration 267). Arg: effect object (+8 controller, +0x44 vertices of 12-byte x / y / z longs, +0x34 vertex shift, +0x14 range). Common part [PROVEN]: scale = controller word +0x34 (size, percent) * 256 / 100; each used vertex is shifted down by the object shift and multiplied by the scale, the per-vertex velocities are stored in the controller (x at +0x3a + 4i, second axis at +0x6e + 4i, third at +0xa2 + 4i), the object shift is cleared and the range scaled. Complete Ghidra C.
  */
 void init_effect_kind1_column /* Original: FUN_000120ca */ (int param_1)
 
@@ -20127,7 +20131,7 @@ LAB_00012c74:
         }
         iVar4 = iVar4 >> 2;
       }
-      FUN_00011db4((int)pcVar1,iVar4);
+      spawn_destruction_effect((int)pcVar1,iVar4);
       if (in_stack_00000014 != 0) {
         tally_destroyed_entity((int)pcVar1);
       }
@@ -20168,7 +20172,7 @@ void FUN_00012d34(int *param_1)
     if ((*(byte *)((int)param_1 + 0x61e) & 4) == 0) {
       sVar6 = 0;
       if (*(short *)((int)param_1 + 0x616) == 0) {
-        bVar5 = FUN_00011db4((int)pcVar1,200);
+        bVar5 = spawn_destruction_effect((int)pcVar1,200);
         sVar6 = (short)CONCAT31(extraout_var,bVar5);
       }
       else if (*(int *)((int)param_1 + 0x2e) < 1) {
@@ -20185,7 +20189,7 @@ void FUN_00012d34(int *param_1)
       }
       else {
         sVar6 = 0xf;
-        if ((*(short *)(param_1 + 0x185) != 0) && (sVar4 = FUN_00013452((int)pcVar1), sVar4 == 0x70)
+        if ((*(short *)(param_1 + 0x185) != 0) && (sVar4 = surface_type_under_object((int)pcVar1), sVar4 == 0x70)
            ) {
           uVar2 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
           if ((short)uVar2 == 0x100) {
@@ -20560,7 +20564,11 @@ LAB_00013446:
 
 
 
-void FUN_00013452(int param_1)
+/* Original: FUN_00013452; source: Pacific Conflict.c. Recovered name: surface_type_under_object [STRONG INFERENCE] (iteration 286).
+ * Ghidra C reviewed (function at overlay offset 0x13452).
+ * surface_type_at_point(object x, y, z). Complete Ghidra C (Ghidra types it void; the code is returned in D0).
+ */
+void surface_type_under_object /* Original: FUN_00013452 */ (int param_1)
 
 {
   surface_type_at_point(*(int *)(param_1 + 0x18),*(undefined4 *)(param_1 + 0x1c),*(int *)(param_1 + 0x20));
@@ -22694,7 +22702,7 @@ void FUN_00015dc8(int *param_1)
       }
       iVar3 = iVar3 >> 2;
     }
-    FUN_00011db4((int)pcVar2,iVar3);
+    spawn_destruction_effect((int)pcVar2,iVar3);
     if (*(short *)((int)param_1 + 0x36) != 0) {
       tally_destroyed_entity((int)pcVar2);
     }

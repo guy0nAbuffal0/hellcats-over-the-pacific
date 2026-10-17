@@ -344,7 +344,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00011b96` (Pacific Conflict) | `replay_logged_effects` | STRONG INFERENCE | Iter 267: DAT_0001b870 = -1 while re-spawning logged effects of the current frame. |
 | `FUN_00011c2c` (Pacific Conflict) | `mark_effect_log_end` | STRONG INFERENCE | Iter 267: 0x7fffffff frame sentinel. |
 | `FUN_00011b48` (Pacific Conflict) | `register_effect_template` | STRONG INFERENCE | Iter 267: fills DAT_0002626e[0..3]; then create handler := 0x11ade (+0x20 = FUN_00011afe). |
-| `FUN_0001203a` (Pacific Conflict) | `init_effect_kind0_flat_ring` | STRONG INFERENCE | Iter 268: kind 0: 6 vertices, x / z outward velocities. |
+| `FUN_0001203a` (Pacific Conflict) | `init_effect_kind0_flat_ring` | STRONG INFERENCE | Iter 268: kind 0: 6 vertices, x / z outward velocities; iter 286: water splash ring. |
 | `FUN_000120ca` (Pacific Conflict) | `init_effect_kind1_column` | STRONG INFERENCE | Iter 268: kind 1: 3 spreading vertices, vertex 2 rising (+0x76). |
 | `FUN_00011efc` (Pacific Conflict) | `init_effect_kind2_burst` | STRONG INFERENCE | Iter 268: kind 2: 12 vertices, jittered outward velocities. |
 | `FUN_0001217e` (Pacific Conflict) | `init_effect_kind3_debris_explosion` | STRONG INFERENCE | Iter 268: kind 3: kind-2 burst at size / 4 + 13 vertices with 3-D velocities. |
@@ -411,6 +411,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00012b66` (Pacific Conflict) | `apply_blast_damage` | STRONG INFERENCE | Iter 285: objects within blast radius destroyed / damaged (stack args). |
 | `FUN_00018956` (Pacific Conflict) | `spawn_object_shadow` | STRONG INFERENCE | Iter 285: template DAT_00026768[kind] linked to owner; hidden when +0xb0 == 0. |
 | `FUN_0001820a` (Pacific Conflict) | `ai_pursue_target` | STRONG INFERENCE | Iter 285: target pose delayed by DAT_0001b878 / 876 frames; manoeuvre +0x69a. |
+| `FUN_00011db4` (Pacific Conflict) | `spawn_destruction_effect` | STRONG INFERENCE | Iter 286: kind 2 in the air, kind 0 on water (0x10), kind 3 on ground. |
+| `FUN_00013452` (Pacific Conflict) | `surface_type_under_object` | STRONG INFERENCE | Iter 286: surface_type_at_point(object position). |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
