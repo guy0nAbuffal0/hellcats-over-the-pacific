@@ -18,8 +18,8 @@ strings by the loader.
 
 | Slot | Text | Used by |
 |---|---|---|
-| 1 | Unable to store instrument panel to disk | ID04 `FUN_000003c2` (iteration 171) |
-| 61 | Hellcats requires a Macintosh with color QuickDraw and a 68020 or higher | ID04 `FUN_00003d42` = JT $f2 start-up gate (iteration 171) |
+| 1 | Unable to store instrument panel to disk | unexported ID04 routine at 0x432 (iteration 172 correction) |
+| 61 | Hellcats requires a Macintosh with color QuickDraw and a 68020 or higher | ID04 `check_system_requirements` = JT $f2 start-up gate |
 | 65 | ALTITUDE | type 0 |
 | 66 / 67 | AIR / SPEED | type 1 |
 | 68 | CLIMB | type 3 |
@@ -82,5 +82,5 @@ slot orientation from screw to screw.
 - Types 8 and 9 (FLAPS / AMMO / Fuel turned out to be separate gauges).
 - The needle function pointer `A5-0x2118` and the per-type record at
   `A5-0x12a2`.
-- ID04 users of slots 1 and 61 (`FUN_000003c2`, `FUN_00003d42`) are located but
-  not yet decoded.
+- ID04 slot users decoded in iteration 172; the panel-store path (ID04 0x432,
+  ID02 0x4d34) is not yet fully understood.

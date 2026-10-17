@@ -2063,7 +2063,22 @@ void initialize_application /* Original: FUN_00002bbc */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002db8(void)
+/*
+ * Original: FUN_00002db8; source: ID02.c:1570.
+ * Recovered name: wait_for_click_or_key [STRONG INFERENCE] (iteration 173).
+ * Ghidra truncated at $A9B4. Bytes 0x2db8..0x2e34 [PROVEN]: loop {
+ *   SystemTask $A9B4; got = GetNextEvent(-1 everyEvent, &evt) $A970 (EXTB.L);
+ *   BSR 0x29f2 (FUN_000029f2); if (!got) continue;
+ *   switch (evt.what) [ID01 switch helper, table 0x2de4 parsed by script]:
+ *     1 mouseDown, 3 keyDown, 5 autoKey -> return;
+ *     6 updateEvt -> if (A5-0x14c6 && evt.message == main_window) {
+ *          BeginUpdate; redraw_main_window; EndUpdate }
+ *     8 activateEvt -> handle_activate_event(evt by value);
+ *     others -> continue }.
+ * Modal "press any key / click" wait that keeps the main window updated.
+ * Caller [PROVEN]: ID04 run_with_temporary_window via JT $4aa.
+ */
+void wait_for_click_or_key /* Original: FUN_00002db8 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
@@ -3640,7 +3655,17 @@ void check_device_color_state_changed /* Original: FUN_00004c18 */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00004d34(void)
+/*
+ * Original: FUN_00004d34; source: ID02.c:2693.
+ * Recovered name: process_pending_update_events [STRONG INFERENCE] (iteration 173).
+ * Ghidra truncated. Bytes 0x4d34..0x4d68 [PROVEN]:
+ *   while (GetNextEvent(0x40 updateMask, &evt) $A970 &&
+ *          evt.message == main_window (A5-0x14ca)) {
+ *     BeginUpdate(main_window) $A922; redraw_main_window; EndUpdate $A923 }
+ * Stops at the first update for another window or when none is pending.
+ * Caller [PROVEN]: ID04 file 0x438 (panel-store failure report) via JT $462.
+ */
+void process_pending_update_events /* Original: FUN_00004d34 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here

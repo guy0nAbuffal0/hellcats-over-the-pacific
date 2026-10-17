@@ -161,7 +161,25 @@ undefined4 FUN_00000362(undefined4 param_1,undefined4 param_2,undefined4 param_3
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000003c2(void)
+/*
+ * Original: FUN_000003c2; source: ID04.c:164.
+ * Recovered name: run_with_temporary_window [STRONG INFERENCE mechanics]
+ * (iteration 172). Ghidra truncated at $A8A9. Bytes 0x3c2..0x430 [PROVEN]:
+ *   if (long A5-0x225a == 0) {
+ *     A5-0x14be = screenBits.bounds (A5-0x1680, 8 bytes); r = that;
+ *     InsetRect(&r, 100, 100) $A8A9;
+ *     A5-0x225a = NewWindow(nil, &r, title = STR# 129 slot 62 "Hellcats"
+ *       (long A5-0xe4e), visible, procID 3, (WindowPtr)-1, goAway, 0) $A913;
+ *   }
+ *   SetPort(w) $A873; ShowWindow(w) $A915; JT $4aa (ID02 file 0x2db8,
+ *   not yet named); HideWindow(w) $A916.
+ * The window is created once and only shown around the ID02 call.
+ * Note: the following unexported routine at file 0x432..0x44c (no Ghidra
+ * entry) is the user of STR# 129 slot 1: if word A5-0x14a0 { JT $462 (ID02
+ * 0x4d34); show_caution_alert_with_number(slot 1 "Unable to store instrument
+ * panel to disk", 0); A5-0x14a0 = 0 } [PROVEN, bytes].
+ */
+void run_with_temporary_window /* Original: FUN_000003c2 */ (void)
 
 {
   int unaff_A5;
@@ -990,7 +1008,20 @@ void FUN_00003a8c(void)
 
 
 
-undefined4 FUN_00003d42(void)
+/*
+ * Original: FUN_00003d42; source: ID04.c:993.
+ * Recovered name: check_system_requirements [STRONG INFERENCE] (iteration 172).
+ * Exported C complete; bytes 0x3d42..0x3d78 agree (last function of ID04).
+ * JT $f2, called by ID02 initialize_application (returns 0 -> ExitToShell).
+ *   SysEnvirons(1, &env) (JT $1f2 = ID09 sysenvirons dispatcher);
+ *   if (!env.hasColorQD (env+9) || env.processor (env+6) < 3 /env68020/) {
+ *     show_caution_alert_with_number(STR# 129 slot 61, 0) (JT $4ba; slot 61 =
+ *       "Hellcats requires a Macintosh with color QuickDraw and a 68020 or
+ *       higher" [PROVEN, resource dump]); return 0; }
+ *   return 1.
+ * Explains the 68020-only instructions (EXTB.L, MULU.L, DIVS.L) used elsewhere.
+ */
+undefined4 check_system_requirements /* Original: FUN_00003d42 */ (void)
 
 {
   undefined4 uVar1;

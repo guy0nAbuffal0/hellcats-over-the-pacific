@@ -66,6 +66,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | STRONG INFERENCE mechanics | Iter 152: columned DrawString output with FillRect backgrounds; slot −0x110e. |
 | `FUN_00001656` / `FUN_00001680` (ID02) | `design_x_to_screen` / `design_y_to_screen` | STRONG INFERENCE | Iter 162: A5−0x149e·v/4800 + half view width/height. |
 | `FUN_00001632` / `FUN_0000001e` (ID02) | `set_back_color_index` / `abs_long` | STRONG INFERENCE | Iter 162. |
+| `FUN_00002db8` / `FUN_00004d34` (ID02) | `wait_for_click_or_key` / `process_pending_update_events` | STRONG INFERENCE | Iter 173: modal input wait; update flush. |
 | A5−0x1372 / A5−0x1370 | view width / height (words) | STRONG INFERENCE | srcRect right/bottom in blit_offscreen_frame_to_window; centre in design_*_to_screen. |
 | `FUN_000007b0` / `00000598` / `00000666` / `00000512` / `0000087a` (ID06) | `init_raster_target` / `alloc_row_table` / `init_edge_pool` / `free_row_table` / `set_raster_target_base` | STRONG INFERENCE | Iter 153: ID06 rasterizer set-up; structures A5−0x1cce / −0x1cd2 / −0x1cd6. |
 | `FUN_000008a2` / `0000096e` / `000009d8` / `00000e10` / `0000026c` (ID06) | `set_active_row_count` / `reset_edge_table` / `add_polygon_edges` / `rasterize_and_present` / `init_row_table_fields` | STRONG INFERENCE | Iter 154: scanline polygon rasterizer API (service slots −0x1304/−0x1310/−0x130c/−0x1308). |
@@ -93,6 +94,9 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_000022fe` (ID03) | `draw_tachometer` | STRONG INFERENCE | Iter 169: instrument type 5; label "RPM". |
 | `FUN_00002950` (ID03) | `draw_direction_indicator` | STRONG INFERENCE | Iter 169: instrument type 6; label "DIRECTION". |
 | `FUN_00004c42` / `00004ecc` / `0000532e` (ID03) | `draw_flaps_indicator` / `draw_ammo_counter` / `draw_fuel_gauge` | STRONG INFERENCE | Iter 171: labels STR#129 slots 75 / 76 / 77. |
+| `FUN_00003d42` (ID04) | `check_system_requirements` | STRONG INFERENCE | Iter 172: Color QD + 68020 check; JT $f2. |
+| `FUN_000003c2` (ID04) | `run_with_temporary_window` | STRONG INFERENCE mechanics | Iter 172: "Hellcats" window around ID02 0x2db8. |
+| ID04 file 0x432 (unexported) | panel-store failure report (proposed) | PROVEN bytes | Iter 172: flag A5−0x14a0 → JT $462 + alert slot 1. |
 | STR# 129 text | `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/` | PROVEN (dump) | Files 0-based; game slot n ↔ file n−1. Slot 93 = out-of-memory message; slot 65 = ALTITUDE. |
 | ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
