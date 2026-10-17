@@ -242,15 +242,30 @@ void dispose_offscreen_bw_port /* Original: FUN_0000033c */ (void)
 
 /*
  * Original: FUN_0000035e; source: ID03.c:175.
- * Status: INVESTIGATING (iteration 161); identifier retained. Ghidra exported
- * no body. Bytes 0x35e..0x512 [PROVEN, partial]: NewRgn x2 + GetClip;
- * ID02 JT $3ca (file 0x1656) / $382 (0x1680) [unnamed]; scale_design_4800 x2;
- * grey (2,2,2) via JT $45a lookup_palette_index_for_rgb_level and JT $36a
- * set_draw_color_index; PaintOval $A8B8 / OpenRgn / FrameOval $A8B7 /
- * CloseRgn; tick lines (MoveTo/LineTo) with a test of word A5-0x2112 == 1;
- * SetClip. [HYPOTHESIS] Draws a round instrument dial.
+ * Recovered name: draw_spinning_disc_indicator [STRONG INFERENCE mechanics]
+ * (iteration 163; INVESTIGATING in iteration 161). Ghidra exported no body.
+ * Bytes 0x35e..0x512 [PROVEN]. Args: words cx [8(A6)], cy [$a(A6)] (design units).
+ *   d = word A5-0x2114 (size); r.left = design_x_to_screen(cx - d/2);
+ *   r.top = design_y_to_screen(cy - d/2); r.right = r.left + scale_design_4800(d);
+ *   r.bottom = r.top + scale_design_4800(d);
+ *   saved = NewRgn, GetClip(saved); ring = NewRgn;
+ *   colour grey (2,2,2) via lookup_palette_index_for_rgb_level (JT $45a) +
+ *   set_draw_color_index (JT $36a); PaintOval(&r) $A8B8;
+ *   OpenRgn; FrameOval(&r) $A8B7; CloseRgn(ring) (ring = outline region);
+ *   centre (cx', cy') = midpoint of r;
+ *   if (scale_design_4800(d) >= 5):
+ *     colour black (0,0,0);
+ *     phase word A5-0x2112: 0 -> vertical line through centre;
+ *       1 -> SetClip(ring), diagonal top-left -> bottom-right;
+ *       2 -> SetClip(ring), diagonal top-right -> bottom-left;
+ *       other -> horizontal line through centre;
+ *     phase = (phase + 5) & 3   (advances one step per call);
+ *   SetClip(saved); DisposeRgn(ring); DisposeRgn(saved).
+ * A grey disc with a spoke that rotates 45 degrees per call [STRONG INFERENCE];
+ * e.g. propeller / activity indicator [HYPOTHESIS]. Callers: 5 BSRs inside
+ * FUN_00000514 (file 0x624, 0x684, 0x6e2, 0x742, 0x774).
  */
-void FUN_0000035e(void)
+void draw_spinning_disc_indicator /* Original: FUN_0000035e */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
