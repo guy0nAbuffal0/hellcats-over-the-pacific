@@ -96,6 +96,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00004c42` / `00004ecc` / `0000532e` (ID03) | `draw_flaps_indicator` / `draw_ammo_counter` / `draw_fuel_gauge` | STRONG INFERENCE | Iter 171: labels STR#129 slots 75 / 76 / 77. |
 | `FUN_00003d42` (ID04) | `check_system_requirements` | STRONG INFERENCE | Iter 172: Color QD + 68020 check; JT $f2. |
 | `FUN_000003c2` (ID04) | `run_with_temporary_window` | STRONG INFERENCE mechanics | Iter 172: "Hellcats" window around ID02 0x2db8. |
+| `FUN_000004f0` / `00000516` / `00000560` (ID04) | `ask_save_changes` / `confirm_end_mission` / `confirm_erase_high_scores` | STRONG INFERENCE | Iter 175: CautionAlert 257 / 259 / 260 (texts from DITL dump). |
+| ALRT 258 "Error" ("^1 ^0.") | used by ID02 show_caution_alert_with_number | PROVEN (dump) | Iter 175. |
 | ID04 file 0x432 (unexported) | panel-store failure report (proposed) | PROVEN bytes | Iter 172: flag A5−0x14a0 → JT $462 + alert slot 1. |
 | STR# 129 text | `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/` | PROVEN (dump) | Files 0-based; game slot n ↔ file n−1. Slot 93 = out-of-memory message; slot 65 = ALTITUDE. |
 | ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
@@ -135,7 +137,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | A5−0x1cc4 | protection challenge table (56 × 12 bytes) | STRONG INFERENCE | Passed to init_protection_table; entries {ptr, len, w1, w2, w3}. See COPY_PROTECTION_FLOW.md. |
 | A5−0x1680..−0x167a | QuickDraw `screenBits.bounds` (top,left,bottom,right) | STRONG INFERENCE | Used as screen rect in ID05 0x06/0xc8. |
 | ID05 file 0x964 (unexported) | protection entry matcher (HYPOTHESIS) | PROVEN bytes | Counts matching entries of table *(A5−0xba)[A5−0xb6] into A5−0xc0; string de-obfuscated with key A5−0x2c. |
-| ID02 local 0x2eaa | quit helper (HYPOTHESIS: `quit_application`) | STRONG INFERENCE | Menu 2 item 13 and fatal MENU-missing path in `initialize_application`. Not a Ghidra-exported function yet (verify). |
+| ID02 local 0x2eaa (unexported) | `quit_application` (proposed) | STRONG INFERENCE | Iter 174: confirm (seg4 0x516 == 2), save prompt (seg4 0x4f0), HideWindow, ExitToShell. Menu 2 item 13 and fatal MENU-missing path. |
+| `FUN_00002e36` (ID02) | `show_resource_file_error_box` | STRONG INFERENCE | Iter 174: "Can't open resource file." / "Click mouse to exit." dBox. |
 | A5−0x14ca | `main_window` (HYPOTHESIS name) | STRONG INFERENCE | SetPort target at end of `initialize_application`; compared with update evt.message in `poll_and_dispatch_event`. |
 | A5−0x1388 | `has_color_quickdraw` (HYPOTHESIS name) | STRONG INFERENCE | byte ← SysEnvRec.hasColorQD in `initialize_application`. |
 | A5−0x1006 | `overlay_image_base` (HYPOTHESIS name) | PROVEN writer | Written only by ID08 `load_overlay_from_resource` (file 0xd4, aligned 0xf0/0xfe, cleared 0x226); gates overlay callbacks in ID02. |

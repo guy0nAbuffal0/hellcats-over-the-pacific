@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 173
+**Last iteration:** 175
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -11,16 +11,16 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | Source file | Functions inventoried | NOT_STARTED | INVESTIGATING | ANNOTATED | RENAMED | VERIFIED | BLOCKED |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
-| ID02.c | 125 | 59 | 0 | 0 | 66 | 0 | 0 |
+| ID02.c | 125 | 58 | 0 | 0 | 67 | 0 | 0 |
 | ID03.c | 45 | 21 | 0 | 0 | 24 | 0 | 0 |
-| ID04.c | 59 | 57 | 0 | 0 | 2 | 0 | 0 |
+| ID04.c | 59 | 54 | 0 | 0 | 5 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **474** | **0** | **0** | **256** | **0** | **6** |
+| **TOTAL** | **736** | **470** | **0** | **0** | **260** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 474 NOT_STARTED + 6 BLOCKED (iteration 173);
-256 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 470 NOT_STARTED + 6 BLOCKED (iteration 175);
+260 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -246,6 +246,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00001680` (ID02) | `design_y_to_screen` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | JT $382; +height/2 | — | 162 (2026-10-17) | C + bytes; token diff = renames |
 | `FUN_00002db8` (ID02) | `wait_for_click_or_key` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | GetNextEvent loop; returns on mouseDown/keyDown/autoKey; JT $4aa | — | 173 (2026-10-17) | Capstone + table |
 | `FUN_00004d34` (ID02) | `process_pending_update_events` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c` | `ID02.decomp.c` | updateMask loop → redraw_main_window; JT $462 | — | 173 (2026-10-17) | Capstone |
+| `FUN_00002e36` (ID02) | `show_resource_file_error_box` | ID02 | RENAMED | STRONG INFERENCE | `ID02.c:1581` | `ID02.decomp.c` (header also documents unexported quit_application at 0x2eaa) | dBox window; STR#129 117/118; Button wait | seg4 0x516 / 0x4f0 roles | 174 (2026-10-17) | Capstone + resource dump |
 | `FUN_000007b0` (ID06) | `init_raster_target` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:494` | `ID06.decomp.c` | target record A5−0x1cce; centre A5−0x1cca/−0x1cc8 | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000598` (ID06) | `alloc_row_table` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:405` | `ID06.decomp.c` | A5−0x1cd2 + n×12 row entries | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
 | `FUN_00000666` (ID06) | `init_edge_pool` | ID06 | RENAMED | STRONG INFERENCE | `ID06.c:443` | `ID06.decomp.c` | A5−0x1cd6 0x5e9c pool, sentinels | Field roles | 153 (2026-10-17) | C complete; token diff = renames |
@@ -295,6 +296,9 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_0000532e` (ID03) | `draw_fuel_gauge` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | label Fuel; bezel at 0x5346 | Internals | 171 (2026-10-17) | STR#129 slot scan |
 | `FUN_00003d42` (ID04) | `check_system_requirements` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | SysEnvirons; hasColorQD; processor ≥ 68020; slot 61 alert; JT $f2 | — | 172 (2026-10-17) | C + bytes |
 | `FUN_000003c2` (ID04) | `run_with_temporary_window` | ID04 | RENAMED | STRONG INFERENCE mechanics | `ID04.c` | `ID04.decomp.c` | NewWindow "Hellcats" inset 100; Show / ID02 0x2db8 / Hide | Purpose of ID02 0x2db8 | 172 (2026-10-17) | Capstone |
+| `FUN_000004f0` (ID04) | `ask_save_changes` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | ALRT 257 Save / Cancel / Don't Save; JT $ba | — | 175 (2026-10-17) | Capstone + ALRT/DITL dump |
+| `FUN_00000516` (ID04) | `confirm_end_mission` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | ALRT 259 Cancel / End Mission; mission state A5−0x12f8 ≥ 3, A5−0x14c4 == 0; JT $13a | — | 175 (2026-10-17) | Capstone + ALRT/DITL dump |
+| `FUN_00000560` (ID04) | `confirm_erase_high_scores` | ID04 | RENAMED | STRONG INFERENCE | `ID04.c` | `ID04.decomp.c` | ALRT 260 Cancel / Erase | — | 175 (2026-10-17) | Capstone + ALRT/DITL dump |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1707,8 +1711,30 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   around. `FUN_00004d34` = process_pending_update_events (updateMask loop).
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** ID02 `FUN_00002e36` / `FUN_00002eaa` (fatal-path
-helpers called after SysBeep in initialize_application; 0x2eaa = quit).
+### Iteration 174 — 2026-10-17
+
+- Working tree clean at start (user committed iterations 172-173); 32
+  protected hashes verified.
+- ID02 `FUN_00002e36` = show_resource_file_error_box (dBox window with
+  "Can't open resource file." / "Click mouse to exit.", wait for Button).
+- Unexported ID02 0x2eaa documented as quit_application: confirm via seg4
+  0x516 (== 2), save prompt via seg4 0x4f0 when settings are dirty (1 save,
+  2 cancel, else discard), HideWindow, ExitToShell.
+- Validation: token diff = renames only; hashes OK.
+
+### Iteration 175 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 174 preserved.
+- ALRT/DITL resources are in the resource dump (ALRT 257 "Save Changes",
+  258 "Error" = "^1 ^0.", 259 "Really End Mission", 260 "Erase Hi Score").
+- Renamed ID04 alert wrappers: ask_save_changes (0x4f0, JT $ba; items Save /
+  Cancel / Don't Save match quit_application's switch), confirm_end_mission
+  (0x516, JT $13a; asks only while a mission is in progress, 2 = End
+  Mission / proceed), confirm_erase_high_scores (0x560).
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID04 `FUN_00000588` (reads the HEL1 128 records
+A5−0x13a8 - likely the high-score / pilot roster) and neighbours.
 
 ## Resuming the five-minute workflow
 

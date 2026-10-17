@@ -2089,7 +2089,30 @@ void wait_for_click_or_key /* Original: FUN_00002db8 */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002e36(void)
+/*
+ * Original: FUN_00002e36; source: ID02.c:1581.
+ * Recovered name: show_resource_file_error_box [STRONG INFERENCE] (iteration 174).
+ * Ghidra truncated. Bytes 0x2e36..0x2ea8 [PROVEN]:
+ *   SetRect(&r, 152, 60, 356, 132) $A8A7  (left, top, right, bottom);
+ *   w = NewWindow(nil, &r, title A5-0xc50, visible, 1 dBoxProc, (WindowPtr)-1,
+ *       no goAway, 0) $A913; SetPort(w); TextFont(0 system) $A887;
+ *   MoveTo(4, 20); DrawString(STR# 129 slot 117 "Can't open resource file.");
+ *   MoveTo(4, 40); DrawString(slot 118 "Click mouse to exit.");
+ *   do { } while (!Button()) $A974   [strings PROVEN from resource dump].
+ * Called by initialize_application when GetResource('MENU', 2) fails, after
+ * SysBeep(20); followed by the quit routine below.
+ *
+ * Unexported routine at file 0x2eaa..0x2ee2 (after this function's RTS):
+ * proposed name quit_application [STRONG INFERENCE]:
+ *   if (JT $13a() (segment 4 file 0x516) != 2) return;       [confirm step]
+ *   if (settings_dirty A5-0x138a)
+ *     switch (JT $ba() (segment 4 file 0x4f0)) {             [save prompt]
+ *       1: save helper 0x2da0 (HEL1 127 ChangedResource/WriteResource);
+ *       2: return (cancel);  default: (exit without saving) }
+ *   if (A5-0x14c6) HideWindow(main_window); ExitToShell $A9F4.
+ * Callers: initialize_application (fatal path), do_menu_command menu 2 item 13.
+ */
+void show_resource_file_error_box /* Original: FUN_00002e36 */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here

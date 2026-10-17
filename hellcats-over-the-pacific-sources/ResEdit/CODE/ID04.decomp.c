@@ -220,7 +220,16 @@ void FUN_00000478(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_000004f0(void)
+/*
+ * Original: FUN_000004f0; source: ID04.c:205.
+ * Recovered name: ask_save_changes [STRONG INFERENCE] (iteration 175).
+ * JT $ba. Bytes 0x4f0..0x514 [PROVEN]: JT $47a(0x101) (ID02 0x442e, alert
+ * centring as in show_caution_alert_with_number); return CautionAlert(257, nil)
+ * $A988. ALRT 257 "Save Changes" / DITL 257 [PROVEN, resource dump in
+ * artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app]: item 1 "Save", 2 "Cancel", 3 "Don't Save" - matches the
+ * quit_application switch (1 save, 2 cancel, else discard).
+ */
+void ask_save_changes /* Original: FUN_000004f0 */ (void)
 
 {
   int unaff_A5;
@@ -234,7 +243,21 @@ void FUN_000004f0(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-undefined4 FUN_00000516(void)
+/*
+ * Original: FUN_00000516; source: ID04.c:219.
+ * Recovered name: confirm_end_mission [STRONG INFERENCE] (iteration 175).
+ * JT $13a. Bytes 0x516..0x55e [PROVEN]:
+ *   if (word A5-0x12f8 < 3 || word A5-0x14c4 != 0) return 2;   [no mission]
+ *   if (FUN_000018e0() == 0) return 2;
+ *   JT $47a(0x103); return CautionAlert(259, nil).
+ * ALRT 259 "Really End Mission" / DITL 259 [PROVEN, dump]: item 1 "Cancel",
+ * 2 "End Mission"; text "Are you sure you want to end the current mission
+ * now?  (You will collect no points)". 2 = proceed. Callers: quit_application
+ * (ID02 0x2eaa) and do_menu_command menu 2 item 9 (End Mission).
+ * A5-0x12f8 >= 3 && A5-0x14c4 == 0 therefore means "mission in progress"
+ * [STRONG INFERENCE].
+ */
+undefined4 confirm_end_mission /* Original: FUN_00000516 */ (void)
 
 {
   bool bVar1;
@@ -262,7 +285,15 @@ undefined4 FUN_00000516(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00000560(void)
+/*
+ * Original: FUN_00000560; source: ID04.c:247.
+ * Recovered name: confirm_erase_high_scores [STRONG INFERENCE] (iteration 175).
+ * Bytes 0x560..0x584 [PROVEN]: JT $47a(0x104); return CautionAlert(260, nil).
+ * ALRT 260 "Erase Hi Score" / DITL 260 [PROVEN, dump]: item 1 "Cancel",
+ * 2 "Erase"; text "Are you sure you want to erase all non-active duty high
+ * scores?". Ghidra lost the return value.
+ */
+void confirm_erase_high_scores /* Original: FUN_00000560 */ (void)
 
 {
   int unaff_A5;
