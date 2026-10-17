@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 280
+**Last iteration:** 285
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 148 | 0 | 0 | 289 | 0 | 6 |
-| **TOTAL** | **736** | **148** | **0** | **0** | **582** | **0** | **6** |
+| Pacific Conflict.c | 443 | 133 | 0 | 0 | 304 | 0 | 6 |
+| **TOTAL** | **736** | **133** | **0** | **0** | **597** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 148 NOT_STARTED + 6 BLOCKED (iteration 280);
-582 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 133 NOT_STARTED + 6 BLOCKED (iteration 285);
+597 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -589,6 +589,21 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_0001776a` | `reset_radar_tracks` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | clears track / blip counts | — | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0000c1aa` | `update_heading_tape` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | strip scrolled by heading | copy loop details | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0000ba2a` | `draw_panel_frame_lines` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | colour runs at host +0x238..+0x258 | what the lines are | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000fe96` | `aircraft_notice_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition +0x16 of aircraft: radar tracks, AI target acquisition | AI states 0x110d4 / 0x11162 | 281 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000b49e` | `reset_overlay_display_state` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | radar / background / tape caches reset | — | 281 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000e0a4` | `aircraft_destroy` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | free +0x616, release target | — | 282 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000e0ce` | `aircraft_create` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | player vs AI set-up, bombs, fuel | FUN_0000dff0, FUN_00018956 | 282 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000e5aa` | `aircraft_tick` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | state handler + 75-frame replay ring | — | 282 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000fe0a` | `aircraft_collision` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | damage bit 0x400 on both; ships FUN_00012b66 | — | 282 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000110f4` | `ai_attack_or_fly` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | pursue target (FUN_0001820a) or fly | — | 282 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_00011182` | `ai_fly` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | per-kind fly handler DAT_0001b3f4 | — | 282 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000dff0` | `init_aircraft_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 0x6b0-byte controller defaults (ammo 675, bombs 2, gear down, gravity -0x5b) | — | 283 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000df5e` | `fill_pose_history` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | 75 replay entries = start position | — | 283 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000fb2a` | `animate_landing_gear` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | gear faces hidden / rotated from +0x679 | LAB_00002440_4 matrix builder | 283 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000f810` | `player_slew_mode` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | control-S toggled free-move state handler | purpose (debug?) | 284 (2026-10-17) | Ghidra C + entry bytes; token diff vs HEAD = renames |
+| `FUN_00012b66` | `apply_blast_damage` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | radius damage to world objects; tally with credit | stack args; other callers | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_00018956` | `spawn_object_shadow` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | ground object linked to an aircraft; option +0xb0 | — | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001820a` | `ai_pursue_target` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aim at the target pose N frames ago (rank lag); manoeuvre states | second half of the function | 285 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -3225,9 +3240,65 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   corrected (a rename to set_radar_range / cycle_radar_range is proposed).
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
-**Next iteration target:** Pacific Conflict callers of add_radar_track,
-`FUN_00001db8` / `FUN_00001d56` (register-argument trig used by the gear /
-altimeter needles), `FUN_00003cca`.
+### Iteration 281 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–280 work preserved.
+- Decoded the aircraft definition (key 1, file 0x1a7b0): +2 0xe5aa, +6
+  0xe0ce, +0xa 0xe0a4, +0xe 0xfb2a, +0x12 0xfe0a, +0x16 `FUN_0000fe96` =
+  aircraft_notice_object (player radar tracks, AI target acquisition).
+  `FUN_0000b49e` = reset_overlay_display_state.
+- **Correction to iteration 249:** dispatch_overlap_collisions calls the
+  definition +0x16 notice handler, not a collision handler (that is +0x12).
+  FUN_00001db8 / FUN_00001d56 in the needle functions are the documented
+  cos / sin call-site aliases (BLOCKED false entries); comments updated.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 282 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–281 work preserved.
+- Pacific Conflict aircraft handlers: `FUN_0000e0a4` = aircraft_destroy,
+  `FUN_0000e0ce` = aircraft_create (first aircraft = player; AI state
+  0x110d4), `FUN_0000e5aa` = aircraft_tick (75-frame pose ring = replay
+  history), `FUN_0000fe0a` = aircraft_collision; AI states `FUN_000110f4` =
+  ai_attack_or_fly, `FUN_00011182` = ai_fly (entry bytes checked).
+  docs/SHIP_CONTROLLERS.md gains an aircraft section.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 283 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–282 work preserved.
+- Pacific Conflict `FUN_0000dff0` = init_aircraft_controller (controller
+  defaults), `FUN_0000df5e` = fill_pose_history, `FUN_0000fb2a` =
+  animate_landing_gear (aircraft pre-render hook; confirms +0x679 = gear,
+  0x2d down / 0 up). AI fly table DAT_0001b3f4 (file 0x1b414, + 0x20):
+  kind 0 none, 1..5 -> 0x10d68, 0x10de8, 0x10f68, 0x10ecc, 0x10da8.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 284 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–283 work preserved.
+- The AI fly-table targets (0x10d68 / 10da8 / 10de8 / 10ecc / 10f68) were
+  already named in earlier iterations (ensure_ai_script_* /
+  tick_ai_1b310_approach_fire / tick_ai_1b370_mission); target list was
+  stale.
+- Pacific Conflict `FUN_0000f810` = player_slew_mode: player state handler
+  0xf7f0, toggled with control-S (0x13) against normal flight 0xe772 in
+  process_flight_input_and_outcome; keypad-driven free movement.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 285 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–284 work preserved.
+- Pacific Conflict `FUN_00012b66` = apply_blast_damage, `FUN_00018956` =
+  spawn_object_shadow (host option +0xb0 = shadows [STRONG INFERENCE]),
+  `FUN_0001820a` = ai_pursue_target: AI aims at the target pose from its
+  replay ring DAT_0001b878 frames back - the rank-dependent value from
+  DAT_0001b2b4 is a reaction lag (difficulty) [STRONG INFERENCE].
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict rest of ai_pursue_target
+(manoeuvres 1..4, firing), other callers of apply_blast_damage (bombs?),
+`FUN_00011db4`.
 
 ## Resuming the five-minute workflow
 

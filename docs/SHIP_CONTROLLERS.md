@@ -44,6 +44,7 @@ Template types 0x15..0x19 are the ones the entity update path sends to
 | +2 tick | `advance_frame_and_tick_controllers`, or `tick_flagged_object_controllers` when `DAT_0001b870 == 3`, over the controller list `DAT_0001c25c` |
 | +0xa destroy | called just before a controller is freed (iteration 270) |
 | +0xe pre-render | `FUN_0000a75e`, phases 1 / 2 (iteration 270; e.g. `effect_pre_render_hook`) |
+| +0x16 notice | `dispatch_overlap_collisions` for every range-overlapping pair (iteration 281; aircraft: `aircraft_notice_object`) |
 | +0x12 collision | `handle_player_contact` (player overlap, object flag +6 & 0x40) and `dispatch_collision` (iteration 262; pair table `DAT_0001b43c` overrides it for some type pairs) |
 
 The keyed table `DAT_0001b524` is therefore general (other blocks of
@@ -76,3 +77,13 @@ subset.
    deck.
 3. When no face is above y = 0: carried objects removed, kill tallied,
    mission state updated, object cleaned up.
+
+## Aircraft definition (key 1, iteration 282)
+
+File 0x1a7b0: +2 `aircraft_tick` (0xe5aa), +6 `aircraft_create` (0xe0ce),
++0xa `aircraft_destroy` (0xe0a4), +0xe `FUN_0000fb2a`, +0x12
+`aircraft_collision` (0xfe0a), +0x16 `aircraft_notice_object` (0xfe96)
+**[PROVEN bytes]**. The first aircraft created is the player (state handler
++0x32 = `update_aircraft_entity`); others start in `ai_attack_or_fly`
+(0x110f4) and can switch to `ai_fly` (0x11182). `aircraft_tick` keeps a
+75-frame pose ring used by the instant replay.

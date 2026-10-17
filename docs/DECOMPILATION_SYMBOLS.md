@@ -396,6 +396,21 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0001776a` (Pacific Conflict) | `reset_radar_tracks` | STRONG INFERENCE | Iter 280: DAT_00026672 = DAT_00026676 = 0. |
 | `FUN_0000c1aa` (Pacific Conflict) | `update_heading_tape` | STRONG INFERENCE | Iter 280: strip at host +0x1b8 scrolled by DAT_0001d80e. |
 | `FUN_0000ba2a` (Pacific Conflict) | `draw_panel_frame_lines` | HYPOTHESIS | Iter 280: colour runs from host +0x238..+0x258. |
+| `FUN_0000fe96` (Pacific Conflict) | `aircraft_notice_object` | STRONG INFERENCE | Iter 281: aircraft definition +0x16; radar tracks for the player, target acquisition for AI. |
+| `FUN_0000b49e` (Pacific Conflict) | `reset_overlay_display_state` | STRONG INFERENCE | Iter 281: reset_background_rows, reset_radar_tracks, caches. |
+| `FUN_0000e0a4` (Pacific Conflict) | `aircraft_destroy` | STRONG INFERENCE | Iter 282: aircraft definition +0xa. |
+| `FUN_0000e0ce` (Pacific Conflict) | `aircraft_create` | STRONG INFERENCE | Iter 282: definition +6; player = first aircraft. |
+| `FUN_0000e5aa` (Pacific Conflict) | `aircraft_tick` | STRONG INFERENCE | Iter 282: definition +2; 75-frame replay ring at +0x36. |
+| `FUN_0000fe0a` (Pacific Conflict) | `aircraft_collision` | STRONG INFERENCE | Iter 282: definition +0x12; damage bit 0x400. |
+| `FUN_000110f4` (Pacific Conflict) | `ai_attack_or_fly` | STRONG INFERENCE | Iter 282: AI state 0x110d4 (+0x20). |
+| `FUN_00011182` (Pacific Conflict) | `ai_fly` | STRONG INFERENCE | Iter 282: AI state 0x11162 (+0x20). |
+| `FUN_0000dff0` (Pacific Conflict) | `init_aircraft_controller` | STRONG INFERENCE | Iter 283: 0x6b0 bytes; ammo 0x2a3, bombs 2, tanks def+0x1c/2, gear 0x2d. |
+| `FUN_0000df5e` (Pacific Conflict) | `fill_pose_history` | STRONG INFERENCE | Iter 283: 75 × 0x14 ring filled with a position. |
+| `FUN_0000fb2a` (Pacific Conflict) | `animate_landing_gear` | STRONG INFERENCE | Iter 283: aircraft definition +0xe; gear faces (+0x17 == 1) by +0x679. |
+| `FUN_0000f810` (Pacific Conflict) | `player_slew_mode` | STRONG INFERENCE | Iter 284: state 0xf7f0 (+0x20), control-S toggle; keypad axis moves with accelerating speed. |
+| `FUN_00012b66` (Pacific Conflict) | `apply_blast_damage` | STRONG INFERENCE | Iter 285: objects within blast radius destroyed / damaged (stack args). |
+| `FUN_00018956` (Pacific Conflict) | `spawn_object_shadow` | STRONG INFERENCE | Iter 285: template DAT_00026768[kind] linked to owner; hidden when +0xb0 == 0. |
+| `FUN_0001820a` (Pacific Conflict) | `ai_pursue_target` | STRONG INFERENCE | Iter 285: target pose delayed by DAT_0001b878 / 876 frames; manoeuvre +0x69a. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
