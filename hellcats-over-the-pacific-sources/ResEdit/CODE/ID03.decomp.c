@@ -568,7 +568,15 @@ void draw_altimeter /* Original: FUN_00001876 */ (undefined4 param_1,undefined2 
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001b48(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00001b48; source: ID03.c:394.
+ * Recovered name: draw_airspeed_indicator [STRONG INFERENCE] (iteration 169).
+ * Instrument type 1 of draw_instrument. Label strings loaded from the
+ * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 66 "AIR" + 67 "SPEED" [PROVEN from
+ * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
+ * the label [STRONG INFERENCE]; drawing internals not yet annotated.
+ */
+void draw_airspeed_indicator /* Original: FUN_00001b48 */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];
@@ -601,7 +609,15 @@ void FUN_00001b48(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00001fee(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00001fee; source: ID03.c:427.
+ * Recovered name: draw_climb_indicator [STRONG INFERENCE] (iteration 169).
+ * Instrument type 3 of draw_instrument. Label strings loaded from the
+ * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 68 "CLIMB" [PROVEN from
+ * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
+ * the label [STRONG INFERENCE]; drawing internals not yet annotated.
+ */
+void draw_climb_indicator /* Original: FUN_00001fee */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];
@@ -632,7 +648,15 @@ void FUN_00001fee(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 // WARNING: Removing unreachable block (ram,0x000023a2)
 // WARNING: Removing unreachable block (ram,0x00002578)
 
-void FUN_000022fe(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_000022fe; source: ID03.c:458.
+ * Recovered name: draw_tachometer [STRONG INFERENCE] (iteration 169).
+ * Instrument type 5 of draw_instrument. Label strings loaded from the
+ * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 69 "RPM" [PROVEN from
+ * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
+ * the label [STRONG INFERENCE]; drawing internals not yet annotated.
+ */
+void draw_tachometer /* Original: FUN_000022fe */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_38 [13];
@@ -647,7 +671,15 @@ void FUN_000022fe(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002600(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00002600; source: ID03.c:473.
+ * Recovered name: draw_manifold_pressure_gauge [STRONG INFERENCE] (iteration 169).
+ * Instrument type 4 of draw_instrument. Label strings loaded from the
+ * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 70 "Manifold" + 71 "Pressure" [PROVEN from
+ * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
+ * the label [STRONG INFERENCE]; drawing internals not yet annotated.
+ */
+void draw_manifold_pressure_gauge /* Original: FUN_00002600 */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_38 [12];
@@ -678,7 +710,15 @@ void FUN_00002600(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 // WARNING: Removing unreachable block (ram,0x000029f4)
 // WARNING: Removing unreachable block (ram,0x00002c94)
 
-void FUN_00002950(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00002950; source: ID03.c:504.
+ * Recovered name: draw_direction_indicator [STRONG INFERENCE] (iteration 169).
+ * Instrument type 6 of draw_instrument. Label strings loaded from the
+ * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 72 "DIRECTION" [PROVEN from
+ * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
+ * the label [STRONG INFERENCE]; drawing internals not yet annotated.
+ */
+void draw_direction_indicator /* Original: FUN_00002950 */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_38 [13];
@@ -693,7 +733,15 @@ void FUN_00002950(undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_00002d1c(undefined4 param_1,undefined2 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00002d1c; source: ID03.c:519.
+ * Recovered name: draw_turn_and_bank_indicator [STRONG INFERENCE] (iteration 169).
+ * Instrument type 2 of draw_instrument. Label strings loaded from the
+ * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 73 "TURN" + 74 "BANK" [PROVEN from
+ * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
+ * the label [STRONG INFERENCE]; drawing internals not yet annotated.
+ */
+void draw_turn_and_bank_indicator /* Original: FUN_00002d1c */ (undefined4 param_1,undefined2 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_38 [13];
@@ -753,9 +801,14 @@ void FUN_000038fc(void)
  *     0x1b if type == 6, else 0x0f   (bezel + corner screws, see below);
  *   colour (4,4,4) via lookup_palette_index_for_rgb_level / set_draw_color_index;
  *   switch (type) [ID01 switch helper, 0..9, table parsed by script]:
- *     0 -> draw_altimeter (FUN_00001876)   1 -> FUN_00001b48   2 -> FUN_00002d1c
- *     3 -> FUN_00001fee   4 -> FUN_00002600   5 -> FUN_000022fe
- *     6 -> FUN_00002950   7 -> (none)         8 -> FUN_000032b8(..., 1)
+ *     0 -> draw_altimeter (FUN_00001876)
+ *     1 -> draw_airspeed_indicator (FUN_00001b48)
+ *     2 -> draw_turn_and_bank_indicator (FUN_00002d1c)
+ *     3 -> draw_climb_indicator (FUN_00001fee)
+ *     4 -> draw_manifold_pressure_gauge (FUN_00002600)
+ *     5 -> draw_tachometer (FUN_000022fe)
+ *     6 -> draw_direction_indicator (FUN_00002950)
+ *     7 -> (none)         8 -> FUN_000032b8(..., 1)
  *     9 -> FUN_000038fc(..., 1)       (each called with $a, $c, $e, $10, $12);
  *   then fills record A5-0x12a2 + type * 16 from the geometry (via
  *   scale_design_4800) [tail not fully listed].
@@ -867,7 +920,15 @@ void FUN_00004b32(void)
 // WARNING: Removing unreachable block (ram,0x00004cee)
 // WARNING: Removing unreachable block (ram,0x00004e00)
 
-void FUN_00004c42(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00004c42; source: ID03.c:673.
+ * Recovered name: draw_flaps_indicator [STRONG INFERENCE] (iteration 171).
+ * Not part of the draw_instrument type switch. Loads label slot 75 "FLAPS"
+ * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
+ * a bezel via draw_ring_with_status_indicators (BSR at file 0x4c58).
+ * Gauge identity from the label [STRONG INFERENCE]; internals not annotated.
+ */
+void draw_flaps_indicator /* Original: FUN_00004c42 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];
@@ -885,7 +946,15 @@ void FUN_00004c42(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 // WARNING: Removing unreachable block (ram,0x00004f7c)
 // WARNING: Removing unreachable block (ram,0x00005092)
 
-void FUN_00004ecc(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/*
+ * Original: FUN_00004ecc; source: ID03.c:691.
+ * Recovered name: draw_ammo_counter [STRONG INFERENCE] (iteration 171).
+ * Not part of the draw_instrument type switch. Loads label slot 76 "AMMO"
+ * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
+ * a bezel via draw_ring_with_status_indicators (BSR at file 0x4ee2).
+ * Gauge identity from the label [STRONG INFERENCE]; internals not annotated.
+ */
+void draw_ammo_counter /* Original: FUN_00004ecc */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];
@@ -914,7 +983,15 @@ void FUN_00005158(void)
 
 // WARNING: Control flow encountered bad instruction data
 
-void FUN_0000532e(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/*
+ * Original: FUN_0000532e; source: ID03.c:720.
+ * Recovered name: draw_fuel_gauge [STRONG INFERENCE] (iteration 171).
+ * Not part of the draw_instrument type switch. Loads label slot 77 "Fuel"
+ * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
+ * a bezel via draw_ring_with_status_indicators (BSR at file 0x5346).
+ * Gauge identity from the label [STRONG INFERENCE]; internals not annotated.
+ */
+void draw_fuel_gauge /* Original: FUN_0000532e */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 auStack_36 [12];

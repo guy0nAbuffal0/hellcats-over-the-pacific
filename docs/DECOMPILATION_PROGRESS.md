@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 168
+**Last iteration:** 171
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -12,7 +12,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
 | ID02.c | 125 | 61 | 0 | 0 | 64 | 0 | 0 |
-| ID03.c | 45 | 30 | 0 | 0 | 15 | 0 | 0 |
+| ID03.c | 45 | 21 | 0 | 0 | 24 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **487** | **0** | **0** | **243** | **0** | **6** |
+| **TOTAL** | **736** | **478** | **0** | **0** | **252** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 487 NOT_STARTED + 6 BLOCKED (iteration 168);
-243 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 478 NOT_STARTED + 6 BLOCKED (iteration 171);
+252 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -282,6 +282,15 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00003c02` (ID03) | `draw_instrument` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | bezel ring + screws; type 0..9 switch to per-gauge drawers; record A5−0x12a2+type·16 | Gauge identities; tail | 167 (2026-10-17) | Capstone + switch table parsed |
 | `FUN_00001876` (ID03) | `draw_altimeter` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | label STR#129 slot 65 "ALTITUDE"; fn ptr A5−0x2118; draw_vector_number | Needle math | 168 (2026-10-17) | Capstone + resource dump |
 | `FUN_00001538` (ID03) | `begin_instrument_supersample` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` (11 call sites) | new_offscreen_bw_port 1× or 3× | — | 168 (2026-10-17) | C (truncated) |
+| `FUN_00001b48` (ID03) | `draw_airspeed_indicator` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | instrument type 1; label "AIR SPEED" | Drawing internals | 169 (2026-10-17) | STR#129 label scan |
+| `FUN_00002d1c` (ID03) | `draw_turn_and_bank_indicator` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | instrument type 2; label "TURN BANK" | Drawing internals | 169 (2026-10-17) | STR#129 label scan |
+| `FUN_00001fee` (ID03) | `draw_climb_indicator` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | instrument type 3; label "CLIMB" | Drawing internals | 169 (2026-10-17) | STR#129 label scan |
+| `FUN_00002600` (ID03) | `draw_manifold_pressure_gauge` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | instrument type 4; label "Manifold Pressure" | Drawing internals | 169 (2026-10-17) | STR#129 label scan |
+| `FUN_000022fe` (ID03) | `draw_tachometer` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | instrument type 5; label "RPM" | Drawing internals | 169 (2026-10-17) | STR#129 label scan |
+| `FUN_00002950` (ID03) | `draw_direction_indicator` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | instrument type 6; label "DIRECTION" | Drawing internals | 169 (2026-10-17) | STR#129 label scan |
+| `FUN_00004c42` (ID03) | `draw_flaps_indicator` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | label FLAPS; bezel at 0x4c58 | Internals | 171 (2026-10-17) | STR#129 slot scan |
+| `FUN_00004ecc` (ID03) | `draw_ammo_counter` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | label AMMO; bezel at 0x4ee2 | Internals | 171 (2026-10-17) | STR#129 slot scan |
+| `FUN_0000532e` (ID03) | `draw_fuel_gauge` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | label Fuel; bezel at 0x5346 | Internals | 171 (2026-10-17) | STR#129 slot scan |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1634,8 +1643,44 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   supersampled B&W port; 11 call sites).
 - Validation: token diff = renames only; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** identify the other instrument types by their label
-slots (A5−0xf46 + 4·slot) starting with `FUN_00001b48` (type 1).
+### Iteration 169 — 2026-10-17
+
+- Working tree clean at start (user committed iteration 168); 32 protected
+  hashes verified.
+- Scripted scan of each instrument drawer for STR# 129 pointer-table loads
+  (A5−0xf46 + 4·slot) identified six more gauges by their labels: type 1 AIR
+  SPEED, 2 TURN BANK, 3 CLIMB, 4 Manifold Pressure, 5 RPM, 6 DIRECTION.
+  Renamed draw_airspeed_indicator, draw_turn_and_bank_indicator,
+  draw_climb_indicator, draw_manifold_pressure_gauge, draw_tachometer,
+  draw_direction_indicator. Types 8 / 9 (FUN_000032b8 / FUN_000038fc) load no
+  label strings - still unnamed. draw_instrument switch comment updated.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+### Iteration 170 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 169 preserved.
+- Wrote `docs/INSTRUMENT_PANEL.md`: STR# 129 label table (slots 1, 61, 65-77),
+  instrument types 0-9, drawing pipeline (supersample → gauge → anti-alias →
+  dispose), bezel / screw hypothesis, open questions. Documentation only.
+- New leads: slot 61 "Hellcats requires a Macintosh with color QuickDraw and a
+  68020 or higher" (likely the seg-4 start-up gate in initialize_application;
+  consistent with EXTB.L / MULU.L use); slots 75-77 FLAPS / AMMO / Fuel unused
+  by types 0-6; slot 1 "Unable to store instrument panel to disk".
+
+### Iteration 171 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iterations 169-170 preserved.
+- Whole-binary scan for STR# 129 slots 1 / 61 / 75-77:
+  - ID03 `FUN_00004c42` (FLAPS), `FUN_00004ecc` (AMMO), `FUN_0000532e` (Fuel) -
+    renamed draw_flaps_indicator / draw_ammo_counter / draw_fuel_gauge (each
+    also draws a bezel; outside the draw_instrument switch).
+  - ID04 `FUN_00003d42` uses slot 61 ("requires color QuickDraw and a 68020");
+    file 0x3d42 is JT $f2, the start-up gate in ID02 initialize_application.
+  - ID04 `FUN_000003c2` uses slot 1 ("Unable to store instrument panel to disk").
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID04 `FUN_00003d42` (system-requirement check) and
+`FUN_000003c2` (instrument panel save), in ID04.decomp.c.
 
 ## Resuming the five-minute workflow
 

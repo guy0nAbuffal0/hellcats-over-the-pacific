@@ -86,6 +86,13 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003c02` (ID03) | `draw_instrument` | STRONG INFERENCE | Iter 167: bezel + type-switch (0..9) to per-gauge drawers; record A5−0x12a2. |
 | `FUN_00001876` (ID03) | `draw_altimeter` | STRONG INFERENCE | Iter 168: instrument type 0; label STR#129[65] "ALTITUDE". |
 | `FUN_00001538` (ID03) | `begin_instrument_supersample` | STRONG INFERENCE | Iter 168: 1× or 3× B&W port for anti-aliased gauge drawing. |
+| `FUN_00001b48` (ID03) | `draw_airspeed_indicator` | STRONG INFERENCE | Iter 169: instrument type 1; label "AIR SPEED". |
+| `FUN_00002d1c` (ID03) | `draw_turn_and_bank_indicator` | STRONG INFERENCE | Iter 169: instrument type 2; label "TURN BANK". |
+| `FUN_00001fee` (ID03) | `draw_climb_indicator` | STRONG INFERENCE | Iter 169: instrument type 3; label "CLIMB". |
+| `FUN_00002600` (ID03) | `draw_manifold_pressure_gauge` | STRONG INFERENCE | Iter 169: instrument type 4; label "Manifold Pressure". |
+| `FUN_000022fe` (ID03) | `draw_tachometer` | STRONG INFERENCE | Iter 169: instrument type 5; label "RPM". |
+| `FUN_00002950` (ID03) | `draw_direction_indicator` | STRONG INFERENCE | Iter 169: instrument type 6; label "DIRECTION". |
+| `FUN_00004c42` / `00004ecc` / `0000532e` (ID03) | `draw_flaps_indicator` / `draw_ammo_counter` / `draw_fuel_gauge` | STRONG INFERENCE | Iter 171: labels STR#129 slots 75 / 76 / 77. |
 | STR# 129 text | `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/` | PROVEN (dump) | Files 0-based; game slot n ↔ file n−1. Slot 93 = out-of-memory message; slot 65 = ALTITUDE. |
 | ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
