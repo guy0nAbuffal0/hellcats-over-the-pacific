@@ -1,6 +1,85 @@
 # Hellcats Over the Pacific — Project Status
 
-Assessment date: 15 October 2026.
+Latest assessment: 17 October 2026. The dated update below supersedes conflicting claims in the older assessment, retained afterward for context.
+
+## Port improvement assessment — 17 October 2026
+
+### Current position
+
+**The strongest next milestone is one source-backed aircraft running in the playable Godot scene.** The repository has a playable training prototype and a much larger reconstruction harness, but the two still run separately. More function renaming alone will not close that gap.
+
+Verified in this assessment:
+
+- `PlayerAircraft._physics_process()` still calls `FlightModelMvp.step()`. `MissionController` exposes mission flags but explicitly does not call `SimCore.tick()`.
+- The live scene has authored training objectives, telemetry, restart/failure flow, a chase camera, a box aircraft, a sea plane and a box island. These are useful scaffolding, not original mission or visual parity.
+- `SimCore` contains substantially more than the old status suggests: overlay RNG initialization/consumption, control and propulsion slices, landing/contact branches, weapon spawn paths, object/template construction and cleanup. Some helpers still use injected entities, synthetic memory or deferred bodies; their presence does not establish complete gameplay.
+- The decompilation tracker, iteration 316, records **736 inventoried functions: 686 RENAMED, 44 VERIFIED, 6 BLOCKED**. These are reconstruction workflow states, not Godot implementation or game-completion percentages. Most renamed functions still need independent verification.
+- Both immutable exports (`*.c`) and annotated reconstructions (`*.decomp.c`) are now inside `sources/resedit/CODE/`, alongside CODE binaries. The older statement that they live outside this repository is obsolete. These are decompiled exports, not evidence that the original developer source has been recovered.
+- New subsystem notes cover sound, cockpit instruments, rendering, ship controllers and pilot persistence. There is enough evidence to plan concrete ports in these areas; the original binaries remain necessary where decompiler output is ambiguous.
+
+### First priority: correct the simulation contract
+
+**1. Separate prototype control fields from recovered engine fields.** In `flight_model_mvp.gd`, `movement_66a` drives yaw and `movement_672` drives roll. In the recovered overlay, `update_tachometer_needle` (`FUN_0000c9c2`) reads player `+0x66a`, while `update_manifold_needle` (`FUN_0000ca44`) reads `+0x672`; the sound driver also reads `+0x66a` for engine/wind playback. RPM and manifold pressure are strong semantic inferences supported by those consumers. Reusing the prototype axis interpretation in a parity adapter would produce the wrong telemetry and behavior. Fuel is another example: fields currently named `weapon_count_67d/67e` feed the two fuel needles. Preserve proven offsets, document confidence, and introduce explicit gameplay-facing names without blindly renaming all uses. Do not guess the remaining field meanings.
+
+Completion criterion: a reviewed field/unit/width mapping for input, attitude, velocity, engine, fuel, gear and flaps, with source consumers and conversion fixtures. See [INSTRUMENT_PANEL.md](INSTRUMENT_PANEL.md), especially “Live needles,” and [SOUND_SYSTEM.md](SOUND_SYSTEM.md).
+
+**2. Reproduce the controller call chain before making it authoritative.** `SimCore._update_single_entity()` currently runs `044a4` and then aircraft-update slices directly. The recovered code separates world-object rate updates from controller ticks: `advance_frame_and_tick_controllers` (`092e4`) calls definition tick handlers, and `aircraft_tick` (`e5aa`) calls the aircraft state handler (`e792` for the player, other handlers for AI). Preserve this separation, controller identity, mission gates and RNG consumption. Otherwise adding more entity types risks applying aircraft behavior to unrelated objects or updating an aircraft twice. Port the necessary live-frame sequence, rather than assuming the four-pass `044e8` loop is the complete original frame.
+
+Completion criterion: one aircraft takes its original controller/state path exactly once per simulated frame; a non-aircraft controller follows its own handler; ordering and RNG draw counts are asserted. See [SHIP_CONTROLLERS.md](SHIP_CONTROLLERS.md), “Who calls the handlers,” and `aircraft_create`, `aircraft_tick`, `advance_frame_and_tick_controllers` in `Pacific Conflict.decomp.c`.
+
+**3. Add an independent behavior reference.** The current replay test compares two four-frame runs of the same implementation. Its runner creates a default `SimCore` without populating a playable aircraft or enabling mission phase. Input packets are recorded, not translated into flight controls. That verifies repeatability of this harness, not responsive flight or agreement with the original.
+
+Start with populated aircraft/template fixtures and input-to-state assertions. Then compare against an independent reference for selected deterministic routines, and capture original-runtime traces if emulator instrumentation is available. Validate integer widths, signed shifts, division/rounding, initial state, tick cadence and conditional RNG draws. Adjacent accumulator/threshold boundary cases remain a useful small task, but should support this integration milestone.
+
+Completion criterion: a throttle or control change causes the expected aircraft-state change; identical inputs reproduce a populated flight; selected original/reference outputs agree. No original-runtime capture was performed for this assessment.
+
+### Second priority: put reconstructed behavior into play
+
+**4. Add a selectable reconstructed-flight backend for one aircraft.** Build a narrow adapter between Godot input, the recovered aircraft controller/template state and a read-only render/HUD snapshot. Establish coordinate axes, original distance/angle units and simulation cadence before converting into meters/degrees. Load real template values where proven; explicitly identify any remaining substitutions. Keep the prototype available during migration, and give exactly one backend ownership of aircraft motion per run.
+
+Completion criterion: the training scene visibly flies using the reconstructed path, input reaches it, HUD and mesh read the same state, and restart resets controller state, mission gates and RNG. Run automated checks plus the existing manual flight smoke checklist. This is a medium-to-large integration task, not a one-line replacement of `step()` with `tick()`.
+
+**5. Import one original object and one original scene subset.** The template/object constructors, vertex transforms, face records and renderer notes now give a practical starting point for exporting original geometry into Godot meshes. Begin with one aircraft or static object, checking vertex counts, face indices, scale, orientation, palette and silhouette against screenshots. Then decode one mission's placements and terrain/contact data. The authored training mission must not be assumed to share original mission numbering or setup; the reconstructed aircraft-creation notes identify Flight School as original mission 2.
+
+Use Godot rendering for the first import. The original span rasterizer, QuickDraw paths and Macintosh segment loader are separate fidelity work; they need not be recreated before displaying original geometry. However, some original collision checks occur inside rendering (`submit_object_faces`), so equivalent gameplay contact must be preserved explicitly when replacing that renderer. Terrain, runway and carrier contact should share geometry/height data with the displayed world.
+
+Completion criterion: one recognizable original object and a documented scene subset appear at verified transforms, with matching collision. See [OVERLAY_RENDERER.md](OVERLAY_RENDERER.md), [RASTERIZER.md](RASTERIZER.md) and the template initialization/instantiation functions. This remains a high-effort data-decoding task; full asset extraction was not demonstrated here.
+
+### Visible improvements supported by the recovered code
+
+**6. Cockpit and instruments — medium effort once telemetry is mapped.** ID03 gauge drawing and overlay needle updates are documented for airspeed, altitude, climb, heading, RPM, manifold pressure, gear, flaps, ammunition and fuel. Start with a Godot cockpit panel using verified value-to-needle mappings, then refine original layout and artwork. Keep gauges whose underlying state is not yet modeled explicitly deferred. This gives visible authenticity and helps diagnose the simulation.
+
+**7. Sound — a comparatively small first feature, medium effort for original behavior.** Bring an engine loop into the live scene, then add original event priorities, looping/release behavior and engine/wind rate rules from `update_game_sounds`. Audio references already exist under `sources/sounds/`, but nothing in the current Godot asset tree imports those audio files. Verify sound identity, sample rate and loop points first. The existing `extract_sounds.py` is a heuristic byte carver with a hard-coded 22050 Hz rate, not a resource-aware decoder; the resource-tool README also warns that in-tree `Hellcats.rsrc` candidates are invalid classic forks. Prefer resource-aware extraction from the disk images for authoritative audio, and verify the available MP3 references separately.
+
+Completion criterion: the engine responds to validated engine state, events trigger the appropriate sound with correct priority, and no incorrect sample rate is presented as original fidelity. See [SOUND_SYSTEM.md](SOUND_SYSTEM.md) and [../tools/mac_resources/README.md](../tools/mac_resources/README.md).
+
+**8. Landing, combat and AI — high effort, build a small complete encounter.** After the aircraft/scene bridge, implement a runway or carrier approach, followed by one weapon, one target, collision/damage, effects and a mission outcome. The recovered source now identifies aircraft state handlers, target acquisition, bullet/shape collision, ship hit counts and sinking steps. These are actionable references, but Godot weapon counters/spawn helpers alone are not a working combat system. Add one AI behavior and one ship type only after the basic encounter works.
+
+Completion criterion: a fired projectile exists in the world, can hit and damage a target, updates the objective/score, produces feedback and cleans up deterministically. Original landing conditions must distinguish safe contact from crashes rather than treating all terrain contact as mission failure.
+
+**9. Mission selection, briefing and pilot progression — medium-to-high effort.** ID02/ID04 reconstruction and [PILOT_ROSTER.md](PILOT_ROSTER.md) provide references for selection, outcomes, summaries and persistence. Start with a verified scenario and mission result, then expand the roster/awards flow. Recreating Macintosh dialog machinery is unnecessary for a Godot UI, but the data and outcome rules should be preserved where proven.
+
+### Recommended sequence and progress measures
+
+1. Correct semantic mappings and add populated, input-responsive reference fixtures.
+2. Implement the live controller sequence and one reconstructed aircraft backend.
+3. Deliver one source-backed training/landing scene with one imported model, cockpit readouts and engine sound.
+4. Deliver one complete combat encounter with damage and mission outcome.
+5. Expand missions, AI, ships, pilot progression and visual fidelity from that working base.
+
+Measure completed playable behaviors, independently checked routines and imported assets. A function-count percentage would be misleading: platform helpers, renamed functions and tested mathematical slices contribute very different amounts to the playable port. The six blocked function entries should be tracked by dependency; they are not automatically blockers for all Godot work. Full LoadSeg emulation and pixel-identical rasterization can remain deferred unless a chosen fidelity milestone requires them.
+
+Documentation cleanup is small and useful now: synchronize `ROADMAP.md`, `IMPORT_STATUS.md`, `CONVERGENCE_BACKLOG.md` and the README with the current overlay RNG, implemented `0435a` branches, in-repository source paths and the still-disconnected gameplay backend. Several older rows describe work already present in code as unstarted, while “Done” mission bridge wording overstates runtime integration.
+
+### Validation performed for this assessment
+
+- Godot 4.6.2 headless suite: **13 scripts passed, 0 failed**, exit 0, using an explicit `/tmp/hellcats-status-20261017.log`. The engine subsequently printed a macOS certificate diagnostic; no script test failed.
+- Python regression: **all checks passed**, including the optional compiled ID05 RNG check.
+- Protected-source checksum verification: **all 32 listed files matched**. The checksum utility also reported one malformed manifest line; no listed file mismatch was reported.
+- No manual play, visual comparison, sound audition, original-emulator trace or end-to-end original mission validation was performed. Headless scene-instantiation tests do not establish those properties.
+- This assessment updates documentation only; no gameplay implementation was changed.
+
+The sections below retain the earlier assessment and may describe an older reconstruction state.
 
 ## Focused convergence update — 16 October 2026
 
