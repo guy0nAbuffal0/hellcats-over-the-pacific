@@ -15414,7 +15414,11 @@ uint * aircraft_create /* Original: FUN_0000e0ce */ (uint param_1,int param_2,un
 
 
 
-uint * FUN_0000e1e6(uint param_1,int param_2,undefined2 param_3)
+/* Original: FUN_0000e1e6; source: Pacific Conflict.c. Recovered name: create_enemy_fighter [STRONG INFERENCE] (iteration 298).
+ * Ghidra C reviewed (function at overlay offset 0xe1e6).
+ * Definition +6 of key 4 (file 0x1a7fa) [PROVEN bytes]. The first type-4 object is kept as a template in DAT_00026000 (no controller, returns 0) for the spawners; later ones get init_aircraft_controller, +0x63e = 1, ground height +0x2e, AI state 0x110d4 (ai_attack_or_fly), flags 0x102100 and a shadow (kind 2). Aircraft template types [STRONG INFERENCE from the definitions and mission checks]: 1 player / friendly fighter (aircraft_create), 2 friendly bomber (mission 5 Flying Fortress fails when one is lost), 3 enemy bomber (mission 6 Scramble succeeds when one is destroyed), 4 enemy fighter. Facility / side codes: 0x200 = friendly, 0x100 = enemy (ordnance_detonation counts 0x200 hits as friendly kills). Ghidra C.
+ */
+uint * create_enemy_fighter /* Original: FUN_0000e1e6 */ (uint param_1,int param_2,undefined2 param_3)
 
 {
   uint *puVar1;
@@ -15456,7 +15460,11 @@ FUN_0000e262(uint param_1,uint param_2,uint param_3,undefined2 param_4,undefined
 
 
 
-uint * FUN_0000e2a4(uint param_1,int param_2,undefined2 param_3)
+/* Original: FUN_0000e2a4; source: Pacific Conflict.c. Recovered name: create_friendly_bomber [STRONG INFERENCE] (iteration 298).
+ * Ghidra C reviewed (function at overlay offset 0xe2a4).
+ * Definition +6 of key 2 (file 0x1a88e) [PROVEN bytes]: init_aircraft_controller, AI state 0x1118e (Ghidra 0x111ae, ai_fly_bomber), no gun ammo, 8 bombs (+0x67c), shadow kind 4, and a gunner turret (spawn_turret_on_object) of side 0x200 (friendly; it targets types 3 / 4), range 25000, linked as the aircraft +0x692. Aircraft template types [STRONG INFERENCE from the definitions and mission checks]: 1 player / friendly fighter (aircraft_create), 2 friendly bomber (mission 5 Flying Fortress fails when one is lost), 3 enemy bomber (mission 6 Scramble succeeds when one is destroyed), 4 enemy fighter. Facility / side codes: 0x200 = friendly, 0x100 = enemy (ordnance_detonation counts 0x200 hits as friendly kills). Ghidra C.
+ */
+uint * create_friendly_bomber /* Original: FUN_0000e2a4 */ (uint param_1,int param_2,undefined2 param_3)
 
 {
   uint *puVar1;
@@ -15483,12 +15491,16 @@ uint * FUN_0000e2a4(uint param_1,int param_2,undefined2 param_3)
 
 
 
-uint * FUN_0000e340(uint param_1,int param_2,undefined2 param_3)
+/* Original: FUN_0000e340; source: Pacific Conflict.c. Recovered name: create_enemy_bomber [STRONG INFERENCE] (iteration 298).
+ * Ghidra C reviewed (function at overlay offset 0xe340).
+ * Definition +6 of key 3 (file 0x1a844) [PROVEN bytes]: create_friendly_bomber, then switches its gunner turret to side 0x100 (enemy; it targets types 1 / 2). Aircraft template types [STRONG INFERENCE from the definitions and mission checks]: 1 player / friendly fighter (aircraft_create), 2 friendly bomber (mission 5 Flying Fortress fails when one is lost), 3 enemy bomber (mission 6 Scramble succeeds when one is destroyed), 4 enemy fighter. Facility / side codes: 0x200 = friendly, 0x100 = enemy (ordnance_detonation counts 0x200 hits as friendly kills). Complete Ghidra C.
+ */
+uint * create_enemy_bomber /* Original: FUN_0000e340 */ (uint param_1,int param_2,undefined2 param_3)
 
 {
   uint *puVar1;
   
-  puVar1 = FUN_0000e2a4(param_1,param_2,param_3);
+  puVar1 = create_friendly_bomber(param_1,param_2,param_3);
   if (*(int *)((int)puVar1 + 0x692) != 0) {
     *(undefined2 *)(*(int *)(*(int *)((int)puVar1 + 0x692) + 8) + 0x3e) = 0x100;
   }
@@ -17226,7 +17238,11 @@ LAB_0001007c:
 
 
 
-void FUN_000100bc(int param_1)
+/* Original: FUN_000100bc; source: Pacific Conflict.c. Recovered name: release_ai_target [STRONG INFERENCE] (iteration 299).
+ * Ghidra C reviewed (function at overlay offset 0x100bc).
+ * Drops the AI target reference (+0x692 object +3 count) and clears +0x692. Complete Ghidra C.
+ */
+void release_ai_target /* Original: FUN_000100bc */ (int param_1)
 
 {
   char *pcVar1;
@@ -17241,7 +17257,11 @@ void FUN_000100bc(int param_1)
 
 
 
-uint FUN_000100d4(int param_1,int param_2)
+/* Original: FUN_000100d4; source: Pacific Conflict.c. Recovered name: enemy_fighter_notice_object [STRONG INFERENCE] (iteration 299).
+ * Ghidra C reviewed (function at overlay offset 0x100d4).
+ * Definition +0x16 notice handler of key 4 (enemy fighter, file 0x1a7fa) [PROVEN bytes]; the AI counterpart of aircraft_notice_object for the enemy states 0x110d4 / 0x11162 / 0x111ba / 0x112c0: with probability 1/64 and when not busy, estimates a chance from the target size / distance; in the dive state 0x111ba it only takes a ship (types 0x15..0x19) near a friendly facility (0x200) - the kamikaze picking its ship - and switches to the bombing / dive states with a target in +0x692. Ghidra C (switch on the target type not recovered: "switch(uVar4);").
+ */
+uint enemy_fighter_notice_object /* Original: FUN_000100d4 */ (int param_1,int param_2)
 
 {
   int iVar1;
@@ -18408,7 +18428,11 @@ void ai_fly /* Original: FUN_00011182 */ (int *param_1)
 
 
 
-void FUN_000111ae(int *param_1)
+/* Original: FUN_000111ae; source: Pacific Conflict.c. Recovered name: ai_fly_bomber [STRONG INFERENCE] (iteration 298).
+ * Ghidra C reviewed (function at overlay offset 0x111ae).
+ * AI state 0x1118e (+0x20) set by create_friendly_bomber: flies with the per-kind handler DAT_0001b3f4[+0x614] or update_aircraft_entity, like ai_fly. Complete Ghidra C.
+ */
+void ai_fly_bomber /* Original: FUN_000111ae */ (int *param_1)
 
 {
   if (*(int *)(&DAT_0001b3f4 + *(short *)(param_1 + 0x185) * 4) == 0) {
@@ -18422,7 +18446,11 @@ void FUN_000111ae(int *param_1)
 
 
 
-void FUN_000111da(int *param_1)
+/* Original: FUN_000111da; source: Pacific Conflict.c. Recovered name: ai_dive_at_target [STRONG INFERENCE] (iteration 298).
+ * Ghidra C reviewed (function at overlay offset 0x111da).
+ * AI state 0x111ba (+0x20) set by tick_wave_spawner: with a valid target (+0x692) steers straight at it (steer_entity_toward_point, aiming at its height when closer than 0xafc8, else at 40000) at throttle 0xd5c with the ground-height floor lifted for the steer, then flies (update_aircraft_entity); without one, in mission 7 while the list flag is clear, it keeps flying; otherwise FUN_000100bc and the ammo check follow. [STRONG INFERENCE: attack-run / kamikaze dive of the incoming waves] Ghidra C (partly read).
+ */
+void ai_dive_at_target /* Original: FUN_000111da */ (int *param_1)
 
 {
   int iVar1;
@@ -18457,7 +18485,7 @@ void FUN_000111da(int *param_1)
       goto LAB_000112b4;
     }
   }
-  FUN_000100bc((int)param_1);
+  release_ai_target((int)param_1);
   if (*(short *)((int)param_1 + 0x682) < 3) {
     *(undefined4 *)((int)param_1 + 0x32) = 0x11162;
   }
@@ -18478,7 +18506,11 @@ LAB_000112b4:
 
 
 
-void FUN_000112e0(int *param_1)
+/* Original: FUN_000112e0; source: Pacific Conflict.c. Recovered name: ai_bombing_run [STRONG INFERENCE] (iteration 299).
+ * Ghidra C reviewed (function at overlay offset 0x112e0).
+ * AI state 0x112c0 (+0x20; set by enemy_fighter_notice_object). Without a valid target or bombs (+0x67c) it releases the target and returns to ai_attack_or_fly (ammo >= 3) or ai_fly. Otherwise a stage machine in +0x675: 0 approach until within 0x9c40 and above 24999; 1 steer straight at the target (ground-height floor lifted) and release the weapon (+0x674 = 1) once below 5000, then stage 2 (pull out). [STRONG INFERENCE: dive-bombing attack] Ghidra C (partly read).
+ */
+void ai_bombing_run /* Original: FUN_000112e0 */ (int *param_1)
 
 {
   int iVar1;
@@ -18493,7 +18525,7 @@ void FUN_000112e0(int *param_1)
   if ((((*(int *)((int)param_1 + 0x692) == 0) || (*(char *)(param_1 + 0x19f) == '\0')) ||
       (iVar2 = *(int *)((int)param_1 + 0x692), (*(byte *)(iVar2 + 7) & 2) != 0)) ||
      (*(int *)(iVar2 + 0x44) == 0)) {
-    FUN_000100bc((int)param_1);
+    release_ai_target((int)param_1);
     if (*(short *)((int)param_1 + 0x682) < 3) {
       *(undefined4 *)((int)param_1 + 0x32) = 0x11162;
     }
@@ -18542,7 +18574,7 @@ void FUN_000112e0(int *param_1)
       bVar5 = true;
       if (45000 < *(int *)((int)param_1 + 0x696)) {
         *(undefined1 *)((int)param_1 + 0x675) = 0;
-        FUN_000100bc((int)param_1);
+        release_ai_target((int)param_1);
       }
     }
     adjust_ai_throttle_vs_speed( /* Original: FUN_00010c2c */param_1,0xd5c);
@@ -25491,7 +25523,7 @@ void destroy_flak_controller /* Original: FUN_00018b98 */ (int param_1)
 
 /* Original: FUN_00018bba; source: Pacific Conflict.c. Recovered name: flak_notice_object [STRONG INFERENCE] (iteration 295).
  * Ghidra C reviewed (function at overlay offset 0x18bba).
- * Definition +0x16 notice handler of key 0x1a (flak gun) [PROVEN bytes]: for a gun with shells (+0x40) on the enemy side (facility 0x200 vs template types 3..4) or friendly side (0x100 vs types < 3), with probability 1/64 and a chance falling with distance (0x339000 / distance, halved when it already has a target) picks the aircraft as its target (+0x36), as aircraft_notice_object does for AI aircraft. Ghidra C (tail not shown here).
+ * Definition +0x16 notice handler of key 0x1a (flak gun) [PROVEN bytes]: for a gun with shells (+0x40) of side 0x200 (friendly; targets the enemy types 3..4) or side 0x100 (enemy; targets types < 3) - side labels corrected in iteration 298, with probability 1/64 and a chance falling with distance (0x339000 / distance, halved when it already has a target) picks the aircraft as its target (+0x36), as aircraft_notice_object does for AI aircraft. Ghidra C (tail not shown here).
  */
 uint flak_notice_object /* Original: FUN_00018bba */ (int param_1,int param_2)
 
@@ -25782,7 +25814,11 @@ int spawn_turret_on_object /* Original: FUN_00019130 */ (int param_1)
 
 
 
-void FUN_0001917c(undefined4 *param_1)
+/* Original: FUN_0001917c; source: Pacific Conflict.c. Recovered name: tick_turret [STRONG INFERENCE] (iteration 299).
+ * Ghidra C reviewed (function at overlay offset 0x1917c).
+ * Definition +2 of key 0x1b. First call: side from the nearest facility (+0x3e). Follows its carrier (+0x32: bomber or ship) and is cleaned up when the carrier is gone or its guns are damaged (flags_685 bit 4); with a target (+0x36) within range (+0x42) and not reloading (+0x46), computes the aim direction (isqrt_floor of the scaled offset) for turret_pre_render and fires (further down). Ghidra C (partly read).
+ */
+void tick_turret /* Original: FUN_0001917c */ (undefined4 *param_1)
 
 {
   char *pcVar1;

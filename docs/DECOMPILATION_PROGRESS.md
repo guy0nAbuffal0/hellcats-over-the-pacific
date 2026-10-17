@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 297
+**Last iteration:** 299
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 53 | 0 | 0 | 384 | 0 | 6 |
-| **TOTAL** | **736** | **53** | **0** | **0** | **677** | **0** | **6** |
+| Pacific Conflict.c | 443 | 44 | 0 | 0 | 393 | 0 | 6 |
+| **TOTAL** | **736** | **44** | **0** | **0** | **686** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 53 NOT_STARTED + 6 BLOCKED (iteration 297);
-677 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 44 NOT_STARTED + 6 BLOCKED (iteration 299);
+686 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -684,6 +684,15 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00011afe` | `create_effect_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00011aae` | `create_camera_facing_controller` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00011ae6` | `face_camera_heading` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | definition-family handler (keys 7 / 8 / 0xf) | — | 297 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000e1e6` | `create_enemy_fighter` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aircraft definition / AI state | — | 298 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000e2a4` | `create_friendly_bomber` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aircraft definition / AI state | — | 298 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0000e340` | `create_enemy_bomber` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aircraft definition / AI state | — | 298 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000111ae` | `ai_fly_bomber` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aircraft definition / AI state | — | 298 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000111da` | `ai_dive_at_target` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | aircraft definition / AI state | — | 298 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000100bc` | `release_ai_target` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | AI / turret handler | — | 299 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000100d4` | `enemy_fighter_notice_object` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | AI / turret handler | — | 299 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_000112e0` | `ai_bombing_run` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | AI / turret handler | — | 299 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
+| `FUN_0001917c` | `tick_turret` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | AI / turret handler | — | 299 (2026-10-17) | Ghidra C + definition bytes; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -3516,10 +3525,34 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   face_camera_heading.
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
+### Iteration 298 — 2026-10-17
+
+- The user committed iteration 297 (HEAD 6627a44); validation re-based.
+  Untracked snds resources of the user left untouched.
+- Verified 32 protected hashes.
+- Aircraft template types identified [STRONG INFERENCE]: 1 player /
+  friendly fighter, 2 friendly bomber, 3 enemy bomber, 4 enemy fighter; side
+  codes 0x200 friendly / 0x100 enemy. `FUN_0000e1e6` = create_enemy_fighter,
+  `FUN_0000e2a4` = create_friendly_bomber (with a gunner turret),
+  `FUN_0000e340` = create_enemy_bomber, AI states `FUN_000111ae` =
+  ai_fly_bomber and `FUN_000111da` = ai_dive_at_target. Side labels in
+  flak_notice_object corrected; type 0x1b turrets also serve as bomber
+  gunners.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+### Iteration 299 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 298 work preserved
+  (validation against HEAD 6627a44).
+- Pacific Conflict `FUN_000100bc` = release_ai_target, `FUN_000100d4` =
+  enemy_fighter_notice_object (key 4 +0x16), `FUN_000112e0` =
+  ai_bombing_run (state 0x112c0), `FUN_0001917c` = tick_turret.
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
 **Next iteration target:** Pacific Conflict plume shapers `FUN_00011796` /
-`FUN_00011940`, turret tick `FUN_0001917c`, `FUN_00019a1a` / `FUN_00019a54`,
-aircraft variants 0xe1e6 / 0xe2a4 / 0xe340, AI states 0x111ae / 0x111da /
-0x112e0.
+`FUN_00011940`, `FUN_0000e262` (aircraft spawn used by the spawners),
+`FUN_00019a1a` / `FUN_00019a54`, remaining 0x8xxx / 0xbxxx / 0xdxxx
+functions.
 
 ## Resuming the five-minute workflow
 

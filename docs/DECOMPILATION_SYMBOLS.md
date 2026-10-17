@@ -491,6 +491,15 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00011afe` (Pacific Conflict) | `create_effect_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
 | `FUN_00011aae` (Pacific Conflict) | `create_camera_facing_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
 | `FUN_00011ae6` (Pacific Conflict) | `face_camera_heading` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
+| `FUN_0000e1e6` (Pacific Conflict) | `create_enemy_fighter` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_0000e2a4` (Pacific Conflict) | `create_friendly_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_0000e340` (Pacific Conflict) | `create_enemy_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_000111ae` (Pacific Conflict) | `ai_fly_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_000111da` (Pacific Conflict) | `ai_dive_at_target` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_000100bc` (Pacific Conflict) | `release_ai_target` | STRONG INFERENCE | Iter 299: AI / turret handler. |
+| `FUN_000100d4` (Pacific Conflict) | `enemy_fighter_notice_object` | STRONG INFERENCE | Iter 299: AI / turret handler. |
+| `FUN_000112e0` (Pacific Conflict) | `ai_bombing_run` | STRONG INFERENCE | Iter 299: AI / turret handler. |
+| `FUN_0001917c` (Pacific Conflict) | `tick_turret` | STRONG INFERENCE | Iter 299: AI / turret handler. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
