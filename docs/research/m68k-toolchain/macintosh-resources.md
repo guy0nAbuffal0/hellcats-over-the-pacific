@@ -2,7 +2,7 @@
 
 ## `Hellcats.rsrc` classification
 
-Path: `hellcats-over-the-pacific-sources/Hellcats/Hellcats.rsrc` (121 559 B).
+Path: `sources/Hellcats/Hellcats.rsrc` (121 559 B).
 
 | Check | Result |
 |-------|--------|

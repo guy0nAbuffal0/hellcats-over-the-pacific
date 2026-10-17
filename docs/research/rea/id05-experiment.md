@@ -1,6 +1,6 @@
 # ID05 Controlled Experiment — REA vs Existing Ghidra C
 
-**Target:** `hellcats-over-the-pacific-sources/ResEdit/CODE/ID05.bin`  
+**Target:** `sources/ResEdit/CODE/ID05.bin`
 **REA:** `rea-agents@6.5.0` via Node 24.11.0 (disposable tarball)  
 **Provider requested:** Ghidra  
 **Original binary:** **not modified**
@@ -49,7 +49,7 @@ JSON per case: `artifacts/rea/id05/*.json`
 
 ## 3. Comparison to existing Ghidra C
 
-Existing protected export [`ID05.c`](../../../hellcats-over-the-pacific-sources/ResEdit/CODE/ID05.c):
+Existing protected export [`ID05.c`](../../../sources/ResEdit/CODE/ID05.c):
 
 ```c
 uint FUN_00000728(void)

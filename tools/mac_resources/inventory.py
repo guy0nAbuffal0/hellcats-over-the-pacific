@@ -19,7 +19,7 @@ except ImportError:  # allow `python3 tools/mac_resources/inventory.py` from rep
     from tools.mac_resources.parse_rsrc import parse_classic_resource_fork  # type: ignore
 
 REPO_DEFAULT = Path(__file__).resolve().parents[2]
-SOURCES = REPO_DEFAULT / "hellcats-over-the-pacific-sources"
+SOURCES = REPO_DEFAULT / "sources"
 
 
 def sha256_file(path: Path) -> str:
@@ -137,7 +137,7 @@ def main() -> int:
         "--sources",
         type=Path,
         default=SOURCES,
-        help="Path to hellcats-over-the-pacific-sources",
+        help="Path to sources",
     )
     ap.add_argument(
         "-o",

@@ -39,7 +39,7 @@ def main() -> int:
     ap.add_argument(
         "--code-dir",
         type=Path,
-        default=Path("hellcats-over-the-pacific-sources/ResEdit/CODE"),
+        default=Path("sources/ResEdit/CODE"),
     )
     ap.add_argument("-o", "--output", type=Path, required=True)
     args = ap.parse_args()

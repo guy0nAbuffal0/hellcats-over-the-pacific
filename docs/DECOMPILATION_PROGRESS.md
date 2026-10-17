@@ -3797,7 +3797,7 @@ segments.
 Invoke: “Resume one five-minute Hellcats C reconstruction iteration from
 `docs/DECOMPILATION_PROGRESS.md`, preserving original artifacts and existing edits.”
 Before each pass, inspect Git status and verify the protected checksum manifest
-relative to `hellcats-over-the-pacific-sources/ResEdit/CODE`. Select the next block,
+relative to `sources/ResEdit/CODE`. Select the next block,
 assign one owner per edited file, compare original C and dependencies, validate
 changes, then update this checkpoint and symbol map. Do not recreate existing
 outputs, commit, push, or touch gameplay code. If a future session exposes a real

@@ -7,7 +7,7 @@ JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Content
 export JAVA_HOME
 export PATH="$JAVA_HOME/bin:$PATH"
 
-ID05="${1:-$REPO/hellcats-over-the-pacific-sources/ResEdit/CODE/ID05.bin}"
+ID05="${1:-$REPO/sources/ResEdit/CODE/ID05.bin}"
 OUT_DIR="${2:-$REPO/artifacts/reverse-engineering/id05}"
 PROJ="$OUT_DIR/ghidra_project"
 mkdir -p "$PROJ" "$OUT_DIR"

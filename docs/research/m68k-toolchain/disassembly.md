@@ -1,6 +1,6 @@
 # ID05 disassembly comparison
 
-Target: `hellcats-over-the-pacific-sources/ResEdit/CODE/ID05.bin`
+Target: `sources/ResEdit/CODE/ID05.bin`
 
 - Size: 3064 B
 - SHA-256: `1c7a3a39153e01b156a17f1e312aa948d0ed906022aa6a1ebd834b9317e2d5f0`

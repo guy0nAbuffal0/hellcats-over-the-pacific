@@ -2,7 +2,7 @@
 
 Damage, firing and sinking of ships in the overlay. Function names are those
 in `Pacific Conflict.decomp.c`; byte facts come from the overlay file
-`hellcats-over-the-pacific-sources/Hellcats/Pacific Conflict` (file offset =
+`sources/Hellcats/Pacific Conflict` (file offset =
 runtime address + 0x20).
 
 ## Definition table [PROVEN, bytes]

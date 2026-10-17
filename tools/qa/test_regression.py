@@ -226,7 +226,7 @@ def check_mission_mvp_data() -> None:
 
 def check_01a48_kind2_jsr_bytes() -> None:
     """PROVEN: kind2/B572 LEA $1A48, but $1A48 is heap_free epilogue; $1A68 is heap_alloc."""
-    binary = REPO_ROOT / "hellcats-over-the-pacific-sources" / "Hellcats" / "Pacific Conflict"
+    binary = REPO_ROOT / "sources" / "Hellcats" / "Pacific Conflict"
     if not binary.is_file():
         fail(f"Missing binary: {binary}")
     data = binary.read_bytes()

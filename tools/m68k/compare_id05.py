@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-ID05 = REPO / "hellcats-over-the-pacific-sources/ResEdit/CODE/ID05.bin"
+ID05 = REPO / "sources/ResEdit/CODE/ID05.bin"
 OUT = REPO / "artifacts/reverse-engineering/id05"
 
 

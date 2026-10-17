@@ -48,7 +48,7 @@ Disposable outputs: `artifacts/reverse-engineering/` (under gitignored `/artifac
 ```bash
 python3 tools/qa/test_regression.py          # core + optional Capstone/Ghidra/C
 bash tools/qa/test_id05_rng_c.sh             # C harness alone
-(cd hellcats-over-the-pacific-sources/ResEdit/CODE && \
+(cd sources/ResEdit/CODE && \
   shasum -a 256 -c ../../../docs/DECOMPILATION_PROTECTED_CHECKSUMS.sha256)
 ```
 

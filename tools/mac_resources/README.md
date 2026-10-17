@@ -1,6 +1,6 @@
 # Macintosh resource inventory tools
 
-Deterministic, read-only inventory and HFS extraction for Hellcats Macintosh source artifacts under `hellcats-over-the-pacific-sources/`. Does **not** modify protected CODE exports.
+Deterministic, read-only inventory and HFS extraction for Hellcats Macintosh source artifacts under `sources/`. Does **not** modify protected CODE exports.
 
 ## Commands
 

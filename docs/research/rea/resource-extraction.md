@@ -19,7 +19,7 @@
 
 ## 2. Available Hellcats inputs (repo)
 
-Root: `hellcats-over-the-pacific-sources/`
+Root: `sources/`
 
 Inventory JSON (deterministic, 69 entries):  
 `artifacts/rea/resources/inventory.json`  
@@ -113,5 +113,5 @@ Prefer existing ResEdit CODE exports + Pacific Conflict blob
 
 ```bash
 python3 tools/mac_resources/inventory.py -o artifacts/rea/resources/inventory.json
-python3 tools/mac_resources/parse_rsrc.py hellcats-over-the-pacific-sources/Hellcats/Hellcats.rsrc
+python3 tools/mac_resources/parse_rsrc.py sources/Hellcats/Hellcats.rsrc
 ```

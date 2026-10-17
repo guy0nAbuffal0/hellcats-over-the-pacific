@@ -1,5 +1,5 @@
 {
-  "source": "hellcats-over-the-pacific-sources/Hellcats/Pacific Conflict",
+  "source": "sources/Hellcats/Pacific Conflict",
   "note": "FUN_00000054 Block D: five 0x1A clones \u2192 A5($1B524)+0x68..0x78 = DAT_0001b58c..1b59c",
   "a5_base": 111908,
   "count": 5,
