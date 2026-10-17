@@ -3787,6 +3787,21 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   extension words must be decoded when an index scale matters.
 - Validation: comment-only changes this iteration; 32 hashes OK.
 
+### Resource enrichment checkpoint — 2026-10-17
+
+- Added deterministic resource-local metadata for all 119 curated items across
+  the 30 `sources/resedit` type directories; the request's “29” count is an
+  arithmetic mismatch with its 30-name list.
+- Linked 33 explicit resource references from `ID*.decomp.c` annotations. These
+  are static VERIFIED references, not runtime observations.
+- Preserved a version split: curated CODE 2 is 19,994 bytes and the recovered
+  1.0.4 resource-fork CODE 2 is 24,832 bytes. No CODE binary or decompiled source
+  was modified.
+- `DATA:0` remains an unresolved compressed A5-world initializer; `DREL:0` is now
+  exposed as 72 relocation offsets and `ZERO:0` as 90 initialization words.
+- Validation is in `tools/qa/test_resedit.py` and `tools/resedit.py verify`; see
+  `docs/RESOURCE_ANALYSIS.md` for format coverage and remaining uncertainty.
+
 **Next iteration target:** continue the VERIFIED pass: create_shape /
 fractal contact records, age_contact_records, drop_contact_records_for_object,
 release_fractal_reference, shape helpers (alloc_*_vertex_block), then the ID0x
@@ -3811,4 +3826,3 @@ handle only after activation; a shell printing ticks alone does not wake this ag
 2. `ID09.c` / `ID05.c` segment entries  
 3. Inventory remaining high-traffic `FUN_*` in Pacific Conflict  
 4. `FUN_00003cca` — multi-sample min using approx_dist3_xyz  
-

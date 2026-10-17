@@ -1,0 +1,157 @@
+# ResEdit resource analysis
+
+The curated resource tree is now reproducible and locally inspectable. Each of
+the 119 resource items under `sources/resedit/` has a sibling binary payload and
+JSON metadata record. `sources/resedit/inventory.json` is only an index; the
+resource-local JSON files are the primary inspection records.
+
+## Coverage
+
+The requested type list contains **30** directory names, despite being described
+as 29. All 30 are retained exactly:
+
+`ALRT`, `BNDL`, `CNTL`, `CODE`, `DATA`, `DITL`, `DLOG`, `DREL`, `FREF`, `HEL1`,
+`HELL`, `ICN#`, `ICON`, `MDPL`, `MENU`, `PICT`, `SIZE`, `STR#`, `TEXT`, `ZERO`,
+`cicn`, `clut`, `icI4`, `icI8`, `ics#`, `ics4`, `ics8`, `snds`, `styl`, `vers`.
+
+Current generated coverage (17 October 2026):
+
+| Measure | Count |
+| --- | ---: |
+| Resource directories | 30 |
+| Individual resources | 119 |
+| Resource-local metadata records | 119 |
+| Indexed binary/hex/image/decompilation representations | 279 |
+| Unassociated CODE support/checksum/tool files inventoried | 12 |
+| Deterministically decoded structures | 116 |
+| Identified internal elements | 1,096 |
+| Proven outgoing resource links | 32 |
+| Static executable-reference annotations | 33 |
+| Type-level named-resource call sites | 2 |
+| Unresolved or truncated primary structures | 3 |
+
+Run `python3 tools/resedit.py inventory` for the authoritative current counts.
+The 33 executable references are direct type/ID references supported by
+decompilation annotations. Two additional `GetNamedResource('snd ', name)` call
+sites are recorded at type scope. They are not claims of runtime observation or
+proof that every named sound executes in a captured session.
+
+## Evidence and edition provenance
+
+Payload precedence is deliberate:
+
+1. Existing ResEdit hexadecimal exports are authoritative for the curated tree.
+2. Existing protected `CODE/ID*.bin` files must match their sibling hex exports
+   and are never rewritten.
+3. The embedded resource fork in
+   `sources/hellcats-over-the-pacific/Hellcats.rsrc` supplies exact payloads only
+   where the curated export has no bytes (notably `cicn` and `snds`) and supplies
+   original resource-map names where Markdown has no `Name:` field.
+
+The AppleDouble file is a **Hellcats 1.0.4** artifact; the curated ResEdit tree is
+primarily 1.0.3. Five payloads differ and the metadata preserves both hashes:
+
+- `CODE:2`: protected ResEdit payload is 19,994 bytes; the 1.0.4 fork payload is
+  24,832 bytes.
+- `vers:1`: the curated payload decodes as 1.0.3; the comparison fork decodes as
+  1.0.4.
+- `DITL:135`: the curated export is truncated in item 9. The 1.0.4 comparison
+  fork adds eight bytes that decode as an empty editable unlock-code field. That
+  recovery is marked **INFERRED**, not substituted into the 1.0.3 evidence.
+- `HEL1:127` and `HEL1:128`: the settings and player/score resources have equal
+  sizes but different content. These resource classes are writable at runtime;
+  metadata does not claim whether the differences came from version defaults or
+  later saved user state.
+
+The directory labels `snds`, `icI4`, and `icI8` are preserved. The parsed
+resource map independently establishes their original four-character types as
+`snd `, `icl4`, and `icl8`; metadata records both identities rather than silently
+renaming directories.
+
+## Metadata model
+
+Each JSON record separates:
+
+- `resource`: original name, exact type/ID, descriptive identity and purpose;
+- `evidence`: byte path, size, SHA-256, origin, fork comparison and all exports;
+- `decoded`: deterministic fields, offsets, elements and unconsumed regions;
+- `relationships`: proven outgoing and automatically generated reverse links;
+- `code_references`: source path, line and supporting decompilation annotation;
+- `claims` and `claim_evidence`: claim-level `PROVEN`, `VERIFIED`, `INFERRED`, or
+  `UNKNOWN` status;
+- `review`: human notes and claims preserved verbatim across regeneration;
+- `unresolved`: explicit remaining questions and provenance mismatches.
+
+Generated fields are reproducible. Human review belongs in `review`, which the
+generator carries forward. Do not put reviewed conclusions inside `decoded`.
+
+## Supported deterministic decoders
+
+Complete field decoders cover `ALRT`, `BNDL`, `CNTL`, `CODE` segment facts,
+`DITL`, `DLOG`, `DREL`, `FREF`, `HEL1` record structure, `MENU`, `SIZE`, `STR#`,
+`TEXT`, `ZERO` word structure, `cicn`, `clut`, the monochrome/indexed icon
+families, `snds`, `styl`, and `vers`.
+
+Important details:
+
+- Every DITL item includes bounds, type/flags, exact content, padding,
+  placeholders and a structural or reviewed semantic identity.
+- Every menu item, string, style run, bundle mapping, relocation entry, palette
+  entry and sampled-sound command is an individual element. Menu entries include
+  the decoded `do_menu_command` action and claim status; the Apple About target
+  remains inferred while the other fixed resource items are byte-verified.
+- `snds` payloads are verified classic format-1 `snd ` resources with a
+  sampled-sound header, unsigned 8-bit mono data, 16.16 sample rate, loop points
+  and no compression. No arbitrary PCM carving or assumed 22,050 Hz rate is used.
+- All 14 `cicn` resources have parsed PixMaps, masks, monochrome bitmaps, embedded
+  color tables and indexed pixels. Decoded RGB pixels match the existing PNGs
+  exactly (zero differing pixels).
+- `PICT` headers and bounds are decoded and rendered exports are indexed, but
+  the full QuickDraw opcode streams are not yet enumerated.
+- CODE records link the protected binary, Ghidra export, semantic decompilation,
+  and function annotations found in that decompilation. CODE 0 additionally
+  exposes all 175 validated LoadSeg jump-table entries.
+
+## Relationships
+
+The generator resolves `ALRT -> DITL`, `DLOG -> DITL`, DITL picture/icon items,
+and `BNDL -> FREF/ICN#`, then writes reverse references. No dangling relationship
+currently exists in the curated tree. A same-ID `TEXT`/`styl` pair is not asserted
+as a link without executable or format evidence.
+
+## Commands
+
+From the repository root:
+
+```sh
+python3 tools/resedit.py generate
+python3 tools/resedit.py inventory
+python3 tools/resedit.py inspect ALRT 259
+python3 tools/resedit.py inspect DITL 137 --detail
+python3 tools/resedit.py inspect clut 999
+python3 tools/resedit.py inspect HEL1 128
+python3 tools/resedit.py inspect CODE 1
+python3 tools/resedit.py search mission
+python3 tools/resedit.py references DITL 259
+python3 tools/resedit.py unknown
+python3 tools/resedit.py verify
+python3 tools/qa/test_resedit.py
+```
+
+`inspect` is concise by default; `--detail` exposes offsets, bytes and evidence.
+`verify` re-parses the inputs, checks metadata drift, validates every hash and
+ensures every discovered item has both binary and JSON companions.
+
+## Remaining uncertainty
+
+- `DATA:0` is proven by CODE to initialize the A5 world with `ZERO:0`, but its
+  complete compression grammar and internal regions remain unresolved.
+- `MDPL:128` is a 594-byte mixed-field structure containing Geneva/font-like and
+  line-layout data, but no documented layout or executable consumer has been
+  established. No gameplay role is claimed.
+- The primary `DITL:135` export remains eight bytes short. The 1.0.4 completion
+  is useful corroboration, not proof that the missing 1.0.3 bytes were identical.
+- PICT QuickDraw opcode enumeration and independent render comparison remain to
+  be implemented.
+- Palette associations for `icI4`/`icI8` are not asserted solely from matching
+  IDs. Their pixel dimensions/depth and raw indices are verified.

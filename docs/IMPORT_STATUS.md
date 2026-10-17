@@ -8,6 +8,16 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 
 **Related:** `docs/SUBSYSTEM_MAP.md`, `docs/CONVERGENCE_BACKLOG.md`, `docs/ROADMAP.md`.
 
+## Resource corpus
+
+The Macintosh resource side is inventoried separately in
+[`RESOURCE_ANALYSIS.md`](RESOURCE_ANALYSIS.md). All 119 curated items across the
+30 on-disk resource directories have local metadata and binary companions. The
+generator records 33 static CODE-reference annotations and keeps those distinct
+from runtime-verified behavior. This does not mean the resources are imported
+into Godot: PICT opcode rendering, resource-backed UI construction, sound
+playback, and most proprietary data consumers remain unported.
+
 ## Legend
 
 | Status | Meaning |
@@ -79,6 +89,11 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 | **ID03.c–ID04.c**, **ID06.c–ID07.c**, **ID09.c** | Mixed helpers; some bad decomp regions | **DEFERRED** / **[UNKNOWN]** | Port only if proven game-critical and missing from **Pacific Conflict.c**. |
 | **ID05.c** | LCG + helpers | **Partial** (RNG constant match) | See §F. |
 | **ID08.c** | LoadSeg / resource traps; see `LOADER_CHAIN.md` | **Doc only** | Full loader parity **[DEFERRED]**. |
+
+Resource provenance caveat: the protected ResEdit `CODE:2` payload is 19,994
+bytes, while the independently recovered 1.0.4 fork has a 24,832-byte segment.
+Both hashes are retained in `sources/resedit/CODE/ID02.json`; the protected input
+was not replaced.
 
 ## H) HUD / cockpit numeric fields
 

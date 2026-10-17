@@ -1,5 +1,11 @@
 # Macintosh resource inventory tools
 
+For the curated `sources/resedit/` corpus, use `tools/resedit.py` and see
+`docs/RESOURCE_ANALYSIS.md`. It generates resource-local binary/JSON companions,
+decodes supported formats, resolves references, and verifies metadata drift.
+The lower-level scripts in this directory remain useful for disk-image and
+standalone resource-fork work.
+
 Deterministic, read-only inventory and HFS extraction for Hellcats Macintosh source artifacts under `sources/`. Does **not** modify protected CODE exports.
 
 ## Commands

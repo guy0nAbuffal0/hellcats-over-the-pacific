@@ -1,0 +1,181 @@
+{
+  "claim_evidence": {
+    "binary_integrity": "SHA-256 and length checked against the extracted payload and source container",
+    "decoded_structure": "Deterministic parser offsets, element counts, consumed bytes, and trailing bytes",
+    "gameplay_role": "Explicit decompilation annotation",
+    "identity": "Reviewed semantic mapping grounded in decoded content"
+  },
+  "claims": {
+    "binary_integrity": "VERIFIED",
+    "decoded_structure": "UNKNOWN",
+    "gameplay_role": "VERIFIED",
+    "identity": "VERIFIED"
+  },
+  "code_references": [
+    {
+      "evidence": "* Register interface D0 = dividend, D1 = divisor (unsigned 32-bit); returns D0 = quotient, D1 = remainder. Fast paths: dividend < divisor (quotient 0); dividend <= 0xffff (one DIVU.W); divisor <= 0xffff (two chained DIVU.W); otherwise normalises both by shifting right until the divisor fits 16 bits, estimates the quotient with DIVU.W and corrects it downward by multiplying back (MULU.W) until the product no longer exceeds the dividend [PROVEN, bytes 0x1c2..0x22a+]. A pre-68020 style routine (the",
+      "function_or_context": "rt_udivmod32_core",
+      "line": 136,
+      "source_path": "sources/resedit/CODE/ID01.decomp.c",
+      "status": "VERIFIED"
+    }
+  ],
+  "decoded": {
+    "consumed_bytes": 2918,
+    "elements": [],
+    "format": "Hellcats A5 World Compressed Initializer Data",
+    "properties": {
+      "printable_ascii_runs": [
+        {
+          "offset": 47,
+          "text": "Taps"
+        },
+        {
+          "offset": 2370,
+          "text": "Hellcats"
+        },
+        {
+          "offset": 2445,
+          "text": "``````@@@@@@@@@@@@@@@@@@@@"
+        },
+        {
+          "offset": 2567,
+          "text": "Engine"
+        },
+        {
+          "offset": 2575,
+          "text": "Short Engine"
+        },
+        {
+          "offset": 2597,
+          "text": "Distant Explosion"
+        },
+        {
+          "offset": 2615,
+          "text": "Wheel"
+        },
+        {
+          "offset": 2621,
+          "text": "Gear"
+        },
+        {
+          "offset": 2631,
+          "text": "Grass"
+        },
+        {
+          "offset": 2637,
+          "text": "Ditch"
+        },
+        {
+          "offset": 2643,
+          "text": "Wind"
+        },
+        {
+          "offset": 2649,
+          "text": "Explosion"
+        },
+        {
+          "offset": 2659,
+          "text": "Distant Explosion"
+        },
+        {
+          "offset": 2679,
+          "text": "Hellcats Saved Settings"
+        },
+        {
+          "offset": 2703,
+          "text": "Pacific Conflict"
+        },
+        {
+          "offset": 2721,
+          "text": "Player and Score Data"
+        },
+        {
+          "offset": 2860,
+          "text": "Hellcats"
+        },
+        {
+          "offset": 2874,
+          "text": "BKj "
+        },
+        {
+          "offset": 2888,
+          "text": "BKj "
+        },
+        {
+          "offset": 2902,
+          "text": "BKj "
+        }
+      ],
+      "structure_status": "unresolved",
+      "u16_word_count": 1459,
+      "word_aligned": true,
+      "zero_byte_count": 684,
+      "zero_byte_fraction": 0.234407
+    },
+    "trailing_bytes": 0
+  },
+  "evidence": {
+    "appledouble_resource_fork_offset": 82,
+    "authoritative_export_path": "sources/resedit/DATA/0.md",
+    "binary_matches_resource_fork_payload": true,
+    "binary_origin": "ResEdit hexadecimal export",
+    "binary_path": "sources/resedit/DATA/0.bin",
+    "binary_size": 2918,
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
+    "comparison_resource_name": null,
+    "representations": [
+      {
+        "kind": "binary payload",
+        "path": "sources/resedit/DATA/0.bin",
+        "sha256": "e349cca624d4a06ec196ef2b18e1d5c4041e4070420816fb0741b3240b713073",
+        "size": 2918
+      },
+      {
+        "kind": "ResEdit Markdown/hex annotation",
+        "path": "sources/resedit/DATA/0.md",
+        "sha256": "ffe34a69d2f146c21af4f0d86af0e69f7e520b03e155bee77e64928c99ae9f69",
+        "size": 5872
+      }
+    ],
+    "resource_attributes": "0x28",
+    "resource_fork_payload_offset": 260,
+    "resource_fork_payload_sha256": "e349cca624d4a06ec196ef2b18e1d5c4041e4070420816fb0741b3240b713073",
+    "resource_fork_payload_size": 2918,
+    "sha256": "e349cca624d4a06ec196ef2b18e1d5c4041e4070420816fb0741b3240b713073",
+    "source_exports": [
+      "sources/resedit/DATA/0.bin",
+      "sources/resedit/DATA/0.md"
+    ]
+  },
+  "relationships": {
+    "incoming": [],
+    "outgoing": []
+  },
+  "resource": {
+    "description": "Hellcats A5 World Compressed Initializer Data; 2918 curated payload bytes.",
+    "descriptive_name": "A5 World Compressed Initializer Data",
+    "id": 0,
+    "key": "DATA:0",
+    "original_fourcc": "DATA",
+    "original_macintosh_name": "",
+    "original_name_bytes_hex": "",
+    "original_name_source": "sources/resedit/DATA/0.md",
+    "purpose": "A5 World Compressed Initializer Data",
+    "type": "DATA"
+  },
+  "review": {
+    "claims": {
+      "pacific_conflict_string_role": "VERIFIED"
+    },
+    "notes": [
+      "The 'Pacific Conflict' text at payload offset 2703 belongs to the compressed A5-world initializer/default filename state. It is not a mission definition or scenery block. CODE:8 subsequently opens the separate sources/hellcats/Pacific Conflict data fork and loads its post-overlay payload."
+    ]
+  },
+  "schema": "hellcats-resedit-resource-v1",
+  "type_code_references": [],
+  "unresolved": [
+    "Binary layout and field semantics remain unidentified."
+  ]
+}

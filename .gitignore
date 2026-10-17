@@ -3,3 +3,6 @@
 
 # Godot editor-specific metadata
 *.uid
+
+# python
+__pycache__/

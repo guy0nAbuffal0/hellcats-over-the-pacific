@@ -1,0 +1,457 @@
+{
+  "claim_evidence": {
+    "binary_integrity": "SHA-256 and length checked against the extracted payload and source container",
+    "decoded_structure": "Deterministic parser offsets, element counts, consumed bytes, and trailing bytes",
+    "gameplay_role": "No direct executable reference established",
+    "identity": "Only a deterministic structural identity is available"
+  },
+  "claims": {
+    "binary_integrity": "VERIFIED",
+    "decoded_structure": "VERIFIED",
+    "gameplay_role": "UNKNOWN",
+    "identity": "VERIFIED"
+  },
+  "code_references": [],
+  "decoded": {
+    "consumed_bytes": 15738,
+    "elements": [
+      {
+        "annotation_line": 13,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000006",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 29,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000002e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 45,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000054",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 61,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000078",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 77,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000009c",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 93,
+        "kind": "known_function",
+        "original_symbol": "FUN_000000c4",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 109,
+        "kind": "known_function",
+        "original_symbol": "FUN_000000ec",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 125,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000120",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 141,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000016e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 157,
+        "kind": "known_function",
+        "original_symbol": "FUN_000001f2",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 173,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000220",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 188,
+        "kind": "known_function",
+        "original_symbol": "FUN_000002c0",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 207,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000362",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 228,
+        "kind": "known_function",
+        "original_symbol": "FUN_000003c2",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 262,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000044e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 277,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000478",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 295,
+        "kind": "known_function",
+        "original_symbol": "FUN_000004f0",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 318,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000516",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 360,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000560",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 380,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000588",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 414,
+        "kind": "known_function",
+        "original_symbol": "FUN_000005e4",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 434,
+        "kind": "known_function",
+        "original_symbol": "FUN_000009ee",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 449,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000a8e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 472,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000bda",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 525,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000e48",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 569,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000f4e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 651,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001106",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 678,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000116a",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 716,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001200",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 736,
+        "kind": "known_function",
+        "original_symbol": "FUN_000014a0",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 751,
+        "kind": "known_function",
+        "original_symbol": "FUN_000014f2",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 769,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000150e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 784,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001562",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 799,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000158c",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 816,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001638",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 845,
+        "kind": "known_function",
+        "original_symbol": "FUN_000016c4",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 878,
+        "kind": "known_function",
+        "original_symbol": "FUN_000017e6",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 894,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000189c",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 910,
+        "kind": "known_function",
+        "original_symbol": "FUN_000018b0",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 929,
+        "kind": "known_function",
+        "original_symbol": "FUN_000018e0",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 959,
+        "kind": "known_function",
+        "original_symbol": "FUN_0000192e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 991,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001a0e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1042,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001bc8",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1063,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001d9e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1086,
+        "kind": "known_function",
+        "original_symbol": "FUN_00001f5e",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1102,
+        "kind": "known_function",
+        "original_symbol": "FUN_000020e8",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1270,
+        "kind": "known_function",
+        "original_symbol": "FUN_00002d86",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1308,
+        "kind": "known_function",
+        "original_symbol": "FUN_00002de6",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1342,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003124",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1370,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003178",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1399,
+        "kind": "known_function",
+        "original_symbol": "FUN_000031aa",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1449,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003260",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1464,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003352",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1482,
+        "kind": "known_function",
+        "original_symbol": "FUN_000033d6",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1501,
+        "kind": "known_function",
+        "original_symbol": "FUN_000035f8",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1520,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003902",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1540,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003a56",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1555,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003a8c",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      },
+      {
+        "annotation_line": 1577,
+        "kind": "known_function",
+        "original_symbol": "FUN_00003d42",
+        "source_path": "sources/resedit/CODE/ID04.decomp.c"
+      }
+    ],
+    "format": "Motorola 68000 CODE Segment",
+    "properties": {
+      "architecture": "Motorola 68000",
+      "decompilation_status": "see sibling .c and .decomp.c files",
+      "first_u16_be": 80,
+      "ghidra_export_path": "sources/resedit/CODE/ID04.c",
+      "known_function_count": 59,
+      "second_u16_be": 33,
+      "segment_size_bytes": 15738,
+      "semantic_decompilation_path": "sources/resedit/CODE/ID04.decomp.c"
+    },
+    "trailing_bytes": 0
+  },
+  "evidence": {
+    "appledouble_resource_fork_offset": 82,
+    "authoritative_export_path": "sources/resedit/CODE/ID04",
+    "binary_matches_resource_fork_payload": true,
+    "binary_origin": "ResEdit hexadecimal export",
+    "binary_path": "sources/resedit/CODE/ID04.bin",
+    "binary_size": 15738,
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
+    "comparison_resource_name": null,
+    "representations": [
+      {
+        "kind": "hexadecimal CODE export",
+        "path": "sources/resedit/CODE/ID04",
+        "sha256": "99906425d30df5a47a215445ac7684f1cdf6725d1f4731d788c61ff95e8ccee5",
+        "size": 31476
+      },
+      {
+        "kind": "binary payload",
+        "path": "sources/resedit/CODE/ID04.bin",
+        "sha256": "6937daa12fbf7b22e7e181a743ec1f2fc16a8df7778e1e39f6e4f337ddbf38a4",
+        "size": 15738
+      },
+      {
+        "kind": "C/decompilation export",
+        "path": "sources/resedit/CODE/ID04.c",
+        "sha256": "80f76da06ed65a240a0e326cdd23b2394dac97fa7d1de488ae0a08f455973f26",
+        "size": 22804
+      },
+      {
+        "kind": "C/decompilation export",
+        "path": "sources/resedit/CODE/ID04.decomp.c",
+        "sha256": "5f8417fc2543bc6f71f18f1ee865aafcd0758ccad88847cbcab7b085ca322d17",
+        "size": 84141
+      }
+    ],
+    "resource_attributes": "0x38",
+    "resource_fork_payload_offset": 3630,
+    "resource_fork_payload_sha256": "6937daa12fbf7b22e7e181a743ec1f2fc16a8df7778e1e39f6e4f337ddbf38a4",
+    "resource_fork_payload_size": 15738,
+    "sha256": "6937daa12fbf7b22e7e181a743ec1f2fc16a8df7778e1e39f6e4f337ddbf38a4",
+    "source_exports": [
+      "sources/resedit/CODE/ID04",
+      "sources/resedit/CODE/ID04.bin",
+      "sources/resedit/CODE/ID04.c",
+      "sources/resedit/CODE/ID04.decomp.c"
+    ]
+  },
+  "relationships": {
+    "incoming": [],
+    "outgoing": []
+  },
+  "resource": {
+    "description": "Motorola 68000 CODE Segment; 15738 curated payload bytes.",
+    "descriptive_name": "Motorola 68000 Code Segment 4",
+    "id": 4,
+    "key": "CODE:4",
+    "original_fourcc": "CODE",
+    "original_macintosh_name": null,
+    "original_name_bytes_hex": null,
+    "original_name_source": "comparison resource map",
+    "purpose": null,
+    "type": "CODE"
+  },
+  "review": {
+    "claims": {},
+    "notes": []
+  },
+  "schema": "hellcats-resedit-resource-v1",
+  "type_code_references": [],
+  "unresolved": []
+}

@@ -16,6 +16,12 @@ Verified in this assessment:
 - The decompilation tracker, iteration 316, records **736 inventoried functions: 686 RENAMED, 44 VERIFIED, 6 BLOCKED**. These are reconstruction workflow states, not Godot implementation or game-completion percentages. Most renamed functions still need independent verification.
 - Both immutable exports (`*.c`) and annotated reconstructions (`*.decomp.c`) are now inside `sources/resedit/CODE/`, alongside CODE binaries. The older statement that they live outside this repository is obsolete. These are decompiled exports, not evidence that the original developer source has been recovered.
 - New subsystem notes cover sound, cockpit instruments, rendering, ship controllers and pilot persistence. There is enough evidence to plan concrete ports in these areas; the original binaries remain necessary where decompiler output is ambiguous.
+- The curated ResEdit corpus is now deterministically inspectable: 119 resources
+  across all 30 on-disk type directories have local binary and JSON companions.
+  Of these, 116 structures are decoded, with 1,096 internal elements, 32 proven
+  outgoing resource links and 33 static executable-reference annotations. See
+  [RESOURCE_ANALYSIS.md](RESOURCE_ANALYSIS.md). The three unresolved/truncated
+  primary structures are `DATA:0`, `MDPL:128`, and `DITL:135`.
 
 ### First priority: correct the simulation contract
 
@@ -49,7 +55,7 @@ Completion criterion: one recognizable original object and a documented scene su
 
 **6. Cockpit and instruments — medium effort once telemetry is mapped.** ID03 gauge drawing and overlay needle updates are documented for airspeed, altitude, climb, heading, RPM, manifold pressure, gear, flaps, ammunition and fuel. Start with a Godot cockpit panel using verified value-to-needle mappings, then refine original layout and artwork. Keep gauges whose underlying state is not yet modeled explicitly deferred. This gives visible authenticity and helps diagnose the simulation.
 
-**7. Sound — a comparatively small first feature, medium effort for original behavior.** Bring an engine loop into the live scene, then add original event priorities, looping/release behavior and engine/wind rate rules from `update_game_sounds`. Audio references already exist under `sources/sounds/`, but nothing in the current Godot asset tree imports those audio files. Verify sound identity, sample rate and loop points first. The existing `extract_sounds.py` is a heuristic byte carver with a hard-coded 22050 Hz rate, not a resource-aware decoder; the resource-tool README also warns that in-tree `Hellcats.rsrc` candidates are invalid classic forks. Prefer resource-aware extraction from the disk images for authoritative audio, and verify the available MP3 references separately.
+**7. Sound — a comparatively small first feature, medium effort for original behavior.** Bring an engine loop into the live scene, then add original event priorities, looping/release behavior and engine/wind rate rules from `update_game_sounds`. Nothing in the current Godot asset tree imports the original audio. The 13 `snds` exports are now structurally verified classic format-1 `snd ` resources with exact 16.16 sample rates, loop points, 8-bit mono sample spans and names; use `tools/resedit.py` rather than the older heuristic `extract_sounds.py` carver. Playback priority and live engine/wind rate behavior still require implementation.
 
 Completion criterion: the engine responds to validated engine state, events trigger the appropriate sound with correct priority, and no incorrect sample rate is presented as original fidelity. See [SOUND_SYSTEM.md](SOUND_SYSTEM.md) and [../tools/mac_resources/README.md](../tools/mac_resources/README.md).
 

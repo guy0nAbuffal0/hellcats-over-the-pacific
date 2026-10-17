@@ -1,0 +1,125 @@
+{
+  "claim_evidence": {
+    "binary_integrity": "SHA-256 and length checked against the extracted payload and source container",
+    "decoded_structure": "Deterministic parser offsets, element counts, consumed bytes, and trailing bytes",
+    "gameplay_role": "No direct executable reference established",
+    "identity": "Reviewed semantic mapping grounded in decoded content"
+  },
+  "claims": {
+    "binary_integrity": "VERIFIED",
+    "decoded_structure": "VERIFIED",
+    "gameplay_role": "INFERRED",
+    "identity": "INFERRED"
+  },
+  "code_references": [],
+  "decoded": {
+    "consumed_bytes": 10,
+    "elements": [],
+    "format": "QuickDraw Picture",
+    "properties": {
+      "actual_size_bytes": 776,
+      "bounds": {
+        "bottom": 92,
+        "height": 93,
+        "left": -1,
+        "right": 437,
+        "top": -1,
+        "width": 438
+      },
+      "declared_size_word": 776,
+      "opcode_decode_status": "not_implemented",
+      "opcode_stream_offset": 10,
+      "quickdraw_version": "version_1",
+      "render_exports": [
+        "sources/resedit/PICT/1000.png",
+        "sources/resedit/PICT/1000.bmp"
+      ],
+      "rendering_fidelity_status": "not_pixel_verified"
+    },
+    "trailing_bytes": 766
+  },
+  "evidence": {
+    "appledouble_resource_fork_offset": 82,
+    "authoritative_export_path": null,
+    "binary_matches_resource_fork_payload": true,
+    "binary_origin": "recovered resource-fork payload",
+    "binary_path": "sources/resedit/PICT/1000.bin",
+    "binary_size": 776,
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
+    "comparison_resource_name": null,
+    "representations": [
+      {
+        "kind": "binary payload",
+        "path": "sources/resedit/PICT/1000.bin",
+        "sha256": "aa1b8e60d163cc5b0218e8769c3d9a71be759e55a056b585b311ad21c92d2ae0",
+        "size": 776
+      },
+      {
+        "kind": "BMP render",
+        "path": "sources/resedit/PICT/1000.bmp",
+        "sha256": "629e717df99c7deab95cd034f378143b00a0f14ae230314c4fc3699353351d13",
+        "size": 4992
+      },
+      {
+        "kind": "ResEdit Markdown/hex annotation",
+        "path": "sources/resedit/PICT/1000.md",
+        "sha256": "a8b9f30ca7e321e2445da7dfd9d12162fc45b31539c5a306562d001107eaa11f",
+        "size": 39
+      },
+      {
+        "kind": "PNG render",
+        "path": "sources/resedit/PICT/1000.png",
+        "sha256": "e086d7201d0211810e89bfa8eac564c9a6d065b63a5df3abbbfe458b5804e5dc",
+        "size": 2431
+      }
+    ],
+    "resource_attributes": "0x20",
+    "resource_fork_payload_offset": 138807,
+    "resource_fork_payload_sha256": "aa1b8e60d163cc5b0218e8769c3d9a71be759e55a056b585b311ad21c92d2ae0",
+    "resource_fork_payload_size": 776,
+    "sha256": "aa1b8e60d163cc5b0218e8769c3d9a71be759e55a056b585b311ad21c92d2ae0",
+    "source_exports": [
+      "sources/resedit/PICT/1000.bin",
+      "sources/resedit/PICT/1000.bmp",
+      "sources/resedit/PICT/1000.md",
+      "sources/resedit/PICT/1000.png"
+    ]
+  },
+  "relationships": {
+    "incoming": [
+      {
+        "evidence": "resource ID encoded in original DITL item data",
+        "kind": "dialog_item_8",
+        "source": "DITL:1000",
+        "status": "PROVEN"
+      }
+    ],
+    "outgoing": []
+  },
+  "resource": {
+    "description": "QuickDraw Picture; 776 curated payload bytes.",
+    "descriptive_name": "Copy Protection Instructions Picture",
+    "id": 1000,
+    "key": "PICT:1000",
+    "original_fourcc": "PICT",
+    "original_macintosh_name": "",
+    "original_name_bytes_hex": "",
+    "original_name_source": "sources/resedit/PICT/1000.md",
+    "purpose": "Copy Protection Instructions Picture",
+    "type": "PICT"
+  },
+  "review": {
+    "claims": {
+      "not_cockpit_artwork": "VERIFIED"
+    },
+    "notes": [
+      "Decoded image and the PROVEN DITL:1000 relationship identify this as copy-protection instructions, not a cockpit or HUD asset."
+    ]
+  },
+  "schema": "hellcats-resedit-resource-v1",
+  "type_code_references": [],
+  "unresolved": [
+    "766 trailing bytes are not decoded."
+  ]
+}
