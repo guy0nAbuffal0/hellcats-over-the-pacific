@@ -25,7 +25,7 @@
 
 ## Validation criteria
 
-- `godot --headless --path . -s godot/tests/run_all.gd` passes (when Godot available).
+- `godot --headless --path godot -s res://tests/run_all.gd` passes (when Godot available).
 - Manual: start Mission-1, complete or fail gracefully, restart.
 
 ## Stop / handoff

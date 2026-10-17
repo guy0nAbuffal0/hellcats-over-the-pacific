@@ -54,4 +54,4 @@ DAT_0001d718 = DAT_0001d724 = DAT_0001d714 = DAT_0001d720 = DAT_0001d710 = DAT_0
 
 - `docs/NOTES.md` — FUN_000044e8 log
 - `docs/STRUCTS.md` — array symbols
-- `hellcats/core/sim_core.gd` — implementation
+- `godot/hellcats/core/sim_core.gd` — implementation

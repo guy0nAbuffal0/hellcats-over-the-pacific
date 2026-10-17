@@ -22,7 +22,7 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 
 | Symbol / cluster | Source (evidence) | Godot / tests | Status | MVP notes |
 |------------------|-------------------|---------------|--------|-----------|
-| **FUN_000044e8** | `Pacific Conflict.c` (~5096–5145); `docs/contracts/tick_FUN_000044e8_contract.md` | `hellcats/core/sim_core.gd`; `godot/tests/integration/test_sim_tick_ordering.gd` | **Done** | **[INFERRED]** Mission-1 playable loop uses `PlayerAircraft` + `FlightModelMvp`; SimCore is parity / future wiring. |
+| **FUN_000044e8** | `Pacific Conflict.c` (~5096–5145); `docs/contracts/tick_FUN_000044e8_contract.md` | `godot/hellcats/core/sim_core.gd`; `godot/tests/integration/test_sim_tick_ordering.gd` | **Done** | **[INFERRED]** Mission-1 playable loop uses `PlayerAircraft` + `FlightModelMvp`; SimCore is parity / future wiring. |
 | **FUN_000044a4** | Same; dispatches to **FUN_0000435a** | `SimCore._update_single_entity` | **Partial** | **param_2** surfaced; full tail parity **[UNKNOWN]**. |
 | **FUN_0000435a** | `Pacific Conflict.c` (~5008–5075); `docs/contracts/FUN_0000435a_contract.md` | `SimCore` (counts / `param_2`); branch logic not fully split | **Partial** | Critical for array 1–2 vs 3–4 fidelity. |
 | **FUN_00005df8** | Called when `DAT_0001b5a0 + 0xac == 0`; clears 7× `DAT_0001bc64` after `FUN_0000528a` (Pacific Conflict.c:6434–6447) | `SimCore._call_05df8()` + `dat_0001bc64`; tick-order counters; test in `test_sim_tick_ordering.gd` | **Done** (loop/clear) | **`FUN_0000528a` body deferred** (call counted only). |
@@ -36,7 +36,7 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 | Symbol / cluster | Source (evidence) | Godot / tests | Status | MVP notes |
 |------------------|-------------------|---------------|--------|-----------|
 | **FUN_0000e792** | `Pacific Conflict.c` (~14016+); `docs/contracts/flight_FUN_0000e792_contract.md` | `FlightModelMvp` + `AircraftState`; `SimCore` slices incl. contact early-out | **Partial** | Contact `61a`/`61e`; LAB_f47c `01d56≡01d76`; spawn + tick-`044a4`+vtable `+8`; `01a68`+large coalesce; `016e2` through `bc28`; `04e6e` kind2 paths incl. `15762` through bias_1a + `04958` clip+`01ba8` grow; `local_f54`/`1562e`/`03ea0` body open; `01be4` ABI deferred; `01b6c` still open. |
-| **FUN_0000e42a**, **FUN_0000e468**, **FUN_0000e570** | Inside / near **FUN_0000e792** block (~13796–13915) | `hellcats/core/flight_math.gd` | **Done** (helpers) | Used by convergence; not always wired in live tick. |
+| **FUN_0000e42a**, **FUN_0000e468**, **FUN_0000e570** | Inside / near **FUN_0000e792** block (~13796–13915) | `godot/hellcats/core/flight_math.gd` | **Done** (helpers) | Used by convergence; not always wired in live tick. |
 | **FUN_00011564** | Overlay table RNG (Pacific Conflict.c:16407–16433) | `rng_overlay_11564.gd`; `SimCore.rng` / `_rng_consume` | **Done** | Paired with **FUN_0001150a** / **FUN_000114ca** init. ID05 on `rng_id05`. |
 | **FUN_0001150a** / **FUN_000114ca** | Init + mul helper (Pacific Conflict.c:16355–16385) | `init_1150a` / `fun_000114ca` / `set_seed` | **Done** | `table[0]` prior value **[UNKNOWN]** (=0). |
 | **DAT_0001b738** (player entity ptr) | `STRUCTS.md`, input + **FUN_0000e792** | `PlayerAircraft` / mission flow | **Partial** | Single “player” in Godot; SimCore designation **[INFERRED]** partial. |
@@ -46,7 +46,7 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 
 | Symbol / cluster | Source (evidence) | Godot / tests | Status | MVP notes |
 |------------------|-------------------|---------------|--------|-----------|
-| **FUN_0000740a** | `Pacific Conflict.c` (~7366+); `docs/briefs/input_FUN_0000740a_brief.md`, `STRUCTS.md` | `hellcats/flight/player_input_map.gd`; `docs/contracts/input_godot_contract.md` | **Partial** | Throttle steps → `throttle_impulse`; full **DAT_0001d858** FSM not ported. |
+| **FUN_0000740a** | `Pacific Conflict.c` (~7366+); `docs/briefs/input_FUN_0000740a_brief.md`, `STRUCTS.md` | `godot/hellcats/flight/player_input_map.gd`; `docs/contracts/input_godot_contract.md` | **Partial** | Throttle steps → `throttle_impulse`; full **DAT_0001d858** FSM not ported. |
 | **DAT_00024cf6** (throttle step accumulator path) | C input handler | Approximated as impulse | **Partial** | **[MVP APPROXIMATION]** per `docs/contracts/input_godot_contract.md`. |
 | **DAT_0001d858** (game state) | Values 1, 7, 8, 9 | `player_active` gate only | **Doc only** / **Partial** | Menu/pause parity **[DEFERRED]**. |
 

@@ -1,7 +1,7 @@
 class_name CheckpointManager
 extends Node3D
 
-const CheckpointScene := preload("res://godot/scenes/mission/Checkpoint.tscn")
+const CheckpointScene := preload("res://scenes/mission/Checkpoint.tscn")
 
 signal checkpoint_passed(checkpoint_id: String)
 

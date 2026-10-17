@@ -1,8 +1,8 @@
 extends RefCounted
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const SimCoreScript := preload("res://hellcats/core/sim_core.gd")
-const FIXTURE_PATH := "res://godot/tests/fixtures/proven_loader_targets.json"
+const FIXTURE_PATH := "res://tests/fixtures/proven_loader_targets.json"
 const EXPECTED_TARGETS := [
 	{"segment_id": 2, "stored_tail": 0x199e, "entrypoint_offset": 0x19a2, "id00_entry_offset": 770, "label": "ID02"},
 	{"segment_id": 5, "stored_tail": 0x0000, "entrypoint_offset": 0x0006, "id00_entry_offset": 1362, "label": "ID05"},

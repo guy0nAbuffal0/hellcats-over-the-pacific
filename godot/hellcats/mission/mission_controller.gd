@@ -6,8 +6,8 @@ const MissionObjectivesScript := preload("res://hellcats/mission/mission_objecti
 const PlayerInputMapScript := preload("res://hellcats/flight/player_input_map.gd")
 const WorldBuilderScript := preload("res://hellcats/world/world_builder_mvp.gd")
 
-@export_file("*.json") var mission_data_path := "res://godot/data/mission_01/mission_01_training.json"
-@export_file("*.json") var aircraft_data_path := "res://godot/data/mission_01/aircraft_mvp.json"
+@export_file("*.json") var mission_data_path := "res://data/mission_01/mission_01_training.json"
+@export_file("*.json") var aircraft_data_path := "res://data/mission_01/aircraft_mvp.json"
 @export var player_path: NodePath = ^"../PlayerAircraft"
 @export var hud_path: NodePath = ^"../HUD"
 @export var checkpoints_path: NodePath = ^"../Checkpoints"

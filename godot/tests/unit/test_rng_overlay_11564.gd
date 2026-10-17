@@ -1,7 +1,7 @@
 extends RefCounted
 ## Deterministic fixtures for FUN_00011564 / FUN_0001150a.
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const RngOverlayScript := preload("res://hellcats/core/rng_overlay_11564.gd")
 
 ## Linear-fixture outputs (reset_linear_fixture, not 1150a).

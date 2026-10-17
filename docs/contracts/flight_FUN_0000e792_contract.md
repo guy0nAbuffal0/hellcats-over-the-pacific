@@ -63,6 +63,6 @@ Bind the Godot **Mission-1** flight path to **evidence-backed** motion rules fro
 
 ## Related files
 
-- `hellcats/core/flight_math.gd` — smoothing helpers
-- `hellcats/flight/flight_model_mvp.gd` — integrator
-- `hellcats/flight/aircraft_state.gd` — `movement_66e`, `movement_672`, `movement_66a`
+- `godot/hellcats/core/flight_math.gd` — smoothing helpers
+- `godot/hellcats/flight/flight_model_mvp.gd` — integrator
+- `godot/hellcats/flight/aircraft_state.gd` — `movement_66e`, `movement_672`, `movement_66a`

@@ -11,7 +11,7 @@ One flight-harness correction: `SimCore._apply_randomized_control_offsets` now n
 Validation: new deterministic overlay-table fixtures failed four overflow assertions before the fix (12 scripts passed / 1 failed), then all 13 scripts passed. Fixtures also check ordinary positive/negative deltas, a clamp boundary, two RNG draws, and the subsequent status override. Commands run from repository root:
 
 ```sh
-/Applications/Godot.app/Contents/MacOS/Godot --headless --path . --log-file /tmp/hellcats-loop-runtime.log --script res://godot/tests/run_all.gd
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --log-file /tmp/hellcats-loop-runtime.log --script res://tests/run_all.gd
 python3 tools/qa/test_regression.py
 git diff --check
 ```
@@ -36,11 +36,11 @@ The project is a clean-room Godot 4 reimplementation of the 1991 Macintosh fligh
 
 The first track is a **playable Mission 1 prototype**. Launching the project opens Flight School. The player flies a box-shaped aircraft over a flat sea with keyboard controls, a text HUD, an attitude strip, a chase camera, one checkpoint ring, and an authored objective list. Success, failure, and restart are implemented in script. **Verified.**
 
-The second track is a **deterministic reverse-engineering harness**. `SimCore` reproduces the original tick order, a few math helpers, and an ID05 random-number generator. It is exercised by tests. The running mission does not call it. **Verified:** `hellcats/mission/mission_controller.gd` states that the Mission 1 scene loop does not call `SimCore.tick()`.
+The second track is a **deterministic reverse-engineering harness**. `SimCore` reproduces the original tick order, a few math helpers, and an ID05 random-number generator. It is exercised by tests. The running mission does not call it. **Verified:** `godot/hellcats/mission/mission_controller.gd` states that the Mission 1 scene loop does not call `SimCore.tick()`.
 
 This is not a faithful recreation of the original game. Combat, a cockpit, a real terrain model, original rendering, and the original flight function are absent or only approximated. **Verified** from the scene and script tree.
 
-`project.godot` names the project "Hellcats Sim", targets Godot 4.5 features, and sets the main scene to `res://godot/scenes/main/Main.tscn`.
+`godot/project.godot` names the project "Hellcats Sim", targets Godot 4.6 features, and sets the main scene to `res://scenes/main/Main.tscn`.
 
 ## B. Implemented Features
 
@@ -148,7 +148,7 @@ These run in `SimCore` and unit tests. They do not fly the on-screen aircraft.
 | Entity field offsets used by `FUN_0000e792` | `EntityState.OFFSETS` | Key layout for the parity objects. No binary `from_bytes` loader |
 | Loader target list | `LoaderMetadata` | JSON lookup of proven entry targets. Does not execute a Macintosh segment load |
 
-`SimCore` also keeps mission phase and flag fields, four entity arrays, a trace log, and a replay runner. **Verified** in `hellcats/core/sim_core.gd`, `flight_math.gd`, `rng.gd`, `loader_metadata.gd`, `replay_runner.gd`.
+`SimCore` also keeps mission phase and flag fields, four entity arrays, a trace log, and a replay runner. **Verified** in `godot/hellcats/core/sim_core.gd`, `flight_math.gd`, `rng.gd`, `loader_metadata.gd`, `replay_runner.gd`.
 
 ## C. Partially Implemented Features
 
@@ -158,7 +158,7 @@ These run in `SimCore` and unit tests. They do not fly the on-screen aircraft.
 
 `SimCore._update_single_entity` applies a smaller set of those slices to `EntityState` objects: randomized control offsets, a control-gate accumulator, threshold decrement, and the same smoothing rule. The comment on that function says it stands in for `FUN_000044a4` → `FUN_0000435a` / `FUN_0000e792`. The original call graph does not work that way. See section E.
 
-`hellcats/core/fixed.gd` (`Fixed68k`) is a 68000-style fixed-point helper. Nothing in the scenes or tests references it. **Verified** by search.
+`godot/hellcats/core/fixed.gd` (`Fixed68k`) is a 68000-style fixed-point helper. Nothing in the scenes or tests references it. **Verified** by search.
 
 ### Input versus the original dispatcher
 
@@ -207,7 +207,7 @@ Checkpoint pass audio is looked up as `PassAudio` and is never created. **Verifi
 
 ### Duplicate test trees
 
-**Verified.** The runner is `godot/tests/run_all.gd` (13 scripts). `hellcats/tests/` holds older `SceneTree` scripts, including `test_sim_entity_controls.gd` and `test_movement_smoothing.gd`, which the runner does not call.
+**Verified.** The runner is `godot/tests/run_all.gd` (13 scripts). `godot/hellcats/tests/` holds older `SceneTree` scripts, including `test_sim_entity_controls.gd` and `test_movement_smoothing.gd`, which the runner does not call.
 
 ## D. Missing Features
 
@@ -289,20 +289,19 @@ Most of those functions are not ported. Coverage below is by subsystem, not by p
 ### Runtime shape
 
 ```
-project.godot
-  Main.tscn
-    Mission01Training.tscn
-      World          world_builder_mvp.gd
-      PlayerAircraft player_aircraft.gd
+godot/
+  project.godot
+  scenes/main/Main.tscn
+    scenes/missions/Mission01Training.tscn
+      World          hellcats/world/world_builder_mvp.gd
+      PlayerAircraft hellcats/player/player_aircraft.gd
         AircraftMesh, Wings, FollowCamera
-      Checkpoints    checkpoint_manager.gd
-      HUD            hud_mvp.gd + hud_attitude_strip.gd
+      Checkpoints    hellcats/mission/checkpoint_manager.gd
+      HUD            hellcats/ui/hud_mvp.gd + hud_attitude_strip.gd
       MissionController
 ```
 
-Scenes, JSON, and the test runner live under `godot/`. Gameplay scripts live under `hellcats/`. There is no second gameplay script tree inside `godot/`. **Verified.**
-
-`docs/TECHNICAL_OVERVIEW.md` section 3 says scripts live under `godot/hellcats/`. That path does not exist. `docs/NOTES.md` repeats the same stale prefix.
+`godot/` is the self-contained Godot project root: it contains `project.godot`, scenes, JSON, gameplay scripts under `godot/hellcats/`, and the test runner. **Verified.**
 
 There are no autoloads. The renderer is `gl_compatibility`. The window is 1280×720 and starts fullscreen (`window/size/mode=2`).
 
@@ -351,7 +350,7 @@ Godot on `PATH`: not found (`which godot` and `which godot4` empty). The binary 
 
 Headless Godot without a `.godot/` global class cache could not resolve `class_name` types used as annotations. That made `entity_state.gd` fail to parse (`-> EntityState`), so `preload(...).new()` failed and `test_sim_tick_ordering.gd` failed. The same issue logged parse errors for `HudAttitudeStrip` and `MissionCheckpoint` during scene-load tests.
 
-**Fix (verified):** avoid those annotations in favor of untyped / base types (`Control`, `Node3D`) and `call()` / `has_method()` where needed. Align `tools/qa/test_regression.py` `EXPECTED_RUNNER_PATHS` with `godot/tests/run_all.gd`. Make `hellcats/tests/fixtures/proven_loader_targets.json` byte-identical to the migrated fixture (tabs vs spaces).
+**Fix (verified):** avoid those annotations in favor of untyped / base types (`Control`, `Node3D`) and `call()` / `has_method()` where needed. Align `tools/qa/test_regression.py` `EXPECTED_RUNNER_PATHS` with `godot/tests/run_all.gd`. Make `godot/hellcats/tests/fixtures/proven_loader_targets.json` byte-identical to the migrated fixture (tabs vs spaces).
 
 ### Python regression
 
@@ -364,7 +363,7 @@ Exit code **0**. All checks passed: `runner-layout`, `loader-fixture`, `replay-f
 ### Godot headless suite
 
 ```bash
-HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://godot/tests/run_all.gd
+HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --script res://tests/run_all.gd
 ```
 
 Exit code **0**. Runner summary: **13 passed, 0 failed, 0 skipped.** No `SCRIPT ERROR` / `Parse Error` lines in the log.
@@ -385,7 +384,7 @@ Exit code **0**. Runner summary: **13 passed, 0 failed, 0 skipped.** No `SCRIPT 
 
 ### Not executed
 
-- `hellcats/tests/*.gd`, including entity-control and movement-smoothing tests
+- `godot/hellcats/tests/*.gd`, including entity-control and movement-smoothing tests
 - `tools/run_headless_rng_test.sh`
 - Editor play: camera, controls, objective banners, stall, sea impact, restart
 

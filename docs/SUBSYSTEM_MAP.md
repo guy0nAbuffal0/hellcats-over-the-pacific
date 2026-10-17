@@ -32,7 +32,7 @@ flowchart TD
 
 **[RECONSTRUCTED]** Per-entity simulation includes **FUN_0000e792** (large; `docs/contracts/flight_FUN_0000e792_contract.md`).
 
-**Godot:** **`hellcats/core/sim_core.gd`** mirrors pass order and **`param_2`**; **Mission-1** gameplay loop is **`PlayerAircraft` + `FlightModelMvp`** **[INFERRED]** unless you explicitly drive SimCore.
+**Godot:** **`godot/hellcats/core/sim_core.gd`** mirrors pass order and **`param_2`**; **Mission-1** gameplay loop is **`PlayerAircraft` + `FlightModelMvp`** **[INFERRED]** unless you explicitly drive SimCore.
 
 ## 2) Per-entity update (conceptual)
 

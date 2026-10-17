@@ -1,10 +1,10 @@
 extends RefCounted
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 
 func run() -> bool:
 	var ok := true
-	var scene := load("res://godot/scenes/missions/Mission01Training.tscn")
+	var scene := load("res://scenes/missions/Mission01Training.tscn")
 	ok = Assertions.assert_true(scene != null, "mission scene resource loads") and ok
 	if scene == null:
 		return false

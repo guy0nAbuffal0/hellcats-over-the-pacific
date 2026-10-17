@@ -312,7 +312,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 - **[PROVEN]** Capstone `@0x54–0xA0`: Loop 4× — `LEA $1A48` (stand-in→`01a68`) alloc `0x4A`, `FUN_00000032` copy from static `@0x1A790` step `0x4A`, `MOVEA.W (A2),A0` then `(A5,A0.L*4)` with `A5=DAT_0001b524`.
 - **[PROVEN]** ROM keys: `0x5858`, then three `0x0999` (last write wins for that slot).
-- **Fixture:** `hellcats/tests/fixtures/dat_00054_template_records_4a.json` (file `0x1a790`).
+- **Fixture:** `godot/hellcats/tests/fixtures/dat_00054_template_records_4a.json` (file `0x1a790`).
 - **Godot:** `load_00054_template_records_4a`, `apply_00054_publish_slot`, `apply_00054_first_loop(_record)` — alloc via live `01a68`; copy body deferred (bytes retained on step).
 - **[DEFERRED]** Blocks B–D; `FUN_00000032` byte copy into mock mem; factory bodies at `+6`.
 - **Validation:** Godot **13 passed, 0 failed**; Python QA green.
@@ -471,7 +471,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 
 - **[PROVEN]** Pacific Conflict.c:4675–4697: `s=*(obj+0x30)`; compare `param_2` to `DAT_0001b190[s]` / `DAT_0001b18c[s]`(=`table[s-1]`); in-band → return 0; else walk ± and write `+0x30`, return 1.
-- **[PROVEN]** ROM table imported via `hellcats/tests/fixtures/dat_0001b190_band_table.json` (see 2026-10-15 entry).
+- **[PROVEN]** ROM table imported via `godot/hellcats/tests/fixtures/dat_0001b190_band_table.json` (see 2026-10-15 entry).
 - **Godot:** `apply_fun_00003da8`; wired after post-`02bd8` followup with `param_2=*(obj+0x10)`.
 - **Validation:** Godot **13 passed, 0 failed**; Python QA green.
 
@@ -672,7 +672,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 ### 2026-10-15 — FUN_00011564 overlay RNG fixture (not yet SimCore)
 
 - **[RECONSTRUCTED]** `FUN_00011564` (Pacific Conflict.c:16407–16433): table RNG at `DAT_00026008`…`0x260e4` (56 words **[INFERRED]** from span); `*p4 = *p5 + *p3`; return `sum >> 16`; wrap rules `+4`/`-0xd8`, `+0x17`/`-0x20`, `+0x36`/`-1` words vs limit `0x260e7`.
-- **[RECONSTRUCTED]** Godot: `hellcats/core/rng_overlay_11564.gd` + `godot/tests/unit/test_rng_overlay_11564.gd` fixture sequence.
+- **[RECONSTRUCTED]** Godot: `godot/hellcats/core/rng_overlay_11564.gd` + `godot/tests/unit/test_rng_overlay_11564.gd` fixture sequence.
 - **SimCore wiring:** `_rng_consume()` uses `RngOverlay11564`; ID05 on `rng_id05`.
 - **[RECONSTRUCTED]** `FUN_000114ca` + `FUN_0001150a` fill (`table[1]=param`, `table[i+1]=114ca(0x1df5e0d,table[i])+1` for i=1..0x36), cursor `0x260e4`, then 10000×`11564`. `set_seed` = full `init_1150a`.
 - **[UNKNOWN]** Pre-init value of `table[0]`; treated as 0.
@@ -712,9 +712,9 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ### 2026-10-15 — P0 headless test reliability (class_name + QA paths)
 
-- **[INFERRED]** Fresh `godot --headless --path . --script res://godot/tests/run_all.gd` without a `.godot/` global class cache does not resolve `class_name` identifiers used as type annotations. That broke `EntityState.from_bytes() -> EntityState` (script failed to parse → `preload(...).new()` failed) and logged parse errors for `HudAttitudeStrip` / `MissionCheckpoint`.
+- **[INFERRED]** Fresh `godot --headless --path godot --script res://tests/run_all.gd` without a `.godot/` global class cache does not resolve `class_name` identifiers used as type annotations. That broke `EntityState.from_bytes() -> EntityState` (script failed to parse → `preload(...).new()` failed) and logged parse errors for `HudAttitudeStrip` / `MissionCheckpoint`.
 - **[MVP AUTHORING DECISION]** Keep `class_name` declarations for editor convenience, but type cross-script references with base types (`Control`, `Node3D`) or leave returns untyped so headless CI works without an imported project cache.
-- **Files:** `hellcats/core/entity_state.gd`, `hellcats/ui/hud_mvp.gd`, `hellcats/mission/checkpoint_manager.gd`, `hellcats/mission/mission_controller.gd`, `tools/qa/test_regression.py` (`EXPECTED_RUNNER_PATHS` aligned with `run_all.gd`), `hellcats/tests/fixtures/proven_loader_targets.json` (byte-synced to migrated fixture).
+- **Files:** `godot/hellcats/core/entity_state.gd`, `godot/hellcats/ui/hud_mvp.gd`, `godot/hellcats/mission/checkpoint_manager.gd`, `godot/hellcats/mission/mission_controller.gd`, `tools/qa/test_regression.py` (`EXPECTED_RUNNER_PATHS` aligned with `run_all.gd`), `godot/hellcats/tests/fixtures/proven_loader_targets.json` (byte-synced to migrated fixture).
 - **Validation:** Godot **11 passed, 0 failed** (exit 0); `python3 tools/qa/test_regression.py` **All deterministic QA regression checks passed** (exit 0).
 - **Not claimed:** visual fidelity, Mission 1 playthrough, or original-flight parity. No gameplay behavior changed.
 
@@ -784,7 +784,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ### 2026-10-15 — overlay trig table dump
 
-- **[RECONSTRUCTED]** 256-short BE sin/cos tables dumped from `Pacific Conflict` at file `0x1ab8c` / `0x1ad8c` → `hellcats/tests/fixtures/trig_tables_ab6c_ad6c.json`. Ghidra `DAT_0001ab6c`/`ad6c` labels sit **0x20** before the usable bases. Loaded by `FlightMath._ensure_trig_tables`.
+- **[RECONSTRUCTED]** 256-short BE sin/cos tables dumped from `Pacific Conflict` at file `0x1ab8c` / `0x1ad8c` → `godot/hellcats/tests/fixtures/trig_tables_ab6c_ad6c.json`. Ghidra `DAT_0001ab6c`/`ad6c` labels sit **0x20** before the usable bases. Loaded by `FlightMath._ensure_trig_tables`.
 - **Validation:** `test_flight_math.gd` dump spot-checks + `sin(0x1000)==0x1000`.
 
 ### 2026-10-15 — FUN_000025a8 attitude matrix
@@ -893,7 +893,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[INFERRED]** Optional **`tick_order_trace_enabled`**: player **`movement_66e`/`672`/`66a`** snapshots before tick, after pass 2 (array 2), and after full gated section; **`rng_state_after_tick`**.
 - **[MVP APPROXIMATION]** Mission-1 **playable** loop remains **`PlayerAircraft` + `FlightModelMvp`**; **`SimCore`** is the **deterministic** bridge for parity tests and future wiring (see `docs/contracts/tick_FUN_000044e8_contract.md`).
 
-**Validation:** `godot/tests/integration/test_sim_tick_ordering.gd`. Run: `godot --headless --path . -s godot/tests/run_all.gd`.
+**Validation:** `godot/tests/integration/test_sim_tick_ordering.gd`. Run: `godot --headless --path godot -s res://tests/run_all.gd`.
 
 ### 2026-04-08 — Flight model convergence pass (FUN_0000e792 motion slice)
 
@@ -903,7 +903,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[MVP TUNING]** `roll_auto_level_gain` still applied when roll stick neutral; rates/drag unchanged unless data changes.
 - **[INFERRED]** Per-tick **`FlightModelMvp.last_flight_trace`** (and `PlayerAircraft.get_flight_trace()`) exposes accumulators, norms, telemetry for QA.
 
-**Validation:** `godot/tests/unit/test_flight_model_mvp.gd` (straight, sustained turn, climb, descend, throttle sequence, smoothing). Run: `godot --headless --path . -s godot/tests/run_all.gd`.
+**Validation:** `godot/tests/unit/test_flight_model_mvp.gd` (straight, sustained turn, climb, descend, throttle sequence, smoothing). Run: `godot --headless --path godot -s res://tests/run_all.gd`.
 
 ### 2026-04-08 — Input convergence pass (FUN_0000740a → Godot)
 
@@ -913,7 +913,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 - **[INFERRED]** Per-tick trace: `pressed` / `held` / `released` / `normalized` / `gated` — inspect `PlayerInputMap.last_input_trace` during play or tests.
 - **[UNKNOWN]** Full Mac `param_2` enum parity; only Godot action edges are logged.
 
-**Validation:** `godot/tests/unit/test_player_input_frame.gd` (deterministic scenarios: hold pitch, tap roll, throttle steps, gate). Run: `godot --headless --path . -s godot/tests/run_all.gd` (from project root; requires Godot 4 on `PATH`).
+**Validation:** `godot/tests/unit/test_player_input_frame.gd` (deterministic scenarios: hold pitch, tap roll, throttle steps, gate). Run: `godot --headless --path godot -s res://tests/run_all.gd` (from project root; requires Godot 4 on `PATH`).
 
 ### FUN_000044e8 — main sim update order
 

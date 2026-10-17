@@ -2,7 +2,7 @@ extends RefCounted
 
 ## Deterministic flight-model scenarios (no Input): FUN_0000e792 smoothing path via FlightMath.
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const AircraftStateScript := preload("res://hellcats/flight/aircraft_state.gd")
 const FlightModelMvpScript := preload("res://hellcats/flight/flight_model_mvp.gd")
 

@@ -61,7 +61,7 @@ Every row must cite **source file:line** or **binary offset**. All statements ta
 
 ## Godot `PlayerInputMap` (FUN_0000740a convergence)
 
-**[RECONSTRUCTED]** Throttle **step** actions correspond to **`+` / `=`** and **`-`** / keypad plus/minus (Pacific Conflict.c cases `0x2b`/`0x3d` and `0x2d`/`0x5f` for `DAT_00024cf6` when `DAT_0001d858 < 6`). Implemented as `throttle_step_up` / `throttle_step_down` → `throttle_impulse` in `hellcats/flight/player_input_map.gd`.
+**[RECONSTRUCTED]** Throttle **step** actions correspond to **`+` / `=`** and **`-`** / keypad plus/minus (Pacific Conflict.c cases `0x2b`/`0x3d` and `0x2d`/`0x5f` for `DAT_00024cf6` when `DAT_0001d858 < 6`). Implemented as `throttle_step_up` / `throttle_step_down` → `throttle_impulse` in `godot/hellcats/flight/player_input_map.gd`.
 
 **[RECONSTRUCTED]** Per-tick **trace** lists `pressed` / `held` / `released` action names and `normalized` floats passed to `FlightModelMvp`.
 

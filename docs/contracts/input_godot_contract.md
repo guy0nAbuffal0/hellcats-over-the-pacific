@@ -50,9 +50,9 @@ Each physics tick, **`PlayerInputMap.read_input_packet(player_active)`** returns
 
 | Script | Role |
 |--------|------|
-| `hellcats/flight/player_input_map.gd` | Actions, gather, `compute_outputs` (pure), trace |
-| `hellcats/flight/flight_model_mvp.gd` | Consumes `controls`; applies `throttle_impulse` |
-| `hellcats/player/player_aircraft.gd` | Calls `read_input_packet(active)` once per frame |
+| `godot/hellcats/flight/player_input_map.gd` | Actions, gather, `compute_outputs` (pure), trace |
+| `godot/hellcats/flight/flight_model_mvp.gd` | Consumes `controls`; applies `throttle_impulse` |
+| `godot/hellcats/player/player_aircraft.gd` | Calls `read_input_packet(active)` once per frame |
 
 ## Related docs
 

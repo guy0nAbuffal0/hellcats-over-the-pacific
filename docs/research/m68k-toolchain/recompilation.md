@@ -7,7 +7,7 @@ Isolated portable C under `tools/recompilation/id05_rng/`. No Macintosh Toolbox 
 ```text
 tools/recompilation/id05_rng/
   rng_id05.h / rng_id05.c   # uint32_t LCG + 15-bit extract
-  test_rng_id05.c           # vectors aligned with hellcats/tests/test_rng.gd
+  test_rng_id05.c           # vectors aligned with godot/hellcats/tests/test_rng.gd
   Makefile                  # -Wall -Wextra; optional ASan/UBSan on clang
 ```
 
@@ -18,7 +18,7 @@ state = state * 0x41c64e6d + 0x3039   (mod 2^32)
 return (state << 1) >> 17             (15-bit unsigned)
 ```
 
-Matches Godot `hellcats/core/rng.gd` (`Rng68k`) math. Immediate constants appear at file offsets **0x730** / **0x738** in `ID05.bin`.
+Matches Godot `godot/hellcats/core/rng.gd` (`Rng68k`) math. Immediate constants appear at file offsets **0x730** / **0x738** in `ID05.bin`.
 
 ## Build / test
 

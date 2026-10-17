@@ -13,30 +13,30 @@ Current status: a deterministic reverse-engineering core plus a **playable Missi
 ## Repo tree (high level)
 
 ```
-project.godot              # default main scene → godot/scenes/main/Main.tscn
 godot/
+├── project.godot          # Godot project root; main scene → scenes/main/Main.tscn
 ├── scenes/                # Main, Mission01Training, world, player, HUD, checkpoint
 ├── data/mission_01/       # mission_01_training.json, aircraft_mvp.json, checkpoints
+├── hellcats/              # all gameplay and simulation scripts
+│   ├── core/              # sim, RNG, loader metadata
+│   ├── flight/            # MVP flight model + input map
+│   ├── mission/           # controller, objectives, checkpoints
+│   ├── player/            # PlayerAircraft
+│   ├── ui/                # HUD_MVP
+│   └── world/             # world_builder_mvp
 └── tests/                 # headless runner: run_all.gd
-hellcats/
-├── core/                  # sim, RNG, loader metadata (deterministic RE core)
-├── flight/                # MVP flight model + input map
-├── mission/               # controller, objectives, checkpoints
-├── player/                # PlayerAircraft
-├── ui/                    # HUD_MVP
-└── world/                 # world_builder_mvp
 tools/qa/                  # test_regression.py + smoke notes
 ```
 
 ## Run the Mission 01 MVP
 
-Open the project in Godot from the repo root (the folder containing `project.godot`) and run the default main scene:
+Open the `godot/` directory (the folder containing `project.godot`) in Godot and run the default main scene:
 
-- `res://godot/scenes/main/Main.tscn`
+- `res://scenes/main/Main.tscn`
 
 Direct mission scene for iteration:
 
-- `res://godot/scenes/missions/Mission01Training.tscn`
+- `res://scenes/missions/Mission01Training.tscn`
 
 Controls:
 
@@ -58,10 +58,10 @@ Mission HUD shows:
 
 ## Run headless (no display)
 
-From the **project root** (the folder containing `project.godot`):
+From the **repository root**:
 
 ```bash
-HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://godot/tests/run_all.gd
+HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --script res://tests/run_all.gd
 ```
 
 Python-side regression checks:

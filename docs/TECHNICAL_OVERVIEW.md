@@ -44,7 +44,7 @@ This document is a **single entry point**: what the project is, how the code is 
 
 ### Godot structure (scenes and scripts)
 
-- **Entry**: `project.godot` points at a main scene (typically `godot/scenes/main/Main.tscn`), which loads the mission scene.
+- **Entry**: `godot/project.godot` points at `res://scenes/main/Main.tscn`, which loads the mission scene.
 - **Mission 01** wires: world placeholder, **PlayerAircraft**, checkpoints, **HUD_MVP**, **MissionController**. Details: `docs/MISSION_01_MVP.md`.
 - **Scripts** live under `godot/hellcats/` by concern: `core/` (sim, RNG, math), `flight/` (input map, MVP flight model, aircraft state), `mission/`, `player/`, `ui/`, `world/`.
 

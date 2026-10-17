@@ -1,8 +1,8 @@
 extends RefCounted
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const ReplayRunnerScript := preload("res://hellcats/core/replay_runner.gd")
-const FIXTURE_PATH := "res://godot/tests/fixtures/replay_inputs.json"
+const FIXTURE_PATH := "res://tests/fixtures/replay_inputs.json"
 const TRACE_A_PATH := "user://trace_replay_a.jsonl"
 const TRACE_B_PATH := "user://trace_replay_b.jsonl"
 

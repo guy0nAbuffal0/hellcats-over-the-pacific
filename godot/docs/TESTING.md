@@ -48,7 +48,7 @@ Run from repo root (`/Users/math/Sites/darkwood/hellcats-over-the-pacific`).
 ```bash
 python3 - <<'PY'
 from pathlib import Path
-test_path = "res://godot/tests/unit/test_rng.gd"  # change as needed
+test_path = "res://tests/unit/test_rng.gd"  # change as needed
 runner = Path("godot/tests/.run_one_tmp.gd")
 runner.write_text(f"""extends SceneTree
 func _init() -> void:
@@ -56,7 +56,7 @@ func _init() -> void:
 \tquit(0 if bool(t.run()) else 1)
 """)
 PY
-godot --headless --path . --script res://godot/tests/.run_one_tmp.gd
+godot --headless --path godot --script res://tests/.run_one_tmp.gd
 rm -f godot/tests/.run_one_tmp.gd
 ```
 
@@ -64,7 +64,7 @@ rm -f godot/tests/.run_one_tmp.gd
 
 ```bash
 # Prefer the absolute Godot binary if `godot` is not on PATH (see root README.md).
-HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://godot/tests/run_all.gd
+HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --script res://tests/run_all.gd
 ```
 
 Headless runs without an imported `.godot/` class cache must not rely on other scripts' `class_name` types in annotations. Prefer `preload(...)`, base types (`Node3D`, `Control`), or untyped returns. See `docs/NOTES.md` entry 2026-10-15.

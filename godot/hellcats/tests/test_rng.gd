@@ -1,6 +1,6 @@
 extends SceneTree
 ## Headless entry (from project root, folder containing project.godot):
-##   godot --headless --script hellcats/tests/test_rng.gd
+##   godot --headless --script godot/hellcats/tests/test_rng.gd
 ##   godot --headless -s res://hellcats/tests/test_rng.gd
 ## Deterministic test vectors for Rng68k (ID05 LCG parity).
 

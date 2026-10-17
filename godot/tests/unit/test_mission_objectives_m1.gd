@@ -1,6 +1,6 @@
 extends RefCounted
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const MissionObjectivesScript := preload("res://hellcats/mission/mission_objectives_m1.gd")
 
 func run() -> bool:

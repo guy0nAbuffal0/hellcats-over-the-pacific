@@ -11,8 +11,8 @@ Run after mission/gameplay changes. Assumes keyboard layout from the MVP doc.
 
 **Launch**
 
-- Open project in Godot from the repo root and run `godot/scenes/main/Main.tscn`.
-- For fast iteration, run `godot/scenes/missions/Mission01Training.tscn` directly.
+- Open the `godot/` project directory and run `res://scenes/main/Main.tscn`.
+- For fast iteration, run `res://scenes/missions/Mission01Training.tscn` directly.
 
 **Sanity (≤ 1 min)**
 
@@ -34,7 +34,7 @@ Run after mission/gameplay changes. Assumes keyboard layout from the MVP doc.
 
 ```bash
 # Godot headless suite (RNG, flight math, loader, replay, mission objectives, mission + HUD scene structure)
-HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://godot/tests/run_all.gd
+HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --script res://tests/run_all.gd
 
 # Static fixture + runner layout checks (no engine)
 python3 tools/qa/test_regression.py

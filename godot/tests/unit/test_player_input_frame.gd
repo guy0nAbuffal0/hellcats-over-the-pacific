@@ -2,7 +2,7 @@ extends RefCounted
 
 ## Deterministic validation (no Input singleton): FUN_0000740a-aligned contract via compute_outputs.
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const PlayerInputMapScript := preload("res://hellcats/flight/player_input_map.gd")
 
 func run() -> bool:

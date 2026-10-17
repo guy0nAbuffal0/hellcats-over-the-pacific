@@ -31,7 +31,7 @@ Useful for future fidelity; MVP can approximate.
 
 ### 4.1 Scene layout (current)
 
-Paths under `res://godot/scenes/` (see also `Main.tscn` run scene in `project.godot`).
+Paths under `res://scenes/` (see also `Main.tscn` run scene in `project.godot`).
 
 - `main/Main.tscn` — root `Node` that instances `missions/Mission01Training.tscn`.
 - `missions/Mission01Training.tscn` — `World` (instances `world/Mission01World.tscn`), `PlayerAircraft`, `Checkpoints` (`Node3D` + `checkpoint_manager.gd`), `HUD` (instances `ui/HUD_MVP.tscn`), `MissionController` (`mission_controller.gd`).
@@ -44,19 +44,19 @@ Paths under `res://godot/scenes/` (see also `Main.tscn` run scene in `project.go
 
 | Area | Script (expected path) | Role |
 | ---- | ---------------------- | ---- |
-| Core | `hellcats/core/sim_core.gd` | Fixed-step / deterministic sequencing; **FUN_000044e8**-aligned **`last_tick_order`** (not used by Mission-1 scene loop; parity / future). See `docs/contracts/tick_FUN_000044e8_contract.md`. |
-| Core | `hellcats/core/flight_math.gd` | Shared math for flight/control. |
-| Flight | `hellcats/flight/aircraft_state.gd` | Telemetry: speed, altitude, attitude, throttle, flags. |
-| Flight | `hellcats/flight/player_input_map.gd` | Actions → normalized control intent + `read_input_packet` / trace; see `docs/contracts/input_godot_contract.md`. |
-| Flight | `hellcats/flight/flight_model_mvp.gd` | MVP integrator: **`movement_66e`/`672`/`66a`** + `FlightMath` smoothing (**[RECONSTRUCTED]** FUN_0000e792 slice); see `docs/contracts/flight_FUN_0000e792_contract.md`. |
-| Mission | `hellcats/mission/mission_controller.gd` | Loads JSON, wires player, checkpoints, HUD; objectives, failure checks, restart. **`mission_phase_a8` / `mission_flag_ac`** (DAT gate bridge); **`get_mission_sim_bridge_state()`**. |
-| Mission | `hellcats/mission/mission_objectives_m1.gd` | Pure, testable objective evaluation from telemetry snapshots (data-driven). |
-| Mission | `hellcats/mission/checkpoint.gd` | Ring pass / signal once per pass. |
-| Player | `hellcats/player/player_aircraft.gd` | Scene adapter: input → model → transform/collisions. |
-| UI | `hellcats/ui/hud_mvp.gd` | Presentation only; no direct mission logic queries. |
-| World | `hellcats/world/world_builder_mvp.gd` | Placeholder terrain/sea/sky (if used). |
+| Core | `godot/hellcats/core/sim_core.gd` | Fixed-step / deterministic sequencing; **FUN_000044e8**-aligned **`last_tick_order`** (not used by Mission-1 scene loop; parity / future). See `docs/contracts/tick_FUN_000044e8_contract.md`. |
+| Core | `godot/hellcats/core/flight_math.gd` | Shared math for flight/control. |
+| Flight | `godot/hellcats/flight/aircraft_state.gd` | Telemetry: speed, altitude, attitude, throttle, flags. |
+| Flight | `godot/hellcats/flight/player_input_map.gd` | Actions → normalized control intent + `read_input_packet` / trace; see `docs/contracts/input_godot_contract.md`. |
+| Flight | `godot/hellcats/flight/flight_model_mvp.gd` | MVP integrator: **`movement_66e`/`672`/`66a`** + `FlightMath` smoothing (**[RECONSTRUCTED]** FUN_0000e792 slice); see `docs/contracts/flight_FUN_0000e792_contract.md`. |
+| Mission | `godot/hellcats/mission/mission_controller.gd` | Loads JSON, wires player, checkpoints, HUD; objectives, failure checks, restart. **`mission_phase_a8` / `mission_flag_ac`** (DAT gate bridge); **`get_mission_sim_bridge_state()`**. |
+| Mission | `godot/hellcats/mission/mission_objectives_m1.gd` | Pure, testable objective evaluation from telemetry snapshots (data-driven). |
+| Mission | `godot/hellcats/mission/checkpoint.gd` | Ring pass / signal once per pass. |
+| Player | `godot/hellcats/player/player_aircraft.gd` | Scene adapter: input → model → transform/collisions. |
+| UI | `godot/hellcats/ui/hud_mvp.gd` | Presentation only; no direct mission logic queries. |
+| World | `godot/hellcats/world/world_builder_mvp.gd` | Placeholder terrain/sea/sky (if used). |
 
-**Seams (later fidelity):** keep tuning in one place (e.g. `flight_tuning_mvp` / resources); objectives driven from `godot/data/`; RNG via `hellcats/core/rng.gd` for anything stochastic.
+**Seams (later fidelity):** keep tuning in one place (e.g. `flight_tuning_mvp` / resources); objectives driven from `godot/data/`; RNG via `godot/hellcats/core/rng.gd` for anything stochastic.
 
 ### 4.3 Simulation tick vs Mission-1 scene loop
 
@@ -66,7 +66,7 @@ Paths under `res://godot/scenes/` (see also `Main.tscn` run scene in `project.go
 
 ## 5. Data layer
 
-**Authoritative gameplay tunables** live in **`godot/data/mission_01/`** (committed JSON). **[MVP AUTHORING DECISION]** Do not mix loader/extraction fixtures (`hellcats/tests/fixtures/proven_loader_targets.json`, segment IDs, etc.) into mission gameplay JSON.
+**Authoritative gameplay tunables** live in **`godot/data/mission_01/`** (committed JSON). **[MVP AUTHORING DECISION]** Do not mix loader/extraction fixtures (`godot/hellcats/tests/fixtures/proven_loader_targets.json`, segment IDs, etc.) into mission gameplay JSON.
 
 | File | Purpose |
 | ---- | -------- |
@@ -178,8 +178,8 @@ Checkpoint ring size/position: `checkpoints_mission_01.json` (`radius_m`, etc.).
 
 ### Run (editor)
 
-- Open Godot at **project root** (folder with `project.godot`).
-- For fast iteration: set **`godot/scenes/missions/Mission01Training.tscn`** as run scene, or open and play it.
+- Open Godot at **`godot/`**, the project root containing `project.godot`.
+- For fast iteration: set **`res://scenes/missions/Mission01Training.tscn`** as the run scene, or open and play it.
 - Alternatively **`Main.tscn`** if it boots Mission 01.
 
 ### Automated
@@ -187,7 +187,7 @@ Checkpoint ring size/position: `checkpoints_mission_01.json` (`radius_m`, etc.).
 From repo root (paths match `godot/tests/run_all.gd`):
 
 ```bash
-godot --headless --path . --script res://godot/tests/run_all.gd
+godot --headless --path godot --script res://tests/run_all.gd
 python3 tools/qa/test_regression.py
 ```
 

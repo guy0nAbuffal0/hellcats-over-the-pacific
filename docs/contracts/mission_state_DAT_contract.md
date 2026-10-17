@@ -23,4 +23,4 @@
 
 ## Related
 
-- `hellcats/mission/mission_controller.gd` — `get_mission_sim_bridge_state()`
+- `godot/hellcats/mission/mission_controller.gd` — `get_mission_sim_bridge_state()`

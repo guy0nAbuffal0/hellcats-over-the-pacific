@@ -2,7 +2,7 @@ extends RefCounted
 
 ## Validates FUN_000044e8-aligned pass order and param_2 pattern in SimCore (deterministic).
 
-const Assertions := preload("res://godot/tests/helpers/assertions.gd")
+const Assertions := preload("res://tests/helpers/assertions.gd")
 const SimCoreScript := preload("res://hellcats/core/sim_core.gd")
 const EntityStateScript := preload("res://hellcats/core/entity_state.gd")
 const EntityTemplateScript := preload("res://hellcats/core/entity_template.gd")

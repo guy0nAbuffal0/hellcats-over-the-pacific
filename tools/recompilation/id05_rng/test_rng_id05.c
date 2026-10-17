@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-/* Vectors aligned with hellcats/tests/test_rng.gd (seed 0, five next()). */
+/* Vectors aligned with godot/hellcats/tests/test_rng.gd (seed 0, five next()). */
 static int test_seed0_sequence(void)
 {
 	uint32_t state = 0;
