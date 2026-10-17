@@ -806,6 +806,27 @@ Do not treat example names from planning docs as approved until revalidated here
 | `_DAT_0001b87a` (Pacific Conflict) | `player_abandoned_intact_aircraft` (comment-only name, word) | PROVEN (writer, readers) / STRONG_INFERENCE (name) | Iter 337: set 1 at 0xf766 when the player bails out with no damage bits and fuel; read by resolve_bailout_outcome and update_aircraft_damage_state -> Discharged (4). Never cleared in code (3 references) [UNKNOWN reset]. |
 | aircraft controller +0x677 (Pacific Conflict) | bail-out state (byte): 0 none, 1 requested, 2 parachute spawned | PROVEN | Iter 338: clr 0x39ec (respawn); 1 from the 'J'/'j' key (0x7d08: airborne +0x63e == 0, _DAT_0001b874 == 0) or AI (0x1093c: damage word bit 8, rng & 0x1f == 0, state handler +0x32 != 0x111ba, host +0x90 != 2, not the player); 2 at 0xf722 after spawn_bailout_parachute, which also sets word +0x684 bit 0 (byte +0x685 bit 0 = pilot gone, the spawn gate). |
 
+## Aircraft status / damage word +0x684 — iteration 339
+
+Big-endian word. Byte +0x684 holds bits 8–15 and byte +0x685 bits 0–7, so a byte
+test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
+(0x109ae). Evidence: an instruction scan of the overlay for $684..$687 operands.
+
+| Bit | Mask | Writers | Readers | Meaning | Certainty |
+|---|---|---|---|---|---|
+| 0 | 0x0001 | apply_random_aircraft_damage (roll < 6); spawn path 0xf71c | 0x9246, 0xf6e6, 0x10570, 0x1094a | pilot hit / pilot gone (Ugh sound; blocks a second parachute) | PROVEN flow / STRONG_INFERENCE |
+| 1–3 | 0x000e | damage rolls < 0x2b / < 0x38 / < 0x45 | update_aircraft_entity 0xf794 / 0xe8a0 / 0xe8e6 | control damage | PROVEN flow / UNKNOWN which control |
+| 4 | 0x0010 | damage roll < 0x51 | 0x7fbc, 0xf652, 0x191c2 | guns damaged (Gun sound gate) | STRONG_INFERENCE |
+| 5 | 0x0020 | damage roll < 0x5e; tick_wave_spawner 0x1818a | 0x97e4, 0xf576, 0xfb08 | UNKNOWN | — |
+| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, iter 341) | progressive engine damage: 0x80 engine damaged, 0x100 / 0x200 engine out (0x100 also smoke / AI bail-out) | PROVEN ladder and engine effect / STRONG_INFERENCE names |
+| 1–9 | 0x03fe | — | landing / ditch / bail-out outcomes | "aircraft damaged" | PROVEN use |
+| 10 | 0x0400 | hard landing 0xf136 / 0xf3a2, aircraft_collision, apply_blast_damage | 0x8fa0, 0xe722, 0x1077a | crashed / destroyed | STRONG_INFERENCE |
+| 11 | 0x0800 | 0xf7f0 (with 0x100, after keeping only 0x8000) | 0xe80e, 0xf372, 0x1070c.. | UNKNOWN | — |
+| 12 | 0x1000 | water contact 0xe832 / 0xf384; cleared on leaving the ground 0xf0d8 | 0x8066 (ditch outcome), 0xef90, 0x108da | in water | STRONG_INFERENCE |
+| 13 | 0x2000 | set / cleared 0xf5a0 / 0xf588 (beside +0x67a) | 0xe628, 0xe6d4 | UNKNOWN | — |
+| 14 | 0x4000 | aircraft_create 0xe11a, respawn (= 0x4000), key 'M' 0x7af6; cleared by keys '0'..'9' (0x79a6) and the throttle step (0x7df0) | 0x7de4, 0x82b6 (refuel snapshot), 0xeb5c, update_aircraft_entity (with +0x66e == 0 clears engine-running +0x669) | ENGINE SWITCHED OFF (iter 340) | PROVEN flow / STRONG_INFERENCE name |
+| 15 | 0x8000 | apply_random_aircraft_damage when the bullet word +0x36 != 0 | kept by andi #$8000 at 0xf7ea | UNKNOWN | — |
+
 ## Rejected / superseded interpretations
 
 | Claim | Status | Reason |
@@ -844,3 +865,6 @@ The low word is copied (zero-extended) from descriptor +0x16 by
 | 11 | 0x800 | +6 & 0x08 | one-frame mover flag, cleared by the sweep | PROVEN (flow) | 0x56d2 |
 | 15 | 0x8000 | +6 & 0x80 | added to DAT_0001c1e4 each frame; that list gets the +0x16 notice handlers (dispatch_overlap_collisions) | PROVEN (flow) | 0x56ac, 0x5832 |
 | 20 | 0x100000 | +5 & 0x10 | distance-based (proximity) collision instead of shape collision; set from bit 13 at creation | PROVEN (bit flow) / STRONG_INFERENCE (meaning) | 0x13e62, 0x570c, 0x5796, 0x116ca, alloc 0x45ba |
+| aircraft controller +0x668 / +0x669 (Pacific Conflict) | throttle setting 0..9 (byte; keys 0–9, step input clamped 0..9) / engine running (byte) | PROVEN (writers) / STRONG_INFERENCE | Iter 340: Ghidra `DAT_0001b738 + 0x19a` on int * = byte +0x668. |
+| aircraft controller +0x66e / +0x672 / +0x66a / +0x680 (Pacific Conflict) | engine power (long) / manifold gauge (word) / RPM tachometer (long) / fuel-burn accumulator (word) | PROVEN (arithmetic) / STRONG_INFERENCE (names) | Iter 341–342: power = density(altitude) × throttle; RPM -> mean of power and airspeed term; replaces the "pitch / roll / yaw axes" hypothesis. |
+| `DAT_0001b2c0` (Pacific Conflict, file 0x1b2e0) | altitude curve: 9 longs 421, 511, 627, 780, 977, 1241, 1646, 2623, 0 (bands of 0x10000) | PROVEN (values, lerp) / STRONG_INFERENCE (inverse air density; sea level -> 1.0 in both consumers) | Iter 343: read by table_lerp_1b2c0; sawtooth above 0x70000 because entry 8 = 0. |

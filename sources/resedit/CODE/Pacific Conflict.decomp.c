@@ -9113,7 +9113,8 @@ void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
  *     |9          hard surface without special case, or intact off-surface landing
  *                  (enemy base: 1/4 POW; no base: only if any_mission_kills_recorded,
  *                  else no outcome);
- *   not stopped, rolling on a hard surface with status bit 6 (+0x684 & 0x40) and
+ *   not stopped, rolling on a hard surface with status word +0x684 bit 14 (0x4000;
+ *   btst.b #6 on byte +0x684 at 0x82b6 - iteration 339 correction) and
  *   _DAT_0001b73c == 0:
  *     |2          host +0xb6 = fuel % ((+0x67d + +0x67e) * 100 / capacity type +0x1c),
  *                  host +0xb8 = bombs +0x67c (sign-extended byte); _DAT_0001b73c = 1 -
@@ -9412,8 +9413,8 @@ LAB_0000796e:
     }
 LAB_00007992:
     _DAT_00024d34 = 0;
-    *(char *)(DAT_0001b738 + 0x19a) = (char)param_1 + -0x30;
-    *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) & 0xbfff;
+    *(char *)(DAT_0001b738 + 0x19a) = (char)param_1 + -0x30; /* keys '0'..'9': throttle byte +0x668 (iter 340) */
+    *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) & 0xbfff; /* engine switched on: clear +0x684 bit 14 (0x79a6) */
     break;
   case 0x41:
   case 0x61:
@@ -9510,8 +9511,8 @@ LAB_00007ba8:
     break;
   case 0x4d:
   case 0x6d:
-    *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;
-    *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) | 0x4000;
+    *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;  /* 'M' / 'm': throttle 0 ... */
+    *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) | 0x4000; /* ... and engine switched OFF (+0x684 bit 14, 0x7af6; iter 340) */
     break;
   case 0x50:
   case 0x70:
@@ -15923,6 +15924,23 @@ int fold_angle_pm_0x2000(short param_1) /* Original: FUN_0000e40c */
  * Banded lerp over overlapping DAT_0001b2c0[]: high word selects band
  * (clamped 0..7); low word weights (hi−lo)<<16 fraction.
  * Callers pass *(world_obj+0x1c) (surface/world cell), not entity pos_1c.
+ * VERIFIED (iteration 343): independent capstone disassembly of 0xe42a..0xe466 is
+ * identical to the C (asr #16, clamp <= 7, lea $1b2c0, scaled-x4 long reads, muls.l, asr
+ * #16, add.w of the low word, ext.l).
+ * Iteration 343 [PROVEN, bytes 0xe42a..0xe466 match the C; data file 0x1b2e0]: the table
+ * DAT_0001b2c0 is 9 signed longs = 421, 511, 627, 780, 977, 1241, 1646, 2623, 0. Index =
+ * altitude >> 16 clamped to at most 7 (no lower clamp); value = e[i] (low word) +
+ * ((altitude & 0xffff) * (e[i+1] - e[i]) >> 16), returned as a sign-extended word.
+ * At sea level both consumers give exactly 1.0 in 8.8 fixed point: local_46
+ * 0x5e50 / ((421 + 0xa25) >> 5) = 256 and scale_template_field_38 0x551a /
+ * ((421 + 0x105) >> 3) = 256. Values grow ~1.2x per 0x10000 of altitude, so power
+ * (and the template +0x38 term) falls with height: an inverse air-density curve
+ * [STRONG_INFERENCE]. Quirk [PROVEN]: entry 8 is 0, so between 0x70000 and 0x7ffff the
+ * value falls from 2623 towards 0, and above 0x80000 (index clamped to 7, fraction =
+ * low word) it repeats that ramp every 0x10000.
+ * Iteration 342: world object +0x18 / +0x1c / +0x20 are its x / y / z, so the input is
+ * the ALTITUDE and the table an altitude curve (air density for engine power, via
+ * local_46 / scale_template_field_38) [STRONG_INFERENCE].
  * Evidence: Pacific Conflict.c:13796+; NOTES 2026-10-15 helper trio; contract.
  */
 int table_lerp_1b2c0(uint param_1) /* Original: FUN_0000e42a */
@@ -16358,6 +16376,12 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    * If flags_685 sign bit set, halve signed byte at +0x19a toward zero, then
    * add into status_1a0; when over template+0x1e, subtract threshold and maybe
    * decrement 67d/67e via overlay_rng_next. [NOTES.md 14137–14163]
+   * Iteration 342: sVar21 = throttle (+0x668). The engine runs (+0x669 = 1) only with
+   * fuel (+0x67d / +0x67e), no damage bits 8 / 9 (word +0x684 & 0x300) and, if damage
+   * bit 6 (0x40) is set, word +0x68c != 0; bit 7 (0x80) halves the throttle. The word
+   * at Ghidra param_1 + 0x1a0 (byte +0x680, cleared by load_player_fuel_and_bombs)
+   * is the FUEL-BURN accumulator: it integrates the throttle and, past template
+   * +0x1e, burns one fuel unit [STRONG_INFERENCE].
    */
   sVar21 = (short)*(char *)(param_1 + 0x19a);
   *(undefined1 *)((int)param_1 + 0x669) = 1; /* movement_669 */
@@ -16415,7 +16439,13 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    * [PROVEN] Runs only if param_1 == DAT_0001b738 (player) or DAT_0001b888
    * (second designated). Delta rule: if |d|<8 add d else add (d+7*(d<0))>>3.
    * [PROVEN] local_46 uses literal 0x666 (not entity+0x666). local_42 from iVar20.
-   * [HYPOTHESIS] axis names pitch/roll/yaw — see contract [INFERRED] mapping.
+   * Iteration 342 correction: not axes. These are the ENGINE [STRONG_INFERENCE]:
+   *   +0x66e engine power -> local_46 = (0x5e50 / ((sVar15 + 0xa25) >> 5)) * throttle
+   *   * 0x666 >> 5 (throttle = sVar21 from +0x668; sVar15 = table_lerp_1b2c0(altitude));
+   *   +0x672 manifold gauge; +0x66a RPM (tachometer) -> midpoint of local_46 and
+   *   local_42 = (airspeed iVar20 << 17) / 0x1c20 (windmilling term).
+   *   Bytes 0xea54..0xea9c: moveq #$11 / asl.l, divs.l #$1c20, addi.l #$a25 / asr #5,
+   *   divs.w into 0x5e50, muls.w #$666, muls.l, asr #5 [PROVEN].
    * [PROVEN] Clear movement_669 when (status&0x40) && 0x66e==0.
    */
   if ((param_1 == DAT_0001b738) || (param_1 == DAT_0001b888)) {
@@ -16435,6 +16465,17 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
       }
       *(int *)((int)param_1 + 0x66e) = (iVar24 >> 3) + *(int *)((int)param_1 + 0x66e);
     }
+    /* Iteration 340/341 engine model [PROVEN, bytes 0xea9c..0xeb6a; C matches]:
+     * every engine quantity approaches its target by 1/8 per frame, snapping when
+     * |diff| < 8: d = target - v; v += (d / 8 == 0) ? d : d / 8, with C truncating
+     * division (the +7 bias before asr #3). +0x66e (long) -> its target first;
+     * manifold +0x672 (word, the manifold gauge) -> target local_26 >> 9, but 0 when
+     * the engine is not running (+0x669 == 0) or word +0x684 & 0x4300 (bit 14 engine
+     * off, bits 8 / 9 heavy damage), halved (signed, +1 bias) when word bit 7 (0x80,
+     * byte +0x685 < 0) is set; RPM +0x66a (long, the tachometer) -> midpoint of
+     * local_46 / local_42. Engine off with +0x66e == 0 clears +0x669 (0xeb6a).
+     * So damage bit 7 = engine damaged (half manifold pressure) and bits 8 / 9 = engine
+     * out [STRONG_INFERENCE]. */
     if ((*(char *)((int)param_1 + 0x669) == '\0') || ((*(ushort *)(param_1 + 0x1a1) & 0x4300) != 0))
     {
       sVar21 = 0;
@@ -23751,7 +23792,7 @@ uint bullet_hits_shape /* Original: FUN_0001665a */ (int param_1,int param_2)
 
 /* Original: FUN_00016724; source: Pacific Conflict.c. Recovered name: apply_random_aircraft_damage [STRONG INFERENCE] (iteration 263).
  * Ghidra C reviewed (function at overlay offset 0x16724).
- * Args: aircraft controller, flag (bullet controller word +0x36) [UNKNOWN meaning]. Type 1 sets _DAT_0001b842; types 1 and 3 resist 3 hits in 4. Otherwise rolls a byte and sets one damage bit in the controller word +0x684: < 6 bit 0, < 0x2b bit 1, < 0x38 bit 2, < 0x45 bit 3, < 0x51 bit 4, < 0x5e bit 5; else bit 6 the first time, later bit 1 is promoted to bit 8 and word +0x688 is cleared. A non-zero flag sets bit 15. The low byte of this word is flags_685 (+0x685), whose bits gate / jitter the control inputs (enqueue_control_inputs_avg4) [PROVEN link]: hits degrade the flight controls. Also called from decomp ~19833. Ghidra C.
+ * Args: aircraft controller, flag (bullet controller word +0x36) [UNKNOWN meaning]. Type 1 sets _DAT_0001b842; types 1 and 3 resist 3 hits in 4. Otherwise rolls a byte and sets one damage bit in the controller word +0x684: < 6 bit 0, < 0x2b bit 1, < 0x38 bit 2, < 0x45 bit 3, < 0x51 bit 4, < 0x5e bit 5; else bit 6 the first time, later bit 9 (0x200; Ghidra tests byte +0x684 & 2) is promoted to bit 8 (0x100) and word +0x688 is cleared [iteration 339 correction: not bit 1]. A non-zero flag sets bit 15. The low byte of this word is flags_685 (+0x685), whose bits gate / jitter the control inputs (enqueue_control_inputs_avg4) [PROVEN link]: hits degrade the flight controls. Also called from decomp ~19833. Ghidra C.
  */
 uint apply_random_aircraft_damage /* Original: FUN_00016724 */ (int param_1,int param_2)
 

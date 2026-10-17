@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 338
+**Last iteration:** 343
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `ee7d927a` (`*/5 * * * *`, activated 2026-10-17 after `f156ee33` was cancelled) in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 0 | 0 | 0 | 384 | 53 | 6 |
-| **TOTAL** | **736** | **0** | **0** | **0** | **677** | **53** | **6** |
+| Pacific Conflict.c | 443 | 0 | 0 | 0 | 383 | 54 | 6 |
+| **TOTAL** | **736** | **0** | **0** | **0** | **676** | **54** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -165,7 +165,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_000025a8` | `build_attitude_matrix` | Pacific Conflict | RENAMED | PROVEN chain | `@0x25A8` | `Pacific Conflict.decomp.c` | `0202a`→`020e6`→`021a0`→`02562` | Axis order semantics | 17 | Body + call sites renamed |
 | `FUN_000028dc` | `transform_vecs12_by_matrix3` | Pacific Conflict | RENAMED | PROVEN | `@0x28DC` | `Pacific Conflict.decomp.c` | 3×3 × packed +2/+6/+10 | — | 17 | Body; all overlay call sites |
 | `FUN_0000e4a4` | `compute_template_force_from_626` | Pacific Conflict | RENAMED | PROVEN algo | `@0xE4A4` | `Pacific Conflict.decomp.c` | template `+0x26..+0x34`; `0x67b`; out→`0x63a` | Physical “lift” label | 16 | Body + single call site |
-| `FUN_0000e42a` | `table_lerp_1b2c0` | Pacific Conflict | RENAMED | PROVEN algo | `@0xE42A` | `Pacific Conflict.decomp.c` | `DAT_0001b2c0` band table | Physical meaning of `*(world+0x1c)` bands | 14 | Capstone-equivalent body; 2 call sites |
+| `FUN_0000e42a` | `table_lerp_1b2c0` | Pacific Conflict | VERIFIED (iter 343) | PROVEN algo | `@0xE42A` | `Pacific Conflict.decomp.c` | `DAT_0001b2c0` band table | Physical meaning of `*(world+0x1c)` bands | 14 | Capstone-equivalent body; 2 call sites |
 | `FUN_0000e468` | `damp_short_if_below_0x200` | Pacific Conflict | RENAMED | PROVEN | `@0xE468` | `Pacific Conflict.decomp.c` | height delta vs `0x200` | — | 14 | Body + e792 use (drag stash) |
 | `FUN_0000e570` | `scale_template_field_38` | Pacific Conflict | RENAMED | PROVEN | `@0xE570` | `Pacific Conflict.decomp.c` | `DAT_00026004+0x38` | — | 14 | Body; e570 uses raw e42a |
 
@@ -4267,9 +4267,120 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Validation: tokens identical to HEAD with the iteration-337 rename mapped;
   `git diff --check` clean.
 
-**Next iteration target:** damage word +0x684 bits (mask 0x3fe, bit 8 = AI
-bail-out trigger, 0x400 hard landing, 0x1000 water, 0x4000 respawn value): build
-the bit table from update_aircraft_damage_state with byte evidence.
+
+### Iteration 339 — 2026-10-18
+
+- 32 protected hashes OK; only my iteration 333–338 changes uncommitted.
+- P0 / P1: aircraft status / damage word +0x684.
+  - An instruction scan of the overlay found every $684..$687 access (about
+    100), each mapped to its function.
+  - Per-bit table added to DECOMPILATION_SYMBOLS.md, with writers, readers
+    and certainty.
+  - Big-endian rule: `btst #n,$684` = word bit n+8.
+- Two corrections of the same byte/word slip:
+  - apply_random_aircraft_damage header: bit 9 (0x200) is promoted to bit 8,
+    not "bit 1";
+  - my iteration-332 note: the refuel-snapshot gate is word bit 14 (0x4000),
+    not 0x40.
+- Comment / doc only.
+- Godot sync impact: review required. Any port reading Ghidra's
+  `*(byte *)(+0x684) & m` must use word bit (log2 m) + 8.
+- Validation: tokens identical to HEAD with the iteration-337 rename mapped;
+  `git diff --check` clean.
+
+
+### Iteration 340 — 2026-10-18
+
+- HEAD moved to aeb6f96 (user commit including iterations up to 338);
+  baselines regenerated. 32 protected hashes OK. An untracked root .DS_Store
+  is not mine and was left alone.
+- +0x684 bit 14 (0x4000) = ENGINE SWITCHED OFF [STRONG_INFERENCE; flow
+  PROVEN]:
+  - set at creation and respawn and by the 'M' / 'm' key (throttle 0);
+  - cleared by the throttle keys '0'..'9' (throttle byte +0x668 = digit) and
+    by a throttle step while it is set;
+  - with +0x66e == 0, update_aircraft_entity clears +0x669 (engine running,
+    the engine-sound gate).
+  This explains the refuel-snapshot gate (engine off while rolling on a hard
+  surface).
+- Ghidra's `DAT_0001b738 + 0x19a` on an `int *` is byte +0x668 (the throttle).
+- Comment-only (two inline notes) plus symbols rows.
+- Godot sync impact: none (no rename). The input map must bind M/m to
+  "engine off" and 0..9 to the throttle detents, and new aircraft must start
+  with the engine off.
+- Validation: tokens identical to the new HEAD; `git diff --check` clean.
+
+
+### Iteration 341 — 2026-10-18
+
+- 32 protected hashes OK; only my iteration 339–340 changes uncommitted.
+- P2 flight dynamics: update_aircraft_entity engine model (0xea9c..0xeb6a)
+  checked against the bytes; the C matches.
+  - Each quantity approaches its target by 1/8 per frame and snaps when the
+    difference is < 8, using truncating division (+7 bias): +0x66e (long),
+    manifold +0x672 (word), RPM +0x66a (long).
+  - Manifold target = local_26 >> 9.
+    - It is 0 when the engine is not running or +0x684 & 0x4300 (engine off,
+      damage bits 8 / 9).
+    - It is halved (signed, +1 bias) when damage bit 7 (0x80) is set.
+  - So 0x80 = engine damaged and 0x100 / 0x200 = engine out
+    [STRONG_INFERENCE]; the +0x684 table was updated.
+- Comment-only (block note in update_aircraft_entity).
+- Godot sync impact: none (no rename). The port's engine smoothing must use
+  C truncating division (a toward-zero /8 with snap), not floor or float
+  lerp.
+- Validation: tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 342 — 2026-10-18
+
+- 32 protected hashes OK; only my iteration 339–341 changes uncommitted.
+- P0 wrong interpretation: update_aircraft_entity block 2b had a HYPOTHESIS
+  that its three smoothed values were pitch / roll / yaw axes. They are the
+  engine:
+  - +0x66e power, target = density(altitude) × throttle (0x5e50 / 0xa25 / 0x666
+    constants, bytes 0xea54..0xea9c PROVEN);
+  - +0x672 manifold;
+  - +0x66a RPM, target = mean of power and airspeed << 17 / 0x1c20.
+- Block 1b, sVar21 = throttle +0x668:
+  - The engine runs only with fuel and without damage bits 8 / 9 (and bit 6
+    unless word +0x68c != 0).
+  - Bit 7 halves the throttle.
+  - Byte +0x680 is the fuel-burn accumulator.
+- table_lerp_1b2c0's input is the object's y = altitude [STRONG_INFERENCE].
+- Comment-only.
+- Godot sync impact: review required. Any port labels treating
+  +0x66e / +0x672 / +0x66a as attitude axes should be renamed to engine
+  power / manifold / RPM (a grep of entity_state.gd found no axis labels on
+  them). Behaviour is unaffected.
+- Validation: tokens identical to HEAD; `git diff --check` clean.
+
+
+### Iteration 343 — 2026-10-18
+
+- 32 protected hashes OK; only my iteration 339–342 changes uncommitted.
+- P2 flight dynamics: table_lerp_1b2c0 (FUN_0000e42a) bytes 0xe42a..0xe466
+  match the C (index scale x4 decoded from extension word 0x2c04).
+- DAT_0001b2c0, read from data file offset 0x1b2e0 [PROVEN]: 421, 511, 627,
+  780, 977, 1241, 1646, 2623, 0, in bands of altitude 0x10000.
+  - Both consumers normalise the sea-level value to exactly 256 (1.0 in 8.8):
+    0x5e50 / 94 and 0x551a / 85. So this is an inverse air-density curve and
+    engine power falls with altitude [STRONG_INFERENCE].
+  - Quirk [PROVEN]: entry 8 = 0 and the index is clamped at 7, so above
+    altitude 0x70000 the value ramps down to 0 and then repeats every
+    0x10000.
+- table_lerp_1b2c0 VERIFIED: every instruction of 0xe42a..0xe466 checked.
+  Inventory row updated; counts: Pacific Conflict 384 -> 383 RENAMED,
+  53 -> 54 VERIFIED.
+- Comment / doc only.
+- Godot sync impact: none (no rename). A port must reproduce the
+  upper-only clamp and the 0 sentinel (the sawtooth above 0x70000), not a
+  saturating curve.
+- Validation: tokens identical to HEAD; `git diff --check` clean.
+
+**Next iteration target:** damp_short_if_below_0x200 (FUN_0000e468) and
+scale_template_field_38 (FUN_0000e570): verify against the bytes and name the
+template +0x38 quantity.
 
 ## Resuming the five-minute workflow
 
