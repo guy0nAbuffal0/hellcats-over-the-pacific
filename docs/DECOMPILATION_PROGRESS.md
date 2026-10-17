@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 279
+**Last iteration:** 280
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -19,8 +19,8 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID07.c | 2 | 0 | 0 | 0 | 2 | 0 | 0 |
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
-| Pacific Conflict.c | 443 | 152 | 0 | 0 | 285 | 0 | 6 |
-| **TOTAL** | **736** | **152** | **0** | **0** | **578** | **0** | **6** |
+| Pacific Conflict.c | 443 | 148 | 0 | 0 | 289 | 0 | 6 |
+| **TOTAL** | **736** | **148** | **0** | **0** | **582** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 152 NOT_STARTED + 6 BLOCKED (iteration 279);
-578 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 148 NOT_STARTED + 6 BLOCKED (iteration 280);
+582 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -585,6 +585,10 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_0000ce1c` | `update_ammo_needle` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x682 | — | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_0000cec4` | `update_fuel_needles` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | +0x67d / +0x67e | — | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00017b68` | `update_radar_scope` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | heading-up blips from DAT_0001b51c | which objects are tracked | 279 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_000176b2` | `add_radar_track` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | ≤ 6 tracks within 2 × range | callers | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0001776a` | `reset_radar_tracks` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | clears track / blip counts | — | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000c1aa` | `update_heading_tape` | Pacific Conflict | RENAMED | STRONG INFERENCE | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | strip scrolled by heading | copy loop details | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
+| `FUN_0000ba2a` | `draw_panel_frame_lines` | Pacific Conflict | RENAMED | HYPOTHESIS | `Pacific Conflict.c` | `Pacific Conflict.decomp.c` | colour runs at host +0x238..+0x258 | what the lines are | 280 (2026-10-17) | Ghidra C; token diff vs HEAD = renames |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -3209,9 +3213,21 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   panel items) [STRONG INFERENCE]. INSTRUMENT_PANEL.md updated.
 - Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
 
-**Next iteration target:** Pacific Conflict `FUN_0000c1aa`, `FUN_0000ba2a`
-(last two drawers of update_view_readouts_and_overlays), the radar track
-list DAT_0001b51c producer, `FUN_00001db8` / `FUN_00001d56`.
+### Iteration 280 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 250–279 work preserved.
+- Pacific Conflict `FUN_000176b2` = add_radar_track, `FUN_0001776a` =
+  reset_radar_tracks, `FUN_0000c1aa` = update_heading_tape,
+  `FUN_0000ba2a` = draw_panel_frame_lines [HYPOTHESIS].
+- **Correction to iteration 244:** DAT_0002666a / DAT_00026666 (set by
+  set_view_distance, cycled by the Tab key) limit the radar tracks, so they
+  are the radar range; the function names are kept and the comment
+  corrected (a rename to set_radar_range / cycle_radar_range is proposed).
+- Validation: token diff vs HEAD = renames only; warnings intact; 32 hashes OK.
+
+**Next iteration target:** Pacific Conflict callers of add_radar_track,
+`FUN_00001db8` / `FUN_00001d56` (register-argument trig used by the gear /
+altimeter needles), `FUN_00003cca`.
 
 ## Resuming the five-minute workflow
 

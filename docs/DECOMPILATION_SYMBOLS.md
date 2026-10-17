@@ -274,7 +274,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003266` (Pacific Conflict) | `init_span_table_32ba` | STRONG INFERENCE mechanics | Iter 244: self-modifying table at 0x3242. |
 | `FUN_00003412` (Pacific Conflict) | `init_span_table_3466` | STRONG INFERENCE mechanics | Iter 244: table at 0x33ee. |
 | `FUN_000035b4` (Pacific Conflict) | `init_span_table_3608` | STRONG INFERENCE mechanics | Iter 244: table at 0x3590. |
-| `FUN_0001771a` (Pacific Conflict) | `set_view_distance` | STRONG INFERENCE | Iter 244: range + 2 * range. |
+| `FUN_0001771a` (Pacific Conflict) | `set_view_distance` (iteration 280: actually the radar range) | STRONG INFERENCE | Iter 244: range + 2 * range. |
 | `FUN_00017736` (Pacific Conflict) | `cycle_view_distance` | STRONG INFERENCE | Iter 244: Tab key: 0xc15c0 / 0x26ac0 / 0xce40. |
 | `FUN_000032ba` (Pacific Conflict) | `fill_span_rows_4bit_a` | STRONG INFERENCE | Iter 245: depth-4 run-list span filler. |
 | `FUN_00003466` (Pacific Conflict) | `fill_span_rows_4bit_b` | STRONG INFERENCE | Iter 245: variant b. |
@@ -392,6 +392,10 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000ce1c` (Pacific Conflict) | `update_ammo_needle` | STRONG INFERENCE | Iter 279: needle 15 from +0x682 (675 rounds). |
 | `FUN_0000cec4` (Pacific Conflict) | `update_fuel_needles` | STRONG INFERENCE | Iter 279: needles 16 / 17 from +0x67d / +0x67e. |
 | `FUN_00017b68` (Pacific Conflict) | `update_radar_scope` | STRONG INFERENCE | Iter 279: tracked objects rotated by heading into the scope rectangle. |
+| `FUN_000176b2` (Pacific Conflict) | `add_radar_track` | STRONG INFERENCE | Iter 280: DAT_0001b51c[≤ 6] (x, z, two words, flag) when metric ≤ DAT_00026666. |
+| `FUN_0001776a` (Pacific Conflict) | `reset_radar_tracks` | STRONG INFERENCE | Iter 280: DAT_00026672 = DAT_00026676 = 0. |
+| `FUN_0000c1aa` (Pacific Conflict) | `update_heading_tape` | STRONG INFERENCE | Iter 280: strip at host +0x1b8 scrolled by DAT_0001d80e. |
+| `FUN_0000ba2a` (Pacific Conflict) | `draw_panel_frame_lines` | HYPOTHESIS | Iter 280: colour runs from host +0x238..+0x258. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |

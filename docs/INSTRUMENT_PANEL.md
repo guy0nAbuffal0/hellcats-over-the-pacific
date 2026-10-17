@@ -119,4 +119,7 @@ The panel bitmaps are static; the overlay draws the needles each frame from
 
 The extra items use host panel words overlay +0x20e..+0x236 (iteration 279);
 `update_radar_scope` (0x17b68) draws heading-up blips in the rectangle at
-host +0x1de..+0x1ea.
+host +0x1de..+0x1ea. Tracks: up to six (`add_radar_track`, metric ≤ 2 × range), cleared by
+`reset_radar_tracks`; the Tab key cycles the range (`cycle_view_distance`,
+named before the radar link was found). `update_heading_tape` scrolls the
+compass strip by the heading (iteration 280).

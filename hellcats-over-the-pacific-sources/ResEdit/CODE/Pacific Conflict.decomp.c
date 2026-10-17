@@ -8578,7 +8578,7 @@ LAB_00006964:
       }
     }
     draw_sky_and_ground((int)sVar8);
-    FUN_0000c1aa((int)sVar8);
+    update_heading_tape((int)sVar8);
     if (sVar8 != 0) {
       (**(code **)(DAT_0001b5a0 + 0x2c2))();
     }
@@ -12252,7 +12252,7 @@ void FUN_0000b49e(void)
 
 {
   reset_background_rows();
-  FUN_0001776a();
+  reset_radar_tracks();
   DAT_00025ffe = 1;
   _DAT_00025ffc = 0;
   return;
@@ -12484,7 +12484,11 @@ uint draw_sky_and_ground /* Original: FUN_0000b4b6 */ (int param_1)
 
 
 
-void FUN_0000ba2a(void)
+/* Original: FUN_0000ba2a; source: Pacific Conflict.c. Recovered name: draw_panel_frame_lines [HYPOTHESIS] (iteration 280).
+ * Ghidra C reviewed (function at overlay offset 0xba2a).
+ * Unless host option +0x9e: at depth 4 writes the colour byte host +0x25d (doubled into both nibbles) straight into the frame buffer along two vertical runs (rows +0x238..+0x23a and +0x23c..+0x23e from the pointers +0x24c / +0x250) and two double horizontal runs (+0x242..+0x244, +0x246..+0x248 from +0x254 / +0x258), with depth-8 / depth-1 variants after it [HYPOTHESIS: reticle or frame lines around a panel element; not identified]. Ghidra C (partly read).
+ */
+void draw_panel_frame_lines /* Original: FUN_0000ba2a */ (void)
 
 {
   byte bVar1;
@@ -13048,7 +13052,11 @@ void FUN_0000c17e(undefined4 param_1,undefined4 param_2)
 // WARNING: Removing unreachable block (ram,0x0000c444)
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-uint FUN_0000c1aa(int param_1)
+/* Original: FUN_0000c1aa; source: Pacific Conflict.c. Recovered name: update_heading_tape [STRONG INFERENCE] (iteration 280).
+ * Ghidra C reviewed (function at overlay offset 0xc1aa).
+ * Called by update_view_readouts_and_overlays (unless host option +0x9e). Scrolls a horizontal strip bitmap (host +0x1b0 / +0x1b8, period +0x1a4, size +0x19e x +0x1a0, placed at +0x19a / +0x19c) by -heading DAT_0001d80e * period / 0x4000 and copies the visible window into the frame (directly, or via the host services +0x28e / +0x2c2 when _DAT_00020ae4 == 0, with FUN_0000c11e / FUN_0000c17e at depth 8); skips the copy when the offset is unchanged (DAT_00025ffe) [STRONG INFERENCE: compass heading tape]. Ghidra C (partly read).
+ */
+uint update_heading_tape /* Original: FUN_0000c1aa */ (int param_1)
 
 {
   int iVar1;
@@ -13810,9 +13818,9 @@ LAB_0000d11c:
     }
     if (*(short *)(DAT_0001b5a0 + 0x9e) == 0) {
       draw_sky_and_ground(param_1);
-      FUN_0000c1aa(param_1);
+      update_heading_tape(param_1);
     }
-    FUN_0000ba2a();
+    draw_panel_frame_lines();
     update_altimeter_needles();
     update_airspeed_needle();
     update_direction_needle();
@@ -17090,7 +17098,7 @@ void FUN_0000fe96(int param_1,int param_2)
     return;
   }
   if (1999 < *(int *)(param_2 + 0x1c) - *(int *)(*(int *)(param_2 + 8) + 0x2e)) {
-    FUN_000176b2(param_2);
+    add_radar_track(param_2);
   }
   if (sVar2 == 1) {
     return;
@@ -24072,7 +24080,11 @@ undefined4 spawn_ground_mark /* Original: FUN_000175de */ (int param_1,uint para
 
 
 
-void FUN_000176b2(int param_1)
+/* Original: FUN_000176b2; source: Pacific Conflict.c. Recovered name: add_radar_track [STRONG INFERENCE] (iteration 280).
+ * Ghidra C reviewed (function at overlay offset 0x176b2).
+ * Adds an object to the radar list when fewer than 6 are tracked and its distance metric (+0x10) is within DAT_00026666: stores its x / z (+0x18 / +0x20) and the controller words +10 / +0x12, visible flag 0. Radar state [STRONG INFERENCE]: DAT_0001b51c up to 6 tracks of 0x14 bytes (x, z, two words from the object controller +10 / +0x12, visible flag) counted by DAT_00026676, drawn by update_radar_scope; DAT_0002666a range with DAT_00026666 = 2 * range (set_view_distance / cycle_view_distance, Tab key - so that "view distance" is the radar range). Complete Ghidra C.
+ */
+void add_radar_track /* Original: FUN_000176b2 */ (int param_1)
 
 {
   short sVar1;
@@ -24101,7 +24113,7 @@ void FUN_000176b2(int param_1)
 
 /* Original: FUN_0001771a; source: Pacific Conflict.c. Recovered name: set_view_distance [STRONG INFERENCE] (iteration 244).
  * Ghidra C reviewed (function at overlay offset 0x1771a).
- * Arg: range. _DAT_0002666e = 1 (changed), DAT_0002666a = range, DAT_00026666 = 2 * range. Set to 0xc15c0 by overlay_initialise; cycled by FUN_00017736 (0xc15c0 -> 0x26ac0 -> 0xce40 -> 0xc15c0), which the Tab key (character 9) calls in process_flight_input_and_outcome - a visibility / detail range toggle [STRONG INFERENCE]. Complete Ghidra C.
+ * Arg: range. _DAT_0002666e = 1 (changed), DAT_0002666a = range, DAT_00026666 = 2 * range. Set to 0xc15c0 by overlay_initialise; cycled by FUN_00017736 (0xc15c0 -> 0x26ac0 -> 0xce40 -> 0xc15c0), which the Tab key (character 9) calls in process_flight_input_and_outcome - a range toggle; iteration 280: DAT_00026666 is the radar track limit (add_radar_track), so this is the radar range [STRONG INFERENCE] - the name set_view_distance is kept but radar range is meant. Complete Ghidra C.
  */
 void set_view_distance /* Original: FUN_0001771a */ (int param_1)
 
@@ -24140,7 +24152,11 @@ void cycle_view_distance /* Original: FUN_00017736 */ (void)
 
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
 
-void FUN_0001776a(void)
+/* Original: FUN_0001776a; source: Pacific Conflict.c. Recovered name: reset_radar_tracks [STRONG INFERENCE] (iteration 280).
+ * Ghidra C reviewed (function at overlay offset 0x1776a).
+ * Clears both radar lists (DAT_00026672 blips to erase, DAT_00026676 tracks) and sets the changed flag _DAT_0002666e. Radar state [STRONG INFERENCE]: DAT_0001b51c up to 6 tracks of 0x14 bytes (x, z, two words from the object controller +10 / +0x12, visible flag) counted by DAT_00026676, drawn by update_radar_scope; DAT_0002666a range with DAT_00026666 = 2 * range (set_view_distance / cycle_view_distance, Tab key - so that "view distance" is the radar range). Complete Ghidra C.
+ */
+void reset_radar_tracks /* Original: FUN_0001776a */ (void)
 
 {
   DAT_00026672 = 0;
