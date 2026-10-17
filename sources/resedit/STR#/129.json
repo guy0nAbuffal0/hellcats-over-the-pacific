@@ -803,8 +803,8 @@
   },
   "review": {
     "claims": {
-      "mission_text_role": "PROVEN",
-      "instrument_label_role": "VERIFIED"
+      "instrument_label_role": "VERIFIED",
+      "mission_text_role": "PROVEN"
     },
     "notes": [
       "Slots 29 through 37 are mission summary/success/failure prose consumed by host completion UI; they are not objective structures. Slots 65 through 78 are labels used by CODE:3 procedural instrument drawing; they are not cockpit artwork."

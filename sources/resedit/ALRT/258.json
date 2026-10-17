@@ -15,7 +15,7 @@
     {
       "evidence": "*   CautionAlert(258, nil) $A988; p2cstr(msg) (JT $2fa).",
       "function_or_context": "show_caution_alert_with_number",
-      "line": 1709,
+      "line": 1729,
       "source_path": "sources/resedit/CODE/ID02.decomp.c",
       "status": "VERIFIED"
     }

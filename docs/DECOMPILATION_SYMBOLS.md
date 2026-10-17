@@ -868,3 +868,60 @@ The low word is copied (zero-extended) from descriptor +0x16 by
 | aircraft controller +0x668 / +0x669 (Pacific Conflict) | throttle setting 0..9 (byte; keys 0–9, step input clamped 0..9) / engine running (byte) | PROVEN (writers) / STRONG_INFERENCE | Iter 340: Ghidra `DAT_0001b738 + 0x19a` on int * = byte +0x668. |
 | aircraft controller +0x66e / +0x672 / +0x66a / +0x680 (Pacific Conflict) | engine power (long) / manifold gauge (word) / RPM tachometer (long) / fuel-burn accumulator (word) | PROVEN (arithmetic) / STRONG_INFERENCE (names) | Iter 341–342: power = density(altitude) × throttle; RPM -> mean of power and airspeed term; replaces the "pitch / roll / yaw axes" hypothesis. |
 | `DAT_0001b2c0` (Pacific Conflict, file 0x1b2e0) | altitude curve: 9 longs 421, 511, 627, 780, 977, 1241, 1646, 2623, 0 (bands of 0x10000) | PROVEN (values, lerp) / STRONG_INFERENCE (inverse air density; sea level -> 1.0 in both consumers) | Iter 343: read by table_lerp_1b2c0; sawtooth above 0x70000 because entry 8 = 0. |
+
+## Aircraft type record (DAT_00026004 = controller +4) — iteration 345
+
+The record is the definition record `DAT_0001b524[key]`: handler slots +2..+0x16,
+then flight data as signed words except +0x38 (long). `update_aircraft_entity`
+sets `DAT_00026004 = param_1[1]` each tick. "AoA" means `movement_626`, which is
+compared against these fields as an angle. Users are in `Pacific Conflict.decomp.c`.
+
+| Field | Users | Role | Certainty |
+|---|---|---|---|
+| +0x1c | load_player_fuel_and_bombs | fuel capacity (units, both tanks) | STRONG_INFERENCE |
+| +0x1e | update_aircraft_entity block 1b | fuel-burn threshold (throttle accumulator +0x680 per fuel unit) | PROVEN flow / STRONG_INFERENCE |
+| +0x20 | block 4c | drag coefficient; gear adds +0x679 / 0xb × it, flaps +0x67b / 0xf × it | PROVEN flow / STRONG_INFERENCE |
+| +0x22 / +0x24 | block 4b | drag terms in v and lift² (induced drag) | HYPOTHESIS |
+| +0x26 / +0x28 | compute_template_force_from_626 | lift coefficient base / slope, clean | STRONG_INFERENCE |
+| +0x2a / +0x2c | same | lift base / slope at full flaps (blend by flaps / 0xf) | STRONG_INFERENCE |
+| +0x2e / +0x30 | block 4c (grounded, gear down) | rolling friction: low speed or grass ('@') / normal | STRONG_INFERENCE |
+| +0x32 | block 4c | brake friction (brake +0x641 or surface 'P'); × 3 / 2 when sliding gear-up | STRONG_INFERENCE |
+| +0x34 | compute_template_force_from_626, block 4 | stall angle: above it marker 0xc, lift fades over 0x20 more | PROVEN flow / STRONG_INFERENCE |
+| +0x36 | block 3a | corner speed: up to it, stick +0x662 commands AoA = stick × stall / 512; from it to speed 0xca8 the factor falls linearly to stick × 1 | PROVEN flow (bytes 0xeb6e.., iter 347) / STRONG_INFERENCE |
+| +0x38 (long) | scale_template_field_38 | rated engine power (× altitude factor) | STRONG_INFERENCE |
+| +0x3c / +0x3e | block 2a | static thrust / speed where thrust becomes power / speed | STRONG_INFERENCE |
+| +0x40 | block 1 | halved unless gear byte +0x679 == 0x2d (gear down) | UNKNOWN role |
+| +0x42 | block 3b | on the ground with gear down: AoA cap (three-point attitude; player 469 = 10.3 deg, friendly bomber 277 = 6.1 deg) | PROVEN flow / STRONG_INFERENCE |
+| +0x44 | block 3a | AoA trim offset: AoA approaches commanded + +0x44 (128 = 2.8 deg) at gain (speed × 0x2a, × 0x143a, 4.12 steps) >> 8 | PROVEN flow / STRONG_INFERENCE |
+| +0x46 / +0x48 | block 3b, block 4c | ground speeds: at or below +0x46 the AoA is held at +0x42, between them it is blended back up (tail lifting), and below +0x46 the low-speed rolling friction +0x2e applies | PROVEN flow / STRONG_INFERENCE |
+
+### Aircraft type records in the data file — iteration 346 [PROVEN values]
+
+Records of 0x4a bytes at file 0x1a7b0 (key 1), 0x1a88e (key 2), 0x1a844 (key 3) and
+0x1a7fa (key 4). All four have +2 aircraft_tick, +0xa destroy 0xe0a4, +0xe 0xfb2a and
++0x12 aircraft_collision. Create handlers: key 1 aircraft_create (the player), key 2
+create_friendly_bomber, key 3 create_enemy_bomber, key 4 create_enemy_fighter.
+Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
+(0x100d4), keys 2 / 3 none. Words unless marked L.
+
+| Field | k1 player | k2 friendly bomber | k3 enemy bomber | k4 enemy fighter | Consistent with the role? |
+|---|---|---|---|---|---|
+| +0x1a | 310 | 310 | 310 | 310 | UNKNOWN |
+| +0x1c fuel capacity | 46 | 93 | 93 | 93 | yes |
+| +0x1e fuel-burn threshold | 24652 | 9145 | 9145 | 9145 | yes (the player burns slower per unit) |
+| +0x20 drag | 2171 | 2171 | 2171 | 2171 | — |
+| +0x22 / +0x24 | 337 / 300 | same | same | same | — |
+| +0x26 / +0x28 lift base / slope, clean | 0 / 599 | same | same | same | yes (no lift at zero AoA) |
+| +0x2a / +0x2c lift base / slope, flaps | 2457 / 599 | same | same | same | yes (flaps add a constant) |
+| +0x2e rolling friction, slow / grass | 102 | 205 | 205 | 205 | yes (> +0x30) |
+| +0x30 rolling friction | 41 | 41 | 41 | 41 | yes |
+| +0x32 brakes | 3276 (0.8 in 4.12) | 1638 | 3276 | 3276 | yes (much larger than rolling) |
+| +0x34 stall angle | 832 = 18.3 deg (0x4000 per turn) | 832 | 832 | 832 | yes (a realistic stall AoA) |
+| +0x36 | 1980 | 1980 | 1980 | 1980 | — |
+| +0x38 L power | 8343704 | 6257778 | 7509334 | 7509334 | yes (differs per type) |
+| +0x3c static thrust | 3527 | 3527 | 3527 | 3527 | — |
+| +0x3e thrust crossover speed | 2365 | 2365 | 2365 | 2365 | — |
+| +0x40 | 67 | 67 | 67 | 67 | UNKNOWN |
+| +0x42 | 469 | 277 | 469 | 469 | — |
+| +0x44 | 128 | 128 | 128 | 128 | — |
+| +0x46 / +0x48 | 640 / 1067 | same | same | same | — |

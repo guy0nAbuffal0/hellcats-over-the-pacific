@@ -1,76 +1,99 @@
-# Hellcats Sim (Godot)
+# Hellcats Over the Pacific — evidence-backed Godot port
 
-Current status: a deterministic reverse-engineering core plus a **playable Mission 01 MVP vertical slice**. The project now includes a simple 3D training mission with authored mission data, placeholder world rendering, keyboard flight controls, mission objectives, HUD feedback, and success/failure flow.
+This repository preserves Macintosh evidence, semantic C reconstruction, and a
+strict Godot translation track. It also contains a playable Mission 01 prototype
+used as a comparison harness. The prototype is not the source of truth for
+original behavior.
 
-## Implemented / Proven / Blocked / Next
+## Start here
 
-- **Implemented [RECONSTRUCTED]:** Tick loop (FUN_000044e8 order), four entity arrays, RNG (ID05 LCG), EntityState with proven offsets, `loader_metadata.gd` (JSON parser), SimCore bridge ingesting `tools/proven_loader_targets.json` and resolving targets.
-- **Implemented [MVP AUTHORING DECISION]:** Mission 01 vertical slice scaffold under `godot/scenes/` with `Mission01Training.tscn`, `Main.tscn`, `PlayerAircraft.tscn`, `HUD_MVP.tscn`, `Mission01World.tscn`, authored mission JSON, simplified flight model, mission controller, checkpoint manager, and mission HUD.
-- **Proven [RECONSTRUCTED]:** ID00→LoadSeg→segment-local chain; trailing u16 = entrypoint−4 or −6. Six targets byte-proven in `godot/docs/LOADER_CHAIN.md` §10 (ID02×1, ID05×1, ID06×3, ID07×1). Artifact `proven_loader_targets.json` currently lists two (ID02, ID05).
-- **Blocked [UNKNOWN]:** Address mapping; runtime relocation; jump-table patching; segment load execution (see LOADER_CHAIN §9); higher-fidelity mission scripting and full combat systems.
-- **Next milestone:** tighten the Mission 01 playable slice with better camera/collision tuning and then start replacing the authored flight/mission behavior with more exact RE-backed behavior incrementally.
+Read only the material needed for the task:
 
-## Repo tree (high level)
+| Need | Canonical entry point |
+|---|---|
+| Current state and next milestone | [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) |
+| Reconstruction checkpoint | [`docs/DECOMPILATION_PROGRESS.md`](docs/DECOMPILATION_PROGRESS.md) |
+| Semantic names, globals, fields | [`docs/DECOMPILATION_SYMBOLS.md`](docs/DECOMPILATION_SYMBOLS.md) via `tools/re_query.py symbol` |
+| Strict translation rules and coverage | [`docs/STRICT_PORT_FOUNDATION.md`](docs/STRICT_PORT_FOUNDATION.md) |
+| Resource corpus | [`docs/RESOURCE_ANALYSIS.md`](docs/RESOURCE_ANALYSIS.md) via `tools/resedit.py` |
+| System navigation | [`docs/SUBSYSTEM_MAP.md`](docs/SUBSYSTEM_MAP.md) |
+| Historical investigations | `docs/research/` on demand only |
 
-```
-godot/
-├── project.godot          # Godot project root; main scene → scenes/main/Main.tscn
-├── scenes/                # Main, Mission01Training, world, player, HUD, checkpoint
-├── data/mission_01/       # mission_01_training.json, aircraft_mvp.json, checkpoints
-├── hellcats/              # all gameplay and simulation scripts
-│   ├── core/              # sim, RNG, loader metadata
-│   ├── flight/            # MVP flight model + input map
-│   ├── mission/           # controller, objectives, checkpoints
-│   ├── player/            # PlayerAircraft
-│   ├── ui/                # HUD_MVP
-│   └── world/             # world_builder_mvp
-└── tests/                 # headless runner: run_all.gd
-tools/qa/                  # test_regression.py + smoke notes
-```
+Do not begin a focused task by loading all documentation or a whole CODE file.
+Use deterministic narrow retrieval:
 
-## Run the Mission 01 MVP
+```sh
+python3 tools/re_query.py function FUN_0000e792
+python3 tools/re_query.py callers FUN_0000e792
+python3 tools/re_query.py globals FUN_0000e792
+python3 tools/re_query.py status FUN_0000e792
+python3 tools/re_query.py symbol DAT_00026004
+python3 tools/re_query.py source-map FUN_0001358c
 
-Open the `godot/` directory (the folder containing `project.godot`) in Godot and run the default main scene:
-
-- `res://scenes/main/Main.tscn`
-
-Direct mission scene for iteration:
-
-- `res://scenes/missions/Mission01Training.tscn`
-
-Controls:
-
-- `Up / Down`: pitch up / down
-- `Left / Right` or `A / D`: roll left / right
-- `Q / E`: yaw left / right
-- `Page Up / Page Down` or `W / S`: throttle up / down
-- `R`: restart mission
-- `Esc`: quit
-
-Mission HUD shows:
-
-- current objective
-- speed
-- altitude
-- heading
-- throttle
-- mission status
-
-## Run headless (no display)
-
-From the **repository root**:
-
-```bash
-HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --script res://tests/run_all.gd
+python3 tools/resedit.py inspect DITL 137
+python3 tools/resedit.py references ALRT 259
+python3 tools/resedit.py search "Mission Navigation"
 ```
 
-Python-side regression checks:
+## Evidence and code layout
 
-```bash
+```text
+sources/hellcats-over-the-pacific/  original disks, resource fork, manuals
+sources/resedit/CODE/*.c            immutable Ghidra exports
+sources/resedit/CODE/*.decomp.c     semantic reconstructions
+sources/resedit/<TYPE>/<ID>.*       resource payload, JSON, local identity
+godot/strict_port/                  faithful C-to-GDScript translations
+godot/hellcats/                     playable prototype implementation
+godot/tests/                        deterministic and scene tests
+docs/                               live references and contracts
+docs/research/                      historical evidence, not startup context
+tools/                              retrieval, verification, extraction, QA
+```
+
+The critical correspondence is:
+
+```text
+immutable Ghidra .c -> semantic .decomp.c -> faithful strict-port .gd
+```
+
+Original function identities and source hashes live in
+`godot/strict_port/mappings/functions.json`. Source-local provenance comments
+remain valuable review evidence.
+
+## Playable prototype
+
+Open `godot/project.godot` in Godot 4 and run
+`res://scenes/main/Main.tscn`. The prototype provides authored training
+objectives, keyboard flight controls, HUD feedback, restart, and success/failure
+flow. Its simplified flight model, world, and visuals are explicitly
+approximations.
+
+Controls: arrow keys or A/D for pitch/roll, Q/E for yaw, Page Up/Page Down or
+W/S for throttle, R to restart, and Esc to quit.
+
+## Validation
+
+From the repository root:
+
+```sh
+python3 tools/qa/test_re.py
+python3 tools/resedit.py verify
+python3 tools/strict_port/check_sync.py --json
 python3 tools/qa/test_regression.py
+bash tools/qa/test_id05_rng_c.sh
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path godot \
+  --log-file /tmp/hellcats-godot.log --script res://tests/run_all.gd
+git diff --check
 ```
 
-## Mission 01 MVP implementation notes
+Verify protected Ghidra exports from their directory because the checksum
+manifest uses local paths:
 
-- `docs/MISSION_01_MVP.md` — scope, architecture, controls, objectives, data paths, and deferred work.
-- `tools/qa/README.md` — manual smoke path and automated commands.
+```sh
+cd sources/resedit/CODE
+shasum -a 256 -c ../../../docs/DECOMPILATION_PROTECTED_CHECKSUMS.sha256
+```
+
+Passing automated tests establishes only their documented scope. It does not by
+itself prove visual parity, full flight parity, or agreement with an observed
+original Macintosh runtime.

@@ -70,6 +70,12 @@
         "path": "sources/resedit/snds/19330.md",
         "sha256": "1e9df25c843bcdcaadcd930e41be9c6b06d55a32690457db206ce6f967613204",
         "size": 25
+      },
+      {
+        "kind": "supporting file",
+        "path": "sources/resedit/snds/19330.mp3",
+        "sha256": "060598ef31f7ffa1fcdec0ede653fdc330194a944c1b5cf8ea75141d2a5fac86",
+        "size": 43960
       }
     ],
     "resource_attributes": "0x20",
@@ -79,7 +85,8 @@
     "sha256": "e667bbdea77aec482a321dde3dd84ba82f140b9c0a3dd8ff2584c62db6024a72",
     "source_exports": [
       "sources/resedit/snds/19330.bin",
-      "sources/resedit/snds/19330.md"
+      "sources/resedit/snds/19330.md",
+      "sources/resedit/snds/19330.mp3"
     ]
   },
   "relationships": {
@@ -107,7 +114,7 @@
     {
       "evidence": "* C args: +8 Pascal name, +0xc short slot. h = GetNamedResource('snd ', name) ($A9A1); none -> return 1. HNoPurge (JT $28a, $A04A); HUnlock (JT $27a); if FreeMem() < 0x3000 and MaxMem(&grow) < 0x3000: HUnlock, HPurge, ReleaseResource ($A9A3), return 1 (out of memory). Makes sure the resource is marked purgeable (GetResAttrs $A9A6; if bit 0x20 is clear, SetResAttrs | 0x20 $A9A7 and ChangedResource); A5-0xd62[slot] = h; returns 0. Callers: FUN_00001f8e (0x1fc8.. eight calls).",
       "function_or_context": "load_named_sound_into_slot",
-      "line": 1812,
+      "line": 1832,
       "scope": "resource_type_by_name_not_individual_id",
       "source_path": "sources/resedit/CODE/ID02.decomp.c",
       "status": "VERIFIED"

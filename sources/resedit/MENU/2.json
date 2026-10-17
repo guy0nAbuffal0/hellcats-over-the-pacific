@@ -15,14 +15,14 @@
     {
       "evidence": "*   GetResource('MENU', 2) == nil -> SysBeep(20); BSR 0x2e36; BSR 0x2eaa",
       "function_or_context": "initialize_application",
-      "line": 2217,
+      "line": 2237,
       "source_path": "sources/resedit/CODE/ID02.decomp.c",
       "status": "VERIFIED"
     },
     {
       "evidence": "* Called by initialize_application when GetResource('MENU', 2) fails, after",
       "function_or_context": "show_resource_file_error_box",
-      "line": 2286,
+      "line": 2306,
       "source_path": "sources/resedit/CODE/ID02.decomp.c",
       "status": "VERIFIED"
     }

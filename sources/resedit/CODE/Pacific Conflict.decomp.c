@@ -15968,6 +15968,12 @@ int table_lerp_1b2c0(uint param_1) /* Original: FUN_0000e42a */
  * (toward-zero style for negative products via +0xfff). Else return param_2.
  * In e792: arg0 = world+0x1c − entity pos_2e (height delta); arg1 = e42a out.
  * Result kept separately from raw e42a (used later as drag divisor @~0xEDF8).
+ *
+ * VERIFIED (iteration 344): independent capstone disassembly of 0xe468..0xe4a2 is
+ * identical to the C (cmpi.l #$1ff / bgt = "param_1 < 0x200"; muls.l; +0xfff bias;
+ * asr #12; sub.w; ext.l). Role [STRONG_INFERENCE]: GROUND EFFECT - within 0x200 units
+ * of the ground (world y - ground height +0x2e) the inverse-density value from
+ * table_lerp_1b2c0 is reduced by up to 1/8, i.e. the air acts denser near the ground.
  */
 int damp_short_if_below_0x200(int param_1,short param_2) /* Original: FUN_0000e468 */
 {
@@ -16086,6 +16092,13 @@ int compute_template_force_from_626_tail /* Original: FUN_0000e512 */ (void)
  *
  * *param_2 = template(+0x38) * (0x551a / ((param_1+0x105)>>3)) >> 8.
  * In e792, param_1 is raw table_lerp_1b2c0 (sVar15), not the e468-damped value.
+ *
+ * VERIFIED (iteration 344): independent capstone disassembly of 0xe570..0xe5a8 is
+ * identical to the C (addi.l #$105, asr #3, divs.w into 0x551a -> word quotient, ext.l,
+ * muls.l template +0x38, asr #8, store). The factor is 256 (1.0) at sea level.
+ * Role [STRONG_INFERENCE]: local_26 = rated engine power (template +0x38) corrected
+ * for altitude; update_aircraft_entity's thrust local_34 = (local_26 * throttle / 9)
+ * / airspeed above template +0x3e, else throttle * template +0x3c / 9 (static thrust).
  */
 void scale_template_field_38(short param_1,int *param_2) /* Original: FUN_0000e570 */
 {
@@ -16274,7 +16287,7 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    */
   iVar1 = *param_1;
   bVar6 = false;
-  DAT_00026004 = param_1[1]; /* external template pointer */
+  DAT_00026004 = param_1[1]; /* aircraft type record = controller +4 (definition DAT_0001b524[key]); field table in DECOMPILATION_SYMBOLS.md (iter 345) */
   local_28 = *(ushort *)(param_1 + 8);           /* attitude-related */
   local_2a = *(ushort *)((int)param_1 + 0x22);
   sVar17 = *(short *)(param_1 + 9);

@@ -6,7 +6,7 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 
 | Aspect | Conclusion | Citation |
 |--------|------------|----------|
-| **Overlay (Pacific Conflict)** | Mixed code+data; code from 0x20; no A5-relative globals; fixed base (Ghidra base 0). | [Pacific_Conflict_loader_analysis.md](../Hellcats-Over-the-Pacific_Mac_EN/ResEdit/CODE/Pacific_Conflict_loader_analysis.md) §1, §4, §5 (H3) |
+| **Overlay (Pacific Conflict)** | Mixed code+data; code from 0x20; no A5-relative globals; fixed base (Ghidra base 0). | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §1, §4, §5 (H3) |
 | **Identity mapping** | For overlay: `runtime_address = file_offset` when load base = 0. | Ibid. §6. Safe parsing: `0x20 ≤ A < 0x3e700`. |
 | **Relocation** | No reloc table. Only FUN_00000020 patches two cells: DAT_0001a7d2, DAT_0001a81c (base/handle from loader). | Ibid. §3. ResEdit/CODE/Pacific Conflict.c FUN_00000020. |
 | **CODE segments (ID01–ID09)** | Segment-local offsets; segment loaded by LoadSeg; A5 world for globals (unaff_A5 in ID02/ID05 .c). | ID02.c, ID05.c; Apple Segment Manager (Inside Mac: RTArch-118). |
@@ -15,9 +15,9 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 
 | Item | Conclusion | Citation |
 |------|------------|----------|
-| **Overlay init** | FUN_00000020(base) then FUN_00000054() set overlay globals; DAT_0001b5a0, DAT_0001b738 etc. used as mission/entity base. | [Pacific_Conflict_loader_analysis.md](../Hellcats-Over-the-Pacific_Mac_EN/ResEdit/CODE/Pacific_Conflict_loader_analysis.md) §7. ResEdit/CODE/Pacific Conflict.c 60, 73, 889, FUN_000044e8, FUN_0000740a. |
+| **Overlay init** | FUN_00000020(base) then FUN_00000054() set overlay globals; DAT_0001b5a0, DAT_0001b738 etc. used as mission/entity base. | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §7. ResEdit/CODE/Pacific Conflict.c 60, 73, 889, FUN_000044e8, FUN_0000740a. |
 | **Who loads overlay** | ID08 FUN_00000006 (resource traps 0x2a2, 0x2b2, 0x2aa) is the best candidate for loading the 255360-byte blob. | Ibid. §7. ID08.c. |
-| **ID00 role** | CODE 0 (ID00.bin): jump-table / segment-loader table for CODE 1–9, not overlay data. | [NOTES.md](NOTES.md) ID00 / loader chain. [decode_id00_loadseg.py](../tools/decode_id00_loadseg.py). |
+| **ID00 role** | CODE 0 (ID00.bin): jump-table / segment-loader table for CODE 1–9, not overlay data. | [Historical notes](research/NOTES_HISTORY.md) and the byte evidence retained below. The former one-off decoder was not retained. |
 
 ## 3) Minimal EntityState offsets (confirmed)
 
@@ -38,7 +38,7 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 - **Bytes 0x00–0x0f:** Four big-endian u32: `0x00000598`, `0x0000225e`, `0x00000578`, `0x00000020`.  
   **[RECONSTRUCTED]** [NOTES.md](NOTES.md); `xxd` on `ResEdit/CODE/ID00.bin`.
 - **From 0x12:** Repeated 8-byte pattern: `3f 3c <seg_hi> <seg_lo> a9 f0 <tail_hi> <tail_lo>`.  
-  **[RECONSTRUCTED]** [decode_id00_loadseg.py](../tools/decode_id00_loadseg.py); Apple Toolbox trap A9F0 = LoadSeg.
+  **[RECONSTRUCTED]** retained byte evidence; Apple Toolbox trap A9F0 = LoadSeg. The former one-off decoder was not retained.
 - **Interpretation:** Each record is `MOVE.W #segment_id,-(SP); _LoadSeg` (6 bytes) then one **trailing u16** (2 bytes). No following instruction consumes the tail; it is **stored data** in the same record.
 
 ### 4.2) Meaning of the trailing u16
@@ -81,7 +81,7 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 - **+4 delta:** bytes immediately before the correlated target are **UNLK (4e 5e)** then **RTS (4e 75)**; the tail points 4 bytes before LINK.
 - **+6 delta:** segment has a 6-byte header before the first LINK; tail points to that header, so first instruction at tail+6.
 
-References: Decoded `ResEdit/CODE/ID02`, `ID05`, `ID06`, `ID07` (xxd on .bin); [correlate_id00_to_functions.py](../tools/correlate_id00_to_functions.py) for deltas; [NOTES.md](NOTES.md) ID00 / loader chain.
+References: Decoded `ResEdit/CODE/ID02`, `ID05`, `ID06`, `ID07` (xxd on .bin); the correlation results preserved above; [historical notes](research/NOTES_HISTORY.md) for the ID00 investigation. The former one-off correlation script was not retained.
 
 ## 5) First proven launcher handoff chain
 
@@ -112,7 +112,7 @@ Classic Mac 68k Segment Manager uses a jump table in CODE 0; ID00.bin is that ju
 - ID00.bin bytes: `ResEdit/CODE/ID00.bin` (xxd, decode_id00_loadseg.py).
 - Tail = (entrypoint − 4) / (entrypoint − 6): decoded ID02 at 0x199e–0x19a2 (UNLK, RTS, LINK); ID05 at 0x0000–0x0006 (header, RTS, LINK); ID06 at 0x0e0c–0x0e10, 0x096a–0x096e, 0x09d4–0x09d8; ID07 at 0x018c–0x0190.
 - Jump table / LoadSeg semantics: [Inside Mac: Mac OS Runtime Architectures — The Jump Table](https://dev.os9.ca/techpubs/mac/runtimehtml/RTArch-118.html).
-- Correlation deltas: [correlate_id00_to_functions.py](../tools/correlate_id00_to_functions.py) (ID02 65/68 at +4, ID05 11/11 at +4 or +6).
+- Correlation deltas: retained results (ID02 65/68 at +4, ID05 11/11 at +4 or +6); the former one-off correlation script was not retained.
 
 ## 6) Recurring +4 / +6 delta (ID02, ID05, ID06, ID07)
 
@@ -142,7 +142,7 @@ Segment 7 has only one ID00 entry (tail 0x018c), which **is** proven (see §4.2)
 
 ## 8) Implementation handoff artifact
 
-- **[PROVEN]** A minimal machine-readable artifact for the first proven loader targets exists at [`tools/proven_loader_targets.json`](../../tools/proven_loader_targets.json).
+- **[PROVEN]** A minimal machine-readable fixture for the proven loader targets exists at [`godot/tests/fixtures/proven_loader_targets.json`](../godot/tests/fixtures/proven_loader_targets.json).
 - **[INFERRED]** Godot can consume this artifact as loader-derived metadata without embedding any guessed segment-manager behavior.
 - **[UNKNOWN]** Additional targets (including the new ID06/ID07 proven targets below) may be added to that JSON only when the maintainer re-runs the proof and updates the artifact; this document does not edit `tools/`.
 

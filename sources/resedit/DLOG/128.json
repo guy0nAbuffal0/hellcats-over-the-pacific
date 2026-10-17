@@ -15,7 +15,7 @@
     {
       "evidence": "* GetNewDialog(0x80 = DLOG 128 \"Creating Instrument Panel\", NULL, (WindowPtr)-1); FUN_0000435e(dialog); ShowWindow; DrawDialog; returns the dialog (the caller disposes it once the panel is built). Ghidra could not decode the body.",
       "function_or_context": "show_creating_panel_dialog",
-      "line": 1756,
+      "line": 1776,
       "source_path": "sources/resedit/CODE/ID02.decomp.c",
       "status": "VERIFIED"
     }

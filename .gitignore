@@ -6,3 +6,10 @@
 
 # python
 __pycache__/
+
+# macOS metadata
+.DS_Store
+
+# Rebuilt by tools/qa/test_id05_rng_c.sh
+/tools/recompilation/id05_rng/test_rng_id05
+/tools/recompilation/id05_rng/test_rng_id05.dSYM/

@@ -15,7 +15,7 @@
     {
       "evidence": "* Only when the flag A5-0xd12 is 0: GetNewDialog(0x8b = DLOG 139 \"Sound Error\", NULL, (WindowPtr)-1) ($A97C); FUN_0000435e(dialog); ShowWindow; DrawDialog ($A981); waits for the mouse button to go down (Button $A974) then DisposDialog and waits for it to be released; sets A5-0xd12 = 1 so it is shown only once. Ghidra could not decode the body.",
       "function_or_context": "show_sound_error_dialog_once",
-      "line": 1736,
+      "line": 1756,
       "source_path": "sources/resedit/CODE/ID02.decomp.c",
       "status": "VERIFIED"
     }

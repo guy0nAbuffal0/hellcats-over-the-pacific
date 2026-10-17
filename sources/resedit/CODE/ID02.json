@@ -214,553 +214,553 @@
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 758,
+        "annotation_line": 778,
         "kind": "known_function",
         "original_symbol": "FUN_00000930",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 779,
+        "annotation_line": 799,
         "kind": "known_function",
         "original_symbol": "FUN_00000a42",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 804,
+        "annotation_line": 824,
         "kind": "known_function",
         "original_symbol": "FUN_00000a86",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 826,
+        "annotation_line": 846,
         "kind": "known_function",
         "original_symbol": "FUN_00000ad0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 862,
+        "annotation_line": 882,
         "kind": "known_function",
         "original_symbol": "FUN_00000c68",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 885,
+        "annotation_line": 905,
         "kind": "known_function",
         "original_symbol": "FUN_00000ca6",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 912,
+        "annotation_line": 932,
         "kind": "known_function",
         "original_symbol": "FUN_00000d24",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 935,
+        "annotation_line": 955,
         "kind": "known_function",
         "original_symbol": "FUN_00000d3a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 996,
+        "annotation_line": 1016,
         "kind": "known_function",
         "original_symbol": "FUN_00000e3e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1020,
+        "annotation_line": 1040,
         "kind": "known_function",
         "original_symbol": "FUN_00000e9e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1045,
+        "annotation_line": 1065,
         "kind": "known_function",
         "original_symbol": "FUN_00000f52",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1063,
+        "annotation_line": 1083,
         "kind": "known_function",
         "original_symbol": "FUN_00000f74",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1081,
+        "annotation_line": 1101,
         "kind": "known_function",
         "original_symbol": "FUN_00000fa0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1103,
+        "annotation_line": 1123,
         "kind": "known_function",
         "original_symbol": "FUN_00000fd2",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1129,
+        "annotation_line": 1149,
         "kind": "known_function",
         "original_symbol": "FUN_000010ce",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1156,
+        "annotation_line": 1176,
         "kind": "known_function",
         "original_symbol": "FUN_000011ec",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1184,
+        "annotation_line": 1204,
         "kind": "known_function",
         "original_symbol": "FUN_00001308",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1217,
+        "annotation_line": 1237,
         "kind": "known_function",
         "original_symbol": "FUN_000014e6",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1233,
+        "annotation_line": 1253,
         "kind": "known_function",
         "original_symbol": "FUN_0000150a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1257,
+        "annotation_line": 1277,
         "kind": "known_function",
         "original_symbol": "FUN_000015cc",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1284,
+        "annotation_line": 1304,
         "kind": "known_function",
         "original_symbol": "FUN_00001632",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1307,
+        "annotation_line": 1327,
         "kind": "known_function",
         "original_symbol": "FUN_00001656",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1326,
+        "annotation_line": 1346,
         "kind": "known_function",
         "original_symbol": "FUN_00001680",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1342,
+        "annotation_line": 1362,
         "kind": "known_function",
         "original_symbol": "FUN_000016aa",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1372,
+        "annotation_line": 1392,
         "kind": "known_function",
         "original_symbol": "FUN_00001876",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1398,
+        "annotation_line": 1418,
         "kind": "known_function",
         "original_symbol": "FUN_0000195c",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1415,
+        "annotation_line": 1435,
         "kind": "known_function",
         "original_symbol": "FUN_0000197c",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1432,
+        "annotation_line": 1452,
         "kind": "known_function",
         "original_symbol": "FUN_000019a2",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1451,
+        "annotation_line": 1471,
         "kind": "known_function",
         "original_symbol": "FUN_000019e2",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1486,
+        "annotation_line": 1506,
         "kind": "known_function",
         "original_symbol": "FUN_00004318",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1499,
+        "annotation_line": 1519,
         "kind": "known_function",
         "original_symbol": "FUN_00001a04",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1515,
+        "annotation_line": 1535,
         "kind": "known_function",
         "original_symbol": "FUN_00001a28",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1552,
+        "annotation_line": 1572,
         "kind": "known_function",
         "original_symbol": "FUN_00001a84",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1568,
+        "annotation_line": 1588,
         "kind": "known_function",
         "original_symbol": "FUN_00001aa8",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1584,
+        "annotation_line": 1604,
         "kind": "known_function",
         "original_symbol": "FUN_00001acc",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1600,
+        "annotation_line": 1620,
         "kind": "known_function",
         "original_symbol": "FUN_00001af0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1616,
+        "annotation_line": 1636,
         "kind": "known_function",
         "original_symbol": "FUN_00001b14",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1648,
+        "annotation_line": 1668,
         "kind": "known_function",
         "original_symbol": "FUN_00001c8a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1698,
+        "annotation_line": 1718,
         "kind": "known_function",
         "original_symbol": "FUN_00001d48",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1734,
+        "annotation_line": 1754,
         "kind": "known_function",
         "original_symbol": "FUN_00001dd4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1754,
+        "annotation_line": 1774,
         "kind": "known_function",
         "original_symbol": "FUN_00001e32",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1769,
+        "annotation_line": 1789,
         "kind": "known_function",
         "original_symbol": "FUN_00001e68",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1810,
+        "annotation_line": 1830,
         "kind": "known_function",
         "original_symbol": "FUN_00001edc",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1825,
+        "annotation_line": 1845,
         "kind": "known_function",
         "original_symbol": "FUN_00001f8e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1885,
+        "annotation_line": 1905,
         "kind": "known_function",
         "original_symbol": "FUN_000020be",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1916,
+        "annotation_line": 1936,
         "kind": "known_function",
         "original_symbol": "FUN_0000212a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1940,
+        "annotation_line": 1960,
         "kind": "known_function",
         "original_symbol": "FUN_00002192",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1955,
+        "annotation_line": 1975,
         "kind": "known_function",
         "original_symbol": "FUN_00002334",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 1973,
+        "annotation_line": 1993,
         "kind": "known_function",
         "original_symbol": "FUN_000027e4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2071,
+        "annotation_line": 2091,
         "kind": "known_function",
         "original_symbol": "FUN_000029f2",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2087,
+        "annotation_line": 2107,
         "kind": "known_function",
         "original_symbol": "FUN_00002a44",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2180,
+        "annotation_line": 2200,
         "kind": "known_function",
         "original_symbol": "FUN_00004db0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2190,
+        "annotation_line": 2210,
         "kind": "known_function",
         "original_symbol": "FUN_00002bbc",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2251,
+        "annotation_line": 2271,
         "kind": "known_function",
         "original_symbol": "FUN_00002db8",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2277,
+        "annotation_line": 2297,
         "kind": "known_function",
         "original_symbol": "FUN_00002e36",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2308,
+        "annotation_line": 2328,
         "kind": "known_function",
         "original_symbol": "FUN_00002ee4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2336,
+        "annotation_line": 2356,
         "kind": "known_function",
         "original_symbol": "FUN_00002f1e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2362,
+        "annotation_line": 2382,
         "kind": "known_function",
         "original_symbol": "FUN_00002fa0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2394,
+        "annotation_line": 2414,
         "kind": "known_function",
         "original_symbol": "FUN_00002fd4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2435,
+        "annotation_line": 2455,
         "kind": "known_function",
         "original_symbol": "FUN_0000309a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2474,
+        "annotation_line": 2494,
         "kind": "known_function",
         "original_symbol": "FUN_000030fa",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2489,
+        "annotation_line": 2509,
         "kind": "known_function",
         "original_symbol": "FUN_00003174",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2504,
+        "annotation_line": 2524,
         "kind": "known_function",
         "original_symbol": "FUN_00003590",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2523,
+        "annotation_line": 2543,
         "kind": "known_function",
         "original_symbol": "FUN_000035bc",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2541,
+        "annotation_line": 2561,
         "kind": "known_function",
         "original_symbol": "FUN_000035e4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2589,
+        "annotation_line": 2609,
         "kind": "known_function",
         "original_symbol": "FUN_000036a2",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2655,
+        "annotation_line": 2675,
         "kind": "known_function",
         "original_symbol": "FUN_000039a8",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2776,
+        "annotation_line": 2796,
         "kind": "known_function",
         "original_symbol": "FUN_00003aae",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 2917,
+        "annotation_line": 2937,
         "kind": "known_function",
         "original_symbol": "FUN_00003bc4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3055,
+        "annotation_line": 3075,
         "kind": "known_function",
         "original_symbol": "FUN_00003d36",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3085,
+        "annotation_line": 3105,
         "kind": "known_function",
         "original_symbol": "FUN_00003d50",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3126,
+        "annotation_line": 3146,
         "kind": "known_function",
         "original_symbol": "FUN_00003db8",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3149,
+        "annotation_line": 3169,
         "kind": "known_function",
         "original_symbol": "FUN_00003dd0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3230,
+        "annotation_line": 3250,
         "kind": "known_function",
         "original_symbol": "FUN_00003f54",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3281,
+        "annotation_line": 3301,
         "kind": "known_function",
         "original_symbol": "FUN_00004050",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3326,
+        "annotation_line": 3346,
         "kind": "known_function",
         "original_symbol": "FUN_0000412e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3360,
+        "annotation_line": 3380,
         "kind": "known_function",
         "original_symbol": "FUN_000041a6",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3395,
+        "annotation_line": 3415,
         "kind": "known_function",
         "original_symbol": "FUN_00004242",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3422,
+        "annotation_line": 3442,
         "kind": "known_function",
         "original_symbol": "FUN_000042b0",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3480,
+        "annotation_line": 3500,
         "kind": "known_function",
         "original_symbol": "FUN_0000435e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3502,
+        "annotation_line": 3522,
         "kind": "known_function",
         "original_symbol": "FUN_0000442e",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3517,
+        "annotation_line": 3537,
         "kind": "known_function",
         "original_symbol": "FUN_00004582",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3532,
+        "annotation_line": 3552,
         "kind": "known_function",
         "original_symbol": "FUN_00004610",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3552,
+        "annotation_line": 3572,
         "kind": "known_function",
         "original_symbol": "FUN_0000462c",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3585,
+        "annotation_line": 3605,
         "kind": "known_function",
         "original_symbol": "FUN_000046b4",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3631,
+        "annotation_line": 3651,
         "kind": "known_function",
         "original_symbol": "FUN_00004738",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3662,
+        "annotation_line": 3682,
         "kind": "known_function",
         "original_symbol": "FUN_0000488a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3685,
+        "annotation_line": 3705,
         "kind": "known_function",
         "original_symbol": "FUN_000048ae",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3727,
+        "annotation_line": 3747,
         "kind": "known_function",
         "original_symbol": "FUN_000049fe",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3836,
+        "annotation_line": 3856,
         "kind": "known_function",
         "original_symbol": "FUN_00004c18",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3910,
+        "annotation_line": 3930,
         "kind": "known_function",
         "original_symbol": "FUN_00004d34",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
       },
       {
-        "annotation_line": 3928,
+        "annotation_line": 3948,
         "kind": "known_function",
         "original_symbol": "FUN_00004d6a",
         "source_path": "sources/resedit/CODE/ID02.decomp.c"
@@ -811,8 +811,8 @@
       {
         "kind": "C/decompilation export",
         "path": "sources/resedit/CODE/ID02.decomp.c",
-        "sha256": "041f729d8e939a9edbdc4cd1c067b8b53f43aaf9d195730d23c9cc9fb4e6ecf9",
-        "size": 161275
+        "sha256": "e8c7452f2fc9ed57c0c68f7f802ef6515d7022a78f1a29d963c2d64e0acf67bc",
+        "size": 162884
       }
     ],
     "resource_attributes": "0x38",

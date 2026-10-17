@@ -3,7 +3,7 @@
   "decoded_resource_count": 116,
   "enriched_resource_count": 119,
   "internal_element_count": 1096,
-  "representation_count": 279,
+  "representation_count": 292,
   "resource_count": 119,
   "resource_type_count": 30,
   "resource_types": [
@@ -804,8 +804,8 @@
     {
       "kind": "unassociated supporting file",
       "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-      "sha256": "f0aff14221507db56a706881c61d06f04bec4ca7efb1020ad949490b09605add",
-      "size": 1058520
+      "sha256": "eb4c91ae63f9d393bc6e95daa75a62c290709b12ab3c74c6d246658844ab874c",
+      "size": 1093065
     },
     {
       "kind": "unassociated supporting file",
