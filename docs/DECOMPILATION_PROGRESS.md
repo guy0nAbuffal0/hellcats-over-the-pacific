@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 165
+**Last iteration:** 166
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `f156ee33` (`*/5 * * * *`) activated 2026-10-16 in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -12,7 +12,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | ID01.c | 6 | 6 | 0 | 0 | 0 | 0 | 0 |
 | ID02.c | 125 | 61 | 0 | 0 | 64 | 0 | 0 |
-| ID03.c | 45 | 33 | 1 | 0 | 11 | 0 | 0 |
+| ID03.c | 45 | 33 | 0 | 0 | 12 | 0 | 0 |
 | ID04.c | 59 | 59 | 0 | 0 | 0 | 0 | 0 |
 | ID05.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
 | ID06.c | 24 | 0 | 0 | 0 | 24 | 0 | 0 |
@@ -20,7 +20,7 @@ Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 | ID08.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | ID09.c | 4 | 0 | 0 | 0 | 4 | 0 | 0 |
 | Pacific Conflict.c | 443 | 331 | 0 | 0 | 106 | 0 | 6 |
-| **TOTAL** | **736** | **490** | **1** | **0** | **239** | **0** | **6** |
+| **TOTAL** | **736** | **490** | **0** | **0** | **240** | **0** | **6** |
 
 Inventory correction (iteration 100): five multiline definitions were previously
 omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
@@ -28,8 +28,8 @@ omitted: ID02 `FUN_00003d50` (:2126), `FUN_00003f54` (:2231),
 `FUN_00010360` (:15361). Totals count exclusive processing statuses; renamed
 functions with annotations remain RENAMED. The two blocked labels `$E352` and
 `$1A186` remain documented below but are not function definitions and do not
-contribute to function totals. Remaining work: 490 NOT_STARTED + 1 INVESTIGATING + 6 BLOCKED (iteration 165);
-239 RENAMED still require independent verification before VERIFIED status.
+contribute to function totals. Remaining work: 490 NOT_STARTED + 6 BLOCKED (iteration 166);
+240 RENAMED still require independent verification before VERIFIED status.
 
 Full machine-readable inventory: [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json)  
 Protected original checksums: [`DECOMPILATION_PROTECTED_CHECKSUMS.sha256`](DECOMPILATION_PROTECTED_CHECKSUMS.sha256)  
@@ -278,7 +278,7 @@ Symbol map: [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md)
 | `FUN_00000912` (ID03) | `draw_vector_number` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | stroke font A5−0x1fde[digit]; scale_design_4800_pen_centred | Loop tail not exported | 161 (2026-10-17) | C (truncated) |
 | `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | ID03 | RENAMED | STRONG INFERENCE mechanics | `ID03.c` | `ID03.decomp.c` | ovals, clip region, 4-phase spoke A5−0x2112, size A5−0x2114; 5 callers in FUN_00000514 | What it depicts | 163 (2026-10-17) | Full Capstone decode |
 | `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | ID03 | RENAMED | STRONG INFERENCE mechanics / HYPOTHESIS purpose | `ID03.c` | `ID03.decomp.c` | black disc + grey ring; up to 5 spinning indicators at cos45 offsets by flag bits | Bit-4 position; caller | 164 (2026-10-17) | Capstone |
-| `FUN_00000a3c` (ID03) | UNKNOWN (identifier retained) | ID03 | INVESTIGATING | HYPOTHESIS (supersampling filter) | `ID03.c` | `ID03.decomp.c` (header) | 1-bit port rows; mask table A5−0x1fb6; output buffer; callers 0x152c/0x37fc/0x4b02 | Loop tail beyond 0xbf0 | 165 (2026-10-17) | Partial Capstone reading |
+| `FUN_00000a3c` (ID03) | `antialias_downsample_bw_3x` | ID03 | RENAMED | STRONG INFERENCE | `ID03.c` | `ID03.decomp.c` | 7×7 Gaussian-like kernel /969; nearest_palette_index_rgb; MoveTo+Line(0,0) pixel plot; out buffer | x0/y0 h/v roles | 166 (2026-10-17) | Full Capstone decode |
 | `FUN_00000728` (ID05) | `ansi_rand` | ID05 | RENAMED | PROVEN | `ID05.c:130-137` | `ID05.decomp.c` | seed A5−0x6c | — | 118 (2026-10-16) | LCG constants match bytes (MULU.L/ADDI.L); token diff = renames |
 | `FUN_00000746` (ID05) | `ansi_srand` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:141-148` | `ID05.decomp.c` | seed A5−0x6c | No callers found | 118 (2026-10-16) | Token diff = renames |
 | `FUN_000007f6` (ID05) | `poison_overlay_bytes` | ID05 | RENAMED | STRONG INFERENCE | `ID05.c:191-207` | `ID05.decomp.c` | `ansi_rand`; table A5−0xb4; caller ID08 0x246 | Copy-protection purpose HYPOTHESIS | 118 (2026-10-16) | DIVUL.L decoded (68020); JT $53a resolved |
@@ -1593,8 +1593,19 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
   comment only (no token change).
 - Validation: token diff unchanged; Ghidra comments intact; hashes OK.
 
-**Next iteration target:** finish ID03 `FUN_00000a3c` (loop tail and output
-format from 0xbf0), then `FUN_00003c02` (first instrument caller).
+### Iteration 166 — 2026-10-17
+
+- Verified 32 protected hashes; uncommitted iteration 165 preserved.
+- Finished ID03 `FUN_00000a3c`: per output pixel a 7×7 window of the 1-bit
+  source with a symmetric Gaussian-like kernel (total weight 969 = 0x3c9),
+  level = sum·0xffff/969 → grey RGB → nearest_palette_index_rgb →
+  set_draw_color_index → plot with MoveTo + Line(0,0); source advances 3
+  pixels / 3 rows per output pixel/row; optional index output buffer.
+  Renamed antialias_downsample_bw_3x; INVESTIGATING back to 0.
+- Validation: token diff = renames only; Ghidra comments intact; hashes OK.
+
+**Next iteration target:** ID03 `FUN_00003c02` (first instrument routine using
+draw_ring_with_status_indicators).
 
 ## Resuming the five-minute workflow
 

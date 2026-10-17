@@ -417,21 +417,30 @@ void draw_vector_number /* Original: FUN_00000912 */ (undefined4 param_1,undefin
 
 /*
  * Original: FUN_00000a3c; source: ID03.c:294.
- * Status: INVESTIGATING (iteration 165); identifier retained. Ghidra exported
- * no body; code spans file 0xa3c to about 0x146a.
- * Partial byte reading [PROVEN for the decoded part]:
- *   PenPat(QD black A5-0x161c); src = GrafPtr arg [8(A6)]: rowBytes = word +6,
- *   base = long +2 (portBits); seven row pointers base + k*rowBytes (k = 0..6);
- *   if (long $14 != 0) clear $12 bytes at $14 (output buffer);
- *   for each x: mask = word table A5-0x1fb6[x & 7] (bit within byte x >> 3);
- *     sum weighted bits of the rows at x (weights 1, 3, 4, 3, 1 ... seen);
- *     same for x + 1, ...  [loop continues beyond 0xbf0, not yet read].
- * [HYPOTHESIS] Supersampling filter: converts a 1-bit offscreen bitmap (drawn
- * by the caller, e.g. FUN_000032b8 via new_offscreen_bw_port) into
- * multi-level (grey) values for anti-aliased output.
+ * Recovered name: antialias_downsample_bw_3x [STRONG INFERENCE]
+ * (iteration 166; INVESTIGATING in iteration 165). Ghidra exported no body.
+ * Bytes 0xa3c..0x1468 [PROVEN]. Args: GrafPtr src [8] (1-bit port: base +2,
+ * rowBytes +6), word x0 [$c], word y0 [$e], word rows [$10], word cols [$12],
+ * byte *out [$14] (optional, 0 = none).
+ *   PenPat(QD black); seven source row pointers base + k*rowBytes (k = 0..6);
+ *   row step = 3 * rowBytes; if (out) clear cols bytes of out;
+ *   for row in 0 .. rows-2:
+ *     for i in 0 .. cols-1 (source x advances by 3 per output pixel):
+ *       sum = sum over a 7x7 window of source bits (mask table A5-0x1fb6[x&7],
+ *             byte x>>3) times a symmetric kernel peaking at the centre
+ *             (e.g. 8,21,29,21,8 / 21,54,73,54,21 / 29,73,97,73,29 ...);
+ *       level = sum * 0xffff / 0x3c9   (969 = total kernel weight; MULU.L /
+ *             DIVS.L) -> RGB grey at -0x2c(A6);
+ *       c = nearest_palette_index_rgb(&rgb); set_draw_color_index(c) (JT $36a);
+ *       MoveTo(x0 + i, y0 + row) $A893; Line(0, 0) $A892  (plot one pixel);
+ *       if (out) out[i] = c;
+ *     advance all row pointers by 3 * rowBytes.
+ * Gaussian-weighted 3x supersampling filter: renders a 1-bit offscreen image
+ * (e.g. from new_offscreen_bw_port) as anti-aliased grey palette pixels.
+ * Exact x0/y0 vs h/v roles per MoveTo push order [STRONG INFERENCE].
  * Callers [PROVEN, BSR scan]: ID03 file 0x152c, 0x37fc (FUN_000032b8), 0x4b02.
  */
-void FUN_00000a3c(void)
+void antialias_downsample_bw_3x /* Original: FUN_00000a3c */ (void)
 
 {
                     // WARNING: Bad instruction - Truncating control flow here
