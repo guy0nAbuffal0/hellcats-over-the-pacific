@@ -105,14 +105,20 @@ signed-char and truncation cases. Passing those cases is behavioral evidence
 because their expected operation comes from the independent disassembly, not
 from executing the GDScript implementation to manufacture expectations.
 
+The `reset_radar_tracks` (`FUN_0001776a`) slice preserves the original three
+stores in order: two 32-bit clears at `DAT_00026672` and `DAT_00026676`, then
+an 8-bit changed flag store at `_DAT_0002666e`. Independent Capstone evidence
+recorded with the decompiled function establishes those widths and addresses;
+the deterministic test initializes nonzero counts and sentinel neighbor bytes.
+
 The manifest records the exact source-function SHA-256, source/original names,
 address, target and independent milestone booleans. Current strict coverage is:
 
 - Decompiled functions: 736
-- Mapped/translated: 2
-- Not ported: 734
-- Structurally verified: 2
-- Behaviorally verified with deterministic tests: 2
+- Mapped/translated: 3
+- Not ported: 733
+- Structurally verified: 3
+- Behaviorally verified with deterministic tests: 3
 - Integrated into the playable runtime: 0
 - Verified against original Macintosh runtime observations: 0
 
@@ -149,10 +155,11 @@ open-addressing pointer table, record offsets +0/+4, the original decompiler
 locals and signed 256-probe counter. `Memory68k` supplies bounds-checked packed
 big-endian byte/word/long access instead of a semantic dictionary substitute.
 
-After this slice the generated strict coverage is 2 translated, structurally
-verified and behaviorally verified functions; 734 remain unported. Neither
-translation is integrated or verified against an observed Macintosh runtime.
+After this slice the generated strict coverage is 3 translated, structurally
+verified and behaviorally verified functions; 733 remain unported. None of the
+translations is integrated or verified against an observed Macintosh runtime.
 
-The next smallest concrete slice is `reset_radar_tracks` (`FUN_0001776a`), a
-verified two-global reset that can extend the same packed-memory state without
-adding speculative structure or allocator behavior.
+The next smallest concrete slice is `set_view_distance` (`FUN_0001771a`), a
+verified three-global update adjacent to the radar reset. It can reuse the same
+packed-memory state and requires explicit signed 32-bit left-shift/wrap behavior
+for `param_1 << 1`.

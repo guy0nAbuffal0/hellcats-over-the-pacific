@@ -6,6 +6,9 @@ extends RefCounted
 const C68kScript := preload("res://strict_port/compat/c68k.gd")
 
 const DAT_0001bdbc: int = 0x1bdbc
+const _DAT_0002666e: int = 0x2666e
+const DAT_00026672: int = 0x26672
+const DAT_00026676: int = 0x26676
 
 var memory
 
@@ -35,3 +38,10 @@ func find_contact_record(param_1: int, param_2: int) -> int:
 			break
 		uVar2 = C68kScript.u32((C68kScript.s16(uVar2) + 1) & 0xff)
 	return piVar1
+
+func reset_radar_tracks() -> void:
+	assert(memory != null, "reset_radar_tracks requires original global memory")
+	memory.write_u32(DAT_00026672, 0)
+	memory.write_u32(DAT_00026676, 0)
+	memory.write_u8(_DAT_0002666e, 1)
+	return

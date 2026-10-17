@@ -2,7 +2,7 @@
 
 Persistent checkpoint for the recurring 5-minute semantic reconstruction loop.
 
-**Last iteration:** 329
+**Last iteration:** 332
 **Last iteration date:** 2026-10-17
 **Loop:** session-only CronCreate job `ee7d927a` (`*/5 * * * *`, activated 2026-10-17 after `f156ee33` was cancelled) in a Claude Code desktop session; it ends when that session closes and auto-expires after 7 days. Otherwise resume manually using the instructions below.
 
@@ -4064,9 +4064,80 @@ All other inventoried functions: **NOT_STARTED** (see inventory JSON).
 - Validation: comment-only; tokens identical to HEAD (iteration-326 rename
   mapped); `git diff --check` clean.
 
-**Next iteration target:** the carrier deck face's surface code: locate the
-carrier model data (template / shape for key 0x15) and read the +0x16 bytes of
-its tag-1 / tag-3 faces, to settle 0x30 vs 0x60 for the deck.
+
+### Iteration 330 — 2026-10-17
+
+- Verified 32 protected hashes; others' uncommitted strict-port / tests /
+  tools work untouched.
+- Data evidence (read-only parse of `sources/hellcats/Pacific Conflict`):
+  build_object_poly_buffers unpacks face byte +9 into surface code (high
+  nibble, face +0x16) and tag (low nibble, face +0x17) [PROVEN].
+- A scan of kind-2 descriptors (0x22 bytes, then (desc+0x1a + desc+0x1e) × 12
+  vectors, then packed faces; 227 parse cleanly) finds four type-0x15
+  carriers: 0x2409a / 0x33cb0 / 0x36142 / 0x3c402.
+  - Their deck faces use codes 0x30 / 0x30 / 0x60 / 0x60.
+  - Only 0x2409a and 0x36142 have a tag-3 (arresting) face; the other two
+    leave controller +0x52 = -1.
+  - So 0x30 and 0x60 are both deck-type hard surfaces [PROVEN for the
+    carriers].
+- Census of the other codes: 0x40 is the most common static code (grass /
+  islands); 0x20 appears only on type 0x11.
+- Code 0x80 exists in the data. Read as a signed char it becomes -128, which
+  no consumer compares.
+- Comment-only changes: the build_object_poly_buffers header and the
+  surface_type_at_point table.
+- Godot sync impact: none (no rename). A port of the model loader must split
+  byte +9 into high and low nibbles.
+- Validation: comment-only; tokens identical to HEAD (iteration-326 rename
+  mapped); `git diff --check` clean.
+
+
+### Iteration 331 — 2026-10-17
+
+- HEAD moved to 81d735a (user commit including iterations up to 329); the
+  token baseline was regenerated from it. 32 protected hashes OK.
+- P1: probe_nearest_facility_kind (FUN_00000354). Bytes confirm key 0x12 ->
+  0x100 and key 0x13 -> 0x200, nearest within range +0xc [PROVEN]. Both keys
+  use create_aircraft_spawner_controller (air bases).
+- 0x100 / key 0x12 = enemy base: landing there on a hard surface gives pilot
+  status 3 (POW) [STRONG_INFERENCE].
+- 0x200 / key 0x13 = friendly base: kills near it count as friendly kills,
+  and runway approach guidance only targets it [STRONG_INFERENCE].
+- This corrects the earlier "base / carrier" reading of 0x12 / 0x13 in
+  WORLD_SCENERY_DATA_LOCATIONS.md: the carrier is key 0x15 (iteration 326).
+  That doc was not edited, only noted here.
+- Comment-only; no rename (name still accurate).
+- Godot sync impact: none (no rename). Port code that treats 0x100 / 0x200
+  as base / carrier should read enemy / friendly base.
+- Validation: tokens identical to the new HEAD; `git diff --check` clean.
+
+
+### Iteration 332 — 2026-10-17
+
+- 32 protected hashes OK; tree has only my three files modified (plus an
+  untracked sources/.DS_Store, not mine, left alone).
+- P1 / P2: process_flight_input_and_outcome (FUN_0000740a) landing-outcome
+  block 0x8108..0x8322 checked against the bytes; the C matches. Outcome
+  code = facility kind (0x100 enemy / 0x200 friendly) plus low bits:
+  - |1: friendly-base landing (once, host +0xce > 0);
+  - |0xa: captured at an enemy base (host +0xd4 = 3, POW);
+  - |8: crash or ditch off a hard surface, with a random POW (3) / MIA (5)
+    pilot fate whose odds depend on the base kind;
+  - |9: ordinary landing end;
+  - |2: rolling on a hard surface writes the fuel % and bombs back into host
+    +0xb6 / +0xb8 (the inverse of load_player_fuel_and_bombs).
+  Offsets, constants and odds PROVEN; meanings STRONG_INFERENCE.
+- Ghidra's label LAB_00008324 is off by one instruction (the bytes branch to
+  the clr.l d6 at 0x8322), but the C keeps `uVar6 = 0` after the label, so the
+  C is equivalent.
+- Section-level check only: the function stays RENAMED (not VERIFIED).
+- Godot sync impact: none (no rename). A port of mission end must keep the
+  OR-composition of facility kind and outcome bits.
+- Validation: comment-only; tokens identical to HEAD; `git diff --check` clean.
+
+**Next iteration target:** conclude_mission (ID02) handling of the outcome
+code: map the low nibbles 1 / 2 / 8 / 9 / 0xa and facility bits to the host
+summary paths, to confirm the meanings inferred here.
 
 ## Resuming the five-minute workflow
 

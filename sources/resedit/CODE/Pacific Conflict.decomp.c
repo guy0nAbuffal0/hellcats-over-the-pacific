@@ -1125,6 +1125,20 @@ undefined4 any_mission_kills_recorded /* Original: FUN_00000334 */ (void)
  * 0x200 before accepting type==2 pads.
  *
  * Evidence: Capstone; 12 BSR sites; runway path @0x19CCE.
+ *
+ * Iteration 331 [PROVEN bytes: cmpi.w #$12 / #$13 at 0x382 / 0x388, 0x3ce -> move.l
+ * #$100, 0x3e4 -> move.l #$200; range test cmp.l $c(a2)]: considers world objects
+ * whose definition key is 0x12 or 0x13 (both created by create_aircraft_spawner_
+ * controller, i.e. air bases that launch aircraft) within their range +0xc, and
+ * returns the nearest one's kind. Meaning [STRONG_INFERENCE, three consumers agree]:
+ *   0x100 = key 0x12 = ENEMY air base: process_flight_input_and_outcome sets pilot
+ *           status 3 (POW, STR# 129 status group) when the player lands on a hard
+ *           surface (codes 0x30 / 0x60 / 0x70) near it;
+ *   0x200 = key 0x13 = FRIENDLY air base: tally_destroyed_entity counts kills near
+ *           it as friendly kills; find_nearest_runway_approach_ends only guides to a
+ *           0x200 base's runway ('p' quads).
+ * Key 0x12 objects also get flag-long bit 20 (proximity collision) in
+ * create_aircraft_spawner_controller.
  */
 undefined4 probe_nearest_facility_kind(void) /* Original: FUN_00000354 */
 {
@@ -6709,8 +6723,18 @@ void instantiate_mission_pool_slot(uint param_1,int param_2,int param_3) /* Orig
  * If (obj+6)&2: trailer after polys writes 0..field_38-1 as u16 indices.
  * Sets DAT_0001daa2 = 1.
  *
- * Unknown: exact meaning of record flag nibbles at +0x16/+0x17; multi-poly
- * consumers beyond 02bd8/04958.
+ * Unknown: multi-poly consumers beyond 02bd8/04958.
+ *
+ * Iteration 330 [PROVEN, C + data]: packed face byte +9 splits into face +0x16 =
+ * high nibble (surface code, 0x00..0xf0, see surface_type_at_point) and face
+ * +0x17 = low nibble (tag: 1 = carrier deck, 3 = carrier arresting zone, read by
+ * carrier_deck_contact; tag 1 also occurs on non-carrier models). Packed face =
+ * long +0, bytes +4..+7, vertex count byte +8, code|tag +9, long +0xa (detail
+ * threshold -> face +0x1c), then count words of vertex indices. The packed faces
+ * follow the 0x22-byte kind-2 descriptor and (desc +0x1a + desc +0x1e) 12-byte
+ * vectors. In the data file there are four type-0x15 (carrier) descriptors at
+ * 0x2409a / 0x33cb0 / 0x36142 / 0x3c402: deck (tag 1) codes 0x30, 0x30, 0x60, 0x60;
+ * only 0x2409a and 0x36142 have a tag-3 face.
  */
 void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004808 */
 {
@@ -9060,6 +9084,34 @@ void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
 /* Original: FUN_0000740a; source: Pacific Conflict.c. Recovered name: process_flight_input_and_outcome [STRONG INFERENCE] (iteration 236).
  * Ghidra C reviewed (function at overlay offset 0x740a).
  * Host hook A5-0x106a, called by run_flight_session as (char, event kind) for key events (kind 3 = keyDown, 4 = keyUp) and (0, 0) between frames; a non-zero result ends the flight and is the outcome code that run_flight_session passes to conclude_mission. Outline from the Ghidra C (Pacific Conflict.decomp.c lines 8746..9545): host mode +0x98 / view modes DAT_0001d858 7..9 gate early exits; in modes 8 / 9 only Esc / quote / backquote end the flight (result 3). Key switch (param_1, characters): 0x1c / 0x1d and 0x1e / 0x1f (the arrow keys) step the view angles DAT_00024cfc by 0x800 and DAT_00024cf8 by 0x540; + / = and - / _ (throttle up / down?), . > Z z and / ? X x (paired controls), digits 0..9 (view or instrument selection; 5 stores DAT_00020b2a into host +0x33e), letters A B C E F G J M R T V (and lower case), P / p -> result 4 (the host shows the Paused dialog), Esc / backquote / tilde -> result 3; space on keyUp. After the keys: view offsets saved to host +0x33e / +0x340 / +0x342; then the outcome logic: probe_nearest_facility_kind (0x100 / 0x200 near facilities) combined with the host status word +0xd4 (1, 3, 4, 5), +0xce and the player state builds codes such as 0x201 / 0x10a; on landing the fuel % and bomb count are written back to host +0xb6 / +0xb8 (see load_player_fuel_and_bombs); a final switch (1..9) handles the remaining codes. Exact per-key actions and outcome codes are not fully decoded [STRONG INFERENCE role, HYPOTHESIS for the individual key meanings].
+ *
+ * Landing-outcome block 0x8108..0x8322, iteration 332 (checked against the bytes; the C
+ * matches). Ghidra's LAB_00008324 sits after the `clr.l d6` at 0x8322, and the C puts
+ * `uVar6 = 0` right after the label, so the two are equivalent.
+ * Evaluated only when the player's engine RPM +0x66a == 0. uVar6 starts as
+ * probe_nearest_facility_kind() (0x100 enemy base, 0x200 friendly base, 0); the low
+ * bits added here form the outcome code returned to run_flight_session / conclude_mission:
+ *   state DAT_0001b868 == 2 (rolled to a stop after touchdown); reset it and _DAT_0001b73c:
+ *     |1  (0x201)  friendly base, hard surface (0x30 / 0x60 / 0x70), host word +0xce > 0,
+ *                  once per flight (_DAT_0001b86a);
+ *     |0xa (0x10a) enemy base, hard surface: host +0xd4 = 3 (pilot POW);
+ *     |8          not a hard surface and (status +0x684 & 0x3fe damage bits, or both
+ *                  fuel tanks +0x67d / +0x67e empty): random pilot fate in host +0xd4,
+ *                  3 = POW / 5 = MIA, odds per base kind (enemy: 1/2 POW, else 1/8
+ *                  MIA; friendly: 1/8 MIA; none: 1/4 MIA, else 1/4 POW);
+ *     |9          hard surface without special case, or intact off-surface landing
+ *                  (enemy base: 1/4 POW; no base: only if any_mission_kills_recorded,
+ *                  else no outcome);
+ *   not stopped, rolling on a hard surface with status bit 6 (+0x684 & 0x40) and
+ *   _DAT_0001b73c == 0:
+ *     |2          host +0xb6 = fuel % ((+0x67d + +0x67e) * 100 / capacity type +0x1c),
+ *                  host +0xb8 = bombs +0x67c (sign-extended byte); _DAT_0001b73c = 1 -
+ *                  the inverse of load_player_fuel_and_bombs (a refuel / rearm
+ *                  snapshot) [STRONG_INFERENCE].
+ * Offsets, constants, odds and widths are PROVEN (bytes). The outcome meanings are
+ * STRONG_INFERENCE: status 3 / 5 = POW / MIA from the STR# 129 status group.
+ * Note: Ghidra writes DAT_0001b738 + 0xb / + 0x1a1 / + 0x19f on an int *: the byte
+ * offsets are +0x2c / +0x684 / +0x67c.
  */
 uint process_flight_input_and_outcome /* Original: FUN_0000740a */ (int param_1,int param_2)
 
@@ -20889,8 +20941,13 @@ void point_over_face_xz /* Original: FUN_000132c8 */ (int *param_1,int param_2)
  *             4-vertex faces coded 'p' on a facility of kind 0x200 -> RUNWAY
  *             [STRONG_INFERENCE].
  * Values and compares are PROVEN (C and bytes cmpi.w #$30 etc.); the surface names
- * are inferences. The carrier deck uses whatever its deck face +0x16 holds (data,
- * not yet read).
+ * are inferences. Iteration 330 (data census of the 227 parsable kind-2 descriptors
+ * in the Pacific Conflict file): carrier decks (type 0x15, tag-1 faces) use 0x30 or
+ * 0x60 [PROVEN] -> 0x30 / 0x60 = deck-type hard surfaces (also on 4 static objects
+ * each); 0x40 on 48 descriptors (47 static), 0x10 on 15, 0x20 only on type 0x11,
+ * 0x50 on 14 static, 0x70 on 2 carriers + 4 static. Code 0x80 also occurs (3 static
+ * + 1 carrier). As a signed char it returns -128 here and matches none of the
+ * consumers' compares.
  */
 int surface_type_at_point /* Original: FUN_00013346 */ (int param_1,undefined4 param_2,int param_3)
 

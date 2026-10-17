@@ -25,6 +25,7 @@ EXPECTED_RUNNER_PATHS = [
     "res://tests/strict_port/test_memory_68k.gd",
     "res://tests/strict_port/test_contact_pair_hash.gd",
     "res://tests/strict_port/test_find_contact_record.gd",
+    "res://tests/strict_port/test_reset_radar_tracks.gd",
     "res://tests/unit/test_rng.gd",
     "res://tests/unit/test_rng_overlay_11564.gd",
     "res://tests/unit/test_flight_math.gd",
