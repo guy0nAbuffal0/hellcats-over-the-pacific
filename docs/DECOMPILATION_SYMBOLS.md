@@ -1,7 +1,8 @@
 # Hellcats Over the Pacific — decompilation symbol map
 
-Maps original Ghidra identifiers to recovered names. Every entry must cite evidence.
-Do not treat example names from planning docs as approved until revalidated here.
+Maps original Ghidra identifiers to recovered names. Every entry must cite
+evidence. Do not treat example names from planning docs as approved until
+revalidated here.
 
 ## Functions
 
@@ -997,3 +998,5 @@ its dropped arguments are listed here.
 | `DAT_00024d1a` / `DAT_00024d18` (Pacific Conflict) | camera pitch / camera heading (words, 0..0x3fff); DAT_0001d810 / DAT_0001d80e = their negatives | PROVEN | corrects the  heading / pitch order: attitude_from_velocity's 7th output is the heading (from x / z), its 6th the pitch (from y). |
 | `attitude_from_velocity` (FUN_00001f22) | `abs_int` ×2 (Ghidra FUN_00002de8) | abs_int(x), abs_int(z) | bytes 0x1f3e..0x1f50 |
 | `atan2_fixed14` (FUN_000102d6) | `abs_int` ×2 (Ghidra FUN_00002de8) | abs_int(param_1), abs_int(param_2) | bytes 0x102e2..0x102f6 |
+| `apply_relative_heading_steer` (FUN_000109ba) | `abs_int` ×2 (Ghidra FUN_00002de8) | abs_int(param_5), abs_int(param_4) | bytes 0x109d4..0x109ee |
+| aircraft controller +0x20 / +0x22 / +0x24 (Pacific Conflict) | attitude words: pitch / heading / bank (roll), 0x4000 per turn | STRONG_INFERENCE | +0x22 heading (camera and steer code); +0x24 bank from apply_relative_heading_steer's clamped bank target; order matches build_attitude_matrix_3ang. |

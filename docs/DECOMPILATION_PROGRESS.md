@@ -2,9 +2,10 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** `apply_relative_heading_steer` (FUN_000109ba), the only `atan2_fixed14`
-caller: verify it against the bytes. `atan2_fixed14` is verified, and its inputs stay
-within the tangent table except for a component of -0x8000.
+**Next target:** `build_relative_steer_sample` (`FUN_00010360`), which builds
+the vector and range that `apply_relative_heading_steer` consumes: verify it
+against the bytes. `apply_relative_heading_steer` is verified (bank-to-turn AI
+steering).
 
 The angle path feeding `attitude_from_velocity` is established:
 `acos_fixed14` and `atan_fixed14` match independent disassembly, and their

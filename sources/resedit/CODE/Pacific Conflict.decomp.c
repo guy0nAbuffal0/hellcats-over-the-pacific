@@ -18395,6 +18395,17 @@ LAB_00010700:
  * Unknown: meaning of +0x61a/c/e beyond
  * filtered steer state.
  */
+/* VERIFIED: bytes 0x109ba..0x10b2c match the C. Call-argument correction: the two
+ * FUN_00002de8() calls are abs_int(param_5) then abs_int(param_4). Behaviour:
+ *   small commands (|p4|, |p5| <= 0x500, p2 >= 0): elevator = 5*p4 - 4*prev(+0x61a),
+ *     aileron = 2*p5 - prev(+0x61c), rudder = aileron >> 4 (word ops);
+ *   else bank-to-turn: target = +0x24 + fold(atan2(v+2, v+6)), clamped to +-limit with
+ *     limit 0 (p2 < 0), p2 (< 0x1000), 0x1000 + (p2 - 0x1000) / 4 (< 0x5000), no clamp
+ *     beyond; aileron = fold(target - +0x24), smoothed (3d - 2*prev(+0x61e)) / 2 when
+ *     |d| <= 0x280; elevator = cos_fixed14(d) / 8; rudder = 0; +0x61e = d.
+ *   +0x61a / +0x61c = p4 / p5; enqueue_control_inputs_avg4(aircraft, rudder, elevator,
+ *     aileron). So +0x24 is the bank (roll) angle [STRONG_INFERENCE].
+ */
 void apply_relative_heading_steer(int param_1,int param_2,int param_3,short param_4,short param_5) /* Original: FUN_000109ba */
 {
   ushort uVar1;
