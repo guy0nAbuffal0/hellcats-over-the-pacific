@@ -266,9 +266,9 @@ revalidated here.
 | `FUN_00019aa2` (Pacific Conflict) | `spawn_camera_relative_object` | STRONG INFERENCE | pool spawn at camera + offset. |
 | `FUN_00019b30` (Pacific Conflict) | `follow_camera_offset` | STRONG INFERENCE | keep object at camera + offset. |
 | `FUN_000018d6` (Pacific Conflict) | `overlay_initialise` | STRONG INFERENCE | RNG seed, subsystem init, light vector. |
-| `FUN_00001958` (Pacific Conflict) | `heap_sbrk` | STRONG INFERENCE | arena = host A5-0x1040 work buffer. |
-| `FUN_00001974` (Pacific Conflict) | `heap_new_size_class_block` | STRONG INFERENCE | 1 << n bytes, header = class. |
-| `FUN_0000199a` (Pacific Conflict) | `heap_add_large_block` | STRONG INFERENCE | n * 8 bytes into the large-block list. |
+| `FUN_00001958` (Pacific Conflict) | `heap_sbrk` | STRONG INFERENCE | arena = host A5-0x1040 work buffer; returns base + old break, no limit check, never -1. Body VERIFIED vs bytes. |
+| `FUN_00001974` (Pacific Conflict) | `heap_new_size_class_block` | STRONG INFERENCE | 1 << n bytes, header = class; returns -1 (not NULL) on failure. Body VERIFIED vs bytes. |
+| `FUN_0000199a` (Pacific Conflict) | `heap_add_large_block` | STRONG INFERENCE | n * 8 bytes into the large-block list; returns the cursor re-read after heap_free_coalesce. Body VERIFIED vs bytes. |
 | `FUN_000019b0` (Pacific Conflict) | `heap_add_large_block_tail` | STRONG INFERENCE | false split of heap_add_large_block. |
 | `FUN_00003732` (Pacific Conflict) | `overlay_init_noop` | PROVEN | empty. |
 | `FUN_00003734` (Pacific Conflict) | `init_code_pointer_tables` | STRONG INFERENCE mechanics | two 2048-entry code-address tables. |
@@ -304,7 +304,8 @@ revalidated here.
 | `FUN_0001320a` (Pacific Conflict) | `project_face_vertices_xz` | VERIFIED | (v >> shift) - origin into +2 / +10. |
 | `FUN_000131ac` (Pacific Conflict) | `project_face_vertices_xy` | VERIFIED | into +2 / +6. |
 | `FUN_00013268` (Pacific Conflict) | `project_face_vertices_yz` | VERIFIED | into +6 / +10. |
-| `FUN_00014af2` (Pacific Conflict) | `release_fractal_reference` | STRONG INFERENCE | decrements / frees shared block +0x2c; "Deactivating Fractal" message. |
+| `FUN_00014af2` (Pacific Conflict) | `release_fractal_reference` | STRONG INFERENCE | decrements / frees shared block +0x2c; "Deactivating Fractal" message. Body VERIFIED vs bytes; printf takes only the string. |
+| `_DAT_0001c1bc` (Pacific Conflict) | shared-block deferred-free flag (word) | STRONG INFERENCE | set by release_fractal_reference when a counter reaches 0; read by sort_group_parts_by_distance (frees zero-count blocks); cleared by overlay_frame_step. |
 | `FUN_000132c8` (Pacific Conflict) | `point_over_face_xz` | STRONG INFERENCE | entity x / z origin, project_face_vertices_xz + point_in_polygon_xz. |
 | `FUN_00014bea` (Pacific Conflict) | `carry_attached_objects` | STRONG INFERENCE | rotates / lowers or removes nearby entities of template types 7 / 8 / 0x1a / 0x1b. |
 | `FUN_0001562e` (Pacific Conflict) | `clip_polygon_y_nonneg` | STRONG INFERENCE | clip against y = 0 (keep y >= 0), returns clipped flag. |
@@ -682,8 +683,8 @@ revalidated here.
 | `FUN_000044a4` | `dispatch_entity_tick` | STRONG INFERENCE | `@0x44A4`: call `apply_entity_mission_rates`; optional `entity+4` bit `0x40` from linked type word `5` vs mission `+0xB0`. |
 | `FUN_0000435a` | `apply_entity_mission_rates` | STRONG INFERENCE | `@0x435A`: scale mission-table rates into `entity+0xC`; kind-2 path-0 updates `*(entity+0x48)+0x1C` slots. |
 | `FUN_00005df8` | `clear_pending_entity_slots` | VERIFIED | `@0x5DF8`: for `i=0..6`, if `DAT_0001bc64[i]` non-null call `dispatch_entity_cleanup` then clear slot. |
-| `FUN_0000528a` | `dispatch_entity_cleanup` | STRONG INFERENCE | `@0x528A`: skip if `flags_07&2`; else `retire_entity` or type-2 soft (`flags\|0x42`, `field_3c=DAT_0001b838`). |
-| `FUN_000051ec` | `retire_entity` | STRONG INFERENCE | `@0x51EC`: clear b880/bc64/table; `+0x18=1e9`; `flags\|2`; null `**(+8)`; `DAT_00024cf0++`. |
+| `FUN_0000528a` | `dispatch_entity_cleanup` | STRONG INFERENCE | `@0x528A`: skip if `flags_07&2`; else `retire_entity` or type-2 soft (`flags\|0x42`, `field_3c=DAT_0001b838` = current frame). Body VERIFIED vs bytes. |
+| `FUN_000051ec` | `retire_entity` | STRONG INFERENCE | `@0x51EC`: clear b880/bc64/table; `+0x18=1e9`; `flags\|2`; null `**(+8)`; `DAT_00024cf0++`. Body VERIFIED vs bytes (capstone omits the ×8 scale of `clr.l $14(a0,a1.l*8)` at 0x5226). |
 | `FUN_00005116` | `spawn_mission_pool_object` | STRONG INFERENCE | `@0x5116`: free `0x18` slot in `*(DAT_0001d6fc+0x30)`; fill xyz/att; `instantiate_mission_pool_slot`; gate on `world+0x44`. |
 | `FUN_000046da` | `instantiate_mission_pool_slot` | STRONG INFERENCE | `@0x46DA`: alloc from desc; publish slot+0x14; identity; factory; rates; `04e6e` vs `DAT_0001d0e4` queue. |
 | `FUN_00012840` | `spawn_weapon_entity` | STRONG INFERENCE | `@0x12840`: pool spawn via `DAT_00026280`; entity `field_610`/`61c`/`+0x20..24`. |
@@ -695,7 +696,7 @@ revalidated here.
 | `FUN_0001a63e` | `memmove_block` | PROVEN | `@0x1A63E`: `(src,dst,n)` overlap-aware copy; longword fast path when `n>0x19`. |
 | `FUN_00001ba8` | `heap_realloc_grow_only` | PROVEN | `@0x1BA8`: if request > header capacity → `heap_calloc`+`memmove_block`+`heap_free_coalesce`. |
 | `FUN_00001b84` | `heap_calloc` | STRONG INFERENCE | `@0x1B84`: `heap_alloc(a*b)` then `heap_zero_payload`. |
-| `FUN_00002e08` | `abs_int` | PROVEN | `@0x2E08`: `MOVE.L 4(A7),D0` / `BGE` / `NEG.L` / `RTS`. ~49 BSR.L call sites. |
+| `FUN_00002e08` | `abs_int` | PROVEN | `@0x2E08`: `MOVE.L 4(A7),D0` / `BGE` / `NEG.L` / `RTS`. ~49 BSR.L call sites (+ 19 `lea.l $2de8.l` runtime references). abs_int(INT_MIN) = INT_MIN. Body VERIFIED vs bytes. |
 | `FUN_00002de8` | *(false entry of `FUN_00002d10`)*; callsite→`abs_int` | bytes PROVEN; callsite PROVEN (: all 17 references found by a linear byte scan are `lea.l $2de8.l` + `jsr (aN)` - the earlier note counted 19; 0x2de8 is a runtime address = file 0x2e08 = abs_int `202f0004 6c02 4480 4e75`) | `@0x2DE8`: mid-epilogue `TST D4`/`BNE` + xyz commit + `UNLK`/`RTS`. 19× `LEA $2DE8`+`JSR` push/arg/D0 look like abs; 0 direct BSR to `2DE8`. **BLOCKED** until LEA target explained. |
 | `FUN_00004e6e` | `activate_near_range_object` | STRONG INFERENCE | `@0x4E6E`: kind2 list+`(36+3a)*0xC` via `$1A48`→`+0x4c/+0x44`+`04808`+flag-gated `02bd8`; kind3 child `0x18` table+`046da`; ends `03b98`. Gate for `spawn_mission_pool_object`. |
 | `FUN_00004808` | `build_object_poly_buffers` | PROVEN layout | `@0x4808`: `heap_alloc` → `obj+0x48`; poly stride `0x20` from stream; index `heap_alloc(count<<1)` → `+0x18`; optional `(+6)&2` trailer; `DAT_0001daa2=1`. |
@@ -737,7 +738,7 @@ revalidated here.
 | `FUN_00003c48` | `approx_dist3_from_abs` | PROVEN | `@0x3C48`: max+(a+b)>>2 on abs components in D0/D1/D3. |
 | `FUN_00003c68` | `approx_dist3_xyz` | PROVEN | `@0x3C68`: six stack XYZ; abs Δs then same combine. |
 | `$1A186` | *(false mid → `tick_landing_approach_glide`)* | BLOCKED | `0x1A1A6−0x20`; literal stored by `try_begin_landing_approach`. |
-| `FUN_00001d02` | `matmul3x3_s16` | PROVEN | `@0x1D02`: 3×3 s16 `out=left×right`, each element 3×`MULS.W` then `ASR #12`. |
+| `FUN_00001d02` | `matmul3x3_s16` | PROVEN | `@0x1D02`: 3×3 s16 `out=left×right`, each element 3×`MULS.W` then `ASR #12` (floor). Body VERIFIED vs bytes; attitude matrix = R4·Rz·Rx·Ry applied as v·M. |
 | `FUN_000020e6` | `fill_attitude_rotation_bases` | PROVEN layout | `@0x20E6`: expand sincos pairs 1–3 into bases at `DAT_0001d7d4` / `1d7bc` / `1d7a4` (≈Rx/Ry/Rz, `0x1000`=1). |
 | `FUN_000021a0` | `fill_attitude_rotation_basis_4` | PROVEN layout | `@0x21A0`: angle4 (`1d7ee/f0`) → `DAT_0001d78c` as ≈Ry `[[c,0,s],[0,1,0],[-s,0,c]]`. |
 | `FUN_00002562` | `finalize_attitude_matrix_4ang` | PROVEN | `@0x2562`: `out=(1d78c×1d7a4)×1d7d4×1d7bc` via three `matmul3x3_s16`. |
@@ -765,13 +766,13 @@ revalidated here.
 | `entity+0x662` | `ctrl_avg_pitchish` (from avg4 p3) | STRONG INFERENCE | Filled by `enqueue_control_inputs_avg4`; jittered if `flags_685` bit2. |
 | `entity+0x666` | `ctrl_avg_heading` (from avg4 p4) | STRONG INFERENCE | Filled by avg4; jittered if `flags_685` bit3; force 0xFF80 if +0x684 bit0. |
 | `entity+0x685` | `flags_685` | PROVEN | bit0 gates avg4; bit2/3 RNG jitter; bit0 of +0x684 clears/forces controls. |
-| `FUN_0000e372` | `isqrt_floor` | PROVEN | `@0xE372`: binary-search floor sqrt on `[0,0x7FFF]`. |
+| `FUN_0000e372` | `isqrt_floor` | PROVEN | `@0xE372`: binary-search floor sqrt on `[0,0x7FFF]`; signed input, result min(floor(sqrt(x)), 0x7FFE), 0 for x < 0. Body VERIFIED vs bytes. |
 | `FUN_0000e3b2` | `acos_scaled_dot3` | PROVEN | `@0xE3B2`: `(dot3>>4)/((p4*p8)>>16)` then `acos_fixed14`; 0 if denom 0. |
 | `$E352` / `LAB_0000e350_2` | *(false)*; callsite→`isqrt_floor` | BLOCKED | `@0xE352=$E372−0x20`; mid-BSR garbage; LEA @0x22CC + table `$32E` @0x11C4. |
 | `FUN_00001f22` | `attitude_from_velocity` | STRONG INFERENCE | `@0x1F22`: velocity → two 14-bit attitude outs via `01ebc`/`01e3a`. |
-| `FUN_00011564` | `overlay_rng_next` | PROVEN | `@0x11564`: additive table RNG on `DAT_00026008…0x260E7`; return `sum>>16`. |
-| `FUN_000114ca` | `overlay_rng_mul_mix` | PROVEN | `@0x114CA`: cross-mul mix for table fill (`0x1DF5E0D`). |
-| `FUN_0001150a` | `overlay_rng_init` | PROVEN | `@0x1150A`: seed + fill 0x36 entries + cursor `0x260E4` + 10000× next. |
+| `FUN_00011564` | `overlay_rng_next` | PROVEN | `@0x11564`: additive table RNG: cursor `DAT_00026008`, ring of 55 longs `0x2600C…0x260E7`, x[n] = x[n-1] + x[n-32]; returns bits 31..16 zero-extended. VERIFIED vs bytes. |
+| `FUN_000114ca` | `overlay_rng_mul_mix` | PROVEN | `@0x114CA`: 32-bit product (a*b mod 2^32) built from 16-bit halves; table fill factor `0x1DF5E0D`. VERIFIED vs bytes. |
+| `FUN_0001150a` | `overlay_rng_init` | PROVEN | `@0x1150A`: seed + LCG fill x[i] = x[i-1]*0x1DF5E0D + 1 (0x36 entries) + cursor `0x260E4` + 10000× next. VERIFIED vs bytes (incl. tail 0x11544). |
 | `FUN_00011544` | `overlay_rng_warmup_epilogue` (bytes) | PROVEN bytes | `@0x11544`: Ghidra-split init tail. **Call sites** treated as `overlay_rng_next` **[INFERRED]**. |
 | `FUN_0000e4a4` | `compute_template_force_from_626` | PROVEN algo | `@0xE4A4`: template coeffs `+0x26..+0x34` × `movement_626` / `0x67b`; may set `field_19e=0xC`. |
 | `FUN_000025a8` | `build_attitude_matrix` | PROVEN chain | `@0x25A8`: `0202a`→`020e6`→`021a0`→`02562` into out matrix. |
@@ -792,9 +793,9 @@ revalidated here.
 | `DAT_0001a7d2` | `template_rec_a_field_u16` | STRONG INFERENCE | Absolute u16; written only via `FUN_00000020`; file offset `0x1a7d2`; `+0x0C` in a `0x4A` record near `s_GRAPHIC_SIMULATIONS_...` (`0x1a77c`). Initial image value `0x0151`. |
 | `DAT_0001a81c` | `template_rec_b_field_u16` | STRONG INFERENCE | `DAT_0001a7d2 + 0x4A`; same store instruction `MOVE.W D0,$4A(A0)`. Initial image value `0x0151`. |
 | `DAT_0001b524` | `template_ptr_table_base` | STRONG INFERENCE | `LEA $1B524,A5` in `FUN_00000054`; indexed by sign-extended u16 record keys (`MOVEA.W (A2),A0` then `(A5,A0.L*4)`). Sparse ID-keyed pointer table. |
-| `FUN_000019d0` | `heap_free_coalesce` | STRONG INFERENCE | Binary `@0x19D0`–`0x1A66`: free payload to size-class list or coalesce into large-block ring; cursor `DAT_00020c60`. |
+| `FUN_000019d0` | `heap_free_coalesce` | STRONG INFERENCE | Binary `@0x19D0`–`0x1A66`: free payload to size-class list (class byte at ptr-4, heads `DAT_00020c64`+class*4) or coalesce into the address-ordered large-block ring (header ptr-8 = size in 8-byte units, next; unsigned compares); cursor `DAT_00020c60` = predecessor block. Body VERIFIED vs bytes. |
 | `FUN_00001a48` | `heap_free_epilogue_cursor` | PROVEN | Mid-label `@0x1A48` of `FUN_000019d0`: `MOVE.L A1,$20C60`; `BRA $1A64`; pop A2; `RTS`. **Not** an allocator. Kind2 `@0x4ED8` + `@0xB572` still `LEA $1A48`+`JSR` then take D0 — **[INFERRED]** LEA off-by `+0x20` vs `heap_alloc`. |
-| `FUN_00001a68` | `heap_alloc` | PROVEN prologue | `@0x1A68`: `MOVEM D2-D3/A2`; size `$10(a7)`; bins/`01974`/`0199a`; D0=payload. Godot stand-in for kind2/B572 call sites. |
+| `FUN_00001a68` | `heap_alloc` | PROVEN prologue | `@0x1A68`: `MOVEM D2-D3/A2`; size `$10(a7)`; bins/`01974`/`0199a`; D0=payload. Godot stand-in for kind2/B572 call sites. Body VERIFIED vs bytes: classes 2..5 = 4/8/16/32-byte blocks (4-byte header), larger requests first-fit from the ring in 8-byte units, carved from the tail of the free block; NULL on failure. |
 | `DAT_00020c60` | `heap_roving_cursor` | STRONG INFERENCE | Large-block freelist cursor; written at `@0x1A48` / read throughout alloc/free. |
 | `DAT_00020c64` | `heap_size_class_bins` | STRONG INFERENCE | Array of freelist heads indexed by size class (×4). |
 | `DAT_0001b85c` (Pacific Conflict) | carried-pair count (word) | PROVEN (use) | cleared every frame by overlay_frame_step; incremented by the unexported 0x15154 handler. |
@@ -990,6 +991,15 @@ its dropped arguments are listed here.
 | `bullet_hits_aircraft` (FUN_000167f4) | `segment_point_min_distance` (FUN_00003cca) | 9 longs: bullet pos - vel/2 (x, y, z), bullet vel (x, y, z), aircraft pos (x, y, z) | bytes 0x16804..0x16852 |
 | (callee side) | `segment_point_min_distance` (FUN_00003cca) | reads the deltas as low words (signed 16-bit); floor midpoints; word distances (wrap above 0x7fff) | bytes 0x3cca..0x3da6 |
 | `bullet_hits_shape` (FUN_0001665a) | `segment_point_min_distance` (FUN_00003cca) | same 9 longs as bullet_hits_aircraft | bytes 0x1666a..0x166b8 |
+| `deactivate_object` (FUN_000052dc) | `heap_free_coalesce` (FUN_000019d0, via runtime `$19b0`) ×2 | *(+0x4c), then *(+0x44); only +0x44 is cleared | bytes 0x530c..0x531e |
+| `update_aircraft_entity` (FUN_0000e792) | (statement order, not a call) | touchdown reads the impact word +0xe BEFORE snapping param_1[3]; Ghidra prints the load after the store | bytes 0xf112 (load) / 0xf124 (store) |
+| `update_aircraft_entity` (FUN_0000e792) | `sin_fixed14` (FUN_00001d76, Ghidra FUN_00001d56 via runtime `$1d56`) ×2 | sext local_28 (0xf49c), then sext word +0x20 (0xf4ca, same value after the commit) | bytes 0xf49c..0xf4d0 |
+| `enemy_fighter_notice_object` (FUN_000100d4) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own object pos (+0x18 / +0x1c / +0x20), target object pos | bytes 0x10176..0x1018e |
+| `enemy_fighter_notice_object` (FUN_000100d4) | `probe_nearest_facility_kind` (FUN_00000354) ×2 | param_2 (target object) | bytes 0x101e0 / 0x1024c |
+| `enemy_fighter_notice_object` (FUN_000100d4) | (jump table, not a call) | Ghidra's empty switch: only target kinds 1, 2, 21..25 proceed | bytes 0x100f0..0x10134 |
+| `ai_attack_or_fly` (FUN_000110f4) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own object (*param_1) +0x18 / +0x1c / +0x20, target (+0x692) +0x18 / +0x1c / +0x20 | bytes 0x11126..0x11140 |
+| `ai_dive_at_target` (FUN_000111da) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own x, 0, own z, target x, 0, target z (horizontal distance) | bytes 0x11202..0x11218 |
+| `ai_bombing_run` (FUN_000112e0) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own x, 0, own z, target x, 0, target z (horizontal distance) | bytes 0x11310..0x11326 |
 | `flak_notice_object` (FUN_00018bba) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: gun pos (x, y, z), target pos (x, y, z) | bytes 0x18c10..0x18c28 |
 | `approx_dist3_xyz` (FUN_00003c68) itself | `abs_int` via Ghidra `FUN_00002de8` | its own 6 longs (x1, y1, z1, x2, y2, z2); each call gets x2 - x1 / y2 - y1 / z2 - z1 | bytes 0x3c70..0x3c9c |
 | `update_tracking_camera` (FUN_00008c30) | `approx_dist3_xyz` ×3 | 0x8cd0: player pos, target pos; 0x8e06 / 0x8e78: own pos + rotated (0, 0, 0x4000), other pos | bytes 0x8cb4..0x8e78 |
@@ -1004,3 +1014,4 @@ its dropped arguments are listed here.
 | aircraft controller +0x692 / +0x696 (Pacific Conflict) | AI target object / its distance | PROVEN (flow) | written by enemy_fighter_notice_object (0x102b2 / 0x102be); ai_pursue_target pursues directly beyond 0x4e20 |
 | `DAT_0001b876` / `DAT_0001b878` (Pacific Conflict) | AI aim lag in frames (definition key 1 / other aircraft), set from the rank table | PROVEN (use) | ai_pursue_target extrapolates the target's replay ring by lag + 4 frames |
 | `ai_pursue_target` (FUN_0001820a) | `abs_int` ×4 (Ghidra FUN_00002de8) | abs_int(heading_err) (0x18324); abs_int(fold(target heading - own)) (0x18350); abs_int(pitch_err - (+0x626 - def +0x44)) (0x1852c); abs_int(heading_err) (0x1853c) | gun-fire decision ±0x7f |
+| `ai_pursue_target` (FUN_0001820a) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: target pos (*param_1 +0x18 / +0x1c / +0x20), manoeuvre waypoint (+0x69c / +0x6a0 / +0x6a4) | bytes 0x185f6..0x1860e |

@@ -2,10 +2,21 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** finish `ai_pursue_target` (FUN_0001820a) from 0x1856e: the manoeuvre
-state machine (+0x69a states 1-3, +0x69b, waypoint +0x69c..+0x6a4, best distance +0x6a8)
-against the bytes, then mark it VERIFIED. The lead, chase and gun-decision paths
-(0x1820a..0x1856a) are checked.
+**Next target:** `max_ai_throttle_maybe_invert_679` (FUN_00010cb2), then the +0x614
+script ticks (DAT_0001b3f4 table: 10d68, 10de8, 10f68, 10ecc, 10da8). The four AI state
+handlers, `release_ai_target` and `adjust_ai_throttle_vs_speed` are VERIFIED.
+
+Open questions recorded in `update_aircraft_entity`: blk 3b reads the blk 2b engine
+locals uninitialised for non-player aircraft (reachability unknown); blk 2b's divs.w
+could trap on a zero divisor (reachability unknown). Section-check comments say
+"blk N", never "Block N", so `re_query.py excerpt --block` stays unambiguous.
+
+The overlay heap (sbrk, size-class / large-block growth, alloc, free) and the overlay
+RNG (init, mul_mix, next) are fully VERIFIED; the false entry FUN_00001a48 is settled.
+Already VERIFIED:
+`ai_pursue_target`, `bullet_hits_aircraft`, `steer_entity_toward_point`,
+`apply_relative_heading_steer`, `retire_entity`, `dispatch_entity_cleanup`, `deactivate_object`, `release_fractal_reference`, `heap_free_coalesce`, `heap_alloc`, `heap_new_size_class_block`, `heap_add_large_block`, `heap_sbrk`, `isqrt_floor`, `update_aircraft_entity`, `fold_angle_pm_0x2000`, `compute_template_force_from_626` (+ false split e512), `abs_int`, `transform_vecs12_by_matrix3`, `build_attitude_matrix` (wrapper), `load_attitude_angle_sincos`, `fill_attitude_rotation_bases`, `fill_attitude_rotation_basis_4`, `finalize_attitude_matrix_4ang`, `matmul3x3_s16`, `enemy_fighter_notice_object`, `invert_ai_bias_67b_if_positive`, `ai_attack_or_fly`, `ai_fly`, `ai_dive_at_target`, `ai_bombing_run`, `adjust_ai_throttle_vs_speed`, `overlay_rng_next` (lagged additive RNG,
+x[n] = x[n-1] + x[n-32] over the 55-long ring 0x2600c..0x260e7).
 
 The angle path feeding `attitude_from_velocity` is established:
 `acos_fixed14` and `atan_fixed14` match independent disassembly, and their
@@ -51,10 +62,11 @@ removed merely because the same identity is retrievable elsewhere.
 
 ## Priority queue
 
-1. Verify `bullet_hits_aircraft`; its caller `tick_bullet` is already verified.
-2. Continue independent verification of high-traffic Pacific Conflict functions.
-3. Resolve remaining ID09/ID05 segment-entry evidence.
-4. Investigate `FUN_00003cca` only when its dependencies are needed.
+1. Verify `update_aircraft_entity` (FUN_0000e792; flight update after AI steering).
+2. Identify the `overlay_rng_init` caller and its seed source.
+3. Continue independent verification of high-traffic Pacific Conflict functions.
+4. Resolve remaining ID09/ID05 segment-entry evidence.
+5. Investigate `FUN_00003cca` only when its dependencies are needed.
 
 The `$1A48` allocator ABI is resolved: the runtime address maps to `heap_alloc`
 at file offset `0x1a68`.

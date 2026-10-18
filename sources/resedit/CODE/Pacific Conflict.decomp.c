@@ -2397,6 +2397,13 @@ void overlay_initialise /* Original: FUN_000018d6 */ (undefined4 param_1)
 /* Original: FUN_00001958; source: Pacific Conflict.c. Recovered name: heap_sbrk [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x1958).
  * Returns the current break address = arena base (host +0x348 = A5-0x1040, the overlay work buffer allocated by the host with NewPtrClear) + break offset DAT_00020c50, then advances the break by the argument. No limit check in this function. Complete Ghidra C.
+ * Section check 0x1958..0x1972 [PROVEN, matches the C]: d0 = *(DAT_0001b5a0 + 0x348) +
+ * DAT_00020c50 (read before the update), then add.l of the stack argument into
+ * DAT_00020c50; no compare, so it never returns -1 and the -1 tests in its two callers
+ * (heap_new_size_class_block, heap_add_large_block) are dead. The break is a byte offset;
+ * callers pass 1 << class or units * 8, so the arena stays 4-byte aligned.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
+ * read-before-write order and the returned sum identical to the C.
  */
 int heap_sbrk /* Original: FUN_00001958 */ (int param_1)
 
@@ -2413,6 +2420,14 @@ int heap_sbrk /* Original: FUN_00001958 */ (int param_1)
 /* Original: FUN_00001974; source: Pacific Conflict.c. Recovered name: heap_new_size_class_block [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x1974).
  * Arg: size class n. Takes 1 << n bytes from heap_sbrk; returns -1 on failure (heap_sbrk itself never fails here), else stores n in the header byte and returns the payload (block + 4). Complete Ghidra C.
+ * Section check 0x1974..0x1998 [PROVEN, matches the C]: asl.l d2,d1 (count mod 64, hence
+ * & 0x3f); one argument (the first push at 0x1974 saves D2); compares the result with
+ * -1 (moveq #$ff / cmp.l); move.b of the class into the header byte; +4.
+ * Consequence [PROVEN]: heap_alloc's small path returns this value unchanged, so a
+ * failed small allocation would yield 0xffffffff, not NULL (the large path yields NULL);
+ * unreachable in practice because heap_sbrk has no failure return.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
+ * the -1 compare, call target and argument identical to the C.
  */
 undefined1 * heap_new_size_class_block /* Original: FUN_00001974 */ (uint param_1)
 
@@ -2435,6 +2450,16 @@ undefined1 * heap_new_size_class_block /* Original: FUN_00001974 */ (uint param_
 /* Original: FUN_0000199a; source: Pacific Conflict.c. Recovered name: heap_add_large_block [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x199a).
  * Arg: size in 8-byte units. Takes n * 8 bytes from heap_sbrk; header long = n, tag byte +4 = 0xff (large block), then heap_free_coalesce(payload) puts it into the large-block list; returns the list head DAT_00020c60 (0 on failure). Complete Ghidra C.
+ * Section check 0x199a..0x19ce [PROVEN, matches the C] (Ghidra also lists 0x19b0.. as
+ * heap_add_large_block_tail): asl.l #3 of the units; one argument (first push saves D2);
+ * -1 test; move.l units to the header, move.b #$ff to header + 4, pea header + 8,
+ * bsr heap_free_coalesce, then d0 = DAT_00020c60 re-read AFTER the free. That value is
+ * the free-list predecessor of the new block (heap_free_coalesce always leaves the
+ * cursor there), so heap_alloc resumes its first-fit scan at cursor->next, i.e. at the
+ * new (possibly merged) block.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x199a..0x19ce; widths, the -1 compare, call targets, arguments and the returned
+ * global identical to the C.
  */
 undefined4 heap_add_large_block /* Original: FUN_0000199a */ (int param_1)
 
@@ -2498,6 +2523,22 @@ undefined4 heap_add_large_block_tail /* Original: FUN_000019b0 */ (void)
  *
  * 68k (PROVEN): starts MOVE.L A2,-(A7); ends at 0x1A66 shared epilogue.
  * Mid-label 0x1A48 stores A1→DAT_00020c60 (Ghidra falsely split this as FUN_00001a48).
+ *
+ * Layouts [PROVEN, bytes]: large block header at ptr-8 = { long size in 8-byte units,
+ * long next }, allocated large blocks carry 0xff in the top byte of ptr-4; small blocks
+ * carry their size-class index in the byte at ptr-4, and freeing reuses that long as the
+ * free-list link (DAT_00020c64 + class*4 is the list head).
+ * Section check 0x19d0..0x1a66 [PROVEN, matches the C]: cmpi.b #$ff at ptr-4; the
+ * address-ordered circular list is walked from the roving cursor DAT_00020c60 with
+ * UNSIGNED pointer compares (bcc/bcs) until cur < blk < cur->next, or at the wrap point
+ * (cur >= cur->next) blk > cur or blk < cur->next; forward merge when blk + size*8
+ * (asl.l #3) == cur->next, else link; backward merge when cur + cur->size*8 == blk,
+ * else cur->next = blk. Both paths reach 0x1a48 with A1 = cur, so the cursor always
+ * becomes cur: heap_roving_cursor_store() below means DAT_00020c60 = piVar4. Small path
+ * 0x1a50: subq.w #4, class byte zero-extended, asl.l #2, push onto the class list.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x19d0..0x1a66 (including the fragment 0x1a44..0x1a66 outside Ghidra's split);
+ * widths, unsigned compares and stores identical to the C. No calls.
  */
 void heap_free_coalesce(int param_1) /* Original: FUN_000019d0 */
 {
@@ -2524,7 +2565,7 @@ void heap_free_coalesce(int param_1) /* Original: FUN_000019d0 */
       *piVar4 = *piVar2 + *piVar4;
       piVar4[1] = *(int *)(param_1 + -4);
       /* [PROVEN] Fall-through to mid-label 0x1A48 — not a real subroutine call. */
-      heap_roving_cursor_store(); /* Original: FUN_00001a48 (false entry) */
+      heap_roving_cursor_store(); /* Original: FUN_00001a48 (false entry); effect: DAT_00020c60 = piVar4 (A1) [PROVEN] */
       return;
     }
     piVar4[1] = (int)piVar2;
@@ -2568,7 +2609,15 @@ void heap_free_coalesce(int param_1) /* Original: FUN_000019d0 */
  *   The real size→pointer allocator is heap_alloc (FUN_00001a68 @0x1A68).
  *
  * Until the $1A48 JSR ABI is explained (wrong symbol, overlay base, or missing
- * stub), leave call sites targeting this address but do not claim they allocate.
+ * stub), leave call sites targeting this address but do not claim they allocate. *
+ * SUPERSEDED [PROVEN]: the "Call-site conflict [BLOCKED]" text above predates the
+ * resolution at the top of this comment and no longer applies: re_query finds 0 binary
+ * bsr/jsr/lea/pea references to file 0x1a48, and the only textual caller is the
+ * fall-through inside heap_free_coalesce. False entry, not a function.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x1a48..0x1a66 (move.l a1,$20c60; bra.b $1a64; movea.l (a7)+,a2; rts): the C body
+ * (DAT_00020c60 = in_A1) is identical as the tail of heap_free_coalesce, whose prologue
+ * pushed the A2 popped here; it is not callable on its own.
  */
 void heap_roving_cursor_store(void) /* Original: FUN_00001a48 */
 {
@@ -2590,6 +2639,23 @@ void heap_roving_cursor_store(void) /* Original: FUN_00001a48 */
  * Outputs: payload pointer in D0 / return, or NULL/sentinel on failure.
  * Side effects: pops size-class freelist DAT_00020c64 or splits large blocks
  *   via DAT_00020c60; may grow heap through FUN_00001974 / FUN_0000199a.
+ *
+ * Section check 0x1a68..0x1b36 [PROVEN, matches the C]: class = 2 + bit length of
+ * (((n + 7) & ~3) - 1) >> 2 (lsr.l, loop tests first), i.e. the smallest power-of-two
+ * block 2^class >= n + 4 header bytes; class <= 5 (unsigned bcs) -> small block of
+ * 4/8/16/32 bytes: pop DAT_00020c64[class] (or heap_new_size_class_block(class) when the
+ * list is empty), store class in the header byte, return block + 4 (payload <= 28 bytes).
+ * Otherwise units = ((n + 7) >> 3) + 1 eight-byte units including the 8-byte header; an
+ * empty ring is first initialised with the zero-size sentinel 0x20c58 (next = itself,
+ * cursor = it). First fit from cursor->next with unsigned compares (bhi); completing a
+ * lap back to the cursor (re-read from memory each time) calls heap_add_large_block(units)
+ * and returns NULL when it fails. Exact fit unlinks the block; a larger block keeps its
+ * head and gives away its TAIL (size -= units, new header at blk + size*8 with size =
+ * units). The cursor becomes the predecessor, the byte at header + 4 is set to 0xff (the
+ * large-block mark heap_free_coalesce tests at ptr-4), and header + 8 is returned.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x1a68..0x1b36; widths, unsigned compares, both call targets and arguments, and the
+ * NULL return identical to the C.
  */
 uint * heap_alloc(int param_1) /* Original: FUN_00001a68 */
 {
@@ -2903,7 +2969,19 @@ void scale_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int para
  * composing basis tables at $1d78c…$1d7d4 into the output matrix.
  *
  * Capstone @0x1D02–0x1D74. False sin entry FUN_00001d56 is the ASR.L at
- * @0x1D56 inside this loop (+0x20 before real sin_fixed14).
+ * @0x1D56 inside this loop (+0x20 before real sin_fixed14). * Exact form [PROVEN]: dst[3i+j] = (a[3i]*b[j] + a[3i+1]*b[3+j] + a[3i+2]*b[6+j]) asr 12
+ * (muls.w 16x16 -> 32, 32-bit sum, floor shift - unlike transform_vecs12_by_matrix3,
+ * which rounds half up). Index extension words decoded by hand: 0x3800 = d3.l x1 (row
+ * byte offset 6i), 0x2a06 / 0x2a0c = d2.l x2 + 6 / + 0xc (b[3+j], b[6+j]); capstone
+ * omits the x2. dst must not alias a or b (rows are written while b is still read);
+ * finalize_attitude_matrix_4ang never aliases. The returned pointer is just a0.
+ * Consequence: the attitude matrix of build_attitude_matrix(p1, p2, p3, p4) is
+ * M = R4(p1) * Rz(p4) * Rx(p2) * Ry(p3), applied by transform_vecs12_by_matrix3 as the
+ * row vector v * M; in update_aircraft_entity v' = v * R4(local_48) * Rz(+0x24 angle)
+ * * Rx(local_28) * Ry(local_2a) [PROVEN composition; axis names STRONG INFERENCE].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x1d02..0x1d74 (rows a2 = 0..2 and columns d2 = 0..2 with signed bge against 2);
+ * identical to the C.
  */
 short * matmul3x3_s16(int param_1,short *param_2,int param_3) /* Original: FUN_00001d02 */
 {
@@ -3299,6 +3377,16 @@ LAB_00001fb0:
  * build_attitude_matrix_3ang (4th angle 0) all start here.
  *
  * Evidence: Capstone store map; Ghidra body matches 8 trig calls.
+ *
+ * Through build_attitude_matrix (which passes (p2, p3, p4, p1) of its own arguments):
+ * 0x1d7fa / 0x1d7fc = cos / sin of build arg 2, 0x1d7f6 / 0x1d7f8 = arg 3, 0x1d7f2 /
+ * 0x1d7f4 = arg 4, 0x1d7ee / 0x1d7f0 = arg 1. In update_aircraft_entity build args are
+ * (local_48, local_28, local_2a, +0x24 angle), so the slots hold, from 0x1d7ee upward:
+ * local_48, +0x24 angle, local_2a, local_28 [PROVEN flow].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x202a..0x209e: four arguments kept in d5 / d4 / d3 / d2, eight pc-relative jsr
+ * (lea $1dd8(pc) / lea $1d76(pc), file addresses), each result stored as a word in the
+ * order above, one adda.w #$20 for the eight one-long pushes; identical to the C.
  */
 void load_attitude_angle_sincos(uint param_1,uint param_2,uint param_3,uint param_4) /* Original: FUN_0000202a */
 {
@@ -3372,6 +3460,15 @@ void load_attitude_angle_sincos_5_6(uint param_1,uint param_2) /* Original: FUN_
  *
  * fill_attitude_rotation_basis_4 similarly fills DAT_0001d78c from angle4.
  * Downstream matmul3x3_s16 chains these into the final attitude matrix.
+ * Note the sign placement: Rx and Ry carry -s below / above the diagonal as shown,
+ * Rz has +s in row 0 and -s in row 1 (it is the transpose of the Rx pattern).
+ * Through build_attitude_matrix: Rx = build arg 2, Ry = arg 3, Rz = arg 4 (arg 1 goes
+ * to basis 4); in update_aircraft_entity that is Rx(local_28), Ry(local_2a), Rz(+0x24
+ * angle), basis 4 (local_48) [PROVEN flow].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x20e6..0x219e: 27 word stores at 0x1d7d4.., 0x1d7bc.., 0x1d7a4.. (offsets 0..0x10),
+ * 0x1000 from d0, negations with neg.w (so -(-0x8000) would stay 0x8000; sin_fixed14
+ * stays within +-0x4000); identical to the C.
  */
 void fill_attitude_rotation_bases(void) /* Original: FUN_000020e6 */
 {
@@ -3426,6 +3523,10 @@ void fill_attitude_rotation_bases(void) /* Original: FUN_000020e6 */
  * slot (X-axis attitude path).
  *
  * Evidence: Capstone @0x21A0–0x21DE; sole direct caller build_attitude_matrix.
+ * Via build_attitude_matrix the angle is build arg 1 (local_48 in update_aircraft_entity).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x21a0..0x21de (lea $1d78c; word stores at 0..0x10; 0x1000; neg.w of 0x1d7f0);
+ * identical to the C.
  */
 void fill_attitude_rotation_basis_4(void) /* Original: FUN_000021a0 */
 {
@@ -3793,6 +3894,14 @@ void build_attitude_matrix_3ang(uint param_1,uint param_2,uint param_3,int param
  * does two matmuls (Rz×Rx then ×Ry) without the R4 factor.
  *
  * Evidence: Capstone @0x2562–0x25A6; Ghidra body matches three 01d02 calls.
+ * Exact chain [PROVEN, bytes]: out = mm(R4 (0x1d78c), Rz (0x1d7a4)); tmp (frame -0x12, 18
+ * bytes) = mm(out, Rx (0x1d7d4)); out = mm(tmp, Ry (0x1d7bc)), where mm(a, b, dst) is
+ * matmul3x3_s16 with the first argument pushed last; the nine argument longs are never
+ * popped (unlk restores the stack). Whether mm(a, b) is a*b or b*a is settled by
+ * matmul3x3_s16 (next target).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x2562..0x25a6 (link #-0x14; lea $1d02(pc) / jsr (a2) x3; d3 = a6 - 0x12); identical
+ * to the C.
  */
 void finalize_attitude_matrix_4ang(int param_1) /* Original: FUN_00002562 */
 {
@@ -3816,6 +3925,13 @@ void finalize_attitude_matrix_4ang(int param_1) /* Original: FUN_00002562 */
  * (&0x3fff). In e792: (local_48, local_28/pos_20, local_2a/att22, yaw_blend,
  * asStack_22). Sibling FUN_0000262e uses compose_attitude_matrix_x instead of 021a0/finalize_attitude_matrix_4ang.
  * Evidence: NOTES attitude-matrix entry; flight contract.
+ * VERIFIED (wrapper body only): checked against an independent capstone disassembly of
+ * the bytes 0x25a8..0x25d4 - link a6; pushes 8(a6) then 0x14 / 0x10 / 0xc(a6), so
+ * load_attitude_angle_sincos receives (param_2, param_3, param_4, param_1);
+ * fill_attitude_rotation_bases and fill_attitude_rotation_basis_4 take no arguments
+ * (the four longs stay on the stack); finalize_attitude_matrix_4ang(param_5); one
+ * adda.w #$14 pops all five longs. Identical to the C. The matrix contents (axis
+ * order) depend on the four callees, which are verified separately.
  */
 void build_attitude_matrix(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_000025a8 */
 {
@@ -4154,6 +4270,15 @@ void rotate_int3_vecs_by_3ang(uint param_1,uint param_2,uint param_3,int param_4
  * In e792: count=1, in-place on auStack_10 using asStack_22 from build_attitude_matrix.
  * Sibling transform_vecs12_to_int3_by_matrix3 writes int[3] results instead of
  * packed shorts.
+ *
+ * Exact form [PROVEN]: out_i = (x * m[i] + y * m[3 + i] + z * m[6 + i] + 0x800) asr 12
+ * (row vector times matrix, i.e. M^T v for the row-major 3x3), each product muls.w
+ * 16x16 -> 32, summed in 32 bits, rounded half up, stored as the low word. All three
+ * inputs are loaded before the first store, so in-place use is safe. The 32-bit count
+ * loop is dbra d5 then clr.w d5 / subq.l #1 / bcc: exactly param_1 (unsigned) records,
+ * 0 records for param_1 == 0.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x28dc..0x2974; identical to the C.
  */
 void transform_vecs12_by_matrix3(uint param_1,int param_2,int param_3,short *param_4) /* Original: FUN_000028dc */
 {
@@ -4652,7 +4777,15 @@ void FUN_00002de8(void) /* Original: FUN_00002de8 — false entry; see header */
  * Unknown / caveats:
  * - Negating INT_MIN is undefined in ISO C; preserves Ghidra/68k NEG.L behavior.
  * - FUN_00002de8 call sites also behave as abs [INFERRED] but bytes @0x2DE8 are
- *   FUN_00002d10's epilogue (BLOCKED dual identity) — not this routine.
+ *   FUN_00002d10's epilogue (BLOCKED dual identity) — not this routine. * Resolved [PROVEN]: every reference to 0x2de8 in the overlay is lea.l $2de8.l (19
+ * sites, e.g. 0x1f42, 0x1831e, 0x18526) - an absolute RUNTIME address = file 0x2e08 =
+ * this function (abs code operands are file - 0x20). Ghidra's FUN_00002de8 call sites
+ * are abs_int; the bytes at file 0x2de8 are unrelated.
+ * INT_MIN [PROVEN, bytes]: neg.l of 0x80000000 leaves 0x80000000, so abs_int(INT_MIN)
+ * returns INT_MIN (negative); callers comparing the result with a positive threshold
+ * would then take the "small" side.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x2e08..0x2e10 (move.l 4(a7),d0; bge; neg.l d0; rts); identical to the C.
  */
 int abs_int(int param_1) /* Original: FUN_00002e08 */
 {
@@ -7365,6 +7498,17 @@ int spawn_mission_pool_object(int param_1,uint param_2,uint param_3,uint param_4
  * when field_01 in [b88e,b88c]; set +0x18=1e9, flags|+2, +0x3c=0;
  * **(entity+8)=0; DAT_00024cf0++.
  * Evidence: NOTES FUN_0000528a/051ec; IMPORT_STATUS.
+ * Section check 0x51ec..0x5288 [PROVEN, matches the C]: +8 == DAT_0001b880 (long) -> clear
+ * it; bytes +1 != +2 -> clr.l at table + 0x14 + idx*0x18 (idx = byte +2 zero-extended:
+ * lea (a3,d0.l*2) gives 3*idx, then clr.l $14(a0,a1.l*8); extension word 0x9e14 has scale
+ * x8, which capstone 5.0.7 omits from its text); range test with sign-extended words
+ * DAT_0001b88e <= byte +1 <= DAT_0001b88c (cmpa.l, bgt/blt); slot scrub over
+ * DAT_0001bc64[0..6] (word index, ble 6); then +0x18 (object x, the position read by
+ * bullet_hits_aircraft) = 1000000000, long +4 |= 2, +0x3c = 0, *(+8) first long = 0
+ * when +8 != 0, DAT_00024cf0 += 1 (long). No calls.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x51ec..0x5288 (raw extension words decoded by hand where noted); widths, signed
+ * compares and stores identical to the C. The name keeps [STRONG INFERENCE].
  */
 void retire_entity(int param_1) /* Original: FUN_000051ec */
 {
@@ -7408,6 +7552,16 @@ void retire_entity(int param_1) /* Original: FUN_000051ec */
  * (field_24==DAT_0001d6fc && id in [b88e,b88c]) OR type!=2 → retire_entity;
  * else type-2 soft path: flags|+0x42, field_3c=DAT_0001b838.
  * Evidence: NOTES; Pacific Conflict.c:5784–5798.
+ * Section check 0x528a..0x52da [PROVEN, matches the C]: btst #1 of byte +7 = bit 1 of the
+ * long flags +4, the bit retire_entity sets (and the soft path's 0x42 includes), so a
+ * second call is a no-op. Retire when (+0x24 == DAT_0001d6fc, long; sign-extended words
+ * DAT_0001b88e <= byte +1 <= DAT_0001b88c, bgt/bge) or type byte +0 != 2; otherwise
+ * long +4 |= 0x42 and +0x3c = DAT_0001b838 (the frame counter incremented by
+ * advance_frame_and_tick_controllers), i.e. a type-2 object is stamped with the current
+ * frame instead of being retired.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x528a..0x52da; widths, signed compares, the short-circuit order and the single
+ * retire_entity(param_1) call identical to the C. The name keeps [STRONG INFERENCE].
  */
 void dispatch_entity_cleanup(char *param_1) /* Original: FUN_0000528a */
 {
@@ -7429,7 +7583,19 @@ void dispatch_entity_cleanup(char *param_1) /* Original: FUN_0000528a */
 
 /* Original: FUN_000052dc; source: Pacific Conflict.c. Recovered name: deactivate_object [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x52dc).
- * Called by collect_near_objects / collect_far_objects for objects leaving the active range and by the mission scene hook for the previous scene. Type 2 (shape): restores the template pose when flagged (+6 & 0x10), frees the vertex buffers (heap_add_large_block_tail, twice; Ghidra shows no arguments) and clears +0x44, frees every face allocation (+0x48 + 0x18, 0x20-byte faces, count +0x3a) and the face table, clears the back-pointer *(+8), runs dispatch_entity_cleanup when +1 != +2, FUN_00014af2 when +0x2c is set, and clears flag bit 0x80000 of +4. Type 3 (group): for each child (+0x30, 0x18-byte entries, count +0x2e) runs FUN_00014af2 for type-2 children with +0x2c, sets flag 2, decrements +3 and clears *(+8); then frees the child list and clears +0x30 and *(+8). Complete Ghidra C.
+ * Called by collect_near_objects / collect_far_objects for objects leaving the active range and by the mission scene hook for the previous scene. Type 2 (shape): restores the template pose when flagged (+6 & 0x10), frees the vertex buffers (heap_free_coalesce(+0x4c) then heap_free_coalesce(+0x44); Ghidra shows no arguments) and clears +0x44 (+0x4c is not cleared), frees every face allocation (+0x48 + 0x18, 0x20-byte faces, count +0x3a) and the face table, clears the back-pointer *(+8), runs dispatch_entity_cleanup when +1 != +2, FUN_00014af2 when +0x2c is set, and clears flag bit 0x80000 of +4. Type 3 (group): for each child (+0x30, 0x18-byte entries, count +0x2e) runs FUN_00014af2 for type-2 children with +0x2c, sets flag 2, decrements +3 and clears *(+8); then frees the child list and clears +0x30 and *(+8). Complete Ghidra C.
+ * CALL-ARGUMENT CORRECTION [PROVEN, bytes 0x530c..0x531c]: the two calls through
+ * lea.l $19b0.l,a2 / jsr (a2) (runtime 0x19b0 = file 0x19d0 heap_free_coalesce) push
+ * move.l $4c(a3) and move.l $44(a3); only +0x44 is cleared afterwards (clr.l at 0x531e).
+ * Section check 0x52dc..0x53f4 [PROVEN, matches the C]: signed byte dispatch on +0 (== 2,
+ * ble -> return, == 3); btst #4 of byte +6 = flag 0x1000 of the long +4; face loop and
+ * child loop count with sign-extended words +0x3a / +0x2e (cmpa.l, bgt), strides 0x20 and
+ * 0x18 (face pointer +0x18, child pointer +0x14); type-2 path ends with andi.l #$fff7ffff;
+ * child path or.l #2, subq.b #1 of byte +3, *(+8) cleared through the pointer.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
+ * signed compares, call order, targets and arguments identical to the C, with the
+ * call-argument correction above (also in DECOMPILATION_SYMBOLS.md). The name keeps
+ * [STRONG INFERENCE]; release_fractal_reference (FUN_00014af2) is still only RENAMED.
  */
 void deactivate_object /* Original: FUN_000052dc */ (char *param_1)
 
@@ -7444,8 +7610,8 @@ void deactivate_object /* Original: FUN_000052dc */ (char *param_1)
     if ((param_1[6] & 0x10U) != 0) {
       reset_object_to_template_pose((int)param_1);
     }
-    heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0 */);
-    heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0 */);
+    heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0; real arg *(int *)(param_1 + 0x4c) [PROVEN, 0x530c] */);
+    heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0; real arg *(int *)(param_1 + 0x44) [PROVEN, 0x5318] */);
     param_1[0x44] = '\0';
     param_1[0x45] = '\0';
     param_1[0x46] = '\0';
@@ -15971,7 +16137,7 @@ uint * create_enemy_bomber /* Original: FUN_0000e340 */ (uint param_1,int param_
  * Confidence: [PROVEN]
  *
  * Integer floor sqrt via binary search on [0,0x7FFF]; returns largest s with
- * s*s <= param_1. Used in e792 airborne (e²+a²+6²) and grounded (e²+6²).
+ * s*s <= param_1 (capped at 0x7ffe; 0 for negative input, see below). Used in e792 airborne (e²+a²+6²) and grounded (e²+6²).
  *
  * False mid-label [PROVEN bytes; callsite STRONG INFERENCE]:
  *   LEA/table slots use $E352 (= $E372 − 0x20), same +0x20 pattern as
@@ -15980,6 +16146,18 @@ uint * create_enemy_bomber /* Original: FUN_0000e340 */ (uint param_1,int param_
  *   not a real entry. Ghidra LAB_0000e350_2; jump-table poke @0x11C4 stores
  *   #$E352 at obj+0x32E. Call sites that LEA $E352 (e.g. @0x22CC) are treated
  *   as isqrt_floor [INFERRED].
+ *
+ * Range correction [PROVEN]: the result is min(floor(sqrt(x)), 0x7ffe) for x >= 0 and
+ * 0 for x < 0 (signed input). The search keeps lo with lo*lo <= x and stops when
+ * lo >= hi - 1 with hi starting at 0x7fff, so 0x7fff is never returned (x >= 0x7ffe^2 =
+ * 0x3ffe0004 gives 0x7ffe); a negative (overflowed) argument never satisfies
+ * mid*mid <= x and yields 0. Checked by simulating the exact loop against
+ * min(isqrt(max(x,0)), 0x7ffe) for x in 0..199999 and the boundary values.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0xe372..0xe3b0: lo / hi as sign-extended words (movea.w / lea (a0,a2.w)), midpoint
+ * truncating toward zero (bge / addq / asr.l), muls.w 16x16->32 square, signed cmp.l /
+ * blt (x < square -> hi = mid, else lo = mid), loop while hi - 1 > lo (cmpa.l / bgt),
+ * returns sext lo; identical to the C.
  */
 int isqrt_floor(int param_1) /* Original: FUN_0000e372 */
 {
@@ -16053,7 +16231,11 @@ int acos_scaled_dot3(int param_1,int param_2,int param_3,int param_4,int param_5
  * Fold a signed angle into [-0x2000, +0x2000]: if >0x2000 subtract 0x4000;
  * if < -0x2000 add 0x4000. Used widely for attitude deltas (e792 landing
  * rough/gentle gate, LAB_0000f47c yaw blend, grounded soft paths).
- * Evidence: NOTES FUN_0000e40c; flight contract “folds to ±0x2000”.
+ * Evidence: NOTES FUN_0000e40c; flight contract “folds to ±0x2000”. * Range note [PROVEN]: a single fold, word arithmetic (addi.w, wraps mod 2^16): it
+ * maps [-0x6000, 0x6000] into [-0x2000, 0x2000]; 0x2000 itself is kept, -0x2000 is kept.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0xe40c..0xe428 (cmpi.w #$2000 / ble, addi.w #$c000, cmpi.w #$e000 / bge, addi.w
+ * #$4000, ext.l); identical to the C.
  */
 int fold_angle_pm_0x2000(short param_1) /* Original: FUN_0000e40c */
 {
@@ -16154,7 +16336,23 @@ int damp_short_if_below_0x200(int param_1,short param_2) /* Original: FUN_0000e4
  * param_3→entity+0x19e (set to 0xC when 626 > template+0x34).
  * Mixes template +0x26/+0x28 (or lerp to +0x2a/+0x2c by |param_2|/0xF), then
  * scales by 626 vs threshold +0x34. Caller smooths into movement_63a.
- * Note: FUN_0000e512 appears to be a Ghidra register-spill twin — leave alone.
+ * Note: FUN_0000e512 appears to be a Ghidra register-spill twin — leave alone. * (param_3 is really byte +0x678 - Ghidra's param_1 + 0x19e in int units - the
+ * smoothing counter consumed by update_aircraft_entity blk 4a.)
+ * Section check 0xe4a4..0xe56e [PROVEN, matches the C; the part after 0xe512 is the
+ * same function, see FUN_0000e512 below]: param_2 == 0 -> c0 = t26, k = t28; else
+ * a = abs_int(param_2) (ext.l), c0 = t26 + (a * (t2a - t26)) divs.l 15, k = t28 +
+ * (a * (t2c - t28)) divs.l 15 (word adds). param_1 <= t34 (cmp.w / bgt, signed): result
+ * = c0 + (k muls.w param_1) / 64 (truncating, +0x3f bias). Otherwise *param_3 = 0xc and
+ * result = ((k muls.w t34) + c0) * max(0, 0x20 - (param_1 - t34)) / 2048 (truncating,
+ * +0x7ff bias). ext.l of the word result.
+ * Interpretation [STRONG INFERENCE]: a lift-coefficient curve - linear in the angle
+ * +0x626 up to the stall break t34, then falling linearly to 0 over 0x20 units past it
+ * (and arming 12 frames of 1/8 smoothing in the caller); c0 / slope interpolate from
+ * clean (t26 / t28) to full-flap (t2a / t2c) values by |+0x67b| / 15, and blk 7a ramps
+ * +0x67b from 1 to 15 (flap deployment). The output feeds +0x63a and both drag terms
+ * (force and force^2) of update_aircraft_entity.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
+ * signed compares, rounding and the abs_int call identical to the C.
  */
 int compute_template_force_from_626(short param_1,short param_2,undefined1 *param_3) /* Original: FUN_0000e4a4 */
 {
@@ -16202,7 +16400,12 @@ int compute_template_force_from_626(short param_1,short param_2,undefined1 *para
 
 /* Original: FUN_0000e512; source: Pacific Conflict.c. Recovered name: compute_template_force_from_626_tail [PROVEN false split].
  * Ghidra C reviewed (function at overlay offset 0xe512).
- * Bytes: 0xe512 is inside compute_template_force_from_626 (LINK a6 at 0xe4a4, UNLK / RTS at 0xe56c / 0xe56e); Ghidra started a function at the branch target and lost the registers (in_A0, unaff_D2w, unaff_A2w, unaff_A6). Kept for traceability; it is not a real entry point. Ghidra C.
+ * Bytes: 0xe512 is inside compute_template_force_from_626 (LINK a6 at 0xe4a4, UNLK / RTS at 0xe56c / 0xe56e); Ghidra started a function at the branch target and lost the registers (in_A0, unaff_D2w, unaff_A2w, unaff_A6). Kept for traceability; it is not a real entry point. Ghidra C. * Register map [PROVEN]: in_A0 = DAT_00026004 (template, 0xe50c), unaff_D2w = param_1
+ * (angle), unaff_A2w = c0, in_D0w = k, unaff_A6 + 0x10 = &param_3. No binary bsr / jsr /
+ * lea / pea reference reaches 0xe512.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0xe512..0xe56e (see compute_template_force_from_626): with that register map the C is
+ * identical; a false entry, not callable on its own.
  */
 int compute_template_force_from_626_tail /* Original: FUN_0000e512 */ (void)
 
@@ -16390,6 +16593,18 @@ void aircraft_tick /* Original: FUN_0000e5aa */ (int *param_1)
  *
  * Note: Ghidra often indexes status as param_1+0x1a1 (uint*); binary uses
  * absolute byte offsets (e.g. BTST bit3 at entity+0x684). Preserve expressions.
+ *
+ * VERIFIED: every part 0xe792..0xf80e (out-of-line airborne path 0xf428..0xf47a
+ * included) was checked against an independent capstone disassembly of the bytes; the
+ * "Section check" comments in the body record each range. Widths, signed / unsigned
+ * compares, rounding, call targets and arguments are identical to the C, with these
+ * recorded corrections: touchdown reads the impact word +0xe before snapping +0xc (order
+ * correction, 0xf112 / 0xf124); FUN_00001d56() x2 = sin_fixed14(local_28 / +0x20)
+ * (dropped arguments); Ghidra's (short) casts on the long first arguments of
+ * spawn_weapon_entity / spawn_ordnance_oriented / spawn_bailout_parachute. Open points
+ * (behaviour as in the bytes, not reconstruction gaps): stale engine locals read in
+ * blk 3b for non-designated aircraft; possible 68000 divide-by-zero trap in blk 2b.
+ * The name keeps [STRONG INFERENCE].
  */
 short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
 {
@@ -16493,6 +16708,20 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
     return (short *)(CONCAT22((short)((uint)uVar7 >> 0x10),uVar13) & 0xffff3fff);
   }
   /*
+   * Section check 0xe792..0xe89c (blk 0) [PROVEN, matches the C; independent capstone
+   * disassembly]: locals -0x34 = *param_1, -0x3a = bVar6 (word 0), d6 = heading +0x24,
+   * a5/d5 = +0x62a and +0x62a asr 2, d4 = +0x66a; adjustment = template +0x40 sign-extended
+   * word, halved toward zero (bge / addq / asr.w) unless byte +0x679 == '-' (0x2d);
+   * -0x38 = +0x2e + adjustment; -0x2c = (char)+0x67d + word +0x634 + (char)+0x67e (ext.w).
+   * Early-out on btst #3 of byte +0x684 (word flag 0x800): signed compare world +0x1c - 0x16
+   * > +0x2e -> +0xc = -0x16; else byte +0x2c == 0x10 -> ori.w #$1000 at +0x684, and for the
+   * player word DAT_0001b850 = 1; +0xc = -0x38 - world +0x1c. Two overlay_rng_next calls
+   * (lea $11544 / jsr (a2)): +0x61e += r & 0x7f, +0x24 = (+0x24 + +0x61e) & 0x3fff;
+   * +0x61a -= r & 0x7f, +0x20 = (+0x20 + +0x61a) & 0x3fff; clr.b +0x669; bra to the shared
+   * epilogue 0xf806 (movem / unlk / rts). The "return value" is only the D0 left over
+   * (no caller reads it). Remaining blocks from 0xe8a0 still to be checked.
+   */
+  /*
    * ---- Block 1: flags_685 control jitter (binary @0xE8A0–0xE93C) --------
    * Control channels filled by enqueue_control_inputs_avg4:
    *   +0x662 ← avg(param_3)  +0x664 ← avg(param_2)  +0x666 ← avg(param_4)
@@ -16545,6 +16774,14 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
     *(undefined2 *)((int)param_1 + 0x666) = 0xff80;
   }
   /*
+   * Section check 0xe8a0..0xe93c (blk 1) [PROVEN, matches the C; independent capstone
+   * disassembly]: btst #2 / #3 of byte +0x685 (word +0x684 bits 0x4 / 0x8); each draw is
+   * word += (overlay_rng_next & 0x7f) - 0x40 (addi.w #$ffc0, range -0x40..+0x3f), then
+   * abs_int (bsr $2e08) of the sign-extended word, signed cmpi.l / ble against 0x200
+   * (+0x662) or 0x140 (+0x666), clamp to +-limit by tst.w / bge; btst #0 of byte +0x684
+   * (word bit 0x100) -> clr.w +0x662, +0x666 = 0xff80. blk 1b starts at 0xe93e.
+   */
+  /*
    * ---- Block 1b: movement_669 gate + status_1a0 accumulator (→0xE9xx) ----
    * [PROVEN] Default movement_669=1; clear + zero local if gate fails
    * (flags_685&0x40 with status_1a3==0, or status&0x300, or both 67d/67e zero).
@@ -16592,6 +16829,17 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
     }
   }
   /*
+   * Section check 0xe93e..0xe9bc (blk 1b) [PROVEN, matches the C; independent capstone
+   * disassembly]: d2 = throttle byte +0x668 sign-extended (ext.w); +0x669 = 1; engine off
+   * (clr.b +0x669, d2 = 0) when (byte +0x685 bit 6 = word flag 0x40 and word +0x68c == 0)
+   * or word +0x684 & 0x300 or both fuel bytes +0x67d / +0x67e are zero; otherwise, when
+   * byte +0x685 is negative (word flag 0x80), d2 is halved toward zero (addq / asr.w).
+   * Word +0x680 += d2; signed cmp.w: while it exceeds template word +0x1e (bge skips when
+   * template >= accumulator) it is reduced by that value ONCE per frame, then one
+   * overlay_rng_next: bit 0 set and +0x67d != 0 -> subq.b #1 +0x67d, else +0x67e != 0 ->
+   * subq.b #1 +0x67e (no wrap below 0). blk 2a starts at 0xe9be.
+   */
+  /*
    * ---- Block 2a: helper prep + local_34 (binary ~0xE9BE–0xE9EA) ----------
    * [PROVEN] e42a(*(world+0x1c)) → sVar15 (raw). e468(world+0x1c−pos_2e, raw)
    * → iVar9 (damped; later drag). e570(raw) → local_26.
@@ -16613,6 +16861,17 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
   else {
     local_34 = ((int)sVar21 * (int)*(short *)(DAT_00026004 + 0x3c)) / 9;
   }
+  /*
+   * Section check 0xe9be..0xea3e (blk 2a) [PROVEN, matches the C; independent capstone
+   * disassembly]: table_lerp_1b2c0(world +0x1c) -> WORD -0x28 (sVar15); its sign-extended
+   * value and (world +0x1c - +0x2e) go to damp_short_if_below_0x200, whose result is kept
+   * only as the WORD -0x2a (Ghidra's int iVar9; every later read, 0xedf8 / 0xee50, is
+   * move.w); scale_template_field_38(sVar15, &local_26 at -0x22), 20 bytes popped.
+   * local_34 (-0x30): 0 when the gated throttle d2 == 0; template word +0x3e (signed,
+   * cmpa.l / bge) < +0x62a >> 2 -> ext.l throttle muls.l local_26, divs.l 9, divs.l
+   * (+0x62a >> 2); else muls.w throttle * template +0x3c, divs.l 9 (signed, truncating).
+   * blk 2b starts at 0xea42.
+   */
   /*
    * ---- Block 2b: designated-entity smoothing 0x66e / 0x672 / 0x66a --------
    * [PROVEN] Runs only if param_1 == DAT_0001b738 (player) or DAT_0001b888
@@ -16706,6 +16965,23 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
     if (((*(byte *)(param_1 + 0x1a1) & 0x40) != 0) && (*(int *)((int)param_1 + 0x66e) == 0)) {
       *(undefined1 *)((int)param_1 + 0x669) = 0;
     }
+    /*
+     * Section check 0xea42..0xeb6a (blk 2b) [PROVEN, matches the C; independent capstone
+     * disassembly]: only the player (DAT_0001b738) or DAT_0001b888 run the engine model -
+     * every other aircraft skips to 0xeb6e and never updates +0x66e / +0x672 / +0x66a.
+     * local_42 (-0x3e) = ((+0x62a >> 2) asl 17) divs.l 0x1c20. local_46 (-0x42): divisor =
+     * low word of (sign-extended word -0x28 + 0xa25) asr.l 5; divs.w into 0x5e50 (quotient
+     * ext.l; 0x5e50 < 0x8000 so it cannot overflow, but a divisor word of 0 - word -0x28
+     * in -0xa25..-0xa06 - would raise the 68000 divide-by-zero trap [PROVEN arithmetic;
+     * reachability not checked]); muls.w gated throttle * 0x666, muls.l by the quotient,
+     * asr.l 5. +0x66e (long) eases to local_46; manifold +0x672 (word) eases to
+     * (local_26 asr 9), 0 when +0x669 == 0 or word +0x684 & 0x4300, halved toward zero when
+     * byte +0x685 < 0; the difference is sign-extended (suba.w) and the snap adds its low
+     * word (-0x46). RPM: d4 = +0x66a read in the prologue (0xe7f4; not written in between),
+     * target = local_46 + (local_42 - local_46) / 2 (bpl / addq #1 / asr, truncating).
+     * Each ease: d = target - v; v += (d / 8 == 0) ? d : d / 8 (addq #7 bias, asr #3).
+     * Then btst #6 of byte +0x684 (word 0x4000) with +0x66e == 0 -> clr.b +0x669.
+     */
   }
   /*
    * ---- Block 3a: movement_626 step (all entities past contact) ------------
@@ -16773,6 +17049,20 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
   }
   *(short *)((int)param_1 + 0x626) = (short)((uint)iVar19 >> 8) + *(short *)((int)param_1 + 0x626);
   /*
+   * Section check 0xeb6e..0xecac (blk 3a) [PROVEN, matches the C; independent capstone
+   * disassembly]: d5 = +0x62a >> 2; slow branch when d5 <= 0xca7 (cmpi.l / bgt). sVar21
+   * (d1): template word +0x36 < d5 -> word +0x662 + low word of
+   * ((ext(+0x662) muls.l (template +0x34 - 0x200)) / 512 * (0xca8 - d5)) divs.l
+   * (0xca8 - template +0x36), else (+0x662 muls.w template +0x34) / 512; all divisions
+   * truncate toward zero (bpl + addi bias before asr). Gain iVar19 (d4) =
+   * (d5 * 0x2a / 4096) * 0x143a / 4096; local_48 (-0x44) and sVar22 (d2) = the same
+   * scaling of words +0x664 / +0x666. Fast branch (d5 >= 0xca8): d1 = +0x662, d4 = 0x2a,
+   * -0x44 = +0x664, d2 = +0x666 unscaled. Then +0x626 (word) += low word of
+   * (d4 * (ext d1 - (ext +0x626 - ext template +0x44))) / 256: the binary uses asr.l #8
+   * after a +0xff bias, Ghidra prints (uint) >> 8; both give the same low 16 bits.
+   * blk 3b starts at 0xecb0.
+   */
+  /*
    * ---- Block 3b: reverse-flight when field_63e!=0 && dir_679=='-' ---------
    * [PROVEN] Cap/blend 626 vs template +0x42/+0x46/+0x48; recompute local_48
    * from (local_46+2*local_42)>>1 * movement_666 (>>16 then >>2). Player clears
@@ -16819,6 +17109,23 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
     local_2a = (local_48 & 0x3fff) + local_2a & 0x3fff; /* attitude_22 accum */
   }
   /*
+   * Section check 0xecb0..0xeda0 (blk 3b) [PROVEN, matches the C; independent capstone
+   * disassembly]: gate byte +0x63e != 0 and byte +0x679 == '-'. Clamp word +0x626 to
+   * template +0x42 (cmp.w / bge); when d5 (+0x62a >> 2) < template +0x48 (ext.l, ble):
+   * d5 <= template +0x46 -> +0x626 = template +0x42, else +0x626 = low word of
+   * (d5 - t46) * (+0x626 - t42) divs.l (t48 - t46) + t42. local_48 = (local_46 +
+   * 2 * local_42) / 2 (lea (a4,d7.l*2), truncating); > 0xffff -> word +0x666, else
+   * (that * ext +0x666) / 65536 truncating; then asr.w #2. Player -> clr.w DAT_0001b858.
+   * After the gate: d6 = (sVar22 + heading +0x24) & 0x3fff; local_48 is masked IN PLACE
+   * (andi.w #$3fff at 0xed7a, unconditional - Ghidra re-applies the mask at its only later
+   * use, 0xf064, so the C is equivalent); gated again, local_2a (-0x26) =
+   * (local_2a + local_48) & 0x3fff.
+   * Uninitialised read [PROVEN, bytes]: local_46 (-0x42) and local_42 (-0x3e) are written
+   * only in blk 2b (player / DAT_0001b888). Any other aircraft reaching this gate reads
+   * stale stack for local_48 here. Whether an AI aircraft can have +0x63e set with '-' is
+   * not established [UNKNOWN reachability].
+   */
+  /*
    * ---- Block 4a: e4a4 → movement_63a (smooth via field_19e) --------------
    * [PROVEN] Force term from 626 + char 0x67b; if field_19e!=0, blend toward
    * prior 63a with >>3 step and decrement 19e. Store result at +0x63a.
@@ -16854,6 +17161,19 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
   if (iVar19 < 0) {
     iVar19 = iVar19 + 7;
   }
+  /*
+   * Section check 0xeda2..0xee6c (blks 4a, 4b) [PROVEN, matches the C; independent
+   * capstone disassembly]: compute_template_force_from_626(sext word +0x626, extb.l byte
+   * +0x67b, &byte +0x678), 12 bytes popped; force d4 = ext.l of the word result; byte
+   * +0x678 != 0 -> force = +0x63a + (force - +0x63a) / 8 (truncating), subq.b #1 +0x678;
+   * word +0x63a = force. Linear drag (stored long -0x4c) = d5 * ((t22 * ((force * d5)
+   * asr 8)) divs.l word -0x2a) -> / 8 truncating -> divs.l 0xa0 -> divs.l word -0x2c
+   * (sVar12). Quadratic (d2) = d5 * ((t22 * ((d5 * ((t24 * ((force * force) asr 4)) asr
+   * 20)) asr 8)) divs.l word -0x2a) -> / 8 truncating -> divs.l 0xa0: the binary finishes
+   * the (>> 3) / 0xa0 here (0xee64..0xee66) and keeps it in d2; Ghidra applies it inside
+   * the +0x636 sum below - same value. The asr steps are floor shifts (no bias), exactly
+   * as the C's signed >>. t22 / t24 = template words +0x22 / +0x24 (ext.l).
+   */
   /*
    * ---- Block 4c: thrust movement_636 + grounded 18e + stall iVar25 -------
    * [PROVEN] Add dir/67b-scaled template+0x20 thrust into 636; remainder/%
@@ -16928,6 +17248,21 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
   if (*(char *)(param_1 + 400) == '\x01') { /* +0x640 == 1: arresting (adda.w #$ff4a at 0xeffe) */
     iVar25 = iVar25 + -0xb6;
   }
+  /*
+   * Section check 0xee6e..0xf000 (blk 4c) [PROVEN, matches the C; independent capstone
+   * disassembly]: a2 = template word +0x20 (ext); local_4c (-0x48) = abs_int(extb +0x679)
+   * * t20 divs.l 0xb, iVar9 (d4) = abs_int(extb +0x67b) * t20 divs.l 0xf (each only when
+   * the byte is non-zero); thrust = ((((t20 + local_4c + iVar9) * d5) asr 8) divs.l
+   * word -0x28) * d5 * 2 divs.l 0xa0; sum = quadratic drag (d2) + thrust + sext word
+   * +0x636; divs.l word -0x2c (sVar12) as divsl d0,d2:d1 -> +0x636 = remainder (sign of
+   * the dividend), +0x62a accumulator (a5) -= quotient. Grounded (+0x63e != 0):
+   * abs_int(extb +0x679) == 0x2d -> base = t2e when d5 < t46 or type byte +0x2c == 0x40,
+   * else t30 (ext), + t32 when byte +0x641 != 0 or type == 0x50; otherwise word flag
+   * 0x1000 (btst #4 of byte +0x684) -> (t32 muls.w 3) / 2 truncating and, for the player,
+   * word DAT_0001b850 = 1; else 0. v = base * (0x5b - linear drag -0x4c) + sext word
+   * +0x638; word +0x638 = v - trunc4096(v) (12-bit fractional carry, C remainder), a5 -=
+   * v / 4096 (truncating). Byte +0x640 == 1 -> a5 -= 0xb6 (adda.w #$ff4a).
+   */
   iVar25 = (local_34 << 2) / (int)sVar12 + iVar25;
   if (iVar25 < 1) {
     iVar25 = 0;
@@ -16957,6 +17292,21 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
   param_1[3] = (int)(local_a >> 6);
   param_1[4] = (int)(local_6 >> 6);
   /*
+   * Section check 0xf002..0xf0b8 (speed commit + blk 5a) [PROVEN, matches the C;
+   * independent capstone disassembly]: a5 += (local_34 asl 2) divs.l sext word -0x2c;
+   * a5 <= 0 (bgt) -> a5 = 0, byte +0x640 = 2, and when the OLD long +0x62a != 0, the
+   * player and word DAT_0001b868 == 1 -> DAT_0001b868 = 2. Body-frame vector = the LOW
+   * words of the 12-byte element at -0xc: x (-0xa) = 0, y (-0x6) = low word of the long
+   * linear drag at -0x4c (sStack_4e = word -0x4a), z (-0x2) = low word of a5; the high
+   * words are never written, and transform_vecs12_by_matrix3 reads and writes only
+   * +2 / +6 / +10 of each element, so they do not matter. build_attitude_matrix(sext
+   * local_48, sext local_28, sext local_2a, sext d6 (uVar13), &matrix at -0x1e); then
+   * transform_vecs12_by_matrix3(1, &vec, &vec, matrix) in place; 0x24 bytes popped.
+   * y += word +0x630, then word +0x630 = 0xffa5 (-0x5b) [HYPOTHESIS: a one-frame vertical
+   * term reset to a constant fall rate]; +8 / +0xc / +0x10 = ext.l(word asr.w 6) of
+   * x / y / z (floor). blk 5b starts at 0xf0ba.
+   */
+  /*
    * ---- Block 5b: field_63e touchdown / leave-ground ----------------------
    * [PROVEN] Airborne (63e==0): surface cross → 63e=1, snap [3], pitch
    * follow-on (hard < -0x168 → status|0x400 + optional FUN_00013452;
@@ -16964,9 +17314,14 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    */
   if (*(char *)((int)param_1 + 0x63e) == '\0') {
     if ((param_1[3] + *(int *)(iVar1 + 0x1c) < iVar23) && (iVar23 <= *(int *)(iVar1 + 0x1c))) {
+      /* ORDER CORRECTION [PROVEN, bytes 0xf112..0xf124]: the binary loads the vertical
+       * velocity word +0xe (low word of param_1[3]) into d1 at 0xf112, BEFORE the snap
+       * stores param_1[3] at 0xf124; Ghidra (original C line 14449-14450) prints the load
+       * after the store, which would test the snapped offset instead of the impact
+       * velocity. Both severity tests below use that pre-snap word (d1). */
+      psVar11 = (short *)(*(short *)((int)param_1 + 0xe) * 0x10);
       *(undefined1 *)((int)param_1 + 0x63e) = 1; /* touchdown */
       param_1[3] = iVar23 - *(int *)(iVar1 + 0x1c);
-      psVar11 = (short *)(*(short *)((int)param_1 + 0xe) * 0x10);
       if ((int)psVar11 < -0x168) {
         *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) | 0x400;
         if (*(int *)((int)param_1 + 0x2e) != 0) {
@@ -16976,7 +17331,7 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
         *(char *)(param_1 + 0xb) = (char)psVar11;
         return psVar11;
       }
-      if (*(short *)((int)param_1 + 0xe) * 0x10 < -0xd8) {
+      if ((int)psVar11 < -0xd8) { /* pre-snap word, d1 reused at 0xf156 */
 LAB_0000f192:
         bVar6 = true; /* rough */
       }
@@ -17003,6 +17358,20 @@ LAB_0000f192:
     }
   }
   /*
+   * Section check 0xf0ba..0xf1bc (blk 5b) [PROVEN, matches the C after the order
+   * correction above; independent capstone disassembly]: grounded -> world +0x1c +
+   * new +0xc >= -0x38 (iVar23) leaves the ground: clr.b +0x63e, andi.w #$efff at +0x684,
+   * player -> clr.w DAT_0001b868. Airborne -> touchdown when world +0x1c + +0xc < iVar23
+   * <= world +0x1c (signed): +0x63e = 1, +0xc = iVar23 - world +0x1c; impact = ext(word
+   * +0xe) asl 4 taken before that store; < -0x168 -> ori.w #$400 at +0x684, then return
+   * (bra 0xf806) when +0x2e != 0, else byte +0x2c = surface_type_under_object(world)
+   * (bsr $13452) and return; < -0xd8 -> rough (word -0x3a = 1); else rough when
+   * abs_int(fold_angle_pm_0x2000(heading d6)) > 0x200 or fold_angle_pm_0x2000(local_28)
+   * < -0x100 (cmpi.w, signed word), otherwise the player sets DAT_0001b856 = 1 (gentle);
+   * then clr.w +0x638 and the player sets DAT_0001b868 = 1. fold_angle_pm_0x2000 is called
+   * through lea $e40c(pc) / jsr (a2) (pc-relative, so 0xe40c is a file address).
+   */
+  /*
    * ---- Block 6a: airborne post-commit (field_63e==0) --------------------
    * [PROVEN] speed=isqrt_floor(e²+a²+6²); attitude_from_velocity→local_28/2a;
    * clear field_190 if stall(2); goto LAB_0000f47c. (FUN_0000e372 / 01f22)
@@ -17016,6 +17385,17 @@ LAB_0000f192:
     if (*(char *)(param_1 + 400) == '\x02') {
       *(undefined1 *)(param_1 + 400) = 0; /* airborne: clear the arrest latch */
     }
+    /*
+     * Section check 0xf1be / 0xf428..0xf47a (blk 6a) [PROVEN, matches the C;
+     * independent capstone disassembly]: the airborne path is placed out of line at
+     * 0xf428 (beq.w from 0xf1c2). sum (d5) = x*x + y*y + z*z of the transformed velocity
+     * words -0xa / -0x6 / -0x2 (muls.w 16x16->32, summed in 32 bits; [UNKNOWN] whether
+     * it can exceed 0x7fffffff); speed (a5) = sext word of isqrt_floor(sum);
+     * attitude_from_velocity(sext x, y, z, speed, sum, &local_28 (-0x24), &local_2a
+     * (-0x26)), 0x20 bytes popped; byte +0x640 == 2 -> 0. a5 held the blk 4c speed
+     * accumulator, so in flight that value is DISCARDED and LAB_0000f47c stores the
+     * recomputed |v| into +0x62a (move.l a5 at 0xf4ba) [PROVEN register flow].
+     */
     goto LAB_0000f47c;
   }
   /*
@@ -17033,6 +17413,25 @@ LAB_0000f192:
   cVar3 = *(char *)(param_1 + 0xb);
   psVar11 = (short *)CONCAT31((int3)((uint)iVar25 >> 8),cVar3);
   iVar25 = iVar20 >> 2;
+  /*
+   * Section check 0xf1c6..0xf34e (blk 6b: prologue, dispatch, '@' and 'P' cases)
+   * [PROVEN, matches the C; independent capstone disassembly]: when +0x2e == 0, byte
+   * +0x2c = surface_type_under_object(world); speed a5 = sext word isqrt_floor(x*x + z*z)
+   * (muls.w, horizontal only); +0xc = iVar23 - world +0x1c; signed byte compare tree on
+   * +0x2c: 0x10 -> 0xf384, 0x20 -> 0xf372, 0x30 / 0x60 / 0x70 -> 0xf350, 0x40 -> 0xf256,
+   * 0x50 -> 0xf31c, anything else -> 0xf402. '@' (0x40): bVar6 = 1 unless
+   * abs_int(extb +0x679) == 0x2d; d2 = r1 & 0x7f, d6 = (r2 & 0x7f) - 0x40 (two
+   * overlay_rng_next via lea $11544 / jsr); when a5 asr 2 <= 0x437 both are scaled by
+   * (a5 >> 2) / 0x438 (ext.l, muls.l, divs.l); d6 &= 0x3fff; word +0x630 += d2; player:
+   * DAT_0001b856 != 0 -> DAT_0001b854 = 1 and DAT_0001b856 = 0 (0xf3fc); else
+   * a5 > 0x10e0 -> 1/16 chance, a5 > 0x2d0 -> 1/32 chance of DAT_0001b854 = 1.
+   * 'P' (0x50): bVar6 as above; player clears DAT_0001b856; then 0xf36c (d6 = 0).
+   * d6 is Ghidra's uVar13 = (sVar22 + word +0x24) & 0x3fff, which LAB_0000f47c writes
+   * back to +0x24: these grounded surfaces REPLACE that angle (small random wobble for
+   * '@', 0 via 0xf36c) [PROVEN flow] - so +0x24 behaves like the roll / bank angle,
+   * levelled on the ground [STRONG INFERENCE]. Remaining cases: see the check after
+   * the switch.
+   */
   if (cVar3 == '@') {
     iVar19 = abs_int( /* Original: FUN_00002e08 */(int)*(char *)((int)param_1 + 0x679));
     if (iVar19 != 0x2d) {
@@ -17132,6 +17531,19 @@ LAB_0000f402:
     *(undefined1 *)(param_1 + 400) = 1; /* over the carrier's tag-3 face → arrest */
   }
   /*
+   * Section check 0xf350..0xf426 (blk 6b remaining cases + tail) [PROVEN, matches the
+   * C; independent capstone disassembly]: 0xf350 (0x30 / 0x60 / 0x70): bVar6 = 1 unless
+   * abs_int(extb +0x679) == 0x2d, then 0xf36c: d6 = 0. 0xf372 (0x20): bVar6 = 1 when word
+   * flag 0x800 (btst #3 of byte +0x684) is clear. 0xf384 (0x10): ori.w #$1000; byte +0x679
+   * != 0 or fold_angle_pm_0x2000(sext +0x626) < -0x80 (cmpi.w, signed) -> ori.w #$400 and
+   * bra 0xf806, i.e. the shared epilogue: the attitude / speed commit at LAB_0000f47c is
+   * SKIPPED on that frame; otherwise d6 = (fold(ext d6) / 2 truncating) - 0x20 +
+   * (overlay_rng_next & 0x3f), scaled by (a5 >> 2) / 0x438 when a5 >> 2 <= 0x437, & 0x3fff,
+   * and the player clears DAT_0001b856. Tail 0xf402: (short)local_28 > 0x2000 (cmpi.w /
+   * ble) -> 0; when bVar6 (word -0x3a) == 0, byte +0x63f != 0 and byte +0x640 == 0 ->
+   * +0x640 = 1; then LAB_0000f47c. blk 6b is fully checked.
+   */
+  /*
    * ---- Block 6c: LAB_0000f47c attitude/speed commit epilogue -------------
    * [PROVEN] Clear 63f; commit pos_20/attitude_22 from local_28/2a; yaw-blend
    * field_24 via e40c*FUN_00001d56; write movement_62a=iVar20; player ring
@@ -17142,12 +17554,12 @@ LAB_0000f47c:
   iVar25 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */local_2a - *(short *)((int)param_1 + 0x22));
   *(ushort *)(param_1 + 8) = local_28; /* pos_20 */
   *(ushort *)((int)param_1 + 0x22) = local_2a; /* attitude_22 */
-  psVar11 = FUN_00001d56();
+  psVar11 = FUN_00001d56( /* = sin_fixed14(sext local_28) [PROVEN: lea.l $1d56.l = runtime -> file 0x1d76; arg pushed at 0xf49c, dropped by Ghidra] */);
   *(ushort *)(param_1 + 9) =
        uVar13 + (short)((int)(short)iVar25 * (int)(short)psVar11 >> 0xc) & 0x3fff; /* field_24 */
   *(int *)((int)param_1 + 0x62a) = iVar20; /* movement_62a */
   if (param_1 == DAT_0001b738) {
-    psVar11 = FUN_00001d56();
+    psVar11 = FUN_00001d56( /* = sin_fixed14(sext word +0x20) [PROVEN: jsr (a2) at 0xf4d0, arg pushed at 0xf4ca; +0x20 = local_28 here] */);
     psVar11 = (short *)((iVar20 * (((int)(short)psVar11 << 0xd) >> 0xc)) / 0x1ce);
     if (0x1d80 < (int)psVar11) {
       psVar11 = (short *)0x1d80;
@@ -17163,6 +17575,18 @@ LAB_0000f47c:
     DAT_0001bc80 = (DAT_0001bc80 + (short)psVar11) - (int)(short)(&DAT_0001bc8c)[iVar25];
     DAT_0001bc84 = (short)iVar25;
   }
+  /*
+   * Section check 0xf47c..0xf54e (blk 6c) [PROVEN, matches the C with the call-argument
+   * correction; independent capstone disassembly]: clr.b +0x63f; d2 = fold_angle_pm_0x2000(
+   * sext local_2a - sext word +0x22) taken BEFORE +0x20 / +0x22 are overwritten with
+   * local_28 / local_2a; +0x24 = (d6 + ((d2 muls.w sin_fixed14(local_28)) asr 12)) & 0x3fff;
+   * +0x62a = a5 (the speed chosen by blks 6a / 6b). Player only: v = ((sext
+   * sin_fixed14(+0x20) asl 13) asr 12) muls.l a5 divs.l 0x1ce, clamped to +-0x1d80 (signed
+   * cmpi.l); ring DAT_0001bc8c[DAT_0001bc84] = v (word), DAT_0001bc80 += v, index + 1 wraps
+   * at 0x78, DAT_0001bc80 -= the word now at the new index, index stored: a 120-frame
+   * moving sum of speed * sin(+0x20) [STRONG INFERENCE: vertical-speed / climb-rate
+   * average for the player's instrument].
+   */
   /*
    * ---- Block 7a: direction/bank char epilogue (67b / 679) ----------------
    * [PROVEN] 67b++ when (0<c<0x0F) or c<0. Mid-range 679 in 1..',' with
@@ -17187,6 +17611,16 @@ LAB_0000f47c:
     *(byte *)((int)param_1 + 0x67a) = *(byte *)((int)param_1 + 0x67a) | 2;
     *(ushort *)(param_1 + 0x1a1) = *(ushort *)(param_1 + 0x1a1) & 0xdfff;
   }
+  /*
+   * Section check 0xf550..0xf5a4 (blk 7a) [PROVEN, matches the C; independent capstone
+   * disassembly]: signed byte +0x67b: addq.b #1 when 1..0xe or negative (tst / ble,
+   * cmpi.b #$e / ble, bge), so it ramps from 1 up to 0xf and from below up to 0, holding
+   * at 0 and at >= 0xf. Signed byte +0x679: when 1..0x2c and byte +0x685 bit 5 (word
+   * flag 0x20) clear -> addq.b #1, ori.b #2 at +0x67a, andi.w #$dfff at +0x684; else when
+   * negative -> addq.b #1, ori.b #2 at +0x67a, ori.w #$2000 at +0x684. So +0x679 ramps
+   * up to 0x2d ('-', the value blks 0 / 3b / 4c test) and from below up to 0; word
+   * flag 0x2000 marks the negative ramp. The 'blk 7b' code starts at 0xf5a6.
+   */
   /*
    * ---- Block 7b: weapon fire branches (19d / 676 / 677) ------------------
    * [PROVEN] 19d+19f: when 19d==1 spawn_weapon_entity (FUN_00012840; player
@@ -17220,6 +17654,24 @@ LAB_0000f47c:
       *(char *)piVar4 = '\0';
     }
   }
+  /*
+   * Section check 0xf5a6..0xf636 (blk 7b, BOMB release - corrected from "gun fire": +0x67c
+   * is the bomb count set by load_player_fuel_and_bombs; the gun is +0x676 below)
+   * [PROVEN, matches the C; independent
+   * capstone disassembly]: gate bytes +0x674 != 0 and +0x67c != 0; phase +0x674 == 1 ->
+   * spawn_weapon_entity(a5 as a full long - Ghidra prints (short)iVar20 -, 0, world
+   * +0x18 / +0x1c / +0x20, sext words +0x20 / +0x22 / +0x24), 0x20 bytes popped; a
+   * non-null result for the player -> DAT_0001b880 = it, its word +0x614 = 1, word
+   * DAT_0001b846 = 1; subq.b #1 at +0x67c; word +0x634 -= 0x10 unless word world +0x90 == 2.
+   * Then +0x674 post-increments and is cleared when its old value was 4 (lea / move.b /
+   * addq.b / cmpi.b #4 / clr.b). So one bomb per phase-1 frame, +0x67c counts bombs,
+   * and word +0x634 loses 0x10 per bomb.
+   * Identity [STRONG INFERENCE]: sVar12 (blk 0, -0x2c) = fuel byte +0x67d + word +0x634
+   * + fuel byte +0x67e is the divisor of thrust and drag (blks 4b / 4c) and of the
+   * local_34 term, i.e. the aircraft MASS: fuel plus a stores load at +0x634 that each
+   * dropped bomb lightens (world +0x90 == 2 keeps it, [HYPOTHESIS] an unlimited-bombs
+   * setting).
+   */
   if (*(char *)((int)param_1 + 0x676) != '\0') {
     if (((*(char *)((int)param_1 + 0x676) == '\x01') && (1 < *(short *)((int)param_1 + 0x682))) &&
        ((*(byte *)((int)param_1 + 0x685) & 0x10) == 0)) {
@@ -17242,6 +17694,17 @@ LAB_0000f47c:
       *pcVar5 = '\0';
     }
   }
+  /*
+   * Section check 0xf638..0xf6da (blk 7b, gun) [PROVEN, matches the C; independent
+   * capstone disassembly]: gate byte +0x676 != 0; fire when it == 1, word +0x682 > 1
+   * (cmpi.w / ble, signed) and byte +0x685 bit 4 (word flag 0x10) clear. local_28 =
+   * (word +0x20 + 0x40) & 0x3fff is a DEAD store (no read of -0x24 after 0xf666; +0x20
+   * was already committed). spawn_ordnance_oriented(a5 as a full long, 1, world +0x18 /
+   * +0x1c / +0x20, sext words +0x20 / +0x22 / +0x24, (sext +0x626 - sext template
+   * (*(param_1 + 4)) +0x44) & 0x3fff as a long), 0x24 bytes popped; a non-null result
+   * for the player -> its word +0x36 = 1; word +0x682 -= 2 even when the spawn failed.
+   * +0x676 post-increments and is cleared when its old value was 2.
+   */
   if ((*(char *)((int)param_1 + 0x677) == '\x01') && ((*(byte *)((int)param_1 + 0x685) & 1) == 0)) {
     psVar11 = (short *)spawn_bailout_parachute( /* Original: FUN_00019430 */(short)*(undefined4 *)((int)param_1 + 0x62a),
                                     *(uint *)(iVar1 + 0x18),*(uint *)(iVar1 + 0x1c),
@@ -17306,6 +17769,24 @@ LAB_0000f47c:
     *(undefined2 *)((int)param_1 + 0x61a) = 0;
     *(undefined2 *)((int)param_1 + 0x61e) = 0;
   }
+  /*
+   * Section check 0xf6dc..0xf80e (blk 7b bail-out + blk 7c + epilogue) [PROVEN, matches
+   * the C; independent capstone disassembly]: bail-out when byte +0x677 == 1 and byte
+   * +0x685 bit 0 (word flag 0x1) clear: spawn_bailout_parachute(long +0x62a - Ghidra
+   * prints a (short) cast -, world +0x18 / +0x1c / +0x20, sext words +0x20 / +0x22 /
+   * +0x24), 0x1c bytes popped; ori.w #1 at +0x684; +0x677 = 2. Player: DAT_0001b87c = the
+   * parachute, words DAT_0001b874 = 1, DAT_0001b872 = 0, DAT_0001d858 = 9; DAT_0001b87a = 1
+   * when word +0x684 & 0x3fe == 0 and a fuel byte is non-zero; if the player's object long
+   * +4 has 0x40 (btst #6 of byte +7) -> and.l #~0x40, drop_contact_records_for_object(
+   * object) (0x137da); then update_view_clip_bounds (0x6ed6). Fuel leak: the header's
+   * "flags_685 bit2" is wrong - the test is btst #1 of byte +0x685 = word flag 0x2: a 1/64
+   * draw (r & 0x3f == 0), then the tank rule of blk 1b. Crash (word -0x3a != 0): word
+   * flag 0x100 set -> word +0x688 = min(+0x688, 0x16) (signed), else 0; word +0x684 =
+   * (+0x684 & 0x8000) | 0x900; long +0x32 = 0xe772 (runtime address of this function);
+   * clr.w +0x61a / +0x61e. Epilogue 0xf806: movem / unlk / rts; D0 is not a meaningful
+   * result. The 0x10-surface hard impact and the blk 5b hard landing reach 0xf806 directly
+   * and skip this tail.
+   */
   return psVar11;
 }
 
@@ -17798,7 +18279,26 @@ void release_ai_target /* Original: FUN_000100bc */ (int param_1)
 
 /* Original: FUN_000100d4; source: Pacific Conflict.c. Recovered name: enemy_fighter_notice_object [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x100d4).
- * Definition +0x16 notice handler of key 4 (enemy fighter, file 0x1a7fa) [PROVEN bytes]; the AI counterpart of aircraft_notice_object for the enemy states 0x110d4 / 0x11162 / 0x111ba / 0x112c0: with probability 1/64 and when not busy, estimates a chance from the target size / distance; in the dive state 0x111ba it only takes a ship (types 0x15..0x19) near a friendly facility (0x200) - the kamikaze picking its ship - and switches to the bombing / dive states with a target in +0x692. Ghidra C (switch on the target type not recovered: "switch(uVar4);").
+ * Definition +0x16 notice handler of key 4 (enemy fighter, file 0x1a7fa) [PROVEN bytes]; the AI counterpart of aircraft_notice_object for the enemy states 0x110d4 / 0x11162 / 0x111ba / 0x112c0: with probability 1/64 and when not busy, estimates a chance from the target size / distance; in the dive state 0x111ba it only takes a ship (types 0x15..0x19) near a friendly facility (0x200) - the kamikaze picking its ship - and switches to the bombing / dive states with a target in +0x692. Ghidra C (switch on the target type not recovered: "switch(uVar4);" - now reconstructed below).
+ * Section check 0x100d4..0x102d4 [PROVEN; independent capstone disassembly]: kind = first
+ * word of the target's definition (*(*(param_2 + 8) + 4)); only kinds 1, 2, 21..25
+ * (jump table) proceed. 1/64 (rng & 0x3f == 0), own byte +0x63e == 0 and own state long
+ * +0x32 in {0x110d4, 0x11162, 0x111ba, 0x112c0} - runtime addresses of ai_attack_or_fly
+ * (0x110f4), ai_fly (0x11182), ai_dive_at_target (0x111da), ai_bombing_run (0x112e0).
+ * d = approx_dist3_xyz(own object pos, target pos); chance = d == 0 ? 0x7fffffff :
+ * (((target +0x14 * 0x6720) divs.l 500) asl 6) divs.l d. Dive state: only without a
+ * target, kind 21..25, probe_nearest_facility_kind(param_2) == 0x200 and (rng & 0x7f) <
+ * chance -> take it. Other states: chance halved when a target exists; (rng & 0x7f) <
+ * chance; switch when no target or 2d < current distance +0x696 (signed): kind 21..25
+ * with probe 0x200 -> damage word +0x684 & 0x3b2 ? dive (0x111ba) : bombs (+0x67c) ?
+ * bombing run (0x112c0) with +0x675 = 0 : no switch; kind 1..2 (<= 4) with ammo word
+ * +0x682 > 1 -> attack (0x110d4); each switch calls invert_ai_bias_67b_if_positive. On a
+ * switch: old target's byte +3 -= 1 (attacker count), +0x692 = param_2, +0x696 = d,
+ * param_2 byte +3 += 1. Identical to the C with the switch reconstruction and the
+ * call-argument corrections above.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x100d4..0x102d4 (jump table decoded by hand: ext 0x0a06 = d0.l x2); identical to the
+ * C with the corrections above. The return value is only the D0 left over.
  */
 uint enemy_fighter_notice_object /* Original: FUN_000100d4 */ (int param_1,int param_2)
 
@@ -17815,7 +18315,14 @@ uint enemy_fighter_notice_object /* Original: FUN_000100d4 */ (int param_1,int p
   iVar1 = *(int *)(param_1 + 8);
   sVar2 = **(short **)(*(int *)(param_2 + 8) + 4);
   uVar4 = (int)sVar2 - 1;
-  switch(uVar4);
+  /* SWITCH RECONSTRUCTION [PROVEN, bytes 0x100f0..0x10102 + word table 0x10104]: Ghidra
+   * printed an empty "switch(uVar4);". cmp.l #$18 / bhi (unsigned) then a 25-entry
+   * pc-relative word table: target kinds 1, 2 and 21..25 continue at 0x10136; kinds
+   * 3..20 and anything outside 1..25 go straight to the epilogue 0x102d0 (no further
+   * effect). */
+  if (!((uVar4 < 2) || ((uVar4 >= 20) && (uVar4 <= 24)))) {
+    return uVar4;
+  }
   uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
   uVar5 = uVar4 & 0xffff003f;
   if ((uVar4 & 0x3f) != 0) {
@@ -17828,7 +18335,7 @@ uint enemy_fighter_notice_object /* Original: FUN_000100d4 */ (int param_1,int p
       (*(int *)(iVar1 + 0x32) != 0x111ba)) && (*(int *)(iVar1 + 0x32) != 0x112c0)) {
     return uVar5;
   }
-  uVar5 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+  uVar5 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (object a +0x18 / +0x1c / +0x20, object b +0x18 / +0x1c / +0x20) of param_1 / param_2 [PROVEN, pushes 0x10176..0x1018a] */);
   if (uVar5 == 0) {
     iVar7 = 0x7fffffff;
   }
@@ -17845,7 +18352,7 @@ uint enemy_fighter_notice_object /* Original: FUN_000100d4 */ (int param_1,int p
     if (0x19 < sVar2) {
       return uVar5;
     }
-    uVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
+    uVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354; arg dropped by Ghidra = param_2 [PROVEN, move.l a4 at 0x101e0] */);
     if (uVar4 != 0x200) {
       return uVar4;
     }
@@ -17880,7 +18387,7 @@ LAB_000102c4:
         }
       }
       else {
-        uVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
+        uVar4 = probe_nearest_facility_kind( /* Original: FUN_00000354; arg dropped by Ghidra = param_2 [PROVEN, move.l a4 at 0x1024c] */);
         if (uVar4 == 0x200) {
           uVar4 = *(ushort *)(iVar1 + 0x684) & 0xffff03b2;
           if ((*(ushort *)(iVar1 + 0x684) & 0x3b2) == 0) {
@@ -18584,6 +19091,18 @@ bool ai_bootstrap_climb_phase(int *param_1) /* Original: FUN_00010b84 */
  * Callers pass constants like 0xd5c or table/script targets.
  *
  * Evidence: Capstone @0x10C2C–0x10CB0; +0x668 clamp matches 10cb2.
+ *
+ * Exact form [PROVEN, word arithmetic]: e = param_2 - (+0x62a asr 2); d = e - prev (+0x620);
+ * +0x620 = e; s = +0x63c + e + 32 * d (asl.w #5) = +0x63c + 33e - 32 prev; +0x63c = s -
+ * trunc256(s) (C remainder, sign of s); throttle byte +0x668 += trunc(s / 256) (addi.w
+ * #$ff bias, asr.w #8, add.b), then clamped to 0..9 (signed). A velocity-form controller:
+ * each frame the throttle moves by (speed error + 32 * its change) / 256, the fraction
+ * carried in +0x63c. s < -0x438 (0xfbc8, signed) sets byte +0x679 = 1 when it is 0 (start
+ * the +0x679 ramp, [HYPOTHESIS] brakes / gear); s > 0x1c2 calls
+ * max_ai_throttle_maybe_invert_679(param_1).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10c2c..0x10cb0; identical to the C (Ghidra's (ushort)sVar2 >> 8 keeps the same low
+ * byte as asr.w #8).
  */
 void adjust_ai_throttle_vs_speed(int *param_1,short param_2) /* Original: FUN_00010c2c */
 {
@@ -18654,6 +19173,14 @@ void max_ai_throttle_maybe_invert_679(int *param_1) /* Original: FUN_00010cb2 */
  * Capstone @0x10CD8–0x10CE6. Callers @0x1008E/@0x100B0/@0x1029E.
  *
  * Unknown: gameplay role of +0x67b vs +0x679.
+ * Role [STRONG INFERENCE]: +0x67b is the flap state - update_aircraft_entity blk 7a ramps
+ * a positive value up to 0xf and a negative one up to 0, and compute_template_force_from_626
+ * blends the lift curve by |+0x67b| / 15. Negating a positive value therefore starts
+ * retracting the flaps from their current extension; enemy_fighter_notice_object calls
+ * this when it commits to an attack / dive / bombing state.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10cd8..0x10ce6 (tst.b / ble / neg.b); identical to the C (the signed byte is > 0, so
+ * neg.b never meets -128).
  */
 void invert_ai_bias_67b_if_positive(int param_1) /* Original: FUN_00010cd8 */
 {
@@ -18975,6 +19502,21 @@ LAB_000110e6:
 /* Original: FUN_000110f4; source: Pacific Conflict.c. Recovered name: ai_attack_or_fly [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x110f4).
  * AI state handler 0x110d4 (+0x20): while the target +0x692 is valid (ammo +0x682 >= 2, target not flagged +7 & 2, has vertices) updates the target distance +0x696 and runs FUN_0001820a (pursuit / attack); otherwise drops the target and flies with the per-kind handler DAT_0001b3f4[+0x614] or update_aircraft_entity. Set by aircraft_create and aircraft_notice_object. Ghidra C.
+ * Section check 0x110f4..0x11180 [PROVEN; independent capstone disassembly]: target kept
+ * when word +0x682 > 1 (cmpi.w / ble, signed), target long +4 bit 1 clear (btst #1 of
+ * byte +7, the retired flag set by retire_entity) and target long +0x44 != 0; otherwise
+ * target byte +3 -= 1 and +0x692 = 0. Kept: +0x696 = approx_dist3_xyz(own object
+ * (*param_1) +0x18 / +0x1c / +0x20, target +0x18 / +0x1c / +0x20) - arguments dropped by
+ * Ghidra, recorded in DECOMPILATION_SYMBOLS.md - then ai_pursue_target(param_1) (which
+ * runs update_aircraft_entity itself); 0x1c bytes popped. Otherwise the long at
+ * DAT_0001b3f4 + 4 * sext word +0x614 is called with param_1 when non-zero, else
+ * update_aircraft_entity(param_1). Table values (runtime, file + 0x20) [PROVEN data]:
+ * [0] = 0 (plain flight), [1] ensure_ai_script_1b2e0_tick (0x10d68), [2]
+ * ensure_ai_script_1b340_tick (0x10de8), [3] tick_ai_1b370_mission (0x10f68), [4]
+ * tick_ai_1b310_approach_fire (0x10ecc), [5] ensure_ai_script_1b310_tick (0x10da8); the
+ * next longs point at effect initialisers, so the table has 6 entries [STRONG INFERENCE].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the call-argument correction.
  */
 void ai_attack_or_fly /* Original: FUN_000110f4 */ (int *param_1)
 
@@ -18991,7 +19533,7 @@ void ai_attack_or_fly /* Original: FUN_000110f4 */ (int *param_1)
       *(undefined4 *)((int)param_1 + 0x692) = 0;
     }
     else {
-      iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+      iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own object pos, target object pos) [PROVEN, pushes 0x11128..0x1113c] */);
       *(int *)((int)param_1 + 0x696) = iVar2;
       ai_pursue_target(param_1);
       bVar1 = true;
@@ -19013,6 +19555,10 @@ void ai_attack_or_fly /* Original: FUN_000110f4 */ (int *param_1)
 /* Original: FUN_00011182; source: Pacific Conflict.c. Recovered name: ai_fly [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x11182).
  * AI state handler 0x11162 (+0x20): flies with the per-kind handler DAT_0001b3f4[word +0x614], or update_aircraft_entity when none. Complete Ghidra C.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x11182..0x111ac (movea.w $614 sign-extends the index, tst.l / movea.l (a2,a1.l*4),
+ * jsr (a0) or bsr update_aircraft_entity, one long popped); identical to the C. Table
+ * contents: see ai_attack_or_fly.
  */
 void ai_fly /* Original: FUN_00011182 */ (int *param_1)
 
@@ -19048,7 +19594,21 @@ void ai_fly_bomber /* Original: FUN_000111ae */ (int *param_1)
 
 /* Original: FUN_000111da; source: Pacific Conflict.c. Recovered name: ai_dive_at_target [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x111da).
- * AI state 0x111ba (+0x20) set by tick_wave_spawner: with a valid target (+0x692) steers straight at it (steer_entity_toward_point, aiming at its height when closer than 0xafc8, else at 40000) at throttle 0xd5c with the ground-height floor lifted for the steer, then flies (update_aircraft_entity); without one, in mission 7 while the list flag is clear, it keeps flying; otherwise FUN_000100bc and the ammo check follow. [STRONG INFERENCE: attack-run / kamikaze dive of the incoming waves] Ghidra C (partly read).
+ * AI state 0x111ba (+0x20) set by tick_wave_spawner: with a valid target (+0x692) steers straight at it (steer_entity_toward_point, aiming at its height when closer than 0xafc8, else at 40000) at throttle 0xd5c with the ground-height floor lifted for the steer, then flies (update_aircraft_entity); without one, in mission 7 while the list flag is clear, it keeps flying; otherwise FUN_000100bc and the ammo check follow. [STRONG INFERENCE: attack-run / kamikaze dive of the incoming waves] Ghidra C (now read in full).
+ * Section check 0x111da..0x112de [PROVEN; independent capstone disassembly]: target valid
+ * = long +4 bit 1 clear (btst #1 of byte +7) and long +0x44 != 0. +0x696 =
+ * approx_dist3_xyz(own x, 0, own z, target x, 0, target z) - Ghidra dropped the
+ * arguments, and the bytes pass 0 for both heights (clr.l at 0x11208 / 0x11212): a
+ * HORIZONTAL distance (recorded in DECOMPILATION_SYMBOLS.md). Aim height = target +0x1c
+ * when +0x696 <= 0xafc8 (signed), else 40000; adjust_ai_throttle_vs_speed(param_1,
+ * 0xd5c); +0x2e saved, set to 0xffff63c0 (-40000) for steer_entity_toward_point(param_1,
+ * target x, aim height, target z), set to 0 for update_aircraft_entity(param_1), then
+ * restored. No target: world word +0x90 == 7 and word *(DAT_00020adc) +4 == 0 -> just fly
+ * (table handler); invalid target or other cases -> release_ai_target(param_1), then
+ * state +0x32 = 0x110d4 (attack) when word +0x682 > 2, else 0x11162 (fly), and fly via
+ * DAT_0001b3f4[word +0x614] / update_aircraft_entity in the same frame.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the call-argument correction.
  */
 void ai_dive_at_target /* Original: FUN_000111da */ (int *param_1)
 
@@ -19066,7 +19626,7 @@ void ai_dive_at_target /* Original: FUN_000111da */ (int *param_1)
   else {
     iVar1 = *(int *)((int)param_1 + 0x692);
     if (((*(byte *)(iVar1 + 7) & 2) == 0) && (*(int *)(iVar1 + 0x44) != 0)) {
-      iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+      iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own x, 0, own z, target x, 0, target z): horizontal distance [PROVEN, pushes 0x11204..0x11214] */);
       *(int *)((int)param_1 + 0x696) = iVar4;
       if (*(int *)((int)param_1 + 0x696) < 0xafc9) {
         iVar4 = *(int *)(iVar1 + 0x1c);
@@ -19108,7 +19668,22 @@ LAB_000112b4:
 
 /* Original: FUN_000112e0; source: Pacific Conflict.c. Recovered name: ai_bombing_run [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x112e0).
- * AI state 0x112c0 (+0x20; set by enemy_fighter_notice_object). Without a valid target or bombs (+0x67c) it releases the target and returns to ai_attack_or_fly (ammo >= 3) or ai_fly. Otherwise a stage machine in +0x675: 0 approach until within 0x9c40 and above 24999; 1 steer straight at the target (ground-height floor lifted) and release the weapon (+0x674 = 1) once below 5000, then stage 2 (pull out). [STRONG INFERENCE: dive-bombing attack] Ghidra C (partly read).
+ * AI state 0x112c0 (+0x20; set by enemy_fighter_notice_object). Without a valid target or bombs (+0x67c) it releases the target and returns to ai_attack_or_fly (ammo >= 3) or ai_fly. Otherwise a stage machine in +0x675: 0 approach until within 0x9c40 and above 24999; 1 steer straight at the target (ground-height floor lifted) and release the weapon (+0x674 = 1) once below 5000, then stage 2 (pull out). [STRONG INFERENCE: dive-bombing attack] Ghidra C (now read in full).
+ * Section check 0x112e0..0x11482 [PROVEN; independent capstone disassembly]: valid = target
+ * +0x692 set, bombs byte +0x67c != 0, target long +4 bit 1 clear, target +0x44 != 0; else
+ * release_ai_target, then +0x32 = 0x110d4 when word +0x682 > 2, else 0x11162, and fly
+ * via the DAT_0001b3f4 handler. Valid: +0x696 = approx_dist3_xyz(own x, 0, own z, target
+ * x, 0, target z) - horizontal, arguments dropped by Ghidra (recorded); aim = target
+ * pos. Signed byte stage +0x675: 0 -> when +0x696 <= 40000 and own height (world +0x1c)
+ * > 24999 stage = 1 and aim at the target height, else aim height 30000; steer, fly.
+ * 1 -> own height <= 4999 -> bomb phase +0x674 = 1 (blk 7b of update_aircraft_entity
+ * drops one bomb) and stage = 2; steer at the target with +0x2e = 0xffff63c0, fly with
+ * +0x2e = 0, restore. 2 -> steer to (own x + (vel x +8 << 13), 30000, own z + (vel z
+ * +0x10 << 13)) - straight ahead along the velocity -, fly; +0x696 > 45000 -> stage 0 and
+ * release_ai_target. Any other stage value: no steer and no flight this frame (only the
+ * throttle). Every valid frame ends with adjust_ai_throttle_vs_speed(param_1, 0xd5c).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the call-argument correction.
  */
 void ai_bombing_run /* Original: FUN_000112e0 */ (int *param_1)
 
@@ -19135,7 +19710,7 @@ void ai_bombing_run /* Original: FUN_000112e0 */ (int *param_1)
   }
   else {
     iVar1 = *param_1;
-    iVar6 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+    iVar6 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own x, 0, own z, target x, 0, target z): horizontal distance [PROVEN, pushes 0x11312..0x11322] */);
     *(int *)((int)param_1 + 0x696) = iVar6;
     iVar6 = *(int *)(iVar2 + 0x18);
     iVar7 = *(int *)(iVar2 + 0x1c);
@@ -19232,7 +19807,12 @@ void spin_object_heading /* Original: FUN_000114b4 */ (int param_1)
  * Confidence: [PROVEN]
  *
  * 32×32→64-ish mix used to fill the overlay RNG table:
- * ((lo2*hi1 + lo1*hi2)<<16) + lo1*lo2. Constant seed factor 0x1DF5E0D.
+ * ((lo2*hi1 + lo1*hi2)<<16) + lo1*lo2. Constant seed factor 0x1DF5E0D. * Correction [PROVEN]: the high cross terms are discarded by the <<16, so this is the
+ * plain 32-bit product: returns (param_1 * param_2) mod 2^32 (not a 64-bit mix).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x114ca..0x11508: lsr.l #16 / andi.l #$ffff halves, three muls.l 32x32->32 (low 32 bits
+ * equal for signed and unsigned), andi.l #$ffff then lsl.l #16 of the cross sum, add.l;
+ * identical to the C. No calls.
  */
 int overlay_rng_mul_mix(uint param_1,uint param_2) /* Original: FUN_000114ca */
 {
@@ -19245,11 +19825,19 @@ int overlay_rng_mul_mix(uint param_1,uint param_2) /* Original: FUN_000114ca */
 /*
  * Original: FUN_0001150a
  * Proposed name: overlay_rng_init
- * Confidence: [PROVEN] fill+warmup; [UNKNOWN] pre-init DAT_00026008[0]
+ * Confidence: [PROVEN] fill+warmup; pre-init DAT_00026008[0] never read (resolved below)
  *
  * Stores seed at DAT_0002600c; fills DAT_00026010… for i=1..0x36 via
  * overlay_rng_mul_mix(0x1DF5E0D, table[i])+1; sets cursor DAT_00026008=0x260E4;
- * warms with 10000× overlay_rng_next.
+ * warms with 10000× overlay_rng_next. * Resolved [PROVEN]: entry [0] (the cursor slot DAT_00026008) is never read; iteration i
+ * reads (&DAT_00026008)[i] = table entry i-1, so i = 1 reads the seed at 0x2600c. The fill
+ * is an LCG: x[0] = seed, x[i] = x[i-1] * 0x1df5e0d + 1 (mod 2^32), i = 1..54.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x1150a..0x11562, including the tail 0x11544..0x11562 that Ghidra also lists as
+ * overlay_rng_warmup_epilogue: seed store 0x1150e; loop d2 = 1..0x36 (signed bge), push
+ * (a3 = 0x26008)[d2*4] and 0x1df5e0d, addq.l #1, move.l d0,(a2)+ from 0x26010; cursor =
+ * 0x2600c + 0xd8 = 0x260e4 (0x1154a); bsr.b overlay_rng_next 10000 times (ble 0x270f).
+ * Identical to the C; no call arguments omitted.
  */
 void overlay_rng_init(undefined4 param_1) /* Original: FUN_0001150a */
 {
@@ -19317,6 +19905,17 @@ void overlay_rng_warmup_epilogue(void) /* Original: FUN_00011544 */
  * 0x260E7); taps +0x17 words (wrap −0x20) and +0x36 words (wrap −1);
  * *cursor = tapA + tapB; return sum >> 16.
  * Table spans DAT_00026008…≈0x260E4 (~0x37 words). Used heavily by e792.
+ * Correction [PROVEN]: DAT_00026008 is the cursor itself; the ring is the 55 longs
+ * 0x2600c..0x260e7 (overlay_rng_init stores the seed at 0x2600c, fills 0x26010.. with
+ * 54 mixed entries, sets the cursor to 0x260e4 and discards 10000 outputs). Each call
+ * moves the cursor to the next slot (wrap to 0x2600c), overwrites it with
+ * slot(+23 = written 32 calls ago) + slot(+54 = written on the previous call), mod 2^32:
+ * x[n] = x[n-1] + x[n-32]; returns bits 31..16 of x[n] zero-extended (0..0xffff).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x11564..0x115ae: addq.w #4 / lea $5c / lea $d8 with unsigned bhi against 0x260e8 and
+ * adda.w #$ff24 (-0xdc) wraps, add.l, lsr.l #16 then clr.l d0 / move.w = identical to
+ * the C; the binary stores the cursor (0x1157e) before reading the taps, which is not
+ * observable (no calls, the taps never alias the new slot). No call arguments omitted.
  */
 uint overlay_rng_next(void) /* Original: FUN_00011564 */
 {
@@ -22572,7 +23171,28 @@ int lift_object_onto_terrain /* Original: FUN_00014830 */ (int param_1,short par
 
 /* Original: FUN_00014af2; source: Pacific Conflict.c. Recovered name: release_fractal_reference [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x14af2).
- * Called by deactivate_object and update_ground_scatter_objects when object +0x2c is set. If the object is flagged +5 & 8 without +5 & 0x10, restores its position from the template entry (*(DAT_0001b5a0 + 0x8c) + scene +0x28 entry +0x2e) and re-applies the template chain transform. Plain object (+6 & 2 clear): decrements the shared counter *(+0x2c) and sets _DAT_0001c1bc = 1 when it reaches 0. Owner (+6 & 2 set): for each block in the list at +0x2c that is still referenced, recursively releases every entity of DAT_0001b5a4 (count DAT_0001b734) pointing at it, prints "*** Deactivating Fractal, but st..." (overlay_printf) if it is still non-zero, frees each block and the list. Finally clears +0x2c. The message names the shared data as fractal (terrain) data [STRONG INFERENCE]. Ghidra C (register arguments of the printf call shown as unaff_*).
+ * Called by deactivate_object and update_ground_scatter_objects when object +0x2c is set. If the object is flagged +5 & 8 without +5 & 0x10, restores its position from the template entry (*(DAT_0001b5a0 + 0x8c) + scene +0x28 entry +0x2e) and re-applies the template chain transform. Plain object (+6 & 2 clear): decrements the shared counter *(+0x2c) and sets _DAT_0001c1bc = 1 when it reaches 0. Owner (+6 & 2 set): for each block in the list at +0x2c that is still referenced, recursively releases every entity of DAT_0001b5a4 (word count at 0x1b736) pointing at it, prints "*** Deactivating Fractal, but st..." (overlay_printf) if it is still non-zero, frees each block and the list. Finally clears +0x2c. The message names the shared data as fractal (terrain) data [STRONG INFERENCE]. Ghidra C (register arguments of the printf call shown as unaff_*).
+ * Corrections [PROVEN, bytes]: the entity count is the WORD at 0x1b736 (low half of the
+ * long DAT_0001b734, as Ghidra's ._2_2_ shows), not the long; the printf call pushes only
+ * the string (pea $14aba(pc) at 0x14ba2, addq.w #4) - the unaff_* arguments are Ghidra
+ * artefacts. Flag bits in the long +4: +5 & 8 = 0x80000 (the bit deactivate_object clears),
+ * +5 & 0x10 = 0x100000, +6 & 2 = 0x200.
+ * _DAT_0001c1bc [STRONG INFERENCE: deferred-free flag]: word set to 1 here when a shared
+ * counter reaches 0; sort_group_parts_by_distance (FUN_0001443a) frees the zero-count
+ * blocks of its +0x2c list while it is non-zero; overlay_frame_step clears it.
+ * Section check 0x14af2..0x14be6 [PROVEN, matches the C]: template entry address =
+ * *(*(+0x24) + 0x28) + 0x1a + 0x14 + idx*0x18 (idx = byte +1; lea (a1,d0.l*2) = 3*idx then
+ * movea.l $14(a0,a1.l*8) - extension word 0x9e14, scale x8 omitted by capstone 5.0.7)
+ * plus *(DAT_0001b5a0 + 0x8c); copies the longs at +2/+6/+10 to +0x18/+0x1c/+0x20, then
+ * apply_template_chain_xform(obj, 1, 0, 0). Counter path: subq.w #1 of *(+0x2c), bne.
+ * Owner path: null test of +0x2c; dbra loops over the word count at *(+0x2c) (block
+ * pointers from +4) and the word count at 0x1b736 (entities from DAT_0001b5a4), both
+ * iterating exactly count times; recursion only when the entity's +0x2c equals the block;
+ * the non-zero word is retested after the recursion before the message; each block, then
+ * the list, freed by heap_free_coalesce. clr.l +0x2c on every path.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
+ * branch conditions, call targets and arguments identical to the C, with the corrections
+ * above. The name keeps [STRONG INFERENCE].
  */
 void release_fractal_reference /* Original: FUN_00014af2 */ (int param_1)
 
@@ -25896,7 +26516,7 @@ void tick_wave_spawner /* Original: FUN_000180c8 */ (int param_1)
 
 /* Original: FUN_0001820a; source: Pacific Conflict.c. Recovered name: ai_pursue_target [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x1820a).
- * Called by ai_attack_or_fly while the target +0x692 is valid. Within 0x4e20 of the target: aims at the target position taken from its 75-frame pose ring (+0x36, index +0x612) DAT_0001b878 frames in the past (DAT_0001b876 when the attacker kind is 1), extrapolated (build_relative_steer_sample); the lag comes from the rank table DAT_0001b2b4 (set at session start) - a rank-dependent reaction delay [STRONG INFERENCE: difficulty]. Runs a manoeuvre state machine in byte +0x69a (0 = pick one at random: 1, 2, or 3 when fast > 0x32a0 and level; 4 =...), saving the start position at +0x69c.., with full throttle (max_ai_throttle_maybe_invert_679), and fires when lined up (further down). Ghidra C (only the first part read).
+ * Called by ai_attack_or_fly while the target +0x692 is valid. Within 0x4e20 of the target: aims at the target position taken from its 75-frame pose ring (+0x36, index +0x612) DAT_0001b878 frames in the past (DAT_0001b876 when the attacker kind is 1), extrapolated (build_relative_steer_sample); the lag comes from the rank table DAT_0001b2b4 (set at session start) - a rank-dependent reaction delay [STRONG INFERENCE: difficulty]. Runs a manoeuvre state machine in byte +0x69a (0 = pick one at random: 1, 2, or 3 when fast > 0x32a0 and level; 4 =...), saving the start position at +0x69c.., with full throttle (max_ai_throttle_maybe_invert_679), and fires when lined up (see the section checks). Ghidra C reviewed in full.
  */
 /* Section check 0x1820a..0x18316 [PROVEN, matches the C]: +0x692 = target object, +0x696 =
  * its distance (written by enemy_fighter_notice_object). Beyond 0x4e20: steer straight at
@@ -25913,7 +26533,23 @@ void tick_wave_spawner /* Original: FUN_000180c8 */ (int param_1)
  * 0x3000, else full; GUNS: +0x676 = 1 when abs_int(pitch_err - (own +0x626 - def +0x44))
  * <= 0x7f and abs_int(heading_err) <= 0x7f, errors measured to the target's CURRENT
  * position (the gun line is the fuselage, so AoA minus trim is removed); state 4 kept
- * with probability 31/32. The manoeuvre part from 0x1856e is not yet checked. */
+ * with probability 31/32.
+ * Section check 0x1856e..0x188b2 [PROVEN, matches the C]: full throttle, then loop while
+ * +0x69a == 0. State 0: waypoint +0x69c/+0x6a0/+0x6a4 = target pos (a4 = *param_1 + 0x18..),
+ * r = rng & 3 (word); r == 1 and +0x62a > 0x32a0 and abs_int(fold(+0x20)) <= 0x1ff -> 3, else
+ * r <= 1 -> 2, else 1; +0x69b = 0, best +0x6a8 = 0, d = 1. Otherwise d = approx_dist3_xyz(
+ * target pos, waypoint) (call-argument correction, 0x1860e). Advance only when d < 2000 and
+ * (d > best or d < 400), signed: state 1 sub 0 -> waypoint = target + (sin, cos)(-own +0x22)
+ * * (+0x62a * 0x4b >> 6) >> 12, y = target y, sub 1; sub != 0 -> state 0. State 2 sub 0 ->
+ * y = target y, angle (rng bit 0 ? -0x200 -> sub 2 : 0x200 -> sub 1); sub != 0 -> rng bit 0
+ * clears the state, sub 1 -> -0x400 / sub 2, else 0x400 / sub 1; waypoint xz radius
+ * +0x62a * 0x2d >> 6 at (angle - own +0x22) & 0x3fff. State 3 sub 0 -> radius 0x2d at
+ * (-own +0x22) & 0x3fff, y + 5000, sub 1; sub 1 -> radius 0x78 at (rng & 0xff) << 6,
+ * y + 3000, sub 2; sub 2 -> state 0. Every advance sets d = 0x7fffffff (best). After the
+ * loop: +0x6a8 = d, steer_entity_toward_point(waypoint), then update_aircraft_entity.
+ * VERIFIED: checked against an independent capstone disassembly of the overlay bytes at
+ * 0x1820a..0x188b2 (sections above); widths, signed compares, asr rounding and call targets
+ * identical to the C, with the call-argument corrections recorded in DECOMPILATION_SYMBOLS.md. */
 void ai_pursue_target /* Original: FUN_0001820a */ (int *param_1)
 
 {
