@@ -26335,8 +26335,12 @@ void tick_trail /* Original: FUN_0001702a */ (int *param_1)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_ground_fire_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x1706a).
  * Cleared 0x54-byte controller, object flags | 0x12040 (starts hidden), object word +0x34 = 0. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
+ * VERIFIED: 0x1706a..0x17096 checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0x54; +0 = object, object long +4 |= 0x12040, object word +0x34 = 0,
+ * +4 = DAT_0001b550 (fixed handler).
  */
-void create_ground_fire_controller /* Original: FUN_0001706a */ (uint param_1)
+uint * create_ground_fire_controller /* Original: FUN_0001706a */ (uint param_1)
 
 {
   uint *puVar1;
@@ -26346,7 +26350,8 @@ void create_ground_fire_controller /* Original: FUN_0001706a */ (uint param_1)
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x12040;
   *(undefined2 *)(param_1 + 0x34) = 0;
   puVar1[1] = DAT_0001b550;
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
@@ -26585,8 +26590,12 @@ void tick_ground_fire /* Original: FUN_00017380 */ (int *param_1)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_debris_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x173a2).
  * Cleared 0x38-byte controller, object flags | 0x152000, definition at +4. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
+ * VERIFIED: 0x173a2..0x173da checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0x38; +0 = object, object long +4 |= 0x152000, +4 =
+ * DAT_0001b524[class].
  */
-void create_debris_controller /* Original: FUN_000173a2 */ (uint param_1,int param_2)
+uint * create_debris_controller /* Original: FUN_000173a2 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -26595,7 +26604,8 @@ void create_debris_controller /* Original: FUN_000173a2 */ (uint param_1,int par
   *puVar1 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x152000;
   puVar1[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
@@ -26687,8 +26697,12 @@ void tick_debris_fragment /* Original: FUN_000174c4 */ (int *param_1)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_ground_mark_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x17566).
  * Cleared 0x32-byte controller, object flag +5 | 2, definition at +4. Template / create / tick pattern of the effect families [PROVEN by the + 0x20 create pointers]: each register_*_template is the first create handler (definition +6, via instantiate_object_from_desc) and redirects later creates to the matching create_*_controller. Complete Ghidra C.
+ * VERIFIED: 0x17566..0x1759c checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0x32; +0 = object, object byte +5 bit 1 set (bset), +4 =
+ * DAT_0001b524[class].
  */
-void create_ground_mark_controller /* Original: FUN_00017566 */ (uint param_1,int param_2)
+uint * create_ground_mark_controller /* Original: FUN_00017566 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -26697,7 +26711,8 @@ void create_ground_mark_controller /* Original: FUN_00017566 */ (uint param_1,in
   *puVar1 = param_1;
   *(byte *)(param_1 + 5) = *(byte *)(param_1 + 5) | 2;
   puVar1[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
@@ -27753,8 +27768,12 @@ LAB_000188a6:
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_shadow_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x188ba).
  * Cleared 0x36-byte shadow controller, object flags | 0x112000, definition at +4. Complete Ghidra C.
+ * VERIFIED: 0x188ba..0x188f2 checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0x36; +0 = object, object long +4 |= 0x112000, +4 =
+ * DAT_0001b524[class].
  */
-void create_shadow_controller /* Original: FUN_000188ba */ (uint param_1,int param_2)
+uint * create_shadow_controller /* Original: FUN_000188ba */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -27763,7 +27782,8 @@ void create_shadow_controller /* Original: FUN_000188ba */ (uint param_1,int par
   *puVar1 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x112000;
   puVar1[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
