@@ -10285,6 +10285,21 @@ void turn_camera_toward_point /* Original: FUN_00008abe */ (int param_1,int para
 /* Original: FUN_00008c30; source: Pacific Conflict.c. Recovered name: update_tracking_camera [STRONG INFERENCE] (iteration 302).
  * Ghidra C reviewed (function at overlay offset 0x8c30).
  * Called from process_flight_input_and_outcome. When the released weapon DAT_0001b880 is still alive, follows it; otherwise, with a target (DAT_0001b888, or the one kept in DAT_0001b884 for 20 frames), places the camera between the player and the target (when within 0x9ab0) and, when the target is roughly ahead (heading difference < 0x1000), looks over the player at it. [STRONG INFERENCE: weapon-follow and target views] Ghidra C (partly read; LAB_000028ba_2 transform not recovered).
+ *
+ * Iteration 381, section check 0x8c30..0x8ea8 (target-follow path) [PROVEN; the C matches]:
+ *   follows the released weapon DAT_0001b880 while its object +0x40 frame is still ahead
+ *   (cmp.l / blt to 0x8ece); otherwise, outside replay mode 3, tracks DAT_0001b884 (taken
+ *   from DAT_0001b888, held for 0x14 frames by DAT_00024d1c).
+ *   CALL-ARGUMENT CORRECTIONS: approx_dist3_xyz(player x, y, z, target x, y, z) at 0x8cd0
+ *   (in range when <= 0x9ab0); the two "nose" tests approx_dist3_xyz(own pos + (0, 0,
+ *   0x4000) rotated by own attitude words +0x20 / +0x22 / +0x24, other pos) at 0x8e06 /
+ *   0x8e78 (via lea $3c48 = approx_dist3_xyz); transform_vecs12_by_matrix3(1, v, v, m)
+ *   via lea $28bc (LAB_000028ba_2).
+ *   Midpoints with the +1 bias; shift count = bits above 15 of the distance; when
+ *   DAT_0001b888 is set and |fold(target +0x22 - player +0x22)| <= 0x1000, the camera is
+ *   placed behind whichever aircraft's nose point is NOT closer to the other (player on a
+ *   tie); else behind the player. place_camera_behind_object(obj, mid x, y, z, shift).
+ *   Remaining: 0x8eac..0x8ff4 (weapon follow, glide, countdown) for a full VERIFIED.
  */
 int update_tracking_camera /* Original: FUN_00008c30 */ (void)
 

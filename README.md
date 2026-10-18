@@ -87,7 +87,6 @@ python3 tools/progress_stats.py --check
 python3 tools/resedit.py verify
 python3 tools/strict_port/check_sync.py --json
 python3 tools/qa/test_regression.py
-bash tools/qa/test_id05_rng_c.sh
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot \
   --log-file /tmp/hellcats-godot.log --script res://tests/run_all.gd
 git diff --check

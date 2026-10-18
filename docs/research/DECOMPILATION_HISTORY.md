@@ -4854,3 +4854,13 @@ handle only after activation; a shell printing ticks alone does not wake this ag
   - the three `pea.l $xxx(pc)` callbacks are PC-relative file offsets;
   - there are no absolute `jsr $xxxx.l`.
 - No further misattributions. Doc-only.
+
+### Iteration 381 — 2026-10-18
+
+- update_tracking_camera first half (0x8c30..0x8ea8) checked against the bytes;
+  the C matches.
+- Call-argument corrections recorded for its three approx_dist3_xyz calls.
+- Camera rule: when the target is ahead (|heading diff| <= 0x1000), the camera
+  goes behind the aircraft whose nose is not closer to the other (the player
+  wins ties).
+- Second half pending.

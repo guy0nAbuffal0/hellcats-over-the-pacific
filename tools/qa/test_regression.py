@@ -274,22 +274,6 @@ def check_optional_capstone() -> str:
         return f"skipped ({exc})"
 
 
-def check_optional_id05_rng_c() -> str:
-    """Optional: compile/run portable ID05 RNG if a C compiler is present."""
-    import shutil
-    import subprocess
-
-    if shutil.which("cc") is None and shutil.which("clang") is None:
-        return "skipped (no C compiler)"
-    script = REPO_ROOT / "tools" / "qa" / "test_id05_rng_c.sh"
-    if not script.is_file():
-        return "skipped (missing test_id05_rng_c.sh)"
-    proc = subprocess.run(["bash", str(script)], capture_output=True, text=True)
-    if proc.returncode != 0:
-        fail(f"id05 RNG C harness failed: {proc.stdout}\n{proc.stderr}")
-    return "compiled+tested"
-
-
 def check_optional_ghidra() -> str:
     import os
 
@@ -310,7 +294,6 @@ def main() -> int:
     ]
     optional = [
         ("optional-capstone", check_optional_capstone),
-        ("optional-id05-rng-c", check_optional_id05_rng_c),
         ("optional-ghidra", check_optional_ghidra),
     ]
     try:

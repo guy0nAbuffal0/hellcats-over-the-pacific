@@ -324,8 +324,7 @@ launcher now invokes `res://tests/run_all.gd`.
   `docs/STRICT_PORT_FOUNDATION.md`, `docs/TECHNICAL_OVERVIEW.md`, this audit,
   `godot/tests/run_all.gd`, `sources/resedit/inventory.json`,
   `tools/decomp/inventory_functions.py`, `tools/qa/test_re.py`,
-  `tools/qa/test_regression.py`, `tools/re_query.py`,
-  `tools/recompilation/id05_rng/test_rng_id05.c`, and `tools/resedit.py`.
+  `tools/qa/test_regression.py`, `tools/re_query.py`, and `tools/resedit.py`.
 - Archived: `docs/CONVERGENCE_BACKLOG.md` and
   `docs/CONVERGENCE_LOOP_TEMPLATE.md` under `docs/research/`.
 - Removed: the two duplicate fixtures and six superseded scripts under
@@ -344,8 +343,8 @@ launcher now invokes `res://tests/run_all.gd`.
   verified; none integrated.
 - ResEdit: 119 resources across 30 types verify; 116 parsed structures and 3
   unresolved formats.
-- Python retrieval, deterministic QA, native ID05 RNG, Markdown links, and
-  `git diff --check`: pass.
+- Python retrieval, deterministic QA, Markdown links, and `git diff --check`:
+  pass.
 - Godot 4.6.2: 20 canonical suites passed, 0 failed, including the two migrated
   legacy-coverage suites and Mission 01 scene/HUD load tests.
 

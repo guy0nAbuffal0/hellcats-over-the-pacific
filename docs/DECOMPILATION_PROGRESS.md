@@ -5,12 +5,10 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 380 (2026-10-18)
-**Next target:** verify `update_tracking_camera` (FUN_00008c30) against the bytes. Its
-callees are now known: approx_dist3_xyz via lea $3c48, transform_vecs12_by_matrix3 via
-lea $28bc, place_camera_behind_object. Record its dropped call arguments as
-call-argument corrections. The overlay binary is at
-`sources/hellcats-over-the-pacific/Pacific Conflict`.
+**Last iteration:** 381 (2026-10-18)
+**Next target:** finish `update_tracking_camera` (FUN_00008c30): check the second half
+0x8eac..0x8ff4 (weapon follow at 0x8ece, glide, countdown and outcome) against the bytes
+and mark the function VERIFIED if it matches. The first half was checked in iteration 381.
 
 **Verification policy (user decision, 2026-10-18):** a function may be marked
 VERIFIED when its body matches an independent disassembly of the bytes and any

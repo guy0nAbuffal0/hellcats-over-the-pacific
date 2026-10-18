@@ -990,3 +990,4 @@ its dropped arguments are listed here.
 | `bullet_hits_shape` (FUN_0001665a) | `segment_point_min_distance` (FUN_00003cca) | same 9 longs as bullet_hits_aircraft | bytes 0x1666a..0x166b8, iter 356 |
 | `flak_notice_object` (FUN_00018bba) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: gun pos (x, y, z), target pos (x, y, z) | bytes 0x18c10..0x18c28, iter 360 |
 | `approx_dist3_xyz` (FUN_00003c68) itself | `abs_int` via Ghidra `FUN_00002de8` | its own 6 longs (x1, y1, z1, x2, y2, z2); each call gets x2 - x1 / y2 - y1 / z2 - z1 | bytes 0x3c70..0x3c9c, iter 361 |
+| `update_tracking_camera` (FUN_00008c30) | `approx_dist3_xyz` ×3 | 0x8cd0: player pos, target pos; 0x8e06 / 0x8e78: own pos + rotated (0, 0, 0x4000), other pos | bytes 0x8cb4..0x8e78, iter 381 |
