@@ -1,4 +1,4 @@
-# World & Scenery Data Locations
+# World and scenery data locations
 
 ## Result
 

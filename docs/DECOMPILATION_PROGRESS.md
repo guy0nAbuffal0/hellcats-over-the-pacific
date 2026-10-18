@@ -2,9 +2,9 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** the other `atan_fixed14` callers (overlay `0x10310` / `0x1033c`):
-check whether their inputs can exceed the tangent table's last valid entry (126).
-`sin_fixed14` / `cos_fixed14` are verified against the bytes (exact 256-word tables).
+**Next target:** `apply_relative_heading_steer` (FUN_000109ba), the only `atan2_fixed14`
+caller: verify it against the bytes. `atan2_fixed14` is verified, and its inputs stay
+within the tangent table except for a component of -0x8000.
 
 The angle path feeding `attitude_from_velocity` is established:
 `acos_fixed14` and `atan_fixed14` match independent disassembly, and their

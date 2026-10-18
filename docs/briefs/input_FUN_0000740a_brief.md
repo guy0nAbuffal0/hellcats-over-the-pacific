@@ -16,7 +16,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 **[RECONSTRUCTED]**
 
-```
+```text
 fun_0740a(key_code param_1, action param_2) -> uint uVar6
   save initial DAT_0001d858 as sVar4
 

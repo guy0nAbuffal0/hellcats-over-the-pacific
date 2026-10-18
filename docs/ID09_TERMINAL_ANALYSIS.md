@@ -1,4 +1,4 @@
-# ID09 terminal block,
+# ID09 terminal block
 
 Scope: original `ID09.c:84-103`, `FUN_00000048`. This records binary evidence
 for the terminal block without reconstructing missing instructions into C.

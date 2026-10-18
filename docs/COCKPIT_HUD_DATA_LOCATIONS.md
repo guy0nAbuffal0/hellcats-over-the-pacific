@@ -1,14 +1,23 @@
-# Cockpit & HUD Data Locations
+# Cockpit and HUD data locations
 
 ## Result
 
-The cockpit is not stored as one `PICT`. The clean application resource fork contains five PICTs—about artwork (128/129), refueling photograph (130), credits (131), and protection instructions (1000)—and none is a cockpit panel. The static instrument panel is drawn procedurally by `CODE:3` with QuickDraw into offscreen bitmaps; the `Pacific Conflict` overlay draws dynamic needles, heading tape, radar, and readouts from flight state, including direct 4/8-bit framebuffer line routines.
+The cockpit is not stored as one `PICT`. The clean application resource fork
+contains five PICTs—about artwork (128/129), refueling photograph (130),
+credits (131), and protection instructions (1000)—and none is a cockpit panel.
+The static instrument panel is drawn procedurally by `CODE:3` with QuickDraw
+into offscreen bitmaps; the `Pacific Conflict` overlay draws dynamic needles,
+heading tape, radar, and readouts from flight state, including direct 4/8-bit
+framebuffer line routines.
 
-Certainty labels mean: **PROVEN** direct original-byte/instruction evidence; **VERIFIED** deterministic/corroborated behavior; **INFERRED** plausible but incomplete; **UNKNOWN** insufficient evidence.
+Certainty labels mean: **PROVEN** direct original-byte/instruction evidence;
+**VERIFIED** deterministic/corroborated behavior; **INFERRED** plausible but
+incomplete; **UNKNOWN** insufficient evidence.
 
 ## Static panel construction
 
-`prepare_instrument_panel` (`CODE:3`, `ID03:0x5cc4`) lays out and constructs the panel. `draw_instrument` (`ID03:0x3c02`) dispatches ten panel types:
+`prepare_instrument_panel` (`CODE:3`, `ID03:0x5cc4`) lays out and constructs
+the panel. `draw_instrument` (`ID03:0x3c02`) dispatches ten panel types:
 
 | Type | Instrument | Drawing function | Certainty |
 | ---: | --- | ---: | --- |
@@ -23,19 +32,37 @@ Certainty labels mean: **PROVEN** direct original-byte/instruction evidence; **V
 | 8 | gyro | `ID03:0x32b8` | VERIFIED |
 | 9 | artificial horizon | `ID03:0x38fc` | VERIFIED |
 
-The routines use QuickDraw ovals, arcs, lines, fills, numerals, and labels from `STR#:129` slots 65–78. `begin_instrument_supersample` (`0x1538`), `composite_instrument_bitmap` (`0x146a`), and `finish_instrument_supersample` (`0x1844`) implement offscreen construction. At depth 1, composition uses the monochrome bitmap path/CopyBits semantics; color configurations use a 3× temporary render and antialiased downsample.
+The routines use QuickDraw ovals, arcs, lines, fills, numerals, and labels from
+`STR#:129` slots 65–78. `begin_instrument_supersample` (`0x1538`),
+`composite_instrument_bitmap` (`0x146a`), and
+`finish_instrument_supersample` (`0x1844`) implement offscreen construction.
+At depth 1, composition uses the monochrome bitmap path/CopyBits semantics;
+color configurations use a 3× temporary render and antialiased downsample.
 
-Additional static panel routines construct flaps, landing gear, ammunition, fuel, and other panel items. Their geometry is procedural and their centers/needle lengths are recorded in the host panel table at `A5-0x12a2` for the overlay.
+Additional static panel routines construct flaps, landing gear, ammunition,
+fuel, and other panel items. Their geometry is procedural and their
+centers/needle lengths are recorded in the host panel table at `A5-0x12a2` for
+the overlay.
 
 ## Generated `HEL2` cache, not source art
 
-`store_panel_bitmaps_as_resources` (`CODE:3`, `ID03:0x5ab6`) writes runtime-generated cache resources of type `HEL2`: ID 127 for the panel cache and per-configuration IDs in the 200/300/400/500 series named `Bitmap`, `HorizonInstrument`, `GyroInstrument`, and `GyroFlags`. `prepare_instrument_panel` creates them when needed.
+`store_panel_bitmaps_as_resources` (`CODE:3`, `ID03:0x5ab6`) writes
+runtime-generated cache resources of type `HEL2`: ID 127 for the panel cache
+and per-configuration IDs in the 200/300/400/500 series named `Bitmap`,
+`HorizonInstrument`, `GyroInstrument`, and `GyroFlags`.
+`prepare_instrument_panel` creates them when needed.
 
-No `HEL2` directory/resource exists in the clean extracted application fork. Therefore these are generated cache artifacts, not the original authored cockpit source. Treating a recovered user preference/resource file containing `HEL2` as cockpit artwork would reverse cause and effect.
+No `HEL2` directory/resource exists in the clean extracted application fork.
+Therefore these are generated cache artifacts, not the original authored
+cockpit source. Treating a recovered user preference/resource file containing
+`HEL2` as cockpit artwork would reverse cause and effect.
 
 ## Flight state to dynamic display
 
-The overlay's `update_view_readouts_and_overlays` (`Pacific Conflict:0xd00c`) orchestrates panel updates. `draw_gauge_needle` (`0xc572`) erases the previous line from the saved static panel and draws the new line. Its callers provide these source values:
+The overlay's `update_view_readouts_and_overlays`
+(`Pacific Conflict:0xd00c`) orchestrates panel updates. `draw_gauge_needle`
+(`0xc572`) erases the previous line from the saved static panel and draws the
+new line. Its callers provide these source values:
 
 | Visible item | Flight-state source | Update function | Certainty |
 | --- | --- | --- | --- |
@@ -50,15 +77,32 @@ The overlay's `update_view_readouts_and_overlays` (`Pacific Conflict:0xd00c`) or
 | ammunition | player word `+0x682`, 675-round scale | `0xce1c` | VERIFIED |
 | fuel, two tanks | player bytes `+0x67d/+0x67e` | `0xcec4` | VERIFIED |
 
-The heading tape is updated by `update_heading_tape` (`0xc1aa`). Radar collection and display culminate in `update_radar_scope` (`0x17b68`), which draws up to six tracked objects. Depth-8 and depth-4 line functions write directly into the frame buffer and restore erased needle pixels from the saved static panel; at depth 1 the overlay calls the host line service.
+The heading tape is updated by `update_heading_tape` (`0xc1aa`). Radar
+collection and display culminate in `update_radar_scope` (`0x17b68`), which
+draws up to six tracked objects. Depth-8 and depth-4 line functions write
+directly into the frame buffer and restore erased needle pixels from the saved
+static panel; at depth 1 the overlay calls the host line service.
 
-The exact crosshair/gunsight routine and any cockpit-attached 3D framing object are not yet conclusively separated from the view renderer. `tick_view_attached_object` (`0x19bbc`) is a promising but still **INFERRED** camera-attached-object path. No resource has been relabeled as a gunsight without that proof.
+The exact crosshair/gunsight routine and any cockpit-attached 3D framing object
+are not yet conclusively separated from the view renderer.
+`tick_view_attached_object` (`0x19bbc`) is a promising but still **INFERRED**
+camera-attached-object path. No resource has been relabeled as a gunsight
+without that proof.
 
 ## Coordinates, palette, and presentation
 
-The panel is resolution-aware rather than a fixed-size bitmap. Host view dimensions and pixel depth (1, 4, or 8) select renderer paths; layout calculations use scaled panel coordinates, including a 4800 design denominator. The clean binary has a special 512-wide/342-high screen-layout case (with menu/view deductions), but this is not evidence for a universal fixed cockpit canvas.
+The panel is resolution-aware rather than a fixed-size bitmap. Host view
+dimensions and pixel depth (1, 4, or 8) select renderer paths; layout
+calculations use scaled panel coordinates, including a 4800 design denominator.
+The clean binary has a special 512-wide/342-high screen-layout case (with
+menu/view deductions), but this is not evidence for a universal fixed cockpit
+canvas.
 
-Color indices depend on the original `clut` resources and display-depth setup. Static panel bitmaps are composited into the offscreen frame. Dynamic color needles/readouts can be written directly into that framebuffer. Final presentation reaches `blit_offscreen_frame_to_window` (`CODE:2`, `ID02:0x0d3a`) and the CopyBits/window path.
+Color indices depend on the original `clut` resources and display-depth setup.
+Static panel bitmaps are composited into the offscreen frame. Dynamic color
+needles/readouts can be written directly into that framebuffer. Final
+presentation reaches `blit_offscreen_frame_to_window` (`CODE:2`,
+`ID02:0x0d3a`) and the CopyBits/window path.
 
 World polygons, cockpit panel, map, and menus therefore use related but separate drawing stages:
 
@@ -80,13 +124,22 @@ World polygons, cockpit panel, map, and menus therefore use related but separate
 | 131 | About/credits scroll picture | decoded render and credits use |
 | 1000 | copy-protection instructions, linked from `DITL:1000` | dialog relationship and decoded render |
 
-Icons and `cicn` resources are Finder/UI/award imagery, not an instrument panel. `STR#:129` instrument words are labels, not bitmaps.
+Icons and `cicn` resources are Finder/UI/award imagery, not an instrument
+panel. `STR#:129` instrument words are labels, not bitmaps.
 
 ## Current Godot gap
 
-`godot/scripts/hud_mvp.gd` provides modern text telemetry and a simplified attitude strip. It does not reproduce the original panel layout, QuickDraw gauge faces, two-stage cached/dynamic drawing, original nonlinear scale equations, heading tape, radar, palette behavior, or 1/4/8-bit presentation. The current interface is therefore a placeholder even where it displays real prototype flight values.
+`godot/scripts/hud_mvp.gd` provides modern text telemetry and a simplified
+attitude strip. It does not reproduce the original panel layout, QuickDraw
+gauge faces, two-stage cached/dynamic drawing, original nonlinear scale
+equations, heading tape, radar, palette behavior, or 1/4/8-bit presentation.
+The current interface is therefore a placeholder even where it displays real
+prototype flight values.
 
-A faithful port should encode the verified procedural panel geometry and flight-state conversion equations as data/tests first, then render them in Godot. Generated `HEL2` bitmaps may be used as regression references if recovered, but should not replace the original construction logic.
+A faithful port should encode the verified procedural panel geometry and
+flight-state conversion equations as data/tests first, then render them in
+Godot. Generated `HEL2` bitmaps may be used as regression references if
+recovered, but should not replace the original construction logic.
 
 ## Evidence table
 
@@ -104,4 +157,8 @@ A faithful port should encode the verified procedural panel geometry and flight-
 
 ## Highest-value next step
 
-Capture the complete panel layout records written by `prepare_instrument_panel` and make a deterministic reference renderer for one display depth. Comparing its output against an emulator frame will close scale, palette, clipping, gunsight placement, and dynamic/static layering more efficiently than searching for nonexistent cockpit artwork.
+Capture the complete panel layout records written by `prepare_instrument_panel`
+and make a deterministic reference renderer for one display depth. Comparing
+its output against an emulator frame will close scale, palette, clipping,
+gunsight placement, and dynamic/static layering more efficiently than searching
+for nonexistent cockpit artwork.

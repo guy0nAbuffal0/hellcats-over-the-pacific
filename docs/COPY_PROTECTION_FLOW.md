@@ -1,9 +1,9 @@
-# Copy-protection flow (ID08 → ID05) —,
+# Copy-protection flow (ID08 → ID05)
 
 Summary of the overlay-load protection chain recovered from the CODE
 segments. All offsets are **physical file offsets** in `IDnn.bin`; jump-table
-(JT) calls are resolved through `ID00.bin` (entry = segment offset, `MOVE.W
-#seg`, `_LoadSeg`; file offset = segment offset + 4-byte CODE header).
+(JT) calls are resolved through `ID00.bin` (entry = segment offset,
+`MOVE.W #seg`, `_LoadSeg`; file offset = segment offset + 4-byte CODE header).
 Byte sequences and control flow are **[PROVEN]**; the "copy protection"
 interpretation is **[STRONG INFERENCE]**; UI meaning of the numbers is
 **[HYPOTHESIS]**. Trap names follow Inside Macintosh.

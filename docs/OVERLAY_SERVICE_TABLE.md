@@ -1,4 +1,4 @@
-# Overlay service table —,
+# Overlay service table
 
 Installed by the unexported ID02 routine at file 0x1b42..0x1c88, called by
 `main` before the overlay is loaded. Each slot receives the address of a CODE 0

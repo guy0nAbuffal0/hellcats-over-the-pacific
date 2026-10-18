@@ -17928,6 +17928,12 @@ LAB_000102a8:
  * Caller: one BSR @0x10A0C (uses *(p3+2), *(p3+6) then fold_angle_pm_0x2000).
  *
  * Evidence: Capstone @0x102D6–0x1035E; BSR.L $1ebc at 0x10310/0x1033C.
+ *
+ * VERIFIED: bytes 0x102d6..0x1035e match the C. Call-argument correction: the two
+ * FUN_00002de8() calls are abs_int(param_1) / abs_int(param_2) (runtime-address lea).
+ * atan input = smaller/larger << 12, so |input| <= 0x1000 (table indices 31..95), except
+ * for a component of -0x8000: abs_int gives 0x8000, which move.w turns back into -0x8000.
+ * (0, 0) leaves D2 unwritten: the result is the caller's D2 & 0x3fff (unaff_D2w).
  */
 ushort atan2_fixed14(short param_1,short param_2) /* Original: FUN_000102d6 */
 {

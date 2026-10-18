@@ -177,7 +177,7 @@ overlay entry (`reset_overlay_state`, ID02 0x212a). An overlay access
 
 | Overlay offset | Host global | Meaning |
 |---|---|---|
-| +0xe | A5-0x137a | pixel depth 1 / 4 / 8 (; older notes call it a mission mode) |
+| +0xe | A5-0x137a | pixel depth 1 / 4 / 8 (older notes call it a mission mode) |
 | +0x16 / +0x18 | A5-0x1372 / A5-0x1370 | view width / height |
 | +0x90 | A5-0x12f8 | mission number |
 | +0xb6 / +0xb8 | A5-0x12d2 / A5-0x12d0 | fuel % / bombs |

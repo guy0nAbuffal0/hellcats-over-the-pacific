@@ -1,4 +1,4 @@
-# Sound system (ID02) —,
+# Sound system (ID02)
 
 Summary of the application-side sound code in CODE segment 2. Offsets are
 physical file offsets in `ID02.bin`. Byte sequences and data layouts are
@@ -80,9 +80,10 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
 - End-of-buffer and continuation handling inside the handlers.
 - Whether nodes from `enqueue_sample_on_channel` are actually reached
   (depends on handler end-of-buffer logic).
-- ~~How the three-node sustain loop is released~~ — `release_channel_loop` rewrites continuations to break self-loops.
+- ~~How the three-node sustain loop is released~~ — `release_channel_loop`
+  rewrites continuations to break self-loops.
 
-## Overlay sound driver (Pacific Conflict, )
+## Overlay sound driver (Pacific Conflict)
 
 The overlay reaches the services above through its globals block (offset k
 = host A5-0x1388 + k): +0x25e sound slots, +0x2aa play, +0x2b2 rate, +0x2b6

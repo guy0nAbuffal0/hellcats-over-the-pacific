@@ -1,11 +1,11 @@
-# Overlay 3-D renderer (Pacific Conflict) —,
+# Overlay 3-D renderer (Pacific Conflict)
 
 Per-frame object drawing in `Pacific Conflict.decomp.c`. Names are the
 recovered ones; confidence **[STRONG INFERENCE]** unless marked.
 
 ## Call flow
 
-```
+```text
 overlay_frame_step
   render_visible_objects            (0xac72)
     project_prepared_object         (0xa676)  vertices already in camera space
@@ -28,8 +28,8 @@ overlay +0x7c = host A5-0x130c = ID06 `add_polygon_edges` (docs/RASTERIZER.md)
 Colour path: `add_face_edges_to_rows` (0x9b8c) turns each
 polygon edge into a 0x1c-byte edge record (pool `DAT_0001b76c`, x 16.16,
 slope, start row) inserted into the per-row buckets `DAT_0001eaac[row]`,
-sharing records between faces with a common edge; `scan_convert_edge_rows` (0x2e14,
-) then keeps an active edge list per row, resolves the front
+sharing records between faces with a common edge; `scan_convert_edge_rows`
+(0x2e14) then keeps an active edge list per row, resolves the front
 face between edges by draw order and writes runs into `DAT_0001b794` /
 `DAT_0001b798` for the span fillers `fill_span_rows_*`. `track_ground_plane_horizon` (0xa07e) handles the ground-plane
 face `DAT_0001bda8`: screen corners covered (`DAT_0001bd90`) and the horizon

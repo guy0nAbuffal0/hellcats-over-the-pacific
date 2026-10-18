@@ -1,4 +1,4 @@
-# Polygon rasterizer (CODE segment 6) —,
+# Polygon rasterizer (CODE segment 6)
 
 CODE segment 6 (`ID06`) contains a self-contained scanline polygon
 rasterizer. The overlay drives it through the application service table

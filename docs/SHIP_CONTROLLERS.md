@@ -1,4 +1,4 @@
-# Ship controllers (Pacific Conflict) —,
+# Ship controllers (Pacific Conflict)
 
 Damage, firing and sinking of ships in the overlay. Function names are those
 in `Pacific Conflict.decomp.c`; byte facts come from the overlay file
@@ -45,9 +45,9 @@ Template types 0x15..0x19 are the ones the entity update path sends to
 | +6 create | `instantiate_object_from_desc` (for any template with a definition; result stored at object +8) |
 | +2 tick | `advance_frame_and_tick_controllers`, or `tick_flagged_object_controllers` when `DAT_0001b870 == 3`, over the controller list `DAT_0001c25c` |
 | +0xa destroy | called just before a controller is freed |
-| +0xe pre-render | `FUN_0000a75e`, phases 1 / 2 (; e.g. `effect_pre_render_hook`) |
-| +0x16 notice | `dispatch_overlap_collisions` for every range-overlapping pair (; aircraft: `aircraft_notice_object`) |
-| +0x12 collision | `handle_player_contact` (player overlap, object flag +6 & 0x40) and `dispatch_collision` (; pair table `DAT_0001b43c` overrides it for some type pairs) |
+| +0xe pre-render | `FUN_0000a75e`, phases 1 / 2 (for example, `effect_pre_render_hook`) |
+| +0x16 notice | `dispatch_overlap_collisions` for every range-overlapping pair (aircraft: `aircraft_notice_object`) |
+| +0x12 collision | `handle_player_contact` (player overlap, object flag +6 & 0x40) and `dispatch_collision` (pair table `DAT_0001b43c` overrides it for some type pairs) |
 
 The keyed table `DAT_0001b524` is therefore general (other blocks of
 `overlay_main_entry` fill other keys); the five records above are the ship
@@ -80,7 +80,7 @@ subset.
 3. When no face is above y = 0: carried objects removed, kill tallied,
    mission state updated, object cleaned up.
 
-## Aircraft definition (key 1, )
+## Aircraft definition (key 1)
 
 File 0x1a7b0: +2 `aircraft_tick` (0xe5aa), +6 `aircraft_create` (0xe0ce),
 +0xa `aircraft_destroy` (0xe0a4), +0xe `FUN_0000fb2a`, +0x12

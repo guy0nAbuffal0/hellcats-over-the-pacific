@@ -1,4 +1,4 @@
-# Pilot roster and scores (`HEL1` 128) —, 176–177,
+# Pilot roster and scores (`HEL1` 128)
 
 `HEL1` 128 is named "Player and Score Data" in the resource dump
 (`artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/`). The
@@ -16,9 +16,9 @@ listed); field meanings are marked.
 |---|---|---|---|
 | +0x00 | 32 bytes | name, Pascal string | converted with p2cstr / c2pstr in `build_rank_and_name_string` |
 | +0x20 | word | pilot status, set from `A5-0x12b4` by `conclude_mission` | **[STRONG INFERENCE]** index into the status strings; status 1 (Dead) triggers a one-shot path |
-| +0x22 | word | rank index into the rank strings | `build_rank_and_name_string`; raised by the Mission Summary promotion step (ID04 0x2b74, ) to the highest rank whose threshold (longs at `A5-0xfd6`) is ≤ the score |
-| +0x24 | word | friendly-fire offence count (1, 2 = warnings; 3 = dishonourable discharge, status 4) | cleared by `reset_pilot_record`; incremented by the Mission Summary state 0 (ID04 0x2798, ) **[STRONG INFERENCE from the texts]** |
-| +0x26 | word | awards bitmask (bits 0–7 → cicn 512–519; bit = mission `A5-0x12f8` − 3, set by summary state 2 when the mission succeeds, ); with missions 2..9 the awards are for missions 3 Bomb Base … 9 The Duel (bits 0–6); Flight School (2) gives none and bit 7 has no mission [STRONG INFERENCE] | cleared by `reset_pilot_record`; drawn by `draw_mission_awards` (ID04 0x1dde, ) **[STRONG INFERENCE]** |
+| +0x22 | word | rank index into the rank strings | `build_rank_and_name_string`; raised by the Mission Summary promotion step (ID04 0x2b74) to the highest rank whose threshold (longs at `A5-0xfd6`) is ≤ the score |
+| +0x24 | word | friendly-fire offence count (1, 2 = warnings; 3 = dishonourable discharge, status 4) | cleared by `reset_pilot_record`; incremented by Mission Summary state 0 (ID04 0x2798) **[STRONG INFERENCE from the texts]** |
+| +0x26 | word | awards bitmask (bits 0–7 → cicn 512–519; bit = mission `A5-0x12f8` − 3, set by summary state 2 when the mission succeeds); missions 3 Bomb Base … 9 The Duel use bits 0–6, Flight School (2) gives none, and bit 7 has no mission **[STRONG INFERENCE]** | cleared by `reset_pilot_record`; drawn by `draw_mission_awards` (ID04 0x1dde) **[STRONG INFERENCE]** |
 | +0x28 | 12 words | tallies | weighted by 12 words at `A5-0xf5e` in `compute_pilot_score` |
 
 The current pilot's index is the word at `A5-0x13a4`.
@@ -31,13 +31,13 @@ The current pilot's index is the word at `A5-0x13a4`.
 | `A5-0xfae` | 100–105 | Active, Dead, Retired, POW, Discharged, MIA |
 | `A5-0xf86` | 106–115 | Fighter, Bomber, Tank, AAA Battery, Vehicle, Carrier, Battleship, Cruiser, PT Boat, Runway |
 
-Record +0x20 indexes the status group (6 values) **[STRONG INFERENCE,
-]**. Tallies 0–9 probably count destroyed targets of the 10
+Record +0x20 indexes the status group (6 values) **[STRONG INFERENCE]**.
+Tallies 0–9 probably count destroyed targets of the 10
 target types **[HYPOTHESIS]**, supported by the 12-item loop in
 `show_mission_summary_dialog` (DLOG 133 "Mission Summary": "Targets
 Destroyed", "Total Aircraft Destroyed", "Score"); tallies 10–11 are unknown. Tallies 0 + 1 (Fighter + Bomber)
 are drawn as aircraft kill markers by `draw_aircraft_kill_markers` (ID04
-0x1f5e, ) under "Total Aircraft Destroyed", which supports
+0x1f5e) under "Total Aircraft Destroyed", which supports
 tallies = destroyed targets per type **[STRONG INFERENCE]**.
 
 ## Functions (ID04)
@@ -58,5 +58,13 @@ tallies = destroyed targets per type **[STRONG INFERENCE]**.
 
 - Scoring weights at `A5-0xf5e` (A5 initial data, not yet read): `draw_targets_destroyed_row` shows count × weight[type] per target type, so weights 0–9 are points per destroyed target of each type **[STRONG INFERENCE]**.
 - Meaning of tallies 10–11. Rank +0x22 also selects cicn 256 + rank (insignia, ID04 0x1b3e).
-- ~~Where the roster is written back~~ — Mission Summary state 3 (ID04 0x2a60, ): after adding each mission kill count A5-0x12ce[t] to tally[t], ChangedResource(roster handle) and UpdateResFile(A5-0x1002). This proves tallies 0–9 are lifetime kills per target type.
--: how the overlay sets the pilot status (host +0xd4 = A5-0x12b4, copied into record +0x20 by `conclude_mission`): `update_aircraft_damage_state` sets 1 (Dead) when the player's pilot is hit and no parachute exists; `resolve_bailout_outcome` decides after a bail-out (enemy territory: POW 1/2; friendly: Dead 1/8; sea: POW / Dead 1/4 each) and sets 4 (Discharged) when the player abandoned an undamaged aircraft that still had fuel **[STRONG INFERENCE]**.
+- ~~Where the roster is written back~~ — Mission Summary state 3 (ID04
+  0x2a60): after adding each mission kill count `A5-0x12ce[t]` to `tally[t]`,
+  `ChangedResource(roster handle)` and `UpdateResFile(A5-0x1002)` run. This
+  proves tallies 0–9 are lifetime kills per target type.
+- Pilot-status source: host +0xd4 (`A5-0x12b4`) is copied into record +0x20 by
+  `conclude_mission`. `update_aircraft_damage_state` sets 1 (Dead) when the
+  player's pilot is hit and no parachute exists; `resolve_bailout_outcome`
+  decides after a bail-out (enemy territory: POW 1/2; friendly: Dead 1/8; sea:
+  POW or Dead 1/4 each) and sets 4 (Discharged) when the player abandoned an
+  undamaged aircraft that still had fuel **[STRONG INFERENCE]**.

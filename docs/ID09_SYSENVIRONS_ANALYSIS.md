@@ -1,4 +1,4 @@
-# ID09 `FUN_00000048`: reverse lookup and SysEnvirons identification —,
+# ID09 `FUN_00000048`: reverse lookup and SysEnvirons identification
 
 Scope: `ID09.c:72-79` (reverse lookup) plus a function-level identification
 hypothesis. Offsets are **physical file offsets in `ID09.bin`**. Capstone 5.0.7,
@@ -64,7 +64,7 @@ documentation, not from this binary. No Apple glue source or runtime trace has
 been compared, so the function is not VERIFIED. machineType value meanings and
 the A-line trap names (`$A260`, `$A207`) remain HYPOTHESIS.
 
-##: entry dispatcher (file 0x20..0x46) [PROVEN bytes; trap names from docs]
+## Entry dispatcher (file 0x20..0x46) [PROVEN bytes; trap names from docs]
 
 | File offset | Bytes | Decode |
 |---|---|---|
@@ -82,5 +82,6 @@ the A-line trap names (`$A260`, `$A207`) remain HYPOTHESIS.
 | 0x42 | 3f400004 | `move.w d0, $4(a7)` (function result) |
 | 0x46 | 4e75 | `rts` |
 
-This explains why the 0x48 body exists, which justifies the rename. machineType mapping
-(XL/Mac/512KE/Plus/SE/II from ROM version bytes) remains HYPOTHESIS.
+This explains why the 0x48 body exists, which justifies the rename. The
+machineType mapping (XL/Mac/512KE/Plus/SE/II from ROM version bytes) remains
+HYPOTHESIS.

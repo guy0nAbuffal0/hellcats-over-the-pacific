@@ -1,4 +1,4 @@
-# Cockpit instrument panel (CODE segment 3) —,
+# Cockpit instrument panel (CODE segment 3)
 
 The instrument panel is drawn by CODE segment 3 (`ID03`). Offsets are
 physical file offsets in `ID03.bin`. Byte sequences, call relations and
@@ -18,7 +18,7 @@ strings by the loader.
 
 | Slot | Text | Used by |
 |---|---|---|
-| 1 | Unable to store instrument panel to disk | unexported ID04 routine at 0x432 ( correction) |
+| 1 | Unable to store instrument panel to disk | unexported ID04 routine at 0x432 |
 | 61 | Hellcats requires a Macintosh with color QuickDraw and a 68020 or higher | ID04 `check_system_requirements` = JT $f2 start-up gate |
 | 65 | ALTITUDE | type 0 |
 | 66 / 67 | AIR / SPEED | type 1 |
@@ -41,7 +41,7 @@ strings by the loader.
 | 5 | `draw_tachometer` (0x22fe) | engine RPM |
 | 6 | `draw_direction_indicator` (0x2950) | heading |
 | 7 | — | nothing drawn |
-| 8 | `draw_gyro_instrument` (0x32b8) | gyro instrument; caches "GyroInstrument" / "GyroFlags" (, which gyro is open) |
+| 8 | `draw_gyro_instrument` (0x32b8) | gyro instrument; caches "GyroInstrument" / "GyroFlags" (which gyro is open) |
 | 9 | `draw_artificial_horizon` (0x38fc) | artificial horizon; caches "HorizonInstrument" |
 
 `draw_instrument` first draws the bezel with
@@ -61,7 +61,9 @@ code; the table was parsed from the bytes.
 3. `antialias_downsample_bw_3x` (0xa3c): each output pixel is a 7×7
    weighted sum (total weight 969) of the 3× bitmap, converted to a grey
    palette index with `nearest_palette_index_rgb` (0xf4) and plotted.
-4. `finish_instrument_supersample` (0x1844, ): SetPort(panel port `A5-0x1496`), `composite_instrument_bitmap` (0x146a: CopyBits at depth 1, else the 3× downsample into the panel), then `dispose_offscreen_bw_port` (0x33c).
+4. `finish_instrument_supersample` (0x1844): SetPort(panel port `A5-0x1496`),
+   `composite_instrument_bitmap` (0x146a: CopyBits at depth 1, otherwise the 3×
+   downsample into the panel), then `dispose_offscreen_bw_port` (0x33c).
 
 Coordinates are design units scaled by `scale_design_4800` (0x8a:
 `A5-0x149e · v / 4800`) and centred with ID02 `design_x_to_screen` /
@@ -96,7 +98,7 @@ slot orientation from screw to screw.
 - ID04 slot users decoded; the panel-store path (ID04 0x432,
   ID02 0x4d34) is not yet fully understood.
 
-## Live needles (overlay, )
+## Live needles (overlay)
 
 The panel bitmaps are static; the overlay draws the needles each frame from
 `update_view_readouts_and_overlays`. Each needle uses words +0xa / +0xc / +0xe
