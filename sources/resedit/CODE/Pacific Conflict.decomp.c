@@ -18622,6 +18622,18 @@ LAB_00010464:
  *   param_2 (DAT_0001b858: +0x40 on 'Z' / '>' keyDown, -0x40 on 'X' / '?', else 0;
  *           clamp +-0x40) -> ring +0x654, sum +0x660 -> +0x664 = RUDDER.
  * Each output is the 4-frame average (sum >> 2 with the +3 bias); ring index +0x642.
+ * CORRECTION [PROVEN]: not a 4-sample mean. The running sum excludes the slot at the
+ * current index (the next to be overwritten): the new sample is stored and added (4 in
+ * the sum), the index advances (wrap at 4), and the slot now at the index - the oldest -
+ * is subtracted. So each output = (x[n] + x[n-1] + x[n-2]) / 4 (truncating): a 3-tap
+ * filter with gain 3/4. Exact simulation of the loop on an impulse of 100 gives
+ * 25, 25, 25, 0. Ghidra's C has the same order; only the "avg4" description overstates it.
+ * Section check 0x10558..0x1064e [PROVEN; independent capstone disassembly]: gate btst #0
+ * of byte +0x685 (word flag 0x1, set at bail-out) -> no input at all; clamps via abs_int
+ * with signed compares (0x140, 0x40, 0x200); ring slots addressed with lea (a2,d3.w*2);
+ * outputs (sum + 3 if negative) asr.w 2; index stored back to +0x642.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C.
  */
 void enqueue_control_inputs_avg4(int param_1,short param_2,short param_3,short param_4) /* Original: FUN_00010558 */
 {
@@ -19038,6 +19050,17 @@ void steer_entity_toward_point(int *param_1,int param_2,int param_3,int param_4)
  * Callers: FUN_00010ce8 / case-0 script paths (@0x10CFC/@0x10FC0).
  *
  * Evidence: Capstone @0x10B84–0x10C2A.
+ * Reading [STRONG INFERENCE, consistent with +0x67b = flaps and +0x679 = gear]: a takeoff
+ * / climb-out sequence - flaps set to start extending (1) if retracted, gear retracted
+ * (negated) once more than 200 above the reference height +0x2e, full throttle, the
+ * elevator driven toward the fixed attitude 0x2c0 of +0x20 (0x2c0 / 0x4000 of a turn, about
+ * 15.5 degrees), and above 2000 the flaps are retracted and the phase ends.
+ * Exact control law [PROVEN]: e = fold_angle_pm_0x2000(0x2c0 - word +0x20); d = e + (e asr.w
+ * 1) - word +0x61a (i.e. 1.5 e - e_prev, word arithmetic); +0x61a = e; |d| > 0x200 (abs_int,
+ * signed) clamps d to +-0x200; enqueue_control_inputs_avg4(param_1, 0, ext d, 0). Both
+ * height tests are signed longs (world +0x1c - +0x2e) against 200 (0xc8) and 2000 (0x7d0).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C.
  */
 bool ai_bootstrap_climb_phase(int *param_1) /* Original: FUN_00010b84 */
 {
@@ -19151,6 +19174,18 @@ void adjust_ai_throttle_vs_speed(int *param_1,short param_2) /* Original: FUN_00
  * AI paths @0x18240/@0x18404/@0x18570.
  *
  * Unknown: exact gameplay meaning of +0x679 (climb/bank bias?).
+ * Role [STRONG INFERENCE]: +0x679 is the landing-gear state. update_aircraft_entity blk 7a
+ * ramps a positive value up to 0x2d ('-' = fully down) and a negative one up to 0
+ * (retracting, word flag 0x2000); blk 0 adds the full template +0x40 (gear height) to
+ * the contact height only when +0x679 == '-', half otherwise; blk 4c uses the '-' state
+ * for the wheeled ground-friction terms t2e / t30 and adds |+0x679| * t20 / 11 to the
+ * thrust term; adjust_ai_throttle_vs_speed lowers it (+0x679 = 1) when far too fast,
+ * and this function raises it (negates a positive value) at full throttle once the
+ * aircraft is more than 100 above the reference height +0x2e. The old "climb / bank
+ * bias" guess is superseded.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10cb2..0x10cd6 (move.b #9 $668; tst.b / ble; world +0x1c - +0x2e, moveq #$64 / cmp.l /
+ * bge, signed; neg.b); identical to the C.
  */
 void max_ai_throttle_maybe_invert_679(int *param_1) /* Original: FUN_00010cb2 */
 {
@@ -19206,6 +19241,16 @@ void invert_ai_bias_67b_if_positive(int param_1) /* Original: FUN_00010cd8 */
  * Callers: FUN_00010d68 / 10da8 / 10de8 (alloc different script tables).
  *
  * Evidence: Capstone @0x10CE8–0x10D66; BSR e792 ≡ update_aircraft_entity.
+ * Block header [PROVEN]: word +0 = phase (0 until ai_bootstrap_climb_phase returns
+ * non-zero, then addq.w #1), word +2 = target speed (sign-extended for
+ * adjust_ai_throttle_vs_speed; 0x9d8 for the 1b2e0 route), +4.. = route state passed to
+ * advance_route_waypoint(own object, header + 4), which returns a pointer to the current
+ * waypoint (3 longs). Aim height = waypoint y when (waypoint y - +0x2e) > 0xfff (signed
+ * cmpi.l / bgt), else +0x2e + 0x1000: the route is flown at least 0x1000 above the
+ * reference height +0x2e [PROVEN arithmetic; +0x2e as the ground / reference height is a
+ * STRONG INFERENCE also used by max_ai_throttle_maybe_invert_679].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C (advance_route_waypoint itself is verified separately).
  */
 void tick_ai_climb_then_waypoint(int *param_1) /* Original: FUN_00010ce8 */
 {
@@ -19246,6 +19291,15 @@ void tick_ai_climb_then_waypoint(int *param_1) /* Original: FUN_00010ce8 */
  *
  * If +0x616 unset: FUN_000168d2(..., &DAT_0001b2e0) → script; word[1]=0x9d8
  * (throttle target). Then tick_ai_climb_then_waypoint.
+ * Route data [PROVEN, file 0x1b300]: DAT_0001b2e0 is not a script but 4 source vertices
+ * (3 longs each) for alloc_transformed_vertex_block(own object, header 8, count 4, src):
+ * (0, 0, 1056000), (-1056000, 0, 1056000), (-1056000, 0, 0), (0, 0, 0) - a square of side
+ * 1056000 in the object's frame, transformed by its template pose into world waypoints
+ * [STRONG INFERENCE: patrol box flown by tick_ai_climb_then_waypoint]. The header word
+ * +2 = 0x9d8 is the speed / throttle target the tick passes on.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10d68..0x10da6 (tst.l $616 / bne; pea $1b2e0, pea 4, pea 8, move.l (a2); bsr $168d2;
+ * move.l to $616; move.w #$9d8 at 2(a0); bsr $10ce8); identical to the C.
  */
 void ensure_ai_script_1b2e0_tick(int *param_1) /* Original: FUN_00010d68 */
 {
@@ -19269,6 +19323,12 @@ void ensure_ai_script_1b2e0_tick(int *param_1) /* Original: FUN_00010d68 */
  *
  * Same as 10d68 with DAT_0001b310 and throttle word 0xd5c.
  * Caller: FUN_00010ecc @0x10ED8.
+ * Route data [PROVEN, file 0x1b330]: DAT_0001b310 = 4 vertices (3 longs each)
+ * (0, 0, 1056000), (-1056000, 0, 1056000), (-1056000, 0, 0), (0, 0, 0): a square of side 1056000
+ * in the object's frame (same layout as ensure_ai_script_1b2e0_tick), target speed 0xd5c.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10da8..0x10de6 (pea table / pea 4 / pea 8 / move.l own object; bsr alloc_transformed_vertex_block;
+ * header word +2 = 0xd5c; bsr tick_ai_climb_then_waypoint); identical to the C.
  */
 void ensure_ai_script_1b310_tick(int *param_1) /* Original: FUN_00010da8 */
 {
@@ -19291,6 +19351,12 @@ void ensure_ai_script_1b310_tick(int *param_1) /* Original: FUN_00010da8 */
  * Confidence: [STRONG INFERENCE]
  *
  * Same pattern: DAT_0001b340, throttle word 0x9d8, then tick.
+ * Route data [PROVEN, file 0x1b360]: DAT_0001b340 = 4 vertices (3 longs each)
+ * (0, 0, 158400), (-158400, 0, 158400), (-158400, 0, 0), (0, 0, 0): a square of side 158400
+ * in the object's frame (same layout as ensure_ai_script_1b2e0_tick), target speed 0x9d8.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10de8..0x10e26 (pea table / pea 4 / pea 8 / move.l own object; bsr alloc_transformed_vertex_block;
+ * header word +2 = 0x9d8; bsr tick_ai_climb_then_waypoint); identical to the C.
  */
 void ensure_ai_script_1b340_tick(int *param_1) /* Original: FUN_00010de8 */
 {
@@ -19366,6 +19432,15 @@ undefined4 ai_script_try_fire_burst(int *param_1) /* Original: FUN_00010e28 */
  *   state 2 → 3 when ai_script_try_fire_burst returns nonzero.
  *
  * Evidence: Capstone @0x10ECC–0x10F66. Likely dispatched via fn ptr (0 BSR).
+ * Dispatch [PROVEN]: it is entry [4] of the +0x614 handler table DAT_0001b3f4 (runtime
+ * 0x10eac), called from ai_attack_or_fly / ai_fly / ai_dive_at_target / ai_bombing_run.
+ * CALL-ARGUMENT CORRECTION [PROVEN, pushes 0x10ef2..0x10f06]: the distance is
+ * approx_dist3_xyz(own x, 0, own z, -0x40af3, 0, 0x2b246a) - horizontal, to the FIXED
+ * world point (-265459, 0, 2827370) [HYPOTHESIS: the mission target the attack run is
+ * aimed at]; < 50000 (cmpi.l #$c34f / bgt) and own height world +0x1c > 20000 (signed).
+ * Phase 2 sets long +0x6ac = DAT_0001b838 (frame counter) + 0x4b, i.e. 75 frames later.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x10ecc..0x10f66; identical to the C with the call-argument correction.
  */
 void tick_ai_1b310_approach_fire(int *param_1) /* Original: FUN_00010ecc */
 {
@@ -19377,7 +19452,7 @@ void tick_ai_1b310_approach_fire(int *param_1) /* Original: FUN_00010ecc */
   ensure_ai_script_1b310_tick( /* Original: FUN_00010da8 */param_1);
   psVar1 = *(short **)((int)param_1 + 0x616);
   if (*psVar1 == 1) {
-    iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+    iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own x, 0, own z, -0x40af3, 0, 0x2b246a) [PROVEN, pushes 0x10ef2..0x10f06] */);
     if (((iVar2 < 50000) && (20000 < *(int *)(iVar3 + 0x1c))) &&
        ((*(byte *)(param_1 + 0x1a1) & 1) == 0)) {
       *psVar1 = 2;
@@ -24879,6 +24954,22 @@ uint * alloc_copied_vertex_block /* Original: FUN_0001691c */ (undefined4 param_
 /* Original: FUN_00016966; source: Pacific Conflict.c. Recovered name: advance_route_waypoint [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x16966).
  * Args: aircraft object, route (word index, word count, 12-byte points). When the object is within 5000 of the current point, moves to the next one (wrapping) and pushes that point 5000 further along the direction from the object (distance normalised with a 15-bit shift). Returns the current point. Used by the AI fly routines. Ghidra C.
+ * Section check 0x16966..0x16a38 [PROVEN; independent capstone disassembly]: point =
+ * route + 4 + 12 * sext index (lea (a0,a0.l*2) then lea 4(a3,a0.l*4) - extension words
+ * 0x8a00 / 0x8c04, scales x2 / x4 that capstone omits). Arrival test: approx_dist3_xyz(own
+ * x, 0, own z, point x, 0, point z) - HORIZONTAL, arguments dropped by Ghidra (recorded)
+ * - <= 4999 (signed). Then index + 1, cleared when it reaches the word count +2 (signed
+ * cmp.w); d = approx_dist3_xyz(own pos, new point) in 3D; s = number of asr #1 until
+ * (d & 0xffff8000) == 0 (andi.w #$8000 keeps the upper word, so the C test is exact);
+ * each axis: point += ((short)((point - own) asr s) * 5000) divs.l ext((d asr s) asr s).
+ * The divisor is shifted TWICE (Ghidra reproduces it: uVar2 is already the shifted
+ * value), so for d >= 0x8000 the push grows beyond 5000: simulated 5000 at d = 20000,
+ * 20000 at d = 100000, about 160000 at d = 1000000 [PROVEN arithmetic]. The push is
+ * stored into the route copy (the per-aircraft block from alloc_transformed_vertex_block),
+ * so waypoints drift outward on every lap. A zero divisor (d == 0, new point exactly at
+ * the aircraft) would trap [reachability unknown].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the call-argument correction.
  */
 int * advance_route_waypoint /* Original: FUN_00016966 */ (int param_1,short *param_2)
 
@@ -24890,14 +24981,14 @@ int * advance_route_waypoint /* Original: FUN_00016966 */ (int param_1,short *pa
   int *piVar5;
   
   piVar5 = (int *)(param_2 + *param_2 * 6 + 2);
-  iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+  iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own x, 0, own z, point x, 0, point z): horizontal [PROVEN, pushes 0x1697c..0x1698a] */);
   if (iVar1 < 5000) {
     *param_2 = *param_2 + 1;
     if (param_2[1] <= *param_2) {
       *param_2 = 0;
     }
     piVar5 = (int *)(param_2 + *param_2 * 6 + 2);
-    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own pos, new point) in 3D [PROVEN, pushes 0x169b8..0x169ca] */);
     sVar4 = 0;
     for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
       sVar4 = sVar4 + 1;

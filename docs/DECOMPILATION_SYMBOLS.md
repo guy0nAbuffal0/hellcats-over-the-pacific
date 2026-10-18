@@ -1000,6 +1000,8 @@ its dropped arguments are listed here.
 | `ai_attack_or_fly` (FUN_000110f4) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own object (*param_1) +0x18 / +0x1c / +0x20, target (+0x692) +0x18 / +0x1c / +0x20 | bytes 0x11126..0x11140 |
 | `ai_dive_at_target` (FUN_000111da) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own x, 0, own z, target x, 0, target z (horizontal distance) | bytes 0x11202..0x11218 |
 | `ai_bombing_run` (FUN_000112e0) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: own x, 0, own z, target x, 0, target z (horizontal distance) | bytes 0x11310..0x11326 |
+| `advance_route_waypoint` (FUN_00016966) | `approx_dist3_xyz` (FUN_00003c68) ×2 | (own x, 0, own z, point x, 0, point z) horizontal; then (own pos, new point) 3D | bytes 0x1697c..0x1698e / 0x169b8..0x169ce |
+| `tick_ai_1b310_approach_fire` (FUN_00010ecc) | `approx_dist3_xyz` (FUN_00003c68) | (own x, 0, own z, -0x40af3, 0, 0x2b246a): horizontal distance to a fixed world point | bytes 0x10ef2..0x10f0a |
 | `flak_notice_object` (FUN_00018bba) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: gun pos (x, y, z), target pos (x, y, z) | bytes 0x18c10..0x18c28 |
 | `approx_dist3_xyz` (FUN_00003c68) itself | `abs_int` via Ghidra `FUN_00002de8` | its own 6 longs (x1, y1, z1, x2, y2, z2); each call gets x2 - x1 / y2 - y1 / z2 - z1 | bytes 0x3c70..0x3c9c |
 | `update_tracking_camera` (FUN_00008c30) | `approx_dist3_xyz` ×3 | 0x8cd0: player pos, target pos; 0x8e06 / 0x8e78: own pos + rotated (0, 0, 0x4000), other pos | bytes 0x8cb4..0x8e78 |
