@@ -10168,6 +10168,17 @@ void place_camera_behind_object /* Original: FUN_000088a0 */ (int param_1,int pa
 /* Original: FUN_00008972; source: Pacific Conflict.c. Recovered name: update_bailout_view [STRONG INFERENCE] (iteration 301).
  * Ghidra C reviewed (function at overlay offset 0x8972).
  * Camera during a bail-out (mission state 9): while the parachute DAT_0001b87c exists and has not landed for long, keeps the camera between it and the abandoned aircraft (when within 0x9ab0) or on the parachute; once the parachute is gone or has been down for more than 0x5a0 frames, calls resolve_bailout_outcome. Ghidra C (partly read).
+ *
+ * VERIFIED (iteration 384, user policy): independent capstone disassembly of 0x8972..0x8abc
+ * is identical to the C. CALL-ARGUMENT CORRECTION: approx_dist3_xyz(aircraft x, y, z,
+ * parachute x, y, z) at 0x89f6 (six longs; Ghidra shows none). Facts [PROVEN]: it exits
+ * through resolve_bailout_outcome when the parachute is gone (+7 & 2) or has been down
+ * (+0x61e) for more than 0x5a0 frames (+0x614); a two-shot (camera behind the parachute
+ * looking at the midpoint, distance <= 0x9ab0) while frame - 0x4b <= its appear frame
+ * +0x40 or it is more than 0x373 above its ground height +0x2e; otherwise the camera sits
+ * on the parachute's recorded pose (ring at controller +0x32, 0x14-byte entries, index
+ * +0x60e + 1 wrapped past 0x4a with an unsigned bls) and looks at the parachute.
+ * Returns 0, or the outcome on the exit path.
  */
 uint update_bailout_view /* Original: FUN_00008972 */ (void)
 

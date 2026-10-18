@@ -4880,3 +4880,10 @@ handle only after activation; a shell printing ticks alone does not wake this ag
   - camera 1000 units out along the offset, with -0xfa / +0xfa on x / y;
   - y floor 0xfa.
 - Inventory row VERIFIED; registry regenerated.
+
+### Iteration 384 — 2026-10-18
+
+- update_bailout_view (FUN_00008972) VERIFIED against the bytes 0x8972..0x8abc.
+  - A call-argument correction was recorded for approx_dist3_xyz (aircraft
+    pos, parachute pos).
+  - The parachute replay ring is at controller +0x32, with 0x14-byte entries.
