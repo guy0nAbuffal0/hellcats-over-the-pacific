@@ -2,9 +2,10 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** `ai_script_try_fire_burst` (FUN_00010e28), then `tick_ai_1b370_mission`
-(FUN_00010f68), the last +0x614 table entry. `tick_ai_1b310_approach_fire` is VERIFIED
-(horizontal distance to the fixed point (-265459, 0, 2827370)).
+**Next target:** `process_flight_input_and_outcome` (FUN_0000740a) key cases: decode
+the 0x7688 jump table (key - 9, 0x76 entries) and check the case bodies (0x7774..0x7dbc).
+The prologue / replay / key filter section 0x740a..0x7686 is checked; the function runs to
+about 0x8740 and is verified section by section.
 
 Open questions recorded in `update_aircraft_entity`: blk 3b reads the blk 2b engine
 locals uninitialised for non-player aircraft (reachability unknown); blk 2b's divs.w
@@ -15,7 +16,7 @@ The overlay heap (sbrk, size-class / large-block growth, alloc, free) and the ov
 RNG (init, mul_mix, next) are fully VERIFIED; the false entry FUN_00001a48 is settled.
 Already VERIFIED:
 `ai_pursue_target`, `bullet_hits_aircraft`, `steer_entity_toward_point`,
-`apply_relative_heading_steer`, `retire_entity`, `dispatch_entity_cleanup`, `deactivate_object`, `release_fractal_reference`, `heap_free_coalesce`, `heap_alloc`, `heap_new_size_class_block`, `heap_add_large_block`, `heap_sbrk`, `isqrt_floor`, `update_aircraft_entity`, `fold_angle_pm_0x2000`, `compute_template_force_from_626` (+ false split e512), `abs_int`, `transform_vecs12_by_matrix3`, `build_attitude_matrix` (wrapper), `load_attitude_angle_sincos`, `fill_attitude_rotation_bases`, `fill_attitude_rotation_basis_4`, `finalize_attitude_matrix_4ang`, `matmul3x3_s16`, `enemy_fighter_notice_object`, `invert_ai_bias_67b_if_positive`, `ai_attack_or_fly`, `ai_fly`, `ai_dive_at_target`, `ai_bombing_run`, `adjust_ai_throttle_vs_speed`, `max_ai_throttle_maybe_invert_679`, `ensure_ai_script_1b2e0_tick`, `tick_ai_climb_then_waypoint`, `advance_route_waypoint`, `ai_bootstrap_climb_phase`, `enqueue_control_inputs_avg4`, `ensure_ai_script_1b340_tick`, `ensure_ai_script_1b310_tick`, `tick_ai_1b310_approach_fire`, `overlay_rng_next` (lagged additive RNG,
+`apply_relative_heading_steer`, `retire_entity`, `dispatch_entity_cleanup`, `deactivate_object`, `release_fractal_reference`, `heap_free_coalesce`, `heap_alloc`, `heap_new_size_class_block`, `heap_add_large_block`, `heap_sbrk`, `isqrt_floor`, `update_aircraft_entity`, `fold_angle_pm_0x2000`, `compute_template_force_from_626` (+ false split e512), `abs_int`, `transform_vecs12_by_matrix3`, `build_attitude_matrix` (wrapper), `load_attitude_angle_sincos`, `fill_attitude_rotation_bases`, `fill_attitude_rotation_basis_4`, `finalize_attitude_matrix_4ang`, `matmul3x3_s16`, `enemy_fighter_notice_object`, `invert_ai_bias_67b_if_positive`, `ai_attack_or_fly`, `ai_fly`, `ai_dive_at_target`, `ai_bombing_run`, `adjust_ai_throttle_vs_speed`, `max_ai_throttle_maybe_invert_679`, `ensure_ai_script_1b2e0_tick`, `tick_ai_climb_then_waypoint`, `advance_route_waypoint`, `ai_bootstrap_climb_phase`, `enqueue_control_inputs_avg4`, `ensure_ai_script_1b340_tick`, `ensure_ai_script_1b310_tick`, `tick_ai_1b310_approach_fire`, `ai_script_try_fire_burst`, `tick_ai_1b370_mission`, `try_begin_landing_approach`, `find_nearest_runway_approach_ends`, `store_xyz_asr`, `tick_landing_approach_glide`, `apply_player_mouse_controls`, `overlay_rng_next` (lagged additive RNG,
 x[n] = x[n-1] + x[n-32] over the 55-long ring 0x2600c..0x260e7).
 
 The angle path feeding `attitude_from_velocity` is established:

@@ -9473,6 +9473,20 @@ switchD_00007684_caseD_1b:
         ((param_1 != 0x5a && (param_1 != 0x7a)))))) &&
       (((param_1 != 0x3e && (((param_1 != 0x2e && (param_1 != 0x58)) && (param_1 != 0x78)))) &&
        ((param_1 != 0x3f && (param_1 != 0x2f)))))))) goto switchD_00007684_caseD_a;
+  /* Section check 0x740a..0x7686 (prologue, replay control, view exits, key filter,
+   * dispatch) [PROVEN, matches the C above; independent capstone disassembly]: sVar4 = old
+   * view mode word DAT_0001d858; replay words 0x1b870 / 0x1b86e / 0x1b86c as in the C;
+   * view 8 -> 9 when a parachute exists (DAT_0001b87c), else 1 with the player object's
+   * long +4 bit 0x40 set (contact records dropped once) - then update_view_clip_bounds and
+   * DAT_0001b884 = 0. Host +0x98 == 2 with no replay: the host hooks +0x2b6 / +0x2be (when
+   * +0x25e != 0), view 8, replay 3 with 0x1e frames, camera = player pos +
+   * transform(build_attitude_matrix_3ang(0, sext +0x22, 0), (-0x2ee, 0x183, -0x513)); then,
+   * while idle, request_instant_replay(+0x63e == 0). View 7 without a target or on the
+   * ground -> 0x79fc (back to view 1); views 8 / 9 -> 0x7fe2. Key filter: param_2 (event)
+   * == 3 lets every key through; event 4 only the space bar; any other event only
+   * a A + - = _ 2 4 6 8 Z z > . X x ? / (keys whose RELEASE matters); otherwise 0x7dbe.
+   * Dispatch: key - 9, unsigned > 0x75 -> 0x7dbe, word table at 0x7688 (ext 0x0a06,
+   * d0.l x2). The cases below are checked separately. */
   switch(param_1) {
   case 9:
     cycle_view_distance();
@@ -10754,6 +10768,17 @@ void begin_replay_view /* Original: FUN_00008ff4 */ (void)
 /* Original: FUN_0000923e; source: Pacific Conflict.c. Recovered name: apply_player_mouse_controls [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x923e).
  * Called every frame by process_flight_input_and_outcome. Unless the player pilot is hit (flags_685 bit 0): normally feeds the mouse position (host words +0x33e / +0x340, kept in DAT_00024d32 / DAT_00024d30) relative to the view centre (DAT_00020b2a / DAT_00020b2c), times 3 (x by 3/2), into enqueue_control_inputs_avg4 with the button state DAT_0001b858; when the target-lock flag _DAT_0001b872 is set and a target DAT_0001b888 exists it steers the player straight at it instead (steer_entity_toward_point). Complete Ghidra C.
+ * Exact mapping [PROVEN]: rudder (param_2) = word DAT_0001b858 (+-0x40 from the keys, see
+ * enqueue_control_inputs_avg4); elevator (param_3) = low word of (sext +0x340 - sext
+ * DAT_00020b2c) * 3; aileron (param_4) = low word of ((sext DAT_00020b2a - sext +0x33e) * 3)
+ * / 2 (truncating). With the clamps of enqueue_control_inputs_avg4 (+-0x200 / +-0x140),
+ * full elevator is reached about 171 pixels and full aileron about 213 pixels from the
+ * view centre; the filter there adds the 3/4 gain. The bit-0 test is word flag 0x1 of
+ * +0x684 (set on bail-out), so after bailing out the mouse no longer flies the aircraft.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x923e..0x92e2 (btst #0 $685; tst.w $1b872 / tst.l $1b888; steer with the object's
+ * +0x18 / +0x1c / +0x20; suba.w + lea (a,a.l*2) = x3, bge / addq / asr.l #1; ext.l / movea.w
+ * word truncations; bsr $10558); identical to the C.
  */
 void apply_player_mouse_controls /* Original: FUN_0000923e */ (void)
 
@@ -19386,6 +19411,18 @@ void ensure_ai_script_1b340_tick(int *param_1) /* Original: FUN_00010de8 */
  * Callers: AI script phase 2 (@0x10F54 / @0x10FEE).
  *
  * Evidence: Capstone @0x10E28–0x10ECA; BSR $12840 ≡ spawn_weapon_entity.
+ * Section check 0x10e28..0x10eca [PROVEN; independent capstone disassembly]: gate frame
+ * counter DAT_0001b838 >= long +0x6ac (signed cmpa.l / blt); +0x67c is the BOMB count
+ * (load_player_fuel_and_bombs), 0 -> return 1. Release when the bomb phase byte +0x674
+ * == 0 and overlay_rng_next & 7 == 0 (1/8 per frame): +0x674 = 2 - NOT 1, so blk 7b of
+ * update_aircraft_entity (which drops only on phase 1) does not drop a second bomb; the
+ * phase then runs 2 -> 3 -> 4 -> 0 there, a 3-frame cooldown. spawn_weapon_entity(long
+ * +0x62a - Ghidra prints a (short) cast -, 0, own object +0x18 / +0x1c / +0x20,
+ * (sext +0x20 + (r3 & 0x7f)) & 0x3fff, (sext +0x22 - 0x80 + (r2 & 0xff)) & 0x3fff, sext
+ * +0x24), r2 drawn before r3; then subq.b #1 at +0x67c and word +0x634 -= 6 (the player
+ * path in blk 7b removes 0x10 and honours world +0x90 == 2; this one does not). Returns 0.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C.
  */
 undefined4 ai_script_try_fire_burst(int *param_1) /* Original: FUN_00010e28 */
 {
@@ -19483,6 +19520,28 @@ void tick_ai_1b310_approach_fire(int *param_1) /* Original: FUN_00010ecc */
  * Always update_aircraft_entity.
  *
  * Evidence: Capstone jmp-table @0x10F68+; callees already renamed.
+ * Section check 0x10f68..0x110f2 [PROVEN; independent capstone disassembly; jump table
+ * at 0x10fb2 decoded by hand, ext 0x8a06 = a0.l x2]: unsigned bhi above 5 -> default.
+ * Block = alloc_copied_vertex_block(own object, header 8, count 8, DAT_0001b370) - COPIED,
+ * not transformed, so the 8 points are world coordinates [PROVEN data, file 0x1b390]:
+ * (-406400, 15000, 3078400), (-54100, 25000, 3385200), (-79700, 30000, 3697800),
+ * (52700, 30000, 3833200), (81200, 30000, 3933500), (-131700, 30000, 3909200),
+ * (-8600, 30000, 3135800), (-89100, 15000, 2859300); route index word +4 starts at 3.
+ * Phase 0: ai_bootstrap_climb_phase -> 1. Phase 1: index == 4 -> phase 2 with +0x6ac =
+ * frame + 75. Phase 2: ai_script_try_fire_burst done -> 3. Phases 1..3 then fly the
+ * route: advance_route_waypoint(own object, header + 4); phase 3 with index back at 0 ->
+ * phase 4, gear down (+0x679 = 1), try_begin_landing_approach(param_1), no steer;
+ * otherwise throttle target = low word of the long DAT_0001b3d0[index] [PROVEN data,
+ * file 0x1b3f0: 0xe10, 0xe10, 0xca8, 0xca8, 0xb40, 0xd5c, 0xd5c, 0xd5c] and the
+ * 0x1000-above-+0x2e aim floor of tick_ai_climb_then_waypoint. Phase 4: world word
+ * +0x90 == 5, own definition first word == 2 and world word +0xce == 0 -> +0xce = 1;
+ * then phase 5 and falls into it. Phase 5 (rollout): enqueue_control_inputs_avg4(param_1,
+ * 0, 0, (+0x62a >> 2) <= 0x59f ? 0x140 : 0), throttle byte +0x668 = 0, +0x641 = 1
+ * (the extra ground-friction term t32 of update_aircraft_entity blk 4c: brakes
+ * [STRONG INFERENCE]). Default (phase > 5): steer at the player's object position.
+ * Every path ends with update_aircraft_entity.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C (try_begin_landing_approach is not yet verified itself).
  */
 void tick_ai_1b370_mission(int *param_1) /* Original: FUN_00010f68 */
 {
@@ -28054,6 +28113,10 @@ void tick_view_attached_object /* Original: FUN_00019bbc */ (int *param_1)
  * Dest in A1 (register ABI): write (x>>s, y>>s, z>>s) where s=param_4.
  * Capstone @0x19C26–0x19C5C also ASR’s the stack copies then MOVEM to A1.
  * Used by find_nearest_runway_approach_ends with entity scale at +0x34.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x19c26..0x19c5c (asr.l d0 on each stacked long - count mod 64, signed -, copy to
+ * (a1), d0 = a1); identical to the C (in_A1 = the register destination, which Ghidra's
+ * call sites in find_nearest_runway_approach_ends do not show).
  */
 void store_xyz_asr(int param_1,int param_2,int param_3,uint param_4) /* Original: FUN_00019c26 */
 {
@@ -28081,6 +28144,24 @@ void store_xyz_asr(int param_1,int param_2,int param_3,uint param_4) /* Original
  * Sole caller: try_begin_landing_approach (@0x19FD6).
  *
  * Evidence: Capstone @0x19C5E+; endpoint stores match landing glide setup.
+ * Section check 0x19c5e..0x19fb8 [PROVEN; independent capstone disassembly]: lists
+ * DAT_0001b5a4 [word 0x1b736] then DAT_0001d4a4 [word 0x1c1e2], each walked from the
+ * end (subq.w / bcc, unsigned count). Candidate object: type byte 2,
+ * probe_nearest_facility_kind(object) == 0x200 (argument dropped by Ghidra), and
+ * d = approx_dist3_xyz(own pos, object pos) in 3D below the best object distance so far
+ * (that best, frame -0x62, is updated only when the object has a pad face). Pad face
+ * (faces at +0x48, count +0x3a, stride 0x20): byte +0x16 == 'p' (0x70), word +0x14 == 4.
+ * Its 4 vertices (object +0x44, 12 bytes each, indices from the face's word list +0x18)
+ * are scaled by store_xyz_asr(x, y, z, sext +0x34) into P1..P4 = frame -0xc / -0x18 /
+ * -0x24 / -0x30 - the DESTINATION is the register a1 (d7 / d6 / d5 / d3), which Ghidra
+ * drops. If the horizontal |P2P3| < |P1P2| (approx_dist3_xyz with y = 0, arguments dropped)
+ * the corners rotate (P1 <- P2 <- P3 <- P4 <- P1) so P1P2 is the short edge. The two
+ * short-edge midpoints M12 / M34 (truncating halves) are ranked by 3D distance from the
+ * aircraft: *param_2 = the nearer, *param_3 = the farther (strict <); the pad wins when
+ * that nearer distance beats the best (signed). Returns 1 when nothing was found or the
+ * best > 0x40740, else 0. Runtime-address calls via lea $3c48.l = approx_dist3_xyz.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the dropped arguments recorded.
  */
 undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int *param_3) /* Original: FUN_00019c5e */
 {
@@ -28250,11 +28331,27 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
  * If find_nearest_runway_approach_ends fills approach endpoints and range metric ∈ (9999,0x26ac1):
  * write glide path into DAT_000267xx (pos + unit dir with Y=0xFDC0), nudge
  * start along dir×10000, clear AI flags, save prior +0x32 into DAT_00026798,
- * install AI +0x32←0x1A186 (≡ tick_landing_approach_glide−0x20), return 0. Else 1.
+ * install AI +0x32←0x1A186 (runtime address of tick_landing_approach_glide), return 0. Else 1.
  *
  * Callers: tick_ai_1b370_mission phase 3→4; player keypath @0x7C98.
  *
  * Evidence: Capstone @0x19FBA+; globals 267bc/c0/c4/b2/b6/ba.
+ * Section check 0x19fba..0x1a1a4 [PROVEN; independent capstone disassembly]: A = local
+ * -0xc / -8 / -4, B = -0x18 / -0x14 / -0x10 filled by find_nearest_runway_approach_ends(own
+ * object, &A, &B) (0 = found). d = approx_dist3_xyz(own pos, A) in 3D - arguments dropped
+ * by Ghidra (recorded) - must satisfy 9999 < d <= 0x26ac0 (signed). With D = B - A:
+ * aim point 0x267bc / c0 / c4 = (A.x + 6 D.x / 64, A.y, A.z + 6 D.z / 64) (truncating),
+ * direction words 0x267b2 / b6 / ba = D >> 3, len = isqrt_floor(sum of squares), then
+ * b2 = (b2 << 12) / len, b6 = 0xfdc0 (-0x240, a fixed descent), ba = (ba << 12) / len
+ * (a zero len would trap); aim point += (b2 * 10000 >> 12, 0x43, ba * 10000 >> 12).
+ * Then word 0x267ac = 0; flaps retracted if extended (+0x67b > 0 -> negated); word
+ * +0x684 &= ~0x4000; long +0x622 = 0, word +0x620 = 0; 0x267a8 / 0x267a4 = 0; 0x267a0 /
+ * 0x2679c = own x / z; word 0x267ae = 0x11b when aim y <= 0x43 else 0x181; 0x26798 = old
+ * +0x32; +0x32 = 0x1a186 = runtime address of tick_landing_approach_glide (file 0x1a1a6,
+ * the usual +0x20 - not a false mid-label). Returns 0; 1 when no approach is possible.
+ * The approach state is in GLOBALS, so only one aircraft at a time can fly it [PROVEN].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the call-argument correction.
  */
 undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
 {
@@ -28269,7 +28366,7 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
   
   iVar1 = *param_1;
   iVar2 = find_nearest_runway_approach_ends( /* Original: FUN_00019c5e */iVar1,&local_10,&local_1c);
-  if (((iVar2 == 0) && (iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */), 9999 < iVar2)) && (iVar2 < 0x26ac1)) {
+  if (((iVar2 == 0) && (iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own pos, runway end A at local_10 / local_c / local_8) [PROVEN, pushes 0x19fe2..0x19ffa] */), 9999 < iVar2)) && (iVar2 < 0x26ac1)) {
     iVar2 = (local_1c - local_10) * 6;
     if (iVar2 < 0) {
       iVar2 = iVar2 + 0x3f;
@@ -28320,7 +28417,9 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
     }
     DAT_00026798 = *(undefined4 *)((int)param_1 + 0x32);
     /* Literal 0x1A186 = tick_landing_approach_glide @0x1A1A6 − 0x20
-     * [BLOCKED false mid-label family]; intended AI callback is 0x1A1A6. */
+     * [BLOCKED false mid-label family]; intended AI callback is 0x1A1A6.
+     * Resolved [PROVEN]: +0x32 holds RUNTIME addresses (file - 0x20), like the AI states
+     * 0x110d4 / 0x11162 / 0x111ba / 0x112c0; 0x1a186 is tick_landing_approach_glide. */
     *(undefined4 *)((int)param_1 + 0x32) = 0x1a186;
     return 0;
   }
@@ -28340,6 +28439,9 @@ undefined4 try_begin_landing_approach(int *param_1) /* Original: FUN_00019fba */
  * (= this−0x20) [BLOCKED false mid-label].
  *
  * Evidence: Capstone @0x1A1A6; 267xx from try_begin_landing_approach.
+  * VERIFIED: every part 0x1a1a6..0x1a63a was checked against an independent capstone
+ * disassembly (section checks in the body); identical to the C with the call-argument
+ * corrections for approx_dist3_xyz and the four abs_int (Ghidra FUN_00002de8) calls.
  */
 void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
 {
@@ -28366,7 +28468,7 @@ void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
   uVar1 = *(undefined4 *)((int)param_1 + 0x2e);
   uVar2 = *(undefined1 *)((int)param_1 + 0x679);
   iVar9 = *param_1;
-  iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+  iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (own pos, aim 0x267bc / c0 / c4) in 3D [PROVEN, pushes 0x1a1d4..0x1a1e2] */);
   *(undefined4 *)((int)param_1 + 0x2e) = 0xfffff060;
   /* iVar6 = along-track lead from range bands (10000 / 0x8e30 / 13000). */
   if (iVar4 < 0xae31) {
@@ -28416,6 +28518,17 @@ void tick_landing_approach_glide(int *param_1) /* Original: FUN_0001a1a6 */
   else {
     iVar12 = DAT_000267c0 + DAT_000267ae;
   }
+  /* Section check 0x1a1a6..0x1a2d8 (part 1 of 2) [PROVEN, matches the C; independent
+   * capstone disassembly]: saves long +0x2e and sext byte +0x679 (gear); d =
+   * approx_dist3_xyz(own pos, aim) 3D (arguments dropped, recorded); +0x2e = -4000.
+   * s = d - 13000 when d > 0xae30, (d - 10000) - ((d - 0x8e30) * 3000) / 8192 when
+   * d > 0x8e30, else d - 10000 (signed, truncating). Target x / y = aim - s * (word
+   * 0x267b2 / 0x267b6) / 4096 (ext.l, muls.l, truncating); 0x267b6 = -0x240, so the
+   * target height rises 0x240 / 0x1000 (about 0.14) per unit of s - an 8-degree glide
+   * slope [PROVEN arithmetic]. Height floor = aim y + sext word 0x267ae (0x11b / 0x181):
+   * at or below it the target sits on the floor; above it, s > 40000 adds (own y -
+   * target y) / 8 and 0x8c40 < s <= 40000 adds ((s - 0x8c40) * (own y - target y) /
+   * 4096) / 8 (all truncating). Part 2 (0x1a2da..) is still to be checked. */
 LAB_0001a2da:
   iVar5 = iVar6 * DAT_000267ba;
   if (iVar5 < 0) {
@@ -28435,8 +28548,8 @@ LAB_0001a2da:
     local_12 = 0x9d8;
   }
   /* Heading from Δxz to aim; lateral offset via sin/cos of local_6. */
-  iVar6 = FUN_00002de8();
-  iVar5 = FUN_00002de8();
+  iVar6 = FUN_00002de8( /* = abs_int(own x - target x) [PROVEN: lea.l $2de8.l runtime = file 0x2e08; arg pushed at 0x1a31e, dropped by Ghidra] */);
+  iVar5 = FUN_00002de8( /* = abs_int(own z - target z) [PROVEN, arg pushed at 0x1a330] */);
   sVar11 = 0;
   for (uVar10 = iVar5 + iVar6; (uVar10 & 0xffff8000) != 0; uVar10 = (int)uVar10 >> 1) {
     sVar11 = sVar11 + 1;
@@ -28536,13 +28649,32 @@ LAB_0001a2da:
   steer_entity_toward_point( /* Original: FUN_00010b2e */param_1,iVar9,iVar12,iVar7);
   /* Mid-band range + abs noise: abort glide, restore prior +0x32. */
   if (((iVar4 < 18000) && (15000 < iVar4)) &&
-     ((iVar9 = FUN_00002de8(), 100 < iVar9 || (iVar9 = FUN_00002de8(), 0x5a < iVar9)))) {
+     ((iVar9 = FUN_00002de8( /* = abs_int(vertical error: target y - own y, register d2) [PROVEN, 0x1a5e8] */), 100 < iVar9 || (iVar9 = FUN_00002de8( /* = abs_int(sext local_12 - (+0x62a >> 2)): speed error [PROVEN, 0x1a5fa..0x1a602] */), 0x5a < iVar9)))) {
     _DAT_0001b83c = 1;
     *(undefined4 *)((int)param_1 + 0x32) = DAT_00026798;
   }
   *(undefined4 *)((int)param_1 + 0x2e) = uVar1;
   *(undefined1 *)((int)param_1 + 0x679) = uVar2;
   update_aircraft_entity(param_1);
+  /* Section check 0x1a2da..0x1a63a (part 2 of 2) [PROVEN, matches the C with the abs_int
+   * argument corrections; independent capstone disassembly]: target z = aim z - s * word
+   * 0x267ba / 4096; throttle target local_12 = 0x9d8 (s > 0x9ab0) / 0x7bc / 0 (s < 4000).
+   * Heading: k = 1 + number of asr #1 bringing |dx| + |dz| below 0x8000, then
+   * attitude_from_velocity((tx - own x) >> k, 0, (tz - own z) >> k, 0, 0, NULL, &local_6).
+   * Lateral offset = abs_int(sext word of ((own x - aim x) * 0x267ba - (own z - aim z) *
+   * 0x267b2) / 4096); tx -= sin(local_6) * off / 4096, tz += cos(local_6) * off / 4096
+   * (muls.w). Grounded (+0x63e) -> +0x32 = saved state 0x26798. Word 0x267ac (k = 1) blends
+   * the target halfway with own pos + 45 * velocity and stores x / z into 0x267a0 /
+   * 0x2679c, then counts 1 -> 2 -> 0. Vertical: e = ty - own y; v = 0x267a4 + 33 e -
+   * 32 (long +0x622); +0x622 = e; 0x267a4 = v - trunc16(v); 0x267a8 += trunc(v / 16),
+   * clamped to +-0x4b0; ty += 0x267a8 (the velocity-form controller of
+   * adjust_ai_throttle_vs_speed, on height). x / z: 0x267a0 / 0x2679c move 1/8 of the way
+   * to tx / tz each frame and become the steer target; mirrored into the object of
+   * DAT_00020b40 when set. adjust_ai_throttle_vs_speed(param_1, local_12),
+   * steer_entity_toward_point(param_1, x, ty, z). Go-around: range d in (15000, 18000)
+   * and (|e| > 100 or |local_12 - (+0x62a >> 2)| > 0x5a) -> word DAT_0001b83c = 1 and +0x32
+   * = saved state. Exit restores +0x2e and the gear byte +0x679, then
+   * update_aircraft_entity. Both parts checked. */
   return;
 }
 
