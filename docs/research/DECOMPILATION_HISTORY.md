@@ -4872,3 +4872,11 @@ handle only after activation; a shell printing ticks alone does not wake this ag
 - Quirk [PROVEN arithmetic]: the glide recompute divides by DAT_0001b86e - 0x1e,
   which is 0 when the countdown is exactly 30. That the flow never reaches it is
   a HYPOTHESIS.
+
+### Iteration 383 — 2026-10-18
+
+- place_camera_behind_object (FUN_000088a0) VERIFIED against the bytes 0x88a0..0x8970:
+  - word-truncated offsets;
+  - camera 1000 units out along the offset, with -0xfa / +0xfa on x / y;
+  - y floor 0xfa.
+- Inventory row VERIFIED; registry regenerated.

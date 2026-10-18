@@ -5,10 +5,10 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 382 (2026-10-18)
-**Next target:** `turn_camera_toward_point` (FUN_00008abe) and `place_camera_behind_object`
-(FUN_000088a0), the two camera helpers update_tracking_camera calls: verify them against
-the bytes.
+**Last iteration:** 383 (2026-10-18)
+**Next target:** `update_bailout_view` (FUN_00008972, bytes 0x8972..0x8abc, already
+disassembled in iteration 383) and `turn_camera_toward_point` (FUN_00008abe): verify
+them against the C.
 
 **Verification policy (user decision, 2026-10-18):** a function may be marked
 VERIFIED when its body matches an independent disassembly of the bytes and any

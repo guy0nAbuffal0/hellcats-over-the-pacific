@@ -10124,6 +10124,13 @@ LAB_00008866:
 /* Original: FUN_000088a0; source: Pacific Conflict.c. Recovered name: place_camera_behind_object [STRONG INFERENCE] (iteration 301).
  * Ghidra C reviewed (function at overlay offset 0x88a0).
  * Args: object, point, shift. Puts the camera (DAT_0001d838 / -834 / -830) 1000 units from the object on the line towards the point (with -0xfa / +0xfa offsets), or at the point when they coincide, never below height 0xfa. Complete Ghidra C.
+ *
+ * VERIFIED (iteration 383): independent capstone disassembly of 0x88a0..0x8970 is identical
+ * to the C. The shift is the low word at $32 (sign-extended); the three offsets
+ * (object pos - point) >> shift are truncated to words; length = isqrt_floor(sum of
+ * muls.w squares), tested as a word; each axis = object pos + (offset * 1000) / length
+ * (muls.w #$3e8, divs.l), with -0xfa on x and +0xfa on y; length 0 -> camera = point;
+ * y floored at 0xfa (cmpi.l #$f9 / bgt). The only call (isqrt_floor) has its argument.
  */
 void place_camera_behind_object /* Original: FUN_000088a0 */ (int param_1,int param_2,int param_3,int param_4,short param_5)
 
