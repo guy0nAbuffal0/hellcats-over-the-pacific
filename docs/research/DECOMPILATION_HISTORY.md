@@ -4864,3 +4864,11 @@ handle only after activation; a shell printing ticks alone does not wake this ag
   goes behind the aircraft whose nose is not closer to the other (the player
   wins ties).
 - Second half pending.
+
+### Iteration 382 — 2026-10-18
+
+- update_tracking_camera (FUN_00008c30) VERIFIED. Its second half 0x8eac..0x8ff2
+  matches the C, and the dropped arguments were documented in iteration 381.
+- Quirk [PROVEN arithmetic]: the glide recompute divides by DAT_0001b86e - 0x1e,
+  which is 0 when the countdown is exactly 30. That the flow never reaches it is
+  a HYPOTHESIS.

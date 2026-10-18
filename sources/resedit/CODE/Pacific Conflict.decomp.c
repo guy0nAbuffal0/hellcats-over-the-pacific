@@ -10299,7 +10299,14 @@ void turn_camera_toward_point /* Original: FUN_00008abe */ (int param_1,int para
  *   DAT_0001b888 is set and |fold(target +0x22 - player +0x22)| <= 0x1000, the camera is
  *   placed behind whichever aircraft's nose point is NOT closer to the other (player on a
  *   tie); else behind the player. place_camera_behind_object(obj, mid x, y, z, shift).
- *   Remaining: 0x8eac..0x8ff4 (weapon follow, glide, countdown) for a full VERIFIED.
+ * VERIFIED (iteration 382, user policy): second half 0x8eac..0x8ff2 also matches the C,
+ *   and the dropped arguments are documented above. Look-at point = the weapon object (on
+ *   the 0x8ece path) or the player. When a tracked target is dropped, the glide steps
+ *   are recomputed as (glide target - camera) / (DAT_0001b86e - 0x1e) (movea.w +
+ *   moveq #-0x1e, divs.l). That divisor is 0 when the countdown is exactly 30 (a
+ *   68000 divide-by-zero trap), so presumably the flow never gets there [HYPOTHESIS].
+ *   The countdown and outcome are as documented in iteration 372;
+ *   turn_camera_toward_point(x, y, z); returns the sign-extended outcome word.
  */
 int update_tracking_camera /* Original: FUN_00008c30 */ (void)
 
