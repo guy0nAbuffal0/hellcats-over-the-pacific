@@ -21154,6 +21154,10 @@ undefined4 face_camera_heading /* Original: FUN_00011ae6 */ (int param_1)
 /* Original: FUN_00011afe; source: Pacific Conflict.c. Recovered name: create_effect_controller [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x11afe).
  * Cleared 0xd6-byte effect controller (the per-vertex velocities of the init_effect_kind* functions live in it), object flags | 0x170000, flag 0x2000 for the template DAT_0002627a; target of register_effect_template once its template slots are filled. Ghidra C.
+ * VERIFIED: 0x11afe..0x11b46 checked against an independent capstone disassembly and found
+ * identical to the C: bsr.l 0x1b6c heap_alloc_cleared; alloc 0xd6; +0 = object, object long +4 |= 0x170000, object word +6 |=
+ * 0x2000 when the object is DAT_0002627a (cmpa.l), +4 = DAT_0001b524[class]; returns a1
+ * (move.l to d0 before rts; index scale *4 decoded by hand).
  */
 uint * create_effect_controller /* Original: FUN_00011afe */ (uint param_1,int param_2)
 
@@ -22013,6 +22017,10 @@ void effect_pre_render_hook /* Original: FUN_000127aa */ (int param_1)
 /* Original: FUN_000127c6; source: Pacific Conflict.c. Recovered name: create_ordnance_controller [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x127c6).
  * Allocates the cleared 0x620-byte ordnance controller: +0 object (object flags | 0x122000), +4 definition DAT_0001b524[key], and fills its 75-entry pose ring (+0x32) with the start position (fill_pose_history). Type 0xc = ballistic ordnance (definition key 0xc: +2 ordnance_tick, +6 register_ordnance_template -> create_ordnance_controller, +0x12 ordnance_collision) [STRONG INFERENCE]. Complete Ghidra C.
+ * VERIFIED: 0x127c6..0x1281c checked against an independent capstone disassembly and found
+ * identical to the C: bsr.l 0x1b6c heap_alloc_cleared; alloc 0x620; +0 = object, object long +4 |= 0x122000, +4 =
+ * DAT_0001b524[class], bsr.l 0xdf5e fill_pose_history(ctl + 0x32, object x, y, z); returns a3
+ * (move.l to d0 before rts; index scale *4 decoded by hand).
  */
 uint * create_ordnance_controller /* Original: FUN_000127c6 */ (uint param_1,int param_2)
 
@@ -22417,15 +22425,25 @@ void ordnance_collision /* Original: FUN_00012f52 */ (int param_1,int param_2)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_singleton_type10_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x12f92).
  * Definition +6 of key 0x10 (file 0x1aa16; no tick, no other handler) [PROVEN bytes]: cleared 0x32-byte controller kept in the single global DAT_00020b40, object flags | 0x112100 [UNKNOWN which object type 0x10 is]. Complete Ghidra C.
+ * VERIFIED: 0x12f92..0x12fd0 checked against an independent capstone disassembly and found
+ * identical to the C as restructured: alloc 0x32, +0 = object, object long +4 |= 0x112100, +4 =
+ * DAT_0001b524[class], then DAT_00020b40 = controller (move.l a0,$20b40.l last); D0 is the
+ * heap_alloc_cleared result, untouched to rts, so the controller is also returned.
  */
-void create_singleton_type10_controller /* Original: FUN_00012f92 */ (uint param_1,int param_2)
+uint * create_singleton_type10_controller /* Original: FUN_00012f92 */ (uint param_1,int param_2)
 
 {
-  DAT_00020b40 = heap_alloc_cleared(0x32);
-  *DAT_00020b40 = param_1;
+  uint *puVar1;
+
+  /* Store order follows the bytes (Ghidra wrote the global first and went through it):
+   * the controller is filled through a0 and published to DAT_00020b40 last (0x12fc2). */
+  puVar1 = heap_alloc_cleared(0x32);
+  *puVar1 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x112100;
-  DAT_00020b40[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  return;
+  puVar1[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
+  DAT_00020b40 = puVar1;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
@@ -24362,6 +24380,10 @@ LAB_00015082:
  * RENAME: the type-0x15 extra handler at 0x15154 prints "Can't find deck tag on carrier" (string at 0x15134) when no face has tag 1, so type 0x15 is the aircraft carrier [PROVEN].
  * Ghidra C reviewed (function at overlay offset 0x150c8).
  * Create entry of controller type 0x15 (3 hits). Allocates a cleared 0x56-byte controller: +0 object (object flag word +6 |= 0x4000), +4 definition DAT_0001b524[key], words +0x50 / +0x52 = -1, +0x48 = 1000000000, word +0x44 = 7, word +0x32 = definition +0x1a; the first one created is kept in _DAT_0001b864. Returns the controller. Type 0x15 alone has the extra handler and the mission checks in step_sinking_object (probe_nearest_facility_kind, missions 7 / 8 / 9) [HYPOTHESIS: the mission ship, e.g. the carrier; the name "flagship" is provisional]. Controller definition table [PROVEN, bytes]: overlay_main_entry Block C copies five 0x1c-byte records from 0x1aa5e (file 0x1aa7e) into DAT_0001b524[key]; record = key word, +2 tick, +6 create, +0x12 extra (code pointers stored as address - 0x20), +0x1a hits. Key 0x15: step_sinking_object / FUN_000150c8 / extra 0x15154 (unexported), 3 hits; 0x19: tick_firing_ship_controller / create_firing_ship_controller, 2 hits; 0x18 and 0x17: step_sinking_object / FUN_000155ec, 2 and 1 hits; 0x16: tick_sinking_controller / create_sinking_controller, 1 hit. The keys match the template types 0x15..0x19 that the entity update path sends to sink_object_shape_at_waterline [STRONG INFERENCE: ship classes]. Complete Ghidra C.
+ * VERIFIED: 0x150c8..0x15132 checked against an independent capstone disassembly and found
+ * identical to the C: alloc 0x56; +0 = object, object word +6 |= 0x4000, +4 =
+ * DAT_0001b524[class], words +0x50 / +0x52 = 0xffff, +0x48 = 1000000000, word +0x32 = word
+ * (+4) +0x1a, word +0x44 = 7; published to DAT_0001b864 when that is 0; returns a1.
  */
 uint * create_carrier_controller /* Original: FUN_000150c8 */ (uint param_1,int param_2)
 
@@ -27195,6 +27217,11 @@ void update_radar_scope /* Original: FUN_00017b68 */ (void)
 /* Original: FUN_00017d16; source: Pacific Conflict.c. Recovered name: create_aircraft_spawner_controller [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x17d16).
  * Definition +6 of key 0x12 (file 0x1aa30: +2 0x17dd4, +6 this, +0xa destroy_aircraft_spawner_controller) [PROVEN bytes]: cleared 0x48-byte controller, object flags | 0x30040, +5 | 0x10 for key 0x12, and a random variant word +0x32 chosen from the object range (0x80e80, 0x40740, 0xc15c0) [: type 0x12 is an aircraft spawner (tick_aircraft_spawner); +0x32 = aircraft left to launch, STRONG INFERENCE]. Ghidra C.
+ * VERIFIED: 0x17d16..0x17db6 checked against an independent capstone disassembly and found
+ * identical to the C: alloc 0x48; object long +4 |= 0x30040, byte +5 bit 4 when class ==
+ * 0x12; v = r & 0xf (overlay_rng_next 0x11564); object range +0xc == 0x80e80 -> (v & 3) + 1,
+ * == 0xc15c0 -> (v & 3) + 2 (andi.w #$fffc / sub.w = Ghidra's - (r & 0xc)), == 0x40740 -> v %
+ * 3 (divs.w #3 / swap), else v; stored as word +0x32; returns a3.
  */
 uint * create_aircraft_spawner_controller /* Original: FUN_00017d16 */ (uint param_1,int param_2)
 
@@ -27393,6 +27420,11 @@ void remove_mission_target /* Original: FUN_00017ffe */ (int param_1)
 /* Original: FUN_00018040; source: Pacific Conflict.c. Recovered name: create_wave_spawner_controller [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x18040).
  * Definition +6 of key 0x14 [PROVEN bytes]: controller with object flags | 0x130040 and 10 aircraft to send (+0x32); in mission 7 (Divine Wind) also allocates the mission target list DAT_00020adc (count words = 10) used by remove_mission_target. Ghidra C (heap_zero_payload_tail allocations, register arguments not shown).
+ * VERIFIED: 0x18040..0x180c6 checked against an independent capstone disassembly and found
+ * identical to the C with both heap_alloc_cleared sizes reconstructed (0x38 and count * 4 +
+ * 10): object long +4 |= 0x130040, +4 = DAT_0001b524[class] (scale *4 decoded by hand), word
+ * +0x32 = 10, +0x34 = DAT_0001b838 + 0x546; when word DAT_0001b5a0 +0x90 == 7 the second
+ * buffer goes to DAT_00020adc with words +2 and +0 = the count; returns a3.
  */
 int * create_wave_spawner_controller /* Original: FUN_00018040 */ (int param_1,int param_2)
 
@@ -27401,14 +27433,18 @@ int * create_wave_spawner_controller /* Original: FUN_00018040 */ (int param_1,i
   int *piVar2;
   undefined2 *puVar3;
   
-  piVar2 = (int *)heap_alloc_cleared( /* size dropped by Ghidra; lea.l $1b4c.l at 0x18050 = runtime -> file 0x1b6c */);
+  /* Size reconstructed [PROVEN, pea $38.w at 0x1804c]; lea.l $1b4c.l at 0x18050 = runtime
+   * -> file 0x1b6c heap_alloc_cleared. */
+  piVar2 = (int *)heap_alloc_cleared(0x38);
   *piVar2 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x130040;
   piVar2[1] = *(int *)(&DAT_0001b524 + param_2 * 4);
   *(undefined2 *)((int)piVar2 + 0x32) = 10;
   piVar2[0xd] = DAT_0001b838 + 0x546;
   if (*(short *)(DAT_0001b5a0 + 0x90) == 7) {
-    puVar3 = (undefined2 *)heap_alloc_cleared( /* size dropped by Ghidra; lea.l $1b4c.l at 0x18050 = runtime -> file 0x1b6c */);
+    /* Size reconstructed [PROVEN, 0x18098..0x180a2]: sext word +0x32 << 2, pea $a(a1) =
+     * count * 4 + 10 (50 bytes for the count 10 set above). */
+    puVar3 = (undefined2 *)heap_alloc_cleared((int)*(short *)((int)piVar2 + 0x32) * 4 + 10);
     uVar1 = *(undefined2 *)((int)piVar2 + 0x32);
     DAT_00020adc = puVar3;
     puVar3[1] = uVar1;
@@ -27964,8 +28000,12 @@ undefined4 shadow_pre_render /* Original: FUN_00018a34 */ (int *param_1)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_flak_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x18b52).
  * Definition +6 of type 0x1a (flak gun): cleared 0xfa-byte controller, +0 object, +4 definition DAT_0001b524[key], word +0x46 = 0x3c (60), long +0x42 = 0x26ac0 [STRONG INFERENCE: engagement range; the same value as the middle radar range], object flag +5 | 2. Complete Ghidra C.
+ * VERIFIED: 0x18b52..0x18b96 checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0xfa; +0 = object, +4 = DAT_0001b524[class], word +0x46 = 0x3c, long
+ * +0x42 = &DAT_00026ac0, object byte +5 bit 1 set (bset).
  */
-void create_flak_controller /* Original: FUN_00018b52 */ (uint param_1,int param_2)
+uint * create_flak_controller /* Original: FUN_00018b52 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -27976,7 +28016,8 @@ void create_flak_controller /* Original: FUN_00018b52 */ (uint param_1,int param
   *(undefined2 *)((int)puVar1 + 0x46) = 0x3c;
   *(undefined **)((int)puVar1 + 0x42) = &DAT_00026ac0;
   *(byte *)(param_1 + 5) = *(byte *)(param_1 + 5) | 2;
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
@@ -28258,6 +28299,10 @@ LAB_00018dde:
 /* Original: FUN_000190c0; source: Pacific Conflict.c. Recovered name: create_turret_controller [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x190c0).
  * Cleared 0x54-byte controller, object flag +5 | 2 (and | 0x10 when at height 0), range +0x42 = 0xce40. Type 0x1b (file 0x1ab24: +2 0x1917c, +0xe turret_pre_render) [PROVEN bytes] is one of the types carried on ships (carry_attached_objects) and is hit by bullets (bullet_hits_shape sets its +0x46) [STRONG INFERENCE: ship gun turret]. Ghidra C.
+ * VERIFIED: 0x190c0..0x1910c checked against an independent capstone disassembly and found
+ * identical to the C: bsr.l 0x1b6c heap_alloc_cleared; alloc 0x54; +0 = object, object byte +5 bit 1 set, bit 4 too when
+ * object long +0x1c == 0, +4 = DAT_0001b524[class], long +0x42 = 0xce40; returns a1
+ * (move.l to d0 before rts; index scale *4 decoded by hand).
  */
 uint * create_turret_controller /* Original: FUN_000190c0 */ (uint param_1,int param_2)
 
@@ -28456,6 +28501,10 @@ undefined4 turret_pre_render /* Original: FUN_00019394 */ (int param_1)
 /* Original: FUN_000193b6; source: Pacific Conflict.c. Recovered name: create_parachute_controller [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x193b6).
  * Cleared 0x6be-byte controller (aircraft-sized, with a 75-entry pose ring at +0x32), object flags | 0x132000. Type 0x1c = bailed-out pilot / parachute [STRONG INFERENCE]: spawn_bailout_parachute (named earlier) spawns it from update_aircraft_entity when an aircraft is abandoned (+0x677 = 2, damage bit 0); for the player it sets mission state 9 and DAT_0001b87c = the parachute, and update_aircraft_damage_state only declares the pilot Dead while DAT_0001b87c is 0. Definition key 0x1c (file 0x1ab3e): +2 parachute_tick, +0xa destroy_parachute_controller [PROVEN bytes]. Ghidra C.
+ * VERIFIED: 0x193b6..0x1940c checked against an independent capstone disassembly and found
+ * identical to the C: bsr.l 0x1b6c heap_alloc_cleared; alloc 0x6be; +0 = object, object long +4 |= 0x132000, +4 =
+ * DAT_0001b524[class], bsr.l 0xdf5e fill_pose_history(ctl + 0x32, object x, y, z); returns a3
+ * (move.l to d0 before rts; index scale *4 decoded by hand).
  */
 uint * create_parachute_controller /* Original: FUN_000193b6 */ (uint param_1,int param_2)
 
@@ -28783,8 +28832,12 @@ void parachute_tick /* Original: FUN_00019938 */ (int *param_1)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_cloud_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x19a1a).
  * Cleared 0x40-byte controller, object flags | 0x132000, definition at +4. Cloud definition key 0x1d (file 0x1ab58): +2 follow_camera_offset (0x19b30), +6 register_cloud_templates [PROVEN bytes]; the five templates DAT_00026784[0..4] are the classes spawned by spawn_camera_relative_object for spawn_cloud_layer. Complete Ghidra C.
+ * VERIFIED: 0x19a1a..0x19a52 checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0x40; +0 = object, object long +4 |= 0x132000, +4 =
+ * DAT_0001b524[class].
  */
-void create_cloud_controller /* Original: FUN_00019a1a */ (uint param_1,int param_2)
+uint * create_cloud_controller /* Original: FUN_00019a1a */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -28793,7 +28846,8 @@ void create_cloud_controller /* Original: FUN_00019a1a */ (uint param_1,int para
   *puVar1 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x132000;
   puVar1[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
@@ -28881,8 +28935,12 @@ void follow_camera_offset /* Original: FUN_00019b30 */ (int *param_1)
  * SIGNATURE CORRECTION [PROVEN, bytes]: the Ghidra C declares this function void, but the 68000 code leaves the heap_alloc_cleared result (the new controller) in D0 up to RTS without overwriting it, and the caller instantiate_object_from_desc (definition +6 call) stores that D0 value at object +8. The real signature is uint *create_view_attached_controller(object, definition key,...). The C body is kept as exported (no token change); a port must return the controller.
  * Ghidra C reviewed (function at overlay offset 0x19b82).
  * Definition +6 of key 0x1e (file 0x1ab72) [PROVEN bytes]: cleared 0x32-byte controller, object flags | 0x132000. Complete Ghidra C.
+ * VERIFIED: 0x19b82..0x19bba checked against an independent capstone disassembly and found
+ * identical to the C with the uint * return applied: bsr.l 0x1b6c heap_alloc_cleared, D0
+ * copied to a0 and never written again before rts; alloc 0x32; +0 = object, object long +4 |= 0x132000, +4 =
+ * DAT_0001b524[class].
  */
-void create_view_attached_controller /* Original: FUN_00019b82 */ (uint param_1,int param_2)
+uint * create_view_attached_controller /* Original: FUN_00019b82 */ (uint param_1,int param_2)
 
 {
   uint *puVar1;
@@ -28891,7 +28949,8 @@ void create_view_attached_controller /* Original: FUN_00019b82 */ (uint param_1,
   *puVar1 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x132000;
   puVar1[1] = *(uint *)(&DAT_0001b524 + param_2 * 4);
-  return;
+  /* Return applied from the DECOMPILATION_SYMBOLS.md signature table (Ghidra: void). */
+  return puVar1;
 }
 
 
