@@ -29,16 +29,16 @@ def collect() -> tuple[dict[str, Any], list[str]]:
     errors: list[str] = []
     identities = [row.get("identity") for row in rows]
     expected_identities = [f"{row.get('segment')}::{row.get('original_function')}" for row in rows]
-    if inventory.get("schema_version") != 2:
-        errors.append("decompilation inventory schema_version must be 2")
+    if inventory.get("schema_version") != 3:
+        errors.append("decompilation inventory schema_version must be 3")
     if len(rows) != inventory.get("total"):
         errors.append("decompilation inventory total does not match function records")
     if identities != expected_identities:
         errors.append("one or more canonical identities do not match segment::original_function")
     if len(identities) != len(set(identities)):
         errors.append("duplicate segment-qualified function identity")
-    if inventory.get("migration", {}).get("unmatched_or_conflicting_records"):
-        errors.append("canonical registry has unresolved migration conflicts")
+    if inventory.get("conflicts"):
+        errors.append("canonical registry has unresolved conflicts")
 
     status_counts = inventory.get("status_counts", {})
     recomputed_status = {

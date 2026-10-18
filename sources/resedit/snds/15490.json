@@ -55,7 +55,7 @@
     "binary_origin": "recovered resource-fork payload",
     "binary_path": "sources/resedit/snds/15490.bin",
     "binary_size": 27108,
-    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble",
     "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
     "comparison_resource_name": "Explosion",
     "representations": [
@@ -112,7 +112,7 @@
   "schema": "hellcats-resedit-resource-v1",
   "type_code_references": [
     {
-      "evidence": "* C args: +8 Pascal name, +0xc short slot. h = GetNamedResource('snd ', name) ($A9A1); none -> return 1. HNoPurge (JT $28a, $A04A); HUnlock (JT $27a); if FreeMem() < 0x3000 and MaxMem(&grow) < 0x3000: HUnlock, HPurge, ReleaseResource ($A9A3), return 1 (out of memory). Makes sure the resource is marked purgeable (GetResAttrs $A9A6; if bit 0x20 is clear, SetResAttrs | 0x20 $A9A7 and ChangedResource); A5-0xd62[slot] = h; returns 0. Callers: FUN_00001f8e (0x1fc8.. eight calls).",
+      "evidence": "* C args: +8 Pascal name, +0xc short slot. h = GetNamedResource('snd ', name) ($A9A1); none -> return 1. HNoPurge (JT $28a, $A04A); HUnlock (JT $27a); if FreeMem < 0x3000 and MaxMem(&grow) < 0x3000: HUnlock, HPurge, ReleaseResource ($A9A3), return 1 (out of memory). Makes sure the resource is marked purgeable (GetResAttrs $A9A6; if bit 0x20 is clear, SetResAttrs | 0x20 $A9A7 and ChangedResource); A5-0xd62[slot] = h; returns 0. Callers: FUN_00001f8e (0x1fc8.. eight calls).",
       "function_or_context": "load_named_sound_into_slot",
       "line": 1832,
       "scope": "resource_type_by_name_not_individual_id",

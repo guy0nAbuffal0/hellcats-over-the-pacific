@@ -31,7 +31,7 @@ The existing Godot project contains two materially different tracks:
 The current Mission 01 dependency chain is `Main.tscn` →
 `Mission01Training.tscn` → world/player/checkpoint/HUD scenes → mission,
 aircraft, input, flight-model and objective scripts plus three JSON data files.
-It does not call `SimCore.tick()`. The main scene remains unchanged.
+It does not call `SimCore.tick`. The main scene remains unchanged.
 
 `sources/resedit/` contains the inventoried resource corpus. Reusable
 evidence includes CODE binaries and metadata, PICT/BMP/PNG artwork, `clut/999`,
@@ -111,15 +111,8 @@ recorded with the decompiled function establishes those widths and addresses;
 the deterministic test initializes nonzero counts and sentinel neighbor bytes.
 
 The manifest records the exact source-function SHA-256, source/original names,
-address, target and independent milestone booleans. Current strict coverage is:
-
-- Decompiled functions: 736
-- Mapped/translated: 3
-- Not ported: 733
-- Structurally verified: 3
-- Behaviorally verified with deterministic tests: 3
-- Integrated into the playable runtime: 0
-- Verified against original Macintosh runtime observations: 0
+address, target, and independent milestone booleans. Run
+`python3 tools/progress_stats.py` for current orthogonal coverage counts.
 
 ## Synchronization workflow
 
@@ -153,10 +146,6 @@ completed hash function. It uses the original `DAT_0001bdbc` address, a 256-slot
 open-addressing pointer table, record offsets +0/+4, the original decompiler
 locals and signed 256-probe counter. `Memory68k` supplies bounds-checked packed
 big-endian byte/word/long access instead of a semantic dictionary substitute.
-
-After this slice the generated strict coverage is 3 translated, structurally
-verified and behaviorally verified functions; 733 remain unported. None of the
-translations is integrated or verified against an observed Macintosh runtime.
 
 The next smallest concrete slice is `set_view_distance` (`FUN_0001771a`), a
 verified three-global update adjacent to the radar reset. It can reuse the same

@@ -268,10 +268,10 @@ LAB_0000022a:
  *
  * Capstone @0x0338–0x0346 (Ghidra emitted halt_baddata for the traps):
  *   LINK A6,#$FFF2
- *   MOVE.W #$64,-(A7)     ; duration = 100 ticks
- *   DC.W $A9C8            ; _SysBeep
- *   DC.W $A9F4            ; _ExitToShell
- *   UNLK A6 / RTS         ; unreachable after ExitToShell
+ *   MOVE.W #$64,-(A7); duration = 100 ticks
+ *   DC.W $A9C8; _SysBeep
+ *   DC.W $A9F4; _ExitToShell
+ *   UNLK A6 / RTS; unreachable after ExitToShell
  *
  * Fatal-error exit helper. No in-segment BSR/JSR found in ID08.bin.
  *
@@ -281,7 +281,7 @@ void sysbeep_and_exit_to_shell(void) /* Original: FUN_00000338 */
 
 {
   /* Reconstructed from Capstone — Ghidra could not decode A-line traps */
-  /* SysBeep(100); ExitToShell(); */
+  /* SysBeep(100); ExitToShell; */
   return;
 }
 

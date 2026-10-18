@@ -1,4 +1,4 @@
-# ID09 `FUN_00000048`: reverse lookup and SysEnvirons identification — iteration 105, 2026-10-16
+# ID09 `FUN_00000048`: reverse lookup and SysEnvirons identification —,
 
 Scope: `ID09.c:72-79` (reverse lookup) plus a function-level identification
 hypothesis. Offsets are **physical file offsets in `ID09.bin`**. Capstone 5.0.7,
@@ -64,7 +64,7 @@ documentation, not from this binary. No Apple glue source or runtime trace has
 been compared, so the function is not VERIFIED. machineType value meanings and
 the A-line trap names (`$A260`, `$A207`) remain HYPOTHESIS.
 
-## Iteration 106: entry dispatcher (file 0x20..0x46) [PROVEN bytes; trap names from docs]
+##: entry dispatcher (file 0x20..0x46) [PROVEN bytes; trap names from docs]
 
 | File offset | Bytes | Decode |
 |---|---|---|

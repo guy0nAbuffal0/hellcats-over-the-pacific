@@ -49,7 +49,7 @@ Paths under `res://scenes/` (see also `Main.tscn` run scene in `project.godot`).
 | Flight | `godot/hellcats/flight/aircraft_state.gd` | Telemetry: speed, altitude, attitude, throttle, flags. |
 | Flight | `godot/hellcats/flight/player_input_map.gd` | Actions → normalized control intent + `read_input_packet` / trace; see `docs/contracts/input_godot_contract.md`. |
 | Flight | `godot/hellcats/flight/flight_model_mvp.gd` | MVP integrator: **`movement_66e`/`672`/`66a`** + `FlightMath` smoothing (**[RECONSTRUCTED]** FUN_0000e792 slice); see `docs/contracts/flight_FUN_0000e792_contract.md`. |
-| Mission | `godot/hellcats/mission/mission_controller.gd` | Loads JSON, wires player, checkpoints, HUD; objectives, failure checks, restart. **`mission_phase_a8` / `mission_flag_ac`** (DAT gate bridge); **`get_mission_sim_bridge_state()`**. |
+| Mission | `godot/hellcats/mission/mission_controller.gd` | Loads JSON, wires player, checkpoints, HUD; objectives, failure checks, restart. **`mission_phase_a8` / `mission_flag_ac`** (DAT gate bridge); **`get_mission_sim_bridge_state`**. |
 | Mission | `godot/hellcats/mission/mission_objectives_m1.gd` | Pure, testable objective evaluation from telemetry snapshots (data-driven). |
 | Mission | `godot/hellcats/mission/checkpoint.gd` | Ring pass / signal once per pass. |
 | Player | `godot/hellcats/player/player_aircraft.gd` | Scene adapter: input → model → transform/collisions. |
@@ -61,8 +61,8 @@ Paths under `res://scenes/` (see also `Main.tscn` run scene in `project.godot`).
 ### 4.3 Simulation tick vs Mission-1 scene loop
 
 - **[RECONSTRUCTED]** **`SimCore`** implements the **`FUN_000044e8`** structure: four entity arrays **in order**, **`FUN_000044a4`**-style **`param_2`** 0/1, then **`_call_06fb8`**, **`last_tick_order`** for QA.
-- **[MVP APPROXIMATION]** **Mission-1** gameplay uses **`PlayerAircraft._physics_process`** → **`FlightModelMvp`** on the **Godot** clock; it does **not** call **`SimCore.tick()`** unless you explicitly bridge them later.
-- **[INFERRED]** Use **`SimCore`** + **`test_sim_tick_ordering.gd`** for **ordering** and **determinism**; use **`PlayerAircraft.get_flight_trace()`** for **flight** QA on the mission.
+- **[MVP APPROXIMATION]** **Mission-1** gameplay uses **`PlayerAircraft._physics_process`** → **`FlightModelMvp`** on the **Godot** clock; it does **not** call **`SimCore.tick`** unless you explicitly bridge them later.
+- **[INFERRED]** Use **`SimCore`** + **`test_sim_tick_ordering.gd`** for **ordering** and **determinism**; use **`PlayerAircraft.get_flight_trace`** for **flight** QA on the mission.
 
 ## 5. Data layer
 
@@ -113,7 +113,7 @@ If this doc’s numbers drift from JSON, **trust the JSON** and update the doc.
 - **Rough behavior:** throttle → target speed band; pitch affects climb and bleed; roll drives bank and turn rate with speed; yaw is weak trim; VS from pitch + speed, damped.
 - **Safety:** soft stall band (`aircraft_mvp.json` → `stall.speed_mps_below`, **55 m/s** at authoring) with heavy damping/sink bias; **hard fail** if **`stall_seconds`** in the snapshot reaches **`failure.stall_seconds`** (**4.0 s**).
 
-**Instrumentation:** **`FlightModelMvp.last_flight_trace`** / **`PlayerAircraft.get_flight_trace()`** — accumulators, norms, pitch/roll/heading, airspeed, throttle, VS.
+**Instrumentation:** **`FlightModelMvp.last_flight_trace`** / **`PlayerAircraft.get_flight_trace`** — accumulators, norms, pitch/roll/heading, airspeed, throttle, VS.
 
 Exact coefficients may live in code or `aircraft_mvp.json`.
 
@@ -179,7 +179,7 @@ Checkpoint ring size/position: `checkpoints_mission_01.json` (`radius_m`, etc.).
 ### Run (editor)
 
 - Open Godot at **`godot/`**, the project root containing `project.godot`.
-- For fast iteration: set **`res://scenes/missions/Mission01Training.tscn`** as the run scene, or open and play it.
+- For focused testing: set **`res://scenes/missions/Mission01Training.tscn`** as the run scene, or open and play it.
 - Alternatively **`Main.tscn`** if it boots Mission 01.
 
 ### Automated

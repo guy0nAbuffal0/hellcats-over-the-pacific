@@ -25,9 +25,9 @@ int DAT_00000904;
 
 /*
  * Original: FUN_00000004; source: ID06.c:26.
- * Recovered name: init_pattern_tables [STRONG INFERENCE] (iteration 158).
+ * Recovered name: init_pattern_tables [STRONG INFERENCE].
  * Exported C complete. Fills the 0xc00-byte table at *(long A5-0x1eda):
- *   bytes 0x000..0x3ff: 32 left masks (0, 0x80000000, 0xc0000000, ... each
+ *   bytes 0x000..0x3ff: 32 left masks (0, 0x80000000, 0xc0000000,... each
  *     written to 8 consecutive longs) - partial-word masks indexed by the span
  *     renderer with (x >> 6) & 0x3e0;
  *   bytes 0x400..0xbff: 64 patterns x 8 rows from the 8-byte patterns at
@@ -74,9 +74,9 @@ undefined4 init_pattern_tables /* Original: FUN_00000004 */ (void)
 
 /*
  * Original: FUN_000000b0; source: ID06.c:63.
- * Recovered name: alloc_pattern_tables [STRONG INFERENCE] (iteration 158).
+ * Recovered name: alloc_pattern_tables [STRONG INFERENCE].
  * Exported C complete: allocates (once) A5-0x1eda = alloc_aligned_clear(0xc00)
- * and A5-0x1ede = alloc_aligned_clear(0x200); returns init_pattern_tables()
+ * and A5-0x1ede = alloc_aligned_clear(0x200); returns init_pattern_tables
  * or 0 on failure. Called first by init_raster_target.
  */
 undefined4 alloc_pattern_tables /* Original: FUN_000000b0 */ (void)
@@ -108,7 +108,7 @@ undefined4 alloc_pattern_tables /* Original: FUN_000000b0 */ (void)
 
 /*
  * Original: FUN_000000f4; source: ID06.c:90.
- * Recovered name: get_pattern_table [STRONG INFERENCE] (iteration 158).
+ * Recovered name: get_pattern_table [STRONG INFERENCE].
  * Exported C complete: ensures A5-0x1eda is allocated and returns it (stored
  * as raster target +0xc by init_raster_target).
  */
@@ -132,7 +132,7 @@ undefined4 get_pattern_table /* Original: FUN_000000f4 */ (void)
 
 /*
  * Original: FUN_00000116; source: ID06.c:108.
- * Recovered name: rgb_to_bw_pattern [STRONG INFERENCE] (iteration 157).
+ * Recovered name: rgb_to_bw_pattern [STRONG INFERENCE].
  * Exported C complete. Words r = param_1 high, g = param_1 low, b = param_2
  * high (16-bit components; only their high bytes are used).
  * luma = ((r>>8)*0x13 + (g>>8)*0x26 + (b>>8)*7) >> 6  (19/38/7 out of 64:
@@ -155,7 +155,7 @@ int rgb_to_bw_pattern /* Original: FUN_00000116 */ (undefined4 param_1,undefined
 
 /*
  * Original: FUN_0000017c; source: ID06.c:121.
- * Recovered name: lookup_colour_map [STRONG INFERENCE] (iteration 157).
+ * Recovered name: lookup_colour_map [STRONG INFERENCE].
  * Exported C complete: i = min(word param, 0xff); returns word table
  * (*(long A5-0x1ede))[i] (low word of result; high word is pointer residue).
  * Used by init_row_table_fields for row table +8.
@@ -177,7 +177,7 @@ undefined4 lookup_colour_map /* Original: FUN_0000017c */ (undefined4 param_1)
 
 /*
  * Original: FUN_000001a2; source: ID06.c:136.
- * Recovered name: reverse_lookup_colour_map [STRONG INFERENCE] (iteration 157).
+ * Recovered name: reverse_lookup_colour_map [STRONG INFERENCE].
  * Exported C complete: first i in 0..255 with table[i] == word param, else 0.
  * Inverse of lookup_colour_map.
  */
@@ -206,7 +206,7 @@ undefined4 reverse_lookup_colour_map /* Original: FUN_000001a2 */ (undefined4 pa
 
 /*
  * Original: FUN_000001dc; source: ID06.c:159.
- * Recovered name: alloc_aligned_clear [STRONG INFERENCE] (iteration 157).
+ * Recovered name: alloc_aligned_clear [STRONG INFERENCE].
  * Exported C complete. If FreeMem (JT $212) < 500000, MaxMem (JT $21a) to
  * compact; p = NewPtrClear(size + 12) (JT $232); returns 0 on failure, else
  * a = (p + 12) & ~3 with *(a-4) = size and *(a-8) = p (header for free_aligned).
@@ -251,7 +251,7 @@ uint alloc_aligned_clear /* Original: FUN_000001dc */ (int param_1)
 
 /*
  * Original: FUN_0000024c; source: ID06.c:195.
- * Recovered name: free_aligned [STRONG INFERENCE] (iteration 157).
+ * Recovered name: free_aligned [STRONG INFERENCE].
  * Exported C complete: if p != 0, DisposPtr(*(p - 8)) (JT $23a); returns p != 0.
  * Frees a block from alloc_aligned_clear.
  */
@@ -270,10 +270,10 @@ bool free_aligned /* Original: FUN_0000024c */ (int param_1)
 
 /*
  * Original: FUN_0000026c; source: ID06.c:208.
- * Recovered name: init_row_table_fields [STRONG INFERENCE] (iteration 154).
+ * Recovered name: init_row_table_fields [STRONG INFERENCE].
  * Overlay service slot (not in service table).
  * Exported C complete. Row table +0 = JT A5+0x192 (renderer callback);
- * +8 = FUN_0000017c(...); +0xa = 11 (fixed-point shift); +0xc = target +4 -
+ * +8 = FUN_0000017c(...); +0xa = 11 (fixed-point shift); +0xc = target +4
  * width * target +6 / 8 (row stride remainder); row entry +8 = target +0xc +
  * (row % 8) * 4 (8-row repeating table: dither pattern [HYPOTHESIS]);
  * +0xe = rows; +0x10 = +0x14 = 0. Returns 1. Caller: alloc_row_table.
@@ -308,7 +308,7 @@ undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 param_
 
 /*
  * Original: FUN_00000318; source: ID06.c:236.
- * Recovered name: render_scanline_spans [STRONG INFERENCE] (iteration 155).
+ * Recovered name: render_scanline_spans [STRONG INFERENCE].
  * Renderer callback installed by init_row_table_fields (JT A5+0x192); called by
  * rasterize_and_present. Args: param_1 = (word continue_flag, word rows),
  * uint *dest, long stride (added after each row).
@@ -325,7 +325,7 @@ undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 param_
  *      in a priority-ordered open list (+0x24 key, links +0x10/+0x14 between the
  *      pool sentinels); the topmost polygon's colour (+0x1c -> +0x1e) selects a
  *      long from the row's pattern table (row entry +8), and longs are stored
- *      to dest between crossings, with mask merging (uVar7 & ~uVar3 | ...) for
+ *      to dest between crossings, with mask merging (uVar7 & ~uVar3 |...) for
  *      partial words;
  *   4. advance each edge x by its slope (+4) and re-sort.
  * Painter-style priority span fill of the polygons from add_polygon_edges.
@@ -478,7 +478,7 @@ void render_scanline_spans /* Original: FUN_00000318 */ (undefined4 param_1,uint
 
 /*
  * Original: FUN_00000512; source: ID06.c:382.
- * Recovered name: free_row_table [STRONG INFERENCE] (iteration 153).
+ * Recovered name: free_row_table [STRONG INFERENCE].
  * Exported C complete. Frees (free_aligned) the row-entry array (+4), the
  * buffers at +0x1c and +0x20, then the 0x24-byte row-table record at
  * long A5-0x1cd2, and clears A5-0x1cd2.
@@ -508,7 +508,7 @@ void free_row_table /* Original: FUN_00000512 */ (void)
 
 /*
  * Original: FUN_00000598; source: ID06.c:405.
- * Recovered name: alloc_row_table [STRONG INFERENCE] (iteration 153).
+ * Recovered name: alloc_row_table [STRONG INFERENCE].
  * Exported C complete. Requires the target record (A5-0x1cce). n = low word of
  * param_1 (the target height when called from init_raster_target). If an
  * existing table has fewer than n entries (+0xe), it is freed; otherwise
@@ -556,7 +556,7 @@ undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
 
 /*
  * Original: FUN_00000666; source: ID06.c:443.
- * Recovered name: init_edge_pool [STRONG INFERENCE] (iteration 153).
+ * Recovered name: init_edge_pool [STRONG INFERENCE].
  * Exported C complete. Requires A5-0x1cd2. Allocates once a 0x5e9c-byte block
  * -> A5-0x1cd6; head sentinel +0x898 -> block+0x8ac, tail sentinel +0x89c ->
  * block+0x5e74, linked to each other through +0x10 / +0x14; sentinel fields
@@ -618,12 +618,12 @@ undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
 
 /*
  * Original: FUN_000007b0; source: ID06.c:494.
- * Recovered name: init_raster_target [STRONG INFERENCE] (iteration 153).
- * Exported C complete. If FUN_000000b0() != 0: allocate (once) the 16-byte
+ * Recovered name: init_raster_target [STRONG INFERENCE].
+ * Exported C complete. If FUN_000000b0 != 0: allocate (once) the 16-byte
  * target record -> A5-0x1cce: +0 = param_1 (pixel base), +4 = param_2 high
  * word, +6 = 1, +8 = param_3 high word (width), +0xa = param_3 low word
- * (height), +0xc = FUN_000000f4(); alloc_row_table(param_2 low, height);
- * init_edge_pool(); A5-0x1cca = width >> 1, A5-0x1cc8 = height >> 1 (centre).
+ * (height), +0xc = FUN_000000f4; alloc_row_table(param_2 low, height);
+ * init_edge_pool; A5-0x1cca = width >> 1, A5-0x1cc8 = height >> 1 (centre).
  * Returns 1 on success, 0 on any failure.
  */
 undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
@@ -675,7 +675,7 @@ undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,u
 
 /*
  * Original: FUN_0000087a; source: ID06.c:541.
- * Recovered name: set_raster_target_base [STRONG INFERENCE] (iteration 153).
+ * Recovered name: set_raster_target_base [STRONG INFERENCE].
  * Exported C complete: if target record exists, its +0 (pixel base) =
  * param_1. Used to retarget rendering to another buffer [STRONG INFERENCE].
  */
@@ -694,7 +694,7 @@ void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 param_1)
 
 /*
  * Original: FUN_000008a2; source: ID06.c:554.
- * Recovered name: set_active_row_count [STRONG INFERENCE] (iteration 154).
+ * Recovered name: set_active_row_count [STRONG INFERENCE].
  * Overlay service slot A5-0x1304 (JT $1a2).
  * Exported C complete; CurrentA5 routine. If target and row table exist,
  * n = param_1 clamped to [1, target height (+0xa)] (out-of-range -> height);
@@ -720,7 +720,7 @@ void set_active_row_count /* Original: FUN_000008a2 */ (int param_1)
 
 /*
  * Original: FUN_00000916; source: ID06.c:572.
- * Recovered name: get_raster_target_size [STRONG INFERENCE] (iteration 158).
+ * Recovered name: get_raster_target_size [STRONG INFERENCE].
  * Exported C complete: if the target exists, *param_1 = width (+8),
  * *param_2 = height (+0xa); returns whether it exists.
  */
@@ -742,9 +742,9 @@ bool get_raster_target_size /* Original: FUN_00000916 */ (undefined2 *param_1,un
 
 /*
  * Original: FUN_00000942; source: ID06.c:588.
- * Recovered name: realloc_row_table [STRONG INFERENCE] (iteration 158).
+ * Recovered name: realloc_row_table [STRONG INFERENCE].
  * Exported C complete: alloc_row_table((word param, current active rows))
- * then init_edge_pool(); returns 0 on failure. Rebuilds the row table and node
+ * then init_edge_pool; returns 0 on failure. Rebuilds the row table and node
  * pool [STRONG INFERENCE: param word is passed as row-table word +8 source].
  */
 undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 param_1)
@@ -770,7 +770,7 @@ undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 param_1)
 
 /*
  * Original: FUN_0000096e; source: ID06.c:609.
- * Recovered name: reset_edge_table [STRONG INFERENCE] (iteration 154).
+ * Recovered name: reset_edge_table [STRONG INFERENCE].
  * Overlay service slot A5-0x1310 (JT $1ba).
  * Exported C complete; CurrentA5 routine. Clears the first two longs of each
  * active row entry (bucket head, end flag), resets the node-pool cursor
@@ -805,7 +805,7 @@ void reset_edge_table /* Original: FUN_0000096e */ (void)
 
 /*
  * Original: FUN_000009d8; source: ID06.c:635.
- * Recovered name: add_polygon_edges [STRONG INFERENCE] (iteration 154).
+ * Recovered name: add_polygon_edges [STRONG INFERENCE].
  * Overlay service slot A5-0x130c (JT $1c2).
  * Exported C complete; CurrentA5 routine. Args: n points, attribute words a/b
  * (stored at node +0x1c / +0x24), int *pts = n pairs {x, y} relative to the
@@ -966,7 +966,7 @@ bool add_polygon_edges /* Original: FUN_000009d8 */ (int param_1,undefined2 para
 
 /*
  * Original: FUN_00000d02; source: ID06.c:779.
- * Recovered name: add_rect_polygon [STRONG INFERENCE] (iteration 158).
+ * Recovered name: add_rect_polygon [STRONG INFERENCE].
  * Exported C complete. Words: colour = param_1 high, x0 = param_1 low,
  * y0 = param_2 high, x1 = param_2 low, y1 = param_3 high. Builds points
  * (x0,y0), (x1,y0), (x1,y1), (x0,y1) and calls
@@ -1004,8 +1004,8 @@ void add_rect_polygon /* Original: FUN_00000d02 */ (undefined4 param_1,undefined
 
 /*
  * Original: FUN_00000d84; source: ID06.c:808.
- * Recovered name: rebase_edge_rows_for_band [STRONG INFERENCE] (iteration 155).
- * Exported C complete: for every allocated node (pool +0x8a0 .. cursor +0x8a4,
+ * Recovered name: rebase_edge_rows_for_band [STRONG INFERENCE].
+ * Exported C complete: for every allocated node (pool +0x8a0.. cursor +0x8a4,
  * stride 0x28): +0x22 += band_offset - active rows (row table +0xe). Called by
  * rasterize_and_present before each band.
  */
@@ -1028,7 +1028,7 @@ void rebase_edge_rows_for_band /* Original: FUN_00000d84 */ (undefined4 param_1)
 
 /*
  * Original: FUN_00000dca; source: ID06.c:825.
- * Recovered name: restore_edge_rows_after_band [STRONG INFERENCE] (iteration 155).
+ * Recovered name: restore_edge_rows_after_band [STRONG INFERENCE].
  * Exported C complete: inverse of rebase_edge_rows_for_band
  * (+0x22 += active rows - band_offset) after each band.
  */
@@ -1051,7 +1051,7 @@ void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 param
 
 /*
  * Original: FUN_00000e10; source: ID06.c:842.
- * Recovered name: rasterize_and_present [STRONG INFERENCE] (iteration 154).
+ * Recovered name: rasterize_and_present [STRONG INFERENCE].
  * Overlay service slot A5-0x1308 (JT $19a).
  * Exported C complete; CurrentA5 routine. Args: dest (0 = render only),
  * band_rows, mode. Links head/tail sentinels (empty active edge list). If

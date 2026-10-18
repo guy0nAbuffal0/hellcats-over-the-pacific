@@ -1,4 +1,4 @@
-# Polygon rasterizer (CODE segment 6) — iterations 153–155, 2026-10-17
+# Polygon rasterizer (CODE segment 6) —,
 
 CODE segment 6 (`ID06`) contains a self-contained scanline polygon
 rasterizer. The overlay drives it through the application service table
@@ -14,7 +14,7 @@ pattern semantics are **[HYPOTHESIS]**.
 
 | Global | Size | Built by | Contents |
 |---|---|---|---|
-| `A5-0x1cce` | 0x10 | `init_raster_target` | +0 pixel base, +4 word, +6 = 1, +8 width, +0xa height, +0xc `FUN_000000f4()` |
+| `A5-0x1cce` | 0x10 | `init_raster_target` | +0 pixel base, +4 word, +6 = 1, +8 width, +0xa height, +0xc `FUN_000000f4` |
 | `A5-0x1cd2` | 0x24 | `alloc_row_table`, `init_row_table_fields` | +0 renderer callback (JT `A5+0x192`), +4 row entries (12 bytes each), +8 word, +0xa fixed-point shift (11), +0xc row stride remainder, +0xe active rows, +0x10 / +0x12 shifts, +0x14 0/1 toggle, +0x1c / +0x20 buffers |
 | `A5-0x1cd6` | 0x5e9c | `init_edge_pool` | node pool; head sentinel +0x898 → +0x8ac, tail sentinel +0x89c → +0x5e74, cursor +0x8a0 / +0x8a4, limit +0x8a8 |
 | `A5-0x1cca` / `-0x1cc8` | words | `init_raster_target` | centre x / y (width / 2, height / 2) |
@@ -81,10 +81,10 @@ initialised on the first band of a frame and reused for later bands
 ## Open questions
 
 - Exact meaning of attribute words a / b (colour index, priority?).
-  `(x >> 6) & 0x3e0` selects one of the 32 left-edge masks (iteration 158).
+  `(x >> 6) & 0x3e0` selects one of the 32 left-edge masks.
 - Role of row-table +0x1c / +0x20 buffers and target +4. Target +0xc is the
   pattern table (`get_pattern_table`).
-- All ID06 functions are named (iteration 158). Pattern data: table
+- All ID06 functions are named. Pattern data: table
   `*A5-0x1eda` (0xc00 bytes: 32 left-edge masks × 8 longs, then 64 patterns ×
   8 replicated rows from the bytes at `A5-0x1ed6`); grey map `*A5-0x1ede`
   (256 words, 16 levels → pattern offsets). Helpers: `alloc_aligned_clear` /

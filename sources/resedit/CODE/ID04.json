@@ -390,7 +390,7 @@
     "binary_origin": "ResEdit hexadecimal export",
     "binary_path": "sources/resedit/CODE/ID04.bin",
     "binary_size": 15738,
-    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble",
     "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
     "comparison_resource_name": null,
     "representations": [
@@ -415,8 +415,8 @@
       {
         "kind": "C/decompilation export",
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "sha256": "5f8417fc2543bc6f71f18f1ee865aafcd0758ccad88847cbcab7b085ca322d17",
-        "size": 84141
+        "sha256": "0f5b856c62a6bf18101e80705f56a5dec5d5791a0869722776172edc7d15c244",
+        "size": 83043
       }
     ],
     "resource_attributes": "0x38",

@@ -1,8 +1,8 @@
-# Ship controllers (Pacific Conflict) — iterations 255–258, 2026-10-17
+# Ship controllers (Pacific Conflict) —,
 
 Damage, firing and sinking of ships in the overlay. Function names are those
 in `Pacific Conflict.decomp.c`; byte facts come from the overlay file
-`sources/Hellcats/Pacific Conflict` (file offset =
+`sources/hellcats-over-the-pacific/Pacific Conflict` (file offset =
 runtime address + 0x20).
 
 ## Definition table [PROVEN, bytes]
@@ -22,32 +22,32 @@ file offsets; data labels are runtime addresses, at file offset + 0x20).
 
 | Key | Tick | Create | Extra | Hits |
 |---|---|---|---|---|
-| 0x15 | `step_sinking_object` | `create_carrier_controller` | 0x15154 `carrier_deck_contact` (unexported; decoded in iteration 326) | 3 |
+| 0x15 | `step_sinking_object` | `create_carrier_controller` | 0x15154 `carrier_deck_contact` (unexported; decoded) | 3 |
 | 0x19 | `tick_firing_ship_controller` | `create_firing_ship_controller` | — | 2 |
 | 0x18 | `step_sinking_object` | `create_basic_ship_controller` | — | 2 |
 | 0x17 | `step_sinking_object` | `create_basic_ship_controller` | — | 1 |
 | 0x16 | `tick_sinking_controller` | `create_sinking_controller` | — | 1 |
 
 The record after these (key 0x1a, pointers 0x18c96 / 0x18b52 / 0x18b98 after
-+0x20) is not copied by Block C. Iteration 287: it is the flak gun (`tick_flak_gun`), one of the
++0x20) is not copied by Block C: it is the flak gun (`tick_flak_gun`), one of the
 types carried on ships.
 
 Template types 0x15..0x19 are the ones the entity update path sends to
 `sink_object_shape_at_waterline` **[PROVEN]**; reading them as ship classes is
 **[STRONG INFERENCE]**. Type 0x15 alone has mission checks in
 `step_sinking_object` (missions 7 / 8 / 9). Type 0x15 is the aircraft carrier
-**[PROVEN, iteration 326: "Can't find deck tag on carrier" in its handler]**.
+**[PROVEN: "Can't find deck tag on carrier" in its handler]**.
 
-## Who calls the handlers (iteration 259)
+## Who calls the handlers
 
 | Slot | Caller |
 |---|---|
 | +6 create | `instantiate_object_from_desc` (for any template with a definition; result stored at object +8) |
 | +2 tick | `advance_frame_and_tick_controllers`, or `tick_flagged_object_controllers` when `DAT_0001b870 == 3`, over the controller list `DAT_0001c25c` |
-| +0xa destroy | called just before a controller is freed (iteration 270) |
-| +0xe pre-render | `FUN_0000a75e`, phases 1 / 2 (iteration 270; e.g. `effect_pre_render_hook`) |
-| +0x16 notice | `dispatch_overlap_collisions` for every range-overlapping pair (iteration 281; aircraft: `aircraft_notice_object`) |
-| +0x12 collision | `handle_player_contact` (player overlap, object flag +6 & 0x40) and `dispatch_collision` (iteration 262; pair table `DAT_0001b43c` overrides it for some type pairs) |
+| +0xa destroy | called just before a controller is freed |
+| +0xe pre-render | `FUN_0000a75e`, phases 1 / 2 (; e.g. `effect_pre_render_hook`) |
+| +0x16 notice | `dispatch_overlap_collisions` for every range-overlapping pair (; aircraft: `aircraft_notice_object`) |
+| +0x12 collision | `handle_player_contact` (player overlap, object flag +6 & 0x40) and `dispatch_collision` (; pair table `DAT_0001b43c` overrides it for some type pairs) |
 
 The keyed table `DAT_0001b524` is therefore general (other blocks of
 `overlay_main_entry` fill other keys); the five records above are the ship
@@ -80,7 +80,7 @@ subset.
 3. When no face is above y = 0: carried objects removed, kill tallied,
    mission state updated, object cleaned up.
 
-## Aircraft definition (key 1, iteration 282)
+## Aircraft definition (key 1, )
 
 File 0x1a7b0: +2 `aircraft_tick` (0xe5aa), +6 `aircraft_create` (0xe0ce),
 +0xa `aircraft_destroy` (0xe0a4), +0xe `FUN_0000fb2a`, +0x12

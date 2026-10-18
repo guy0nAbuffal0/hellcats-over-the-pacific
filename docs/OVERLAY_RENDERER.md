@@ -1,4 +1,4 @@
-# Overlay 3-D renderer (Pacific Conflict) — iterations 271–272, 2026-10-17
+# Overlay 3-D renderer (Pacific Conflict) —,
 
 Per-frame object drawing in `Pacific Conflict.decomp.c`. Names are the
 recovered ones; confidence **[STRONG INFERENCE]** unless marked.
@@ -23,13 +23,13 @@ overlay_frame_step
 `output_face_colour` clips to the screen and calls the overlay span
 renderer `FUN_00009b8c`; `output_face_bw` clips and calls the host service
 overlay +0x7c = host A5-0x130c = ID06 `add_polygon_edges` (docs/RASTERIZER.md)
-**[PROVEN by the A5 arithmetic]** (iteration 273).
+**[PROVEN by the A5 arithmetic]**.
 
-Colour path (iteration 274): `add_face_edges_to_rows` (0x9b8c) turns each
+Colour path: `add_face_edges_to_rows` (0x9b8c) turns each
 polygon edge into a 0x1c-byte edge record (pool `DAT_0001b76c`, x 16.16,
 slope, start row) inserted into the per-row buckets `DAT_0001eaac[row]`,
 sharing records between faces with a common edge; `scan_convert_edge_rows` (0x2e14,
-iteration 276) then keeps an active edge list per row, resolves the front
+) then keeps an active edge list per row, resolves the front
 face between edges by draw order and writes runs into `DAT_0001b794` /
 `DAT_0001b798` for the span fillers `fill_span_rows_*`. `track_ground_plane_horizon` (0xa07e) handles the ground-plane
 face `DAT_0001bda8`: screen corners covered (`DAT_0001bd90`) and the horizon
@@ -72,7 +72,7 @@ the previous frame; when it changed and the view axis lies inside the face
 `dispatch_collision(player, object)` — the renderer doubles as the collision
 test for flying into large objects.
 
-## Sky and ground (iteration 275)
+## Sky and ground
 
 `draw_sky_and_ground` (0xb4b6), called by `overlay_frame_step`, scales the
 horizon edge from `track_ground_plane_horizon` to window rows and fills the
@@ -81,7 +81,7 @@ per side from the corner bits `DAT_0001bd90` (0xf all ground, 0 all sky)
 **[STRONG INFERENCE]**. `reset_background_rows` (0xb460) initialises its
 per-row span buffer.
 
-## Frame output (iteration 305)
+## Frame output
 
 Colour depths: `scan_convert_edge_rows` → `present_spans_to_window` (0xd298:
 bands of a 0x2000-byte buffer filled by the span filler `*DAT_00020ac0`,

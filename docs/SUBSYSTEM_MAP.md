@@ -81,7 +81,7 @@ flowchart TD
 
 **[RECONSTRUCTED]** Mission block **`DAT_0001b5a0`** fields **`+0xa8`** (phase) and **`+0xac`** (flag) gate **FUN_000044e8**’s middle section.
 
-**Godot:** **`MissionController`** exposes **`mission_phase_a8`** / **`mission_flag_ac`** and **`get_mission_sim_bridge_state()`** — **`docs/contracts/mission_state_DAT_contract.md`**.
+**Godot:** **`MissionController`** exposes **`mission_phase_a8`** / **`mission_flag_ac`** and **`get_mission_sim_bridge_state`** — **`docs/contracts/mission_state_DAT_contract.md`**.
 
 ## 5) RNG (two layers)
 
@@ -90,7 +90,7 @@ flowchart TD
 | Segment LCG | **ID05.c** `FUN_00000728` style (`* 0x41c64e6d + 0x3039`) | Matches **`Rng68k`** / docs. |
 | In-overlay RNG | **FUN_00011564** (`Pacific Conflict.c`) | Many callers; order-sensitive for replay. |
 
-See **`IMPORT_STATUS.md`** §F and **`ROADMAP.md`** Phase A.
+See **`IMPORT_STATUS.md`** §F and **`STRICT_PORT_FOUNDATION.md`**.
 
 ## 6) Camera
 
@@ -121,9 +121,3 @@ flowchart LR
 | `docs/contracts/mission_state_DAT_contract.md` | Mission bridge |
 | `docs/STRUCTS.md` | DAT_* / offset tables |
 | `docs/LOADER_CHAIN.md` | ID00–ID09 and loading |
-
-## Update log
-
-| Date | Change |
-|------|--------|
-| 2026-04-08 | Initial **SUBSYSTEM_MAP.md**. |

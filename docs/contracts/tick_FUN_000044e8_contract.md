@@ -8,13 +8,13 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[MVP APPROXIMATION]**
 
 **[RECONSTRUCTED]** Order of operations:
 
-1. If `*(short *)(DAT_0001b5a0 + 0xac) == 0` → call **`FUN_00005df8()`**.
+1. If `*(short *)(DAT_0001b5a0 + 0xac) == 0` → call **`FUN_00005df8`**.
 2. If `0 < *(short *)(DAT_0001b5a0 + 0xa8) < 6` (mission phase gate):
    - Iterate **`DAT_0001d4a4`** (count **`DAT_0001c1e0`**): for each pointer, **`FUN_000044a4(entity, 0)`**.
    - Iterate **`DAT_0001b5a4`** (count **`DAT_0001b734`**): **`FUN_000044a4(entity, 0)`**.
    - Iterate **`DAT_0001d0e4`** (count **`DAT_0001c1dc`**): **`FUN_000044a4(entity, 1)`**.
    - Iterate **`DAT_0001cbe4`** (count **`DAT_0001c1d8`**): **`FUN_000044a4(entity, 1)`**.
-   - Call **`FUN_00006fb8()`**.
+   - Call **`FUN_00006fb8`**.
 
 **[RECONSTRUCTED]** Globals: **`DAT_0001b5a0 + 0xa8`** = mission phase; **`+ 0xac`** = mission flag (zero triggers **`FUN_00005df8`** before the phase gate).
 
@@ -33,9 +33,9 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[MVP APPROXIMATION]**
 | Original | Godot |
 |----------|--------|
 | Phase gate `0 < a8 < 6` | `mission_phase_a8 > 0 && mission_phase_a8 < 6` |
-| Flag `ac == 0` → FUN_00005df8 | `_call_05df8()` — **[RECONSTRUCTED]** seven-slot clear of `dat_0001bc64` after `_call_0528a` (Pacific Conflict.c:6434–6447); **`FUN_0000528a` body deferred** |
-| Array 1..4 iteration | `entity_array_1` … `entity_array_4` with same **param_2** (0,0,1,1) |
-| FUN_00006fb8 | `_call_06fb8()` — **[RECONSTRUCTED]** sets `dat_0001d710`…`dat_0001d724` to `100000000` (Pacific Conflict.c:7180–7189); recorded in `last_tick_order.fun_00006fb8_*` |
+| Flag `ac == 0` → FUN_00005df8 | `_call_05df8` — **[RECONSTRUCTED]** seven-slot clear of `dat_0001bc64` after `_call_0528a` (Pacific Conflict.c:6434–6447); **`FUN_0000528a` body deferred** |
+| Array 1..4 pass | `entity_array_1` … `entity_array_4` with same **param_2** (0,0,1,1) |
+| FUN_00006fb8 | `_call_06fb8` — **[RECONSTRUCTED]** sets `dat_0001d710`…`dat_0001d724` to `100000000` (Pacific Conflict.c:7180–7189); recorded in `last_tick_order.fun_00006fb8_*` |
 | FUN_000044a4 → entity update | `_update_single_entity` (placeholder / ported slices) |
 
 **[RECONSTRUCTED]** `FUN_00006fb8` body (Pacific Conflict.c:7180–7189):
@@ -52,6 +52,5 @@ DAT_0001d718 = DAT_0001d724 = DAT_0001d714 = DAT_0001d720 = DAT_0001d710 = DAT_0
 
 ## Related
 
-- `docs/NOTES.md` — FUN_000044e8 log
 - `docs/STRUCTS.md` — array symbols
 - `godot/hellcats/core/sim_core.gd` — implementation

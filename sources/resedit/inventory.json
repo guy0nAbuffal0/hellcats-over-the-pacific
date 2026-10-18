@@ -804,8 +804,8 @@
     {
       "kind": "unassociated supporting file",
       "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-      "sha256": "1edae10faa10cc1e6ecae43d4f9c6e8c40866887dc5bf056f2e2130f11f480e2",
-      "size": 1108234
+      "sha256": "7d1301d4caf6d138918cd45af291ce074d77d261fa569d9ca6b4fbc6e2a21a47",
+      "size": 1113901
     },
     {
       "kind": "unassociated supporting file",
@@ -834,14 +834,14 @@
     {
       "kind": "unassociated supporting file",
       "path": "sources/resedit/CODE/tools/README.md",
-      "sha256": "468efd2a126e12f426ea36e2e7eb096c643986872e2659e53119c4923ea4e7c5",
-      "size": 3990
+      "sha256": "91060f30e83446003b37b7f40cd5f19752169229f4415f168f1a03b622e7861c",
+      "size": 4007
     },
     {
       "kind": "unassociated supporting file",
       "path": "sources/resedit/CODE/tools/inspect_pacific_conflict.py",
-      "sha256": "6b7bbfe423a14dde10ef679c0ae933e86684bf9957719c0a41a436bb5ccc5920",
-      "size": 8741
+      "sha256": "6f9757ddb0e0cc8f048f4c8a7c5f439b6a7ea80e9d48cc9ba5ec755373f8924b",
+      "size": 8758
     },
     {
       "kind": "unassociated supporting file",

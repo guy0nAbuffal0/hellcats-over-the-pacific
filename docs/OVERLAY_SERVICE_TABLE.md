@@ -1,4 +1,4 @@
-# Overlay service table — iteration 135, 2026-10-16
+# Overlay service table —,
 
 Installed by the unexported ID02 routine at file 0x1b42..0x1c88, called by
 `main` before the overlay is loaded. Each slot receives the address of a CODE 0
@@ -56,17 +56,17 @@ Gaps in the contiguous A5-0x1122..-0x10a6 range: A5-0x10e6 and A5-0x10e2
 are not written by this routine.
 
 After the table, the routine allocates the overlay work buffer at long
-`A5-0x1040`: `NewPtrClear(0x4e390)` (320400 bytes) when `FreeMem() > 0x100000`,
+`A5-0x1040`: `NewPtrClear(0x4e390)` (320400 bytes) when `FreeMem > 0x100000`,
 otherwise `NewPtrClear(0x35cf0)` (220400 bytes). The result is not checked.
 
 ## Not in this table
 
 The function-pointer slots called by ID02 (`A5-0x1092`, `-0x104e`, `-0x1096`,
 `-0x109e`, `-0x10a2`) are outside this range and have no `d16(A5)` writer in
-any CODE segment (iteration 117). They are presumably written by the overlay
+any CODE segment. They are presumably written by the overlay
 (overlay → application callbacks). **[STRONG INFERENCE]**
 
-## Overlay hooks (the other direction) — iteration 233
+## Overlay hooks (the other direction)
 
 `overlay_main_entry` (Pacific Conflict `FUN_00001112`) receives the host
 globals pointer (A5-0x1388) and writes overlay entry points into the host

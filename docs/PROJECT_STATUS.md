@@ -1,9 +1,5 @@
 # Hellcats Over the Pacific — current status
 
-Updated 18 October 2026. Older assessments are preserved in
-[`research/PROJECT_STATUS_HISTORY.md`](research/PROJECT_STATUS_HISTORY.md); they
-are historical and may contain superseded counts or architecture assumptions.
-
 ## Current position
 
 The repository has two intentionally separate Godot tracks:
@@ -45,7 +41,7 @@ corpora for a focused task.
 
 Detailed current references:
 
-- `DECOMPILATION_PROGRESS.md` — live reconstruction counts and next target
+- `DECOMPILATION_PROGRESS.md` — semantic reconstruction target and workflow
 - `DECOMPILATION_SYMBOLS.md` — canonical semantic symbol and field registry
 - `STRICT_PORT_FOUNDATION.md` — strict translation contract and milestones
 - `RESOURCE_ANALYSIS.md` — resource corpus and decoding status

@@ -1,6 +1,6 @@
 extends RefCounted
 ## Focused tests for the movement-smoothing slice (Pacific Conflict.c:14179-14244).
-## Evidence: NOTES.md ownership branch; STRUCTS.md 0x66e/0x672/0x66a.
+## Evidence: STRUCTS.md and FUN_0000e792 source annotation for 0x66e/0x672/0x66a.
 
 const EntityStateScript := preload("res://hellcats/core/entity_state.gd")
 const EntityTemplateScript := preload("res://hellcats/core/entity_template.gd")

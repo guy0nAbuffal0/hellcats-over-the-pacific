@@ -1,4 +1,4 @@
-# Cockpit instrument panel (CODE segment 3) — iterations 159–169, 2026-10-17
+# Cockpit instrument panel (CODE segment 3) —,
 
 The instrument panel is drawn by CODE segment 3 (`ID03`). Offsets are
 physical file offsets in `ID03.bin`. Byte sequences, call relations and
@@ -18,7 +18,7 @@ strings by the loader.
 
 | Slot | Text | Used by |
 |---|---|---|
-| 1 | Unable to store instrument panel to disk | unexported ID04 routine at 0x432 (iteration 172 correction) |
+| 1 | Unable to store instrument panel to disk | unexported ID04 routine at 0x432 ( correction) |
 | 61 | Hellcats requires a Macintosh with color QuickDraw and a 68020 or higher | ID04 `check_system_requirements` = JT $f2 start-up gate |
 | 65 | ALTITUDE | type 0 |
 | 66 / 67 | AIR / SPEED | type 1 |
@@ -27,7 +27,7 @@ strings by the loader.
 | 70 / 71 | Manifold / Pressure | type 4 |
 | 72 | DIRECTION | type 6 |
 | 73 / 74 | TURN / BANK | type 2 |
-| 75 / 76 / 77 | FLAPS / AMMO / Fuel | `draw_flaps_indicator` (0x4c42) / `draw_ammo_counter` (0x4ecc) / `draw_fuel_gauge` (0x532e), outside the type switch (iteration 171) |
+| 75 / 76 / 77 | FLAPS / AMMO / Fuel | `draw_flaps_indicator` (0x4c42) / `draw_ammo_counter` (0x4ecc) / `draw_fuel_gauge` (0x532e), outside the type switch |
 
 ## Instrument types (`draw_instrument`, ID03 0x3c02)
 
@@ -41,8 +41,8 @@ strings by the loader.
 | 5 | `draw_tachometer` (0x22fe) | engine RPM |
 | 6 | `draw_direction_indicator` (0x2950) | heading |
 | 7 | — | nothing drawn |
-| 8 | `draw_gyro_instrument` (0x32b8) | gyro instrument; caches "GyroInstrument" / "GyroFlags" (iteration 202, which gyro is open) |
-| 9 | `draw_artificial_horizon` (0x38fc) | artificial horizon; caches "HorizonInstrument" (iteration 202) |
+| 8 | `draw_gyro_instrument` (0x32b8) | gyro instrument; caches "GyroInstrument" / "GyroFlags" (, which gyro is open) |
+| 9 | `draw_artificial_horizon` (0x38fc) | artificial horizon; caches "HorizonInstrument" |
 
 `draw_instrument` first draws the bezel with
 `draw_ring_with_status_indicators` (flags `0x1b` for type 6, otherwise
@@ -61,7 +61,7 @@ code; the table was parsed from the bytes.
 3. `antialias_downsample_bw_3x` (0xa3c): each output pixel is a 7×7
    weighted sum (total weight 969) of the 3× bitmap, converted to a grey
    palette index with `nearest_palette_index_rgb` (0xf4) and plotted.
-4. `finish_instrument_supersample` (0x1844, iteration 206): SetPort(panel port `A5-0x1496`), `composite_instrument_bitmap` (0x146a: CopyBits at depth 1, else the 3× downsample into the panel), then `dispose_offscreen_bw_port` (0x33c).
+4. `finish_instrument_supersample` (0x1844, ): SetPort(panel port `A5-0x1496`), `composite_instrument_bitmap` (0x146a: CopyBits at depth 1, else the 3× downsample into the panel), then `dispose_offscreen_bw_port` (0x33c).
 
 Coordinates are design units scaled by `scale_design_4800` (0x8a:
 `A5-0x149e · v / 4800`) and centred with ID02 `design_x_to_screen` /
@@ -79,24 +79,24 @@ slot orientation from screw to screw.
 
 ## Open questions
 
-- Types 8 and 9: identified by their cached-bitmap resource names (iteration 202); bodies only partly decoded.
-- Panel cache (iteration 203): `store_panel_bitmaps_as_resources` (ID03
+- Types 8 and 9: identified by their cached-bitmap resource names; bodies only partly decoded.
+- Panel cache: `store_panel_bitmaps_as_resources` (ID03
   0x5ab6) saves the rendered bitmaps as HEL2 200 / 300 / 400 / 500 +
   configuration (`A5-0x13ae`); HEL2 127 "Bitmap Cache" holds 0x160-byte
   entries per configuration with a "stored" flag at +0xc. A failure sets
   `A5-0x14a0`, reported by ID04 0x432 as "Unable to store instrument panel
   to disk".
-- Panel set-up (iteration 204): `prepare_instrument_panel` (ID03 0x5cc4,
+- Panel set-up: `prepare_instrument_panel` (ID03 0x5cc4,
   JT $17a) sets the design scale `A5-0x149e` = 0.75 × half view width and
   reuses a stored cache entry when its key (+0 1-bit mode, +2 / +4,
   +6 / +8 view width / height) matches, restoring the per-instrument records
   (`A5-0x12a2`) from entry +0x12.
-- ~~The needle function pointer `A5-0x2118`~~ — cosine (with `A5-0x211c` sine), used by `dial_point_at_angle` (iteration 211). The per-type record at `A5-0x12a2` is still open.
+- ~~The needle function pointer `A5-0x2118`~~ — cosine (with `A5-0x211c` sine), used by `dial_point_at_angle`. The per-type record at `A5-0x12a2` is still open.
 - GEAR: `draw_landing_gear_indicator` (ID03 0x54fe, label STR# 78) lays out three lamps.
-- ID04 slot users decoded in iteration 172; the panel-store path (ID04 0x432,
+- ID04 slot users decoded; the panel-store path (ID04 0x432,
   ID02 0x4d34) is not yet fully understood.
 
-## Live needles (overlay, iteration 278)
+## Live needles (overlay, )
 
 The panel bitmaps are static; the overlay draws the needles each frame from
 `update_view_readouts_and_overlays`. Each needle uses words +0xa / +0xc / +0xe
@@ -117,9 +117,9 @@ The panel bitmaps are static; the overlay draws the needles each frame from
 | ammo | `update_ammo_needle` (0xce1c) | player +0x682 (675 rounds full scale) |
 | fuel | `update_fuel_needles` (0xcec4) | player +0x67d / +0x67e (two tanks) |
 
-The extra items use host panel words overlay +0x20e..+0x236 (iteration 279);
+The extra items use host panel words overlay +0x20e..+0x236;
 `update_radar_scope` (0x17b68) draws heading-up blips in the rectangle at
 host +0x1de..+0x1ea. Tracks: up to six (`add_radar_track`, metric ≤ 2 × range), cleared by
 `reset_radar_tracks`; the Tab key cycles the range (`cycle_view_distance`,
 named before the radar link was found). `update_heading_tape` scrolls the
-compass strip by the heading (iteration 280).
+compass strip by the heading.

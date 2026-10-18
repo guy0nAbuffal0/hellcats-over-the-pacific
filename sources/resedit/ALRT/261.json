@@ -43,7 +43,7 @@
     "binary_origin": "ResEdit hexadecimal export",
     "binary_path": "sources/resedit/ALRT/261.bin",
     "binary_size": 12,
-    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble",
     "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
     "comparison_resource_name": "Not on floppy",
     "representations": [

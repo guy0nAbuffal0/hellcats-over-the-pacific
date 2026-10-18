@@ -1,4 +1,4 @@
-# Sound system (ID02) — iterations 138–142, 2026-10-16/17
+# Sound system (ID02) —,
 
 Summary of the application-side sound code in CODE segment 2. Offsets are
 physical file offsets in `ID02.bin`. Byte sequences and data layouts are
@@ -64,7 +64,7 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
    slot, the buffer is refilled, registers are restored and `RTS` jumps to
    the previous handler (chaining).
 
-## Sound resources (iteration 218)
+## Sound resources
 
 | ID02 file | Name | Role |
 |---|---|---|
@@ -80,10 +80,9 @@ vertical-blanking level-1 interrupt vector, `Lvl1DT[1]` at low-memory
 - End-of-buffer and continuation handling inside the handlers.
 - Whether nodes from `enqueue_sample_on_channel` are actually reached
   (depends on handler end-of-buffer logic).
-- ~~How the three-node sustain loop is released~~ — `release_channel_loop`
-  (iteration 144) rewrites continuations to break self-loops.
+- ~~How the three-node sustain loop is released~~ — `release_channel_loop` rewrites continuations to break self-loops.
 
-## Overlay sound driver (Pacific Conflict, iteration 264)
+## Overlay sound driver (Pacific Conflict, )
 
 The overlay reaches the services above through its globals block (offset k
 = host A5-0x1388 + k): +0x25e sound slots, +0x2aa play, +0x2b2 rate, +0x2b6
@@ -97,7 +96,7 @@ is-playing, +0x2ba release loop, +0x2be silence.
 
 Lower sound numbers have priority **[STRONG INFERENCE]**.
 
-### Sound slots (iteration 265) [PROVEN]
+### Sound slots [PROVEN]
 
 `load_game_sounds` takes the `'snd '` names from A5 initial data (DATA 0 in
 `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/`; A5-x

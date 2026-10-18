@@ -7,653 +7,653 @@ Do not treat example names from planning docs as approved until revalidated here
 
 | Original symbol | Recovered name | Confidence | Evidence |
 |---|---|---|---|
-| `FUN_00000048` (ID09) | `sysenvirons_glue_fallback` | STRONG INFERENCE | Iter 106: entry dispatcher at file 0x20-0x46 calls `$A090` (_SysEnvirons) only when GetOSTrapAddress($90) ≠ GetToolTrapAddress($9F _Unimplemented) or falls into 0x48; body fills SysEnvRec from documented low-memory globals and returns 0xea84 (−5500 envNotPresent). Lookup table proven at file 0x54..0x58. Trap/global names from Apple docs, not validated against Apple glue. See `ID09_SYSENVIRONS_ANALYSIS.md`. |
-| `FUN_000002a6` (ID09) | `fsopen_glue` | STRONG INFERENCE | Iter 107: file 0x2a6..0x2dc LINK −0x32 IOParam; +0x12←long arg, +0x16←word arg, clears +0x1a/+0x1b/+0x1c; `$A000` (_Open); +0x18→VAR arg; D0→result; pops 10 bytes = FSOpen(fileName, vRefNum, VAR refNum): OSErr. Trap/field names from Inside Macintosh. |
-| `FUN_000003c2` (ID09) | `swapmmumode_glue` | STRONG INFERENCE | Iter 108: file 0x3c2..0x3d4 loads byte via VAR ptr into D0, `$A05D` (_SwapMMUMode), stores D0.B back, pops 4 bytes = SwapMMUMode(VAR mode: SignedByte). Trap name from Inside Macintosh. |
-| `FUN_00000006` (ID07) | `load_str129_string_table` | STRONG INFERENCE | Iter 109: ID07.bin 0x06..0x18e GetResource('STR#',0x81) `$A9A0`, HLock via JT `$272(A5)`, in-place \\p/escape processing, stores 120 string pointers to A5−0xf46[1..120]. Sole caller `FUN_00000190` (ID07). |
-| `FUN_00000190` (ID07) | `init_string_pointer_groups` | STRONG INFERENCE | Iter 110: calls `load_str129_string_table`, copies slots 2..22→A5−0x221e[21], 94..99→A5−0xffe[6], 100..105→A5−0xfae[6], 106..115→A5−0xf86[10]. JT A5+0x592; called from ID02 file 0x2c0a. |
-| `FUN_00002bbc` (ID02) | `initialize_application` | STRONG INFERENCE | Iter 111: ID02.bin 0x2bbc..0x2d9e Toolbox init sequence ($A86E InitGraf … $A850 InitCursor), JT $592 string init + UnloadSeg 7, SysEnvirons via JT $1f2, 'MENU' 2 / 'HEL1' 127/128 load-or-create, SetPort. Caller `FUN_0000309a`. |
-| `FUN_0000309a` (ID02) | `main` | STRONG INFERENCE (entry chain PROVEN) | Iter 112: called from ID01 runtime entry via JT A5+0x4b2 (constant at ID01 file 0x4); runs `initialize_application`, ID08 overlay loader, UnloadSeg 4/8/5, then loops forever on `FUN_00002fd4`. |
-| `FUN_00002fd4` (ID02) | `poll_and_dispatch_event` | STRONG INFERENCE | Iter 113: ID02.bin 0x2fd4..0x3098 GetNextEvent ($A970) + switch on what: mouseDown→0x2f1e, cmd-key→MenuKey→0x36a2, update→Begin/EndUpdate+0x4db0, activate→0x2fa0. Called forever by `main`. |
-| `FUN_000036a2` (ID02) | `do_menu_command` | STRONG INFERENCE | Iter 114: HiWord/LoWord($A86A/$A86B) of menuResult; menu 1 Apple (OpenDeskAcc), menu 3 Edit (SystemEdit), menu 2 13-item command menu (quit = 0x2eaa). Called from `poll_and_dispatch_event` after MenuKey. |
-| `FUN_00002a44` (ID02) | `apply_settings_to_live_options` | STRONG INFERENCE | Iter 116: copies HEL1 127 words S+2..S+0x24 into A5−0x12ee..−0x12d0; change-triggered callbacks via A5−0x1092/−0x104e/−0x1096 gated by A5−0x1006; redraw FUN_00004db0. 6 callers in ID02.bin. |
-| `FUN_00002f1e` (ID02) | `handle_mouse_down` | STRONG INFERENCE | Iter 127: FindWindow switch: inMenuBar→MenuSelect→do_menu_command, inSysWindow→SystemClick, inGoAway(main)→TrackGoAway→HideWindow. |
-| `FUN_00002fa0` (ID02) | `handle_activate_event` | STRONG INFERENCE | Iter 127: (modifiers&3)==3 && message==main_window → InvalRect(&main_window->portRect). |
-| `FUN_00004db0` (ID02) | `redraw_main_window` | STRONG INFERENCE | Iter 128: gated redraw: HideCursor, FUN_00004c18, UnloadSeg 3, overlay callback A5−0x109e, helpers, ShowCursor. Called from update handling and apply_settings_to_live_options. |
-| `FUN_00004c18` (ID02) | `check_device_color_state_changed` | STRONG INFERENCE | Iter 129: compares per-device 256-word arrays from FUN_000048ae with stored copies; on change → JT $182, refresh, overlay callback A5−0x1096. |
-| `FUN_000048ae` (ID02) | `build_palette_index_map` | STRONG INFERENCE | Iter 130: per device slot, PmForeColor(i) → fgColor index → map[i]/inverse[idx]; duplicate detection → A5−0x102a; selects A5−0x1122 = JT 0x46a or 0x33a. |
-| `FUN_000046b4` (ID02) | `rebuild_all_palette_index_maps` | STRONG INFERENCE | Iter 131: rebuild map for each device slot 1..3 (or B&W path). |
-| `FUN_00004738` (ID02) | `configure_palette_entries` | STRONG INFERENCE | Iter 131: depth-4 / depth-8 Palette Manager entry usage + colours. |
-| `FUN_0000488a` (ID02) | `clear_ctab_size_callback` | STRONG INFERENCE | Iter 131: A5 from CurrentA5; (*A5−0x14b2)+6 = 0. |
-| `FUN_000049fe` (ID02) | `lookup_palette_index_for_rgb_level` | STRONG INFERENCE | Iter 132: (r,g,b) levels ×64→16-bit; search A5−0x350[8] then *(A5−0x14a6); +200 at 8-bit. |
-| `FUN_00000d24` (ID02) | `close_and_dispose_port` | STRONG INFERENCE | Iter 133: ClosePort(p); DisposPtr(p). Used on A5−0x103a. |
-| `FUN_00000d3a` (ID02) | `blit_offscreen_frame_to_window` | STRONG INFERENCE | Iter 134: (base, top, rows, mode) → offscreen PixMap port A5−0x103a, CopyBits to thePort. JT $322; ID06 0xf18; address taken at ID02 0x1b6a. |
-| `FUN_00001b14` (ID02) | `freemem_a5safe` | STRONG INFERENCE | Iter 135: CurrentA5 wrapper around ID09 FreeMem glue; service slot A5−0x10a6. |
-| `FUN_00001a04` / `1a84` / `1aa8` / `1acc` / `1af0` (ID02) | `dispose_handle_a5safe` / `hlock_a5safe` / `hunlock_a5safe` / `hpurge_a5safe` / `hnopurge_a5safe` | STRONG INFERENCE | Iter 136: CurrentA5 thunks → ID09 $A023/$A029/$A02A/$A049/$A04A glue; service slots. |
-| `FUN_00001a28` (ID02) | `realloc_and_clear_handle_a5safe` | STRONG INFERENCE | Iter 136: ReallocHandle + MemError check + zero-fill via FUN_000002b0. |
-| `FUN_000019a2` (ID02) | `new_handle_clear_or_die_a5safe` | STRONG INFERENCE | Iter 137: NewHandleClear + MemError → fatal; service slot A5−0x10c2. |
-| `FUN_000019e2` (ID02) | `fatal_memory_error_exit` | STRONG INFERENCE | Iter 137: dispose overlay, FUN_00004318, show STR#129[93] via FUN_00001d48, ExitToShell. |
-| `FUN_00001d48` (ID02) | `show_caution_alert_with_number` | STRONG INFERENCE | Iter 138: ParamText(msg, number) + CautionAlert(258). JT $4ba. |
-| `FUN_00001c8a` (ID02) | `format_int_decimal_pstring` | STRONG INFERENCE | Iter 138: signed decimal → Pascal string in 10-byte buffer. |
-| `FUN_00004318` (ID02) | `shutdown_sound` | STRONG INFERENCE | Iter 138: stop 3 channels, restore $0196, SndDisposeChannel(A5−0x356). |
-| `FUN_00004242` (ID02) | `silence_sound_channel` | STRONG INFERENCE | Iter 139: ch 0..1 → FUN_00003d50(ch, A5−0xc26, 0, 370, 0) into channel record. |
-| `FUN_00003d36` (ID02) | `clear_sound_buffer_to_silence` | STRONG INFERENCE | Iter 139: SoundBase ($0266) 370 words ← 0x80. |
-| `FUN_00003d50` (ID02) | `alloc_sound_buffer_node` | STRONG INFERENCE | Iter 140: node from channel free list; {+0 cursor, +8 buffer, +0xc start, +0x10 end, +0x14 next, +0x18 continuation}. |
-| `FUN_00003dd0` (ID02) | `init_sound_system` | STRONG INFERENCE | Iter 140: builds channel queues, silence buffer, installs routine into low-memory $0196 (saved in A5−0xc36). |
-| `FUN_000039a8` / `FUN_00003aae` / `FUN_00003bc4` (ID02) | `vbl_sound_handler_ch0_unrolled` / `vbl_sound_handler_ch0_variant` / `vbl_sound_handler_two_channel` | STRONG INFERENCE | Iter 141: Lvl1DT[1] VBL hooks; in-code A5 cache; RTS-chain to previous vector; resample into SoundBase. |
-| `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | STRONG INFERENCE | Iter 141: arg == 1 → $0196 = A5−0x35c. |
-| `FUN_00003f54` (ID02) | `play_sample_on_channel` | STRONG INFERENCE | Iter 142: queue sample on ch 0..1 with optional sustain loop; see SOUND_SYSTEM.md. |
-| `FUN_00004050` (ID02) | `enqueue_sample_on_channel` | STRONG INFERENCE (purpose HYPOTHESIS) | Iter 143: queues nodes like play_sample_on_channel but leaves channel head unchanged. |
-| `FUN_0000412e` (ID02) | `set_sound_playback_rate` | STRONG INFERENCE | Iter 144: 16.16 rate → step/len globals. |
-| `FUN_000041a6` (ID02) | `release_channel_loop` | STRONG INFERENCE | Iter 144: breaks sustain self-loops, ends in silence. |
-| `FUN_000042b0` (ID02) | `is_channel_playing` | STRONG INFERENCE | Iter 144: current buffer ≠ silence. |
-| `FUN_00000c68` (ID02) | `apply_pending_color_entries_a5safe` | STRONG INFERENCE | Iter 145: SetEntries(-1, ctSize-1, ctTable) on A5−0x14b2; ctSize = 0. |
-| `FUN_00001876` (ID02) | `blit_image_clipped_to_region` | STRONG INFERENCE | Iter 145: CopyBits image A5−0x12b0 via port A5−0x1496 clipped to region from FUN_000016aa. |
-| `FUN_0000195c` / `FUN_0000197c` (ID02) | `blit_image_clipped_to_region_a5safe` / `run_segment3_entry_and_unload_a5safe` | STRONG INFERENCE | Iter 145: CurrentA5 service thunks. |
-| `FUN_00000a42` (ID02) | `draw_thick_line_pixel_index_a5safe` | STRONG INFERENCE | Iter 146: fgColor raw index; 2-px MoveTo/LineTo. |
-| `FUN_00000a86` (ID02) | `draw_thick_xor_line_a5safe` | STRONG INFERENCE | Iter 146: black srcXor 2-px line. |
-| `FUN_00000ad0` (ID02) | `paint_view_horizon_bands_a5safe` | STRONG INFERENCE (purpose HYPOTHESIS) | Iter 147: top band + two tilted quads + bottom band in view region. |
-| `FUN_000015cc` (ID02) | `set_draw_color_index` | STRONG INFERENCE | Iter 147: fgColor = index (or B&W path). |
-| `FUN_00000f52` / `FUN_00000f74` (ID02) | `close_port_a5safe` / `swap_port_a5safe` | STRONG INFERENCE | Iter 148: ClosePort; SetPort returning previous port. |
-| `FUN_00000fa0` (ID02) | `paint_rect_color_index_a5safe` | STRONG INFERENCE | Iter 148: colour index + PaintRect. |
-| `FUN_00000fd2` (ID02) | `paint_polygon_rgb_a5safe` | STRONG INFERENCE | Iter 148: filled polygon in packed RGB, y negated. |
-| `FUN_00000e3e` (ID02) | `blit_pixels_via_port_a5safe` | STRONG INFERENCE | Iter 149: set baseAddr; CopyBits src→dst (default thePort). |
-| `FUN_00000e9e` (ID02) | `open_offscreen_cport_a5safe` | STRONG INFERENCE | Iter 149: OpenCPort + pixmap/portRect/visRgn setup on caller storage. |
-| `FUN_00000ca6` (ID02) | `new_offscreen_cport` | STRONG INFERENCE | Iter 149: allocate CGrafPort (0x6c) and set it up. |
-| `FUN_000014e6` (ID02) | `swap_mmu_mode_a5safe` | STRONG INFERENCE | Iter 150: SwapMMUMode(&A5−0x1000) via ID09 glue; slot −0x10c6. |
-| `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | STRONG INFERENCE mechanics | Iter 151: two notched frames (pen 2/1) from rect A5−0x119c, drawn twice. |
-| `FUN_000010ce` (ID02) | `build_notched_frame_poly` | STRONG INFERENCE mechanics | Iter 151: notched/chamfered frame polygon from a Rect. |
-| `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | STRONG INFERENCE mechanics | Iter 152: columned DrawString output with FillRect backgrounds; slot −0x110e. |
-| `FUN_00001656` / `FUN_00001680` (ID02) | `design_x_to_screen` / `design_y_to_screen` | STRONG INFERENCE | Iter 162: A5−0x149e·v/4800 + half view width/height. |
-| `FUN_00001632` / `FUN_0000001e` (ID02) | `set_back_color_index` / `abs_long` | STRONG INFERENCE | Iter 162. |
-| `FUN_00002db8` / `FUN_00004d34` (ID02) | `wait_for_click_or_key` / `process_pending_update_events` | STRONG INFERENCE | Iter 173: modal input wait; update flush. |
+| `FUN_00000048` (ID09) | `sysenvirons_glue_fallback` | STRONG INFERENCE | entry dispatcher at file 0x20-0x46 calls `$A090` (_SysEnvirons) only when GetOSTrapAddress($90) ≠ GetToolTrapAddress($9F _Unimplemented) or falls into 0x48; body fills SysEnvRec from documented low-memory globals and returns 0xea84 (−5500 envNotPresent). Lookup table proven at file 0x54..0x58. Trap/global names from Apple docs, not validated against Apple glue. See `ID09_SYSENVIRONS_ANALYSIS.md`. |
+| `FUN_000002a6` (ID09) | `fsopen_glue` | STRONG INFERENCE | file 0x2a6..0x2dc LINK −0x32 IOParam; +0x12←long arg, +0x16←word arg, clears +0x1a/+0x1b/+0x1c; `$A000` (_Open); +0x18→VAR arg; D0→result; pops 10 bytes = FSOpen(fileName, vRefNum, VAR refNum): OSErr. Trap/field names from Inside Macintosh. |
+| `FUN_000003c2` (ID09) | `swapmmumode_glue` | STRONG INFERENCE | file 0x3c2..0x3d4 loads byte via VAR ptr into D0, `$A05D` (_SwapMMUMode), stores D0.B back, pops 4 bytes = SwapMMUMode(VAR mode: SignedByte). Trap name from Inside Macintosh. |
+| `FUN_00000006` (ID07) | `load_str129_string_table` | STRONG INFERENCE | ID07.bin 0x06..0x18e GetResource('STR#',0x81) `$A9A0`, HLock via JT `$272(A5)`, in-place \\p/escape processing, stores 120 string pointers to A5−0xf46[1..120]. Sole caller `FUN_00000190` (ID07). |
+| `FUN_00000190` (ID07) | `init_string_pointer_groups` | STRONG INFERENCE | calls `load_str129_string_table`, copies slots 2..22→A5−0x221e[21], 94..99→A5−0xffe[6], 100..105→A5−0xfae[6], 106..115→A5−0xf86[10]. JT A5+0x592; called from ID02 file 0x2c0a. |
+| `FUN_00002bbc` (ID02) | `initialize_application` | STRONG INFERENCE | ID02.bin 0x2bbc..0x2d9e Toolbox init sequence ($A86E InitGraf … $A850 InitCursor), JT $592 string init + UnloadSeg 7, SysEnvirons via JT $1f2, 'MENU' 2 / 'HEL1' 127/128 load-or-create, SetPort. Caller `FUN_0000309a`. |
+| `FUN_0000309a` (ID02) | `main` | STRONG INFERENCE (entry chain PROVEN) | called from ID01 runtime entry via JT A5+0x4b2 (constant at ID01 file 0x4); runs `initialize_application`, ID08 overlay loader, UnloadSeg 4/8/5, then loops forever on `FUN_00002fd4`. |
+| `FUN_00002fd4` (ID02) | `poll_and_dispatch_event` | STRONG INFERENCE | ID02.bin 0x2fd4..0x3098 GetNextEvent ($A970) + switch on what: mouseDown→0x2f1e, cmd-key→MenuKey→0x36a2, update→Begin/EndUpdate+0x4db0, activate→0x2fa0. Called forever by `main`. |
+| `FUN_000036a2` (ID02) | `do_menu_command` | STRONG INFERENCE | HiWord/LoWord($A86A/$A86B) of menuResult; menu 1 Apple (OpenDeskAcc), menu 3 Edit (SystemEdit), menu 2 13-item command menu (quit = 0x2eaa). Called from `poll_and_dispatch_event` after MenuKey. |
+| `FUN_00002a44` (ID02) | `apply_settings_to_live_options` | STRONG INFERENCE | copies HEL1 127 words S+2..S+0x24 into A5−0x12ee..−0x12d0; change-triggered callbacks via A5−0x1092/−0x104e/−0x1096 gated by A5−0x1006; redraw FUN_00004db0. 6 callers in ID02.bin. |
+| `FUN_00002f1e` (ID02) | `handle_mouse_down` | STRONG INFERENCE | FindWindow switch: inMenuBar→MenuSelect→do_menu_command, inSysWindow→SystemClick, inGoAway(main)→TrackGoAway→HideWindow. |
+| `FUN_00002fa0` (ID02) | `handle_activate_event` | STRONG INFERENCE | (modifiers&3)==3 && message==main_window → InvalRect(&main_window->portRect). |
+| `FUN_00004db0` (ID02) | `redraw_main_window` | STRONG INFERENCE | gated redraw: HideCursor, FUN_00004c18, UnloadSeg 3, overlay callback A5−0x109e, helpers, ShowCursor. Called from update handling and apply_settings_to_live_options. |
+| `FUN_00004c18` (ID02) | `check_device_color_state_changed` | STRONG INFERENCE | compares per-device 256-word arrays from FUN_000048ae with stored copies; on change → JT $182, refresh, overlay callback A5−0x1096. |
+| `FUN_000048ae` (ID02) | `build_palette_index_map` | STRONG INFERENCE | per device slot, PmForeColor(i) → fgColor index → map[i]/inverse[idx]; duplicate detection → A5−0x102a; selects A5−0x1122 = JT 0x46a or 0x33a. |
+| `FUN_000046b4` (ID02) | `rebuild_all_palette_index_maps` | STRONG INFERENCE | rebuild map for each device slot 1..3 (or B&W path). |
+| `FUN_00004738` (ID02) | `configure_palette_entries` | STRONG INFERENCE | depth-4 / depth-8 Palette Manager entry usage + colours. |
+| `FUN_0000488a` (ID02) | `clear_ctab_size_callback` | STRONG INFERENCE | A5 from CurrentA5; (*A5−0x14b2)+6 = 0. |
+| `FUN_000049fe` (ID02) | `lookup_palette_index_for_rgb_level` | STRONG INFERENCE | (r,g,b) levels ×64→16-bit; search A5−0x350[8] then *(A5−0x14a6); +200 at 8-bit. |
+| `FUN_00000d24` (ID02) | `close_and_dispose_port` | STRONG INFERENCE | ClosePort(p); DisposPtr(p). Used on A5−0x103a. |
+| `FUN_00000d3a` (ID02) | `blit_offscreen_frame_to_window` | STRONG INFERENCE | (base, top, rows, mode) → offscreen PixMap port A5−0x103a, CopyBits to thePort. JT $322; ID06 0xf18; address taken at ID02 0x1b6a. |
+| `FUN_00001b14` (ID02) | `freemem_a5safe` | STRONG INFERENCE | CurrentA5 wrapper around ID09 FreeMem glue; service slot A5−0x10a6. |
+| `FUN_00001a04` / `1a84` / `1aa8` / `1acc` / `1af0` (ID02) | `dispose_handle_a5safe` / `hlock_a5safe` / `hunlock_a5safe` / `hpurge_a5safe` / `hnopurge_a5safe` | STRONG INFERENCE | CurrentA5 thunks → ID09 $A023/$A029/$A02A/$A049/$A04A glue; service slots. |
+| `FUN_00001a28` (ID02) | `realloc_and_clear_handle_a5safe` | STRONG INFERENCE | ReallocHandle + MemError check + zero-fill via FUN_000002b0. |
+| `FUN_000019a2` (ID02) | `new_handle_clear_or_die_a5safe` | STRONG INFERENCE | NewHandleClear + MemError → fatal; service slot A5−0x10c2. |
+| `FUN_000019e2` (ID02) | `fatal_memory_error_exit` | STRONG INFERENCE | dispose overlay, FUN_00004318, show STR#129[93] via FUN_00001d48, ExitToShell. |
+| `FUN_00001d48` (ID02) | `show_caution_alert_with_number` | STRONG INFERENCE | ParamText(msg, number) + CautionAlert(258). JT $4ba. |
+| `FUN_00001c8a` (ID02) | `format_int_decimal_pstring` | STRONG INFERENCE | signed decimal → Pascal string in 10-byte buffer. |
+| `FUN_00004318` (ID02) | `shutdown_sound` | STRONG INFERENCE | stop 3 channels, restore $0196, SndDisposeChannel(A5−0x356). |
+| `FUN_00004242` (ID02) | `silence_sound_channel` | STRONG INFERENCE | ch 0..1 → FUN_00003d50(ch, A5−0xc26, 0, 370, 0) into channel record. |
+| `FUN_00003d36` (ID02) | `clear_sound_buffer_to_silence` | STRONG INFERENCE | SoundBase ($0266) 370 words ← 0x80. |
+| `FUN_00003d50` (ID02) | `alloc_sound_buffer_node` | STRONG INFERENCE | node from channel free list; {+0 cursor, +8 buffer, +0xc start, +0x10 end, +0x14 next, +0x18 continuation}. |
+| `FUN_00003dd0` (ID02) | `init_sound_system` | STRONG INFERENCE | builds channel queues, silence buffer, installs routine into low-memory $0196 (saved in A5−0xc36). |
+| `FUN_000039a8` / `FUN_00003aae` / `FUN_00003bc4` (ID02) | `vbl_sound_handler_ch0_unrolled` / `vbl_sound_handler_ch0_variant` / `vbl_sound_handler_two_channel` | STRONG INFERENCE | Lvl1DT[1] VBL hooks; in-code A5 cache; RTS-chain to previous vector; resample into SoundBase. |
+| `FUN_00003db8` (ID02) | `select_two_channel_sound_handler` | STRONG INFERENCE | arg == 1 → $0196 = A5−0x35c. |
+| `FUN_00003f54` (ID02) | `play_sample_on_channel` | STRONG INFERENCE | queue sample on ch 0..1 with optional sustain loop; see SOUND_SYSTEM.md. |
+| `FUN_00004050` (ID02) | `enqueue_sample_on_channel` | STRONG INFERENCE (purpose HYPOTHESIS) | queues nodes like play_sample_on_channel but leaves channel head unchanged. |
+| `FUN_0000412e` (ID02) | `set_sound_playback_rate` | STRONG INFERENCE | 16.16 rate → step/len globals. |
+| `FUN_000041a6` (ID02) | `release_channel_loop` | STRONG INFERENCE | breaks sustain self-loops, ends in silence. |
+| `FUN_000042b0` (ID02) | `is_channel_playing` | STRONG INFERENCE | current buffer ≠ silence. |
+| `FUN_00000c68` (ID02) | `apply_pending_color_entries_a5safe` | STRONG INFERENCE | SetEntries(-1, ctSize-1, ctTable) on A5−0x14b2; ctSize = 0. |
+| `FUN_00001876` (ID02) | `blit_image_clipped_to_region` | STRONG INFERENCE | CopyBits image A5−0x12b0 via port A5−0x1496 clipped to region from FUN_000016aa. |
+| `FUN_0000195c` / `FUN_0000197c` (ID02) | `blit_image_clipped_to_region_a5safe` / `run_segment3_entry_and_unload_a5safe` | STRONG INFERENCE | CurrentA5 service thunks. |
+| `FUN_00000a42` (ID02) | `draw_thick_line_pixel_index_a5safe` | STRONG INFERENCE | fgColor raw index; 2-px MoveTo/LineTo. |
+| `FUN_00000a86` (ID02) | `draw_thick_xor_line_a5safe` | STRONG INFERENCE | black srcXor 2-px line. |
+| `FUN_00000ad0` (ID02) | `paint_view_horizon_bands_a5safe` | STRONG INFERENCE (purpose HYPOTHESIS) | top band + two tilted quads + bottom band in view region. |
+| `FUN_000015cc` (ID02) | `set_draw_color_index` | STRONG INFERENCE | fgColor = index (or B&W path). |
+| `FUN_00000f52` / `FUN_00000f74` (ID02) | `close_port_a5safe` / `swap_port_a5safe` | STRONG INFERENCE | ClosePort; SetPort returning previous port. |
+| `FUN_00000fa0` (ID02) | `paint_rect_color_index_a5safe` | STRONG INFERENCE | colour index + PaintRect. |
+| `FUN_00000fd2` (ID02) | `paint_polygon_rgb_a5safe` | STRONG INFERENCE | filled polygon in packed RGB, y negated. |
+| `FUN_00000e3e` (ID02) | `blit_pixels_via_port_a5safe` | STRONG INFERENCE | set baseAddr; CopyBits src→dst (default thePort). |
+| `FUN_00000e9e` (ID02) | `open_offscreen_cport_a5safe` | STRONG INFERENCE | OpenCPort + pixmap/portRect/visRgn setup on caller storage. |
+| `FUN_00000ca6` (ID02) | `new_offscreen_cport` | STRONG INFERENCE | allocate CGrafPort (0x6c) and set it up. |
+| `FUN_000014e6` (ID02) | `swap_mmu_mode_a5safe` | STRONG INFERENCE | SwapMMUMode(&A5−0x1000) via ID09 glue; slot −0x10c6. |
+| `FUN_000011ec` (ID02) | `draw_notched_frame_pair_a5safe` | STRONG INFERENCE mechanics | two notched frames (pen 2/1) from rect A5−0x119c, drawn twice. |
+| `FUN_000010ce` (ID02) | `build_notched_frame_poly` | STRONG INFERENCE mechanics | notched/chamfered frame polygon from a Rect. |
+| `FUN_00001308` (ID02) | `draw_text_in_columns_a5safe` | STRONG INFERENCE mechanics | columned DrawString output with FillRect backgrounds; slot −0x110e. |
+| `FUN_00001656` / `FUN_00001680` (ID02) | `design_x_to_screen` / `design_y_to_screen` | STRONG INFERENCE | A5−0x149e·v/4800 + half view width/height. |
+| `FUN_00001632` / `FUN_0000001e` (ID02) | `set_back_color_index` / `abs_long` | STRONG INFERENCE | — |
+| `FUN_00002db8` / `FUN_00004d34` (ID02) | `wait_for_click_or_key` / `process_pending_update_events` | STRONG INFERENCE | modal input wait; update flush. |
 | A5−0x1372 / A5−0x1370 | view width / height (words) | STRONG INFERENCE | srcRect right/bottom in blit_offscreen_frame_to_window; centre in design_*_to_screen. |
-| `FUN_000007b0` / `00000598` / `00000666` / `00000512` / `0000087a` (ID06) | `init_raster_target` / `alloc_row_table` / `init_edge_pool` / `free_row_table` / `set_raster_target_base` | STRONG INFERENCE | Iter 153: ID06 rasterizer set-up; structures A5−0x1cce / −0x1cd2 / −0x1cd6. |
-| `FUN_000008a2` / `0000096e` / `000009d8` / `00000e10` / `0000026c` (ID06) | `set_active_row_count` / `reset_edge_table` / `add_polygon_edges` / `rasterize_and_present` / `init_row_table_fields` | STRONG INFERENCE | Iter 154: scanline polygon rasterizer API (service slots −0x1304/−0x1310/−0x130c/−0x1308). |
-| `FUN_00000318` (ID06) | `render_scanline_spans` | STRONG INFERENCE | Iter 155: priority span fill; in-code state at 0x39e..0x3e1. JT $192. |
-| `FUN_00000d84` / `FUN_00000dca` (ID06) | `rebase_edge_rows_for_band` / `restore_edge_rows_after_band` | STRONG INFERENCE | Iter 155: band row-counter adjustment. |
-| `FUN_000001dc` / `FUN_0000024c` (ID06) | `alloc_aligned_clear` / `free_aligned` | STRONG INFERENCE | Iter 157: aligned NewPtrClear with header; DisposPtr of raw pointer. |
-| `FUN_00000116` (ID06) | `rgb_to_bw_pattern` | STRONG INFERENCE | Iter 157: luma → pattern pointer (A5−0x1ed6, 64 × 8 bytes). |
-| `FUN_0000017c` / `FUN_000001a2` (ID06) | `lookup_colour_map` / `reverse_lookup_colour_map` | STRONG INFERENCE | Iter 157: 256-word map at *A5−0x1ede. |
-| `FUN_00000004` / `000000b0` / `000000f4` (ID06) | `init_pattern_tables` / `alloc_pattern_tables` / `get_pattern_table` | STRONG INFERENCE | Iter 158: mask + pattern table A5−0x1eda (0xc00), grey map A5−0x1ede (0x200). |
-| `FUN_00000916` / `00000942` / `00000d02` (ID06) | `get_raster_target_size` / `realloc_row_table` / `add_rect_polygon` | STRONG INFERENCE | Iter 158. |
-| `FUN_00000056` / `0000008a` / `000000a6` (ID03) | `scale_design_480_min10` / `scale_design_4800` / `scale_design_4800_pen_centred` | STRONG INFERENCE | Iter 159: design-unit → screen scaling via A5−0x149e. |
-| `FUN_000000c8` / `000000f4` (ID03) | `max3_int` / `nearest_palette_index_rgb` | STRONG INFERENCE | Iter 159. |
-| `FUN_00000006` / `000002a8` / `0000033c` (ID03) | `set_scaled_text_style` / `new_offscreen_bw_port` / `dispose_offscreen_bw_port` | STRONG INFERENCE | Iter 160: text style; 1-bit offscreen GrafPort create/dispose. |
-| `FUN_00000912` (ID03) | `draw_vector_number` | STRONG INFERENCE | Iter 161: stroke-font digits from A5−0x1fde. |
-| `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | STRONG INFERENCE mechanics | Iter 163: grey disc + 4-phase rotating spoke (A5−0x2112), size A5−0x2114. Iter 167: likely a bezel screw head (HYPOTHESIS). |
-| `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | STRONG INFERENCE mechanics | Iter 164: ring + up to 5 diagonal spinning indicators by flag bits. |
-| `FUN_00000a3c` (ID03) | `antialias_downsample_bw_3x` | STRONG INFERENCE | Iter 166: 3× Gaussian (7×7, /969) downsample of 1-bit bitmap into grey palette pixels. |
-| `FUN_00003c02` (ID03) | `draw_instrument` | STRONG INFERENCE | Iter 167: bezel + type-switch (0..9) to per-gauge drawers; record A5−0x12a2. |
-| `FUN_00001876` (ID03) | `draw_altimeter` | STRONG INFERENCE | Iter 168: instrument type 0; label STR#129[65] "ALTITUDE". |
-| `FUN_00001538` (ID03) | `begin_instrument_supersample` | STRONG INFERENCE | Iter 168: 1× or 3× B&W port for anti-aliased gauge drawing. |
-| `FUN_00001b48` (ID03) | `draw_airspeed_indicator` | STRONG INFERENCE | Iter 169: instrument type 1; label "AIR SPEED". |
-| `FUN_00002d1c` (ID03) | `draw_turn_and_bank_indicator` | STRONG INFERENCE | Iter 169: instrument type 2; label "TURN BANK". |
-| `FUN_00001fee` (ID03) | `draw_climb_indicator` | STRONG INFERENCE | Iter 169: instrument type 3; label "CLIMB". |
-| `FUN_00002600` (ID03) | `draw_manifold_pressure_gauge` | STRONG INFERENCE | Iter 169: instrument type 4; label "Manifold Pressure". |
-| `FUN_000022fe` (ID03) | `draw_tachometer` | STRONG INFERENCE | Iter 169: instrument type 5; label "RPM". |
-| `FUN_00002950` (ID03) | `draw_direction_indicator` | STRONG INFERENCE | Iter 169: instrument type 6; label "DIRECTION". |
-| `FUN_00004c42` / `00004ecc` / `0000532e` (ID03) | `draw_flaps_indicator` / `draw_ammo_counter` / `draw_fuel_gauge` | STRONG INFERENCE | Iter 171: labels STR#129 slots 75 / 76 / 77. |
-| `FUN_00003d42` (ID04) | `check_system_requirements` | STRONG INFERENCE | Iter 172: Color QD + 68020 check; JT $f2. |
-| `FUN_000003c2` (ID04) | `run_with_temporary_window` | STRONG INFERENCE mechanics | Iter 172: "Hellcats" window around ID02 0x2db8. |
-| `FUN_000004f0` / `00000516` / `00000560` (ID04) | `ask_save_changes` / `confirm_end_mission` / `confirm_erase_high_scores` | STRONG INFERENCE | Iter 175: CautionAlert 257 / 259 / 260 (texts from DITL dump). |
-| `FUN_00000588` (ID04) | `compute_pilot_score` | STRONG INFERENCE | Iter 176: Σ record +0x28 tallies × A5−0xf5e weights. |
-| `FUN_00000f4e` / `00001106` / `00001a0e` (ID04) | `rank_pilots_by_score` / `reset_pilot_record` / `build_rank_and_name_string` | STRONG INFERENCE | Iter 177; see PILOT_ROSTER.md. |
-| `FUN_000031aa` (ID04) | `conclude_mission` | STRONG INFERENCE | Iter 178: mission-over flag + pilot status write; JT $da. |
-| `FUN_00003124` / `FUN_00003178` (ID04) | `play_named_sound_async` / `stop_named_sound` | STRONG INFERENCE | Iter 179: Sound Manager 'snd ' by name (A5−0x2128); channel A5−0x2152, handle A5−0x2156. |
-| `FUN_00002de6` (ID04) | `show_mission_summary_dialog` | STRONG INFERENCE | Iter 180: DLOG 133 "Mission Summary". |
-| `FUN_00000006` (ID04) | `disable_dialog_control` | PROVEN | Iter 181: bytes; HiliteControl 255. |
-| `FUN_0000002e` (ID04) | `enable_dialog_control` | PROVEN | Iter 181: bytes; HiliteControl 0. |
-| `FUN_00000054` (ID04) | `hide_dialog_control` | PROVEN | Iter 181: bytes; HideControl. |
-| `FUN_00000078` (ID04) | `show_dialog_control` | PROVEN | Iter 181: bytes; ShowControl. |
-| `FUN_0000009c` (ID04) | `set_dialog_item_text` | PROVEN | Iter 181: bytes; SetIText. |
-| `FUN_000000c4` (ID04) | `set_dialog_control_title` | PROVEN | Iter 181: bytes; SetCTitle. |
-| `FUN_000000ec` (ID04) | `set_dialog_user_item_proc` | PROVEN | Iter 181: bytes; SetDItem with a ProcPtr. |
-| `FUN_00000120` (ID04) | `frame_dialog_item_box` | PROVEN | Iter 181: bytes; InsetRect -2, PenSize 1, FrameRect. |
-| `FUN_0000016e` (ID04) | `draw_default_button_outline` | PROVEN | Iter 181: bytes; user item via JT $12a; item A5-0x225e; FrameRoundRect 16. |
-| `FUN_000001f2` (ID04) | `draw_grey_user_item` | PROVEN | Iter 181: bytes; user item via JT $142; FillRect gray A5-0x1624. |
-| `FUN_000017e6` (ID04) | `create_scrolling_text_item` | STRONG INFERENCE | Iter 182: bytes; TENew -> A5-0x223a; NewControl scrollBarProc -> A5-0x2236; user item JT $92. |
-| `FUN_0000189c` (ID04) | `dispose_scrolling_text_item` | PROVEN | Iter 182: bytes; TEDispose + DisposeControl. |
-| `FUN_000018b0` (ID04) | `append_line_to_scrolling_text` | STRONG INFERENCE | Iter 182: bytes; strlen (ID02 0x3e8) + TEInsert ×2 + 0x158c scroll update. |
-| `FUN_000014a0` (ID04) | `draw_scrolling_text_item` | PROVEN | Iter 183: bytes; EraseRect viewRect, TEUpdate, frame. |
-| `FUN_000014f2` (ID04) | `scrolling_text_user_item_proc` | PROVEN | Iter 183: bytes; Pascal user item, JT $92. |
-| `FUN_0000150e` (ID04) | `sync_text_scroll_to_control` | PROVEN | Iter 183: bytes; TEScroll by ctl value × lineHeight. |
-| `FUN_00001562` (ID04) | `update_scroll_bar_maximum` | PROVEN | Iter 183: bytes; SetCtlMax(nLines − visible). |
-| `FUN_0000158c` (ID04) | `scroll_text_to_show_selection` | STRONG INFERENCE | Iter 183: bytes; centre line holding selStart. |
-| `FUN_00001638` (ID04) | `fit_text_view_to_box` | PROVEN | Iter 183: bytes; viewRect = box − 16, whole lines, TECalText. |
-| `FUN_000016c4` (ID04) | `scroll_bar_action_proc` | PROVEN | Iter 183: bytes; JT $16a TrackControl action; parts 20..23; also documents unexported click handler 0x1752. |
-| `FUN_000018e0` (ID04) | `get_mission_kill_report_state` | STRONG INFERENCE | Iter 184: bytes; 0/1/2 from A5-0x12f8, -0x14c0, -0x12ba and ten kill words A5-0x12ce. |
-| `FUN_0000192e` (ID04) | `update_summary_dialog_buttons` | STRONG INFERENCE | Iter 184: bytes; enables items 1/3; moves default ring A5-0x225e to item 1. |
-| `FUN_00002d86` (ID04) | `set_score_item_text` | PROVEN | Iter 185: "Score: " + compute_pilot_score. |
-| `FUN_00001f5e` (ID04) | `draw_aircraft_kill_markers` | STRONG INFERENCE | Iter 186: tallies 0+1, red discs, under "Total Aircraft Destroyed". |
-| `FUN_000020e8` (ID04) | `aircraft_kill_markers_user_item_proc` | PROVEN | Iter 186: JT $ea user item. |
-| `FUN_00001bc8` (ID04) | `draw_targets_destroyed_row` | STRONG INFERENCE | Iter 187–188: per target type; skips 2/4/8; count and count × weight. |
-| A5−0xf5e | per-target-type point weights (words) | STRONG INFERENCE | Iter 188: count × weight in draw_targets_destroyed_row and compute_pilot_score. |
-| A5−0x2226 | pointer to the Mission Summary kill counts (local array) | PROVEN | Iter 188: set at ID04 0x2e00. |
-| A5−0x12ce | ten per-mission kill counters, cleared when added to the pilot tallies | PROVEN | Iter 189: summary state 3 (0x2a2e). |
-| A5−0x13a2 | ten per-type kill totals, incremented with the pilot tallies | STRONG INFERENCE | Iter 189: role beyond accumulation unknown. |
-| A5−0x1002 | resource file reference number used with UpdateResFile | STRONG INFERENCE | Iter 189: roster write-back. |
-| A5−0x2176 | summary kill-transfer index (target type) | PROVEN | Iter 189. |
-| A5−0xfd6 | rank point thresholds (one long per rank) | STRONG INFERENCE | Iter 190: summary state 4 promotion. |
-| A5−0x2220 | Mission Summary argument word from conclude_mission; low byte 1 grants the mission award | PROVEN flow / HYPOTHESIS meaning | Iter 191. |
-| A5−0x12f8 | current mission number; award bit = value − 3 | STRONG INFERENCE | Iter 191: summary state 2. |
-| A5−0x12b6 | friendly units destroyed this mission (≥ 5 → executed for treason) | STRONG INFERENCE | Iter 192: summary state 0. |
-| A5−0x12ba | mission objective state (> 0 done, 0 open, −1 failed by event, −2 original Hellcat lost) | STRONG INFERENCE | Iter 192. |
-| A5−0x221e + 4k | STR# 129 slot 2 + k pointer group (outcome texts) | PROVEN | Iter 192 (with ID07 init_string_pointer_groups). |
-| A5−0x21c6 / A5−0x21ca | summary line queue (string pointers) / cursor | PROVEN | Iter 190: states 0, 4, 5. |
-| `FUN_00001d9e` (ID04) | `draw_targets_destroyed_list` | PROVEN | Iter 187: JT $aa user item 6. |
-| `FUN_00000220` (ID04) | `draw_percent_bar_item` | PROVEN | Iter 193: bytes; percentage bar A5-0x225c (0..100), dkGray / white. |
-| `FUN_000002c0` (ID04) | `percent_bar_user_item_proc` | PROVEN | Iter 193: bytes; JT $8a user item; documents unexported set_radio_group_selection 0x2dc. |
-| `FUN_00000362` (ID04) | `get_radio_group_selection` | PROVEN | Iter 193: bytes; first set control of an item list, else -1. |
-| `FUN_00000a8e` (ID04) | `fuel_slider_dialog_filter` | STRONG INFERENCE | Iter 194: bytes; Return/Enter, slider tracking (StillDown/GetMouse), update events. |
-| `FUN_00000bda` (ID04) | `scenario_selection_filter_proc` | PROVEN | Iter 194: bytes; JT $112 filter, DLOG 129, slider item 5. |
-| `FUN_00000e48` (ID04) | `refuel_dialog_filter_proc` | PROVEN | Iter 194: bytes; JT $14a filter, DLOG 132, slider item 3. |
-| `FUN_000009ee` (ID04) | `draw_select_mission_title` | PROVEN | Iter 197: bytes; JT $11a user item 4 of DLOG 129; STR# 64 centred, size 24. |
-| `FUN_0000116a` (ID04) | `prune_inactive_pilots_beyond_ten` | STRONG INFERENCE | Iter 197: bytes; clears non-Active records after the best ten; WriteResource roster. |
-| `FUN_0000044e` (ID04) | `show_scenery_open_error_alert` | PROVEN | Iter 198: bytes; ParamText + StopAlert(256) "Unable to open Hellcats scenery file"; JT $fa. |
-| `FUN_00000478` (ID04) | `show_paused_dialog` | PROVEN | Iter 198: bytes; DLOG 131 "Paused", wait for key down + up; JT $122. |
-| `FUN_000005e4` (ID04) | `duty_roster_filter_proc` | PROVEN | Iter 198: bytes; JT $c2 filter; documents unexported run_duty_roster_dialog 0x644 (JT $132, DLOG 130). |
-| `FUN_00003260` (ID04) | `draw_map_grid_and_centre_mark` | PROVEN | Iter 199: bytes; 4 x 4 grid + centre cross; A5-0x214e = 1. |
-| `FUN_00003352` (ID04) | `plot_map_symbol_callback` | PROVEN | Iter 199: bytes; JT $72 callback: DrawChar at map coordinates (CurrentA5). |
-| `FUN_000033d6` (ID04) | `draw_map_view_item` | STRONG INFERENCE | Iter 199: bytes; blue sea, A5-0x1052(scale, JT $72), scale text " mi./grid" item 7. |
-| `FUN_000035f8` (ID04) | `map_view_user_item_proc` | PROVEN | Iter 200: bytes; JT $b2; documents unexported track_map_bearing_and_distance 0x3614. |
-| `FUN_00003902` (ID04) | `map_dialog_filter_proc` | PROVEN | Iter 200: bytes; JT $d2; documents unexported run_map_dialog 0x3976 (JT $10a, DLOG 137 zoom). |
-| `FUN_00003a56` (ID04) | `poll_click_or_key_event` | PROVEN | Iter 200: bytes; 1 for mouseDown / keyDown / autoKey. |
-| `FUN_00003a8c` (ID04) | `show_about_dialog` | STRONG INFERENCE | Iter 200: bytes; DLOG 127 / 138 (1-bit), vers 1 text; tail not decoded. |
-| `FUN_00001200` (ID04) | `draw_high_scores_table` | PROVEN | Iter 201: JT $e2; DLOG 134. |
-| `FUN_000032b8` (ID03) | `draw_gyro_instrument` | STRONG INFERENCE (HYPOTHESIS which gyro) | Iter 202: type 8; handles A5-0x11dc "GyroInstrument" / A5-0x11d4 "GyroFlags". |
-| `FUN_00003832` (ID03) | `make_inset_face_oval_region` | STRONG INFERENCE | Iter 202: oval region of the face inside the bezel. |
-| `FUN_000038fc` (ID03) | `draw_artificial_horizon` | STRONG INFERENCE | Iter 202: type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument". |
-| `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | PROVEN | Iter 203: AddResource HEL2 200–500 + config. |
-| `FUN_00005c36` (ID03) | `open_cport_on_buffer` | PROVEN | Iter 204: OpenCPort on a caller buffer (rowBytes, baseAddr, bounds). |
-| `FUN_00005cb6` (ID03) | `close_port_glue` | PROVEN | Iter 204: ClosePort. |
-| `FUN_00005cc4` (ID03) | `prepare_instrument_panel` | STRONG INFERENCE | Iter 204: JT $17a; panel scale A5-0x149e; Bitmap Cache lookup by display configuration. |
-| `FUN_00005860` (ID03) | `compute_panel_screen_addresses` | STRONG INFERENCE | Iter 205: screen byte addresses base + y*rowBytes + x/(8/depth). |
-| `FUN_00006c1c` (ID03) | `remap_cached_panel_colours` | STRONG INFERENCE | Iter 205: JT $182; re-colours a cached panel; palette indices via lookup_palette_index_for_rgb_level. |
-| `FUN_0000077e` (ID03) | `draw_vector_glyph_string_centred` | STRONG INFERENCE | Iter 206: centred stroke-font string; glyph table A5-0x20b0 (6 glyphs). |
-| `FUN_0000146a` (ID03) | `composite_instrument_bitmap` | PROVEN | Iter 206: CopyBits (1-bit) or antialias_downsample_bw_3x into the panel port A5-0x1496. |
-| `FUN_00001844` (ID03) | `finish_instrument_supersample` | PROVEN | Iter 206: SetPort(panel), composite, dispose_offscreen_bw_port. |
-| `FUN_00003f24` (ID03) | `draw_bevelled_frame` | STRONG INFERENCE | Iter 207: four shaded polygons between outer and inner rects. |
-| `FUN_00004110` (ID03) | `draw_numbered_bevel_box` | PROVEN | Iter 207: black box, bevel, vector-font number. |
-| `FUN_00004790` (ID03) | `draw_percent_scale_gauge` | STRONG INFERENCE | Iter 208: 0–100 vertical scale; role HYPOTHESIS. |
-| `FUN_00004b32` (ID03) | `draw_split_display_box` | STRONG INFERENCE | Iter 209: halves A5-0x119c / A5-0x1194. |
-| `FUN_00004304` (ID03) | `draw_panel_section_with_numbered_boxes` | STRONG INFERENCE mechanics | Iter 210: boxes 1 / 3 / 15; purpose UNKNOWN. |
-| `FUN_000054fe` (ID03) | `draw_landing_gear_indicator` | STRONG INFERENCE | Iter 211: STR# 78 "GEAR" label, three lamp positions A5-0x1174..-0x1164. |
-| `FUN_00005718` (ID03) | `dial_point_at_angle` | STRONG INFERENCE | Iter 211: degrees -> 1/0x4000 turn; cos A5-0x2118 / sin A5-0x211c, 4.12. |
-| `FUN_00005158` (ID03) | `draw_arc_scale_ticks` | STRONG INFERENCE | Iter 212: 10-degree arc ticks via cos / sin pointers; documents unexported gauge 0x532e. |
-| `FUN_000071a2` (ID03) | `remap_panel_colours_identity` | STRONG INFERENCE | Iter 212: identity 256-entry table -> remap_cached_panel_colours. |
-| `FUN_00000038`..`FUN_000002ee` (ID02) | `ansi_div` … `ansi_strcmp` (20 C runtime functions) | PROVEN / STRONG INFERENCE | Iter 213: complete Ghidra C; ctype masks. |
-| `FUN_0000030c`..`FUN_00000412` (ID02) | `ansi_strchr` … `ansi_strncat` (9 string functions) | PROVEN | Iter 214. |
-| `FUN_0000045a` (ID02) | `begin_overlay_session` | STRONG INFERENCE mechanics | Iter 215: UnloadSeg 4, memory + sound, hooks A5-0x1082 / -0x107e; documents end_overlay_session 0x4a4. |
-| `FUN_000004c6` (ID02) | `ensure_free_memory_and_init_sound` | PROVEN | Iter 215: FreeMem < 500000 -> MaxMem; init_sound_system. |
-| `FUN_00000930` (ID02) | `call_overlay_session_hooks` | PROVEN | Iter 215: hooks A5-0x1082, -0x107e, -0x107a(a, b), -0x1076. |
-| `FUN_000004fc` (ID02) | `run_flight_session` | STRONG INFERENCE | Iter 216: game loop around the overlay. |
-| `FUN_0000150a` (ID02) | `get_blended_fill_pattern` | STRONG INFERENCE | Iter 217: depth 1: dither of the fg / bg colour average; else gray. |
-| `FUN_000016aa` (ID02) | `draw_view_frame_outline` | STRONG INFERENCE mechanics | Iter 217: outline of the design rect x ±3200, y 670..2400. |
-| `FUN_00001dd4` (ID02) | `show_sound_error_dialog_once` | PROVEN | Iter 218: DLOG 139 "Sound Error", once (A5-0xd12). |
-| `FUN_00001e32` (ID02) | `show_creating_panel_dialog` | PROVEN | Iter 218: DLOG 128 "Creating Instrument Panel". |
-| `FUN_00001e68` (ID02) | `release_sound_slots` | PROVEN | Iter 218: 20 slots A5-0xd62: RecoverHandle(p - 0x14), HPurge, HUnlock. |
-| `FUN_00001edc` (ID02) | `load_named_sound_into_slot` | PROVEN | Iter 218: GetNamedResource snd, memory check 0x3000, purgeable, slot store. |
-| `FUN_00001f8e` (ID02) | `load_game_sounds` | STRONG INFERENCE | Iter 219: loads 11 named sounds into slots; memory-dependent slot 0; error dialog. |
-| `FUN_000020be` (ID02) | `lock_sound_slots` | PROVEN | Iter 219: HLock + slot = *h + 0x14. |
-| `FUN_0000212a` (ID02) | `reset_overlay_state` | HYPOTHESIS name | Iter 219: clears overlay data areas, calls overlay entry (A5-0x1388, TickCount). |
-| `FUN_0000435e` (ID02) | `position_window_on_screen` | PROVEN | Iter 219: centre horizontally, 1/3 down under the menu bar, MoveWindow. |
-| `FUN_00002192` (ID02) | `scan_display_devices` | STRONG INFERENCE | Iter 220: main / right / left monitors. |
-| `FUN_000027e4` (ID02) | `configure_display_from_main_device` | STRONG INFERENCE | Iter 221. |
-| `FUN_000029f2` (ID02) | `refresh_display_if_changed` | PROVEN | Iter 221. |
-| `FUN_00002334` (ID02) | `layout_game_window_and_view` | STRONG INFERENCE | Iter 222. |
-| `FUN_000030fa` (ID02) | `install_menus` | PROVEN | Iter 223: MENU 1..5, Apple menu DRVR, DrawMenuBar. |
-| `FUN_00003174` (ID02) | `update_menu_items` | STRONG INFERENCE | Iter 223: FrontWindow DA test, enable / disable items. |
-| `FUN_00003590` (ID02) | `set_menu_item_enabled` | PROVEN | Iter 223: EnableItem / DisableItem, DrawMenuBar for item 0. |
-| `FUN_000035bc` (ID02) | `set_view_size_option` | PROVEN | Iter 223: settings +0xe, relayout. |
-| `FUN_0000442e` (ID02) | `position_alert_template` | PROVEN | Iter 224: JT $47a; centres ALRT template rect. |
-| `FUN_00004582` (ID02) | `centre_window_on_screen` | PROVEN | Iter 224: JT $472; MoveWindow centred. |
-| `FUN_00004610` (ID02) | `detach_window_palette` | PROVEN | Iter 224: SetPalette(window, NULL). |
-| `FUN_0000462c` (ID02) | `select_palette_for_depth` | PROVEN | Iter 224: palette + RGB table per depth 1 / 4 / 8. |
-| `FUN_00002ee4` (ID02) | `copy_pascal_string` | PROVEN | Iter 225: length byte + bytes. |
-| `FUN_000035e4` (ID02) | `start_new_mission` | STRONG INFERENCE | Iter 225: roster + scenario dialogs, reset mission state, run_flight_session. |
-| `FUN_00004d6a` (ID02) | `handle_update_event` | PROVEN | Iter 225: JT $492; Begin/EndUpdate around redraw_main_window; documents restore_screen_globals 0x4d96. |
-| `FUN_00000110`..`FUN_000001c2` (ID01) | `rt_udiv32`, `rt_umod32`, `rt_sdiv32`, `rt_smod32`, `rt_sdivmod32_core`, `rt_udivmod32_core` | PROVEN | Iter 226: 32-bit divide runtime. |
-| `FUN_00000334` (Pacific Conflict) | `any_mission_kills_recorded` | STRONG INFERENCE | Iter 227: 12 kill words DAT_0001b5a0+0xba..+0xd0. |
-| `FUN_000003fa` (Pacific Conflict) | `load_player_fuel_and_bombs` | STRONG INFERENCE | Iter 227: fuel % +0xb6 -> two tanks +0x67d/+0x67e; bombs +0xb9 -> +0x67c. |
-| `FUN_00000488` (Pacific Conflict) | `tally_destroyed_entity` | STRONG INFERENCE | Iter 227: kill counter +0xb8 + 2*type; friendly kills +0xd2. |
-| `FUN_000004f8` (Pacific Conflict) | `transform_through_node_chain` | STRONG INFERENCE | Iter 228: hierarchical transform of an object through its parent nodes. |
-| `FUN_000005fa` (Pacific Conflict) | `traverse_scene_tree` | STRONG INFERENCE | Iter 228: recursive scene graph walk with callback. |
-| `FUN_000006a6` (Pacific Conflict) | `for_each_mission_scene_object` | STRONG INFERENCE | Iter 228: walk from the current mission scene root. |
-| `FUN_000006ec` (Pacific Conflict) | `collect_map_features` | STRONG INFERENCE | Iter 229: scene visitor: land outlines (hook +0x292), type-0x70 list, facility 0x12/0x13 list. |
-| `FUN_00000954` (Pacific Conflict) | `plot_mission_map_symbols` | STRONG INFERENCE | Iter 229: target of host A5-0x1052; plots A / B / C / T. |
-| `FUN_0000b190` (Pacific Conflict) | `clip_polygon_x_min` | PROVEN | Iter 230: x >= DAT_00020aee. |
-| `FUN_0000b242` (Pacific Conflict) | `clip_polygon_x_max` | PROVEN | Iter 230: x <= DAT_00020aec. |
-| `FUN_0000b2f4` (Pacific Conflict) | `clip_polygon_y_min` | STRONG INFERENCE | Iter 230: y >= DAT_00020aea. |
-| `FUN_0000b3aa` (Pacific Conflict) | `clip_polygon_y_max` | STRONG INFERENCE | Iter 230: y <= DAT_0001b73e. |
-| `FUN_00000aba` (Pacific Conflict) | `nearest_type80_centroid_visitor` | STRONG INFERENCE mechanics | Iter 231: nearest face centroid of type-0x80 objects. |
-| `FUN_00000bea` (Pacific Conflict) | `point_near_camera_or_type80_object` | HYPOTHESIS name | Iter 231: metric thresholds 0x33900 / 0x40741. |
-| `FUN_00000c4c` (Pacific Conflict) | `anchor_point_visitor` | STRONG INFERENCE mechanics | Iter 231: kind-1 node pose or nearest ground airfield point. |
-| `FUN_00000d6a` (Pacific Conflict) | `find_anchor_point` | HYPOTHESIS name | Iter 231: mode 0 / 1 over the scene. |
-| `FUN_00000db0` (Pacific Conflict) | `ensure_handle_allocated` | STRONG INFERENCE | Iter 232: NewHandleClear / realloc when purged, HNoPurge. |
-| `FUN_00000e0a` (Pacific Conflict) | `lock_handle_nopurge` | STRONG INFERENCE | Iter 232: HLock + HNoPurge. |
-| `FUN_00000e32` (Pacific Conflict) | `unlock_handle_purgeable` | STRONG INFERENCE | Iter 232: HUnlock + HPurge. |
-| `FUN_00000e5a` (Pacific Conflict) | `lock_overlay_buffers` | STRONG INFERENCE | Iter 232: HLock of the four panel bitmap handles. |
-| `FUN_00000ea0` (Pacific Conflict) | `allocate_session_buffers` | STRONG INFERENCE | Iter 233: host hook A5-0x1082. |
-| `FUN_00000f92` (Pacific Conflict) | `lock_session_buffers` | STRONG INFERENCE | Iter 233: host hook A5-0x107e. |
-| `FUN_00001094` (Pacific Conflict) | `unlock_session_buffers` | STRONG INFERENCE | Iter 233: host hook A5-0x1076. |
-| `FUN_00001112` (Pacific Conflict) | `overlay_main_entry` | STRONG INFERENCE | Iter 233: installs the overlay hook table A5-0x10a2..-0x104e. |
-| `FUN_00003ac4` (Pacific Conflict) | `start_mission_scene` | STRONG INFERENCE | Iter 234: hook A5-0x109a; scene entry, anchor point, camera. |
-| `FUN_0000739a` (Pacific Conflict) | `copy_player_pose_to_camera` | STRONG INFERENCE | Iter 234: camera position / angles from the player. |
-| `FUN_00006598` (Pacific Conflict) | `overlay_frame_step` | STRONG INFERENCE | Iter 234: hook A5-0x107a per frame; body partly decoded. |
-| `FUN_00007310` (Pacific Conflict) | `begin_flight_for_rank` | STRONG INFERENCE | Iter 234: hook A5-0x106e; rank table DAT_0001b2b4. |
-| `FUN_00006ed6` (Pacific Conflict) | `update_view_clip_bounds` | STRONG INFERENCE | Iter 235: hook A5-0x109e; view half height, clip y-max DAT_0001b73e. |
-| `FUN_000038f4` (Pacific Conflict) | `respawn_player_at_anchor` | STRONG INFERENCE | Iter 235: hook A5-0x108a; player back on the nearest airfield. |
-| `FUN_0000740a` (Pacific Conflict) | `process_flight_input_and_outcome` | STRONG INFERENCE | Iter 236: key handler + outcome code. |
-| `FUN_00006ff6` (Pacific Conflict) | `configure_renderer_for_display` | STRONG INFERENCE | Iter 237. |
-| `FUN_00004210` (Pacific Conflict) | `refresh_object_colours_for_depth` | STRONG INFERENCE | Iter 238: hook A5-0x1096; per-depth object colouring. |
-| `FUN_000041ec` (Pacific Conflict) | `recolour_kind2_object` | HYPOTHESIS name | Iter 238: kind-2 objects: FUN_00003da8 + FUN_00003ea0. |
-| `FUN_00004916` (Pacific Conflict) | `set_object_faces_bw_pattern` | STRONG INFERENCE | Iter 238: face +4 = host pattern table [index]. |
-| `FUN_00003da8` (Pacific Conflict) | `update_object_distance_band` | STRONG INFERENCE | Iter 239: band +0x30 from thresholds DAT_0001b190. |
-| `FUN_00003e02` (Pacific Conflict) | `update_record_distance_band` | STRONG INFERENCE | Iter 239: same for record +4. |
-| `FUN_00003e5c` (Pacific Conflict) | `snapshot_face_colours` | HYPOTHESIS name | Iter 239: copy face colours after the face list. |
-| `FUN_00003ea0` (Pacific Conflict) | `shade_object_faces` | STRONG INFERENCE | Iter 239: flat shading with light vector, haze blend at depth 8. |
-| `FUN_0000147a` (Pacific Conflict) | `queue_face_palette_entry` | STRONG INFERENCE | Iter 240: owner table + pending ColorSpec at host +0x72. |
-| `FUN_00001548` (Pacific Conflict) | `write_face_palette_slot` | STRONG INFERENCE | Iter 240: queue + mark slot on other monitors. |
-| `FUN_0000159e` (Pacific Conflict) | `assign_face_colour` | STRONG INFERENCE | Iter 240: depth 1 luminance pattern, depth 4 table, depth 8 dynamic palette slot (200, round-robin). |
-| `FUN_000011e6` (Pacific Conflict) | `widen_printf_format` | PROVEN | Iter 241: %d -> %ld, %x -> %lx into DAT_00020b4c. |
-| `FUN_00001254` (Pacific Conflict) | `overlay_printf` | STRONG INFERENCE | Iter 241: host service +0x262 (A5-0x1126). |
-| `FUN_00001294` (Pacific Conflict) | `reset_palette_owner_tables` | STRONG INFERENCE | Iter 241: 0x400-byte owner tables per device. |
-| `FUN_00001300` (Pacific Conflict) | `init_depth8_colour_state` | STRONG INFERENCE | Iter 241: depth-8 set-up. |
-| `FUN_0000131c` (Pacific Conflict) | `init_depth4_colour_state` | STRONG INFERENCE | Iter 241: depth-4 set-up from device records. |
-| `FUN_0000640c` (Pacific Conflict) | `spawn_cloud_layer` | STRONG INFERENCE | Iter 242: hook A5-0x104e; ten camera-relative objects or retire type 0x1d. |
-| `FUN_00019aa2` (Pacific Conflict) | `spawn_camera_relative_object` | STRONG INFERENCE | Iter 242: pool spawn at camera + offset. |
-| `FUN_00019b30` (Pacific Conflict) | `follow_camera_offset` | STRONG INFERENCE | Iter 242: keep object at camera + offset. |
-| `FUN_000018d6` (Pacific Conflict) | `overlay_initialise` | STRONG INFERENCE | Iter 243: RNG seed, subsystem init, light vector. |
-| `FUN_00001958` (Pacific Conflict) | `heap_sbrk` | STRONG INFERENCE | Iter 243: arena = host A5-0x1040 work buffer. |
-| `FUN_00001974` (Pacific Conflict) | `heap_new_size_class_block` | STRONG INFERENCE | Iter 243: 1 << n bytes, header = class. |
-| `FUN_0000199a` (Pacific Conflict) | `heap_add_large_block` | STRONG INFERENCE | Iter 243: n * 8 bytes into the large-block list. |
-| `FUN_000019b0` (Pacific Conflict) | `heap_add_large_block_tail` | STRONG INFERENCE | Iter 243: false split of heap_add_large_block. |
-| `FUN_00003732` (Pacific Conflict) | `overlay_init_noop` | PROVEN | Iter 244: empty. |
-| `FUN_00003734` (Pacific Conflict) | `init_code_pointer_tables` | STRONG INFERENCE mechanics | Iter 244: two 2048-entry code-address tables. |
-| `FUN_00003266` (Pacific Conflict) | `init_span_table_32ba` | STRONG INFERENCE mechanics | Iter 244: self-modifying table at 0x3242. |
-| `FUN_00003412` (Pacific Conflict) | `init_span_table_3466` | STRONG INFERENCE mechanics | Iter 244: table at 0x33ee. |
-| `FUN_000035b4` (Pacific Conflict) | `init_span_table_3608` | STRONG INFERENCE mechanics | Iter 244: table at 0x3590. |
-| `FUN_0001771a` (Pacific Conflict) | `set_view_distance` (iteration 280: actually the radar range) | VERIFIED | Iter 244: range + 2 * range. |
-| `FUN_00017736` (Pacific Conflict) | `cycle_view_distance` | VERIFIED | Iter 244: Tab key: 0xc15c0 / 0x26ac0 / 0xce40. |
-| `FUN_000032ba` (Pacific Conflict) | `fill_span_rows_4bit_a` | STRONG INFERENCE | Iter 245: depth-4 run-list span filler. |
-| `FUN_00003466` (Pacific Conflict) | `fill_span_rows_4bit_b` | STRONG INFERENCE | Iter 245: variant b. |
-| `FUN_00003608` (Pacific Conflict) | `fill_span_rows_4bit_c` | STRONG INFERENCE | Iter 245: variant c. |
-| `FUN_000037b4` (Pacific Conflict) | `fill_span_rows_8bit` | STRONG INFERENCE | Iter 246: depth-8 span filler via the 2048-entry code tables. |
-| `FUN_00001b4c` (Pacific Conflict) | `heap_zero_payload_tail` | STRONG INFERENCE | Iter 246: false split. |
-| `FUN_00001be4` (Pacific Conflict) | `heap_realloc_grow_only_tail` | STRONG INFERENCE | Iter 246: false split. |
-| `FUN_00001c04` (Pacific Conflict) | `copy_object_vertex_buffer` | STRONG INFERENCE | Iter 246: +0x44 -> +0x4c, 12-byte vertices. |
-| `FUN_00002e12` (Pacific Conflict) | `noop_stub_2e12` | PROVEN | Iter 247: empty. |
-| `FUN_00004e06` (Pacific Conflict) | `reset_object_to_template_pose` | STRONG INFERENCE | Iter 247: position from the scene template, template chain transform. |
-| `FUN_00004e4e` (Pacific Conflict) | `reset_object_to_template_pose_tail` | STRONG INFERENCE | Iter 247: false split. |
-| `FUN_00006e74` (Pacific Conflict) | `reset_span_row_lists` | STRONG INFERENCE | Iter 248: one background span per row. |
-| `FUN_00006ece` (Pacific Conflict) | `clear_flag_00020ae4` | PROVEN | Iter 248: one store. |
-| `FUN_0000823e` (Pacific Conflict) | `process_flight_input_tail` | STRONG INFERENCE | Iter 248: false split of the key handler. |
-| `FUN_00008784` (Pacific Conflict) | `request_instant_replay` (was `set_state_word_1b86c`) | STRONG INFERENCE (iter 374) / VERIFIED | Iter 248: 2 / 1 by argument. Iter 374: sets the pending instant-replay request DAT_0001b86c (1 airborne, 2 on the ground). |
-| `FUN_00005832` (Pacific Conflict) | `dispatch_overlap_collisions` | STRONG INFERENCE | Iter 249: 1-D sweep over metric +/- radius, type handler +0x16. Iter 324: VERIFIED; walks the bit-15 list DAT_0001c1e4 (count DAT_0001c1c4), range +0xc, +0x28 scratch. |
-| `FUN_000058ec` (Pacific Conflict) | `build_visible_object_list` | STRONG INFERENCE | Iter 249: view-space transform and pyramid cull into DAT_0001c9dc. |
-| `FUN_000053f8` (Pacific Conflict) | `collect_near_objects` | STRONG INFERENCE | Iter 250: active array: view candidates, deactivation / retirement. |
-| `FUN_0000555a` (Pacific Conflict) | `collect_far_objects` | STRONG INFERENCE (name) / VERIFIED (iter 323) | Iter 250: world array: view candidates, collision list. Iter 323: DAT_0001c1e4 gets flag bit 15, not "!0x2800"; 0x2800 = mover side of the sweep; retires out-of-range objects older than 0x4b frames. |
-| `FUN_00005a14` (Pacific Conflict) | `update_altitude_detail_bands` | STRONG INFERENCE | Iter 251: power-of-two altitude band, tables DAT_0001b214 / DAT_0001b264, land rebuild. |
-| `FUN_00004958` (Pacific Conflict) | `build_land_outline_at_detail` | STRONG INFERENCE | Iter 251: drops vertices within tolerance, clips, de-duplicates into template vertex table. |
-| `FUN_00005e28` (Pacific Conflict) | `update_ground_scatter_objects` | STRONG INFERENCE | Iter 252: 64 ground points DAT_0001b924, 7 object slots DAT_0001bc64, gated by +0xac and height < 0x26ad. |
-| `FUN_00013346` (Pacific Conflict) | `surface_type_at_point` | STRONG INFERENCE | Iter 252: face code (+0x16) of nearby land face containing (x, z); default DAT_0001bda8+0x16. |
-| `FUN_00013070` (Pacific Conflict) | `point_in_polygon_xz` | VERIFIED | Iter 253: even-odd crossing test on vertex words +2 / +10. |
-| `FUN_0001310e` (Pacific Conflict) | `point_in_polygon_yz` | VERIFIED | Iter 253: same on +6 / +10. |
-| `FUN_0001320a` (Pacific Conflict) | `project_face_vertices_xz` | VERIFIED | Iter 253: (v >> shift) - origin into +2 / +10. |
-| `FUN_000131ac` (Pacific Conflict) | `project_face_vertices_xy` | VERIFIED | Iter 253: into +2 / +6. |
-| `FUN_00013268` (Pacific Conflict) | `project_face_vertices_yz` | VERIFIED | Iter 253: into +6 / +10. |
-| `FUN_00014af2` (Pacific Conflict) | `release_fractal_reference` | STRONG INFERENCE | Iter 253: decrements / frees shared block +0x2c; "Deactivating Fractal" message. |
-| `FUN_000132c8` (Pacific Conflict) | `point_over_face_xz` | STRONG INFERENCE | Iter 254: entity x / z origin, project_face_vertices_xz + point_in_polygon_xz. |
-| `FUN_00014bea` (Pacific Conflict) | `carry_attached_objects` | STRONG INFERENCE | Iter 254: rotates / lowers or removes nearby entities of template types 7 / 8 / 0x1a / 0x1b. |
-| `FUN_0001562e` (Pacific Conflict) | `clip_polygon_y_nonneg` | STRONG INFERENCE | Iter 255: clip against y = 0 (keep y >= 0), returns clipped flag. |
-| `FUN_00015762` (Pacific Conflict) | `sink_object_shape_at_waterline` | STRONG INFERENCE | Iter 255: rotated / lowered template shape, faces clipped at y = 0. |
-| `FUN_00014d86` (Pacific Conflict) | `step_sinking_object` | STRONG INFERENCE | Iter 255: timed sink steps; on completion removes riders, tallies, mission +0xce. |
-| `FUN_00015580` (Pacific Conflict) | `create_sinking_controller` | STRONG INFERENCE | Iter 256: 0x56-byte record, +4 = DAT_0001b524[key], interval 3, object flags 0x102000. |
-| `FUN_000155d8` (Pacific Conflict) | `tick_sinking_controller` | STRONG INFERENCE | Iter 256: step_sinking_object when +0x4c != 0. |
-| `FUN_00014f48` (Pacific Conflict) | `apply_hit_to_sinkable_object` | STRONG INFERENCE | Iter 257: decrements hits +0x32, random list / capsize rates, schedules 15 sinking steps. |
-| `FUN_0001530e` (Pacific Conflict) | `create_firing_ship_controller` | STRONG INFERENCE | Iter 257: 300-byte controller, 20 shots. |
-| `FUN_00015356` (Pacific Conflict) | `tick_firing_ship_controller` | STRONG INFERENCE | Iter 257: random spawn_weapon_entity from faces with +0x17 == 1; sinking afterwards. |
-| `FUN_000150c8` (Pacific Conflict) | `create_carrier_controller` (was `create_flagship_controller`) | PROVEN (identity, iter 326) | Iter 258: create entry of definition key 0x15 (table at runtime 0x1aa5e); 0x56-byte record; first in _DAT_0001b864. Iter 326: renamed; type 0x15 = carrier, string "Can't find deck tag on carrier" at 0x15134. |
-| `FUN_000155ec` (Pacific Conflict) | `create_basic_ship_controller` | STRONG INFERENCE | Iter 258: create entry of keys 0x18 / 0x17; 0x50-byte record. |
-| `FUN_000092e4` (Pacific Conflict) | `advance_frame_and_tick_controllers` | STRONG INFERENCE | Iter 259: DAT_0001b838++, appear / expiry flags 0x40 / 0x42, ticks DAT_0001c25c via definition +2. |
-| `FUN_0000947c` (Pacific Conflict) | `apply_controller_velocities` | STRONG INFERENCE | Iter 259: saves position, adds controller +8..+0x10 velocity. |
-| `FUN_000094d2` (Pacific Conflict) | `tick_flagged_object_controllers` | STRONG INFERENCE | Iter 259: DAT_0001b870 == 3: ticks only objects with +5 & 4. |
-| `FUN_0001429c` (Pacific Conflict) | `handle_player_contact` | STRONG INFERENCE | Iter 259: player overlap; contact record; definition +0x12 handler. |
-| `FUN_0001358c` (Pacific Conflict) | `contact_pair_hash` | VERIFIED | Iter 260: low byte of a ^ (b << 2). |
-| `FUN_000135a0` (Pacific Conflict) | `find_contact_record` | VERIFIED | Iter 260: linear probe of DAT_0001bdbc (256 slots) for (a, b). |
-| `FUN_000135e8` (Pacific Conflict) | `create_shape_contact_record` | STRONG INFERENCE | Iter 260: 0x10 + 6 * faces record for plain shapes. |
-| `FUN_0001383c` (Pacific Conflict) | `create_fractal_contact_record` | STRONG INFERENCE | Iter 260: 0x3e-byte record for fractal objects. |
-| `FUN_00013980` (Pacific Conflict) | `fractal_height_at` | STRONG INFERENCE | Iter 260: height of fractal terrain at relative (x, z). |
-| `FUN_00014198` (Pacific Conflict) | `handle_terrain_contact` | STRONG INFERENCE | Iter 260: sets player controller +0x2e ground height. |
-| `FUN_00013ee0` (Pacific Conflict) | `test_object_collision` | STRONG INFERENCE | Iter 261: summed-range check; fractal → test_terrain_collision; shape face sign flip + FUN_0001346c → FUN_00014348. |
-| `FUN_00013cdc` (Pacific Conflict) | `test_terrain_collision` | STRONG INFERENCE | Iter 261: a below fractal_height_at → FUN_00014348; sets controller +0x2e. |
-| `FUN_00013e4e` (Pacific Conflict) | `test_proximity_collision` | STRONG INFERENCE | Iter 261: flag 0x100000 on both; 3/4 distance below a range. Iter 322: `and.l` of both flag longs, `btst #20` [PROVEN]; bit 20 = distance-collision mode (see object flag long). |
-| `FUN_00013eae` (Pacific Conflict) | `test_player_vs_type0e_proximity` | STRONG INFERENCE | Iter 261: player vs template type 0xe. |
-| `FUN_00014348` (Pacific Conflict) | `dispatch_collision` | STRONG INFERENCE | Iter 262: definition +0x12 handlers; pair table DAT_0001b43c (10 × 8 bytes). |
-| `FUN_0001346c` (Pacific Conflict) | `point_in_face_by_axis` | STRONG INFERENCE | Iter 262: projects on yz / xz / xy by axis code, point-in-polygon. |
-| `FUN_00012fd2` (Pacific Conflict) | `point_in_polygon_xy` | VERIFIED | Iter 262: even-odd crossing test on words +2 / +6. |
-| `FUN_000167f4` (Pacific Conflict) | `bullet_hits_aircraft` | STRONG INFERENCE | Iter 263: 1/8: damage roll + retire bullet; player hit 1/2 → _DAT_0001b842. |
-| `FUN_0001665a` (Pacific Conflict) | `bullet_hits_shape` | STRONG INFERENCE | Iter 263: retire bullet; type 0x1b controller +0x46 = 1 at 1/16. |
-| `FUN_00016724` (Pacific Conflict) | `apply_random_aircraft_damage` | STRONG INFERENCE | Iter 263: one random damage bit in controller +0x684 (bit 15 set from the bullet word +0x36 [UNKNOWN meaning]). |
-| `FUN_000095ac` (Pacific Conflict) | `play_game_sound` | STRONG INFERENCE | Iter 264: priority (DAT_00024d10) play of slot n via host play_sample_on_channel. |
-| `FUN_000096ae` (Pacific Conflict) | `stop_game_sound` | STRONG INFERENCE | Iter 264: release_channel_loop(1) when n is current. |
-| `FUN_000096f4` (Pacific Conflict) | `update_game_sounds` | STRONG INFERENCE | Iter 264: per-frame event flags → sounds; engine sound from player +0x66a. |
-| `FUN_00011c58` (Pacific Conflict) | `spawn_effect` | STRONG INFERENCE | Iter 266: pool object DAT_0002626e[kind], init DAT_0001b40c[kind], explosion sound countdowns, event ring DAT_000260ee. |
-| `FUN_00010650` (Pacific Conflict) | `update_aircraft_damage_state` | STRONG INFERENCE | Iter 266: damage stages in +0x684; player bit 0 → A5-0x12b4 = 1 (Dead), Ugh. |
-| `FUN_00011b96` (Pacific Conflict) | `replay_logged_effects` | STRONG INFERENCE | Iter 267: DAT_0001b870 = -1 while re-spawning logged effects of the current frame. |
-| `FUN_00011c2c` (Pacific Conflict) | `mark_effect_log_end` | STRONG INFERENCE | Iter 267: 0x7fffffff frame sentinel. |
-| `FUN_00011b48` (Pacific Conflict) | `register_effect_template` | VERIFIED | Iter 267: fills DAT_0002626e[0..3]; then create handler := 0x11ade (+0x20 = FUN_00011afe). |
-| `FUN_0001203a` (Pacific Conflict) | `init_effect_kind0_flat_ring` | STRONG INFERENCE | Iter 268: kind 0: 6 vertices, x / z outward velocities; iter 286: water splash ring. |
-| `FUN_000120ca` (Pacific Conflict) | `init_effect_kind1_column` | STRONG INFERENCE | Iter 268: kind 1: 3 spreading vertices, vertex 2 rising (+0x76). |
-| `FUN_00011efc` (Pacific Conflict) | `init_effect_kind2_burst` | STRONG INFERENCE | Iter 268: kind 2: 12 vertices, jittered outward velocities. |
-| `FUN_0001217e` (Pacific Conflict) | `init_effect_kind3_debris_explosion` | STRONG INFERENCE | Iter 268: kind 3: kind-2 burst at size / 4 + 13 vertices with 3-D velocities. |
-| `FUN_00012768` (Pacific Conflict) | `tick_effect` | STRONG INFERENCE | Iter 269: animate DAT_0001b41c[kind]; lifetime +0x36; retire when done. |
-| `FUN_000123ce` (Pacific Conflict) | `animate_effect_kind0_ring` | STRONG INFERENCE | Iter 269: x / z expansion; kind-1 spawn at 0x47. |
-| `FUN_00012466` (Pacific Conflict) | `animate_effect_kind0_ring_tail` | PROVEN | Iter 269: false split of 0x123ce. |
-| `FUN_00012486` (Pacific Conflict) | `animate_effect_kind1_column` | STRONG INFERENCE | Iter 269: vertex 2 up with gravity 0x5b; ends below 0. |
-| `FUN_00012296` (Pacific Conflict) | `animate_effect_kind2_burst` | STRONG INFERENCE | Iter 269: velocities halved; faces darkened 6/8 at depth 8. |
-| `FUN_00012528` (Pacific Conflict) | `animate_effect_kind3_debris` | STRONG INFERENCE | Iter 269: gravity, ground clamp; FUN_000175de / FUN_000115fc at the end. |
-| `FUN_00012738` (Pacific Conflict) | `face_object_to_camera` | VERIFIED | Iter 269: attitude = −camera angles. |
-| `FUN_000127aa` (Pacific Conflict) | `effect_pre_render_hook` | STRONG INFERENCE | Iter 270: definition +0xe of effects; DAT_0001b42c[kind]. |
-| `FUN_000115fc` (Pacific Conflict) | `spawn_smoke_plume` | HYPOTHESIS | Iter 270: template DAT_000260e8; sizes +0x36 / +0x34; end frame +0x38. |
-| `FUN_000115da` (Pacific Conflict) | `register_smoke_template` | VERIFIED | Iter 270: DAT_000260e8 = template; create handler → 0x115b0. |
-| `FUN_00011670` (Pacific Conflict) | `attach_trailing_plume` | STRONG INFERENCE | Iter 270: plume linked to an aircraft (+0x3c), 8 trail points. |
-| `FUN_000175de` (Pacific Conflict) | `spawn_ground_mark` | HYPOTHESIS | Iter 270: template DAT_00026660 scaled, expiry +2700 frames. |
-| `FUN_0000a75e` (Pacific Conflict) | `transform_and_project_object` | STRONG INFERENCE | Iter 271: +0xe hook phases 1 / 2; vertices of faces with bit 0x20 → camera space → DAT_000256b2. |
-| `FUN_0000a676` (Pacific Conflict) | `project_prepared_object` | STRONG INFERENCE | Iter 271: projects +0x4c camera-space vertices; face bits 0x60. |
-| `FUN_0000ac72` (Pacific Conflict) | `render_visible_objects` | STRONG INFERENCE | Iter 271: per-frame draw of the visible list in three passes. |
-| `FUN_00009ae0` (Pacific Conflict) | `face_is_back_facing` | STRONG INFERENCE | Iter 272: stored normal vs camera vector, dot < 1. |
-| `FUN_00009da6` (Pacific Conflict) | `emit_faces_bsp` | STRONG INFERENCE | Iter 272: far child, node + chain, near child. |
-| `FUN_00009d34` (Pacific Conflict) | `emit_face_chain` | STRONG INFERENCE | Iter 272: front-facing faces of a +0x12 chain. |
-| `FUN_00009ef8` (Pacific Conflict) | `emit_faces_in_order` | STRONG INFERENCE | Iter 272: object +0x38 root faces with chains. |
-| `FUN_00009fc4` (Pacific Conflict) | `emit_faces_unnumbered` | STRONG INFERENCE | Iter 272: same, without draw-order numbers. |
-| `FUN_0000a2f2` (Pacific Conflict) | `submit_object_faces` | STRONG INFERENCE | Iter 272: output via *DAT_00020ab4; camera crossing a face → dispatch_collision. |
-| `FUN_0000a512` (Pacific Conflict) | `transform_face_vertices` | STRONG INFERENCE | Iter 273: transform / project unmarked vertices of one face. |
-| `FUN_0000b028` (Pacific Conflict) | `clip_face_near_plane` | STRONG INFERENCE | Iter 273: Sutherland-Hodgman at z = 5. |
-| `FUN_0000a16e` (Pacific Conflict) | `output_face_colour` | STRONG INFERENCE | Iter 273: DAT_00020ab4 at depth 8 / 4; screen clip, FUN_00009b8c. |
-| `FUN_0000a220` (Pacific Conflict) | `output_face_bw` | STRONG INFERENCE | Iter 273: DAT_00020ab4 at depth 1; screen clip, host add_polygon_edges. |
-| `FUN_00009b8c` (Pacific Conflict) | `add_face_edges_to_rows` | STRONG INFERENCE | Iter 274: 0x1c-byte edge records (pool DAT_0001b76c) sorted into DAT_0001eaac[row]. |
-| `FUN_0000a07e` (Pacific Conflict) | `track_ground_plane_horizon` | STRONG INFERENCE | Iter 274: DAT_0001bd90 corner bits, horizon edge DAT_0001bda0..94. |
-| `FUN_0000b4b6` (Pacific Conflict) | `draw_sky_and_ground` | STRONG INFERENCE | Iter 275: horizon edge scaled to window; colours host +0x18e / +0x190 by corner bits DAT_0001bd90. |
-| `FUN_0000b460` (Pacific Conflict) | `reset_background_rows` | STRONG INFERENCE | Iter 275: DAT_00020ad4 rows = (0, 1, DAT_0001b82a, DAT_0001daa0). |
-| `FUN_00002e14` (Pacific Conflict) | `scan_convert_edge_rows` | STRONG INFERENCE | Iter 276: row buckets DAT_0001eaac → active edges → runs in DAT_0001b794 / 798 by draw order. |
-| `FUN_0000d00c` (Pacific Conflict) | `update_view_readouts_and_overlays` | STRONG INFERENCE | Iter 277: readouts 0..3 cached in DAT_00025ff4, host +0x27a; else sky + HUD drawers. |
-| `FUN_0001443a` (Pacific Conflict) | `sort_group_parts_by_distance` | STRONG INFERENCE | Iter 277: per-part distance sort, haze blend, draw-order numbers. |
-| `FUN_0000c572` (Pacific Conflict) | `draw_gauge_needle` | STRONG INFERENCE | Iter 278: erase previous end (cache DAT_00025f4a / 92), draw via *DAT_0001da9c or host +0x272. |
-| `FUN_0000c664` (Pacific Conflict) | `update_altimeter_needles` | STRONG INFERENCE | Iter 278: instrument type 0, two hands. |
-| `FUN_0000c80c` (Pacific Conflict) | `update_airspeed_needle` | STRONG INFERENCE | Iter 278: type 1 from +0x62a. |
-| `FUN_0000c8d6` (Pacific Conflict) | `update_direction_needle` | STRONG INFERENCE | Iter 278: type 6 from DAT_0001d80e. |
-| `FUN_0000c948` (Pacific Conflict) | `update_climb_needle` | STRONG INFERENCE | Iter 278: type 3 from DAT_0001bc80 (rate of climb). |
-| `FUN_0000c9c2` (Pacific Conflict) | `update_tachometer_needle` | STRONG INFERENCE | Iter 278: type 5 from +0x66a (engine RPM). |
-| `FUN_0000ca44` (Pacific Conflict) | `update_manifold_needle` | STRONG INFERENCE | Iter 278: type 4 from +0x672. |
-| `FUN_0000cc12` (Pacific Conflict) | `update_flaps_needle` | STRONG INFERENCE | Iter 279: needle 10 from +0x67b. |
-| `FUN_0000ccca` (Pacific Conflict) | `update_gear_needles` | STRONG INFERENCE | Iter 279: needles 11..13 from +0x679. |
-| `FUN_0000ce1c` (Pacific Conflict) | `update_ammo_needle` | STRONG INFERENCE | Iter 279: needle 15 from +0x682 (675 rounds). |
-| `FUN_0000cec4` (Pacific Conflict) | `update_fuel_needles` | STRONG INFERENCE | Iter 279: needles 16 / 17 from +0x67d / +0x67e. |
-| `FUN_00017b68` (Pacific Conflict) | `update_radar_scope` | STRONG INFERENCE | Iter 279: tracked objects rotated by heading into the scope rectangle. |
-| `FUN_000176b2` (Pacific Conflict) | `add_radar_track` | VERIFIED | Iter 280: DAT_0001b51c[≤ 6] (x, z, two words, flag) when metric ≤ DAT_00026666. |
-| `FUN_0001776a` (Pacific Conflict) | `reset_radar_tracks` | VERIFIED | Iter 280: DAT_00026672 = DAT_00026676 = 0. |
-| `FUN_0000c1aa` (Pacific Conflict) | `update_heading_tape` | STRONG INFERENCE | Iter 280: strip at host +0x1b8 scrolled by DAT_0001d80e. |
-| `FUN_0000ba2a` (Pacific Conflict) | `draw_panel_frame_lines` | HYPOTHESIS | Iter 280: colour runs from host +0x238..+0x258. |
-| `FUN_0000fe96` (Pacific Conflict) | `aircraft_notice_object` | STRONG INFERENCE | Iter 281: aircraft definition +0x16; radar tracks for the player, target acquisition for AI. |
-| `FUN_0000b49e` (Pacific Conflict) | `reset_overlay_display_state` | STRONG INFERENCE | Iter 281: reset_background_rows, reset_radar_tracks, caches. |
-| `FUN_0000e0a4` (Pacific Conflict) | `aircraft_destroy` | STRONG INFERENCE | Iter 282: aircraft definition +0xa. |
-| `FUN_0000e0ce` (Pacific Conflict) | `aircraft_create` | STRONG INFERENCE | Iter 282: definition +6; player = first aircraft. |
-| `FUN_0000e5aa` (Pacific Conflict) | `aircraft_tick` | STRONG INFERENCE | Iter 282: definition +2; 75-frame replay ring at +0x36. |
-| `FUN_0000fe0a` (Pacific Conflict) | `aircraft_collision` | STRONG INFERENCE | Iter 282: definition +0x12; damage bit 0x400. |
-| `FUN_000110f4` (Pacific Conflict) | `ai_attack_or_fly` | STRONG INFERENCE | Iter 282: AI state 0x110d4 (+0x20). |
-| `FUN_00011182` (Pacific Conflict) | `ai_fly` | STRONG INFERENCE | Iter 282: AI state 0x11162 (+0x20). |
-| `FUN_0000dff0` (Pacific Conflict) | `init_aircraft_controller` | STRONG INFERENCE | Iter 283: 0x6b0 bytes; ammo 0x2a3, bombs 2, tanks def+0x1c/2, gear 0x2d. |
-| `FUN_0000df5e` (Pacific Conflict) | `fill_pose_history` | VERIFIED | Iter 283: 75 × 0x14 ring filled with a position. |
-| `FUN_0000fb2a` (Pacific Conflict) | `animate_landing_gear` | STRONG INFERENCE | Iter 283: aircraft definition +0xe; gear faces (+0x17 == 1) by +0x679. |
-| `FUN_0000f810` (Pacific Conflict) | `player_slew_mode` | STRONG INFERENCE | Iter 284: state 0xf7f0 (+0x20), control-S toggle; keypad axis moves with accelerating speed. |
-| `FUN_00012b66` (Pacific Conflict) | `apply_blast_damage` | STRONG INFERENCE | Iter 285: objects within blast radius destroyed / damaged (stack args). |
-| `FUN_00018956` (Pacific Conflict) | `spawn_object_shadow` | STRONG INFERENCE | Iter 285: template DAT_00026768[kind] linked to owner; hidden when +0xb0 == 0. |
-| `FUN_0001820a` (Pacific Conflict) | `ai_pursue_target` | STRONG INFERENCE | Iter 285: target pose delayed by DAT_0001b878 / 876 frames; manoeuvre +0x69a. |
-| `FUN_00011db4` (Pacific Conflict) | `spawn_destruction_effect` | STRONG INFERENCE | Iter 286: kind 2 in the air, kind 0 on water (0x10), kind 3 on ground. |
-| `FUN_00013452` (Pacific Conflict) | `surface_type_under_object` | STRONG INFERENCE | Iter 286: surface_type_at_point(object position). |
-| `FUN_00012a2a` (Pacific Conflict) | `ordnance_tick` | STRONG INFERENCE | Iter 287: definition key 0xc +2; replay ring +0x60e. |
-| `FUN_00012d34` (Pacific Conflict) | `ordnance_detonation` | STRONG INFERENCE | Iter 287: impact effect; host +0xcc / +0xd2 / +0xce; blast after 5 / 15 frames. |
-| `FUN_00018c96` (Pacific Conflict) | `tick_flak_gun` | STRONG INFERENCE | Iter 287: definition key 0x1a +2; timed bursts at +0x5a / +0xd2. |
-| `FUN_0001281e` (Pacific Conflict) | `register_ordnance_template` | VERIFIED | Iter 288: DAT_00026280 (spawn_weapon_entity template). |
-| `FUN_000127c6` (Pacific Conflict) | `create_ordnance_controller` | STRONG INFERENCE | Iter 288: 0x620 bytes, flags 0x122000, pose ring +0x32. |
-| `FUN_000128b6` (Pacific Conflict) | `ordnance_ballistic_step` | STRONG INFERENCE | Iter 288: speed +0x610, gravity -0x5b, impact bit 0x400 in +0x61c. |
-| `FUN_00012f52` (Pacific Conflict) | `ordnance_collision` | STRONG INFERENCE | Iter 288: impact; ship target → +0x616 direct hit. |
-| `FUN_00018b52` (Pacific Conflict) | `create_flak_controller` | STRONG INFERENCE | Iter 289: type 0x1a +6; range 0x26ac0. |
-| `FUN_00018b98` (Pacific Conflict) | `destroy_flak_controller` | VERIFIED | Iter 289: type 0x1a +0xa; drops +0x36 / +0x32 refs. |
-| `FUN_00016b4c` (Pacific Conflict) | `attach_smoke_trail` | STRONG INFERENCE | Iter 289: kind-0 trail; aircraft +0x68c count. |
-| `FUN_00016b9e` (Pacific Conflict) | `attach_burning_trail` | HYPOTHESIS | Iter 289: kind-1 trail; explosion sound countdowns. |
-| `FUN_00017102` (Pacific Conflict) | `attach_ground_fire` | HYPOTHESIS | Iter 289: FUN_000170ba object linked to owner. |
-| `FUN_000173fe` (Pacific Conflict) | `spawn_debris_fragment` | STRONG INFERENCE | Iter 289: template DAT_0002665c, random velocity, 45 frames. |
-| `FUN_00016ae8` (Pacific Conflict) | `spawn_trail` | STRONG INFERENCE | Iter 290: DAT_00026650[kind] + init DAT_0001b50c[kind]. |
-| `FUN_0001702a` (Pacific Conflict) | `tick_trail` | VERIFIED | Iter 290: animate DAT_0001b514[kind]; lifetime +0x34. |
-| `FUN_00016ac4` (Pacific Conflict) | `init_trail_kind0` | VERIFIED | Iter 290: 75 frames, state 1. |
-| `FUN_00016ad6` (Pacific Conflict) | `init_trail_kind1` | VERIFIED | Iter 290: 75 frames, state 1. |
-| `FUN_00016c6a` (Pacific Conflict) | `animate_smoke_trail` | STRONG INFERENCE | Iter 290: 4-vertex ribbon ±0x22 following a damaged aircraft. |
-| `FUN_00016e06` (Pacific Conflict) | `animate_burning_trail` | STRONG INFERENCE | Iter 290: ribbon ±100 following its owner. |
-| `FUN_000170ba` (Pacific Conflict) | `spawn_ground_fire_object` | VERIFIED | Iter 290: template DAT_00026658, +0x32 = 45. |
-| `FUN_00016a78` (Pacific Conflict) | `register_trail_templates` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00016a3a` (Pacific Conflict) | `create_trail_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00016c24` (Pacific Conflict) | `destroy_trail_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00017098` (Pacific Conflict) | `register_ground_fire_template` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_0001706a` (Pacific Conflict) | `create_ground_fire_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_0001713c` (Pacific Conflict) | `destroy_ground_fire_controller` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00017150` (Pacific Conflict) | `animate_ground_fire` | HYPOTHESIS | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00017380` (Pacific Conflict) | `tick_ground_fire` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000173dc` (Pacific Conflict) | `register_debris_template` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000173a2` (Pacific Conflict) | `create_debris_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000174c4` (Pacific Conflict) | `tick_debris_fragment` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_0001759e` (Pacific Conflict) | `register_ground_mark_template` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_00017566` (Pacific Conflict) | `create_ground_mark_controller` | STRONG INFERENCE | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000175c0` (Pacific Conflict) | `tick_ground_mark` | VERIFIED | Iter 291: effect-family handler (template / create / destroy / tick). |
-| `FUN_000168ae` (Pacific Conflict) | `impact_one_time_in_16` | HYPOTHESIS | Iter 292: 1/16 chance ordnance_collision. |
-| `FUN_000168d2` (Pacific Conflict) | `alloc_transformed_vertex_block` | VERIFIED | Iter 292: header + 12-byte points via template xform. |
-| `FUN_0001691c` (Pacific Conflict) | `alloc_copied_vertex_block` | VERIFIED | Iter 292: same, copied. |
-| `FUN_00016966` (Pacific Conflict) | `advance_route_waypoint` | STRONG INFERENCE | Iter 292: next waypoint within 5000. |
-| `FUN_00017d16` (Pacific Conflict) | `create_aircraft_spawner_controller` | STRONG INFERENCE | Iter 292: key 0x12 create; object kind unknown. |
-| `FUN_00017db8` (Pacific Conflict) | `destroy_aircraft_spawner_controller` | STRONG INFERENCE | Iter 292: releases 3 refs. |
-| `FUN_00017ffe` (Pacific Conflict) | `remove_mission_target` | STRONG INFERENCE | Iter 292: mission 7 target list, objective +0xce. |
-| `FUN_00017dd4` (Pacific Conflict) | `tick_aircraft_spawner` | STRONG INFERENCE | Iter 293: wave spawner, 1/512 chance when its aircraft are gone. |
-| `FUN_000162ba` (Pacific Conflict) | `draw_distant_object_dots` | STRONG INFERENCE | Iter 293: far objects as dots via DAT_0001da80. |
-| `FUN_00016128` (Pacific Conflict) | `plot_dot_depth4` | STRONG INFERENCE | Iter 293: nibble dot with saved background. |
-| `FUN_00016230` (Pacific Conflict) | `plot_dot_bw` | STRONG INFERENCE | Iter 293: square via host add_polygon_edges. |
-| `FUN_00015ebe` (Pacific Conflict) | `erase_dots_depth8` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00015f3e` (Pacific Conflict) | `plot_dot_depth8` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00015fb8` (Pacific Conflict) | `erase_dots_depth4` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00017780` (Pacific Conflict) | `erase_radar_blip_depth8` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00017868` (Pacific Conflict) | `erase_radar_blip_depth4` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00017948` (Pacific Conflict) | `draw_radar_blip_depth4` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00017a34` (Pacific Conflict) | `erase_radar_blip_bw` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00017a60` (Pacific Conflict) | `draw_radar_blip_bw` | STRONG INFERENCE | Iter 294: per-depth dot / radar blip routine. |
-| `FUN_00018040` (Pacific Conflict) | `create_wave_spawner_controller` | STRONG INFERENCE | Iter 295: key 0x14 create; mission 7 target list. |
-| `FUN_000180c8` (Pacific Conflict) | `tick_wave_spawner` | STRONG INFERENCE | Iter 295: key 0x14 tick; timed far-away aircraft launches. |
-| `FUN_000188f4` (Pacific Conflict) | `register_shadow_templates` | VERIFIED | Iter 295: shadow template slots. |
-| `FUN_000188ba` (Pacific Conflict) | `create_shadow_controller` | STRONG INFERENCE | Iter 295: 0x36-byte controller. |
-| `FUN_00018942` (Pacific Conflict) | `destroy_shadow_controller` | VERIFIED | Iter 295: owner reference. |
-| `FUN_000189d0` (Pacific Conflict) | `tick_shadow` | STRONG INFERENCE | Iter 295: key 5 tick; follows owner at ground height. |
-| `FUN_00018bba` (Pacific Conflict) | `flak_notice_object` | STRONG INFERENCE | Iter 295: key 0x1a +0x16; flak target pick. |
-| `FUN_0001940e` (Pacific Conflict) | `register_parachute_template` | VERIFIED | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_000193b6` (Pacific Conflict) | `create_parachute_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_00019938` (Pacific Conflict) | `parachute_tick` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_0001952e` (Pacific Conflict) | `parachute_descend` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_0001951a` (Pacific Conflict) | `destroy_parachute_controller` | VERIFIED | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_0001910e` (Pacific Conflict) | `register_turret_template` | VERIFIED | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_000190c0` (Pacific Conflict) | `create_turret_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_00019130` (Pacific Conflict) | `spawn_turret_on_object` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_00019394` (Pacific Conflict) | `turret_pre_render` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_00019b82` (Pacific Conflict) | `create_view_attached_controller` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_00019bbc` (Pacific Conflict) | `tick_view_attached_object` | STRONG INFERENCE | Iter 296: handler of definition key 0x1b / 0x1c / 0x1e. |
-| `FUN_000115b0` (Pacific Conflict) | `create_plume_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_000116e8` (Pacific Conflict) | `destroy_plume_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_000116fc` (Pacific Conflict) | `tick_smoke_plume` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_00011a90` (Pacific Conflict) | `plume_pre_render` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_00011afe` (Pacific Conflict) | `create_effect_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_00011aae` (Pacific Conflict) | `create_camera_facing_controller` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_00011ae6` (Pacific Conflict) | `face_camera_heading` | STRONG INFERENCE | Iter 297: handler of definition key 7 / 8 / 0xf. |
-| `FUN_0000e1e6` (Pacific Conflict) | `create_enemy_fighter` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
-| `FUN_0000e2a4` (Pacific Conflict) | `create_friendly_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
-| `FUN_0000e340` (Pacific Conflict) | `create_enemy_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
-| `FUN_000111ae` (Pacific Conflict) | `ai_fly_bomber` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
-| `FUN_000111da` (Pacific Conflict) | `ai_dive_at_target` | STRONG INFERENCE | Iter 298: aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
-| `FUN_000100bc` (Pacific Conflict) | `release_ai_target` | VERIFIED | Iter 299: AI / turret handler. |
-| `FUN_000100d4` (Pacific Conflict) | `enemy_fighter_notice_object` | STRONG INFERENCE | Iter 299: AI / turret handler. |
-| `FUN_000112e0` (Pacific Conflict) | `ai_bombing_run` | STRONG INFERENCE | Iter 299: AI / turret handler. |
-| `FUN_0001917c` (Pacific Conflict) | `tick_turret` | STRONG INFERENCE | Iter 299: AI / turret handler. |
-| `FUN_0000e262` (Pacific Conflict) | `spawn_enemy_fighter` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
-| `FUN_00011796` (Pacific Conflict) | `shape_free_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
-| `FUN_00011940` (Pacific Conflict) | `shape_trailing_plume` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
-| `FUN_00019a54` (Pacific Conflict) | `register_cloud_templates` | VERIFIED | Iter 300: spawn / plume / cloud handler. |
-| `FUN_00019a1a` (Pacific Conflict) | `create_cloud_controller` | STRONG INFERENCE | Iter 300: spawn / plume / cloud handler. |
-| `FUN_0000879e` (Pacific Conflict) | `resolve_bailout_outcome` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. Iter 336: VERIFIED; outcome 7; no-base odds are Dead 1/4 first, then POW 3/16. |
-| `FUN_00008972` (Pacific Conflict) | `update_bailout_view` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
-| `FUN_000088a0` (Pacific Conflict) | `place_camera_behind_object` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
-| `FUN_00008abe` (Pacific Conflict) | `turn_camera_toward_point` | STRONG INFERENCE | Iter 301: bail-out / camera / sound. |
-| `FUN_00009550` (Pacific Conflict) | `stop_all_sound_channels` | VERIFIED | Iter 301: bail-out / camera / sound. |
-| `FUN_0000923e` (Pacific Conflict) | `apply_player_mouse_controls` | STRONG INFERENCE | Iter 302: player input / camera. |
-| `FUN_00008ff4` (Pacific Conflict) | `begin_replay_view` | STRONG INFERENCE | Iter 302: player input / camera. |
-| `FUN_00008c30` (Pacific Conflict) | `update_tracking_camera` | STRONG INFERENCE | Iter 302: player input / camera. |
-| `FUN_00015bd4` (Pacific Conflict) | `register_bullet_template` | VERIFIED | Iter 303: bullet family / contact records. |
-| `FUN_00015b92` (Pacific Conflict) | `create_bullet_controller` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
-| `FUN_00015dc8` (Pacific Conflict) | `tick_bullet` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
-| `FUN_00015e62` (Pacific Conflict) | `bullet_pre_render` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
-| `FUN_00015d78` (Pacific Conflict) | `spawn_ordnance_oriented_3ang` | STRONG INFERENCE | Iter 303: bullet family / contact records. |
-| `FUN_0001377a` (Pacific Conflict) | `age_contact_records` | VERIFIED | Iter 303: bullet family / contact records. |
-| `FUN_000137da` (Pacific Conflict) | `drop_contact_records_for_object` | VERIFIED | Iter 303: bullet family / contact records. |
-| `FUN_0000c11e` (Pacific Conflict) | `begin_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
-| `FUN_0000c17e` (Pacific Conflict) | `end_offscreen_drawing` | HYPOTHESIS | Iter 304: panel helper. |
-| `FUN_0000cac6` (Pacific Conflict) | `update_bomb_indicator` | STRONG INFERENCE | Iter 304: panel helper. |
-| `FUN_0000cb62` (Pacific Conflict) | `update_throttle_gauge` | STRONG INFERENCE | Iter 304: panel helper. |
-| `FUN_0001a75e` (Pacific Conflict) | `c_strlen` | VERIFIED | Iter 304 (renamed from bounded_strlen in 315): panel helper. |
-| `FUN_0000d3bc` (Pacific Conflict) | `draw_line_depth8` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000d5b0` (Pacific Conflict) | `draw_line_depth4` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000d91a` (Pacific Conflict) | `restore_line_depth8` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000db60` (Pacific Conflict) | `restore_line_depth4` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000d27c` (Pacific Conflict) | `mark_view_overlays_drawn` | VERIFIED | Iter 305: line / frame output / pose ring. |
-| `FUN_0000d298` (Pacific Conflict) | `present_spans_to_window` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000d34c` (Pacific Conflict) | `present_bw_frame` | STRONG INFERENCE | Iter 305: line / frame output / pose ring. |
-| `FUN_0000df98` (Pacific Conflict) | `fill_pose_history_angles` | VERIFIED | Iter 305: line / frame output / pose ring. |
-| `FUN_0000dfd2` (Pacific Conflict) | `fill_pose_history_flags` | VERIFIED | Iter 305: line / frame output / pose ring. |
-| `FUN_0000bca8` (Pacific Conflict) | `copy_rect_depth4` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
-| `FUN_0000bfb0` (Pacific Conflict) | `copy_rect_depth8` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
-| `FUN_00014830` (Pacific Conflict) | `lift_object_onto_terrain` | STRONG INFERENCE | Iter 306: blit / terrain helper. |
-| `FUN_00011486` (Pacific Conflict) | `create_spinner_controller` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
-| `FUN_000114b4` (Pacific Conflict) | `spin_object_heading` | VERIFIED | Iter 307: definition handler / radar buttons. |
-| `FUN_00018a34` (Pacific Conflict) | `shadow_pre_render` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
-| `FUN_00017a8c` (Pacific Conflict) | `update_radar_range_buttons` | STRONG INFERENCE | Iter 307: definition handler / radar buttons. |
-| `FUN_00012f92` (Pacific Conflict) | `create_singleton_type10_controller` | HYPOTHESIS | Iter 307: definition handler / radar buttons. |
-| `FUN_00003cca` (Pacific Conflict) | `segment_point_min_distance` | PROVEN | Iter 308: from bytes; bisection of segment (start + word deltas) against a point. |
-| `FUN_0000e512` (Pacific Conflict) | `compute_template_force_from_626_tail` | PROVEN | Iter 308: false split inside FUN_0000e4a4. |
-| `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
-| `DAT_0001b86e` (Pacific Conflict) | instant-replay / end-sequence frame countdown (word; comment-only name replay_frames_left) | PROVEN (accesses) / STRONG_INFERENCE (name) | Iter 372: begin_replay_view = 0x69 (75 replay + 30 hold, with DAT_0001b870 = 1 and a 0x4b-frame camera glide); crash end hold = 0x1e (host +0x98 == 2, view mode 8, DAT_0001b870 = 3); update_tracking_camera subq.w each frame, <= 0x1e -> DAT_0001b870 = 3, at 0 decides the outcome (no crash -> -1; crash without parachute -> Dead; else resolve_bailout_outcome); process_flight_input_and_outcome returns to live (DAT_0001b870 = 0) when it is 0. All accesses are word ops (0x742a, 0x74f8, 0x7584, 0x75ae, 0x8efc, 0x8f6c, 0x8f72). |
-| `DAT_0001b86c` (Pacific Conflict) | pending instant-replay request (word: 0 none, 1 airborne, 2 on the ground) | PROVEN (accesses) / STRONG_INFERENCE (name) | Iter 374: set by request_instant_replay, consumed and cleared by begin_replay_view (camera side), cleared on respawn. |
-| host A5-0x12f0 (overlay host +0x98) | instant-replay state (word): 0 idle, 1 replay (File menu "Instant Replay", MENU 2 item 8 / ⌘I, or begin_replay_view), 2 crash end sequence (update_aircraft_damage_state, live) | PROVEN | Iter 375: MENU 2 item 8 text and handler; ID02 start_new_mission clears it; ID04 update_summary_dialog_buttons enables buttons only when 0; overlay process_flight_input_and_outcome / update_tracking_camera (reset to 0 at the end of the countdown). |
-| `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
-| `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
-| DAT_0001c9dc / DAT_0001c1d4 | visible object list / its count | STRONG INFERENCE | Iter 249. |
-| DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 | selected span-filler routines (address − 0x20) | STRONG INFERENCE | Iter 245. |
-| host +0x348 (A5−0x1040) | overlay heap arena (host NewPtrClear work buffer) | STRONG INFERENCE | Iter 243. |
-| host +0xae (A5−0x12da) | clouds option (spawn_cloud_layer) | STRONG INFERENCE | Iter 242. |
-| DAT_0001d860 / DAT_0001d864 | per-frame palette-slot usage maps (swapped by overlay_frame_step) | STRONG INFERENCE | Iter 240. |
-| DAT_0001bd88 / -8a / -8c | light direction vector (z / y / x components) | STRONG INFERENCE | Iter 239. |
-| host +0xaa (A5−0x12de) | haze option | STRONG INFERENCE | Iter 239. |
-| DAT_0001b5a0 + 0xe (Pacific Conflict) | host A5−0x137a pixel depth (1 / 4 / 8), not a mission mode | STRONG INFERENCE | Iter 237 correction. |
-| DAT_0001d838 / DAT_0001d834 / DAT_0001d830 | camera position x / y / z (copied from the player) | STRONG INFERENCE | Iter 234. |
-| Overlay hook slots A5−0x10a2 .. A5−0x104e | filled by overlay_main_entry (overlay address − 0x20) | STRONG INFERENCE | Iter 233: table in OVERLAY_SERVICE_TABLE.md. |
-| DAT_0001b5a0 (Pacific Conflict) | pointer to the host A5 world at A5−0x1388: overlay offset k = host A5−0x1388 + k | STRONG INFERENCE | Iter 232: mission, fuel, bombs, kills, friendly kills, bitmap handles and service slots all agree. |
-| DAT_00020aee / DAT_00020aec / DAT_00020aea / DAT_0001b73e | polygon clip rectangle x-min / x-max / y-min / y-max | STRONG INFERENCE | Iter 230. |
-| DAT_0001b5a0 +0xb6 / +0xb8 / +0xba.. / +0xd2 | mission fuel % / bombs / kill counters by type / friendly kills | STRONG INFERENCE | Iter 227. |
-| ID01 0x96 / 0xaa / 0xbe (JT $2a / $32 / $3a) | sparse word / sparse long / dense switch helpers | PROVEN | Iter 226. |
-| A5−0x2cc | depth of the palette currently attached | PROVEN | Iter 224. |
-| A5−0xc4e .. A5−0xc3e | MenuHandles of MENU 1..5 | PROVEN | Iter 223. |
-| HEL1 127 settings +0xe / +0x1c | view size option (1..4) / multi-monitor option | STRONG INFERENCE | Iter 222. |
-| A5−0x14ca / A5−0x14ae / A5−0x14aa | game window / palettes (13 and 217 entries) | STRONG INFERENCE | Iter 222. |
-| A5−0x137c / A5−0x137e | screen height / width (main device) | STRONG INFERENCE | Iter 221. |
-| A5−0x1358 / −0x1342 / −0x132c | display device records: main / right / left (0x16 bytes) | STRONG INFERENCE | Iter 220. |
-| A5−0x1036 | main GDHandle | PROVEN | Iter 220: GetMainDevice. |
-| A5−0xd62 | 20 sound slots (pointer 0x14 into a locked snd handle) | STRONG INFERENCE | Iter 218. |
-| ID09 JT $262 / $272 / $27a / $282 / $28a | RecoverHandle / HLock / HUnlock / HPurge / HNoPurge glue | PROVEN | Iter 218: trap words in ID09 0x250..0x294. |
-| A5−0x13ba / A5−0x13b8 | current foreground / background colour index (depth 1) | STRONG INFERENCE | Iter 217. |
-| A5−0x106e / −0x106a / −0x1086 | overlay hooks: start (rank) / key and event handler / optional poll | STRONG INFERENCE | Iter 216. |
-| A5−0x14fc / A5−0x1504 | frame counter / start tick of the flight | STRONG INFERENCE | Iter 216. |
-| A5−0x1082 / −0x107e / −0x107a / −0x1076 | overlay session hooks (begin / after memory / run / end) | STRONG INFERENCE | Iter 215. |
-| A5−0x12ee | sound enabled flag | STRONG INFERENCE | Iter 215: guards init_sound_system / shutdown_sound. |
-| A5−0x1508 | strtok save pointer | PROVEN | Iter 214. |
-| A5−0x1608 | C runtime ctype class table (256 bytes) | STRONG INFERENCE | Iter 213. |
-| A5−0x2118 / A5−0x211c | cosine / sine function pointers (4.12, 0x4000 per turn; copies of A5−0x1062 / −0x1066) | STRONG INFERENCE | Iter 211: dial_point_at_angle. |
-| A5−0x149e | panel design-unit scale (0.75 × half view width) | PROVEN formula | Iter 204: set by prepare_instrument_panel; used by scale_design_4800. |
-| A5−0x14a0 | "panel store failed" flag (alert in ID04 0x432) | PROVEN | Iter 203. |
-| A5−0x13ae / A5−0x211e | panel configuration index (HEL2 id offset; cache entry) / configuration of the loaded bitmaps | STRONG INFERENCE | Iter 203. |
-| A5−0x12b0 / −0x11f6 / −0x11dc / −0x11d4 / −0x13b2 | cached panel bitmaps "Bitmap" / "HorizonInstrument" / "GyroInstrument" / "GyroFlags" / "Bitmap Cache" (HEL2 resources) | PROVEN names | Iter 202: AddResource in ID03 0x5b5e..0x5d44. |
-| ID04 0x137a (unexported, JT $102) | `run_high_scores_dialog` | STRONG INFERENCE | Iter 201. |
-| ID04 0x3614 (unexported) | `track_map_bearing_and_distance` | STRONG INFERENCE | Iter 200. |
-| ID04 0x3976 (unexported, JT $10a) | `run_map_dialog` | STRONG INFERENCE | Iter 200: DLOG 137. |
-| A5−0x137a | screen pixel depth (1 / 4 / 8); 1 = black and white | PROVEN arithmetic | Iter 200, corrected iter 205: x / (8 / depth) byte offsets. |
-| A5−0x1382 / A5−0x1378 | screen base address / rowBytes | STRONG INFERENCE | Iter 205. |
-| A5−0x1056 / A5−0x105a | angle (atan2-like, 1/0x4000 turns) / square-root function pointers | HYPOTHESIS | Iter 200: map bearing / distance. |
-| HEL1 127 settings +0x26 | map scale (miles per grid square) | STRONG INFERENCE | Iter 199: " mi./grid" text. |
-| A5−0x1052 | map object plotter function pointer (scale, callback) -> Pacific Conflict plot_mission_map_symbols (FUN_00000954) | PROVEN call / STRONG INFERENCE target | Iter 199, target iter 229. |
-| ID04 0x644 (unexported, JT $132) | `run_duty_roster_dialog` | STRONG INFERENCE | Iter 198: DLOG 130 "Duty Roster". |
-| A5−0x225c | fuel load percentage (0..100) of the Scenario Selection / Refuel dialogs | STRONG INFERENCE | Iter 194: DITL 132 "Fuel: E F". |
-| ID04 0xe70 (unexported, JT $9a) | `run_refuel_dialog` | STRONG INFERENCE | Iter 195: DLOG 132 runner. |
-| ID04 0xc02 (unexported, JT $82) | `run_scenario_selection_dialog` | STRONG INFERENCE | Iter 196: DLOG 129 runner; returns mission or 0. |
-| HEL1 127 settings +0x1e / +0x20 / +0x22 / +0x24 | mission / pilot index / fuel % / bombs | STRONG INFERENCE | Iter 196: written by the Scenario Selection runner. |
-| Mission numbers 2..9 | Flight School, Bomb Base, Capture Island, Flying Fortress, Scramble!, Divine Wind, Flattop, The Duel | STRONG INFERENCE | Iter 196: radio item − 7; consistent with summary failure texts. |
-| A5−0x12d2 / A5−0x12d0 | flight fuel load percentage / bomb count (0..2) | STRONG INFERENCE | Iter 195: written by run_refuel_dialog. |
-| A5−0x2240 | bomb radio item list (3 words) | STRONG INFERENCE | Iter 195. |
-| ID04 0x2dc (unexported) | `set_radio_group_selection` | PROVEN | Iter 193: SetCtlValue(item == selected). |
-| ID04 0x1dde (unexported, JT $152) | `draw_mission_awards` | STRONG INFERENCE | Iter 187: record +0x26 bits -> cicn 512–519. |
-| ID04 0x1b3e (unexported, JT $15a) | `draw_rank_insignia` | STRONG INFERENCE | Iter 187: cicn 256 + rank. |
-| ID04 0x2104 (unexported, JT $ca) | `mission_summary_filter_proc` | STRONG INFERENCE | Iter 185: ModalDialog filter; comment block in ID04.decomp.c. |
-| ID04 0x21d6 (unexported) | `advance_mission_summary_text` | STRONG INFERENCE | Iter 185: state machine on A5-0x2222. |
-| A5−0x2222 / −0x2230 / −0x222c | summary text state / step delay (ticks) / last step tick | STRONG INFERENCE | Iter 185. |
-| ID02 0x2c8 / 0x2d8; ID09 0x416 | strcpy / strcat; C-to-Pascal string in place | PROVEN | Iter 185: bytes. |
-| A5−0x12ce | ten per-mission kill counters (one per target type) | STRONG INFERENCE | Iter 184: get_mission_kill_report_state; "No new kills to report." |
-| A5−0x12b4 / A5−0x14c4 | current pilot status / mission-over flag | STRONG INFERENCE | Iter 178. |
-| A5−0xffe / A5−0xfae / A5−0xf86 | rank / pilot-status / target-type string groups | PROVEN (dump) | Iter 176: STR#129 slots 94-99 / 100-105 / 106-115. |
-| HEL1 127 / HEL1 128 | "Hellcats Saved Settings" / "Player and Score Data" | PROVEN (dump names) | Iter 176. |
-| ALRT 258 "Error" ("^1 ^0.") | used by ID02 show_caution_alert_with_number | PROVEN (dump) | Iter 175. |
-| ID04 file 0x432 (unexported) | panel-store failure report (proposed) | PROVEN bytes | Iter 172: flag A5−0x14a0 → JT $462 + alert slot 1. |
+| `FUN_000007b0` / `00000598` / `00000666` / `00000512` / `0000087a` (ID06) | `init_raster_target` / `alloc_row_table` / `init_edge_pool` / `free_row_table` / `set_raster_target_base` | STRONG INFERENCE | ID06 rasterizer set-up; structures A5−0x1cce / −0x1cd2 / −0x1cd6. |
+| `FUN_000008a2` / `0000096e` / `000009d8` / `00000e10` / `0000026c` (ID06) | `set_active_row_count` / `reset_edge_table` / `add_polygon_edges` / `rasterize_and_present` / `init_row_table_fields` | STRONG INFERENCE | scanline polygon rasterizer API (service slots −0x1304/−0x1310/−0x130c/−0x1308). |
+| `FUN_00000318` (ID06) | `render_scanline_spans` | STRONG INFERENCE | priority span fill; in-code state at 0x39e..0x3e1. JT $192. |
+| `FUN_00000d84` / `FUN_00000dca` (ID06) | `rebase_edge_rows_for_band` / `restore_edge_rows_after_band` | STRONG INFERENCE | band row-counter adjustment. |
+| `FUN_000001dc` / `FUN_0000024c` (ID06) | `alloc_aligned_clear` / `free_aligned` | STRONG INFERENCE | aligned NewPtrClear with header; DisposPtr of raw pointer. |
+| `FUN_00000116` (ID06) | `rgb_to_bw_pattern` | STRONG INFERENCE | luma → pattern pointer (A5−0x1ed6, 64 × 8 bytes). |
+| `FUN_0000017c` / `FUN_000001a2` (ID06) | `lookup_colour_map` / `reverse_lookup_colour_map` | STRONG INFERENCE | 256-word map at *A5−0x1ede. |
+| `FUN_00000004` / `000000b0` / `000000f4` (ID06) | `init_pattern_tables` / `alloc_pattern_tables` / `get_pattern_table` | STRONG INFERENCE | mask + pattern table A5−0x1eda (0xc00), grey map A5−0x1ede (0x200). |
+| `FUN_00000916` / `00000942` / `00000d02` (ID06) | `get_raster_target_size` / `realloc_row_table` / `add_rect_polygon` | STRONG INFERENCE | — |
+| `FUN_00000056` / `0000008a` / `000000a6` (ID03) | `scale_design_480_min10` / `scale_design_4800` / `scale_design_4800_pen_centred` | STRONG INFERENCE | design-unit → screen scaling via A5−0x149e. |
+| `FUN_000000c8` / `000000f4` (ID03) | `max3_int` / `nearest_palette_index_rgb` | STRONG INFERENCE | — |
+| `FUN_00000006` / `000002a8` / `0000033c` (ID03) | `set_scaled_text_style` / `new_offscreen_bw_port` / `dispose_offscreen_bw_port` | STRONG INFERENCE | text style; 1-bit offscreen GrafPort create/dispose. |
+| `FUN_00000912` (ID03) | `draw_vector_number` | STRONG INFERENCE | stroke-font digits from A5−0x1fde. |
+| `FUN_0000035e` (ID03) | `draw_spinning_disc_indicator` | STRONG INFERENCE mechanics | grey disc + 4-phase rotating spoke (A5−0x2112), size A5−0x2114;  likely a bezel screw head (HYPOTHESIS). |
+| `FUN_00000514` (ID03) | `draw_ring_with_status_indicators` | STRONG INFERENCE mechanics | ring + up to 5 diagonal spinning indicators by flag bits. |
+| `FUN_00000a3c` (ID03) | `antialias_downsample_bw_3x` | STRONG INFERENCE | 3× Gaussian (7×7, /969) downsample of 1-bit bitmap into grey palette pixels. |
+| `FUN_00003c02` (ID03) | `draw_instrument` | STRONG INFERENCE | bezel + type-switch (0..9) to per-gauge drawers; record A5−0x12a2. |
+| `FUN_00001876` (ID03) | `draw_altimeter` | STRONG INFERENCE | instrument type 0; label STR#129[65] "ALTITUDE". |
+| `FUN_00001538` (ID03) | `begin_instrument_supersample` | STRONG INFERENCE | 1× or 3× B&W port for anti-aliased gauge drawing. |
+| `FUN_00001b48` (ID03) | `draw_airspeed_indicator` | STRONG INFERENCE | instrument type 1; label "AIR SPEED". |
+| `FUN_00002d1c` (ID03) | `draw_turn_and_bank_indicator` | STRONG INFERENCE | instrument type 2; label "TURN BANK". |
+| `FUN_00001fee` (ID03) | `draw_climb_indicator` | STRONG INFERENCE | instrument type 3; label "CLIMB". |
+| `FUN_00002600` (ID03) | `draw_manifold_pressure_gauge` | STRONG INFERENCE | instrument type 4; label "Manifold Pressure". |
+| `FUN_000022fe` (ID03) | `draw_tachometer` | STRONG INFERENCE | instrument type 5; label "RPM". |
+| `FUN_00002950` (ID03) | `draw_direction_indicator` | STRONG INFERENCE | instrument type 6; label "DIRECTION". |
+| `FUN_00004c42` / `00004ecc` / `0000532e` (ID03) | `draw_flaps_indicator` / `draw_ammo_counter` / `draw_fuel_gauge` | STRONG INFERENCE | labels STR#129 slots 75 / 76 / 77. |
+| `FUN_00003d42` (ID04) | `check_system_requirements` | STRONG INFERENCE | Color QD + 68020 check; JT $f2. |
+| `FUN_000003c2` (ID04) | `run_with_temporary_window` | STRONG INFERENCE mechanics | "Hellcats" window around ID02 0x2db8. |
+| `FUN_000004f0` / `00000516` / `00000560` (ID04) | `ask_save_changes` / `confirm_end_mission` / `confirm_erase_high_scores` | STRONG INFERENCE | CautionAlert 257 / 259 / 260 (texts from DITL dump). |
+| `FUN_00000588` (ID04) | `compute_pilot_score` | STRONG INFERENCE | Σ record +0x28 tallies × A5−0xf5e weights. |
+| `FUN_00000f4e` / `00001106` / `00001a0e` (ID04) | `rank_pilots_by_score` / `reset_pilot_record` / `build_rank_and_name_string` | STRONG INFERENCE |; see PILOT_ROSTER.md. |
+| `FUN_000031aa` (ID04) | `conclude_mission` | STRONG INFERENCE | mission-over flag + pilot status write; JT $da. |
+| `FUN_00003124` / `FUN_00003178` (ID04) | `play_named_sound_async` / `stop_named_sound` | STRONG INFERENCE | Sound Manager 'snd ' by name (A5−0x2128); channel A5−0x2152, handle A5−0x2156. |
+| `FUN_00002de6` (ID04) | `show_mission_summary_dialog` | STRONG INFERENCE | DLOG 133 "Mission Summary". |
+| `FUN_00000006` (ID04) | `disable_dialog_control` | PROVEN | bytes; HiliteControl 255. |
+| `FUN_0000002e` (ID04) | `enable_dialog_control` | PROVEN | bytes; HiliteControl 0. |
+| `FUN_00000054` (ID04) | `hide_dialog_control` | PROVEN | bytes; HideControl. |
+| `FUN_00000078` (ID04) | `show_dialog_control` | PROVEN | bytes; ShowControl. |
+| `FUN_0000009c` (ID04) | `set_dialog_item_text` | PROVEN | bytes; SetIText. |
+| `FUN_000000c4` (ID04) | `set_dialog_control_title` | PROVEN | bytes; SetCTitle. |
+| `FUN_000000ec` (ID04) | `set_dialog_user_item_proc` | PROVEN | bytes; SetDItem with a ProcPtr. |
+| `FUN_00000120` (ID04) | `frame_dialog_item_box` | PROVEN | bytes; InsetRect -2, PenSize 1, FrameRect. |
+| `FUN_0000016e` (ID04) | `draw_default_button_outline` | PROVEN | bytes; user item via JT $12a; item A5-0x225e; FrameRoundRect 16. |
+| `FUN_000001f2` (ID04) | `draw_grey_user_item` | PROVEN | bytes; user item via JT $142; FillRect gray A5-0x1624. |
+| `FUN_000017e6` (ID04) | `create_scrolling_text_item` | STRONG INFERENCE | bytes; TENew -> A5-0x223a; NewControl scrollBarProc -> A5-0x2236; user item JT $92. |
+| `FUN_0000189c` (ID04) | `dispose_scrolling_text_item` | PROVEN | bytes; TEDispose + DisposeControl. |
+| `FUN_000018b0` (ID04) | `append_line_to_scrolling_text` | STRONG INFERENCE | bytes; strlen (ID02 0x3e8) + TEInsert ×2 + 0x158c scroll update. |
+| `FUN_000014a0` (ID04) | `draw_scrolling_text_item` | PROVEN | bytes; EraseRect viewRect, TEUpdate, frame. |
+| `FUN_000014f2` (ID04) | `scrolling_text_user_item_proc` | PROVEN | bytes; Pascal user item, JT $92. |
+| `FUN_0000150e` (ID04) | `sync_text_scroll_to_control` | PROVEN | bytes; TEScroll by ctl value × lineHeight. |
+| `FUN_00001562` (ID04) | `update_scroll_bar_maximum` | PROVEN | bytes; SetCtlMax(nLines − visible). |
+| `FUN_0000158c` (ID04) | `scroll_text_to_show_selection` | STRONG INFERENCE | bytes; centre line holding selStart. |
+| `FUN_00001638` (ID04) | `fit_text_view_to_box` | PROVEN | bytes; viewRect = box − 16, whole lines, TECalText. |
+| `FUN_000016c4` (ID04) | `scroll_bar_action_proc` | PROVEN | bytes; JT $16a TrackControl action; parts 20..23; also documents unexported click handler 0x1752. |
+| `FUN_000018e0` (ID04) | `get_mission_kill_report_state` | STRONG INFERENCE | bytes; 0/1/2 from A5-0x12f8, -0x14c0, -0x12ba and ten kill words A5-0x12ce. |
+| `FUN_0000192e` (ID04) | `update_summary_dialog_buttons` | STRONG INFERENCE | bytes; enables items 1/3; moves default ring A5-0x225e to item 1. |
+| `FUN_00002d86` (ID04) | `set_score_item_text` | PROVEN | "Score: " + compute_pilot_score. |
+| `FUN_00001f5e` (ID04) | `draw_aircraft_kill_markers` | STRONG INFERENCE | tallies 0+1, red discs, under "Total Aircraft Destroyed". |
+| `FUN_000020e8` (ID04) | `aircraft_kill_markers_user_item_proc` | PROVEN | JT $ea user item. |
+| `FUN_00001bc8` (ID04) | `draw_targets_destroyed_row` | STRONG INFERENCE | per target type; skips 2/4/8; count and count × weight. |
+| A5−0xf5e | per-target-type point weights (words) | STRONG INFERENCE | count × weight in draw_targets_destroyed_row and compute_pilot_score. |
+| A5−0x2226 | pointer to the Mission Summary kill counts (local array) | PROVEN | set at ID04 0x2e00. |
+| A5−0x12ce | ten per-mission kill counters, cleared when added to the pilot tallies | PROVEN | summary state 3 (0x2a2e). |
+| A5−0x13a2 | ten per-type kill totals, incremented with the pilot tallies | STRONG INFERENCE | role beyond accumulation unknown. |
+| A5−0x1002 | resource file reference number used with UpdateResFile | STRONG INFERENCE | roster write-back. |
+| A5−0x2176 | summary kill-transfer index (target type) | PROVEN | — |
+| A5−0xfd6 | rank point thresholds (one long per rank) | STRONG INFERENCE | summary state 4 promotion. |
+| A5−0x2220 | Mission Summary argument word from conclude_mission; low byte 1 grants the mission award | PROVEN flow / HYPOTHESIS meaning | — |
+| A5−0x12f8 | current mission number; award bit = value − 3 | STRONG INFERENCE | summary state 2. |
+| A5−0x12b6 | friendly units destroyed this mission (≥ 5 → executed for treason) | STRONG INFERENCE | summary state 0. |
+| A5−0x12ba | mission objective state (> 0 done, 0 open, −1 failed by event, −2 original Hellcat lost) | STRONG INFERENCE | — |
+| A5−0x221e + 4k | STR# 129 slot 2 + k pointer group (outcome texts) | PROVEN |  (with ID07 init_string_pointer_groups). |
+| A5−0x21c6 / A5−0x21ca | summary line queue (string pointers) / cursor | PROVEN | states 0, 4, 5. |
+| `FUN_00001d9e` (ID04) | `draw_targets_destroyed_list` | PROVEN | JT $aa user item 6. |
+| `FUN_00000220` (ID04) | `draw_percent_bar_item` | PROVEN | bytes; percentage bar A5-0x225c (0..100), dkGray / white. |
+| `FUN_000002c0` (ID04) | `percent_bar_user_item_proc` | PROVEN | bytes; JT $8a user item; documents unexported set_radio_group_selection 0x2dc. |
+| `FUN_00000362` (ID04) | `get_radio_group_selection` | PROVEN | bytes; first set control of an item list, else -1. |
+| `FUN_00000a8e` (ID04) | `fuel_slider_dialog_filter` | STRONG INFERENCE | bytes; Return/Enter, slider tracking (StillDown/GetMouse), update events. |
+| `FUN_00000bda` (ID04) | `scenario_selection_filter_proc` | PROVEN | bytes; JT $112 filter, DLOG 129, slider item 5. |
+| `FUN_00000e48` (ID04) | `refuel_dialog_filter_proc` | PROVEN | bytes; JT $14a filter, DLOG 132, slider item 3. |
+| `FUN_000009ee` (ID04) | `draw_select_mission_title` | PROVEN | bytes; JT $11a user item 4 of DLOG 129; STR# 64 centred, size 24. |
+| `FUN_0000116a` (ID04) | `prune_inactive_pilots_beyond_ten` | STRONG INFERENCE | bytes; clears non-Active records after the best ten; WriteResource roster. |
+| `FUN_0000044e` (ID04) | `show_scenery_open_error_alert` | PROVEN | bytes; ParamText + StopAlert(256) "Unable to open Hellcats scenery file"; JT $fa. |
+| `FUN_00000478` (ID04) | `show_paused_dialog` | PROVEN | bytes; DLOG 131 "Paused", wait for key down + up; JT $122. |
+| `FUN_000005e4` (ID04) | `duty_roster_filter_proc` | PROVEN | bytes; JT $c2 filter; documents unexported run_duty_roster_dialog 0x644 (JT $132, DLOG 130). |
+| `FUN_00003260` (ID04) | `draw_map_grid_and_centre_mark` | PROVEN | bytes; 4 x 4 grid + centre cross; A5-0x214e = 1. |
+| `FUN_00003352` (ID04) | `plot_map_symbol_callback` | PROVEN | bytes; JT $72 callback: DrawChar at map coordinates (CurrentA5). |
+| `FUN_000033d6` (ID04) | `draw_map_view_item` | STRONG INFERENCE | bytes; blue sea, A5-0x1052(scale, JT $72), scale text " mi./grid" item 7. |
+| `FUN_000035f8` (ID04) | `map_view_user_item_proc` | PROVEN | bytes; JT $b2; documents unexported track_map_bearing_and_distance 0x3614. |
+| `FUN_00003902` (ID04) | `map_dialog_filter_proc` | PROVEN | bytes; JT $d2; documents unexported run_map_dialog 0x3976 (JT $10a, DLOG 137 zoom). |
+| `FUN_00003a56` (ID04) | `poll_click_or_key_event` | PROVEN | bytes; 1 for mouseDown / keyDown / autoKey. |
+| `FUN_00003a8c` (ID04) | `show_about_dialog` | STRONG INFERENCE | bytes; DLOG 127 / 138 (1-bit), vers 1 text; tail not decoded. |
+| `FUN_00001200` (ID04) | `draw_high_scores_table` | PROVEN | JT $e2; DLOG 134. |
+| `FUN_000032b8` (ID03) | `draw_gyro_instrument` | STRONG INFERENCE (HYPOTHESIS which gyro) | type 8; handles A5-0x11dc "GyroInstrument" / A5-0x11d4 "GyroFlags". |
+| `FUN_00003832` (ID03) | `make_inset_face_oval_region` | STRONG INFERENCE | oval region of the face inside the bezel. |
+| `FUN_000038fc` (ID03) | `draw_artificial_horizon` | STRONG INFERENCE | type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument". |
+| `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | PROVEN | AddResource HEL2 200–500 + config. |
+| `FUN_00005c36` (ID03) | `open_cport_on_buffer` | PROVEN | OpenCPort on a caller buffer (rowBytes, baseAddr, bounds). |
+| `FUN_00005cb6` (ID03) | `close_port_glue` | PROVEN | ClosePort. |
+| `FUN_00005cc4` (ID03) | `prepare_instrument_panel` | STRONG INFERENCE | JT $17a; panel scale A5-0x149e; Bitmap Cache lookup by display configuration. |
+| `FUN_00005860` (ID03) | `compute_panel_screen_addresses` | STRONG INFERENCE | screen byte addresses base + y*rowBytes + x/(8/depth). |
+| `FUN_00006c1c` (ID03) | `remap_cached_panel_colours` | STRONG INFERENCE | JT $182; re-colours a cached panel; palette indices via lookup_palette_index_for_rgb_level. |
+| `FUN_0000077e` (ID03) | `draw_vector_glyph_string_centred` | STRONG INFERENCE | centred stroke-font string; glyph table A5-0x20b0 (6 glyphs). |
+| `FUN_0000146a` (ID03) | `composite_instrument_bitmap` | PROVEN | CopyBits (1-bit) or antialias_downsample_bw_3x into the panel port A5-0x1496. |
+| `FUN_00001844` (ID03) | `finish_instrument_supersample` | PROVEN | SetPort(panel), composite, dispose_offscreen_bw_port. |
+| `FUN_00003f24` (ID03) | `draw_bevelled_frame` | STRONG INFERENCE | four shaded polygons between outer and inner rects. |
+| `FUN_00004110` (ID03) | `draw_numbered_bevel_box` | PROVEN | black box, bevel, vector-font number. |
+| `FUN_00004790` (ID03) | `draw_percent_scale_gauge` | STRONG INFERENCE | 0–100 vertical scale; role HYPOTHESIS. |
+| `FUN_00004b32` (ID03) | `draw_split_display_box` | STRONG INFERENCE | halves A5-0x119c / A5-0x1194. |
+| `FUN_00004304` (ID03) | `draw_panel_section_with_numbered_boxes` | STRONG INFERENCE mechanics | boxes 1 / 3 / 15; purpose UNKNOWN. |
+| `FUN_000054fe` (ID03) | `draw_landing_gear_indicator` | STRONG INFERENCE | STR# 78 "GEAR" label, three lamp positions A5-0x1174..-0x1164. |
+| `FUN_00005718` (ID03) | `dial_point_at_angle` | STRONG INFERENCE | degrees -> 1/0x4000 turn; cos A5-0x2118 / sin A5-0x211c, 4.12. |
+| `FUN_00005158` (ID03) | `draw_arc_scale_ticks` | STRONG INFERENCE | 10-degree arc ticks via cos / sin pointers; documents unexported gauge 0x532e. |
+| `FUN_000071a2` (ID03) | `remap_panel_colours_identity` | STRONG INFERENCE | identity 256-entry table -> remap_cached_panel_colours. |
+| `FUN_00000038`..`FUN_000002ee` (ID02) | `ansi_div` … `ansi_strcmp` (20 C runtime functions) | PROVEN / STRONG INFERENCE | complete Ghidra C; ctype masks. |
+| `FUN_0000030c`..`FUN_00000412` (ID02) | `ansi_strchr` … `ansi_strncat` (9 string functions) | PROVEN | — |
+| `FUN_0000045a` (ID02) | `begin_overlay_session` | STRONG INFERENCE mechanics | UnloadSeg 4, memory + sound, hooks A5-0x1082 / -0x107e; documents end_overlay_session 0x4a4. |
+| `FUN_000004c6` (ID02) | `ensure_free_memory_and_init_sound` | PROVEN | FreeMem < 500000 -> MaxMem; init_sound_system. |
+| `FUN_00000930` (ID02) | `call_overlay_session_hooks` | PROVEN | hooks A5-0x1082, -0x107e, -0x107a(a, b), -0x1076. |
+| `FUN_000004fc` (ID02) | `run_flight_session` | STRONG INFERENCE | game loop around the overlay. |
+| `FUN_0000150a` (ID02) | `get_blended_fill_pattern` | STRONG INFERENCE | depth 1: dither of the fg / bg colour average; else gray. |
+| `FUN_000016aa` (ID02) | `draw_view_frame_outline` | STRONG INFERENCE mechanics | outline of the design rect x ±3200, y 670..2400. |
+| `FUN_00001dd4` (ID02) | `show_sound_error_dialog_once` | PROVEN | DLOG 139 "Sound Error", once (A5-0xd12). |
+| `FUN_00001e32` (ID02) | `show_creating_panel_dialog` | PROVEN | DLOG 128 "Creating Instrument Panel". |
+| `FUN_00001e68` (ID02) | `release_sound_slots` | PROVEN | 20 slots A5-0xd62: RecoverHandle(p - 0x14), HPurge, HUnlock. |
+| `FUN_00001edc` (ID02) | `load_named_sound_into_slot` | PROVEN | GetNamedResource snd, memory check 0x3000, purgeable, slot store. |
+| `FUN_00001f8e` (ID02) | `load_game_sounds` | STRONG INFERENCE | loads 11 named sounds into slots; memory-dependent slot 0; error dialog. |
+| `FUN_000020be` (ID02) | `lock_sound_slots` | PROVEN | HLock + slot = *h + 0x14. |
+| `FUN_0000212a` (ID02) | `reset_overlay_state` | HYPOTHESIS name | clears overlay data areas, calls overlay entry (A5-0x1388, TickCount). |
+| `FUN_0000435e` (ID02) | `position_window_on_screen` | PROVEN | centre horizontally, 1/3 down under the menu bar, MoveWindow. |
+| `FUN_00002192` (ID02) | `scan_display_devices` | STRONG INFERENCE | main / right / left monitors. |
+| `FUN_000027e4` (ID02) | `configure_display_from_main_device` | STRONG INFERENCE | — |
+| `FUN_000029f2` (ID02) | `refresh_display_if_changed` | PROVEN | — |
+| `FUN_00002334` (ID02) | `layout_game_window_and_view` | STRONG INFERENCE | — |
+| `FUN_000030fa` (ID02) | `install_menus` | PROVEN | MENU 1..5, Apple menu DRVR, DrawMenuBar. |
+| `FUN_00003174` (ID02) | `update_menu_items` | STRONG INFERENCE | FrontWindow DA test, enable / disable items. |
+| `FUN_00003590` (ID02) | `set_menu_item_enabled` | PROVEN | EnableItem / DisableItem, DrawMenuBar for item 0. |
+| `FUN_000035bc` (ID02) | `set_view_size_option` | PROVEN | settings +0xe, relayout. |
+| `FUN_0000442e` (ID02) | `position_alert_template` | PROVEN | JT $47a; centres ALRT template rect. |
+| `FUN_00004582` (ID02) | `centre_window_on_screen` | PROVEN | JT $472; MoveWindow centred. |
+| `FUN_00004610` (ID02) | `detach_window_palette` | PROVEN | SetPalette(window, NULL). |
+| `FUN_0000462c` (ID02) | `select_palette_for_depth` | PROVEN | palette + RGB table per depth 1 / 4 / 8. |
+| `FUN_00002ee4` (ID02) | `copy_pascal_string` | PROVEN | length byte + bytes. |
+| `FUN_000035e4` (ID02) | `start_new_mission` | STRONG INFERENCE | roster + scenario dialogs, reset mission state, run_flight_session. |
+| `FUN_00004d6a` (ID02) | `handle_update_event` | PROVEN | JT $492; Begin/EndUpdate around redraw_main_window; documents restore_screen_globals 0x4d96. |
+| `FUN_00000110`..`FUN_000001c2` (ID01) | `rt_udiv32`, `rt_umod32`, `rt_sdiv32`, `rt_smod32`, `rt_sdivmod32_core`, `rt_udivmod32_core` | PROVEN | 32-bit divide runtime. |
+| `FUN_00000334` (Pacific Conflict) | `any_mission_kills_recorded` | STRONG INFERENCE | 12 kill words DAT_0001b5a0+0xba..+0xd0. |
+| `FUN_000003fa` (Pacific Conflict) | `load_player_fuel_and_bombs` | STRONG INFERENCE | fuel % +0xb6 -> two tanks +0x67d/+0x67e; bombs +0xb9 -> +0x67c. |
+| `FUN_00000488` (Pacific Conflict) | `tally_destroyed_entity` | STRONG INFERENCE | kill counter +0xb8 + 2*type; friendly kills +0xd2. |
+| `FUN_000004f8` (Pacific Conflict) | `transform_through_node_chain` | STRONG INFERENCE | hierarchical transform of an object through its parent nodes. |
+| `FUN_000005fa` (Pacific Conflict) | `traverse_scene_tree` | STRONG INFERENCE | recursive scene graph walk with callback. |
+| `FUN_000006a6` (Pacific Conflict) | `for_each_mission_scene_object` | STRONG INFERENCE | walk from the current mission scene root. |
+| `FUN_000006ec` (Pacific Conflict) | `collect_map_features` | STRONG INFERENCE | scene visitor: land outlines (hook +0x292), type-0x70 list, facility 0x12/0x13 list. |
+| `FUN_00000954` (Pacific Conflict) | `plot_mission_map_symbols` | STRONG INFERENCE | target of host A5-0x1052; plots A / B / C / T. |
+| `FUN_0000b190` (Pacific Conflict) | `clip_polygon_x_min` | PROVEN | x >= DAT_00020aee. |
+| `FUN_0000b242` (Pacific Conflict) | `clip_polygon_x_max` | PROVEN | x <= DAT_00020aec. |
+| `FUN_0000b2f4` (Pacific Conflict) | `clip_polygon_y_min` | STRONG INFERENCE | y >= DAT_00020aea. |
+| `FUN_0000b3aa` (Pacific Conflict) | `clip_polygon_y_max` | STRONG INFERENCE | y <= DAT_0001b73e. |
+| `FUN_00000aba` (Pacific Conflict) | `nearest_type80_centroid_visitor` | STRONG INFERENCE mechanics | nearest face centroid of type-0x80 objects. |
+| `FUN_00000bea` (Pacific Conflict) | `point_near_camera_or_type80_object` | HYPOTHESIS name | metric thresholds 0x33900 / 0x40741. |
+| `FUN_00000c4c` (Pacific Conflict) | `anchor_point_visitor` | STRONG INFERENCE mechanics | kind-1 node pose or nearest ground airfield point. |
+| `FUN_00000d6a` (Pacific Conflict) | `find_anchor_point` | HYPOTHESIS name | mode 0 / 1 over the scene. |
+| `FUN_00000db0` (Pacific Conflict) | `ensure_handle_allocated` | STRONG INFERENCE | NewHandleClear / realloc when purged, HNoPurge. |
+| `FUN_00000e0a` (Pacific Conflict) | `lock_handle_nopurge` | STRONG INFERENCE | HLock + HNoPurge. |
+| `FUN_00000e32` (Pacific Conflict) | `unlock_handle_purgeable` | STRONG INFERENCE | HUnlock + HPurge. |
+| `FUN_00000e5a` (Pacific Conflict) | `lock_overlay_buffers` | STRONG INFERENCE | HLock of the four panel bitmap handles. |
+| `FUN_00000ea0` (Pacific Conflict) | `allocate_session_buffers` | STRONG INFERENCE | host hook A5-0x1082. |
+| `FUN_00000f92` (Pacific Conflict) | `lock_session_buffers` | STRONG INFERENCE | host hook A5-0x107e. |
+| `FUN_00001094` (Pacific Conflict) | `unlock_session_buffers` | STRONG INFERENCE | host hook A5-0x1076. |
+| `FUN_00001112` (Pacific Conflict) | `overlay_main_entry` | STRONG INFERENCE | installs the overlay hook table A5-0x10a2..-0x104e. |
+| `FUN_00003ac4` (Pacific Conflict) | `start_mission_scene` | STRONG INFERENCE | hook A5-0x109a; scene entry, anchor point, camera. |
+| `FUN_0000739a` (Pacific Conflict) | `copy_player_pose_to_camera` | STRONG INFERENCE | camera position / angles from the player. |
+| `FUN_00006598` (Pacific Conflict) | `overlay_frame_step` | STRONG INFERENCE | hook A5-0x107a per frame; body partly decoded. |
+| `FUN_00007310` (Pacific Conflict) | `begin_flight_for_rank` | STRONG INFERENCE | hook A5-0x106e; rank table DAT_0001b2b4. |
+| `FUN_00006ed6` (Pacific Conflict) | `update_view_clip_bounds` | STRONG INFERENCE | hook A5-0x109e; view half height, clip y-max DAT_0001b73e. |
+| `FUN_000038f4` (Pacific Conflict) | `respawn_player_at_anchor` | STRONG INFERENCE | hook A5-0x108a; player back on the nearest airfield. |
+| `FUN_0000740a` (Pacific Conflict) | `process_flight_input_and_outcome` | STRONG INFERENCE | key handler + outcome code. |
+| `FUN_00006ff6` (Pacific Conflict) | `configure_renderer_for_display` | STRONG INFERENCE | — |
+| `FUN_00004210` (Pacific Conflict) | `refresh_object_colours_for_depth` | STRONG INFERENCE | hook A5-0x1096; per-depth object colouring. |
+| `FUN_000041ec` (Pacific Conflict) | `recolour_kind2_object` | HYPOTHESIS name | kind-2 objects: FUN_00003da8 + FUN_00003ea0. |
+| `FUN_00004916` (Pacific Conflict) | `set_object_faces_bw_pattern` | STRONG INFERENCE | face +4 = host pattern table [index]. |
+| `FUN_00003da8` (Pacific Conflict) | `update_object_distance_band` | STRONG INFERENCE | band +0x30 from thresholds DAT_0001b190. |
+| `FUN_00003e02` (Pacific Conflict) | `update_record_distance_band` | STRONG INFERENCE | same for record +4. |
+| `FUN_00003e5c` (Pacific Conflict) | `snapshot_face_colours` | HYPOTHESIS name | copy face colours after the face list. |
+| `FUN_00003ea0` (Pacific Conflict) | `shade_object_faces` | STRONG INFERENCE | flat shading with light vector, haze blend at depth 8. |
+| `FUN_0000147a` (Pacific Conflict) | `queue_face_palette_entry` | STRONG INFERENCE | owner table + pending ColorSpec at host +0x72. |
+| `FUN_00001548` (Pacific Conflict) | `write_face_palette_slot` | STRONG INFERENCE | queue + mark slot on other monitors. |
+| `FUN_0000159e` (Pacific Conflict) | `assign_face_colour` | STRONG INFERENCE | depth 1 luminance pattern, depth 4 table, depth 8 dynamic palette slot (200, round-robin). |
+| `FUN_000011e6` (Pacific Conflict) | `widen_printf_format` | PROVEN | %d -> %ld, %x -> %lx into DAT_00020b4c. |
+| `FUN_00001254` (Pacific Conflict) | `overlay_printf` | STRONG INFERENCE | host service +0x262 (A5-0x1126). |
+| `FUN_00001294` (Pacific Conflict) | `reset_palette_owner_tables` | STRONG INFERENCE | 0x400-byte owner tables per device. |
+| `FUN_00001300` (Pacific Conflict) | `init_depth8_colour_state` | STRONG INFERENCE | depth-8 set-up. |
+| `FUN_0000131c` (Pacific Conflict) | `init_depth4_colour_state` | STRONG INFERENCE | depth-4 set-up from device records. |
+| `FUN_0000640c` (Pacific Conflict) | `spawn_cloud_layer` | STRONG INFERENCE | hook A5-0x104e; ten camera-relative objects or retire type 0x1d. |
+| `FUN_00019aa2` (Pacific Conflict) | `spawn_camera_relative_object` | STRONG INFERENCE | pool spawn at camera + offset. |
+| `FUN_00019b30` (Pacific Conflict) | `follow_camera_offset` | STRONG INFERENCE | keep object at camera + offset. |
+| `FUN_000018d6` (Pacific Conflict) | `overlay_initialise` | STRONG INFERENCE | RNG seed, subsystem init, light vector. |
+| `FUN_00001958` (Pacific Conflict) | `heap_sbrk` | STRONG INFERENCE | arena = host A5-0x1040 work buffer. |
+| `FUN_00001974` (Pacific Conflict) | `heap_new_size_class_block` | STRONG INFERENCE | 1 << n bytes, header = class. |
+| `FUN_0000199a` (Pacific Conflict) | `heap_add_large_block` | STRONG INFERENCE | n * 8 bytes into the large-block list. |
+| `FUN_000019b0` (Pacific Conflict) | `heap_add_large_block_tail` | STRONG INFERENCE | false split of heap_add_large_block. |
+| `FUN_00003732` (Pacific Conflict) | `overlay_init_noop` | PROVEN | empty. |
+| `FUN_00003734` (Pacific Conflict) | `init_code_pointer_tables` | STRONG INFERENCE mechanics | two 2048-entry code-address tables. |
+| `FUN_00003266` (Pacific Conflict) | `init_span_table_32ba` | STRONG INFERENCE mechanics | self-modifying table at 0x3242. |
+| `FUN_00003412` (Pacific Conflict) | `init_span_table_3466` | STRONG INFERENCE mechanics | table at 0x33ee. |
+| `FUN_000035b4` (Pacific Conflict) | `init_span_table_3608` | STRONG INFERENCE mechanics | table at 0x3590. |
+| `FUN_0001771a` (Pacific Conflict) | `set_view_distance` (: actually the radar range) | VERIFIED | range + 2 * range. |
+| `FUN_00017736` (Pacific Conflict) | `cycle_view_distance` | VERIFIED | Tab key: 0xc15c0 / 0x26ac0 / 0xce40. |
+| `FUN_000032ba` (Pacific Conflict) | `fill_span_rows_4bit_a` | STRONG INFERENCE | depth-4 run-list span filler. |
+| `FUN_00003466` (Pacific Conflict) | `fill_span_rows_4bit_b` | STRONG INFERENCE | variant b. |
+| `FUN_00003608` (Pacific Conflict) | `fill_span_rows_4bit_c` | STRONG INFERENCE | variant c. |
+| `FUN_000037b4` (Pacific Conflict) | `fill_span_rows_8bit` | STRONG INFERENCE | depth-8 span filler via the 2048-entry code tables. |
+| `FUN_00001b4c` (Pacific Conflict) | `heap_zero_payload_tail` | STRONG INFERENCE | false split. |
+| `FUN_00001be4` (Pacific Conflict) | `heap_realloc_grow_only_tail` | STRONG INFERENCE | false split. |
+| `FUN_00001c04` (Pacific Conflict) | `copy_object_vertex_buffer` | STRONG INFERENCE | +0x44 -> +0x4c, 12-byte vertices. |
+| `FUN_00002e12` (Pacific Conflict) | `noop_stub_2e12` | PROVEN | empty. |
+| `FUN_00004e06` (Pacific Conflict) | `reset_object_to_template_pose` | STRONG INFERENCE | position from the scene template, template chain transform. |
+| `FUN_00004e4e` (Pacific Conflict) | `reset_object_to_template_pose_tail` | STRONG INFERENCE | false split. |
+| `FUN_00006e74` (Pacific Conflict) | `reset_span_row_lists` | STRONG INFERENCE | one background span per row. |
+| `FUN_00006ece` (Pacific Conflict) | `clear_flag_00020ae4` | PROVEN | one store. |
+| `FUN_0000823e` (Pacific Conflict) | `process_flight_input_tail` | STRONG INFERENCE | false split of the key handler. |
+| `FUN_00008784` (Pacific Conflict) | `request_instant_replay` (was `set_state_word_1b86c`) | STRONG INFERENCE / VERIFIED | 2 / 1 by argument;  sets the pending instant-replay request DAT_0001b86c (1 airborne, 2 on the ground). |
+| `FUN_00005832` (Pacific Conflict) | `dispatch_overlap_collisions` | STRONG INFERENCE | 1-D sweep over metric +/- radius, type handler +0x16;  VERIFIED; walks the bit-15 list DAT_0001c1e4 (count DAT_0001c1c4), range +0xc, +0x28 scratch. |
+| `FUN_000058ec` (Pacific Conflict) | `build_visible_object_list` | STRONG INFERENCE | view-space transform and pyramid cull into DAT_0001c9dc. |
+| `FUN_000053f8` (Pacific Conflict) | `collect_near_objects` | STRONG INFERENCE | active array: view candidates, deactivation / retirement. |
+| `FUN_0000555a` (Pacific Conflict) | `collect_far_objects` | STRONG INFERENCE (name) / VERIFIED | world array: view candidates, collision list;  DAT_0001c1e4 gets flag bit 15, not "!0x2800"; 0x2800 = mover side of the sweep; retires out-of-range objects older than 0x4b frames. |
+| `FUN_00005a14` (Pacific Conflict) | `update_altitude_detail_bands` | STRONG INFERENCE | power-of-two altitude band, tables DAT_0001b214 / DAT_0001b264, land rebuild. |
+| `FUN_00004958` (Pacific Conflict) | `build_land_outline_at_detail` | STRONG INFERENCE | drops vertices within tolerance, clips, de-duplicates into template vertex table. |
+| `FUN_00005e28` (Pacific Conflict) | `update_ground_scatter_objects` | STRONG INFERENCE | 64 ground points DAT_0001b924, 7 object slots DAT_0001bc64, gated by +0xac and height < 0x26ad. |
+| `FUN_00013346` (Pacific Conflict) | `surface_type_at_point` | STRONG INFERENCE | face code (+0x16) of nearby land face containing (x, z); default DAT_0001bda8+0x16. |
+| `FUN_00013070` (Pacific Conflict) | `point_in_polygon_xz` | VERIFIED | even-odd crossing test on vertex words +2 / +10. |
+| `FUN_0001310e` (Pacific Conflict) | `point_in_polygon_yz` | VERIFIED | same on +6 / +10. |
+| `FUN_0001320a` (Pacific Conflict) | `project_face_vertices_xz` | VERIFIED | (v >> shift) - origin into +2 / +10. |
+| `FUN_000131ac` (Pacific Conflict) | `project_face_vertices_xy` | VERIFIED | into +2 / +6. |
+| `FUN_00013268` (Pacific Conflict) | `project_face_vertices_yz` | VERIFIED | into +6 / +10. |
+| `FUN_00014af2` (Pacific Conflict) | `release_fractal_reference` | STRONG INFERENCE | decrements / frees shared block +0x2c; "Deactivating Fractal" message. |
+| `FUN_000132c8` (Pacific Conflict) | `point_over_face_xz` | STRONG INFERENCE | entity x / z origin, project_face_vertices_xz + point_in_polygon_xz. |
+| `FUN_00014bea` (Pacific Conflict) | `carry_attached_objects` | STRONG INFERENCE | rotates / lowers or removes nearby entities of template types 7 / 8 / 0x1a / 0x1b. |
+| `FUN_0001562e` (Pacific Conflict) | `clip_polygon_y_nonneg` | STRONG INFERENCE | clip against y = 0 (keep y >= 0), returns clipped flag. |
+| `FUN_00015762` (Pacific Conflict) | `sink_object_shape_at_waterline` | STRONG INFERENCE | rotated / lowered template shape, faces clipped at y = 0. |
+| `FUN_00014d86` (Pacific Conflict) | `step_sinking_object` | STRONG INFERENCE | timed sink steps; on completion removes riders, tallies, mission +0xce. |
+| `FUN_00015580` (Pacific Conflict) | `create_sinking_controller` | STRONG INFERENCE | 0x56-byte record, +4 = DAT_0001b524[key], interval 3, object flags 0x102000. |
+| `FUN_000155d8` (Pacific Conflict) | `tick_sinking_controller` | STRONG INFERENCE | step_sinking_object when +0x4c != 0. |
+| `FUN_00014f48` (Pacific Conflict) | `apply_hit_to_sinkable_object` | STRONG INFERENCE | decrements hits +0x32, random list / capsize rates, schedules 15 sinking steps. |
+| `FUN_0001530e` (Pacific Conflict) | `create_firing_ship_controller` | STRONG INFERENCE | 300-byte controller, 20 shots. |
+| `FUN_00015356` (Pacific Conflict) | `tick_firing_ship_controller` | STRONG INFERENCE | random spawn_weapon_entity from faces with +0x17 == 1; sinking afterwards. |
+| `FUN_000150c8` (Pacific Conflict) | `create_carrier_controller` (was `create_flagship_controller`) | PROVEN (identity, ) | create entry of definition key 0x15 (table at runtime 0x1aa5e); 0x56-byte record; first in _DAT_0001b864;  renamed; type 0x15 = carrier, string "Can't find deck tag on carrier" at 0x15134. |
+| `FUN_000155ec` (Pacific Conflict) | `create_basic_ship_controller` | STRONG INFERENCE | create entry of keys 0x18 / 0x17; 0x50-byte record. |
+| `FUN_000092e4` (Pacific Conflict) | `advance_frame_and_tick_controllers` | STRONG INFERENCE | DAT_0001b838++, appear / expiry flags 0x40 / 0x42, ticks DAT_0001c25c via definition +2. |
+| `FUN_0000947c` (Pacific Conflict) | `apply_controller_velocities` | STRONG INFERENCE | saves position, adds controller +8..+0x10 velocity. |
+| `FUN_000094d2` (Pacific Conflict) | `tick_flagged_object_controllers` | STRONG INFERENCE | DAT_0001b870 == 3: ticks only objects with +5 & 4. |
+| `FUN_0001429c` (Pacific Conflict) | `handle_player_contact` | STRONG INFERENCE | player overlap; contact record; definition +0x12 handler. |
+| `FUN_0001358c` (Pacific Conflict) | `contact_pair_hash` | VERIFIED | low byte of a ^ (b << 2). |
+| `FUN_000135a0` (Pacific Conflict) | `find_contact_record` | VERIFIED | linear probe of DAT_0001bdbc (256 slots) for (a, b). |
+| `FUN_000135e8` (Pacific Conflict) | `create_shape_contact_record` | STRONG INFERENCE | 0x10 + 6 * faces record for plain shapes. |
+| `FUN_0001383c` (Pacific Conflict) | `create_fractal_contact_record` | STRONG INFERENCE | 0x3e-byte record for fractal objects. |
+| `FUN_00013980` (Pacific Conflict) | `fractal_height_at` | STRONG INFERENCE | height of fractal terrain at relative (x, z). |
+| `FUN_00014198` (Pacific Conflict) | `handle_terrain_contact` | STRONG INFERENCE | sets player controller +0x2e ground height. |
+| `FUN_00013ee0` (Pacific Conflict) | `test_object_collision` | STRONG INFERENCE | summed-range check; fractal → test_terrain_collision; shape face sign flip + FUN_0001346c → FUN_00014348. |
+| `FUN_00013cdc` (Pacific Conflict) | `test_terrain_collision` | STRONG INFERENCE | a below fractal_height_at → FUN_00014348; sets controller +0x2e. |
+| `FUN_00013e4e` (Pacific Conflict) | `test_proximity_collision` | STRONG INFERENCE | flag 0x100000 on both; 3/4 distance below a range;  `and.l` of both flag longs, `btst #20` [PROVEN]; bit 20 = distance-collision mode (see object flag long). |
+| `FUN_00013eae` (Pacific Conflict) | `test_player_vs_type0e_proximity` | STRONG INFERENCE | player vs template type 0xe. |
+| `FUN_00014348` (Pacific Conflict) | `dispatch_collision` | STRONG INFERENCE | definition +0x12 handlers; pair table DAT_0001b43c (10 × 8 bytes). |
+| `FUN_0001346c` (Pacific Conflict) | `point_in_face_by_axis` | STRONG INFERENCE | projects on yz / xz / xy by axis code, point-in-polygon. |
+| `FUN_00012fd2` (Pacific Conflict) | `point_in_polygon_xy` | VERIFIED | even-odd crossing test on words +2 / +6. |
+| `FUN_000167f4` (Pacific Conflict) | `bullet_hits_aircraft` | STRONG INFERENCE | 1/8: damage roll + retire bullet; player hit 1/2 → _DAT_0001b842. |
+| `FUN_0001665a` (Pacific Conflict) | `bullet_hits_shape` | STRONG INFERENCE | retire bullet; type 0x1b controller +0x46 = 1 at 1/16. |
+| `FUN_00016724` (Pacific Conflict) | `apply_random_aircraft_damage` | STRONG INFERENCE | one random damage bit in controller +0x684 (bit 15 set from the bullet word +0x36 [UNKNOWN meaning]). |
+| `FUN_000095ac` (Pacific Conflict) | `play_game_sound` | STRONG INFERENCE | priority (DAT_00024d10) play of slot n via host play_sample_on_channel. |
+| `FUN_000096ae` (Pacific Conflict) | `stop_game_sound` | STRONG INFERENCE | release_channel_loop(1) when n is current. |
+| `FUN_000096f4` (Pacific Conflict) | `update_game_sounds` | STRONG INFERENCE | per-frame event flags → sounds; engine sound from player +0x66a. |
+| `FUN_00011c58` (Pacific Conflict) | `spawn_effect` | STRONG INFERENCE | pool object DAT_0002626e[kind], init DAT_0001b40c[kind], explosion sound countdowns, event ring DAT_000260ee. |
+| `FUN_00010650` (Pacific Conflict) | `update_aircraft_damage_state` | STRONG INFERENCE | damage stages in +0x684; player bit 0 → A5-0x12b4 = 1 (Dead), Ugh. |
+| `FUN_00011b96` (Pacific Conflict) | `replay_logged_effects` | STRONG INFERENCE | DAT_0001b870 = -1 while re-spawning logged effects of the current frame. |
+| `FUN_00011c2c` (Pacific Conflict) | `mark_effect_log_end` | STRONG INFERENCE | 0x7fffffff frame sentinel. |
+| `FUN_00011b48` (Pacific Conflict) | `register_effect_template` | VERIFIED | fills DAT_0002626e[0..3]; then create handler:= 0x11ade (+0x20 = FUN_00011afe). |
+| `FUN_0001203a` (Pacific Conflict) | `init_effect_kind0_flat_ring` | STRONG INFERENCE | kind 0: 6 vertices, x / z outward velocities: water splash ring. |
+| `FUN_000120ca` (Pacific Conflict) | `init_effect_kind1_column` | STRONG INFERENCE | kind 1: 3 spreading vertices, vertex 2 rising (+0x76). |
+| `FUN_00011efc` (Pacific Conflict) | `init_effect_kind2_burst` | STRONG INFERENCE | kind 2: 12 vertices, jittered outward velocities. |
+| `FUN_0001217e` (Pacific Conflict) | `init_effect_kind3_debris_explosion` | STRONG INFERENCE | kind 3: kind-2 burst at size / 4 + 13 vertices with 3-D velocities. |
+| `FUN_00012768` (Pacific Conflict) | `tick_effect` | STRONG INFERENCE | animate DAT_0001b41c[kind]; lifetime +0x36; retire when done. |
+| `FUN_000123ce` (Pacific Conflict) | `animate_effect_kind0_ring` | STRONG INFERENCE | x / z expansion; kind-1 spawn at 0x47. |
+| `FUN_00012466` (Pacific Conflict) | `animate_effect_kind0_ring_tail` | PROVEN | false split of 0x123ce. |
+| `FUN_00012486` (Pacific Conflict) | `animate_effect_kind1_column` | STRONG INFERENCE | vertex 2 up with gravity 0x5b; ends below 0. |
+| `FUN_00012296` (Pacific Conflict) | `animate_effect_kind2_burst` | STRONG INFERENCE | velocities halved; faces darkened 6/8 at depth 8. |
+| `FUN_00012528` (Pacific Conflict) | `animate_effect_kind3_debris` | STRONG INFERENCE | gravity, ground clamp; FUN_000175de / FUN_000115fc at the end. |
+| `FUN_00012738` (Pacific Conflict) | `face_object_to_camera` | VERIFIED | attitude = −camera angles. |
+| `FUN_000127aa` (Pacific Conflict) | `effect_pre_render_hook` | STRONG INFERENCE | definition +0xe of effects; DAT_0001b42c[kind]. |
+| `FUN_000115fc` (Pacific Conflict) | `spawn_smoke_plume` | HYPOTHESIS | template DAT_000260e8; sizes +0x36 / +0x34; end frame +0x38. |
+| `FUN_000115da` (Pacific Conflict) | `register_smoke_template` | VERIFIED | DAT_000260e8 = template; create handler → 0x115b0. |
+| `FUN_00011670` (Pacific Conflict) | `attach_trailing_plume` | STRONG INFERENCE | plume linked to an aircraft (+0x3c), 8 trail points. |
+| `FUN_000175de` (Pacific Conflict) | `spawn_ground_mark` | HYPOTHESIS | template DAT_00026660 scaled, expiry +2700 frames. |
+| `FUN_0000a75e` (Pacific Conflict) | `transform_and_project_object` | STRONG INFERENCE | +0xe hook phases 1 / 2; vertices of faces with bit 0x20 → camera space → DAT_000256b2. |
+| `FUN_0000a676` (Pacific Conflict) | `project_prepared_object` | STRONG INFERENCE | projects +0x4c camera-space vertices; face bits 0x60. |
+| `FUN_0000ac72` (Pacific Conflict) | `render_visible_objects` | STRONG INFERENCE | per-frame draw of the visible list in three passes. |
+| `FUN_00009ae0` (Pacific Conflict) | `face_is_back_facing` | STRONG INFERENCE | stored normal vs camera vector, dot < 1. |
+| `FUN_00009da6` (Pacific Conflict) | `emit_faces_bsp` | STRONG INFERENCE | far child, node + chain, near child. |
+| `FUN_00009d34` (Pacific Conflict) | `emit_face_chain` | STRONG INFERENCE | front-facing faces of a +0x12 chain. |
+| `FUN_00009ef8` (Pacific Conflict) | `emit_faces_in_order` | STRONG INFERENCE | object +0x38 root faces with chains. |
+| `FUN_00009fc4` (Pacific Conflict) | `emit_faces_unnumbered` | STRONG INFERENCE | same, without draw-order numbers. |
+| `FUN_0000a2f2` (Pacific Conflict) | `submit_object_faces` | STRONG INFERENCE | output via *DAT_00020ab4; camera crossing a face → dispatch_collision. |
+| `FUN_0000a512` (Pacific Conflict) | `transform_face_vertices` | STRONG INFERENCE | transform / project unmarked vertices of one face. |
+| `FUN_0000b028` (Pacific Conflict) | `clip_face_near_plane` | STRONG INFERENCE | Sutherland-Hodgman at z = 5. |
+| `FUN_0000a16e` (Pacific Conflict) | `output_face_colour` | STRONG INFERENCE | DAT_00020ab4 at depth 8 / 4; screen clip, FUN_00009b8c. |
+| `FUN_0000a220` (Pacific Conflict) | `output_face_bw` | STRONG INFERENCE | DAT_00020ab4 at depth 1; screen clip, host add_polygon_edges. |
+| `FUN_00009b8c` (Pacific Conflict) | `add_face_edges_to_rows` | STRONG INFERENCE | 0x1c-byte edge records (pool DAT_0001b76c) sorted into DAT_0001eaac[row]. |
+| `FUN_0000a07e` (Pacific Conflict) | `track_ground_plane_horizon` | STRONG INFERENCE | DAT_0001bd90 corner bits, horizon edge DAT_0001bda0..94. |
+| `FUN_0000b4b6` (Pacific Conflict) | `draw_sky_and_ground` | STRONG INFERENCE | horizon edge scaled to window; colours host +0x18e / +0x190 by corner bits DAT_0001bd90. |
+| `FUN_0000b460` (Pacific Conflict) | `reset_background_rows` | STRONG INFERENCE | DAT_00020ad4 rows = (0, 1, DAT_0001b82a, DAT_0001daa0). |
+| `FUN_00002e14` (Pacific Conflict) | `scan_convert_edge_rows` | STRONG INFERENCE | row buckets DAT_0001eaac → active edges → runs in DAT_0001b794 / 798 by draw order. |
+| `FUN_0000d00c` (Pacific Conflict) | `update_view_readouts_and_overlays` | STRONG INFERENCE | readouts 0..3 cached in DAT_00025ff4, host +0x27a; else sky + HUD drawers. |
+| `FUN_0001443a` (Pacific Conflict) | `sort_group_parts_by_distance` | STRONG INFERENCE | per-part distance sort, haze blend, draw-order numbers. |
+| `FUN_0000c572` (Pacific Conflict) | `draw_gauge_needle` | STRONG INFERENCE | erase previous end (cache DAT_00025f4a / 92), draw via *DAT_0001da9c or host +0x272. |
+| `FUN_0000c664` (Pacific Conflict) | `update_altimeter_needles` | STRONG INFERENCE | instrument type 0, two hands. |
+| `FUN_0000c80c` (Pacific Conflict) | `update_airspeed_needle` | STRONG INFERENCE | type 1 from +0x62a. |
+| `FUN_0000c8d6` (Pacific Conflict) | `update_direction_needle` | STRONG INFERENCE | type 6 from DAT_0001d80e. |
+| `FUN_0000c948` (Pacific Conflict) | `update_climb_needle` | STRONG INFERENCE | type 3 from DAT_0001bc80 (rate of climb). |
+| `FUN_0000c9c2` (Pacific Conflict) | `update_tachometer_needle` | STRONG INFERENCE | type 5 from +0x66a (engine RPM). |
+| `FUN_0000ca44` (Pacific Conflict) | `update_manifold_needle` | STRONG INFERENCE | type 4 from +0x672. |
+| `FUN_0000cc12` (Pacific Conflict) | `update_flaps_needle` | STRONG INFERENCE | needle 10 from +0x67b. |
+| `FUN_0000ccca` (Pacific Conflict) | `update_gear_needles` | STRONG INFERENCE | needles 11..13 from +0x679. |
+| `FUN_0000ce1c` (Pacific Conflict) | `update_ammo_needle` | STRONG INFERENCE | needle 15 from +0x682 (675 rounds). |
+| `FUN_0000cec4` (Pacific Conflict) | `update_fuel_needles` | STRONG INFERENCE | needles 16 / 17 from +0x67d / +0x67e. |
+| `FUN_00017b68` (Pacific Conflict) | `update_radar_scope` | STRONG INFERENCE | tracked objects rotated by heading into the scope rectangle. |
+| `FUN_000176b2` (Pacific Conflict) | `add_radar_track` | VERIFIED | DAT_0001b51c[≤ 6] (x, z, two words, flag) when metric ≤ DAT_00026666. |
+| `FUN_0001776a` (Pacific Conflict) | `reset_radar_tracks` | VERIFIED | DAT_00026672 = DAT_00026676 = 0. |
+| `FUN_0000c1aa` (Pacific Conflict) | `update_heading_tape` | STRONG INFERENCE | strip at host +0x1b8 scrolled by DAT_0001d80e. |
+| `FUN_0000ba2a` (Pacific Conflict) | `draw_panel_frame_lines` | HYPOTHESIS | colour runs from host +0x238..+0x258. |
+| `FUN_0000fe96` (Pacific Conflict) | `aircraft_notice_object` | STRONG INFERENCE | aircraft definition +0x16; radar tracks for the player, target acquisition for AI. |
+| `FUN_0000b49e` (Pacific Conflict) | `reset_overlay_display_state` | STRONG INFERENCE | reset_background_rows, reset_radar_tracks, caches. |
+| `FUN_0000e0a4` (Pacific Conflict) | `aircraft_destroy` | STRONG INFERENCE | aircraft definition +0xa. |
+| `FUN_0000e0ce` (Pacific Conflict) | `aircraft_create` | STRONG INFERENCE | definition +6; player = first aircraft. |
+| `FUN_0000e5aa` (Pacific Conflict) | `aircraft_tick` | STRONG INFERENCE | definition +2; 75-frame replay ring at +0x36. |
+| `FUN_0000fe0a` (Pacific Conflict) | `aircraft_collision` | STRONG INFERENCE | definition +0x12; damage bit 0x400. |
+| `FUN_000110f4` (Pacific Conflict) | `ai_attack_or_fly` | STRONG INFERENCE | AI state 0x110d4 (+0x20). |
+| `FUN_00011182` (Pacific Conflict) | `ai_fly` | STRONG INFERENCE | AI state 0x11162 (+0x20). |
+| `FUN_0000dff0` (Pacific Conflict) | `init_aircraft_controller` | STRONG INFERENCE | 0x6b0 bytes; ammo 0x2a3, bombs 2, tanks def+0x1c/2, gear 0x2d. |
+| `FUN_0000df5e` (Pacific Conflict) | `fill_pose_history` | VERIFIED | 75 × 0x14 ring filled with a position. |
+| `FUN_0000fb2a` (Pacific Conflict) | `animate_landing_gear` | STRONG INFERENCE | aircraft definition +0xe; gear faces (+0x17 == 1) by +0x679. |
+| `FUN_0000f810` (Pacific Conflict) | `player_slew_mode` | STRONG INFERENCE | state 0xf7f0 (+0x20), control-S toggle; keypad axis moves with accelerating speed. |
+| `FUN_00012b66` (Pacific Conflict) | `apply_blast_damage` | STRONG INFERENCE | objects within blast radius destroyed / damaged (stack args). |
+| `FUN_00018956` (Pacific Conflict) | `spawn_object_shadow` | STRONG INFERENCE | template DAT_00026768[kind] linked to owner; hidden when +0xb0 == 0. |
+| `FUN_0001820a` (Pacific Conflict) | `ai_pursue_target` | STRONG INFERENCE | target pose delayed by DAT_0001b878 / 876 frames; manoeuvre +0x69a. |
+| `FUN_00011db4` (Pacific Conflict) | `spawn_destruction_effect` | STRONG INFERENCE | kind 2 in the air, kind 0 on water (0x10), kind 3 on ground. |
+| `FUN_00013452` (Pacific Conflict) | `surface_type_under_object` | STRONG INFERENCE | surface_type_at_point(object position). |
+| `FUN_00012a2a` (Pacific Conflict) | `ordnance_tick` | STRONG INFERENCE | definition key 0xc +2; replay ring +0x60e. |
+| `FUN_00012d34` (Pacific Conflict) | `ordnance_detonation` | STRONG INFERENCE | impact effect; host +0xcc / +0xd2 / +0xce; blast after 5 / 15 frames. |
+| `FUN_00018c96` (Pacific Conflict) | `tick_flak_gun` | STRONG INFERENCE | definition key 0x1a +2; timed bursts at +0x5a / +0xd2. |
+| `FUN_0001281e` (Pacific Conflict) | `register_ordnance_template` | VERIFIED | DAT_00026280 (spawn_weapon_entity template). |
+| `FUN_000127c6` (Pacific Conflict) | `create_ordnance_controller` | STRONG INFERENCE | 0x620 bytes, flags 0x122000, pose ring +0x32. |
+| `FUN_000128b6` (Pacific Conflict) | `ordnance_ballistic_step` | STRONG INFERENCE | speed +0x610, gravity -0x5b, impact bit 0x400 in +0x61c. |
+| `FUN_00012f52` (Pacific Conflict) | `ordnance_collision` | STRONG INFERENCE | impact; ship target → +0x616 direct hit. |
+| `FUN_00018b52` (Pacific Conflict) | `create_flak_controller` | STRONG INFERENCE | type 0x1a +6; range 0x26ac0. |
+| `FUN_00018b98` (Pacific Conflict) | `destroy_flak_controller` | VERIFIED | type 0x1a +0xa; drops +0x36 / +0x32 refs. |
+| `FUN_00016b4c` (Pacific Conflict) | `attach_smoke_trail` | STRONG INFERENCE | kind-0 trail; aircraft +0x68c count. |
+| `FUN_00016b9e` (Pacific Conflict) | `attach_burning_trail` | HYPOTHESIS | kind-1 trail; explosion sound countdowns. |
+| `FUN_00017102` (Pacific Conflict) | `attach_ground_fire` | HYPOTHESIS | FUN_000170ba object linked to owner. |
+| `FUN_000173fe` (Pacific Conflict) | `spawn_debris_fragment` | STRONG INFERENCE | template DAT_0002665c, random velocity, 45 frames. |
+| `FUN_00016ae8` (Pacific Conflict) | `spawn_trail` | STRONG INFERENCE | DAT_00026650[kind] + init DAT_0001b50c[kind]. |
+| `FUN_0001702a` (Pacific Conflict) | `tick_trail` | VERIFIED | animate DAT_0001b514[kind]; lifetime +0x34. |
+| `FUN_00016ac4` (Pacific Conflict) | `init_trail_kind0` | VERIFIED | 75 frames, state 1. |
+| `FUN_00016ad6` (Pacific Conflict) | `init_trail_kind1` | VERIFIED | 75 frames, state 1. |
+| `FUN_00016c6a` (Pacific Conflict) | `animate_smoke_trail` | STRONG INFERENCE | 4-vertex ribbon ±0x22 following a damaged aircraft. |
+| `FUN_00016e06` (Pacific Conflict) | `animate_burning_trail` | STRONG INFERENCE | ribbon ±100 following its owner. |
+| `FUN_000170ba` (Pacific Conflict) | `spawn_ground_fire_object` | VERIFIED | template DAT_00026658, +0x32 = 45. |
+| `FUN_00016a78` (Pacific Conflict) | `register_trail_templates` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_00016a3a` (Pacific Conflict) | `create_trail_controller` | STRONG INFERENCE | effect-family handler (template / create / destroy / tick). |
+| `FUN_00016c24` (Pacific Conflict) | `destroy_trail_controller` | STRONG INFERENCE | effect-family handler (template / create / destroy / tick). |
+| `FUN_00017098` (Pacific Conflict) | `register_ground_fire_template` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_0001706a` (Pacific Conflict) | `create_ground_fire_controller` | STRONG INFERENCE | effect-family handler (template / create / destroy / tick). |
+| `FUN_0001713c` (Pacific Conflict) | `destroy_ground_fire_controller` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_00017150` (Pacific Conflict) | `animate_ground_fire` | HYPOTHESIS | effect-family handler (template / create / destroy / tick). |
+| `FUN_00017380` (Pacific Conflict) | `tick_ground_fire` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_000173dc` (Pacific Conflict) | `register_debris_template` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_000173a2` (Pacific Conflict) | `create_debris_controller` | STRONG INFERENCE | effect-family handler (template / create / destroy / tick). |
+| `FUN_000174c4` (Pacific Conflict) | `tick_debris_fragment` | STRONG INFERENCE | effect-family handler (template / create / destroy / tick). |
+| `FUN_0001759e` (Pacific Conflict) | `register_ground_mark_template` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_00017566` (Pacific Conflict) | `create_ground_mark_controller` | STRONG INFERENCE | effect-family handler (template / create / destroy / tick). |
+| `FUN_000175c0` (Pacific Conflict) | `tick_ground_mark` | VERIFIED | effect-family handler (template / create / destroy / tick). |
+| `FUN_000168ae` (Pacific Conflict) | `impact_one_time_in_16` | HYPOTHESIS | 1/16 chance ordnance_collision. |
+| `FUN_000168d2` (Pacific Conflict) | `alloc_transformed_vertex_block` | VERIFIED | header + 12-byte points via template xform. |
+| `FUN_0001691c` (Pacific Conflict) | `alloc_copied_vertex_block` | VERIFIED | same, copied. |
+| `FUN_00016966` (Pacific Conflict) | `advance_route_waypoint` | STRONG INFERENCE | next waypoint within 5000. |
+| `FUN_00017d16` (Pacific Conflict) | `create_aircraft_spawner_controller` | STRONG INFERENCE | key 0x12 create; object kind unknown. |
+| `FUN_00017db8` (Pacific Conflict) | `destroy_aircraft_spawner_controller` | STRONG INFERENCE | releases 3 refs. |
+| `FUN_00017ffe` (Pacific Conflict) | `remove_mission_target` | STRONG INFERENCE | mission 7 target list, objective +0xce. |
+| `FUN_00017dd4` (Pacific Conflict) | `tick_aircraft_spawner` | STRONG INFERENCE | wave spawner, 1/512 chance when its aircraft are gone. |
+| `FUN_000162ba` (Pacific Conflict) | `draw_distant_object_dots` | STRONG INFERENCE | far objects as dots via DAT_0001da80. |
+| `FUN_00016128` (Pacific Conflict) | `plot_dot_depth4` | STRONG INFERENCE | nibble dot with saved background. |
+| `FUN_00016230` (Pacific Conflict) | `plot_dot_bw` | STRONG INFERENCE | square via host add_polygon_edges. |
+| `FUN_00015ebe` (Pacific Conflict) | `erase_dots_depth8` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00015f3e` (Pacific Conflict) | `plot_dot_depth8` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00015fb8` (Pacific Conflict) | `erase_dots_depth4` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00017780` (Pacific Conflict) | `erase_radar_blip_depth8` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00017868` (Pacific Conflict) | `erase_radar_blip_depth4` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00017948` (Pacific Conflict) | `draw_radar_blip_depth4` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00017a34` (Pacific Conflict) | `erase_radar_blip_bw` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00017a60` (Pacific Conflict) | `draw_radar_blip_bw` | STRONG INFERENCE | per-depth dot / radar blip routine. |
+| `FUN_00018040` (Pacific Conflict) | `create_wave_spawner_controller` | STRONG INFERENCE | key 0x14 create; mission 7 target list. |
+| `FUN_000180c8` (Pacific Conflict) | `tick_wave_spawner` | STRONG INFERENCE | key 0x14 tick; timed far-away aircraft launches. |
+| `FUN_000188f4` (Pacific Conflict) | `register_shadow_templates` | VERIFIED | shadow template slots. |
+| `FUN_000188ba` (Pacific Conflict) | `create_shadow_controller` | STRONG INFERENCE | 0x36-byte controller. |
+| `FUN_00018942` (Pacific Conflict) | `destroy_shadow_controller` | VERIFIED | owner reference. |
+| `FUN_000189d0` (Pacific Conflict) | `tick_shadow` | STRONG INFERENCE | key 5 tick; follows owner at ground height. |
+| `FUN_00018bba` (Pacific Conflict) | `flak_notice_object` | STRONG INFERENCE | key 0x1a +0x16; flak target pick. |
+| `FUN_0001940e` (Pacific Conflict) | `register_parachute_template` | VERIFIED | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_000193b6` (Pacific Conflict) | `create_parachute_controller` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_00019938` (Pacific Conflict) | `parachute_tick` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_0001952e` (Pacific Conflict) | `parachute_descend` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_0001951a` (Pacific Conflict) | `destroy_parachute_controller` | VERIFIED | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_0001910e` (Pacific Conflict) | `register_turret_template` | VERIFIED | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_000190c0` (Pacific Conflict) | `create_turret_controller` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_00019130` (Pacific Conflict) | `spawn_turret_on_object` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_00019394` (Pacific Conflict) | `turret_pre_render` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_00019b82` (Pacific Conflict) | `create_view_attached_controller` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_00019bbc` (Pacific Conflict) | `tick_view_attached_object` | STRONG INFERENCE | handler of definition key 0x1b / 0x1c / 0x1e. |
+| `FUN_000115b0` (Pacific Conflict) | `create_plume_controller` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_000116e8` (Pacific Conflict) | `destroy_plume_controller` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_000116fc` (Pacific Conflict) | `tick_smoke_plume` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011a90` (Pacific Conflict) | `plume_pre_render` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011afe` (Pacific Conflict) | `create_effect_controller` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011aae` (Pacific Conflict) | `create_camera_facing_controller` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_00011ae6` (Pacific Conflict) | `face_camera_heading` | STRONG INFERENCE | handler of definition key 7 / 8 / 0xf. |
+| `FUN_0000e1e6` (Pacific Conflict) | `create_enemy_fighter` | STRONG INFERENCE | aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_0000e2a4` (Pacific Conflict) | `create_friendly_bomber` | STRONG INFERENCE | aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_0000e340` (Pacific Conflict) | `create_enemy_bomber` | STRONG INFERENCE | aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_000111ae` (Pacific Conflict) | `ai_fly_bomber` | STRONG INFERENCE | aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_000111da` (Pacific Conflict) | `ai_dive_at_target` | STRONG INFERENCE | aircraft definition / AI state (types 1 / 2 / 3 / 4 = player, friendly bomber, enemy bomber, enemy fighter). |
+| `FUN_000100bc` (Pacific Conflict) | `release_ai_target` | VERIFIED | AI / turret handler. |
+| `FUN_000100d4` (Pacific Conflict) | `enemy_fighter_notice_object` | STRONG INFERENCE | AI / turret handler. |
+| `FUN_000112e0` (Pacific Conflict) | `ai_bombing_run` | STRONG INFERENCE | AI / turret handler. |
+| `FUN_0001917c` (Pacific Conflict) | `tick_turret` | STRONG INFERENCE | AI / turret handler. |
+| `FUN_0000e262` (Pacific Conflict) | `spawn_enemy_fighter` | STRONG INFERENCE | spawn / plume / cloud handler. |
+| `FUN_00011796` (Pacific Conflict) | `shape_free_plume` | STRONG INFERENCE | spawn / plume / cloud handler. |
+| `FUN_00011940` (Pacific Conflict) | `shape_trailing_plume` | STRONG INFERENCE | spawn / plume / cloud handler. |
+| `FUN_00019a54` (Pacific Conflict) | `register_cloud_templates` | VERIFIED | spawn / plume / cloud handler. |
+| `FUN_00019a1a` (Pacific Conflict) | `create_cloud_controller` | STRONG INFERENCE | spawn / plume / cloud handler. |
+| `FUN_0000879e` (Pacific Conflict) | `resolve_bailout_outcome` | STRONG INFERENCE | bail-out / camera / sound;  VERIFIED; outcome 7; no-base odds are Dead 1/4 first, then POW 3/16. |
+| `FUN_00008972` (Pacific Conflict) | `update_bailout_view` | STRONG INFERENCE | bail-out / camera / sound. |
+| `FUN_000088a0` (Pacific Conflict) | `place_camera_behind_object` | STRONG INFERENCE | bail-out / camera / sound. |
+| `FUN_00008abe` (Pacific Conflict) | `turn_camera_toward_point` | STRONG INFERENCE | bail-out / camera / sound. |
+| `FUN_00009550` (Pacific Conflict) | `stop_all_sound_channels` | VERIFIED | bail-out / camera / sound. |
+| `FUN_0000923e` (Pacific Conflict) | `apply_player_mouse_controls` | STRONG INFERENCE | player input / camera. |
+| `FUN_00008ff4` (Pacific Conflict) | `begin_replay_view` | STRONG INFERENCE | player input / camera. |
+| `FUN_00008c30` (Pacific Conflict) | `update_tracking_camera` | STRONG INFERENCE | player input / camera. |
+| `FUN_00015bd4` (Pacific Conflict) | `register_bullet_template` | VERIFIED | bullet family / contact records. |
+| `FUN_00015b92` (Pacific Conflict) | `create_bullet_controller` | STRONG INFERENCE | bullet family / contact records. |
+| `FUN_00015dc8` (Pacific Conflict) | `tick_bullet` | STRONG INFERENCE | bullet family / contact records. |
+| `FUN_00015e62` (Pacific Conflict) | `bullet_pre_render` | STRONG INFERENCE | bullet family / contact records. |
+| `FUN_00015d78` (Pacific Conflict) | `spawn_ordnance_oriented_3ang` | STRONG INFERENCE | bullet family / contact records. |
+| `FUN_0001377a` (Pacific Conflict) | `age_contact_records` | VERIFIED | bullet family / contact records. |
+| `FUN_000137da` (Pacific Conflict) | `drop_contact_records_for_object` | VERIFIED | bullet family / contact records. |
+| `FUN_0000c11e` (Pacific Conflict) | `begin_offscreen_drawing` | HYPOTHESIS | panel helper. |
+| `FUN_0000c17e` (Pacific Conflict) | `end_offscreen_drawing` | HYPOTHESIS | panel helper. |
+| `FUN_0000cac6` (Pacific Conflict) | `update_bomb_indicator` | STRONG INFERENCE | panel helper. |
+| `FUN_0000cb62` (Pacific Conflict) | `update_throttle_gauge` | STRONG INFERENCE | panel helper. |
+| `FUN_0001a75e` (Pacific Conflict) | `c_strlen` | VERIFIED |  (renamed from bounded_strlen in 315): panel helper. |
+| `FUN_0000d3bc` (Pacific Conflict) | `draw_line_depth8` | STRONG INFERENCE | line / frame output / pose ring. |
+| `FUN_0000d5b0` (Pacific Conflict) | `draw_line_depth4` | STRONG INFERENCE | line / frame output / pose ring. |
+| `FUN_0000d91a` (Pacific Conflict) | `restore_line_depth8` | STRONG INFERENCE | line / frame output / pose ring. |
+| `FUN_0000db60` (Pacific Conflict) | `restore_line_depth4` | STRONG INFERENCE | line / frame output / pose ring. |
+| `FUN_0000d27c` (Pacific Conflict) | `mark_view_overlays_drawn` | VERIFIED | line / frame output / pose ring. |
+| `FUN_0000d298` (Pacific Conflict) | `present_spans_to_window` | STRONG INFERENCE | line / frame output / pose ring. |
+| `FUN_0000d34c` (Pacific Conflict) | `present_bw_frame` | STRONG INFERENCE | line / frame output / pose ring. |
+| `FUN_0000df98` (Pacific Conflict) | `fill_pose_history_angles` | VERIFIED | line / frame output / pose ring. |
+| `FUN_0000dfd2` (Pacific Conflict) | `fill_pose_history_flags` | VERIFIED | line / frame output / pose ring. |
+| `FUN_0000bca8` (Pacific Conflict) | `copy_rect_depth4` | STRONG INFERENCE | blit / terrain helper. |
+| `FUN_0000bfb0` (Pacific Conflict) | `copy_rect_depth8` | STRONG INFERENCE | blit / terrain helper. |
+| `FUN_00014830` (Pacific Conflict) | `lift_object_onto_terrain` | STRONG INFERENCE | blit / terrain helper. |
+| `FUN_00011486` (Pacific Conflict) | `create_spinner_controller` | STRONG INFERENCE | definition handler / radar buttons. |
+| `FUN_000114b4` (Pacific Conflict) | `spin_object_heading` | VERIFIED | definition handler / radar buttons. |
+| `FUN_00018a34` (Pacific Conflict) | `shadow_pre_render` | STRONG INFERENCE | definition handler / radar buttons. |
+| `FUN_00017a8c` (Pacific Conflict) | `update_radar_range_buttons` | STRONG INFERENCE | definition handler / radar buttons. |
+| `FUN_00012f92` (Pacific Conflict) | `create_singleton_type10_controller` | HYPOTHESIS | definition handler / radar buttons. |
+| `FUN_00003cca` (Pacific Conflict) | `segment_point_min_distance` | PROVEN | from bytes; bisection of segment (start + word deltas) against a point. |
+| `FUN_0000e512` (Pacific Conflict) | `compute_template_force_from_626_tail` | PROVEN | false split inside FUN_0000e4a4. |
+| `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
+| `DAT_0001b86e` (Pacific Conflict) | instant-replay / end-sequence frame countdown (word; comment-only name replay_frames_left) | PROVEN (accesses) / STRONG_INFERENCE (name) | begin_replay_view = 0x69 (75 replay + 30 hold, with DAT_0001b870 = 1 and a 0x4b-frame camera glide); crash end hold = 0x1e (host +0x98 == 2, view mode 8, DAT_0001b870 = 3); update_tracking_camera subq.w each frame, <= 0x1e -> DAT_0001b870 = 3, at 0 decides the outcome (no crash -> -1; crash without parachute -> Dead; else resolve_bailout_outcome); process_flight_input_and_outcome returns to live (DAT_0001b870 = 0) when it is 0. All accesses are word ops (0x742a, 0x74f8, 0x7584, 0x75ae, 0x8efc, 0x8f6c, 0x8f72). |
+| `DAT_0001b86c` (Pacific Conflict) | pending instant-replay request (word: 0 none, 1 airborne, 2 on the ground) | PROVEN (accesses) / STRONG_INFERENCE (name) | set by request_instant_replay, consumed and cleared by begin_replay_view (camera side), cleared on respawn. |
+| host A5-0x12f0 (overlay host +0x98) | instant-replay state (word): 0 idle, 1 replay (File menu "Instant Replay", MENU 2 item 8 / ⌘I, or begin_replay_view), 2 crash end sequence (update_aircraft_damage_state, live) | PROVEN | MENU 2 item 8 text and handler; ID02 start_new_mission clears it; ID04 update_summary_dialog_buttons enables buttons only when 0; overlay process_flight_input_and_outcome / update_tracking_camera (reset to 0 at the end of the countdown). |
+| `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | slot names from DATA 0; kept as original identifiers. |
+| `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | type 2 frees vertex / face buffers; type 3 releases child list. |
+| DAT_0001c9dc / DAT_0001c1d4 | visible object list / its count | STRONG INFERENCE | — |
+| DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 | selected span-filler routines (address − 0x20) | STRONG INFERENCE | — |
+| host +0x348 (A5−0x1040) | overlay heap arena (host NewPtrClear work buffer) | STRONG INFERENCE | — |
+| host +0xae (A5−0x12da) | clouds option (spawn_cloud_layer) | STRONG INFERENCE | — |
+| DAT_0001d860 / DAT_0001d864 | per-frame palette-slot usage maps (swapped by overlay_frame_step) | STRONG INFERENCE | — |
+| DAT_0001bd88 / -8a / -8c | light direction vector (z / y / x components) | STRONG INFERENCE | — |
+| host +0xaa (A5−0x12de) | haze option | STRONG INFERENCE | — |
+| DAT_0001b5a0 + 0xe (Pacific Conflict) | host A5−0x137a pixel depth (1 / 4 / 8), not a mission mode | STRONG INFERENCE |  correction. |
+| DAT_0001d838 / DAT_0001d834 / DAT_0001d830 | camera position x / y / z (copied from the player) | STRONG INFERENCE | — |
+| Overlay hook slots A5−0x10a2.. A5−0x104e | filled by overlay_main_entry (overlay address − 0x20) | STRONG INFERENCE | table in OVERLAY_SERVICE_TABLE.md. |
+| DAT_0001b5a0 (Pacific Conflict) | pointer to the host A5 world at A5−0x1388: overlay offset k = host A5−0x1388 + k | STRONG INFERENCE | mission, fuel, bombs, kills, friendly kills, bitmap handles and service slots all agree. |
+| DAT_00020aee / DAT_00020aec / DAT_00020aea / DAT_0001b73e | polygon clip rectangle x-min / x-max / y-min / y-max | STRONG INFERENCE | — |
+| DAT_0001b5a0 +0xb6 / +0xb8 / +0xba.. / +0xd2 | mission fuel % / bombs / kill counters by type / friendly kills | STRONG INFERENCE | — |
+| ID01 0x96 / 0xaa / 0xbe (JT $2a / $32 / $3a) | sparse word / sparse long / dense switch helpers | PROVEN | — |
+| A5−0x2cc | depth of the palette currently attached | PROVEN | — |
+| A5−0xc4e.. A5−0xc3e | MenuHandles of MENU 1..5 | PROVEN | — |
+| HEL1 127 settings +0xe / +0x1c | view size option (1..4) / multi-monitor option | STRONG INFERENCE | — |
+| A5−0x14ca / A5−0x14ae / A5−0x14aa | game window / palettes (13 and 217 entries) | STRONG INFERENCE | — |
+| A5−0x137c / A5−0x137e | screen height / width (main device) | STRONG INFERENCE | — |
+| A5−0x1358 / −0x1342 / −0x132c | display device records: main / right / left (0x16 bytes) | STRONG INFERENCE | — |
+| A5−0x1036 | main GDHandle | PROVEN | GetMainDevice. |
+| A5−0xd62 | 20 sound slots (pointer 0x14 into a locked snd handle) | STRONG INFERENCE | — |
+| ID09 JT $262 / $272 / $27a / $282 / $28a | RecoverHandle / HLock / HUnlock / HPurge / HNoPurge glue | PROVEN | trap words in ID09 0x250..0x294. |
+| A5−0x13ba / A5−0x13b8 | current foreground / background colour index (depth 1) | STRONG INFERENCE | — |
+| A5−0x106e / −0x106a / −0x1086 | overlay hooks: start (rank) / key and event handler / optional poll | STRONG INFERENCE | — |
+| A5−0x14fc / A5−0x1504 | frame counter / start tick of the flight | STRONG INFERENCE | — |
+| A5−0x1082 / −0x107e / −0x107a / −0x1076 | overlay session hooks (begin / after memory / run / end) | STRONG INFERENCE | — |
+| A5−0x12ee | sound enabled flag | STRONG INFERENCE | guards init_sound_system / shutdown_sound. |
+| A5−0x1508 | strtok save pointer | PROVEN | — |
+| A5−0x1608 | C runtime ctype class table (256 bytes) | STRONG INFERENCE | — |
+| A5−0x2118 / A5−0x211c | cosine / sine function pointers (4.12, 0x4000 per turn; copies of A5−0x1062 / −0x1066) | STRONG INFERENCE | dial_point_at_angle. |
+| A5−0x149e | panel design-unit scale (0.75 × half view width) | PROVEN formula | set by prepare_instrument_panel; used by scale_design_4800. |
+| A5−0x14a0 | "panel store failed" flag (alert in ID04 0x432) | PROVEN | — |
+| A5−0x13ae / A5−0x211e | panel configuration index (HEL2 id offset; cache entry) / configuration of the loaded bitmaps | STRONG INFERENCE | — |
+| A5−0x12b0 / −0x11f6 / −0x11dc / −0x11d4 / −0x13b2 | cached panel bitmaps "Bitmap" / "HorizonInstrument" / "GyroInstrument" / "GyroFlags" / "Bitmap Cache" (HEL2 resources) | PROVEN names | AddResource in ID03 0x5b5e..0x5d44. |
+| ID04 0x137a (unexported, JT $102) | `run_high_scores_dialog` | STRONG INFERENCE | — |
+| ID04 0x3614 (unexported) | `track_map_bearing_and_distance` | STRONG INFERENCE | — |
+| ID04 0x3976 (unexported, JT $10a) | `run_map_dialog` | STRONG INFERENCE | DLOG 137. |
+| A5−0x137a | screen pixel depth (1 / 4 / 8); 1 = black and white | PROVEN arithmetic |, corrected: x / (8 / depth) byte offsets. |
+| A5−0x1382 / A5−0x1378 | screen base address / rowBytes | STRONG INFERENCE | — |
+| A5−0x1056 / A5−0x105a | angle (atan2-like, 1/0x4000 turns) / square-root function pointers | HYPOTHESIS | map bearing / distance. |
+| HEL1 127 settings +0x26 | map scale (miles per grid square) | STRONG INFERENCE | " mi./grid" text. |
+| A5−0x1052 | map object plotter function pointer (scale, callback) -> Pacific Conflict plot_mission_map_symbols (FUN_00000954) | PROVEN call / STRONG INFERENCE target |, target. |
+| ID04 0x644 (unexported, JT $132) | `run_duty_roster_dialog` | STRONG INFERENCE | DLOG 130 "Duty Roster". |
+| A5−0x225c | fuel load percentage (0..100) of the Scenario Selection / Refuel dialogs | STRONG INFERENCE | DITL 132 "Fuel: E F". |
+| ID04 0xe70 (unexported, JT $9a) | `run_refuel_dialog` | STRONG INFERENCE | DLOG 132 runner. |
+| ID04 0xc02 (unexported, JT $82) | `run_scenario_selection_dialog` | STRONG INFERENCE | DLOG 129 runner; returns mission or 0. |
+| HEL1 127 settings +0x1e / +0x20 / +0x22 / +0x24 | mission / pilot index / fuel % / bombs | STRONG INFERENCE | written by the Scenario Selection runner. |
+| Mission numbers 2..9 | Flight School, Bomb Base, Capture Island, Flying Fortress, Scramble!, Divine Wind, Flattop, The Duel | STRONG INFERENCE | radio item − 7; consistent with summary failure texts. |
+| A5−0x12d2 / A5−0x12d0 | flight fuel load percentage / bomb count (0..2) | STRONG INFERENCE | written by run_refuel_dialog. |
+| A5−0x2240 | bomb radio item list (3 words) | STRONG INFERENCE | — |
+| ID04 0x2dc (unexported) | `set_radio_group_selection` | PROVEN | SetCtlValue(item == selected). |
+| ID04 0x1dde (unexported, JT $152) | `draw_mission_awards` | STRONG INFERENCE | record +0x26 bits -> cicn 512–519. |
+| ID04 0x1b3e (unexported, JT $15a) | `draw_rank_insignia` | STRONG INFERENCE | cicn 256 + rank. |
+| ID04 0x2104 (unexported, JT $ca) | `mission_summary_filter_proc` | STRONG INFERENCE | ModalDialog filter; comment block in ID04.decomp.c. |
+| ID04 0x21d6 (unexported) | `advance_mission_summary_text` | STRONG INFERENCE | state machine on A5-0x2222. |
+| A5−0x2222 / −0x2230 / −0x222c | summary text state / step delay (ticks) / last step tick | STRONG INFERENCE | — |
+| ID02 0x2c8 / 0x2d8; ID09 0x416 | strcpy / strcat; C-to-Pascal string in place | PROVEN | bytes. |
+| A5−0x12ce | ten per-mission kill counters (one per target type) | STRONG INFERENCE | get_mission_kill_report_state; "No new kills to report." |
+| A5−0x12b4 / A5−0x14c4 | current pilot status / mission-over flag | STRONG INFERENCE | — |
+| A5−0xffe / A5−0xfae / A5−0xf86 | rank / pilot-status / target-type string groups | PROVEN (dump) | STR#129 slots 94-99 / 100-105 / 106-115. |
+| HEL1 127 / HEL1 128 | "Hellcats Saved Settings" / "Player and Score Data" | PROVEN (dump names) | — |
+| ALRT 258 "Error" ("^1 ^0.") | used by ID02 show_caution_alert_with_number | PROVEN (dump) | — |
+| ID04 file 0x432 (unexported) | panel-store failure report (proposed) | PROVEN bytes | flag A5−0x14a0 → JT $462 + alert slot 1. |
 | STR# 129 text | `artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app/` | PROVEN (dump) | Files 0-based; game slot n ↔ file n−1. Slot 93 = out-of-memory message; slot 65 = ALTITUDE. |
-| ID02 `FUN_0000001e` | `abs_long` (renamed iter 162) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
+| ID02 `FUN_0000001e` | `abs_long` (renamed ) | PROVEN (C) | JT $4da; used by nearest_palette_index_rgb. |
 | A5−0x1614 / A5−0x161c | QuickDraw globals `white` / `black` patterns | STRONG INFERENCE | Standard QD global order below thePort (A5−0x160c). |
 | low-memory $0196 | `Lvl1DT[1]` (VBL level-1 interrupt vector) | STRONG INFERENCE | Saved in A5−0xc36; replaced by A5−0x360 handler. |
 | A5−0x7d0 | sound channel records [2] × 0x238 bytes | STRONG INFERENCE | Indexed by silence_sound_channel / FUN_00003d50. |
-| ID02 file 0x1b42 (unexported) | `install_overlay_service_table` (proposed) | STRONG INFERENCE | Iter 135: 34 JT addresses → A5 table; A5−0x1040 work buffer. See OVERLAY_SERVICE_TABLE.md. |
+| ID02 file 0x1b42 (unexported) | `install_overlay_service_table` (proposed) | STRONG INFERENCE | 34 JT addresses → A5 table; A5−0x1040 work buffer. See OVERLAY_SERVICE_TABLE.md. |
 | A5−0x1040 | overlay work buffer (HYPOTHESIS name) | PROVEN allocation | NewPtrClear(320400 or 220400) by FreeMem > 1 MB. |
 | A5−0x103a | offscreen GrafPort pointer (HYPOTHESIS name) | STRONG INFERENCE | Disposed by close_and_dispose_port; created by FUN_00000d3a when 0. |
-| `FUN_00004b62` (ID02, not decompiled) | `init_standard_colour_indices` (proposed) | STRONG INFERENCE | Iter 132: 9 grey-level lookups → A5 colour-index words (−0x11ae … −0x11f8). |
+| `FUN_00004b62` (ID02, not decompiled) | `init_standard_colour_indices` (proposed) | STRONG INFERENCE | 9 grey-level lookups → A5 colour-index words (−0x11ae … −0x11f8). |
 | A5−0x136e | device table [4] × 0x16 bytes (slots 1..3 used) | STRONG INFERENCE | +0 GDevice handle (SetGDevice in FUN_000048ae), +4 stored word array. |
-| `FUN_00000728` (ID05) | `ansi_rand` | PROVEN | Iter 118: seed A5−0x6c ×0x41c64e6d +0x3039; returns (seed<<1)>>17. |
+| `FUN_00000728` (ID05) | `ansi_rand` | PROVEN | seed A5−0x6c ×0x41c64e6d +0x3039; returns (seed<<1)>>17. |
 | `FUN_00000746` (ID05) | `ansi_srand` | STRONG INFERENCE | Stores arg to A5−0x6c. Caller: ID05 0x8c0 (init_protection_table, seeded by TickCount). |
-| `FUN_000007f6` (ID05) | `poison_overlay_bytes` | STRONG INFERENCE | 12 × {ptr, byte} into A5−0xb4, byte := 0xFF at base + rand % size. Called from ID08 0x246 (JT $53a) with overlay base/code size. |
+| `FUN_000007f6` (ID05) | `poison_overlay_bytes` | STRONG INFERENCE | 12 × {ptr, byte} into A5−0xb4, byte:= 0xFF at base + rand % size. Called from ID08 0x246 (JT $53a) with overlay base/code size. |
 | `FUN_0000085e` (ID05) | `restore_poisoned_overlay_bytes` | STRONG INFERENCE | Restores A5−0xb4 table if A5−0xbc / A5−0xc0 set. Called from ID08 0x29e (JT $55a). |
-| `FUN_00000934` (ID05) | `record_code_index_equals` | STRONG INFERENCE | Iter 119: (s8)rec[4]*20 + (s8)rec[5] == n → word 1/0. Called from ID08 0x282/0x2b2 (JT $54a); success at 0x282 → JT $532 stub (ID05 0x8b2) A5−0xbc++. |
-| `FUN_00000754` (ID05) | `encode_base26_6chars` | PROVEN | Iter 120: 6 chars 'A'+(v%26) right-to-left, NUL; DIVS.L #26 at 0x76c/0x784. |
-| `FUN_000007a8` (ID05) | `decode_base26_6chars` | PROVEN | Iter 120: acc = acc*26 + ((s8)c − 'A') over 6 chars → *out. |
-| `FUN_00000a62` (ID05) | `random_28bit_value` | STRONG INFERENCE | Iter 121: caller 0x442; see ID05.decomp.c header. |
-| `FUN_00000a90` (ID05) | `pack_fields_to_code_buf68` | STRONG INFERENCE | Iter 121: caller 0x498; buf A5−0x68; see ID05.decomp.c header. |
-| `FUN_00000b10` (ID05) | `unpack_fields_from_code` | STRONG INFERENCE | Iter 121: no caller found; see ID05.decomp.c header. |
-| `FUN_00000b84` (ID05) | `encode_code28_to_buf54` | STRONG INFERENCE | Iter 121: ID05 0x4b2; ID08 0x276/0x2a6 (JT $552); see ID05.decomp.c header. |
-| `FUN_00000ba8` (ID05) | `decode_code_to_long_a` | STRONG INFERENCE | Iter 121: no caller found; see ID05.decomp.c header. |
-| `FUN_00000bc2` (ID05) | `encode_long_to_buf40` | STRONG INFERENCE | Iter 121: caller 0x4ce; see ID05.decomp.c header. |
-| `FUN_00000bde` (ID05) | `decode_code_to_long_b` | STRONG INFERENCE | Iter 121: caller 0x674; see ID05.decomp.c header. |
-| `FUN_000002c8` (ID05) | `code_dialog_filter` | STRONG INFERENCE | Iter 122: ModalDialog filter (SetPort, default-button FrameRoundRect, HiliteControl on empty item 3, Return/Enter→1, Esc→2). File 0x3ba..0x4e2 is a separate unexported code-string builder. |
-| `FUN_00000160` (ID05) | `read_DATA128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID08 0x26c (JT $582). |
-| `FUN_000001bc` (ID05) | `write_DATA128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID08 0x2c4 (JT $57a). |
-| `FUN_00000214` (ID05) | `read_TEXT128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID05 0x3f4, 0x458. |
-| `FUN_00000270` (ID05) | `write_TEXT128_pair` | STRONG INFERENCE | Iter 123: two longs at start of resource 128; callers ID05 0x44a, 0x718. |
-| `FUN_00000006` (ID05) | `center_template_rect_on_screen` | STRONG INFERENCE | Iter 124: GetResource(type,id) rect centred horizontally, top at mbar + 1/3 of remaining height. |
-| `FUN_000000c8` (ID05) | `get_machine_screen_fingerprint` | STRONG INFERENCE | Iter 124: machineType, screen width/height, depth (GDevice or screenBits), 0. |
-| `FUN_000004e4` (ID05) | `get_dialog_item_text_upper` | STRONG INFERENCE | Iter 125: GetIText → C string → upper (ctype A5−0x1608 bit 7 → ID02 0x1ce). |
-| `FUN_00000560` (ID05) | `run_protection_dialog` | STRONG INFERENCE | Iter 125: DLOG 1000 challenge/response loop; Alert 1001 ($A985, corrected iter 138); called from ID08 0x298 (JT $572). |
-| `FUN_000008d6` (ID05) | `pick_random_protection_challenge` | STRONG INFERENCE | Iter 125: random entry of table *(A5−0xba)[A5−0xb6] → 3 words. |
-| `FUN_000008b8` (ID05, not decompiled) | `init_protection_table` (proposed) | STRONG INFERENCE | Iter 126: ansi_srand(arg3); A5−0xba = arg1; A5−0xb6 = arg2; called from ID08 0x25c (JT $542) with (A5−0x1cc4, 56, TickCount). |
+| `FUN_00000934` (ID05) | `record_code_index_equals` | STRONG INFERENCE | (s8)rec[4]*20 + (s8)rec[5] == n → word 1/0. Called from ID08 0x282/0x2b2 (JT $54a); success at 0x282 → JT $532 stub (ID05 0x8b2) A5−0xbc++. |
+| `FUN_00000754` (ID05) | `encode_base26_6chars` | PROVEN | 6 chars 'A'+(v%26) right-to-left, NUL; DIVS.L #26 at 0x76c/0x784. |
+| `FUN_000007a8` (ID05) | `decode_base26_6chars` | PROVEN | acc = acc*26 + ((s8)c − 'A') over 6 chars → *out. |
+| `FUN_00000a62` (ID05) | `random_28bit_value` | STRONG INFERENCE | caller 0x442; see ID05.decomp.c header. |
+| `FUN_00000a90` (ID05) | `pack_fields_to_code_buf68` | STRONG INFERENCE | caller 0x498; buf A5−0x68; see ID05.decomp.c header. |
+| `FUN_00000b10` (ID05) | `unpack_fields_from_code` | STRONG INFERENCE | no caller found; see ID05.decomp.c header. |
+| `FUN_00000b84` (ID05) | `encode_code28_to_buf54` | STRONG INFERENCE | ID05 0x4b2; ID08 0x276/0x2a6 (JT $552); see ID05.decomp.c header. |
+| `FUN_00000ba8` (ID05) | `decode_code_to_long_a` | STRONG INFERENCE | no caller found; see ID05.decomp.c header. |
+| `FUN_00000bc2` (ID05) | `encode_long_to_buf40` | STRONG INFERENCE | caller 0x4ce; see ID05.decomp.c header. |
+| `FUN_00000bde` (ID05) | `decode_code_to_long_b` | STRONG INFERENCE | caller 0x674; see ID05.decomp.c header. |
+| `FUN_000002c8` (ID05) | `code_dialog_filter` | STRONG INFERENCE | ModalDialog filter (SetPort, default-button FrameRoundRect, HiliteControl on empty item 3, Return/Enter→1, Esc→2). File 0x3ba..0x4e2 is a separate unexported code-string builder. |
+| `FUN_00000160` (ID05) | `read_DATA128_pair` | STRONG INFERENCE | two longs at start of resource 128; callers ID08 0x26c (JT $582). |
+| `FUN_000001bc` (ID05) | `write_DATA128_pair` | STRONG INFERENCE | two longs at start of resource 128; callers ID08 0x2c4 (JT $57a). |
+| `FUN_00000214` (ID05) | `read_TEXT128_pair` | STRONG INFERENCE | two longs at start of resource 128; callers ID05 0x3f4, 0x458. |
+| `FUN_00000270` (ID05) | `write_TEXT128_pair` | STRONG INFERENCE | two longs at start of resource 128; callers ID05 0x44a, 0x718. |
+| `FUN_00000006` (ID05) | `center_template_rect_on_screen` | STRONG INFERENCE | GetResource(type,id) rect centred horizontally, top at mbar + 1/3 of remaining height. |
+| `FUN_000000c8` (ID05) | `get_machine_screen_fingerprint` | STRONG INFERENCE | machineType, screen width/height, depth (GDevice or screenBits), 0. |
+| `FUN_000004e4` (ID05) | `get_dialog_item_text_upper` | STRONG INFERENCE | GetIText → C string → upper (ctype A5−0x1608 bit 7 → ID02 0x1ce). |
+| `FUN_00000560` (ID05) | `run_protection_dialog` | STRONG INFERENCE | DLOG 1000 challenge/response loop; Alert 1001 ($A985, corrected ); called from ID08 0x298 (JT $572). |
+| `FUN_000008d6` (ID05) | `pick_random_protection_challenge` | STRONG INFERENCE | random entry of table *(A5−0xba)[A5−0xb6] → 3 words. |
+| `FUN_000008b8` (ID05, not decompiled) | `init_protection_table` (proposed) | STRONG INFERENCE | ansi_srand(arg3); A5−0xba = arg1; A5−0xb6 = arg2; called from ID08 0x25c (JT $542) with (A5−0x1cc4, 56, TickCount). |
 | A5−0x1cc4 | protection challenge table (56 × 12 bytes) | STRONG INFERENCE | Passed to init_protection_table; entries {ptr, len, w1, w2, w3}. See COPY_PROTECTION_FLOW.md. |
 | A5−0x1680..−0x167a | QuickDraw `screenBits.bounds` (top,left,bottom,right) | STRONG INFERENCE | Used as screen rect in ID05 0x06/0xc8. |
 | ID05 file 0x964 (unexported) | protection entry matcher (HYPOTHESIS) | PROVEN bytes | Counts matching entries of table *(A5−0xba)[A5−0xb6] into A5−0xc0; string de-obfuscated with key A5−0x2c. |
-| ID02 local 0x2eaa (unexported) | `quit_application` (proposed) | STRONG INFERENCE | Iter 174: confirm (seg4 0x516 == 2), save prompt (seg4 0x4f0), HideWindow, ExitToShell. Menu 2 item 13 and fatal MENU-missing path. |
-| `FUN_00002e36` (ID02) | `show_resource_file_error_box` | STRONG INFERENCE | Iter 174: "Can't open resource file." / "Click mouse to exit." dBox. |
+| ID02 local 0x2eaa (unexported) | `quit_application` (proposed) | STRONG INFERENCE | confirm (seg4 0x516 == 2), save prompt (seg4 0x4f0), HideWindow, ExitToShell. Menu 2 item 13 and fatal MENU-missing path. |
+| `FUN_00002e36` (ID02) | `show_resource_file_error_box` | STRONG INFERENCE | "Can't open resource file." / "Click mouse to exit." dBox. |
 | A5−0x14ca | `main_window` (HYPOTHESIS name) | STRONG INFERENCE | SetPort target at end of `initialize_application`; compared with update evt.message in `poll_and_dispatch_event`. |
 | A5−0x1388 | `has_color_quickdraw` (HYPOTHESIS name) | STRONG INFERENCE | byte ← SysEnvRec.hasColorQD in `initialize_application`. |
 | A5−0x1006 | `overlay_image_base` (HYPOTHESIS name) | PROVEN writer | Written only by ID08 `load_overlay_from_resource` (file 0xd4, aligned 0xf0/0xfe, cleared 0x226); gates overlay callbacks in ID02. |
@@ -663,7 +663,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | A5−0xf46 | `str129_string_ptrs[121]` (HYPOTHESIS name) | STRONG INFERENCE role | Written by `load_str129_string_table` slots 1..120; read by `init_string_pointer_groups`. |
 | JT `$4fa(A5)` → `FUN_0000024a` (ID02) | memmove-like (not renamed yet) | STRONG INFERENCE | Overlap-safe byte copy (dst, src, n) in ID02.c:218; CODE0 jump table entry seg 2 off 0x246. |
 | JT `$3a(A5)` → ID01 file 0xbe | runtime word switch helper (no Ghidra function) | PROVEN bytes | Pops return addr as table: lo, hi, default; offsets relative to their own word; zero offset → `BEQ *` hang. |
-| `FUN_00000432` (ID09) | `length_prefixed_bytes_to_c_string_in_place` | STRONG INFERENCE | `ID09.c:135-142`: unsigned byte length, forward overlapping copy, zero terminator, original-pointer return. No direct callers found. C transform preserved. Iter 108: bytes at ID09.bin file 0x432..0x44a match (DBRA shift loop, CLR.B terminator, return arg) — p2cstr-like. |
+| `FUN_00000432` (ID09) | `length_prefixed_bytes_to_c_string_in_place` | STRONG INFERENCE | `ID09.c:135-142`: unsigned byte length, forward overlapping copy, zero terminator, original-pointer return. No direct callers found. C transform preserved;  bytes at ID09.bin file 0x432..0x44a match (DBRA shift loop, CLR.B terminator, return arg) — p2cstr-like. |
 | `FUN_00000006` (ID08) | `load_overlay_from_resource` | STRONG INFERENCE | ID08.bin `@0x6`: A5 `$2a2/$2b2/$232/$2aa/…`; ret 0 fail / 1 ok; LOADER_CHAIN overlay candidate. |
 | `FUN_00000348` (ID08) | `alloc_and_read_resource_payload` | PROVEN | ID08.bin `@0x348`: A5 `$2ca`/`$2c2` size; `$22a` alloc→`A5-0x12fc`; `$2b2` read. |
 | `FUN_00000338` (ID08) | `sysbeep_and_exit_to_shell` | PROVEN | ID08.bin `@0x338`: `MOVE.W #$64,-(A7); _SysBeep ($A9C8); _ExitToShell ($A9F4)`. |
@@ -672,8 +672,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00000032` | `copy_block_return_dst` | STRONG INFERENCE | Binary @ `0x32`: saves D2, calls `FUN_0001a63e(src,dst,n)` (args reordered), returns `dst` in D0. Used throughout `FUN_00000054` after `FUN_00001a48` with lengths `0x4A`/`0x1A`/`0x1C`/`0x20`. |
 | `FUN_00000054` | `overlay_init_template_pointer_tables` | STRONG INFERENCE | Capstone `@0x54`–`0x332`: Block A 4×`0x4A` keyed; Block B 16 fixed `0x1A`/`0x20`→`DAT_0001b538`…`1b574`; Block C 5×`0x1C` keyed from `$1AA5E`; Block D five `0x1A`→`DAT_0001b58c`…`1b59c`. Caller `init_mission_object_tables`. |
 | `FUN_000016e2` | `init_mission_object_tables` | STRONG INFERENCE | `@0x16E2`: BSR `$54` then `instantiate_object_from_desc`/`heap_alloc`; builds count×`0x18` child table; publishes `DAT_0001d6fc`, `1bdb4`/`b0`/`ac`/`a8`/`a4`, `bc28`/`34`/`38`. |
-| `FUN_00004690` | `instantiate_object_from_desc` | VERIFIED (iter 320; type byte signed, extb.l) | `@0x4690`: `alloc_object_from_desc`; if `desc[1]!=0` call `*(DAT_0001b524[type]+6)(obj,type,0)` → store at `obj+8`. |
-| `FUN_000045ba` | `alloc_object_from_desc` | VERIFIED (iter 321) | `@0x45BA`: kind 2→size `0x52`, kind 3→size `0x34` via `heap_alloc_cleared`; desc +0x16 zero-extended to +4; desc bit 13 → flag bit 20 (big-endian byte +6); unknown tags return D1. |
+| `FUN_00004690` | `instantiate_object_from_desc` | VERIFIED (; type byte signed, extb.l) | `@0x4690`: `alloc_object_from_desc`; if `desc[1]!=0` call `*(DAT_0001b524[type]+6)(obj,type,0)` → store at `obj+8`. |
+| `FUN_000045ba` | `alloc_object_from_desc` | VERIFIED | `@0x45BA`: kind 2→size `0x52`, kind 3→size `0x34` via `heap_alloc_cleared`; desc +0x16 zero-extended to +4; desc bit 13 → flag bit 20 (big-endian byte +6); unknown tags return D1. |
 | `FUN_00001b6c` | `heap_alloc_cleared` | STRONG INFERENCE | `@0x1B6C`: `heap_alloc` then `heap_zero_payload`. |
 | `FUN_00001b38` | `heap_zero_payload` | PROVEN | `@0x1B38`: derive payload size from heap header (`0xFF` large vs size-class); call `memzero`. |
 | `FUN_0001a716` | `memzero` | PROVEN | `@0x1A716`: aligned CLR.B/CLR.L zero-fill of `nbytes` at `dst`. |
@@ -689,13 +689,13 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00015d20` | `spawn_ordnance_oriented` | STRONG INFERENCE | `@0x15D20`: `build_attitude_matrix_x` then `spawn_ordnance_scattered`. |
 | `FUN_00015bf6` | `spawn_ordnance_scattered` | STRONG INFERENCE | `@0x15BF6`: RNG±0x20 scatter; pool `DAT_0002664a`; write vel/`0x3a`/`+0x40` matrix. |
 | `FUN_0000262e` | `build_attitude_matrix_x` | PROVEN chain | `@0x262E`: `0202a`→`025d6` (X-axis sibling of `025a8`). |
-| `FUN_00019430` | `spawn_bailout_parachute` (was `spawn_special_weapon_entity`; renamed iter 337) (iteration 296: actually spawns the parachute) | STRONG INFERENCE | `@0x19430`: pool `DAT_00026780`; fields `610/614/618/61c`; 0xD verts `>>3` → `622/656/68a`. |
+| `FUN_00019430` | `spawn_bailout_parachute` (was `spawn_special_weapon_entity`; renamed ) (: actually spawns the parachute) | STRONG INFERENCE | `@0x19430`: pool `DAT_00026780`; fields `610/614/618/61c`; 0xD verts `>>3` → `622/656/68a`. |
 | `FUN_0000e40c` | `fold_angle_pm_0x2000` | PROVEN | `@0xE40C`: if `>0x2000` −`0x4000`; if `<−0x2000` +`0x4000`. |
 | `FUN_0001a63e` | `memmove_block` | PROVEN | `@0x1A63E`: `(src,dst,n)` overlap-aware copy; longword fast path when `n>0x19`. |
 | `FUN_00001ba8` | `heap_realloc_grow_only` | PROVEN | `@0x1BA8`: if request > header capacity → `heap_calloc`+`memmove_block`+`heap_free_coalesce`. |
 | `FUN_00001b84` | `heap_calloc` | STRONG INFERENCE | `@0x1B84`: `heap_alloc(a*b)` then `heap_zero_payload`. |
 | `FUN_00002e08` | `abs_int` | PROVEN | `@0x2E08`: `MOVE.L 4(A7),D0` / `BGE` / `NEG.L` / `RTS`. ~49 BSR.L call sites. |
-| `FUN_00002de8` | *(false entry of `FUN_00002d10`)*; callsite→`abs_int` | bytes PROVEN; callsite PROVEN (iter 361: all 17 references found by a linear byte scan are `lea.l $2de8.l` + `jsr (aN)` - the earlier note counted 19; 0x2de8 is a runtime address = file 0x2e08 = abs_int `202f0004 6c02 4480 4e75`) | `@0x2DE8`: mid-epilogue `TST D4`/`BNE` + xyz commit + `UNLK`/`RTS`. 19× `LEA $2DE8`+`JSR` push/arg/D0 look like abs; 0 direct BSR to `2DE8`. **BLOCKED** until LEA target explained. |
+| `FUN_00002de8` | *(false entry of `FUN_00002d10`)*; callsite→`abs_int` | bytes PROVEN; callsite PROVEN (: all 17 references found by a linear byte scan are `lea.l $2de8.l` + `jsr (aN)` - the earlier note counted 19; 0x2de8 is a runtime address = file 0x2e08 = abs_int `202f0004 6c02 4480 4e75`) | `@0x2DE8`: mid-epilogue `TST D4`/`BNE` + xyz commit + `UNLK`/`RTS`. 19× `LEA $2DE8`+`JSR` push/arg/D0 look like abs; 0 direct BSR to `2DE8`. **BLOCKED** until LEA target explained. |
 | `FUN_00004e6e` | `activate_near_range_object` | STRONG INFERENCE | `@0x4E6E`: kind2 list+`(36+3a)*0xC` via `$1A48`→`+0x4c/+0x44`+`04808`+flag-gated `02bd8`; kind3 child `0x18` table+`046da`; ends `03b98`. Gate for `spawn_mission_pool_object`. |
 | `FUN_00004808` | `build_object_poly_buffers` | PROVEN layout | `@0x4808`: `heap_alloc` → `obj+0x48`; poly stride `0x20` from stream; index `heap_alloc(count<<1)` → `+0x18`; optional `(+6)&2` trailer; `DAT_0001daa2=1`. |
 | `FUN_00002bd8` | `apply_template_chain_xform` | STRONG INFERENCE | `@0x2BD8`: walk `obj+0x24` chain; optional `0253e`+`02ada` if slot angles≠0; `01c5c` translate; null-aux commits `+0x18/1c/20`; mesh path uses count/`+0x34` shift into `param_4`. |
@@ -710,8 +710,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_0000202a` | `load_attitude_angle_sincos` | PROVEN | `@0x202A`: for each of 4 angles, `cos_fixed14` then `sin_fixed14` into `DAT_0001d7fa/fc`, `f6/f8`, `f2/f4`, `ee/f0`. |
 | `FUN_00001d76` | `sin_fixed14` | PROVEN | `@0x1D76`: lerp on `DAT_0001ab6c[angle>>6]`; frac `&0x3F`. |
 | `FUN_00001dd8` | `cos_fixed14` | PROVEN | `@0x1DD8`: same as sin on `DAT_0001ad6c`. |
-| `FUN_00001e3a` | `acos_fixed14` | PROVEN | `@0x1E3A`: clamp ±0x1000; binary search + lerp on cos table `DAT_0001ad6c` → angle. |
-| `FUN_00001ebc` | `atan_fixed14` | STRONG INFERENCE | `@0x1EBC`: binary search+lerp on `DAT_0001af6c` longs; `((idx−0x3f)<<6)+frac & 0x3fff`. Heading via ratio+quadrants. |
+| `FUN_00001e3a` | `acos_fixed14` | PROVEN | Independent disassembly matches bytes `0x1e3a..0x1eba`. `DAT_0001ad6c[i] = round(4096 * cos(i * pi / 128))` for `i=0..0x80`; clamp ±0x1000, binary-search, then interpolate to `0..0x2000`. |
+| `FUN_00001ebc` | `atan_fixed14` | PROVEN mechanics / STRONG INFERENCE name | Independent disassembly matches bytes `0x1ebc..0x1f20`. Entries `0..126` of `DAT_0001af6c` equal `4096 * tan((i - 0x3f) * pi / 128)` within ±1; the function binary-searches and interpolates a 14-bit angle. Entry 127 is an unused non-monotonic quirk for current ratio callers. |
 | `FUN_000102d6` | `atan2_fixed14` | STRONG INFERENCE | `@0x102D6`: abs(dx),abs(dy) then `atan_fixed14` + 0x1000/0x2000 quadrants → 14-bit heading. |
 | `FUN_000109ba` | `apply_relative_heading_steer` | STRONG INFERENCE | `@0x109BA`: atan2 on rel +2/+6, fold, range-blend vs +0x24, smooth +0x61e, `enqueue_control_inputs_avg4`. |
 | `FUN_00010558` | `enqueue_control_inputs_avg4` | PROVEN | `@0x10558`: clamp; 4-slot rings +0x644/4c/54; means → +0x666/+0x662/+0x664; gated by +0x685 bit0. |
@@ -760,7 +760,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001d56` | *(false mid-`matmul3x3_s16`)*; callsite→`sin_fixed14` | BLOCKED | `@0x1D56` = `$1D76−0x20` (ASR inside matmul). |
 | `FUN_00001db8` | *(false mid-`sin_fixed14`)*; callsite→`cos_fixed14` | BLOCKED | `@0x1DB8` = `$1DD8−0x20`. |
 | `FUN_00006fb8` | `reset_distance_base_globals` | STRONG INFERENCE | `@0x6FB8`: six `MOVE.L #$05F5E100` to `DAT_0001d710/14/18/1c/20/24`. |
-| `FUN_0000e792` | `update_aircraft_entity` | STRONG INFERENCE | Blocks 0–7c; Block1 Capstone@E8A0 links avg4→662/666 (iter 94). Callers: climb/waypoint/AI ticks — not sim tick. |
+| `FUN_0000e792` | `update_aircraft_entity` | STRONG INFERENCE | Blocks 0–7c; Block1 Capstone@E8A0 links avg4→662/666. Callers: climb/waypoint/AI ticks — not sim tick. |
 | `entity+0x662` | `ctrl_avg_pitchish` (from avg4 p3) | STRONG INFERENCE | Filled by `enqueue_control_inputs_avg4`; jittered if `flags_685` bit2. |
 | `entity+0x666` | `ctrl_avg_heading` (from avg4 p4) | STRONG INFERENCE | Filled by avg4; jittered if `flags_685` bit3; force 0xFF80 if +0x684 bit0. |
 | `entity+0x685` | `flags_685` | PROVEN | bit0 gates avg4; bit2/3 RNG jitter; bit0 of +0x684 clears/forces controls. |
@@ -796,20 +796,20 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001a68` | `heap_alloc` | PROVEN prologue | `@0x1A68`: `MOVEM D2-D3/A2`; size `$10(a7)`; bins/`01974`/`0199a`; D0=payload. Godot stand-in for kind2/B572 call sites. |
 | `DAT_00020c60` | `heap_roving_cursor` | STRONG INFERENCE | Large-block freelist cursor; written at `@0x1A48` / read throughout alloc/free. |
 | `DAT_00020c64` | `heap_size_class_bins` | STRONG INFERENCE | Array of freelist heads indexed by size class (×4). |
-| `DAT_0001b85c` (Pacific Conflict) | carried-pair count (word) | PROVEN (use) | Iter 325: cleared every frame by overlay_frame_step; incremented by the unexported 0x15154 handler. |
-| `DAT_0001b860` (Pacific Conflict) | carried-pair array, 8 bytes {carrier object, rider object} | PROVEN (layout) / STRONG_INFERENCE (meaning) | Iter 325: rider metric biased by carrier extent around controller +0x54 before the world sort. |
-| `DAT_0001b85a` (Pacific Conflict) | carried-pair capacity (word, grows by 4) | PROVEN | Iter 325: 0x152a0. |
-| `DAT_0001c1c0` (Pacific Conflict) | visible-list count before world objects (word) | PROVEN (value) | Iter 325: = low word of DAT_0001c1d4 after collect_near_objects. |
-| `unexported 0x15154` (Pacific Conflict) | `carrier_deck_contact` (comment-only reconstruction) | STRONG INFERENCE (name) / PROVEN (body) | Iter 326: definition key 0x15 slot +0x12; deck face = tag 1 (face +0x17), deck height in controller +0x54; sets aircraft controller +0x2e / +0x2c, +0x63f (tag 3), appends carried pair. |
-| carrier controller +0x50 / +0x52 / +0x54 (Pacific Conflict) | deck face index / tag-3 face index / deck height (words; -1 = not found) | PROVEN (layout) | Iter 326, 0x15178..0x15200. |
-| aircraft controller +0x63f / +0x640 (Pacific Conflict) | arrest request (byte, per frame) / arrest latch (byte: 0 none, 1 braking -0xB6 per frame, 2 stopped) | PROVEN (flow) / STRONG_INFERENCE (arresting wire) | Iter 327: 0x15286 sets +0x63f over carrier tag-3 face; 0xf420 latches; 0xeffe brakes; 0xf01a stop; 0xf478 clear airborne; 0xf47c clears +0x63f. Replaces the "stall latch / field_190" reading. |
-| `DAT_0001b868` (Pacific Conflict) | `player_landing_state` (comment-only name) | STRONG INFERENCE (name) / PROVEN (values, word) | Iter 328: 0 airborne/reset, 1 touchdown, 2 stopped; consumed by process_flight_input_and_outcome when engine off (0x8110). |
-| face +0x16 / aircraft controller +0x2c (Pacific Conflict) | surface code (packed face byte +9 high nibble; low nibble = face tag +0x17): 0x10 water, 0x20 ?, 0x30 / 0x60 deck-type hard (carrier decks, iter 330), 0x40 grass, 0x50 ?, 0x70 runway, 0x80 unused by compares | PROVEN (values) / STRONG_INFERENCE (0x10, 0x40, 0x70) / UNKNOWN (0x20, 0x50, 0x60 identity) | Iter 329: table at surface_type_at_point; 0x30/0x60/0x70 valid landings; 'p' quads = runway approach ends. |
-| definition keys 0x12 / 0x13 (Pacific Conflict) | enemy air base / friendly air base (aircraft spawners) | PROVEN (code mapping 0x12->0x100, 0x13->0x200) / STRONG_INFERENCE (enemy / friendly) | Iter 331: probe_nearest_facility_kind; POW on landing near 0x100; friendly kill and runway guidance near 0x200. |
-| `_DAT_0001b87a` (Pacific Conflict) | `player_abandoned_intact_aircraft` (comment-only name, word) | PROVEN (writer, readers) / STRONG_INFERENCE (name) | Iter 337: set 1 at 0xf766 when the player bails out with no damage bits and fuel; read by resolve_bailout_outcome and update_aircraft_damage_state -> Discharged (4). Never cleared in code (3 references) [UNKNOWN reset]. |
-| aircraft controller +0x677 (Pacific Conflict) | bail-out state (byte): 0 none, 1 requested, 2 parachute spawned | PROVEN | Iter 338: clr 0x39ec (respawn); 1 from the 'J'/'j' key (0x7d08: airborne +0x63e == 0, _DAT_0001b874 == 0) or AI (0x1093c: damage word bit 8, rng & 0x1f == 0, state handler +0x32 != 0x111ba, host +0x90 != 2, not the player); 2 at 0xf722 after spawn_bailout_parachute, which also sets word +0x684 bit 0 (byte +0x685 bit 0 = pilot gone, the spawn gate). |
+| `DAT_0001b85c` (Pacific Conflict) | carried-pair count (word) | PROVEN (use) | cleared every frame by overlay_frame_step; incremented by the unexported 0x15154 handler. |
+| `DAT_0001b860` (Pacific Conflict) | carried-pair array, 8 bytes {carrier object, rider object} | PROVEN (layout) / STRONG_INFERENCE (meaning) | rider metric biased by carrier extent around controller +0x54 before the world sort. |
+| `DAT_0001b85a` (Pacific Conflict) | carried-pair capacity (word, grows by 4) | PROVEN | 0x152a0. |
+| `DAT_0001c1c0` (Pacific Conflict) | visible-list count before world objects (word) | PROVEN (value) | = low word of DAT_0001c1d4 after collect_near_objects. |
+| `unexported 0x15154` (Pacific Conflict) | `carrier_deck_contact` (comment-only reconstruction) | STRONG INFERENCE (name) / PROVEN (body) | definition key 0x15 slot +0x12; deck face = tag 1 (face +0x17), deck height in controller +0x54; sets aircraft controller +0x2e / +0x2c, +0x63f (tag 3), appends carried pair. |
+| carrier controller +0x50 / +0x52 / +0x54 (Pacific Conflict) | deck face index / tag-3 face index / deck height (words; -1 = not found) | PROVEN (layout) |, 0x15178..0x15200. |
+| aircraft controller +0x63f / +0x640 (Pacific Conflict) | arrest request (byte, per frame) / arrest latch (byte: 0 none, 1 braking -0xB6 per frame, 2 stopped) | PROVEN (flow) / STRONG_INFERENCE (arresting wire) | 0x15286 sets +0x63f over carrier tag-3 face; 0xf420 latches; 0xeffe brakes; 0xf01a stop; 0xf478 clear airborne; 0xf47c clears +0x63f. Replaces the "stall latch / field_190" reading. |
+| `DAT_0001b868` (Pacific Conflict) | `player_landing_state` (comment-only name) | STRONG INFERENCE (name) / PROVEN (values, word) | 0 airborne/reset, 1 touchdown, 2 stopped; consumed by process_flight_input_and_outcome when engine off (0x8110). |
+| face +0x16 / aircraft controller +0x2c (Pacific Conflict) | surface code (packed face byte +9 high nibble; low nibble = face tag +0x17): 0x10 water, 0x20 ?, 0x30 / 0x60 deck-type hard (carrier decks, ), 0x40 grass, 0x50 ?, 0x70 runway, 0x80 unused by compares | PROVEN (values) / STRONG_INFERENCE (0x10, 0x40, 0x70) / UNKNOWN (0x20, 0x50, 0x60 identity) | table at surface_type_at_point; 0x30/0x60/0x70 valid landings; 'p' quads = runway approach ends. |
+| definition keys 0x12 / 0x13 (Pacific Conflict) | enemy air base / friendly air base (aircraft spawners) | PROVEN (code mapping 0x12->0x100, 0x13->0x200) / STRONG_INFERENCE (enemy / friendly) | probe_nearest_facility_kind; POW on landing near 0x100; friendly kill and runway guidance near 0x200. |
+| `_DAT_0001b87a` (Pacific Conflict) | `player_abandoned_intact_aircraft` (comment-only name, word) | PROVEN (writer, readers) / STRONG_INFERENCE (name) | set 1 at 0xf766 when the player bails out with no damage bits and fuel; read by resolve_bailout_outcome and update_aircraft_damage_state -> Discharged (4). Never cleared in code (3 references) [UNKNOWN reset]. |
+| aircraft controller +0x677 (Pacific Conflict) | bail-out state (byte): 0 none, 1 requested, 2 parachute spawned | PROVEN | clr 0x39ec (respawn); 1 from the 'J'/'j' key (0x7d08: airborne +0x63e == 0, _DAT_0001b874 == 0) or AI (0x1093c: damage word bit 8, rng & 0x1f == 0, state handler +0x32 != 0x111ba, host +0x90 != 2, not the player); 2 at 0xf722 after spawn_bailout_parachute, which also sets word +0x684 bit 0 (byte +0x685 bit 0 = pilot gone, the spawn gate). |
 
-## Aircraft status / damage word +0x684 — iteration 339
+## Aircraft status / damage word +0x684
 
 Big-endian word. Byte +0x684 holds bits 8–15 and byte +0x685 bits 0–7, so a byte
 test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
@@ -818,19 +818,19 @@ test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
 | Bit | Mask | Writers | Readers | Meaning | Certainty |
 |---|---|---|---|---|---|
 | 0 | 0x0001 | apply_random_aircraft_damage (roll < 6); spawn path 0xf71c | 0x9246, 0xf6e6, 0x10570, 0x1094a | pilot hit / pilot gone (Ugh sound; blocks a second parachute) | PROVEN flow / STRONG_INFERENCE |
-| 1 | 0x0002 | damage roll < 0x2b (37 / 256, the most likely hit) | update_aircraft_entity 0xf794 | FUEL LEAK: 1/64 per frame, -1 unit from a random non-empty tank | PROVEN flow / STRONG_INFERENCE (iter 349) |
-| 2 | 0x0004 | damage roll < 0x38 | 0xe8a0 | ELEVATOR damage: +0x662 += rng & 0x7f - 0x40, clamp ±0x200 | PROVEN flow / STRONG_INFERENCE (iter 349) |
-| 3 | 0x0008 | damage roll < 0x45 | 0xe8e6 | AILERON damage: +0x666 jitter, clamp ±0x140 | PROVEN flow / STRONG_INFERENCE (iter 349) |
+| 1 | 0x0002 | damage roll < 0x2b (37 / 256, the most likely hit) | update_aircraft_entity 0xf794 | FUEL LEAK: 1/64 per frame, -1 unit from a random non-empty tank | PROVEN flow / STRONG_INFERENCE |
+| 2 | 0x0004 | damage roll < 0x38 | 0xe8a0 | ELEVATOR damage: +0x662 += rng & 0x7f - 0x40, clamp ±0x200 | PROVEN flow / STRONG_INFERENCE |
+| 3 | 0x0008 | damage roll < 0x45 | 0xe8e6 | AILERON damage: +0x666 jitter, clamp ±0x140 | PROVEN flow / STRONG_INFERENCE |
 | 4 | 0x0010 | damage roll < 0x51 | 0x7fbc, 0xf652, 0x191c2 | guns damaged (Gun sound gate) | STRONG_INFERENCE |
-| 5 | 0x0020 | damage roll < 0x5e; tick_wave_spawner 0x1818a | 0x97e4 (gear sound), 0xf576 / 0xfb08 (gear step) | LANDING GEAR JAMMED: gear +0x679 cannot step 1..0x2c towards 0x2d (down) and its sound is suppressed; retraction (negative values) still runs | PROVEN flow / STRONG_INFERENCE (iter 350) |
-| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, iter 341) | damage ladder (iter 363, per frame): 0x40 heavy hit (smoke trail; 1/2 -> 0x80 or 0x200) -> 0x80 engine damaged (1/4 -> 0x200) -> 0x200 engine out (until the next heavy hit) -> 0x100 on fire (trailing plume, AI bail-out, elevator 0 / aileron -0x80; 1/2 -> 0x400 destroyed); word +0x688 = ladder freeze timer | PROVEN ladder and engine effect / STRONG_INFERENCE names |
+| 5 | 0x0020 | damage roll < 0x5e; tick_wave_spawner 0x1818a | 0x97e4 (gear sound), 0xf576 / 0xfb08 (gear step) | LANDING GEAR JAMMED: gear +0x679 cannot step 1..0x2c towards 0x2d (down) and its sound is suppressed; retraction (negative values) still runs | PROVEN flow / STRONG_INFERENCE |
+| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, ) | damage ladder (, per frame): 0x40 heavy hit (smoke trail; 1/2 -> 0x80 or 0x200) -> 0x80 engine damaged (1/4 -> 0x200) -> 0x200 engine out (until the next heavy hit) -> 0x100 on fire (trailing plume, AI bail-out, elevator 0 / aileron -0x80; 1/2 -> 0x400 destroyed); word +0x688 = ladder freeze timer | PROVEN ladder and engine effect / STRONG_INFERENCE names |
 | 1–9 | 0x03fe | — | landing / ditch / bail-out outcomes | "aircraft damaged" | PROVEN use |
 | 10 | 0x0400 | hard landing 0xf136 / 0xf3a2, aircraft_collision, apply_blast_damage | 0x8fa0, 0xe722, 0x1077a | crashed / destroyed | STRONG_INFERENCE |
-| 11 | 0x0800 | crash at the end of update_aircraft_entity (0xf7ea / 0xf7f0: status = (s & 0x8000) \| 0x900, state handler +0x32 = 0xe772 = update_aircraft_entity) | update_aircraft_entity early exit (0xe80e: rests at ground - 0x16, jitter, engine off); surface 0x20 bad-contact skip (0xf372); update_aircraft_damage_state (0x1070c / 0x10740 / 0x10796; request_instant_replay(!bit 11)) | WRECKED ON THE GROUND (0x900 = wreck + burning) | PROVEN flow / STRONG_INFERENCE (iter 351) |
+| 11 | 0x0800 | crash at the end of update_aircraft_entity (0xf7ea / 0xf7f0: status = (s & 0x8000) \| 0x900, state handler +0x32 = 0xe772 = update_aircraft_entity) | update_aircraft_entity early exit (0xe80e: rests at ground - 0x16, jitter, engine off); surface 0x20 bad-contact skip (0xf372); update_aircraft_damage_state (0x1070c / 0x10740 / 0x10796; request_instant_replay(!bit 11)) | WRECKED ON THE GROUND (0x900 = wreck + burning) | PROVEN flow / STRONG_INFERENCE |
 | 12 | 0x1000 | water contact 0xe832 / 0xf384; cleared on leaving the ground 0xf0d8 | 0x8066 (ditch outcome), 0xef90, 0x108da | in water | STRONG_INFERENCE |
-| 13 | 0x2000 | set while the gear retracts (+0x679 < 0, 0xf5a0), cleared while it extends (0xf588) | aircraft_tick replay 0xe628 / 0xe6d4 (gear = 0x2d when clear, 0 when set; on a change, re-derives the gear direction from the sign) | GEAR LEVER UP | PROVEN flow / STRONG_INFERENCE (iter 350) |
-| 14 | 0x4000 | aircraft_create 0xe11a, respawn (= 0x4000), key 'M' 0x7af6; cleared by keys '0'..'9' (0x79a6) and the throttle step (0x7df0) | 0x7de4, 0x82b6 (refuel snapshot), 0xeb5c, update_aircraft_entity (with +0x66e == 0 clears engine-running +0x669) | ENGINE SWITCHED OFF (iter 340) | PROVEN flow / STRONG_INFERENCE name |
-| 15 | 0x8000 | apply_random_aircraft_damage when the bullet's +0x36 != 0; bullet +0x36 = 1 only for rounds fired by the player (update_aircraft_entity gun path, `psVar11[0x1b] = 1`) | kept by andi #$8000 at 0xf7ea (the only bit to survive a crash); no explicit test found | HIT BY THE PLAYER (kill attribution); its consumer is not yet identified | PROVEN writer chain / STRONG_INFERENCE (iter 352) |
+| 13 | 0x2000 | set while the gear retracts (+0x679 < 0, 0xf5a0), cleared while it extends (0xf588) | aircraft_tick replay 0xe628 / 0xe6d4 (gear = 0x2d when clear, 0 when set; on a change, re-derives the gear direction from the sign) | GEAR LEVER UP | PROVEN flow / STRONG_INFERENCE |
+| 14 | 0x4000 | aircraft_create 0xe11a, respawn (= 0x4000), key 'M' 0x7af6; cleared by keys '0'..'9' (0x79a6) and the throttle step (0x7df0) | 0x7de4, 0x82b6 (refuel snapshot), 0xeb5c, update_aircraft_entity (with +0x66e == 0 clears engine-running +0x669) | ENGINE SWITCHED OFF | PROVEN flow / STRONG_INFERENCE name |
+| 15 | 0x8000 | apply_random_aircraft_damage when the bullet's +0x36 != 0; bullet +0x36 = 1 only for rounds fired by the player (update_aircraft_entity gun path, `psVar11[0x1b] = 1`) | kept by andi #$8000 at 0xf7ea (the only bit to survive a crash); no explicit test found | HIT BY THE PLAYER (kill attribution); its consumer is not yet identified | PROVEN writer chain / STRONG_INFERENCE |
 
 ## Rejected / superseded interpretations
 
@@ -844,16 +844,16 @@ test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
 |---|---|---|
 | `FUN_00000054` copy length | `pcVar5 = FUN_00000020` | Replaced with `(code *)0x20` — function address equals byte count 32. |
 
-## Signature corrections (iteration 318)
+## Signature corrections
 
 | Symbols | Ghidra signature | Corrected | Confidence | Evidence | Downstream |
 |---|---|---|---|---|---|
-| create_*_controller (16 functions, see DECOMPILATION_PROGRESS iteration 318) | `void f(...)` | returns the new controller (`uint *`) in D0 | PROVEN | D0 = heap_alloc_cleared result untouched to RTS; instantiate_object_from_desc stores it at object +8 | Godot `sim_core.gd` `_call_fun_00004690` / create handlers: review |
+| create_*_controller (16 functions, see DECOMPILATION_PROGRESS ) | `void f(...)` | returns the new controller (`uint *`) in D0 | PROVEN | D0 = heap_alloc_cleared result untouched to RTS; instantiate_object_from_desc stores it at object +8 | Godot `sim_core.gd` `_call_fun_00004690` / create handlers: review |
 | point_over_face_xz (FUN_000132c8) | `void` | returns int (point_in_polygon_xz result) | PROVEN | D0 untouched after the last bsr; call sites 0x15236 / 0x1527a test D0 | none found in godot/ |
 | surface_type_under_object (FUN_00013452) | `void` | returns the surface code | PROVEN | bsr surface_type_at_point then RTS; callers use D0 at 0xf148 / 0xf1d0 / 0x11e04 | godot sim_core.gd / flight_math.gd reference FUN_00013452: review |
 | begin_offscreen_drawing (FUN_0000c11e) | `void` | returns the host +0x286 result (previous port?) | PROVEN (return) / STRONG_INFERENCE (meaning) | caller keeps D0 in a3 at 0xc242 | none found in godot/ |
 
-## Object flag long (+4) — iteration 322
+## Object flag long (+4)
 
 The low word is copied (zero-extended) from descriptor +0x16 by
 `alloc_object_from_desc`; big-endian byte +7 = bits 0–7, +6 = bits 8–15,
@@ -867,15 +867,15 @@ The low word is copied (zero-extended) from descriptor +0x16 by
 | 1 | 0x2 | +7 & 0x02 | excluded from view and collision (sent to the out-of-range path) | PROVEN (flow) | collect_far_objects 0x55c4 / 0x56f8 |
 | 2 | 0x4 | +7 & 0x04 | no camera-relative candidate entry | PROVEN (flow) | 0x5600 |
 | 6 | 0x40 | +7 & 0x40 | not put on the visible list; uses the player tests (handle_player_contact / test_player_vs_type0e_proximity); set on the player (DAT_0001b738) | PROVEN (flow) / STRONG_INFERENCE (meaning) | 0x55cc, 0x56f0, 0x579c |
-| 10 | 0x400 | +6 & 0x04 | destructible by gunfire: bullet_hits_shape marks it for destruction 1 hit in 8 (otherwise solid, the bullet stops) | PROVEN (flow) / STRONG_INFERENCE (iter 356) | 0x166c8 |
+| 10 | 0x400 | +6 & 0x04 | destructible by gunfire: bullet_hits_shape marks it for destruction 1 hit in 8 (otherwise solid, the bullet stops) | PROVEN (flow) / STRONG_INFERENCE | 0x166c8 |
 | 11 | 0x800 | +6 & 0x08 | one-frame mover flag, cleared by the sweep | PROVEN (flow) | 0x56d2 |
 | 15 | 0x8000 | +6 & 0x80 | added to DAT_0001c1e4 each frame; that list gets the +0x16 notice handlers (dispatch_overlap_collisions) | PROVEN (flow) | 0x56ac, 0x5832 |
 | 20 | 0x100000 | +5 & 0x10 | distance-based (proximity) collision instead of shape collision; set from bit 13 at creation | PROVEN (bit flow) / STRONG_INFERENCE (meaning) | 0x13e62, 0x570c, 0x5796, 0x116ca, alloc 0x45ba |
-| aircraft controller +0x668 / +0x669 (Pacific Conflict) | throttle setting 0..9 (byte; keys 0–9, step input clamped 0..9) / engine running (byte) | PROVEN (writers) / STRONG_INFERENCE | Iter 340: Ghidra `DAT_0001b738 + 0x19a` on int * = byte +0x668. |
-| aircraft controller +0x66e / +0x672 / +0x66a / +0x680 (Pacific Conflict) | engine power (long) / manifold gauge (word) / RPM tachometer (long) / fuel-burn accumulator (word) | PROVEN (arithmetic) / STRONG_INFERENCE (names) | Iter 341–342: power = density(altitude) × throttle; RPM -> mean of power and airspeed term; replaces the "pitch / roll / yaw axes" hypothesis. |
-| `DAT_0001b2c0` (Pacific Conflict, file 0x1b2e0) | altitude curve: 9 longs 421, 511, 627, 780, 977, 1241, 1646, 2623, 0 (bands of 0x10000) | PROVEN (values, lerp) / STRONG_INFERENCE (inverse air density; sea level -> 1.0 in both consumers) | Iter 343: read by table_lerp_1b2c0; sawtooth above 0x70000 because entry 8 = 0. |
+| aircraft controller +0x668 / +0x669 (Pacific Conflict) | throttle setting 0..9 (byte; keys 0–9, step input clamped 0..9) / engine running (byte) | PROVEN (writers) / STRONG_INFERENCE | Ghidra `DAT_0001b738 + 0x19a` on int * = byte +0x668. |
+| aircraft controller +0x66e / +0x672 / +0x66a / +0x680 (Pacific Conflict) | engine power (long) / manifold gauge (word) / RPM tachometer (long) / fuel-burn accumulator (word) | PROVEN (arithmetic) / STRONG_INFERENCE (names) | power = density(altitude) × throttle; RPM -> mean of power and airspeed term; replaces the "pitch / roll / yaw axes" hypothesis. |
+| `DAT_0001b2c0` (Pacific Conflict, file 0x1b2e0) | altitude curve: 9 longs 421, 511, 627, 780, 977, 1241, 1646, 2623, 0 (bands of 0x10000) | PROVEN (values, lerp) / STRONG_INFERENCE (inverse air density; sea level -> 1.0 in both consumers) | read by table_lerp_1b2c0; sawtooth above 0x70000 because entry 8 = 0. |
 
-## Aircraft type record (DAT_00026004 = controller +4) — iteration 345
+## Aircraft type record (DAT_00026004 = controller +4)
 
 The record is the definition record `DAT_0001b524[key]`: handler slots +2..+0x16,
 then flight data as signed words except +0x38 (long). `update_aircraft_entity`
@@ -893,7 +893,7 @@ compared against these fields as an angle. Users are in `Pacific Conflict.decomp
 | +0x2e / +0x30 | block 4c (grounded, gear down) | rolling friction: low speed or grass ('@') / normal | STRONG_INFERENCE |
 | +0x32 | block 4c | brake friction (brake +0x641 or surface 'P'); × 3 / 2 when sliding gear-up | STRONG_INFERENCE |
 | +0x34 | compute_template_force_from_626, block 4 | stall angle: above it marker 0xc, lift fades over 0x20 more | PROVEN flow / STRONG_INFERENCE |
-| +0x36 | block 3a | corner speed: up to it, stick +0x662 commands AoA = stick × stall / 512; from it to speed 0xca8 the factor falls linearly to stick × 1 | PROVEN flow (bytes 0xeb6e.., iter 347) / STRONG_INFERENCE |
+| +0x36 | block 3a | corner speed: up to it, stick +0x662 commands AoA = stick × stall / 512; from it to speed 0xca8 the factor falls linearly to stick × 1 | PROVEN flow (bytes 0xeb6e.., ) / STRONG_INFERENCE |
 | +0x38 (long) | scale_template_field_38 | rated engine power (× altitude factor) | STRONG_INFERENCE |
 | +0x3c / +0x3e | block 2a | static thrust / speed where thrust becomes power / speed | STRONG_INFERENCE |
 | +0x40 | block 1 | halved unless gear byte +0x679 == 0x2d (gear down) | UNKNOWN role |
@@ -901,7 +901,7 @@ compared against these fields as an angle. Users are in `Pacific Conflict.decomp
 | +0x44 | block 3a | AoA trim offset: AoA approaches commanded + +0x44 (128 = 2.8 deg) at gain (speed × 0x2a, × 0x143a, 4.12 steps) >> 8 | PROVEN flow / STRONG_INFERENCE |
 | +0x46 / +0x48 | block 3b, block 4c | ground speeds: at or below +0x46 the AoA is held at +0x42, between them it is blended back up (tail lifting), and below +0x46 the low-speed rolling friction +0x2e applies | PROVEN flow / STRONG_INFERENCE |
 
-### Aircraft type records in the data file — iteration 346 [PROVEN values]
+### Aircraft type records in the data file [PROVEN values]
 
 Records of 0x4a bytes at file 0x1a7b0 (key 1), 0x1a88e (key 2), 0x1a844 (key 3) and
 0x1a7fa (key 4). All four have +2 aircraft_tick, +0xa destroy 0xe0a4, +0xe 0xfb2a and
@@ -932,44 +932,45 @@ Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
 | +0x44 | 128 | 128 | 128 | 128 | — |
 | +0x46 / +0x48 | 640 / 1067 | same | same | same | — |
 
-## Aircraft control inputs — iteration 348
+## Aircraft control inputs
 
 | Symbol | Meaning | Confidence | Evidence |
 |---|---|---|---|
-| aircraft controller +0x662 / +0x664 / +0x666 (Pacific Conflict) | elevator (±0x200) / rudder (±0x40) / aileron (±0x140) inputs, 4-frame averages | PROVEN (flow, clamps) / STRONG_INFERENCE (names) | Iter 348: enqueue_control_inputs_avg4; mouse y -> elevator, mouse x -> aileron, Z / X keys (DAT_0001b858 = ±0x40) -> rudder; rings +0x644 / +0x64c / +0x654, sums +0x65c / +0x65e / +0x660, index +0x642. |
-| `DAT_0001b858` (Pacific Conflict) | rudder key input (word: +0x40 Z, -0x40 X, 0) | PROVEN | Iter 348: key handler cases 0x5a / 0x3e and 0x58 / 0x3f. |
-| bullet controller +0x36 (Pacific Conflict) | fired by the player (word: 1 / 0) | PROVEN | Iter 352: set only when the shooter is DAT_0001b738; tick_bullet calls tally_destroyed_entity only when it is non-zero; apply_random_aircraft_damage copies it to +0x684 bit 15. |
+| aircraft controller +0x662 / +0x664 / +0x666 (Pacific Conflict) | elevator (±0x200) / rudder (±0x40) / aileron (±0x140) inputs, 4-frame averages | PROVEN (flow, clamps) / STRONG_INFERENCE (names) | enqueue_control_inputs_avg4; mouse y -> elevator, mouse x -> aileron, Z / X keys (DAT_0001b858 = ±0x40) -> rudder; rings +0x644 / +0x64c / +0x654, sums +0x65c / +0x65e / +0x660, index +0x642. |
+| `DAT_0001b858` (Pacific Conflict) | rudder key input (word: +0x40 Z, -0x40 X, 0) | PROVEN | key handler cases 0x5a / 0x3e and 0x58 / 0x3f. |
+| bullet controller +0x36 (Pacific Conflict) | fired by the player (word: 1 / 0) | PROVEN | set only when the shooter is DAT_0001b738; tick_bullet calls tally_destroyed_entity only when it is non-zero; apply_random_aircraft_damage copies it to +0x684 bit 15. |
 
-## Aircraft smoke-trail count — iteration 364
+## Aircraft smoke-trail count
 
 | Symbol | Meaning | Confidence | Evidence |
 |---|---|---|---|
 | aircraft controller +0x68c | active smoke trails (word): ++ in attach_smoke_trail, -- in destroy_trail_controller for a kind-0 trail still linked (+0x56); with damage bit 6 the engine runs only while it is non-zero | PROVEN | addq.w 0x16b84, subq.w 0x16df4, tst.w 0xe952 (the only three references) |
 
-## Gun turret (definition key 0x1b) — iteration 357
+## Gun turret (definition key 0x1b)
 
 | Symbol | Meaning | Confidence | Evidence |
 |---|---|---|---|
-| definition key 0x1b (file 0x1ab24) | gun turret carried by bombers and ships (+2 tick_turret, +0xe turret_pre_render) | PROVEN (record) | iterations 299 / 357 |
-| turret controller +0x3e / +0x40 | side (0x200 friendly targets types 3–4, 0x100 enemy targets types < 3, 0 never targets) / initialised flag (also the flak "shells" gate) | PROVEN | Iter 359: key 0x1b shares flak_notice_object (+0x16 = 0x18b9a) and destroy_flak_controller (+0xa = 0x18b78) with the flak gun. |
-| turret controller +0x48 / +0x4a | shot timer (fires when it reaches 0, reset to 2) / burst frames (7..14, a burst starts 1 frame in 16) | PROVEN | Iter 358, bytes 0x192da..0x1936a. |
-| turret controller +0x4c / +0x4e, +0x50 / +0x52 | aim angles (from attitude_from_velocity) / aim errors (±0x80 at burst start, × 7/8 per shot) | PROVEN | Iter 358. |
+| definition key 0x1b (file 0x1ab24) | gun turret carried by bombers and ships (+2 tick_turret, +0xe turret_pre_render) | PROVEN (record) | — |
+| turret controller +0x3e / +0x40 | side (0x200 friendly targets types 3–4, 0x100 enemy targets types < 3, 0 never targets) / initialised flag (also the flak "shells" gate) | PROVEN | key 0x1b shares flak_notice_object (+0x16 = 0x18b9a) and destroy_flak_controller (+0xa = 0x18b78) with the flak gun. |
+| turret controller +0x48 / +0x4a | shot timer (fires when it reaches 0, reset to 2) / burst frames (7..14, a burst starts 1 frame in 16) | PROVEN |, bytes 0x192da..0x1936a. |
+| turret controller +0x4c / +0x4e, +0x50 / +0x52 | aim angles (from attitude_from_velocity) / aim errors (±0x80 at burst start, × 7/8 per shot) | PROVEN | — |
 | turret controller +0x46 | knocked out by gunfire (word, 0 / 1; set 1 hit in 16 by bullet_hits_shape, never cleared by turret code) | PROVEN (accesses) / STRONG_INFERENCE (permanent) | tst.w at 0x19220 / 0x1939e; move.w #1 at 0x1670e. Replaces "reloading". |
 
-## False entries and runtime-address callees — iteration 376
+## False entries and runtime-address callees
 
 `lea.l $xxxx.l` / `jsr (aN)` operands in the overlay are RUNTIME addresses (file offset
 - 0x20). Ghidra treated them as file offsets and invented functions at the wrong place.
 
 | Ghidra name | Real callee | Evidence |
 |---|---|---|
-| `FUN_00002de8` (false entry) | `abs_int` (file 0x2e08) | iteration 361 |
-| `FUN_00003c48` (false entry inside `compute_camera_abs_metric`; was named `approx_dist3_from_abs`) | `approx_dist3_xyz` (file 0x3c68) | iteration 376: all 6 references are `lea.l $3c48.l`; 6 call sites corrected in the decomp |
-| `LAB_000028ba_2` (update_tracking_camera) | `transform_vecs12_by_matrix3` (file 0x28dc) | iteration 376: `lea.l $28bc.l` at 0x8dc6 |
-| `heap_roving_cursor_store` (FUN_00001a48, false entry) | `heap_alloc(size)` (file 0x1a68) | iteration 377: all 4 `lea.l $1a48.l` (overlay_main_entry ×2, 0x4e6e, 0xb4b6); 27 call sites corrected; resolves the old "$1A48 allocator ABI" blocker |
-| `heap_add_large_block_tail` (0x19b0), `heap_zero_payload_tail` (0x1b4c), `heap_realloc_grow_only_tail` (0x1be4), `reset_object_to_template_pose_tail` (0x4e4e), `overlay_rng_warmup_epilogue` (0x11544) | `heap_free_coalesce`, `heap_alloc_cleared`, `copy_object_vertex_buffer`, `activate_near_range_object`, `overlay_rng_next` (each + 0x20) | iteration 377 scan of all `lea.l` code operands; overlay_rng_next done in iteration 378 (17 lea, 49 call sites, now PROVEN); the other four corrected in iteration 379 (activate_near_range_object ×3 and copy_object_vertex_buffer ×2 in init_mission_object_tables, heap_free_coalesce ×2 in deactivate_object, heap_alloc_cleared ×2 in create_wave_spawner_controller) |
+| `FUN_00002de8` (false entry) | `abs_int` (file 0x2e08) | — |
+| `FUN_00003c48` (false entry inside `compute_camera_abs_metric`; was named `approx_dist3_from_abs`) | `approx_dist3_xyz` (file 0x3c68) | all 6 references are `lea.l $3c48.l`; 6 call sites corrected in the decomp |
+| `LAB_000028ba_2` (update_tracking_camera) | `transform_vecs12_by_matrix3` (file 0x28dc) | `lea.l $28bc.l` at 0x8dc6 |
+| `LAB_0000e3e8_4` (turn_camera_toward_point) | `fold_angle_pm_0x2000` (file 0xe40c) | `lea.l $e3ec.l` at 0x8b68 |
+| `heap_roving_cursor_store` (FUN_00001a48, false entry) | `heap_alloc(size)` (file 0x1a68) | all 4 `lea.l $1a48.l` (overlay_main_entry ×2, 0x4e6e, 0xb4b6); 27 call sites corrected; resolves the old "$1A48 allocator ABI" blocker |
+| `heap_add_large_block_tail` (0x19b0), `heap_zero_payload_tail` (0x1b4c), `heap_realloc_grow_only_tail` (0x1be4), `reset_object_to_template_pose_tail` (0x4e4e), `overlay_rng_warmup_epilogue` (0x11544) | `heap_free_coalesce`, `heap_alloc_cleared`, `copy_object_vertex_buffer`, `activate_near_range_object`, `overlay_rng_next` (each + 0x20) |  scan of all `lea.l` code operands; overlay_rng_next done (17 lea, 49 call sites, now PROVEN); the other four corrected (activate_near_range_object ×3 and copy_object_vertex_buffer ×2 in init_mission_object_tables, heap_free_coalesce ×2 in deactivate_object, heap_alloc_cleared ×2 in create_wave_spawner_controller) |
 
-Iteration 380 completeness check [PROVEN, byte scan]: the 78 absolute `move.l #$xxxx`
+Runtime-address completeness check [PROVEN, byte scan]: the 78 absolute `move.l #$xxxx`
 code-pointer stores (64 distinct targets) (state handlers, definition-table slots, renderer hooks) all point
 at file xxxx + 0x20, and the decomp already names those targets. The three `pea.l
 $xxx(pc)` callbacks (collect_map_features 0x6ec, nearest_type80_centroid_visitor 0xaba,
@@ -980,15 +981,18 @@ checked against the runtime-address rule.
 ## Call-argument corrections
 
 Ghidra calls that lost their stack arguments; the bytes give the real list.
-Under the 2026-10-18 policy, a function whose body matches the bytes is VERIFIED once
+Under the verification policy, a function whose body matches the bytes is VERIFIED once
 its dropped arguments are listed here.
 
 | Caller | Callee | Real arguments | Evidence |
 |---|---|---|---|
-| `bullet_hits_aircraft` (FUN_000167f4) | `segment_point_min_distance` (FUN_00003cca) | 9 longs: bullet pos - vel/2 (x, y, z), bullet vel (x, y, z), aircraft pos (x, y, z) | bytes 0x16804..0x16852, iter 354 |
-| (callee side) | `segment_point_min_distance` (FUN_00003cca) | reads the deltas as low words (signed 16-bit); floor midpoints; word distances (wrap above 0x7fff) | bytes 0x3cca..0x3da6, iter 355 |
-| `bullet_hits_shape` (FUN_0001665a) | `segment_point_min_distance` (FUN_00003cca) | same 9 longs as bullet_hits_aircraft | bytes 0x1666a..0x166b8, iter 356 |
-| `flak_notice_object` (FUN_00018bba) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: gun pos (x, y, z), target pos (x, y, z) | bytes 0x18c10..0x18c28, iter 360 |
-| `approx_dist3_xyz` (FUN_00003c68) itself | `abs_int` via Ghidra `FUN_00002de8` | its own 6 longs (x1, y1, z1, x2, y2, z2); each call gets x2 - x1 / y2 - y1 / z2 - z1 | bytes 0x3c70..0x3c9c, iter 361 |
-| `update_tracking_camera` (FUN_00008c30) | `approx_dist3_xyz` ×3 | 0x8cd0: player pos, target pos; 0x8e06 / 0x8e78: own pos + rotated (0, 0, 0x4000), other pos | bytes 0x8cb4..0x8e78, iter 381 |
-| `update_bailout_view` (FUN_00008972) | `approx_dist3_xyz` | 6 longs: aircraft pos, parachute pos | bytes 0x89de..0x89f6, iter 384 |
+| `bullet_hits_aircraft` (FUN_000167f4) | `segment_point_min_distance` (FUN_00003cca) | 9 longs: bullet pos - vel/2 (x, y, z), bullet vel (x, y, z), aircraft pos (x, y, z) | bytes 0x16804..0x16852 |
+| (callee side) | `segment_point_min_distance` (FUN_00003cca) | reads the deltas as low words (signed 16-bit); floor midpoints; word distances (wrap above 0x7fff) | bytes 0x3cca..0x3da6 |
+| `bullet_hits_shape` (FUN_0001665a) | `segment_point_min_distance` (FUN_00003cca) | same 9 longs as bullet_hits_aircraft | bytes 0x1666a..0x166b8 |
+| `flak_notice_object` (FUN_00018bba) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: gun pos (x, y, z), target pos (x, y, z) | bytes 0x18c10..0x18c28 |
+| `approx_dist3_xyz` (FUN_00003c68) itself | `abs_int` via Ghidra `FUN_00002de8` | its own 6 longs (x1, y1, z1, x2, y2, z2); each call gets x2 - x1 / y2 - y1 / z2 - z1 | bytes 0x3c70..0x3c9c |
+| `update_tracking_camera` (FUN_00008c30) | `approx_dist3_xyz` ×3 | 0x8cd0: player pos, target pos; 0x8e06 / 0x8e78: own pos + rotated (0, 0, 0x4000), other pos | bytes 0x8cb4..0x8e78 |
+| `update_bailout_view` (FUN_00008972) | `approx_dist3_xyz` | 6 longs: aircraft pos, parachute pos | bytes 0x89de..0x89f6 |
+| `turn_camera_toward_point` (FUN_00008abe) | `compute_camera_abs_metric`, `abs_int` ×2 | (x, y, z); abs_int(pitch diff), abs_int(heading diff) | bytes 0x8ad2..0x8b9e |
+| `DAT_00024d1a` / `DAT_00024d18` (Pacific Conflict) | camera pitch / camera heading (words, 0..0x3fff); DAT_0001d810 / DAT_0001d80e = their negatives | PROVEN | corrects the  heading / pitch order: attitude_from_velocity's 7th output is the heading (from x / z), its 6th the pitch (from y). |
+| `attitude_from_velocity` (FUN_00001f22) | `abs_int` ×2 (Ghidra FUN_00002de8) | abs_int(x), abs_int(z) | bytes 0x1f3e..0x1f50 |

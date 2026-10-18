@@ -38,7 +38,7 @@ Every row must cite **source file:line** or **binary offset**. All statements ta
 
 ### Godot `SimCore` mapping
 
-**[RECONSTRUCTED]** `entity_array_1` … `entity_array_4`, **`pass_id`** 1–4, **`last_tick_order`** / **`get_last_tick_order()`** — see `docs/contracts/tick_FUN_000044e8_contract.md`.
+**[RECONSTRUCTED]** `entity_array_1` … `entity_array_4`, **`pass_id`** 1–4, **`last_tick_order`** / **`get_last_tick_order`** — see `docs/contracts/tick_FUN_000044e8_contract.md`.
 
 ## FUN_0000740a — input handler globals
 
@@ -77,7 +77,7 @@ See `docs/contracts/input_godot_contract.md`.
 
 **[MVP APPROXIMATION]** Targets are not **local_46** / **local_42** from **FUN_0000e42a** / template math; they are **[MVP TUNING]** scaled commands.
 
-**[INFERRED]** `snapshot()` includes these fields for HUD/objectives/traces.
+**[INFERRED]** `snapshot` includes these fields for HUD/objectives/traces.
 
 ## Entity (FUN_0000e792) — key offsets
 
@@ -122,7 +122,7 @@ See `docs/contracts/input_godot_contract.md`.
 | 0x1a1 | byte/ushort | status at +0x684 (Ghidra int* index) |
 | 0x1a3 | short | 14137 |
 
-### Control channels + `flags_685` bitfield (iter 94–96)
+### Control channels + `flags_685` bitfield
 
 Fed by `enqueue_control_inputs_avg4` (`FUN_00010558`) when **bit0 clear**; consumed in `update_aircraft_entity` Block 1+.
 
@@ -151,7 +151,7 @@ Related: **+0x684 bit0** (status) forces `+0x662=0`, `+0x666=0xFF80` after jitte
 
 ## FUN_0000e792 — ownership branch (0x66e, 0x672, 0x66a writes)
 
-**[RECONSTRUCTED]** The following writes occur **only when** `(param_1 == DAT_0001b738) || (param_1 == DAT_0001b888)` (Pacific Conflict.c:14179). **DAT_0001b738** = player entity pointer; **DAT_0001b888** = second entity pointer (e.g. target). See [NOTES.md](NOTES.md) “FUN_0000e792 — ownership branch” for setup/use sites. **[UNKNOWN]** Semantic meaning of the three accumulators (e.g. axis or control surface).
+**[RECONSTRUCTED]** The following writes occur **only when** `(param_1 == DAT_0001b738) || (param_1 == DAT_0001b888)` (Pacific Conflict.c:14179). **DAT_0001b738** = player entity pointer; **DAT_0001b888** = second entity pointer (e.g. target). Setup/use sites are recorded in the `FUN_0000e792` source-local annotation. **[UNKNOWN]** Semantic meaning of the three accumulators (e.g. axis or control surface).
 
 | Offset | Type | Condition for write | Delta rule | Source (Pacific Conflict.c) |
 |--------|------|---------------------|------------|------------------------------|
@@ -185,7 +185,7 @@ Related: **+0x684 bit0** (status) forces `+0x662=0`, `+0x666=0xFF80` after jitte
 | 0x48 | short | 14304, 14306 |
 
 **[INFERRED]** Godot models this as `EntityTemplate`, a separate auxiliary record attached to `EntityState`, specifically to avoid guessing packed entity layout or folding external pointed-to data into the entity byte offsets.
-**[RECONSTRUCTED]** `compute_template_field_40_adjustment()` in `SimCore` mirrors the proven `FUN_0000e792` rule at lines 14067-14074: `field_40` is used directly when `direction_char_679 == '-'`, otherwise it is halved toward zero.
+**[RECONSTRUCTED]** `compute_template_field_40_adjustment` in `SimCore` mirrors the proven `FUN_0000e792` rule at lines 14067-14074: `field_40` is used directly when `direction_char_679 == '-'`, otherwise it is halved toward zero.
 **[RECONSTRUCTED]** `field_38` is also now modeled in Godot helper math because `FUN_0000e570` reads `*(int *)(DAT_00026004 + 0x38)` directly. [Pacific Conflict.c:13910-13915]
 
 ## Cross-reference to Godot

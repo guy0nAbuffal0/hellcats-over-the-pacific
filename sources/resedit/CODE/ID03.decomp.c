@@ -11,7 +11,7 @@ typedef unsigned char    byte;
 
 /*
  * Original: FUN_00000006; source: ID03.c:12.
- * Recovered name: set_scaled_text_style [STRONG INFERENCE] (iteration 160).
+ * Recovered name: set_scaled_text_style [STRONG INFERENCE].
  * Ghidra truncated at $A888. Bytes 0x06..0x54 [PROVEN]: word size at 8(A6).
  *   if (mode A5-0x137a == 1) { TextFace(0) $A888;
  *       TextSize(scale_design_4800((short)(size * 10) / 3)) $A88A }
@@ -35,7 +35,7 @@ void set_scaled_text_style /* Original: FUN_00000006 */ (void)
 
 /*
  * Original: FUN_00000056; source: ID03.c:27.
- * Recovered name: scale_design_480_min10 [STRONG INFERENCE] (iteration 159).
+ * Recovered name: scale_design_480_min10 [STRONG INFERENCE].
  * Exported C complete: v = (long A5-0x149e * (short)param + 5) / 480, then at
  * least 10 (when clamped, the high word of the result becomes 0). A5-0x149e is a
  * scale factor (screen-size dependent) [STRONG INFERENCE; identity UNKNOWN].
@@ -60,7 +60,7 @@ undefined4 scale_design_480_min10 /* Original: FUN_00000056 */ (undefined4 param
 
 /*
  * Original: FUN_0000008a; source: ID03.c:45.
- * Recovered name: scale_design_4800 [STRONG INFERENCE] (iteration 159).
+ * Recovered name: scale_design_4800 [STRONG INFERENCE].
  * Exported C complete: (long A5-0x149e * (short)param) / 4800 (signed, truncating).
  * Converts design units to screen units [STRONG INFERENCE].
  */
@@ -76,7 +76,7 @@ int scale_design_4800 /* Original: FUN_0000008a */ (undefined4 param_1)
 
 /*
  * Original: FUN_000000a6; source: ID03.c:55.
- * Recovered name: scale_design_4800_pen_centred [STRONG INFERENCE] (iteration 159).
+ * Recovered name: scale_design_4800_pen_centred [STRONG INFERENCE].
  * Exported C complete: scale_design_4800(v) - thePort->pnSize.h (+0x36) / 2
  * (pen-centred coordinate). Ghidra's unaff_A6 half is register residue.
  */
@@ -95,7 +95,7 @@ short scale_design_4800_pen_centred /* Original: FUN_000000a6 */ (undefined4 par
 
 /*
  * Original: FUN_000000c8; source: ID03.c:68.
- * Recovered name: max3_int [STRONG INFERENCE] (iteration 159).
+ * Recovered name: max3_int [STRONG INFERENCE].
  * Exported C complete: signed maximum of three longs.
  */
 int max3_int /* Original: FUN_000000c8 */ (int param_1,int param_2,int param_3)
@@ -114,7 +114,7 @@ int max3_int /* Original: FUN_000000c8 */ (int param_1,int param_2,int param_3)
 
 /*
  * Original: FUN_000000f4; source: ID03.c:82.
- * Recovered name: nearest_palette_index_rgb [STRONG INFERENCE] (iteration 159).
+ * Recovered name: nearest_palette_index_rgb [STRONG INFERENCE].
  * Exported C complete. param_1 -> RGB (3 words). JT $4da = ID02 FUN_0000001e
  * (abs). Distance = max3_int(|dr|, |dg|, |db|) (Chebyshev).
  *   best over the 8 base colours at A5-0x350 (6 bytes each);
@@ -194,7 +194,7 @@ LAB_0000027e:
 
 /*
  * Original: FUN_000002a8; source: ID03.c:148.
- * Recovered name: new_offscreen_bw_port [STRONG INFERENCE] (iteration 160).
+ * Recovered name: new_offscreen_bw_port [STRONG INFERENCE].
  * Ghidra truncated after the allocations. Bytes 0x2a8..0x33a [PROVEN].
  * Args: words width [8(A6)], height [$a(A6)]. Returns GrafPtr (D0).
  *   rowBytes = (width / 16) * 2 + 2; bits = NewPtrClear(height * rowBytes)
@@ -223,7 +223,7 @@ void new_offscreen_bw_port /* Original: FUN_000002a8 */ (undefined4 param_1)
 
 /*
  * Original: FUN_0000033c; source: ID03.c:164.
- * Recovered name: dispose_offscreen_bw_port [STRONG INFERENCE] (iteration 160).
+ * Recovered name: dispose_offscreen_bw_port [STRONG INFERENCE].
  * Ghidra truncated. Bytes 0x33c..0x35c [PROVEN]: arg GrafPtr port;
  *   ClosePort(port) $A87D; DisposPtr(port->portBits.baseAddr (+2)) (JT $23a);
  *   DisposPtr(port). Inverse of new_offscreen_bw_port. Caller: FUN_000032b8
@@ -243,7 +243,7 @@ void dispose_offscreen_bw_port /* Original: FUN_0000033c */ (void)
 /*
  * Original: FUN_0000035e; source: ID03.c:175.
  * Recovered name: draw_spinning_disc_indicator [STRONG INFERENCE mechanics]
- * (iteration 163; INVESTIGATING in iteration 161). Ghidra exported no body.
+ * (; INVESTIGATING). Ghidra exported no body.
  * Bytes 0x35e..0x512 [PROVEN]. Args: words cx [8(A6)], cy [$a(A6)] (design units).
  *   d = word A5-0x2114 (size); r.left = design_x_to_screen(cx - d/2);
  *   r.top = design_y_to_screen(cy - d/2); r.right = r.left + scale_design_4800(d);
@@ -262,7 +262,7 @@ void dispose_offscreen_bw_port /* Original: FUN_0000033c */ (void)
  *     phase = (phase + 5) & 3   (advances one step per call);
  *   SetClip(saved); DisposeRgn(ring); DisposeRgn(saved).
  * A grey disc with a spoke that rotates 45 degrees per call [STRONG INFERENCE].
- * Iteration 167 [HYPOTHESIS, stronger]: a bezel screw head - draw_instrument
+ *  [HYPOTHESIS, stronger]: a bezel screw head - draw_instrument
  * places these at the bezel corners, and the stepping phase gives each screw a
  * different slot orientation (not an animation). Callers: 5 BSRs inside
  * draw_ring_with_status_indicators (FUN_00000514; file 0x624, 0x684, 0x6e2, 0x742, 0x774).
@@ -281,7 +281,7 @@ void draw_spinning_disc_indicator /* Original: FUN_0000035e */ (void)
 /*
  * Original: FUN_00000514; source: ID03.c:186.
  * Recovered name: draw_ring_with_status_indicators [STRONG INFERENCE mechanics /
- * HYPOTHESIS purpose] (iteration 164). Exported C kept (truncated at $A8B8).
+ * HYPOTHESIS purpose]. Exported C kept (truncated at $A8B8).
  * Bytes 0x514..0x77c [PROVEN]. Words: d [8], w [$a], cy [$c], cx [$e];
  * flags = long [$10] (bits tested on byte $11).
  *   r.left = design_x_to_screen(cx - d/2); r.top = design_y_to_screen(cy - d/2);
@@ -313,7 +313,7 @@ void draw_ring_with_status_indicators /* Original: FUN_00000514 */ (undefined4 p
 
 
 
-/* Original: FUN_0000077e; source: ID03.c. Recovered name: draw_vector_glyph_string_centred [STRONG INFERENCE] (iteration 206).
+/* Original: FUN_0000077e; source: ID03.c. Recovered name: draw_vector_glyph_string_centred [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x77e.
  * C args: +8 char *text, +0xc short scale, +0xe short x, +0x10 short y (design units). First pass: for each character found in the six-entry glyph table A5-0x20b0 (pointer per glyph; glyph byte 0 = character, byte 1 = width), x -= (width + 1) * scale / 2 - centres the string. Second pass: for each character, MoveTo / LineTo strokes ($A893 / $A891) from the glyph point list, scaled with scale_design_4800_pen_centred (0xa6) [PROVEN control flow; glyph data is A5 initial data, not read]. Caller: draw_direction_indicator (0x2bd6) - probably the compass letters [HYPOTHESIS]. Ghidra truncated the drawing loop.
  */
@@ -368,7 +368,7 @@ void draw_vector_glyph_string_centred /* Original: FUN_0000077e */ (char *param_
 
 /*
  * Original: FUN_00000912; source: ID03.c:253.
- * Recovered name: draw_vector_number [STRONG INFERENCE] (iteration 161).
+ * Recovered name: draw_vector_number [STRONG INFERENCE].
  * Exported C kept (truncated after the first stroke). Words: value = param_1
  * high, scale = param_1 low, cx = param_2 high, y = param_2 low.
  * Splits value into up to 5 decimal digits (most significant first in
@@ -424,17 +424,17 @@ void draw_vector_number /* Original: FUN_00000912 */ (undefined4 param_1,undefin
 /*
  * Original: FUN_00000a3c; source: ID03.c:294.
  * Recovered name: antialias_downsample_bw_3x [STRONG INFERENCE]
- * (iteration 166; INVESTIGATING in iteration 165). Ghidra exported no body.
+ * (; INVESTIGATING). Ghidra exported no body.
  * Bytes 0xa3c..0x1468 [PROVEN]. Args: GrafPtr src [8] (1-bit port: base +2,
  * rowBytes +6), word x0 [$c], word y0 [$e], word rows [$10], word cols [$12],
  * byte *out [$14] (optional, 0 = none).
  *   PenPat(QD black); seven source row pointers base + k*rowBytes (k = 0..6);
  *   row step = 3 * rowBytes; if (out) clear cols bytes of out;
- *   for row in 0 .. rows-2:
- *     for i in 0 .. cols-1 (source x advances by 3 per output pixel):
+ *   for row in 0.. rows-2:
+ *     for i in 0.. cols-1 (source x advances by 3 per output pixel):
  *       sum = sum over a 7x7 window of source bits (mask table A5-0x1fb6[x&7],
  *             byte x>>3) times a symmetric kernel peaking at the centre
- *             (e.g. 8,21,29,21,8 / 21,54,73,54,21 / 29,73,97,73,29 ...);
+ *             (e.g. 8,21,29,21,8 / 21,54,73,54,21 / 29,73,97,73,29...);
  *       level = sum * 0xffff / 0x3c9   (969 = total kernel weight; MULU.L /
  *             DIVS.L) -> RGB grey at -0x2c(A6);
  *       c = nearest_palette_index_rgb(&rgb); set_draw_color_index(c) (JT $36a);
@@ -455,9 +455,9 @@ void antialias_downsample_bw_3x /* Original: FUN_00000a3c */ (void)
 
 
 
-/* Original: FUN_0000146a; source: ID03.c. Recovered name: composite_instrument_bitmap [PROVEN] (iteration 206).
+/* Original: FUN_0000146a; source: ID03.c. Recovered name: composite_instrument_bitmap [PROVEN].
  * Decoded from ID03.bin bytes at file 0x146a.
- * C args: +8 GrafPtr src (the instrument port), +0xc short size, +0xe short (0 from the caller), +0x10 short x, +0x12 short y. Computes the destination rect from scale_design_4800(size) and design_x_to_screen / design_y_to_screen (JT $3ca / $382). Depth 1 (A5-0x137a == 1): rect = src portRect offset to the destination (OffsetRect $A8A8), CopyBits(src bits, panel port A5-0x1496 bits, &src portRect, &rect, mode 3 = srcBic, NULL) ($A8EC). Otherwise antialias_downsample_bw_3x(src, rect ..., colour A5-0x1fa6) into the panel. Caller: finish_instrument_supersample (0x1860).
+ * C args: +8 GrafPtr src (the instrument port), +0xc short size, +0xe short (0 from the caller), +0x10 short x, +0x12 short y. Computes the destination rect from scale_design_4800(size) and design_x_to_screen / design_y_to_screen (JT $3ca / $382). Depth 1 (A5-0x137a == 1): rect = src portRect offset to the destination (OffsetRect $A8A8), CopyBits(src bits, panel port A5-0x1496 bits, &src portRect, &rect, mode 3 = srcBic, NULL) ($A8EC). Otherwise antialias_downsample_bw_3x(src, rect..., colour A5-0x1fa6) into the panel. Caller: finish_instrument_supersample (0x1860).
  */
 // WARNING: Control flow encountered bad instruction data
 
@@ -485,8 +485,8 @@ void composite_instrument_bitmap /* Original: FUN_0000146a */ (undefined4 param_
 
 /*
  * Original: FUN_00001538; source: ID03.c:327.
- * Recovered name: begin_instrument_supersample [STRONG INFERENCE] (iteration 168).
- * Exported C kept (two truncated branches). Args: short *size, *x, *y, ...,
+ * Recovered name: begin_instrument_supersample [STRONG INFERENCE].
+ * Exported C kept (two truncated branches). Args: short *size, *x, *y,...,
  * GrafPtr *out_port. If mode A5-0x137a == 1 (1-bit screen): creates a 1x B&W
  * port with new_offscreen_bw_port(scaled size). Otherwise multiplies x and y
  * by 3 and creates a port of 3 * scaled size + 6 for 3x supersampling
@@ -530,7 +530,7 @@ void begin_instrument_supersample /* Original: FUN_00001538 */ (undefined2 *para
 
 
 
-/* Original: FUN_00001844; source: ID03.c. Recovered name: finish_instrument_supersample [PROVEN] (iteration 206).
+/* Original: FUN_00001844; source: ID03.c. Recovered name: finish_instrument_supersample [PROVEN].
  * Decoded from ID03.bin bytes at file 0x1844.
  * C args: +8 GrafPtr port, +0xc short size, +0xe short x, +0x10 short y. SetPort(panel port A5-0x1496) ($A873); composite_instrument_bitmap(port, size, 0, x, y); dispose_offscreen_bw_port(port) (0x33c). Ends the begin_instrument_supersample sequence. Callers: draw_airspeed_indicator (0x1b3c), draw_climb_indicator (0x1fe2), draw_tachometer (0x22f2), draw_manifold_pressure_gauge (0x25f4).
  */
@@ -551,11 +551,11 @@ void finish_instrument_supersample /* Original: FUN_00001844 */ (void)
 
 /*
  * Original: FUN_00001876; source: ID03.c:379.
- * Recovered name: draw_altimeter [STRONG INFERENCE] (iteration 168).
+ * Recovered name: draw_altimeter [STRONG INFERENCE].
  * Instrument type 0 of draw_instrument. Exported C kept (truncated). Bytes
  * 0x1876..0x1b46 [PROVEN, condensed]: begin_instrument_supersample(...);
  * tick/needle geometry through function pointer long A5-0x2118 (JSR (A0)) in
- * loops of 12 steps; a 20-iteration loop of draw_vector_number labels;
+ * loops of 12 steps; a 20-pass loop of draw_vector_number labels;
  * TextFont(1) $A887, set_scaled_text_style(20), GetFontInfo $A88B; label
  * string = long A5-0xe42 = STR# 129 slot 65 (A5-0xf46 + 65*4) -> centred with
  * StringWidth $A88C, MoveTo, DrawString $A884; finish via FUN_00001844.
@@ -582,7 +582,7 @@ void draw_altimeter /* Original: FUN_00001876 */ (undefined4 param_1,undefined2 
 
 /*
  * Original: FUN_00001b48; source: ID03.c:394.
- * Recovered name: draw_airspeed_indicator [STRONG INFERENCE] (iteration 169).
+ * Recovered name: draw_airspeed_indicator [STRONG INFERENCE].
  * Instrument type 1 of draw_instrument. Label strings loaded from the
  * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 66 "AIR" + 67 "SPEED" [PROVEN from
  * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
@@ -623,7 +623,7 @@ void draw_airspeed_indicator /* Original: FUN_00001b48 */ (undefined4 param_1,un
 
 /*
  * Original: FUN_00001fee; source: ID03.c:427.
- * Recovered name: draw_climb_indicator [STRONG INFERENCE] (iteration 169).
+ * Recovered name: draw_climb_indicator [STRONG INFERENCE].
  * Instrument type 3 of draw_instrument. Label strings loaded from the
  * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 68 "CLIMB" [PROVEN from
  * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
@@ -662,7 +662,7 @@ void draw_climb_indicator /* Original: FUN_00001fee */ (undefined4 param_1,undef
 
 /*
  * Original: FUN_000022fe; source: ID03.c:458.
- * Recovered name: draw_tachometer [STRONG INFERENCE] (iteration 169).
+ * Recovered name: draw_tachometer [STRONG INFERENCE].
  * Instrument type 5 of draw_instrument. Label strings loaded from the
  * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 69 "RPM" [PROVEN from
  * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
@@ -685,7 +685,7 @@ void draw_tachometer /* Original: FUN_000022fe */ (undefined4 param_1,undefined2
 
 /*
  * Original: FUN_00002600; source: ID03.c:473.
- * Recovered name: draw_manifold_pressure_gauge [STRONG INFERENCE] (iteration 169).
+ * Recovered name: draw_manifold_pressure_gauge [STRONG INFERENCE].
  * Instrument type 4 of draw_instrument. Label strings loaded from the
  * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 70 "Manifold" + 71 "Pressure" [PROVEN from
  * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
@@ -724,7 +724,7 @@ void draw_manifold_pressure_gauge /* Original: FUN_00002600 */ (undefined4 param
 
 /*
  * Original: FUN_00002950; source: ID03.c:504.
- * Recovered name: draw_direction_indicator [STRONG INFERENCE] (iteration 169).
+ * Recovered name: draw_direction_indicator [STRONG INFERENCE].
  * Instrument type 6 of draw_instrument. Label strings loaded from the
  * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 72 "DIRECTION" [PROVEN from
  * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
@@ -747,7 +747,7 @@ void draw_direction_indicator /* Original: FUN_00002950 */ (undefined4 param_1,u
 
 /*
  * Original: FUN_00002d1c; source: ID03.c:519.
- * Recovered name: draw_turn_and_bank_indicator [STRONG INFERENCE] (iteration 169).
+ * Recovered name: draw_turn_and_bank_indicator [STRONG INFERENCE].
  * Instrument type 2 of draw_instrument. Label strings loaded from the
  * STR# 129 pointer table (A5-0xf46 + 4*slot): slot 73 "TURN" + 74 "BANK" [PROVEN from
  * the resource dump, 0-based files, slot n = file n-1]. Gauge identity from
@@ -766,7 +766,7 @@ void draw_turn_and_bank_indicator /* Original: FUN_00002d1c */ (undefined4 param
 
 
 
-/* Original: FUN_000032b8; source: ID03.c. Recovered name: draw_gyro_instrument [STRONG INFERENCE] (iteration 202).
+/* Original: FUN_000032b8; source: ID03.c. Recovered name: draw_gyro_instrument [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x32b8.
  * Instrument type 8 of draw_instrument (called with $a, $c, $e, $10, $12 and 1). Uses the handles A5-0x11dc and A5-0x11d4 (HLock / HUnlock through ID09 JT $26a / $272 / $27a), which ID03 0x5ba6..0x5bea saves with AddResource (HEL2, id base A5-0x13ae + 400 / 500) under the names STR# 129 slot 81 "GyroInstrument" and slot 82 "GyroFlags" [PROVEN]. Draws scale lines with design_x_to_screen / design_y_to_screen (JT $3ca / $382) and scale_design_4800, renders into a black-and-white port (new_offscreen_bw_port 0x2a8, SetOrigin), uses ID02 JT $402 (file 0xca6), PaintRect and CopyBits ($A8EC), then antialias_downsample_bw_3x (0xa3c) and dispose_offscreen_bw_port (0x33c) [PROVEN calls]. Which gyro instrument this is (and what the flags image shows) is not yet decoded [HYPOTHESIS name]. Ghidra truncated the body.
  */
@@ -781,7 +781,7 @@ void draw_gyro_instrument /* Original: FUN_000032b8 */ (void)
 
 
 
-/* Original: FUN_00003832; source: ID03.c. Recovered name: make_inset_face_oval_region [STRONG INFERENCE] (iteration 202).
+/* Original: FUN_00003832; source: ID03.c. Recovered name: make_inset_face_oval_region [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x3832.
  * C args: +8 Rect *r (out), +0xc short size, +0xe short y, +0x10 short x (design units). PenSize(1, 1); r = screen square from design_x_to_screen(x - size/2) + 1, design_y_to_screen(y - size/2) + 1, side scale_design_4800(size) - 2; InsetRect(r, scale(50), scale(50)); rgn = NewRgn ($A8D8); OpenRgn ($A8DA); FrameOval(r) ($A8B7); CloseRgn(rgn) ($A8DB); returns rgn [PROVEN, bytes 0x3832..0x38fa]: the oval of the instrument face inside the bezel. Caller: draw_artificial_horizon (0x3996).
  */
@@ -796,7 +796,7 @@ void make_inset_face_oval_region /* Original: FUN_00003832 */ (void)
 
 
 
-/* Original: FUN_000038fc; source: ID03.c. Recovered name: draw_artificial_horizon [STRONG INFERENCE] (iteration 202).
+/* Original: FUN_000038fc; source: ID03.c. Recovered name: draw_artificial_horizon [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x38fc.
  * Instrument type 9 of draw_instrument. Builds an oval region of the face (NewRgn / OpenRgn / FrameOval / CloseRgn) and a second one with make_inset_face_oval_region, combines them with DiffRgn ($A8E6), saves the clip (GetClip $A87A) and clips to the face (SetClip $A879); computes a rotated line with sine / cosine values through function pointers (jsr (A0); MULU.L then ASR.L #12, 4.12 fixed point) and draws it with MoveTo / LineTo, plus an 8-step loop of marks; restores the clip; uses the handle A5-0x11f6, which ID03 0x5b82 saves with AddResource under STR# 129 slot 80 "HorizonInstrument" [PROVEN], and PtInRgn ($A8E8) tests. Interpreted as the artificial horizon (bank-rotated horizon line in a round face) [STRONG INFERENCE from the resource name and the rotation]. Ghidra truncated the body.
  */
@@ -815,7 +815,7 @@ void draw_artificial_horizon /* Original: FUN_000038fc */ (void)
 
 /*
  * Original: FUN_00003c02; source: ID03.c:567.
- * Recovered name: draw_instrument [STRONG INFERENCE] (iteration 167).
+ * Recovered name: draw_instrument [STRONG INFERENCE].
  * Ghidra mis-decoded the inline switch table after JSR $3a(A5) as code (the
  * pbVar1 |= 0x50 and |= 0x8a00c6 statements are table bytes, not behaviour);
  * exported C kept verbatim. Bytes 0x3c02..0x3dbe decoded [PROVEN]; tail after
@@ -865,7 +865,7 @@ void draw_instrument /* Original: FUN_00003c02 */ (undefined4 param_1,undefined2
 
 
 
-/* Original: FUN_00003f24; source: ID03.c. Recovered name: draw_bevelled_frame [STRONG INFERENCE] (iteration 207).
+/* Original: FUN_00003f24; source: ID03.c. Recovered name: draw_bevelled_frame [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x3f24.
  * C args: eight shorts at +8..+0x16 = outer top, left, bottom, right, then inner top, left, bottom, right (screen coordinates; caller draw_numbered_bevel_box passes outer = rect, inner = rect inset by the bevel). Draws four quadrilateral polygons between the outer and inner rectangles (OpenPoly $A8CB, MoveTo / LineTo, ClosePoly $A8CC; FillPoly $A8CA with the pattern from JT $3e2 (ID02 0x150a), or PaintPoly $A8C7 for the last side), each in its own grey from lookup_palette_index_for_rgb_level levels 1 / 0 / 2 set with set_draw_color_index / set_back_color_index; KillPoly ($A8CD) after each [PROVEN traps]. The side shading gives a raised / sunken 3-D bevel [STRONG INFERENCE]. Callers: draw_numbered_bevel_box (0x41de), FUN_00004304 (0x465e).
  */
@@ -886,9 +886,9 @@ void draw_bevelled_frame /* Original: FUN_00003f24 */ (void)
 
 
 
-/* Original: FUN_00004110; source: ID03.c. Recovered name: draw_numbered_bevel_box [PROVEN] (iteration 207).
+/* Original: FUN_00004110; source: ID03.c. Recovered name: draw_numbered_bevel_box [PROVEN].
  * Decoded from ID03.bin bytes at file 0x4110.
- * C args: +8 Rect *r (in / out), +0xc short number. bevel = design_x_to_screen(20) - design_x_to_screen(0); inner = r inset by bevel; PaintRect(inner) in colour level 0 (black); draw_bevelled_frame(r, inner); *r = inner; colour level 4 at depth 1, else 3; pen = max(1, 10 * A5-0x149e / 480) and a size from scale_design_480_min10(12) (0x56) / 10; draw_vector_number(number, pen ..., centre of the rect converted back to design units: c * 4800 / A5-0x149e). Draws a black box with a bevelled border and a vector-font number in it. Callers: FUN_00004304 (0x46b6, 0x4718, 0x477a; rects A5-0x11c6, -0x11be, -0x11b6).
+ * C args: +8 Rect *r (in / out), +0xc short number. bevel = design_x_to_screen(20) - design_x_to_screen(0); inner = r inset by bevel; PaintRect(inner) in colour level 0 (black); draw_bevelled_frame(r, inner); *r = inner; colour level 4 at depth 1, else 3; pen = max(1, 10 * A5-0x149e / 480) and a size from scale_design_480_min10(12) (0x56) / 10; draw_vector_number(number, pen..., centre of the rect converted back to design units: c * 4800 / A5-0x149e). Draws a black box with a bevelled border and a vector-font number in it. Callers: FUN_00004304 (0x46b6, 0x4718, 0x477a; rects A5-0x11c6, -0x11be, -0x11b6).
  */
 // WARNING: Control flow encountered bad instruction data
 
@@ -907,7 +907,7 @@ void draw_numbered_bevel_box /* Original: FUN_00004110 */ (void)
 
 
 
-/* Original: FUN_00004304; source: ID03.c. Recovered name: draw_panel_section_with_numbered_boxes [STRONG INFERENCE mechanics] (iteration 210).
+/* Original: FUN_00004304; source: ID03.c. Recovered name: draw_panel_section_with_numbered_boxes [STRONG INFERENCE mechanics].
  * Decoded from ID03.bin bytes at file 0x4304.
  * No arguments. Caller: the panel redraw path of prepare_instrument_panel (0x67fa, after A5-0x2114 = 40). PaintRect of the design rect (-400, 750)-(400, 1560) in colour level 0, then (depth 1 or 4: level 0, else level (0, 1, 0)) InsetRect(2, 2) and PaintRect again; the inset rect -> A5-0x11aa; design point (-10, 1150) -> A5-0x11a0 / -0x119e; A5-0x11c8 = depth A5-0x137a; then two 26-step line loops (MoveTo / LineTo, design coordinates through JT $3ca / $382; counters compared with 0x19 and 0x1a) and draw_bevelled_frame around the area; finally three draw_numbered_bevel_box boxes stacked at design x 490..610, y 720..840, 900..1020, 1080..1200 (SetRect $A8A7) with the numbers 1, 3 and 15, their inner rects stored at A5-0x11c6, -0x11be, -0x11b6 [PROVEN, bytes 0x4304..0x478e]. What this panel section shows (and the meaning of 1 / 3 / 15) is not yet known [UNKNOWN]; the name only describes what is drawn.
  */
@@ -930,7 +930,7 @@ void draw_panel_section_with_numbered_boxes /* Original: FUN_00004304 */ (void)
 
 
 
-/* Original: FUN_00004790; source: ID03.c. Recovered name: draw_percent_scale_gauge [STRONG INFERENCE] (iteration 208).
+/* Original: FUN_00004790; source: ID03.c. Recovered name: draw_percent_scale_gauge [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x4790.
  * Caller: the panel redraw path of prepare_instrument_panel (0x681e) with design arguments (0x14a, 0x258, 7, scale_design_480_min10(10), 0x794, 0x898). Converts its box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800), PaintRect in colour level 0 and FrameRect ($A8A1) in level 3 (depth 1) or 2; draws ten tick marks (loop i = 0..9, MoveTo / LineTo, y step = height / 9); then into a 3x black-and-white port (new_offscreen_bw_port 0x2a8, SetOrigin(-2, -2)) draws the vector-font numbers 100 and 0 at the top and bottom of the scale (draw_vector_number 0x912), composites it with antialias_downsample_bw_3x (0xa3c) into the panel port A5-0x1496 and disposes the port (0x33c); stores its geometry in the record at A5-0x1186 [PROVEN calls and constants]. A vertical 0-100 percentage scale; which control it shows (throttle?) is open [HYPOTHESIS].
  */
@@ -945,7 +945,7 @@ void draw_percent_scale_gauge /* Original: FUN_00004790 */ (void)
 
 
 
-/* Original: FUN_00004b32; source: ID03.c. Recovered name: draw_split_display_box [STRONG INFERENCE] (iteration 209).
+/* Original: FUN_00004b32; source: ID03.c. Recovered name: draw_split_display_box [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x4b32.
  * Caller: the panel redraw path of prepare_instrument_panel (0x6846) with design arguments (0x17c, 0x17c, 7, scale_design_480_min10(10), 0x474, -0x2a8). PenSize(1, 1); converts the box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800); PaintRect in colour level 0; FrameRect ($A8A1) in level 2; InsetRect(3, 3); then splits the inset rect at its horizontal centre into a left half stored at A5-0x119c and a right half stored at A5-0x1194 (8-byte Rects) [PROVEN, bytes 0x4b32..0x4c40]. A5-0x119c is the rect that ID02 draw_notched_frame_pair_a5safe (overlay service slot -0x10ea) draws into, and A5-0x1194 is read by ID02 0x1206 / 0x1222 - so this lays out a two-part indicator box on the panel whose contents the overlay draws; which indicator is open [UNKNOWN].
  */
@@ -966,7 +966,7 @@ void draw_split_display_box /* Original: FUN_00004b32 */ (void)
 
 /*
  * Original: FUN_00004c42; source: ID03.c:673.
- * Recovered name: draw_flaps_indicator [STRONG INFERENCE] (iteration 171).
+ * Recovered name: draw_flaps_indicator [STRONG INFERENCE].
  * Not part of the draw_instrument type switch. Loads label slot 75 "FLAPS"
  * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
  * a bezel via draw_ring_with_status_indicators (BSR at file 0x4c58).
@@ -992,7 +992,7 @@ void draw_flaps_indicator /* Original: FUN_00004c42 */ (undefined4 param_1,undef
 
 /*
  * Original: FUN_00004ecc; source: ID03.c:691.
- * Recovered name: draw_ammo_counter [STRONG INFERENCE] (iteration 171).
+ * Recovered name: draw_ammo_counter [STRONG INFERENCE].
  * Not part of the draw_instrument type switch. Loads label slot 76 "AMMO"
  * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
  * a bezel via draw_ring_with_status_indicators (BSR at file 0x4ee2).
@@ -1016,9 +1016,9 @@ void draw_ammo_counter /* Original: FUN_00004ecc */ (undefined4 param_1,undefine
 // WARNING: Removing unreachable block (ram,0x000051c0)
 // WARNING: Removing unreachable block (ram,0x0000532a)
 
-/* Original: FUN_00005158; source: ID03.c. Recovered name: draw_arc_scale_ticks [STRONG INFERENCE] (iteration 212).
+/* Original: FUN_00005158; source: ID03.c. Recovered name: draw_arc_scale_ticks [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5158.
- * C args (words): +8, +0xa length, +0xc size, +0xe x, +0x10 y, +0x12 side flag. Loop over tick i: angle a = (i * 0x1555 / 12 - 0xaab) & 0x3fff in 1/0x4000 turns (10-degree steps starting at -60 degrees); every fourth tick is a major tick (PenSize(size / 10, size / 10), length 4 * len), the others minor (PenSize(2 * size / 30, ...), length 2 * len); the end points come from the cosine / sine pointers A5-0x2118 / A5-0x211c (4.12) with the side flag selecting the mirrored arc, scaled with scale_design_4800_pen_centred (0xa6) and drawn with MoveTo / LineTo [PROVEN, bytes 0x5158..0x532c]. Callers: the unexported gauge at 0x532e (0x53b0 with flag 1, 0x53e8 with flag 0) - a gauge with a left and a right arc scale.
+ * C args (words): +8, +0xa length, +0xc size, +0xe x, +0x10 y, +0x12 side flag. Loop over tick i: angle a = (i * 0x1555 / 12 - 0xaab) & 0x3fff in 1/0x4000 turns (10-degree steps starting at -60 degrees); every fourth tick is a major tick (PenSize(size / 10, size / 10), length 4 * len), the others minor (PenSize(2 * size / 30,...), length 2 * len); the end points come from the cosine / sine pointers A5-0x2118 / A5-0x211c (4.12) with the side flag selecting the mirrored arc, scaled with scale_design_4800_pen_centred (0xa6) and drawn with MoveTo / LineTo [PROVEN, bytes 0x5158..0x532c]. Callers: the unexported gauge at 0x532e (0x53b0 with flag 1, 0x53e8 with flag 0) - a gauge with a left and a right arc scale.
  * The following bytes 0x532e..0x54fc (not exported by Ghidra) are that gauge, called by the panel redraw path at 0x69c6: bezel (draw_ring_with_status_indicators flags 0x0f), begin_instrument_supersample, the two arcs above, a 24-point label (set_scaled_text_style, DrawString), positions stored at A5-0x1162..-0x1158, finish_instrument_supersample. Its label string and identity are not decoded yet [UNKNOWN].
  */
 void draw_arc_scale_ticks /* Original: FUN_00005158 */ (void)
@@ -1034,7 +1034,7 @@ void draw_arc_scale_ticks /* Original: FUN_00005158 */ (void)
 
 /*
  * Original: FUN_0000532e; source: ID03.c:720.
- * Recovered name: draw_fuel_gauge [STRONG INFERENCE] (iteration 171).
+ * Recovered name: draw_fuel_gauge [STRONG INFERENCE].
  * Not part of the draw_instrument type switch. Loads label slot 77 "Fuel"
  * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
  * a bezel via draw_ring_with_status_indicators (BSR at file 0x5346).
@@ -1056,7 +1056,7 @@ void draw_fuel_gauge /* Original: FUN_0000532e */ (undefined4 param_1,undefined4
 
 
 
-/* Original: FUN_000054fe; source: ID03.c. Recovered name: draw_landing_gear_indicator [STRONG INFERENCE] (iteration 211).
+/* Original: FUN_000054fe; source: ID03.c. Recovered name: draw_landing_gear_indicator [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x54fe.
  * C args: +8 short size, +0xa short x, +0xc short y, +0xe, +0x10 (caller: the panel redraw path at 0x697e with 0x258, 7, scale_design_480_min10(10), 0x7a8, -0xb2c). draw_ring_with_status_indicators(size, flags 0x0f) (0x514); begin_instrument_supersample; PenSize; stroke drawing from the point table A5-0x1f80 (MoveTo / LineTo with scale_design_4800_pen_centred); TextFont(1), set_scaled_text_style(24) (0x6), GetFontInfo, StringWidth and DrawString of the label held at local -0x1a, loaded from A5-0xe0e = STR# 129 slot 78 "GEAR" (0x5628) [PROVEN]; then stores three screen points and radii at A5-0x1174 / -0x1172, -0x116e / -0x116c, -0x1168 / -0x1166 with radius scale_design_4800(75) in -0x1170, -0x116a, -0x1164 - three indicator lamps, presumably one per landing-gear leg, lit later by the overlay [STRONG INFERENCE]; finish_instrument_supersample (0x1844).
  */
@@ -1079,7 +1079,7 @@ void draw_landing_gear_indicator /* Original: FUN_000054fe */ (undefined4 param_
 // WARNING: Control flow encountered bad instruction data
 // WARNING: Removing unreachable block (ram,0x0000583a)
 
-/* Original: FUN_00005718; source: ID03.c. Recovered name: dial_point_at_angle [STRONG INFERENCE] (iteration 211).
+/* Original: FUN_00005718; source: ID03.c. Recovered name: dial_point_at_angle [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5718.
  * C args: +8 Rect *dial, +0xc short angle in degrees, +0xe short radial offset, +0x10 short *x (out), +0x12 short *y (out). r = half the dial width; step = +5 or -5 by the sign of the offset; returns at once when offset + step == 0. a = (angle - 90) * 0x4000 / 360, normalised into 0..0x4000 (0x4000 = one turn); x = centre x + (A5-0x2118)(a) * r >> 12, y = centre y + (A5-0x211c)(a) * r >> 12 (4.12 fixed point) [PROVEN, Ghidra C]. With 0 degrees at the top (a = 270 degrees), A5-0x2118 behaves as cosine and A5-0x211c as sine [STRONG INFERENCE]; both are copied from A5-0x1062 / A5-0x1066 by prepare_instrument_panel. The truncated tail draws a radial tick (MoveTo / LineTo at 0x5836 / 0x5842). Callers: 0x6468, 0x6532, 0x674c, 0x67c6 (panel redraw path).
  */
@@ -1126,7 +1126,7 @@ void dial_point_at_angle /* Original: FUN_00005718 */ (short *param_1,undefined4
 
 
 
-/* Original: FUN_00005860; source: ID03.c. Recovered name: compute_panel_screen_addresses [STRONG INFERENCE] (iteration 205).
+/* Original: FUN_00005860; source: ID03.c. Recovered name: compute_panel_screen_addresses [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5860.
  * No arguments (complete Ghidra C below). Converts fixed design coordinates with design_y_to_screen (JT $382) and design_x_to_screen (JT $3ca, rounded down to even) into a rectangle and four column / row values (A5-0x1150..-0x113e), then four screen byte addresses A5-0x113c / -0x1138 / -0x1134 / -0x1130 = base A5-0x1382 + y * rowBytes A5-0x1378 + x / (8 / depth), with depth = A5-0x137a [PROVEN arithmetic: 8 / depth = pixels per byte, so A5-0x137a is the pixel depth 1 / 4 / 8 - it is also compared with 4 in remap_cached_panel_colours]. Which panel areas these addresses delimit is not yet known [UNKNOWN]. Caller: prepare_instrument_panel (0x5d46; only BSR found in ID03).
  */
@@ -1182,7 +1182,7 @@ void compute_panel_screen_addresses /* Original: FUN_00005860 */ (void)
 
 
 
-/* Original: FUN_00005ab6; source: ID03.c. Recovered name: store_panel_bitmaps_as_resources [PROVEN] (iteration 203).
+/* Original: FUN_00005ab6; source: ID03.c. Recovered name: store_panel_bitmaps_as_resources [PROVEN].
  * Decoded from ID03.bin bytes at file 0x5ab6.
  * No arguments. With panel configuration c = A5-0x13ae: SetResLoad(false) ($A99B); for ids 200, 300, 400, 500 + c: GetResource(HEL2, id) ($A9A0) and RmveResource ($A9AD) of any old copy; SetResLoad(true); UpdateResFile(A5-0x1002) ($A999); then AddResource ($A9AB) of the handles A5-0x12b0, -0x11f6, -0x11dc, -0x11d4 as HEL2 200 / 300 / 400 / 500 + c with the names STR# 129 slots 79 "Bitmap", 80 "HorizonInstrument", 81 "GyroInstrument", 82 "GyroFlags", adding each ResError ($A9AF) to a local count. If any failed: cache entry flag +0xc = 0 (cache = HEL2 127 "Bitmap Cache" at A5-0x13b2, 0x160 bytes per configuration) and A5-0x14a0 = 1, which makes the ID04 routine at 0x432 show STR# 129 slot 1 "Unable to store instrument panel to disk"; otherwise flag +0xc = 1. Finally ChangedResource(cache) ($A9AA) and UpdateResFile. Caller: ID03 0x6ba4.
  * Related (inside the Ghidra range of FUN_00005860, not exported): file 0x59f4..0x5ab4 releases the same four handles - ReleaseResource ($A9A3) when the cache entry of configuration A5-0x211e is flagged as stored, else DisposHandle (ID09 JT $25a) - and clears them [PROVEN, bytes]; callers 0x5ed2, 0x61d6.
@@ -1198,7 +1198,7 @@ void store_panel_bitmaps_as_resources /* Original: FUN_00005ab6 */ (void)
 
 
 
-/* Original: FUN_00005c36; source: ID03.c. Recovered name: open_cport_on_buffer [PROVEN] (iteration 204).
+/* Original: FUN_00005c36; source: ID03.c. Recovered name: open_cport_on_buffer [PROVEN].
  * Decoded from ID03.bin bytes at file 0x5c36.
  * C args: +8 CGrafPort *port (0x6c bytes), +0xc short rowBytes, +0xe Ptr baseAddr, +0x12 Rect bounds (by value). Clears the 0x6c bytes (JT $4f2, ID02 0x2b0), OpenCPort(port) ($AA00), restores thePort; sets the port PixMap (handle at +2): rowBytes (+4), baseAddr (+0), bounds (+6) = bounds; portRect (+0x10) = bounds; RectRgn(visRgn +0x18, &bounds) ($A8DF); returns port. Caller: prepare_instrument_panel (0x5da8, port A5-0x1492 -> A5-0x1496).
  */
@@ -1216,7 +1216,7 @@ void open_cport_on_buffer /* Original: FUN_00005c36 */ (undefined4 param_1)
 
 
 
-/* Original: FUN_00005cb6; source: ID03.c. Recovered name: close_port_glue [PROVEN] (iteration 204).
+/* Original: FUN_00005cb6; source: ID03.c. Recovered name: close_port_glue [PROVEN].
  * Decoded from ID03.bin bytes at file 0x5cb6.
  * ClosePort(port +8) ($A87D). Callers: prepare_instrument_panel (0x5d72 for A5-0x11cc, 0x5d92 for A5-0x1496).
  */
@@ -1231,9 +1231,9 @@ void close_port_glue /* Original: FUN_00005cb6 */ (void)
 
 
 
-/* Original: FUN_00005cc4; source: ID03.c. Recovered name: prepare_instrument_panel [STRONG INFERENCE] (iteration 204).
+/* Original: FUN_00005cc4; source: ID03.c. Recovered name: prepare_instrument_panel [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5cc4.
- * Reached through JT $17a (CODE 0 entry -> ID03 0x5cc4). Partly decoded [PROVEN, bytes 0x5cc4..0x5f20]: saves CurResFile ($A994) and UseResFile(A5-0x1002) ($A998); panel scale A5-0x149e = A5-0x149a = (w / 2 + w) / 2 for the half view width w = A5-0x1372 (the factor used by scale_design_4800); copies A5-0x1066 / -0x1062 to A5-0x211c / -0x2118; cache = GetResource(HEL2, 127) -> A5-0x13b2, or NewHandleClear(0x580) added as HEL2 127 "Bitmap Cache" (STR# 129 slot 83) - 4 entries of 0x160 bytes; calls FUN_00005860; closes the old ports A5-0x11cc / A5-0x1496 (close_port_glue) and disposes the region A5-0x13b6 ($A8D9); opens A5-0x1492 with open_cport_on_buffer; then searches the 4 cache entries for one whose +0 / +2 / +4 / +6 / +8 equal A5-0x137a (1-bit mode), A5-0x137e, A5-0x137c, A5-0x1372, A5-0x1370 (view size) and that is the current configuration A5-0x13ae or flagged stored (+0xc); for a stored entry it copies its ten 16-byte instrument records (+0x12) to A5-0x12a2 and 20 bytes (+0xb2) to A5-0x1202, releases the current bitmaps (0x59f4) and loads HEL2 300 + entry ... as A5-0x11f6 and the others. So rendered panels are reused from disk when the display configuration matches [STRONG INFERENCE]; the rest of the function (redraw path) is not yet decoded.
+ * Reached through JT $17a (CODE 0 entry -> ID03 0x5cc4). Partly decoded [PROVEN, bytes 0x5cc4..0x5f20]: saves CurResFile ($A994) and UseResFile(A5-0x1002) ($A998); panel scale A5-0x149e = A5-0x149a = (w / 2 + w) / 2 for the half view width w = A5-0x1372 (the factor used by scale_design_4800); copies A5-0x1066 / -0x1062 to A5-0x211c / -0x2118; cache = GetResource(HEL2, 127) -> A5-0x13b2, or NewHandleClear(0x580) added as HEL2 127 "Bitmap Cache" (STR# 129 slot 83) - 4 entries of 0x160 bytes; calls FUN_00005860; closes the old ports A5-0x11cc / A5-0x1496 (close_port_glue) and disposes the region A5-0x13b6 ($A8D9); opens A5-0x1492 with open_cport_on_buffer; then searches the 4 cache entries for one whose +0 / +2 / +4 / +6 / +8 equal A5-0x137a (1-bit mode), A5-0x137e, A5-0x137c, A5-0x1372, A5-0x1370 (view size) and that is the current configuration A5-0x13ae or flagged stored (+0xc); for a stored entry it copies its ten 16-byte instrument records (+0x12) to A5-0x12a2 and 20 bytes (+0xb2) to A5-0x1202, releases the current bitmaps (0x59f4) and loads HEL2 300 + entry... as A5-0x11f6 and the others. So rendered panels are reused from disk when the display configuration matches [STRONG INFERENCE]; the rest of the function (redraw path) is not yet decoded.
  */
 // WARNING: Control flow encountered bad instruction data
 
@@ -1246,7 +1246,7 @@ void prepare_instrument_panel /* Original: FUN_00005cc4 */ (void)
 
 
 
-/* Original: FUN_00006c1c; source: ID03.c. Recovered name: remap_cached_panel_colours [STRONG INFERENCE] (iteration 205).
+/* Original: FUN_00006c1c; source: ID03.c. Recovered name: remap_cached_panel_colours [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x6c1c.
  * Reached through JT $182 (CODE 0 entry -> ID03 0x6c1c). Returns at once unless the current configuration A5-0x13ae has a cache entry (A5-0x13b2) whose key (+0 depth, +2, +4, +6 / +8 view size) matches the display. In 1-bit mode calls JT $482 (ID02 0x4b62, the standard colour index set-up). Otherwise builds a 256-word translation table on the stack, keyed by the entry word +0xa & 0x1fff and a switch on the depth (JT $2a), walks the pixels of the panel bitmaps (A5-0x12b0, port A5-0x1496, A5-0x11dc with mask A5-0x11de and sizes A5-0x11e2 / -0x11e4) replacing bytes through the table, and refreshes many palette-index globals (A5-0x11fa, -0x11f8, -0x11ae, -0x11ac, -0x11a2, -0x118c, -0x118a, -0x1188, -0x117e, -0x117c, -0x112c, -0x12a4) with lookup_palette_index_for_rgb_level (JT $45a); at depth 4 some are OR-combined with themselves shifted (0x70a0 / 0x7184) [PROVEN calls]. So a panel loaded from the cache is re-coloured for the current palette [STRONG INFERENCE]. Exact table semantics not decoded.
  */
@@ -1285,7 +1285,7 @@ void remap_cached_panel_colours /* Original: FUN_00006c1c */ (void)
 
 
 
-/* Original: FUN_000071a2; source: ID03.c. Recovered name: remap_panel_colours_identity [STRONG INFERENCE] (iteration 212).
+/* Original: FUN_000071a2; source: ID03.c. Recovered name: remap_panel_colours_identity [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x71a2.
  * Builds an identity table of 256 words on the stack (t[i] = i) and calls remap_cached_panel_colours(t, A5-0x1354) (0x6c1c). Note for remap_cached_panel_colours: its first argument is this 256-entry index table and its second is A5-0x1354 [PROVEN, bytes 0x71a2..0x71d2]. Callers: 0x60e2 and 0x6ba8 (prepare_instrument_panel).
  */

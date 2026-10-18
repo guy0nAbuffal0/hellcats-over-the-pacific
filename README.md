@@ -17,7 +17,7 @@ Read only the material needed for the task:
 | Strict translation rules and coverage | [`docs/STRICT_PORT_FOUNDATION.md`](docs/STRICT_PORT_FOUNDATION.md) |
 | Resource corpus | [`docs/RESOURCE_ANALYSIS.md`](docs/RESOURCE_ANALYSIS.md) via `tools/resedit.py` |
 | System navigation | [`docs/SUBSYSTEM_MAP.md`](docs/SUBSYSTEM_MAP.md) |
-| Historical investigations | `docs/research/` on demand only |
+| Documentation index | [`docs/README.md`](docs/README.md) |
 
 Do not begin a focused task by loading all documentation or a whole CODE file.
 Use deterministic narrow retrieval:
@@ -51,7 +51,6 @@ godot/strict_port/                  faithful C-to-GDScript translations
 godot/hellcats/                     playable prototype implementation
 godot/tests/                        deterministic and scene tests
 docs/                               live references and contracts
-docs/research/                      historical evidence, not startup context
 tools/                              retrieval, verification, extraction, QA
 ```
 

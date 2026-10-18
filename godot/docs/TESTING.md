@@ -67,7 +67,9 @@ rm -f godot/tests/.run_one_tmp.gd
 HOME=/tmp/hellcats-godot-home /Applications/Godot.app/Contents/MacOS/Godot --headless --path godot --script res://tests/run_all.gd
 ```
 
-Headless runs without an imported `.godot/` class cache must not rely on other scripts' `class_name` types in annotations. Prefer `preload(...)`, base types (`Node3D`, `Control`), or untyped returns. See `docs/NOTES.md` entry 2026-10-15.
+Headless runs without an imported `.godot/` class cache must not rely on other
+scripts' `class_name` types in annotations. Prefer `preload(...)`, base types
+(`Node3D`, `Control`), or untyped returns.
 
 ### Run Python QA validation
 

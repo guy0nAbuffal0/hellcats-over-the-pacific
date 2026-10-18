@@ -25,8 +25,8 @@ undefined DAT_00000059;
 
 /*
  * Original: FUN_00000048; source: ID09.c:26-103.
- * Recovered name: sysenvirons_glue_fallback [STRONG INFERENCE] (iteration 106).
- * Status: RENAMED; iterations 101-106; exported body annotated, binary discrepancies open.
+ * Recovered name: sysenvirons_glue_fallback [STRONG INFERENCE].
+ * Status: RENAMED; exported body annotated, binary discrepancies open.
  * Confidence: [PROVEN] exported-C control flow; [UNKNOWN] selector meanings.
  * Input: param_1 points to writable storage for at least eight undefined2 words
  * in the analyzed block (16 bytes under the original 16-bit word model).
@@ -47,7 +47,7 @@ undefined DAT_00000059;
  * Original expressions remain unchanged. See docs/ID09_SELECTOR_ANALYSIS.md
  * and docs/ID09_TERMINAL_ANALYSIS.md; whole-function semantics are unverified.
  *
- * Iteration 105 proposed name: sysenvirons_glue_fallback [STRONG INFERENCE].
+ *  proposed name: sysenvirons_glue_fallback [STRONG INFERENCE].
  * Not applied to the identifier yet (no call sites in the exports to update).
  * Evidence: 16-byte record (8 words) matching Inside Macintosh SysEnvRec
  * (environsVersion=1 @0, machineType @2, systemVersion @4, processor @6,
@@ -59,7 +59,7 @@ undefined DAT_00000059;
  * The address-to-name mapping comes from external Toolbox documentation,
  * not from this binary; behavior vs. Apple's actual glue is not validated.
  *
- * Iteration 106 dispatcher evidence [PROVEN, bytes; trap names from docs]:
+ *  dispatcher evidence [PROVEN, bytes; trap names from docs]:
  * file 0x20 TST.W $28e.w / BMI -> 0x48 (this fallback); else 0x26 MOVE.W #$90,D0;
  * 0x2a A-line $A346 (GetOSTrapAddress); 0x2e MOVE.W #$9f,D0; 0x32 $A746
  * (GetToolTrapAddress, $9F = _Unimplemented); 0x34 CMPA.L / BEQ -> 0x48.
@@ -94,7 +94,7 @@ void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1
   /* Binary file 0x76: CMPI.B #$ff,$9(A0), after MOVEA.L $02ae.w,A0.
    * File 0x7e tests signed byte +8. The labels below are retained artifacts;
    * do not interpret them as independently established runtime globals.
-   * Iteration 106 [HYPOTHESIS]: word 1 is SysEnvRec.machineType, and the
+   *  [HYPOTHESIS]: word 1 is SysEnvRec.machineType, and the
    * selectors are ROM header bytes (ROMBase)+8 / +9 (ROM version word).
    * Constants: envXL=-2 (0xfffe), envMac=-1 (0xffff), envMachUnknown=0,
    * env512KE=1, envMacPlus=2, envSE=3, envMacII=4. Byte +9 == 0xff -> XL;
@@ -146,7 +146,7 @@ void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1
    * First match in reverse order wins: offsets -1..-5 yield codes 5..1.
    * No match yields 0. The scalar declaration is a Ghidra artifact: no C
    * array bounds or valid object provenance are established by this export.
-   * Iteration 105 binary evidence [PROVEN, bytes]: file 0xf8 MOVE.B $21e.w,D0;
+   *  binary evidence [PROVEN, bytes]: file 0xf8 MOVE.B $21e.w,D0;
    * 0xfc LEA $59(PC),A0 (disp 0xff5b, PC-relative, so the table travels with
    * the segment; DAT_00000059 is a segment-relative label, not low memory);
    * 0x100 MOVE.W #4,D1; 0x104 CMP.B -(A0),D0; 0x106 DBEQ D1; 0x10a ADDQ.W #1;
@@ -180,7 +180,7 @@ void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1
    * Retain the inferred C type/test; the binary establishes a signed WORD test. */
   if (-1 < _DAT_000003f6) {
     param_1[7] = 0;
-    /* 61 iterations (0x3c down through 0), not 60: 122 bytes cleared.
+    /* 61 loop passes (0x3c down through 0), not 60: 122 bytes cleared.
      * Binary file 0x13e..0x148: MOVE.W #$3c,D1; CLR.W -(A7); DBRA;
      * MOVEA.L A7,A0. register0x0000003c is a Ghidra register artifact,
      * not a proven memory address 0x3c. Preserve its exported expression. */
@@ -221,10 +221,10 @@ void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1
 
 /*
  * Original: FUN_000002a6; source: ID09.c:107-114.
- * Recovered name: fsopen_glue [STRONG INFERENCE] (iteration 107).
+ * Recovered name: fsopen_glue [STRONG INFERENCE].
  * Status: RENAMED. The exported body is only Ghidra's truncation artifact:
  * A-line word $A000 at file 0x2c6 was treated as bad instruction data.
- * halt_baddata() is retained unchanged; the real body is described below
+ * halt_baddata is retained unchanged; the real body is described below
  * from bytes and is NOT reconstructed as executable C (trap ABI is external).
  *
  * Binary file 0x2a6..0x2dc [PROVEN, bytes; Capstone 68000 BE]:
@@ -261,9 +261,9 @@ void fsopen_glue /* Original: FUN_000002a6 */ (void)
 
 /*
  * Original: FUN_000003c2; source: ID09.c:118-125.
- * Recovered name: swapmmumode_glue [STRONG INFERENCE] (iteration 108).
+ * Recovered name: swapmmumode_glue [STRONG INFERENCE].
  * Status: RENAMED. Exported body is Ghidra's truncation at A-line $A05D;
- * halt_baddata() is retained, the real body is described here only.
+ * halt_baddata is retained, the real body is described here only.
  *
  * Binary file 0x3c2..0x3d4 [PROVEN, bytes; Capstone 68000 BE]:
  *   MOVEA.L 4(A7),A0; MOVE.B (A0),D0     load byte through VAR pointer
@@ -298,7 +298,7 @@ void swapmmumode_glue /* Original: FUN_000003c2 */ (void)
  * Known callers: none found in the ten original C exports.
  * Known callees: none.
  * Evidence: ID09.c:132-141 zero-extends the byte count, copies forward from
- * cursor[1], then writes zero; :142 returns the original pointer.
+ * cursor[1], then writes zero:142 returns the original pointer.
  * Local mapping: param_1 -> buffer; uVar1 -> remaining_count;
  * pbVar2 -> write_cursor.
  * Unknown: actual callers, encoding and binary address mapping/ABI. No binary

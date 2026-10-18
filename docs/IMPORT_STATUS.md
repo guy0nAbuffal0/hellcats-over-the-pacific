@@ -6,7 +6,7 @@ Tags: **[RECONSTRUCTED]** / **[INFERRED]** / **[UNKNOWN]** / **[DEFERRED]**.
 
 **Corpus:** `Hellcats-Over-the-Pacific_Mac_EN/ResEdit/CODE/` — **Pacific Conflict.c** (main game), **ID01.c–ID09.c** (segment/runtime splits). See `docs/LOADER_CHAIN.md` for how ID segments relate to the overlay.
 
-**Related:** `docs/SUBSYSTEM_MAP.md`, `docs/ROADMAP.md`; the prototype-era backlog is archived under `docs/research/`.
+**Related:** `docs/SUBSYSTEM_MAP.md`, `docs/STRICT_PORT_FOUNDATION.md`.
 
 ## Resource corpus
 
@@ -34,10 +34,10 @@ playback, and most proprietary data consumers remain unported.
 | **FUN_000044e8** | `Pacific Conflict.c` (~5096–5145); `docs/contracts/tick_FUN_000044e8_contract.md` | `godot/hellcats/core/sim_core.gd`; `godot/tests/integration/test_sim_tick_ordering.gd` | **Done** | **[INFERRED]** Mission-1 playable loop uses `PlayerAircraft` + `FlightModelMvp`; SimCore is parity / future wiring. |
 | **FUN_000044a4** | Same; dispatches to **FUN_0000435a** | `SimCore._update_single_entity` | **Partial** | **param_2** surfaced; full tail parity **[UNKNOWN]**. |
 | **FUN_0000435a** | `Pacific Conflict.c` (~5008–5075); `docs/contracts/FUN_0000435a_contract.md` | `SimCore` (counts / `param_2`); branch logic not fully split | **Partial** | Critical for array 1–2 vs 3–4 fidelity. |
-| **FUN_00005df8** | Called when `DAT_0001b5a0 + 0xac == 0`; clears 7× `DAT_0001bc64` after `FUN_0000528a` (Pacific Conflict.c:6434–6447) | `SimCore._call_05df8()` + `dat_0001bc64`; tick-order counters; test in `test_sim_tick_ordering.gd` | **Done** (loop/clear) | **`FUN_0000528a` body deferred** (call counted only). |
+| **FUN_00005df8** | Called when `DAT_0001b5a0 + 0xac == 0`; clears 7× `DAT_0001bc64` after `FUN_0000528a` (Pacific Conflict.c:6434–6447) | `SimCore._call_05df8` + `dat_0001bc64`; tick-order counters; test in `test_sim_tick_ordering.gd` | **Done** (loop/clear) | **`FUN_0000528a` body deferred** (call counted only). |
 | **FUN_0000528a** | Cleanup invoked by **FUN_00005df8** (Pacific Conflict.c:5784–5798) | `SimCore._call_0528a` + entity offsets `flags_07` / `field_24` / `field_3c` | **Done** (control flow) | Calls **FUN_000051ec** or type-0x02 alt (`field_04\|0x42`, `field_3c=DAT_0001b838`). |
 | **FUN_000051ec** | Called from **FUN_0000528a** (Pacific Conflict.c:5751–5779) | `SimCore._call_051ec` + `mem_u32` | **Done** (proven stores) | Entity writes, table poke via `mem_u32[*(DAT_0001d6fc+0x30)+0x14+field_02*0x18]`, and `mem_u32[entity+8]=0`. Full Mac heap identity **[INFERRED]** via flat `mem_u32`. |
-| **FUN_00006fb8** | After four entity passes; body sets six globals to `100000000` (Pacific Conflict.c:7180–7189) | `SimCore._call_06fb8()` + `last_tick_order.fun_00006fb8_*`; `test_sim_tick_ordering.gd` | **Done** (side effect) | Semantic role of the six DATs **[INFERRED]** / partially **[UNKNOWN]**. |
+| **FUN_00006fb8** | After four entity passes; body sets six globals to `100000000` (Pacific Conflict.c:7180–7189) | `SimCore._call_06fb8` + `last_tick_order.fun_00006fb8_*`; `test_sim_tick_ordering.gd` | **Done** (side effect) | Semantic role of the six DATs **[INFERRED]** / partially **[UNKNOWN]**. |
 | Entity arrays **DAT_0001d4a4**, **DAT_0001b5a4**, **DAT_0001d0e4**, **DAT_0001cbe4** + counts | `STRUCTS.md`, tick contract | `SimCore` pass lists | **Done** (structural) | **[INFERRED]** Roles of arrays 1,3,4 beyond counts **[UNKNOWN]**. |
 
 ## B) Flight model and entity update (FUN_0000e792)
@@ -63,7 +63,7 @@ playback, and most proprietary data consumers remain unported.
 
 | Symbol / cluster | Source (evidence) | Godot / tests | Status | MVP notes |
 |------------------|-------------------|---------------|--------|-----------|
-| **DAT_0001b5a0** + **0xa8** / **0xac** | `docs/contracts/mission_state_DAT_contract.md`, `STRUCTS.md` | `MissionController.mission_phase_a8`, `mission_flag_ac`; `get_mission_sim_bridge_state()` | **Done** (MVP bridge) | Matches gates for tick narrative. |
+| **DAT_0001b5a0** + **0xa8** / **0xac** | `docs/contracts/mission_state_DAT_contract.md`, `STRUCTS.md` | `MissionController.mission_phase_a8`, `mission_flag_ac`; `get_mission_sim_bridge_state` | **Done** (MVP bridge) | Matches gates for tick narrative. |
 | Full **DAT_0001b5a0** layout | C | Partial in `STRUCTS.md` | **Doc only** | **[UNKNOWN]** many fields. |
 
 ## E) Camera
@@ -76,7 +76,7 @@ playback, and most proprietary data consumers remain unported.
 
 | Symbol / cluster | Source (evidence) | Godot / tests | Status | MVP notes |
 |------------------|-------------------|---------------|--------|-----------|
-| **FUN_00000728** (LCG `* 0x41c64e6d + 0x3039`) | **ID05.c** (~130–135); cited in `docs/ROADMAP.md` | `Rng68k` / SimCore seeding pattern | **Done** (algorithm) | Segment-local; parity uses same constants **[RECONSTRUCTED]**. |
+| **FUN_00000728** (LCG `* 0x41c64e6d + 0x3039`) | **ID05.c** (~130–135) | `Rng68k` / SimCore seeding pattern | **Done** (algorithm) | Segment-local; parity uses same constants **[RECONSTRUCTED]**. |
 | **FUN_00011564** | **Pacific Conflict.c** | See §B; `rng_overlay_11564.gd` | **Partial** | Fixture exists; not yet the SimCore consumer. |
 
 ## G) Loader / segments (ID01–ID09)
@@ -99,20 +99,3 @@ was not replaced.
 | Topic | Godot / docs | Status | MVP notes |
 |-------|----------------|--------|-----------|
 | Cockpit ↔ **FUN_0000e792** entity fields | `AircraftState` snapshot; training HUD | **Partial** | Field-accurate HUD vs original remains **[INFERRED]** and open for parity. |
-
-## Update log
-
-| Date | Change |
-|------|--------|
-| 2026-10-15 | Contact surface via `world_obj_ptr` (`*param_1`) + `mem_u32[+0x1c]`; drops `contact_surface_1c`. |
-| 2026-10-15 | **FUN_0001150a** / **FUN_000114ca** init+warm-up on overlay RNG. |
-| 2026-10-15 | **FUN_00011564** wired into `SimCore._rng_consume`; ID05 retained as `rng_id05`. |
-| 2026-10-15 | **FUN_00011564** overlay RNG class + fixture test; SimCore still on ID05 LCG. |
-| 2026-10-15 | **FUN_0000e792** contact early-out (`status_1a1&8`) on SimCore; Mission-1 not wired. |
-| 2026-10-15 | **FUN_000051ec** indirect table/`**(+8)` stores via `mem_u32`. |
-| 2026-10-15 | **FUN_0000528a** control flow + partial **FUN_000051ec**; table/`**(+8)` still deferred. |
-| 2026-10-15 | **FUN_00005df8** loop/clear ported; **FUN_0000528a** body still deferred. |
-| 2026-10-15 | **FUN_00006fb8** side effect ported on `SimCore`; docs/contracts updated. |
-| 2026-04-08 | Initial **IMPORT_STATUS.md** from architecture audit. |
-
-When you complete a row (e.g. **FUN_00006fb8**), update this file and add a line to `docs/NOTES.md`.

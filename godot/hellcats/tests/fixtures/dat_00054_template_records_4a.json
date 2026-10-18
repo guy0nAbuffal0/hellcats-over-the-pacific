@@ -1,5 +1,5 @@
 {
-  "source": "sources/Hellcats/Pacific Conflict",
+  "source": "sources/hellcats-over-the-pacific/Pacific Conflict",
   "note": "FUN_00000054 first loop: 4\u00d70x4A records from GRAPHIC SIMULATIONS region; key=s16 at +0 \u2192 DAT_0001b524[key]",
   "file_offset": "0x1a790",
   "record_size": 74,

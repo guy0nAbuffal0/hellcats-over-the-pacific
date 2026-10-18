@@ -1,4 +1,4 @@
-# ID09 terminal block: iteration 103, 2026-10-16
+# ID09 terminal block,
 
 Scope: original `ID09.c:84-103`, `FUN_00000048`. This records binary evidence
 for the terminal block without reconstructing missing instructions into C.
@@ -55,7 +55,7 @@ name or ABI is inferred from their numeric values.
   cleared-stack pointer plus `0x18`: the last `puVar5` precedes its final -2 step.
 - **[PROVEN, bytes]** The binary continues after the source truncation and has
   three opaque A-line sites, branches and an additional output write. Therefore
-  `halt_baddata()` does not establish a real runtime halt.
+  `halt_baddata` does not establish a real runtime halt.
 - **[PROVEN, bytes]** The epilogue uses `JMP (A1)`, with A1 restored from stack;
   it does not independently establish Ghidra's jumptable/callback interpretation.
 - **[UNKNOWN]** A-line contracts, stack entry layout, complete calling convention,

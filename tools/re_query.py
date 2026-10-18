@@ -45,8 +45,8 @@ def mask_comments(text: str) -> str:
 class Registry:
     def __init__(self) -> None:
         data = json.loads(INVENTORY.read_text(encoding="utf-8"))
-        if data.get("schema_version") != 2:
-            raise ValueError("decompilation inventory is not canonical schema v2; regenerate it")
+        if data.get("schema_version") != 3:
+            raise ValueError("decompilation inventory is not canonical schema v3; regenerate it")
         self.rows: list[dict[str, Any]] = data["functions"]
 
     def resolve(self, query: str, segment: str | None = None) -> dict[str, Any]:
@@ -126,9 +126,8 @@ def correspondence(row: dict[str, Any], detail: bool = False) -> dict[str, Any]:
     if detail:
         result["evidence_references"] = row["evidence_references"]
         result["known_blockers"] = row["known_blockers"]
-        result["last_relevant_source_update"] = row["last_relevant_source_update"]
-        if "historical_tracker" in row:
-            result["historical_tracker"] = row["historical_tracker"]
+        result["technical_evidence"] = row.get("technical_evidence", {})
+        result["source_revision"] = row.get("source_revision")
     return result
 
 

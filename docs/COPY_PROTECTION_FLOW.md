@@ -1,4 +1,4 @@
-# Copy-protection flow (ID08 → ID05) — iterations 117–126, 2026-10-16
+# Copy-protection flow (ID08 → ID05) —,
 
 Summary of the overlay-load protection chain recovered from the CODE
 segments. All offsets are **physical file offsets** in `IDnn.bin`; jump-table

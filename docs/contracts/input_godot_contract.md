@@ -57,4 +57,3 @@ Each physics tick, **`PlayerInputMap.read_input_packet(player_active)`** returns
 ## Related docs
 
 - `docs/briefs/input_FUN_0000740a_brief.md` — RE extraction
-- `docs/NOTES.md` — changelog entries

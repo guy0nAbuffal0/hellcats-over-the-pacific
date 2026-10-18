@@ -1,5 +1,5 @@
 {
-  "source": "sources/Hellcats/Pacific Conflict",
+  "source": "sources/hellcats-over-the-pacific/Pacific Conflict",
   "note": "FUN_00000054 Block C: 5x0x1C keyed clones from 0x1AA5E \u2192 DAT_0001b524[key]",
   "file_offset": "0x1aa5e",
   "record_size": 28,

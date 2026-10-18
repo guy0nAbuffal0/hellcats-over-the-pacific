@@ -23,8 +23,8 @@ python3 tools/resedit.py inspect DITL 137
 python3 tools/resedit.py references ALRT 259
 ```
 
-Do not preload `docs/research/`, whole CODE files, the full symbol registry, or
-all resource metadata. Those are on-demand evidence. Before editing, inspect
+Do not preload whole CODE files, the full symbol registry, or all resource
+metadata. Those are on-demand evidence. Before editing, inspect
 Git status and preserve unrelated changes. Run targeted checks, then the
 appropriate project-wide validation before claiming completion. Do not commit
 or push unless explicitly asked.

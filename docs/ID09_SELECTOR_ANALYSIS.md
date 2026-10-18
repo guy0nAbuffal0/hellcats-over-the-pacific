@@ -1,4 +1,4 @@
-# ID09 selector discrepancies — iteration 104, 2026-10-16
+# ID09 selector discrepancies —,
 
 Scope: `ID09.c:44-65`, `FUN_00000048`, and the adjacent omitted block.
 All offsets in the byte table are **physical file offsets**, obtained by searching

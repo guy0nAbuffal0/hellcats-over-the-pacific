@@ -6,7 +6,7 @@
 
 | Offset | Role | **[RECONSTRUCTED]** use |
 |--------|------|-------------------------|
-| +0xac | short | If **== 0**, call **FUN_00005df8()** before phase gate (5102–5103). |
+| +0xac | short | If **== 0**, call **FUN_00005df8** before phase gate (5102–5103). |
 | +0xa8 | short | **FUN_000044e8** runs four entity passes only if **0 < value < 6** (5105). |
 | +0xb0 | short | Used in **FUN_000044a4** after **FUN_0000435a**: toggles **entity+4** bit **0x40** vs entity **+8** / type **5** (5083–5088). |
 
@@ -23,4 +23,4 @@
 
 ## Related
 
-- `godot/hellcats/mission/mission_controller.gd` — `get_mission_sim_bridge_state()`
+- `godot/hellcats/mission/mission_controller.gd` — `get_mission_sim_bridge_state`

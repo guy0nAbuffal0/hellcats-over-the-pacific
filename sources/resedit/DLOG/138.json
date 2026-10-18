@@ -13,7 +13,7 @@
   },
   "code_references": [
     {
-      "evidence": "* GetNewDialog(0x8a = DLOG 138 \"About Hellcats 1-Bit\") when A5-0x137a == 1, else GetNewDialog(0x7f = DLOG 127 \"About Hellcats\"); returns at once when it fails. JT $472; ShowWindow; DrawDialog; SetPort; GetDItem(item 3), MoveTo its box, TextFont(1), TextSize(8); GetResource(vers, 1) ($A9A0) and builds the version text from its first word (major = high byte + 0x30 ...) - the rest (0x3b3c..0x3d3e) is not decoded yet. So A5-0x137a == 1 selects the 1-bit (black and white) variants, which matches draw",
+      "evidence": "* GetNewDialog(0x8a = DLOG 138 \"About Hellcats 1-Bit\") when A5-0x137a == 1, else GetNewDialog(0x7f = DLOG 127 \"About Hellcats\"); returns at once when it fails. JT $472; ShowWindow; DrawDialog; SetPort; GetDItem(item 3), MoveTo its box, TextFont(1), TextSize(8); GetResource(vers, 1) ($A9A0) and builds the version text from its first word (major = high byte + 0x30...) - the rest (0x3b3c..0x3d3e) is not decoded yet. So A5-0x137a == 1 selects the 1-bit (black and white) variants, which matches draw_",
       "function_or_context": "show_about_dialog",
       "line": 1557,
       "source_path": "sources/resedit/CODE/ID04.decomp.c",
@@ -50,7 +50,7 @@
     "binary_origin": "ResEdit hexadecimal export",
     "binary_path": "sources/resedit/DLOG/138.bin",
     "binary_size": 31,
-    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats.rsrc",
+    "comparison_container": "sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble",
     "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
     "comparison_resource_name": "About Hellcats 1-Bit",
     "representations": [

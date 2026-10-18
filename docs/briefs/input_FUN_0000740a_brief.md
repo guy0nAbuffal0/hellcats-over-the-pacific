@@ -6,7 +6,7 @@ Every statement is tagged: **[RECONSTRUCTED]** (from decompiler/binary), **[INFE
 
 ## Overview
 
-**[RECONSTRUCTED]** `uint FUN_0000740a(int param_1, int param_2)` is the central **keyboard/mouse-style input dispatcher**. It receives a **virtual key code** `param_1` and an **action code** `param_2`, mutates **global UI/flight/mission state**, then runs **post-input hooks** (camera follow, HUD bits, mode-specific updates) and returns a **uint mask** `uVar6` consumed by downstream logic (bit tests against `FUN_00000354()` output, OR-ing flags such as `1`, `2`, `6`, `8`, `9`, `0x10a`, `0x201`, etc.).
+**[RECONSTRUCTED]** `uint FUN_0000740a(int param_1, int param_2)` is the central **keyboard/mouse-style input dispatcher**. It receives a **virtual key code** `param_1` and an **action code** `param_2`, mutates **global UI/flight/mission state**, then runs **post-input hooks** (camera follow, HUD bits, mode-specific updates) and returns a **uint mask** `uVar6` consumed by downstream logic (bit tests against `FUN_00000354` output, OR-ing flags such as `1`, `2`, `6`, `8`, `9`, `0x10a`, `0x201`, etc.).
 
 **[INFERRED]** This is **not** analog stick samples: it is **discrete key events** plus **accumulators** (`DAT_00024cf6`, mouse deltas, angular inputs) updated inside the same function and in helper paths.
 
@@ -37,7 +37,7 @@ fun_0740a(key_code param_1, action param_2) -> uint uVar6
           FUN_000137da(player)
       else:
         DAT_0001d858 = 9
-      FUN_00006ed6()
+      FUN_00006ed6
       DAT_0001b884 = 0
 
   // Mission callback when *(mission+0x98) != 0
@@ -45,7 +45,7 @@ fun_0740a(key_code param_1, action param_2) -> uint uVar6
     if *(short*)(mission+0x98) == 2 && DAT_0001b870 == 0:
       if *(int*)(mission+0x25e) != 0 && mission_callback_at(+0x2b6)(0) != 0:
         mission_callback_at(+0x2be)(0)
-      FUN_00006ed6()
+      FUN_00006ed6
       DAT_0001d858 = 8
       DAT_0001b870 = 3
       DAT_0001b86e = 0x1e
@@ -56,7 +56,7 @@ fun_0740a(key_code param_1, action param_2) -> uint uVar6
       FUN_00008784( (char)(player+0x63e) == 0 )
 
   if DAT_0001b86c != 0 && DAT_0001b86e == 0:
-    FUN_00008ff4()
+    FUN_00008ff4
 
   // Early exits / special states
   if DAT_0001d858 == 7 && (DAT_0001b888 == NULL || (player+0x63e) != 0):
@@ -69,7 +69,7 @@ fun_0740a(key_code param_1, action param_2) -> uint uVar6
     goto after_key_switch
 
   // Skip main key switch unless param_2 is “allowed” for this huge exclusion list
-  if param_2 != 3 && NOT( (param_2==4 && param_1==0x20) && ... long list ... ):
+  if param_2 != 3 && NOT( (param_2==4 && param_1==0x20) &&... long list... ):
     goto case_default_tail
 
   switch (param_1):
@@ -81,21 +81,21 @@ fun_0740a(key_code param_1, action param_2) -> uint uVar6
   // Mouse position sync vs mission +0x33e/+0x340, optional slew limits
 
   // FUN_00008000:
-  FUN_0000923e()
-  if DAT_0001b870 == 3: FUN_000094d2() else FUN_000092e4()
-  FUN_000096f4()
+  FUN_0000923e
+  if DAT_0001b870 == 3: FUN_000094d2 else FUN_000092e4
+  FUN_000096f4
 
   // If not (DAT_0001d858 > 7 || player+0x62a != 0 || (player+0x63e)==0):
-  //   uVar6 = FUN_00000354(); RNG-heavy updates to *(mission+0xd4), etc.
+  //   uVar6 = FUN_00000354; RNG-heavy updates to *(mission+0xd4), etc.
 
   uVar6 = 0  // LAB_00008324
   switch (DAT_0001d858):
-    1,2: FUN_0000739a(); transition 1<->2 using DAT_00024cf8 / DAT_00024cfc vs DAT_0001d804 / DAT_0001d800
+    1,2: FUN_0000739a; transition 1<->2 using DAT_00024cf8 / DAT_00024cfc vs DAT_0001d804 / DAT_0001d800
     5: camera from player table slot
     6: chase math (FUN_00003b98, FUN_0000e372, FUN_00001f22, …)
     7: camera locked to DAT_0001b888
-    8: uVar7 = FUN_00008c30()
-    9: uVar7 = FUN_00008972(); maybe uVar6 = uVar7
+    8: uVar7 = FUN_00008c30
+    9: uVar7 = FUN_00008972; maybe uVar6 = uVar7
 
   merge_return_path:
     // If DAT_0001d810 in (0x1000,0x3000), snap pitch band
@@ -154,7 +154,5 @@ fun_0740a(key_code param_1, action param_2) -> uint uVar6
 
 ## Cross-references
 
-- `docs/NOTES.md` — FUN_0000740a variable log
 - `docs/STRUCTS.md` — FUN_0000740a globals
-- `docs/ROADMAP.md` — key code → `param_1` mapping status
 - `docs/contracts/input_godot_contract.md` — **[INFERRED]** Godot MVP implementation contract (gather outputs, gating, trace)

@@ -8,7 +8,7 @@ typedef unsigned char    byte;
 
 
 
-/* Original: FUN_00000110; source: ID01.c. Recovered name: rt_udiv32 [PROVEN] (iteration 226).
+/* Original: FUN_00000110; source: ID01.c. Recovered name: rt_udiv32 [PROVEN].
  * Decoded from ID01.bin bytes at file 0x110.
  * Stack-argument entry (dividend at 4(A7), divisor at 8(A7) on entry; the code shuffles the return address so the caller sees D1 preserved) that saves D2-D3/D7 and calls rt_udivmod32_core (0x1c2); returns the unsigned quotient in D0 [PROVEN, bytes 0x110..0x12e].
  */
@@ -25,7 +25,7 @@ undefined4 rt_udiv32 /* Original: FUN_00000110 */ (void)
 
 
 
-/* Original: FUN_00000130; source: ID01.c. Recovered name: rt_umod32 [PROVEN] (iteration 226).
+/* Original: FUN_00000130; source: ID01.c. Recovered name: rt_umod32 [PROVEN].
  * Decoded from ID01.bin bytes at file 0x130.
  * Stack-argument entry (dividend at 4(A7), divisor at 8(A7) on entry; the code shuffles the return address so the caller sees D1 preserved) that saves D2-D3/D7 and calls rt_udivmod32_core (0x1c2); returns the unsigned remainder (MOVE.L D1,D0) in D0 [PROVEN, bytes 0x130..0x150].
  */
@@ -43,7 +43,7 @@ undefined8 rt_umod32 /* Original: FUN_00000130 */ (void)
 
 
 
-/* Original: FUN_00000152; source: ID01.c. Recovered name: rt_sdiv32 [PROVEN] (iteration 226).
+/* Original: FUN_00000152; source: ID01.c. Recovered name: rt_sdiv32 [PROVEN].
  * Decoded from ID01.bin bytes at file 0x152.
  * Stack-argument entry (dividend at 4(A7), divisor at 8(A7) on entry; the code shuffles the return address so the caller sees D1 preserved) that saves D2-D3/D7 and calls rt_sdivmod32_core (0x194); returns the signed quotient in D0 [PROVEN, bytes 0x152..0x170]. Reached through JT $5a (used by ID02 ansi_ldiv).
  */
@@ -56,7 +56,7 @@ void rt_sdiv32 /* Original: FUN_00000152 */ (void)
 
 
 
-/* Original: FUN_00000172; source: ID01.c. Recovered name: rt_smod32 [PROVEN] (iteration 226).
+/* Original: FUN_00000172; source: ID01.c. Recovered name: rt_smod32 [PROVEN].
  * Decoded from ID01.bin bytes at file 0x172.
  * Stack-argument entry (dividend at 4(A7), divisor at 8(A7) on entry; the code shuffles the return address so the caller sees D1 preserved) that saves D2-D3/D7 and calls rt_sdivmod32_core (0x194); returns the signed remainder in D0 [PROVEN, bytes 0x172..0x192]. Reached through JT $62 (used by ID02 ansi_ldiv).
  */
@@ -74,7 +74,7 @@ undefined8 rt_smod32 /* Original: FUN_00000172 */ (void)
 
 
 
-/* Original: FUN_00000194; source: ID01.c. Recovered name: rt_sdivmod32_core [PROVEN] (iteration 226).
+/* Original: FUN_00000194; source: ID01.c. Recovered name: rt_sdivmod32_core [PROVEN].
  * Decoded from ID01.bin bytes at file 0x194.
  * Register interface D0 = dividend, D1 = divisor. Makes both operands positive (NEG.L), calls rt_udivmod32_core and fixes the signs so the quotient truncates toward zero and the remainder takes the sign of the dividend (C semantics) [PROVEN, bytes 0x194..0x1c0].
  */
@@ -131,9 +131,9 @@ uint rt_sdivmod32_core /* Original: FUN_00000194 */ (void)
 
 
 
-/* Original: FUN_000001c2; source: ID01.c. Recovered name: rt_udivmod32_core [PROVEN] (iteration 226).
+/* Original: FUN_000001c2; source: ID01.c. Recovered name: rt_udivmod32_core [PROVEN].
  * Decoded from ID01.bin bytes at file 0x1c2.
- * Register interface D0 = dividend, D1 = divisor (unsigned 32-bit); returns D0 = quotient, D1 = remainder. Fast paths: dividend < divisor (quotient 0); dividend <= 0xffff (one DIVU.W); divisor <= 0xffff (two chained DIVU.W); otherwise normalises both by shifting right until the divisor fits 16 bits, estimates the quotient with DIVU.W and corrects it downward by multiplying back (MULU.W) until the product no longer exceeds the dividend [PROVEN, bytes 0x1c2..0x22a+]. A pre-68020 style routine (the 68020 DIVU.L is not used).\n * Other ID01 code not exported by Ghidra (bytes 0x00..0x10e): 0x00 / 0x04 hold 0x0a and 0x4b2 (header words; 0x4b2 is the entry JT offset used by ID02 main [PROVEN]); 0x08..0x32 start-up: clears $0A4A, A6 = 0, JSR 0x34, then a call through JT $4b2 / the first jump-table slot and ExitToShell ($A9F4); 0x34..0x94 initialises the A5 world: GetResource(ZERO, 0) and GetResource(DATA, 0) ($A9A0), expands DATA into the globals below CurrentA5 (word runs, zero runs from ZERO), releases both, then GetResource(DREL, 0) and adds A5 to every relocation offset it lists (A5-relative pointer fix-ups); 0x96 / 0xaa / 0xbe are the switch helpers reached through JT $2a (word values: count, then (offset, value) pairs and a default), JT $32 (long values) and JT $3a (dense: lo, hi, default, offsets) - the formats decoded in iterations 185-192; 0xda is a 32 x 32 -> 32 multiply built from three MULU.W. These explain the inline tables Ghidra decoded as ori.b / btst instructions throughout ID02..ID04.
+ * Register interface D0 = dividend, D1 = divisor (unsigned 32-bit); returns D0 = quotient, D1 = remainder. Fast paths: dividend < divisor (quotient 0); dividend <= 0xffff (one DIVU.W); divisor <= 0xffff (two chained DIVU.W); otherwise normalises both by shifting right until the divisor fits 16 bits, estimates the quotient with DIVU.W and corrects it downward by multiplying back (MULU.W) until the product no longer exceeds the dividend [PROVEN, bytes 0x1c2..0x22a+]. A pre-68020 style routine (the 68020 DIVU.L is not used).\n * Other ID01 code not exported by Ghidra (bytes 0x00..0x10e): 0x00 / 0x04 hold 0x0a and 0x4b2 (header words; 0x4b2 is the entry JT offset used by ID02 main [PROVEN]); 0x08..0x32 start-up: clears $0A4A, A6 = 0, JSR 0x34, then a call through JT $4b2 / the first jump-table slot and ExitToShell ($A9F4); 0x34..0x94 initialises the A5 world: GetResource(ZERO, 0) and GetResource(DATA, 0) ($A9A0), expands DATA into the globals below CurrentA5 (word runs, zero runs from ZERO), releases both, then GetResource(DREL, 0) and adds A5 to every relocation offset it lists (A5-relative pointer fix-ups); 0x96 / 0xaa / 0xbe are the switch helpers reached through JT $2a (word values: count, then (offset, value) pairs and a default), JT $32 (long values) and JT $3a (dense: lo, hi, default, offsets) - the formats decoded; 0xda is a 32 x 32 -> 32 multiply built from three MULU.W. These explain the inline tables Ghidra decoded as ori.b / btst instructions throughout ID02..ID04.
  */
 ulonglong rt_udivmod32_core /* Original: FUN_000001c2 */ (void)
 

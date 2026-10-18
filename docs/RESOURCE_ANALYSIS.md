@@ -28,9 +28,11 @@ Payload precedence is deliberate:
 2. Existing protected `CODE/ID*.bin` files must match their sibling hex exports
    and are never rewritten.
 3. The embedded resource fork in
-   `sources/hellcats-over-the-pacific/Hellcats.rsrc` supplies exact payloads only
-   where the curated export has no bytes (notably `cicn` and `snds`) and supplies
-   original resource-map names where Markdown has no `Name:` field.
+   `sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble` supplies exact
+   payloads only where the curated export has no bytes (notably `cicn` and
+   `snds`) and supplies original resource-map names where Markdown has no
+   `Name:` field. Its SHA-256 is
+   `a36f245a37fe8693c25b70e3219e5b01bcec01cbee6aa8a0492871c7e8fff956`.
 
 The AppleDouble file is a **Hellcats 1.0.4** artifact; the curated ResEdit tree is
 primarily 1.0.3. Five payloads differ and the metadata preserves both hashes:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Deterministic inspector and metadata generator for sources/resedit.
 
-The authoritative payloads come from the classic resource fork embedded in the
-AppleDouble file at sources/hellcats-over-the-pacific/Hellcats.rsrc.  Generated
-*.bin and *.json files are derived evidence; existing ResEdit exports are never
+The comparison payloads come from the classic resource fork embedded in
+sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble. Generated *.bin
+and *.json files are derived evidence; existing ResEdit exports are never
 rewritten.
 """
 
@@ -21,7 +21,9 @@ from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 RESEDIT = ROOT / "sources" / "resedit"
-APPLEDOUBLE = ROOT / "sources" / "hellcats-over-the-pacific" / "Hellcats.rsrc"
+APPLEDOUBLE = (
+    ROOT / "sources" / "hellcats-over-the-pacific" / "Hellcats_1_0_4.appledouble"
+)
 SCHEMA = "hellcats-resedit-resource-v1"
 
 # The directory spelling is retained exactly.  The original four-character

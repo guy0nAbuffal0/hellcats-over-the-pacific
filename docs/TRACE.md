@@ -36,7 +36,7 @@ Proven keys (from Pacific Conflict / FUN_0000e792, FUN_000041ec):
 ## Replay semantics
 
 - **Initial RNG seed** is not stored in the trace; it is a run parameter (e.g. first run: seed 12345; replay: seed 12345).
-- **Input** for frame N is the input **consumed during** tick N. Replay: before tick N, set `sim.input_packet` from `input`, then `sim.tick()`.
+- **Input** for frame N is the input **consumed during** tick N. Replay: before tick N, set `sim.input_packet` from `input`, then `sim.tick`.
 - **Acceptance criterion:** Same initial seed + same sequence of input packets (from a replay file) ⇒ identical trace (same JSONL lines).
 
 ## File layout

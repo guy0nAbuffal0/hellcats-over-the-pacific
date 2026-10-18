@@ -27,14 +27,17 @@ python3 tools/mac_resources/verify.py \
   artifacts/reverse-engineering/resources/from_103/hfs/inventory.json
 ```
 
-Optional `--decode-app-rsrc` runs `resource_dasm` / `rsrcdump` on application forks after HFS extract. See `docs/research/m68k-toolchain/macintosh-resources.md`.
+Optional `--decode-app-rsrc` runs `resource_dasm` / `rsrcdump` on application
+forks after HFS extraction.
 
 ## Behavior
 
 - Emits JSON with path, size, SHA-256, kind (inventory) or HFS entry metadata (extract).
 - Attempts classic Mac resource-map parse only for `*.rsrc` candidates.
 - On parse failure, records `parse_status: failed` and an error string — **never invents** type/ID/name lists.
-- `Hellcats.rsrc` in-tree is **not** a classic fork (repeating `0xc8`); prefer `.dsk` images.
+- `Hellcats.rsrc` is **not** a classic fork (repeating `0xc8`).
+- `Hellcats_1_0_4.appledouble` contains the comparison resource fork used by
+  `tools/resedit.py`; prefer `.dsk` images when inspecting other editions.
 - Output is deterministic (stable sort + `sort_keys`).
 
 ## Kinds (`inventory.py`)

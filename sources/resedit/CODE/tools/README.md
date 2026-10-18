@@ -7,7 +7,7 @@ Scripts to inspect the **Pacific Conflict** binary (255,360 bytes) and derive se
 Default path (relative to `tools/`):
 
 ```
-../../../Hellcats/Pacific Conflict
+../../../hellcats-over-the-pacific/Pacific Conflict
 ```
 
 Override with the first positional argument to either script.

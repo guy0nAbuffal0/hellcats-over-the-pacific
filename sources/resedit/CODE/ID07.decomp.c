@@ -10,9 +10,9 @@ typedef unsigned char    byte;
 
 /*
  * Original: FUN_00000006; source: ID07.c:9-16.
- * Recovered name: load_str129_string_table [STRONG INFERENCE] (iteration 109).
+ * Recovered name: load_str129_string_table [STRONG INFERENCE].
  * Status: RENAMED. Ghidra stopped at the inline switch table after the JSR at
- * file 0xd6 (bytes 0xda..0xe5 are data, not code). halt_baddata() is retained;
+ * file 0xd6 (bytes 0xda..0xe5 are data, not code). halt_baddata is retained;
  * the real body below is described from bytes, NOT reconstructed as C.
  * Coordinates: ID07.bin file offsets; CODE header is 4 bytes, so jump-table
  * segment offsets map to file offset + 4 (checked for seg 9 / seg 1 targets).
@@ -21,7 +21,7 @@ typedef unsigned char    byte;
  *   h = GetResource('STR#', 0x81)      CLR.L -(A7); PEA #'STR#'; MOVE.W #$81; $A9A0
  *   JSR $272(A5)(h)                    JT -> seg 9 file 0x270 = HLock glue ($A029)
  *   p = *h + 2                          skip STR# count word (count not read)
- *   for i = 1 .. 0x78 (CMPI.W #$79 / BLT):
+ *   for i = 1.. 0x78 (CMPI.W #$79 / BLT):
  *     len = (unsigned) p[0]; next = p + len + 1
  *     if p[1] == '\\' && p[2] == 'p':   explicit Pascal-string marker
  *       JSR $4fa(A5)(p+1, p+3, len-2)  JT -> seg 2 FUN_0000024a (overlap-safe
@@ -56,7 +56,7 @@ void load_str129_string_table /* Original: FUN_00000006 */ (void)
 
 /*
  * Original: FUN_00000190; source: ID07.c:20-44.
- * Recovered name: init_string_pointer_groups [STRONG INFERENCE] (iteration 110).
+ * Recovered name: init_string_pointer_groups [STRONG INFERENCE].
  * Status: RENAMED. Exported C matches binary file 0x190..0x268 [PROVEN, bytes]:
  * JSR $6(PC) then four LEA d16(A5) copy loops of longwords.
  * Input: none (A5 world). Output: void.

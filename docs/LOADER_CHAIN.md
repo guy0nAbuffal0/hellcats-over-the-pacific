@@ -9,15 +9,15 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 | **Overlay (Pacific Conflict)** | Mixed code+data; code from 0x20; no A5-relative globals; fixed base (Ghidra base 0). | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §1, §4, §5 (H3) |
 | **Identity mapping** | For overlay: `runtime_address = file_offset` when load base = 0. | Ibid. §6. Safe parsing: `0x20 ≤ A < 0x3e700`. |
 | **Relocation** | No reloc table. Only FUN_00000020 patches two cells: DAT_0001a7d2, DAT_0001a81c (base/handle from loader). | Ibid. §3. ResEdit/CODE/Pacific Conflict.c FUN_00000020. |
-| **CODE segments (ID01–ID09)** | Segment-local offsets; segment loaded by LoadSeg; A5 world for globals (unaff_A5 in ID02/ID05 .c). | ID02.c, ID05.c; Apple Segment Manager (Inside Mac: RTArch-118). |
+| **CODE segments (ID01–ID09)** | Segment-local offsets; segment loaded by LoadSeg; A5 world for globals (unaff_A5 in ID02/ID05.c). | ID02.c, ID05.c; Apple Segment Manager (Inside Mac: RTArch-118). |
 
 ## 2) Entrypoint and overlay loading
 
 | Item | Conclusion | Citation |
 |------|------------|----------|
-| **Overlay init** | FUN_00000020(base) then FUN_00000054() set overlay globals; DAT_0001b5a0, DAT_0001b738 etc. used as mission/entity base. | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §7. ResEdit/CODE/Pacific Conflict.c 60, 73, 889, FUN_000044e8, FUN_0000740a. |
+| **Overlay init** | FUN_00000020(base) then FUN_00000054 set overlay globals; DAT_0001b5a0, DAT_0001b738 etc. used as mission/entity base. | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §7. ResEdit/CODE/Pacific Conflict.c 60, 73, 889, FUN_000044e8, FUN_0000740a. |
 | **Who loads overlay** | ID08 FUN_00000006 (resource traps 0x2a2, 0x2b2, 0x2aa) is the best candidate for loading the 255360-byte blob. | Ibid. §7. ID08.c. |
-| **ID00 role** | CODE 0 (ID00.bin): jump-table / segment-loader table for CODE 1–9, not overlay data. | [Historical notes](research/NOTES_HISTORY.md) and the byte evidence retained below. The former one-off decoder was not retained. |
+| **ID00 role** | CODE 0 (ID00.bin): jump-table / segment-loader table for CODE 1–9, not overlay data. | Byte evidence retained below. |
 
 ## 3) Minimal EntityState offsets (confirmed)
 
@@ -35,9 +35,9 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 
 ### 4.1) Header and table
 
-- **Bytes 0x00–0x0f:** Four big-endian u32: `0x00000598`, `0x0000225e`, `0x00000578`, `0x00000020`.  
-  **[RECONSTRUCTED]** [NOTES.md](NOTES.md); `xxd` on `ResEdit/CODE/ID00.bin`.
-- **From 0x12:** Repeated 8-byte pattern: `3f 3c <seg_hi> <seg_lo> a9 f0 <tail_hi> <tail_lo>`.  
+- **Bytes 0x00–0x0f:** Four big-endian u32: `0x00000598`, `0x0000225e`, `0x00000578`, `0x00000020`.
+  **[RECONSTRUCTED]** `xxd` on `ResEdit/CODE/ID00.bin`.
+- **From 0x12:** Repeated 8-byte pattern: `3f 3c <seg_hi> <seg_lo> a9 f0 <tail_hi> <tail_lo>`.
   **[RECONSTRUCTED]** retained byte evidence; Apple Toolbox trap A9F0 = LoadSeg. The former one-off decoder was not retained.
 - **Interpretation:** Each record is `MOVE.W #segment_id,-(SP); _LoadSeg` (6 bytes) then one **trailing u16** (2 bytes). No following instruction consumes the tail; it is **stored data** in the same record.
 
@@ -47,66 +47,67 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 
 **Evidence:**
 
-1. **ID02 (segment 2), tail 0x199e → FUN_000019a2 (delta +4)**  
+1. **ID02 (segment 2), tail 0x199e → FUN_000019a2 (delta +4)**
    Decoded ID02 segment (hex file decoded to binary):
    - At segment offset **0x199e:** `4e 5e` = **UNLK A6** (end of previous routine).
    - At **0x19a0:** `4e 75` = **RTS**.
-   - At **0x19a2:** `4e 56` = **LINK** (start of FUN_000019a2).  
+   - At **0x19a2:** `4e 56` = **LINK** (start of FUN_000019a2).
    So: tail = 0x199e = (LINK_offset) − 4 ⇒ **entrypoint_offset = tail + 4**.
 
-2. **ID05 (segment 5), tail 0x0000 → FUN_00000006 (delta +6)**  
+2. **ID05 (segment 5), tail 0x0000 → FUN_00000006 (delta +6)**
    Decoded ID05 segment:
    - At **0x0000:** `05 10 00 0b` (non-code; segment header/count).
    - At **0x0004:** `4e 75` = **RTS**.
-   - At **0x0006:** `4e 56` = **LINK** (start of first routine).  
+   - At **0x0006:** `4e 56` = **LINK** (start of first routine).
    So: tail = 0, first instruction at 6 ⇒ **entrypoint_offset = tail + 6** (6-byte prologue before first routine).
 
-3. **ID06 (segment 6), tail 0x0e0c → FUN_00000e10 (delta +4)**  
+3. **ID06 (segment 6), tail 0x0e0c → FUN_00000e10 (delta +4)**
    **[PROVEN]** `xxd` on `ResEdit/CODE/ID06.bin` at offset 0x0e08:
-   - At **0x0e0c:** `4e 5e` = **UNLK**; at **0x0e0e:** `4e 75` = **RTS**; at **0x0e10:** `4e 56` = **LINK** (start of FUN_00000e10 in ID06.c).  
+   - At **0x0e0c:** `4e 5e` = **UNLK**; at **0x0e0e:** `4e 75` = **RTS**; at **0x0e10:** `4e 56` = **LINK** (start of FUN_00000e10 in ID06.c).
    So: tail = 0x0e0c ⇒ **entrypoint_offset = 0x0e10** (tail + 4).
 
-4. **ID06 (segment 6), tail 0x096a → FUN_0000096e (delta +4)**  
+4. **ID06 (segment 6), tail 0x096a → FUN_0000096e (delta +4)**
    **[PROVEN]** ID06.bin at 0x0966: bytes at **0x096a** are `4e 5e 4e 75 4e 56` (UNLK, RTS, LINK). LINK at 0x096e = FUN_0000096e (ID06.c).
 
-5. **ID06 (segment 6), tail 0x09d4 → FUN_000009d8 (delta +4)**  
+5. **ID06 (segment 6), tail 0x09d4 → FUN_000009d8 (delta +4)**
    **[PROVEN]** ID06.bin at 0x09d0: bytes at **0x09d4** are `4e 5e 4e 75 4e 56` (UNLK, RTS, LINK). LINK at 0x09d8 = FUN_000009d8 (ID06.c).
 
-6. **ID07 (segment 7), tail 0x018c → FUN_00000190 (delta +4)**  
+6. **ID07 (segment 7), tail 0x018c → FUN_00000190 (delta +4)**
    **[PROVEN]** `xxd` on `ResEdit/CODE/ID07.bin` at offset 0x0188:
-   - At **0x018c:** `4e 5e` = **UNLK**; at **0x018e:** `4e 75` = **RTS**; at **0x0190:** `4e 56` = **LINK** (start of FUN_00000190 in ID07.c).  
+   - At **0x018c:** `4e 5e` = **UNLK**; at **0x018e:** `4e 75` = **RTS**; at **0x0190:** `4e 56` = **LINK** (start of FUN_00000190 in ID07.c).
    So: tail = 0x018c ⇒ **entrypoint_offset = 0x0190** (tail + 4). ID00 has one segment-7 entry; this is it.
 
 **Conclusion:** The trailing u16 is the **segment-local routine offset as stored by the linker**: stored_value = (first_instruction_offset − 4) or (first_instruction_offset − 6). So:
 - **+4 delta:** bytes immediately before the correlated target are **UNLK (4e 5e)** then **RTS (4e 75)**; the tail points 4 bytes before LINK.
 - **+6 delta:** segment has a 6-byte header before the first LINK; tail points to that header, so first instruction at tail+6.
 
-References: Decoded `ResEdit/CODE/ID02`, `ID05`, `ID06`, `ID07` (xxd on .bin); the correlation results preserved above; [historical notes](research/NOTES_HISTORY.md) for the ID00 investigation. The former one-off correlation script was not retained.
+References: decoded `ResEdit/CODE/ID02`, `ID05`, `ID06`, `ID07` (`xxd` on
+`.bin`) and the correlation results preserved above.
 
 ## 5) First proven launcher handoff chain
 
 Classic Mac 68k Segment Manager uses a jump table in CODE 0; ID00.bin is that jump table (or equivalent). Handoff:
 
-1. **Caller (in some CODE segment)**  
-   Executes **JSR *offset*(A5)** where *offset* is a positive offset into the jump table (e.g. ≥ 32 above A5).  
+1. **Caller (in some CODE segment)**
+   Executes **JSR *offset*(A5)** where *offset* is a positive offset into the jump table (e.g. ≥ 32 above A5).
    [Inside Mac: RTArch-118 — “JSR offset(A5)” for intersegment calls.]
 
-2. **Jump table entry (ID00.bin)**  
+2. **Jump table entry (ID00.bin)**
    At the entry corresponding to *offset*:
    - **MOVE.W #segment_id,-(SP); _LoadSeg** (trap A9F0) loads the target CODE resource if not already loaded.
    - The **trailing u16** in the same 8-byte record is the **stored segment-local offset** (routine_offset − 4 or −6 as above).
 
-3. **Segment Manager (after LoadSeg)**  
+3. **Segment Manager (after LoadSeg)**
    Loads the segment, then:
    - Computes **routine_address = segment_base + (tail + 4)** [or tail + 6 for first routine in a 6-byte-header segment].
    - Patches the jump table entry with a **JMP** to that address (e.g. 6-byte JMP in loaded entry).
    - Executes that JMP, transferring control to the routine.
 
-4. **Target routine**  
+4. **Target routine**
    Starts with **LINK** (4e 56) at segment offset = tail + 4 (or tail + 6). Same layout in ID02, ID05, ID06, ID07 as per correlation.
 
-**Chain summary:**  
-**JSR offset(A5)** → [entry: MOVE.W #seg,-(SP); LoadSeg; .word tail] → **LoadSeg(seg)** → Segment Manager sets **routine = base + (tail+4 or tail+6)** → **JMP routine** → **LINK** at routine start.
+**Chain summary:**
+**JSR offset(A5)** → [entry: MOVE.W #seg,-(SP); LoadSeg;.word tail] → **LoadSeg(seg)** → Segment Manager sets **routine = base + (tail+4 or tail+6)** → **JMP routine** → **LINK** at routine start.
 
 **Citations:**
 - ID00.bin bytes: `ResEdit/CODE/ID00.bin` (xxd, decode_id00_loadseg.py).
@@ -123,7 +124,7 @@ Classic Mac 68k Segment Manager uses a jump table in CODE 0; ID00.bin is that ju
 | **ID06** | At (target − 4): **4e 5e** (UNLK); at (target − 2): **4e 75** (RTS); at target: **4e 56** (LINK). | Same as ID02: tail = first_instruction − 4. Proven for tails 0x0e0c, 0x096a, 0x09d4 only (see §4.2). |
 | **ID07** | At (target − 4): **4e 5e** (UNLK); at (target − 2): **4e 75** (RTS); at target: **4e 56** (LINK). | Same as ID02; single ID00 entry for segment 7, tail 0x018c → FUN_00000190. |
 
-So the recurring +4 is “tail = first_instruction − 4” (previous function’s UNLK); +6 is “tail = first_instruction − 6” (6-byte header before first routine). **ID06** does not use a +6 first-routine layout at offset 0 (ID06.bin at 0x0000 is `01 70 00 09 48 e7 ...`, not a 6-byte prologue + RTS + LINK); **[RECONSTRUCTED]** from xxd. **ID07** at 0x0000 is `05 68 00 02 4e 75 4e 56 ...` (4-byte header, RTS, LINK at 0x06), so first routine could be at 0x06 with delta +6, but the only ID00 entry for segment 7 has tail 0x018c (delta +4). **[UNKNOWN]** whether segment 7 has another call path for the routine at 0x06.
+So the recurring +4 is “tail = first_instruction − 4” (previous function’s UNLK); +6 is “tail = first_instruction − 6” (6-byte header before first routine). **ID06** does not use a +6 first-routine layout at offset 0 (ID06.bin at 0x0000 is `01 70 00 09 48 e7...`, not a 6-byte prologue + RTS + LINK); **[RECONSTRUCTED]** from xxd. **ID07** at 0x0000 is `05 68 00 02 4e 75 4e 56...` (4-byte header, RTS, LINK at 0x06), so first routine could be at 0x06 with delta +6, but the only ID00 entry for segment 7 has tail 0x018c (delta +4). **[UNKNOWN]** whether segment 7 has another call path for the routine at 0x06.
 
 ## 7) Unresolved segment-6 and segment-7 entries
 
@@ -136,7 +137,7 @@ So the recurring +4 is “tail = first_instruction − 4” (previous function�
 | 6 | 0x0854 | 4e 5e 4e 75, then 4e ba (JSR) | No LINK at tail+4. |
 | 6 | 0x0112 | 4e 75 (RTS), then 4e 56 | RTS at tail, not UNLK. |
 | 6 | 0x00ea | 4e ba (JSR) | Not UNLK/RTS/LINK. |
-| 6 | 0x0398 | 2a ba ... | Not UNLK/RTS/LINK. |
+| 6 | 0x0398 | 2a ba... | Not UNLK/RTS/LINK. |
 
 Segment 7 has only one ID00 entry (tail 0x018c), which **is** proven (see §4.2).
 
@@ -149,7 +150,7 @@ Segment 7 has only one ID00 entry (tail 0x018c), which **is** proven (see §4.2)
 ## 9) Godot integration boundary
 
 - **[INFERRED]** [`loader_metadata.gd`](../godot/hellcats/core/loader_metadata.gd) is the clean-room boundary for proven loader-target facts: parsed JSON only, no segment-manager emulation.
-- **[INFERRED]** [`sim_core.gd`](../godot/hellcats/core/sim_core.gd) now accepts that metadata through `load_loader_metadata_from_file()` / `load_loader_metadata_from_json_text()` and resolves targets through `resolve_loader_target()`.
+- **[INFERRED]** [`sim_core.gd`](../godot/hellcats/core/sim_core.gd) now accepts that metadata through `load_loader_metadata_from_file` / `load_loader_metadata_from_json_text` and resolves targets through `resolve_loader_target`.
 - **[RECONSTRUCTED]** The canonical headless integration test [`test_sim_loader_bridge.gd`](../godot/tests/integration/test_sim_loader_bridge.gd) proves `SimCore` can ingest the proven ID02 and ID05 targets and still execute a deterministic tick.
 - **[UNKNOWN]** Runtime relocation, jump-table patching, and actual segment load execution are still out of scope for the Godot core until the address model is proven further.
 
@@ -168,7 +169,7 @@ Only the following loader targets are supported by **byte-level evidence** (UNLK
 
 **[PROVEN]** counts: ID02 one, ID05 one, ID06 three, ID07 one. All others (including the six unresolved ID06 entries in §7) remain **[UNKNOWN]** until the same byte-level check is applied.
 
-## Host globals seen from the overlay (iteration 232)
+## Host globals seen from the overlay
 
 `DAT_0001b5a0` holds the address `A5 - 0x1388` that the host passes to the
 overlay entry (`reset_overlay_state`, ID02 0x212a). An overlay access
@@ -176,14 +177,14 @@ overlay entry (`reset_overlay_state`, ID02 0x212a). An overlay access
 
 | Overlay offset | Host global | Meaning |
 |---|---|---|
-| +0xe | A5-0x137a | pixel depth 1 / 4 / 8 (iteration 237; older notes call it a mission mode) |
+| +0xe | A5-0x137a | pixel depth 1 / 4 / 8 (; older notes call it a mission mode) |
 | +0x16 / +0x18 | A5-0x1372 / A5-0x1370 | view width / height |
 | +0x90 | A5-0x12f8 | mission number |
 | +0xb6 / +0xb8 | A5-0x12d2 / A5-0x12d0 | fuel % / bombs |
 | +0xba.. | A5-0x12ce.. | kill counters by target type |
 | +0xd2 | A5-0x12b6 | friendly units destroyed |
 | +0xd8, +0x192, +0x1ac, +0x1b4 | A5-0x12b0, -0x11f6, -0x11dc, -0x11d4 | cached panel bitmap handles |
-| +0x2c6 .. +0x2e2 | A5-0x10c2 .. A5-0x10a6 | host memory services (new / realloc / lock / unlock / purge / nopurge / freemem) |
+| +0x2c6.. +0x2e2 | A5-0x10c2.. A5-0x10a6 | host memory services (new / realloc / lock / unlock / purge / nopurge / freemem) |
 
 **[STRONG INFERENCE]** — every offset checked so far agrees with the host
 side; the A5-0x1388 argument itself is **[PROVEN]** (ID02 0x217a).

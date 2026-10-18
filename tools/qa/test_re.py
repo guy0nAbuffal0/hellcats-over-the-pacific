@@ -55,8 +55,8 @@ def main() -> int:
     assert "DAT_0001b2c0" in run("globals", "table_lerp_1b2c0", "--access", "unknown")
     assert "update_aircraft_entity" in run("callers", "table_lerp_1b2c0")
     assert "Pacific Conflict::FUN_0000e42a" in run("callees", "--segment", "Pacific Conflict", "FUN_0000e792")
-    status = run("status", "--segment", "Pacific Conflict", "FUN_0000e42a")
-    assert '"reconstruction_status": "VERIFIED"' in status and "DECOMPILATION_HISTORY" not in status
+    status = run("status", "--segment", "Pacific Conflict", "FUN_0000e42a", "--detail")
+    assert '"reconstruction_status": "VERIFIED"' in status and '"technical_evidence"' in status
     assert "altitude curve" in run("symbol", "DAT_0001b2c0")
     assert "contact_pair_hash" in run("source-map", "FUN_0001358c")
     correspondence = run("correspondence", "--segment", "Pacific Conflict", "FUN_0001358c")

@@ -1,17 +1,17 @@
 # C-to-C reconstruction checkpoint
 
-This is the live checkpoint for focused reconstruction. The 345-iteration
-ledger and former 705-row Markdown tracker are preserved as historical evidence
-in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
-must not be loaded wholesale for routine work.
+This is the concise entry point for focused semantic reconstruction.
 
-**Last iteration:** 384 (2026-10-18)
-**Next target:** `turn_camera_toward_point` (FUN_00008abe), the last camera helper:
-verify it against the bytes.
+**Next target:** verify `bullet_hits_aircraft` (`FUN_000167f4`) against the
+bytes, including its nine arguments to `segment_point_min_distance`.
 
-**Verification policy (user decision, 2026-10-18):** a function may be marked
-VERIFIED when its body matches an independent disassembly of the bytes and any
-call arguments Ghidra dropped are documented as a call-argument correction in
+The angle path feeding `attitude_from_velocity` is established:
+`acos_fixed14` and `atan_fixed14` match independent disassembly, and their
+cosine/tangent lookup-table scales are recorded in the symbol reference.
+
+A function may be marked `VERIFIED` when its body matches an independent
+disassembly of the bytes and every call argument omitted by Ghidra is recorded
+as a call-argument correction in
 [`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md).
 
 ## Current coverage
@@ -19,8 +19,8 @@ call arguments Ghidra dropped are documented as a call-argument correction in
 Run `python3 tools/progress_stats.py` for current orthogonal reconstruction,
 strict-port, and resource counts. The segment-qualified canonical records live
 in [`DECOMPILATION_INVENTORY.json`](DECOMPILATION_INVENTORY.json); statuses are
-reconstruction workflow states, not Godot coverage. The strict-port manifest is
-the sole authoritative C-to-GDScript mapping.
+reconstruction states, not Godot coverage. The strict-port manifest is the sole
+authoritative C-to-GDScript mapping.
 
 ## Canonical sources
 
@@ -30,49 +30,29 @@ the sole authoritative C-to-GDScript mapping.
 - Symbols, globals, fields, and confidence: `DECOMPILATION_SYMBOLS.md`
 - Immutable-source hashes: `DECOMPILATION_PROTECTED_CHECKSUMS.sha256`
 - Strict C-to-GDScript mappings: `godot/strict_port/mappings/functions.json`
-- Historical tracker and iteration evidence: `research/DECOMPILATION_HISTORY.md`
 
 Source-local provenance comments remain authoritative evidence and must not be
 removed merely because the same identity is retrievable elsewhere.
 
-## Focused iteration
+## Focused reconstruction
 
 1. Inspect `git status --short`; do not overwrite unrelated edits.
 2. Select one target from this checkpoint.
-3. Retrieve only the needed evidence with `tools/re_query.py`; use `tools/resedit.py`
-   for one resource type/ID at a time.
-4. Compare the original `.c`, the selected `.decomp.c` function, direct callers,
-   globals, and binary/disassembly evidence. Do not load unrelated full files.
-5. Make one evidence-backed change. Preserve original identifiers, widths,
-   arithmetic, conditions, memory layouts, and unresolved annotations.
-6. Run targeted validation. Update the symbol registry and this checkpoint only
-   when their live facts change. Add historical narrative to the archive only
-   when it supplies unique evidence.
-7. Periodically, and before handoff, run the full validation listed in `README.md`.
-
-Useful retrieval examples:
-
-```sh
-python3 tools/re_query.py function FUN_0000e792
-python3 tools/re_query.py excerpt --segment "Pacific Conflict" FUN_0000e792 --address 0xf47c
-python3 tools/re_query.py callers FUN_0000e792
-python3 tools/re_query.py callees --segment "Pacific Conflict" FUN_0000e792
-python3 tools/re_query.py globals FUN_0000e792
-python3 tools/re_query.py status FUN_0000e792
-python3 tools/re_query.py tests test_flight_math --case _test_fun_0000e42a
-python3 tools/re_query.py symbol DAT_00026004
-python3 tools/re_query.py source-map FUN_0001358c
-```
+3. Retrieve only the required function, excerpt, callers, callees, globals, and
+   test case with `tools/re_query.py`.
+4. Compare the immutable `.c`, semantic `.decomp.c`, and independent
+   binary/disassembly evidence.
+5. Preserve identifiers, widths, arithmetic, conditions, layouts, and
+   unresolved annotations in every evidence-backed edit.
+6. Regenerate the inventory and run targeted checks, followed by the validation
+   in `README.md` before handoff.
 
 ## Priority queue
 
-1. Verify `bullet_hits_aircraft` described above (`tick_bullet` verified in
-   iteration 353).
-2. ~~Revisit the blocked `$1A48` allocator ABI~~ (resolved in iteration 377: runtime address → heap_alloc).
-3. Continue independent verification of high-traffic Pacific Conflict functions.
-4. Resolve remaining ID09/ID05 segment-entry evidence.
-5. Investigate `FUN_00003cca` only when its dependencies are needed.
+1. Verify `bullet_hits_aircraft`; its caller `tick_bullet` is already verified.
+2. Continue independent verification of high-traffic Pacific Conflict functions.
+3. Resolve remaining ID09/ID05 segment-entry evidence.
+4. Investigate `FUN_00003cca` only when its dependencies are needed.
 
-Do not recreate existing outputs, touch gameplay code during a reconstruction
-iteration, commit, or push. A recurring loop should operate on this checkpoint
-and one narrow target; it must not reread the historical ledger every five minutes.
+The `$1A48` allocator ABI is resolved: the runtime address maps to `heap_alloc`
+at file offset `0x1a68`.

@@ -8,7 +8,6 @@ import hashlib
 import json
 import re
 import sys
-from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -16,8 +15,6 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CODE = ROOT / "sources" / "resedit" / "CODE"
 DEFAULT_OUTPUT = ROOT / "docs" / "DECOMPILATION_INVENTORY.json"
-HISTORY = ROOT / "docs" / "research" / "DECOMPILATION_HISTORY.md"
-SYMBOLS = ROOT / "docs" / "DECOMPILATION_SYMBOLS.md"
 STRICT_MAP = ROOT / "godot" / "strict_port" / "mappings" / "functions.json"
 FUN_RE = re.compile(
     r"^(?P<ret>[A-Za-z_][\w\s*]*?)\b(?P<name>[A-Za-z_]\w*)"
@@ -85,6 +82,13 @@ def definitions(path: Path) -> list[dict[str, Any]]:
                 "end": closing + 1,
                 "original_ids": list(dict.fromkeys(ids[-2:])),
                 "body_sha256": sha256_text(text[match.start():closing + 1]),
+                "whole_function_verified": bool(
+                    re.search(
+                        r"\bVERIFIED\b.*?independent.*?disassembly.*?identical",
+                        text[previous_end:match.start()],
+                        flags=re.IGNORECASE | re.DOTALL,
+                    )
+                ),
             }
         )
         previous_end = closing + 1
@@ -102,95 +106,19 @@ def original_inventory(path: Path) -> list[dict[str, Any]]:
     ]
 
 
-def clean_cell(value: str) -> str:
-    return value.strip().replace("`", "")
-
-
-def split_markdown_row(line: str) -> list[str]:
-    cells: list[str] = []
-    cell: list[str] = []
-    in_code = False
-    escaped = False
-    for char in line.strip().strip("|"):
-        if char == "`" and not escaped:
-            in_code = not in_code
-        if char == "|" and not in_code and not escaped:
-            cells.append("".join(cell))
-            cell = []
-        else:
-            cell.append(char)
-        escaped = char == "\\" and not escaped
-        if char != "\\":
-            escaped = False
-    cells.append("".join(cell))
-    return cells
-
-
-def history_rows(path: Path) -> tuple[dict[tuple[str, str], dict[str, Any]], list[dict[str, Any]]]:
-    """Migrate the old Markdown tracker without making it a runtime dependency."""
-    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    header = "| Original | Proposed name | File | Status | Confidence | Orig loc | Decomp loc | Dependencies | Unresolved | Last iter | Validation |"
-    try:
-        start = lines.index(header) + 2
-    except ValueError as exc:
-        raise ValueError(f"historical function tracker header not found in {rel(path)}") from exc
-    found: dict[tuple[str, str], dict[str, Any]] = {}
-    conflicts: list[dict[str, Any]] = []
-    fields = (
-        "original", "proposed_name", "segment", "status", "confidence",
-        "original_location", "semantic_location", "dependencies", "unresolved",
-        "last_iteration", "validation",
+def stable_technical_text(value: str) -> str:
+    """Remove process chronology while retaining the technical statement."""
+    value = re.sub(
+        r"\b(?:iterations?|iters?\.?)\s*-?\s*\d+"
+        r"(?:\s*(?:-|/|–|—|and)\s*\d+)*\b[:,]?[ ]*",
+        "",
+        value,
+        flags=re.IGNORECASE,
     )
-    for line_number in range(start, len(lines)):
-        line = lines[line_number]
-        if line == "## Iteration log":
-            break
-        if not line.startswith("|") or not ORIGINAL_RE.search(line):
-            continue
-        cells = [clean_cell(cell) for cell in split_markdown_row(line)]
-        if len(cells) > len(fields):
-            # A handful of old rows contain an unescaped bitwise `|` in the
-            # dependencies cell. The fixed suffix makes the repair exact.
-            cells = cells[:7] + ["|".join(cells[7:-3])] + cells[-3:]
-        if len(cells) != len(fields):
-            conflicts.append({"path": rel(path), "line": line_number + 1, "reason": "column_count", "raw": line})
-            continue
-        record = dict(zip(fields, cells))
-        record["evidence_location"] = f"{rel(path)}:{line_number + 1}"
-        segment = record["segment"].removesuffix(".c")
-        for original in ORIGINAL_RE.findall(record["original"]):
-            key = (segment, original)
-            if key in found:
-                conflicts.append({"key": f"{segment}::{original}", "reason": "duplicate_history_rows", "rows": [found[key], record]})
-            else:
-                found[key] = record
-    return found, conflicts
-
-
-def verified_iteration_evidence(path: Path) -> dict[str, list[str]]:
-    """Recover later whole-function promotions not copied into tracker rows."""
-    text = path.read_text(encoding="utf-8", errors="replace")
-    marker = text.find("## Iteration log")
-    if marker < 0:
-        return {}
-    base_line = text.count("\n", 0, marker) + 1
-    found: dict[str, list[str]] = {}
-    offset = marker
-    for paragraph in text[marker:].split("\n\n"):
-        if "VERIFIED against the bytes" in paragraph:
-            line = base_line + text[marker:offset].count("\n")
-            for original in set(ORIGINAL_RE.findall(paragraph)):
-                found.setdefault(original, []).append(f"{rel(path)}:{line}")
-        offset += len(paragraph) + 2
-    return found
-
-
-def symbol_references(path: Path) -> dict[str, list[str]]:
-    refs: dict[str, list[str]] = {}
-    for number, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
-        for original in set(ORIGINAL_RE.findall(line)):
-            refs.setdefault(original, []).append(f"{rel(path)}:{number}")
-    return refs
+    value = re.sub(r"\b20\d{2}-\d{2}-\d{2}\b[:,]?[ ]*", "", value)
+    value = re.sub(r"\(\s*\)", "", value)
+    value = re.sub(r"\s+([,;:.])", r"\1", value)
+    return re.sub(r"\s+", " ", value).strip(" ;,:")
 
 
 def strict_rows(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
@@ -210,9 +138,6 @@ def address_for(original: str) -> str:
 
 
 def build_registry(code_dir: Path, previous: dict[str, Any]) -> dict[str, Any]:
-    history, history_conflicts = history_rows(HISTORY)
-    later_verifications = verified_iteration_evidence(HISTORY)
-    symbols = symbol_references(SYMBOLS)
     strict = strict_rows(STRICT_MAP)
     prior = {
         (row.get("segment"), row.get("original_function")): row
@@ -220,8 +145,7 @@ def build_registry(code_dir: Path, previous: dict[str, Any]) -> dict[str, Any]:
         if row.get("segment") and row.get("original_function")
     }
     functions: list[dict[str, Any]] = []
-    conflicts = list(history_conflicts)
-    unmatched_history = set(history)
+    conflicts: list[dict[str, Any]] = []
     file_counts: dict[str, int] = {}
 
     original_files = [code_dir / f"ID{i:02}.c" for i in range(1, 10)] + [code_dir / "Pacific Conflict.c"]
@@ -256,43 +180,38 @@ def build_registry(code_dir: Path, previous: dict[str, Any]) -> dict[str, Any]:
                 semantic = candidates[0]
 
             old = prior.get(key, {})
-            historical = history.get(key)
-            unmatched_history.discard(key)
             if old:
                 status = old.get("reconstruction_status", "ANNOTATED")
-                confidence = old.get("renaming_confidence", "UNRECORDED")
-            elif historical:
-                status = historical["status"].split()[0]
-                if status not in STATUS_VALUES:
-                    conflicts.append({"key": f"{segment}::{original_id}", "reason": "unknown_status", "value": historical["status"]})
-                    status = "ANNOTATED"
-                confidence = historical["confidence"] or "UNRECORDED"
+                confidence = stable_technical_text(old.get("renaming_confidence", "UNRECORDED"))
             else:
-                status = old.get("reconstruction_status", "RENAMED" if semantic and semantic["name"] != original_id else "ANNOTATED")
-                confidence = old.get("renaming_confidence", "UNRECORDED")
+                status = "RENAMED" if semantic and semantic["name"] != original_id else "ANNOTATED"
+                confidence = "UNRECORDED"
             if status not in STATUS_VALUES:
                 conflicts.append({"key": f"{segment}::{original_id}", "reason": "unknown_status", "value": status})
                 status = "ANNOTATED"
-            if segment == "Pacific Conflict" and original_id in later_verifications:
+            if semantic and semantic["whole_function_verified"]:
                 status = "VERIFIED"
-
             strict_row = strict.get(key)
             evidence = [f"{rel(original_path)}:{original['original_line']}"]
             if semantic:
                 evidence.append(f"{rel(semantic_path)}:{semantic['line_start']}-{semantic['line_end']}")
-            if historical:
-                evidence.append(historical["evidence_location"])
-            evidence.extend(symbols.get(original_id, []))
-            if segment == "Pacific Conflict":
-                evidence.extend(later_verifications.get(original_id, []))
-            evidence.extend(old.get("evidence_references", []))
+            for reference in old.get("evidence_references", []):
+                if reference.startswith((
+                    "docs/DECOMPILATION_SYMBOLS.md:",
+                    f"{rel(original_path)}:",
+                    f"{rel(semantic_path)}:",
+                )):
+                    continue
+                evidence.append(reference)
             evidence = list(dict.fromkeys(evidence))
 
-            unresolved = historical.get("unresolved", "") if historical else ""
             blockers = list(old.get("known_blockers", []))
-            if unresolved and unresolved not in {"—", "-"}:
-                blockers.append(unresolved)
             blockers = list(dict.fromkeys(blockers))
+            technical_evidence = {
+                field: stable_technical_text(value)
+                for field, value in old.get("technical_evidence", {}).items()
+            }
+            blockers = [stable_technical_text(value) for value in dict.fromkeys(blockers)]
             confidence_upper = confidence.upper()
             row = {
                 "identity": f"{segment}::{original_id}",
@@ -322,45 +241,26 @@ def build_registry(code_dir: Path, previous: dict[str, Any]) -> dict[str, Any]:
                 ),
                 "evidence_references": evidence,
                 "known_blockers": blockers,
-                "last_relevant_source_update": (
-                    old.get("last_relevant_source_update")
-                    or (f"iteration {historical['last_iteration']}" if historical and historical.get("last_iteration") else None)
-                ),
+                "technical_evidence": technical_evidence,
+                "source_revision": semantic["body_sha256"] if semantic else None,
                 "strict_port": strict_row,
             }
-            if historical:
-                row["historical_tracker"] = historical
             for annotation_key in ("notes", "review"):
                 if annotation_key in old:
                     row[annotation_key] = old[annotation_key]
             functions.append(row)
-
-    for key in sorted(unmatched_history):
-        record = history[key]
-        conflicts.append(
-            {
-                "key": f"{key[0]}::{key[1]}",
-                "reason": "historical_row_not_an_original_function",
-                "evidence_location": record["evidence_location"],
-            }
-        )
 
     identities = [row["identity"] for row in functions]
     if len(identities) != len(set(identities)):
         raise ValueError("duplicate segment-qualified identities in generated inventory")
     status_counts = {status: sum(row["reconstruction_status"] == status for row in functions) for status in sorted(STATUS_VALUES)}
     return {
-        "schema_version": 2,
-        "generated": date.today().isoformat(),
+        "schema_version": 3,
         "identity": "segment::original_function",
         "total": len(functions),
         "file_counts": file_counts,
         "status_counts": status_counts,
-        "migration": {
-            "source": rel(HISTORY),
-            "matched_historical_rows": len(history) - len(unmatched_history),
-            "unmatched_or_conflicting_records": conflicts,
-        },
+        "conflicts": conflicts,
         "functions": functions,
     }
 
@@ -378,12 +278,12 @@ def main() -> int:
         if not args.output.exists() or args.output.read_text(encoding="utf-8") != rendered:
             print(f"FAIL stale registry: {rel(args.output)}; rerun without --check", file=sys.stderr)
             return 1
-        print(f"PASS registry coverage={generated['total']} conflicts={len(generated['migration']['unmatched_or_conflicting_records'])}")
+        print(f"PASS registry coverage={generated['total']} conflicts={len(generated['conflicts'])}")
         return 0
     args.output.write_text(rendered, encoding="utf-8")
     print(
         f"wrote {rel(args.output)} functions={generated['total']} "
-        f"conflicts={len(generated['migration']['unmatched_or_conflicting_records'])}"
+        f"conflicts={len(generated['conflicts'])}"
     )
     return 0
 
