@@ -2,10 +2,10 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** `ai_pursue_target` (FUN_0001820a), the AI caller of the steering chain
-(aim-point lead along the target's path, the +0x69a state 4 switch): verify it against
-the bytes. The steering chain itself (steer_entity_toward_point,
-build_relative_steer_sample, apply_relative_heading_steer) is verified.
+**Next target:** finish `ai_pursue_target` (FUN_0001820a) from 0x1856e: the manoeuvre
+state machine (+0x69a states 1-3, +0x69b, waypoint +0x69c..+0x6a4, best distance +0x6a8)
+against the bytes, then mark it VERIFIED. The lead, chase and gun-decision paths
+(0x1820a..0x1856a) are checked.
 
 The angle path feeding `attitude_from_velocity` is established:
 `acos_fixed14` and `atan_fixed14` match independent disassembly, and their

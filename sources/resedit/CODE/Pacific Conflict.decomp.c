@@ -25898,6 +25898,22 @@ void tick_wave_spawner /* Original: FUN_000180c8 */ (int param_1)
  * Ghidra C reviewed (function at overlay offset 0x1820a).
  * Called by ai_attack_or_fly while the target +0x692 is valid. Within 0x4e20 of the target: aims at the target position taken from its 75-frame pose ring (+0x36, index +0x612) DAT_0001b878 frames in the past (DAT_0001b876 when the attacker kind is 1), extrapolated (build_relative_steer_sample); the lag comes from the rank table DAT_0001b2b4 (set at session start) - a rank-dependent reaction delay [STRONG INFERENCE: difficulty]. Runs a manoeuvre state machine in byte +0x69a (0 = pick one at random: 1, 2, or 3 when fast > 0x32a0 and level; 4 =...), saving the start position at +0x69c.., with full throttle (max_ai_throttle_maybe_invert_679), and fires when lined up (further down). Ghidra C (only the first part read).
  */
+/* Section check 0x1820a..0x18316 [PROVEN, matches the C]: +0x692 = target object, +0x696 =
+ * its distance (written by enemy_fighter_notice_object). Beyond 0x4e20: steer straight at
+ * the target's current position (steer_entity_toward_point), FUN_00010cb2, +0x69a = 0. Within
+ * it: aim at pose[i] + (lag + 4) * (pose[i+1] - pose[i]) from the target's replay ring
+ * (+0x36, 0x14-byte entries, index +0x612), i = index - lag (wrapping at 0x4b), with
+ * lag = DAT_0001b876 when this AI's definition key is 1, else DAT_0001b878 (rank table set in
+ * begin_flight_for_rank); the pitch / heading errors are then divided by 4 (word, +3 bias).
+ * Section check 0x18316..0x1856a [PROVEN, matches the C]. Call-argument corrections:
+ * abs_int(heading_err) > 0x53f outside state 4 -> abs_int(fold(target +0x22 - own +0x22))
+ * <= 0x1000 or rng & 1 == 0 -> manoeuvre (0x1856e), else +0x69a = 4 (direct chase). Chase:
+ * apply_relative_heading_steer; throttle via adjust_ai_throttle_vs_speed to the target
+ * speed (+0x62a / 4; 0 below 0x800, scaled to 0x1000, blended to 0x1c21 by 0x2000) inside
+ * 0x3000, else full; GUNS: +0x676 = 1 when abs_int(pitch_err - (own +0x626 - def +0x44))
+ * <= 0x7f and abs_int(heading_err) <= 0x7f, errors measured to the target's CURRENT
+ * position (the gun line is the fuselage, so AoA minus trim is removed); state 4 kept
+ * with probability 31/32. The manoeuvre part from 0x1856e is not yet checked. */
 void ai_pursue_target /* Original: FUN_0001820a */ (int *param_1)
 
 {

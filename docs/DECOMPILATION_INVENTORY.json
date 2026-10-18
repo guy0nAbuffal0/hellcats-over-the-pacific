@@ -24394,8 +24394,8 @@
       "semantic_name": "ai_pursue_target",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 25901,
-        "line_end": 26155,
+        "line_start": 25917,
+        "line_end": 26171,
         "function_sha256": "ba293cb48d077fd941b39baa948b316b5a11770832a88ae0c63d4a456a3f29a9"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24405,7 +24405,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22210",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:25901-26155"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:25917-26171"
       ],
       "known_blockers": [
         "second half of the function"
@@ -24430,8 +24430,8 @@
       "semantic_name": "create_shadow_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26164,
-        "line_end": 26174,
+        "line_start": 26180,
+        "line_end": 26190,
         "function_sha256": "0a0e784daccb30b1f6df3a4c4c4a28041d053c62bd821dad12f4a933920c9fbd"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24441,7 +24441,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22468",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26164-26174"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26180-26190"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24464,8 +24464,8 @@
       "semantic_name": "register_shadow_templates",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26183,
-        "line_end": 26200,
+        "line_start": 26199,
+        "line_end": 26216,
         "function_sha256": "bd316f0b5a065ca3f21aedf840be7ccbbc61c2ebf8461b646fa87aff4c5c470c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24475,7 +24475,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22482",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26183-26200"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26199-26216"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24498,8 +24498,8 @@
       "semantic_name": "destroy_shadow_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26209,
-        "line_end": 26219,
+        "line_start": 26225,
+        "line_end": 26235,
         "function_sha256": "97f01a451a3bbe74fcaf537a7728598b65c5f1534c5620f02eb2c6a963731821"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24509,7 +24509,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22503",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26209-26219"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26225-26235"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24532,8 +24532,8 @@
       "semantic_name": "spawn_object_shadow",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26227,
-        "line_end": 26248,
+        "line_start": 26243,
+        "line_end": 26264,
         "function_sha256": "b009371d0b8a1321da99beff0a33f39441c1e88f9c428d0a2371bf431f2950c0"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24543,7 +24543,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22517",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26227-26248"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26243-26264"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24566,8 +24566,8 @@
       "semantic_name": "tick_shadow",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26256,
-        "line_end": 26278,
+        "line_start": 26272,
+        "line_end": 26294,
         "function_sha256": "3344cfd94e6faee2f0ab6c40d19217329c1725c8127c460bef00988b62e1d5f8"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24577,7 +24577,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22542",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26256-26278"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26272-26294"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24600,8 +24600,8 @@
       "semantic_name": "shadow_pre_render",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26286,
-        "line_end": 26346,
+        "line_start": 26302,
+        "line_end": 26362,
         "function_sha256": "d737477834d783bcfcc649896791d0ce5d5a1389491c88f464d35ae2d71daa6a"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24611,7 +24611,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22568",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26286-26346"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26302-26362"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24634,8 +24634,8 @@
       "semantic_name": "create_flak_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26355,
-        "line_end": 26367,
+        "line_start": 26371,
+        "line_end": 26383,
         "function_sha256": "8c1214913c348414d74e9f2b3c3849282d37b02dc6044f52c18974bd90b0a0ff"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24645,7 +24645,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22632",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26355-26367"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26371-26383"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24668,8 +24668,8 @@
       "semantic_name": "destroy_flak_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26376,
-        "line_end": 26390,
+        "line_start": 26392,
+        "line_end": 26406,
         "function_sha256": "742863d1836c95be8ea6646900faecf83fbb70a6107e9ff1bcad104d4df2d82b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24679,7 +24679,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22648",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26376-26390"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26392-26406"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24702,8 +24702,8 @@
       "semantic_name": "flak_notice_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26418,
-        "line_end": 26470,
+        "line_start": 26434,
+        "line_end": 26486,
         "function_sha256": "ab18d7f64e445985b60fda05143500754641f3cbaa956121dc0521dbbaccab40"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24713,7 +24713,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22666",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26418-26470"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26434-26486"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24736,8 +24736,8 @@
       "semantic_name": "tick_flak_gun",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26478,
-        "line_end": 26641,
+        "line_start": 26494,
+        "line_end": 26657,
         "function_sha256": "cffbc0942da2ae8d6d90f9dcd6041586848ce81a4754e02d36dd9c0033c0afef"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24747,7 +24747,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22722",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26478-26641"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26494-26657"
       ],
       "known_blockers": [
         "targeting maths"
@@ -24772,8 +24772,8 @@
       "semantic_name": "create_turret_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26649,
-        "line_end": 26663,
+        "line_start": 26665,
+        "line_end": 26679,
         "function_sha256": "8da7afb19a5c031ab78d63ee56d27548d3b38fddb27420475696979c51366d02"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24783,7 +24783,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22889",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26649-26663"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26665-26679"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24806,8 +24806,8 @@
       "semantic_name": "register_turret_template",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26672,
-        "line_end": 26678,
+        "line_start": 26688,
+        "line_end": 26694,
         "function_sha256": "c8d1c2f3cea1566fe985e0f5c3195d1cac1d030fed8bdefe59cf074d0b49ecac"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24817,7 +24817,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22907",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26672-26678"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26688-26694"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24840,8 +24840,8 @@
       "semantic_name": "spawn_turret_on_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26686,
-        "line_end": 26704,
+        "line_start": 26702,
+        "line_end": 26720,
         "function_sha256": "77b14d7ad805f9fdf071fc620afbfc6d83dd056d439c1271674f194b865c131f"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24851,7 +24851,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22917",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26686-26704"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26702-26720"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24874,8 +24874,8 @@
       "semantic_name": "tick_turret",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26726,
-        "line_end": 26823,
+        "line_start": 26742,
+        "line_end": 26839,
         "function_sha256": "4b0b3bb5788c17c890b85d8c71712de6536ee604edd38c6458aade0e547c0d6c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24885,7 +24885,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:22939",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26726-26823"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26742-26839"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24908,8 +24908,8 @@
       "semantic_name": "turret_pre_render",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26832,
-        "line_end": 26839,
+        "line_start": 26848,
+        "line_end": 26855,
         "function_sha256": "2fd2b561ff50e15e08800b0af2c32dafa2e62b005d11a03bb3980d4ee26bc7ae"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24919,7 +24919,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23040",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26832-26839"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26848-26855"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24942,8 +24942,8 @@
       "semantic_name": "create_parachute_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26847,
-        "line_end": 26859,
+        "line_start": 26863,
+        "line_end": 26875,
         "function_sha256": "19243c0142b5f0cd459cd3e55eb463f8c388c1a9ddecbc93fb95ee23a0e415d8"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24953,7 +24953,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23051",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26847-26859"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26863-26875"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -24976,8 +24976,8 @@
       "semantic_name": "register_parachute_template",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26868,
-        "line_end": 26874,
+        "line_start": 26884,
+        "line_end": 26890,
         "function_sha256": "735f39c2a327edbff45cbef100205a52bbe99d306859452487bf7dd19c463713"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -24987,7 +24987,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23067",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26868-26874"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26884-26890"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25010,8 +25010,8 @@
       "semantic_name": "spawn_bailout_parachute",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26899,
-        "line_end": 26936,
+        "line_start": 26915,
+        "line_end": 26952,
         "function_sha256": "dcc19a9c590f3edc957385c98464b72e952d9a6ab2c53783525c73e0ad540ebf"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25021,7 +25021,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23077",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26899-26936"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26915-26952"
       ],
       "known_blockers": [
         "Exact munition class"
@@ -25046,8 +25046,8 @@
       "semantic_name": "destroy_parachute_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26945,
-        "line_end": 26952,
+        "line_start": 26961,
+        "line_end": 26968,
         "function_sha256": "53801c996c5786b504f9dec5424dc87f430d21217b24f88187e65f441db3b90e"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25057,7 +25057,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23119",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26945-26952"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26961-26968"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25080,8 +25080,8 @@
       "semantic_name": "parachute_descend",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 26960,
-        "line_end": 27115,
+        "line_start": 26976,
+        "line_end": 27131,
         "function_sha256": "5fa34c95e2fde7256487a33a041ffeb07670877cfd27d11243730176980a030e"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25091,7 +25091,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23130",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:26960-27115"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:26976-27131"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25114,8 +25114,8 @@
       "semantic_name": "parachute_tick",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27123,
-        "line_end": 27165,
+        "line_start": 27139,
+        "line_end": 27181,
         "function_sha256": "dd4cea867efda619fc7f67a9e0067913c4caf715b3457e6d0856995f6536a0a4"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25125,7 +25125,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23289",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27123-27165"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27139-27181"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25148,8 +25148,8 @@
       "semantic_name": "create_cloud_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27174,
-        "line_end": 27184,
+        "line_start": 27190,
+        "line_end": 27200,
         "function_sha256": "3e04ca8dde0675b8d35ab36911a5fffe7329c22b4f8b9af584c7b710c8e12ef7"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25159,7 +25159,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23335",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27174-27184"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27190-27200"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25182,8 +25182,8 @@
       "semantic_name": "register_cloud_templates",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27193,
-        "line_end": 27210,
+        "line_start": 27209,
+        "line_end": 27226,
         "function_sha256": "d6b78a8c82402577a60b0bf77d6c931c21f54ba10267e2f4666c98fb9dee45ad"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25193,7 +25193,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23349",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27193-27210"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27209-27226"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25216,8 +25216,8 @@
       "semantic_name": "spawn_camera_relative_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27218,
-        "line_end": 27240,
+        "line_start": 27234,
+        "line_end": 27256,
         "function_sha256": "3c5bd1c0dddb08d1f9b67fcbd18b0a953bb20778c48bc5090ce237eab0ab16e5"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25227,7 +25227,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23370",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27218-27240"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27234-27256"
       ],
       "known_blockers": [
         "cloud reading"
@@ -25252,8 +25252,8 @@
       "semantic_name": "follow_camera_offset",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27248,
-        "line_end": 27263,
+        "line_start": 27264,
+        "line_end": 27279,
         "function_sha256": "40f2661e6c4ab60819235330ea2c85f8a90a14c6d4804afd766965e4dbc19ac6"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25263,7 +25263,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23396",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27248-27263"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27264-27279"
       ],
       "known_blockers": [
         "cloud reading"
@@ -25288,8 +25288,8 @@
       "semantic_name": "create_view_attached_controller",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27272,
-        "line_end": 27282,
+        "line_start": 27288,
+        "line_end": 27298,
         "function_sha256": "65a808d97f25236afe0eccaaf015a1daf040a604a196b581749c7fcd5429b86d"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25299,7 +25299,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23415",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27272-27282"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27288-27298"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25322,8 +25322,8 @@
       "semantic_name": "tick_view_attached_object",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27290,
-        "line_end": 27302,
+        "line_start": 27306,
+        "line_end": 27318,
         "function_sha256": "afe661bdcf3afaa936a1d5cd47b0d7e1c221856d75e13b03e62d39e98edf1d26"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25333,7 +25333,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23429",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27290-27302"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27306-27318"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25356,8 +25356,8 @@
       "semantic_name": "store_xyz_asr",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27315,
-        "line_end": 27323,
+        "line_start": 27331,
+        "line_end": 27339,
         "function_sha256": "b9f599c15079eb715f21551205ccb9e9b1f0f3c2f8840b2c86b853941b7cff2c"
       },
       "renaming_confidence": "PROVEN",
@@ -25367,7 +25367,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23445",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27315-27323"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27331-27339"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25390,8 +25390,8 @@
       "semantic_name": "find_nearest_runway_approach_ends",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27342,
-        "line_end": 27498,
+        "line_start": 27358,
+        "line_end": 27514,
         "function_sha256": "58296aafcc33f37c1c01f63fa23e5d5aad68a5488db876aaa8cb61f2ee7ad0ac"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25401,7 +25401,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23458",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27342-27498"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27358-27514"
       ],
       "known_blockers": [
         "pad schema"
@@ -25426,8 +25426,8 @@
       "semantic_name": "try_begin_landing_approach",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27516,
-        "line_end": 27585,
+        "line_start": 27532,
+        "line_end": 27601,
         "function_sha256": "56f5755c2e1f2bbaef0029a2ffa3a96ba62d08b2703e0dec352b02df5555e573"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25437,7 +25437,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23619",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27516-27585"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27532-27601"
       ],
       "known_blockers": [
         "handler"
@@ -25462,8 +25462,8 @@
       "semantic_name": "tick_landing_approach_glide",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27601,
-        "line_end": 27804,
+        "line_start": 27617,
+        "line_end": 27820,
         "function_sha256": "d696573c4327663dbc20f79cb5d3eaca44eafed7776afa3c8b5a23ac850c8cc5"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25473,7 +25473,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23693",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27601-27804"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27617-27820"
       ],
       "known_blockers": [
         "abort band"
@@ -25498,8 +25498,8 @@
       "semantic_name": "memmove_block",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27821,
-        "line_end": 27941,
+        "line_start": 27837,
+        "line_end": 27957,
         "function_sha256": "9f0319f02fc6cc9928dbbd436dcebe802ea413a8eba4c8c32f3ebfdf1d463d49"
       },
       "renaming_confidence": "PROVEN",
@@ -25509,7 +25509,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:23890",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27821-27941"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27837-27957"
       ],
       "known_blockers": [
         "Exact return-reg meaning"
@@ -25534,8 +25534,8 @@
       "semantic_name": "memzero",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 27957,
-        "line_end": 27997,
+        "line_start": 27973,
+        "line_end": 28013,
         "function_sha256": "c1f3519931b9d023da79a6644047b324087e4dbb773e551611dc9355e04210f0"
       },
       "renaming_confidence": "PROVEN",
@@ -25545,7 +25545,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:24014",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:27957-27997"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:27973-28013"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -25568,8 +25568,8 @@
       "semantic_name": "c_strlen",
       "semantic_source": {
         "path": "sources/resedit/CODE/Pacific Conflict.decomp.c",
-        "line_start": 28006,
-        "line_end": 28028,
+        "line_start": 28022,
+        "line_end": 28044,
         "function_sha256": "3a55047a196412f955e95cec369a022ad15da59f4ebffecb527723985fb68dbd"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -25579,7 +25579,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/Pacific Conflict.c:24059",
-        "sources/resedit/CODE/Pacific Conflict.decomp.c:28006-28028"
+        "sources/resedit/CODE/Pacific Conflict.decomp.c:28022-28044"
       ],
       "known_blockers": [],
       "technical_evidence": {
