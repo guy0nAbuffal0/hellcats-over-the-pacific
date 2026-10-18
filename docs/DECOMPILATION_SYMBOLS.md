@@ -1000,3 +1000,4 @@ its dropped arguments are listed here.
 | `atan2_fixed14` (FUN_000102d6) | `abs_int` ×2 (Ghidra FUN_00002de8) | abs_int(param_1), abs_int(param_2) | bytes 0x102e2..0x102f6 |
 | `apply_relative_heading_steer` (FUN_000109ba) | `abs_int` ×2 (Ghidra FUN_00002de8) | abs_int(param_5), abs_int(param_4) | bytes 0x109d4..0x109ee |
 | aircraft controller +0x20 / +0x22 / +0x24 (Pacific Conflict) | attitude words: pitch / heading / bank (roll), 0x4000 per turn | STRONG_INFERENCE | +0x22 heading (camera and steer code); +0x24 bank from apply_relative_heading_steer's clamped bank target; order matches build_attitude_matrix_3ang. |
+| `build_relative_steer_sample` (FUN_00010360) | `abs_int` ×3 (Ghidra FUN_00002de8) | abs_int(dx), abs_int(dy), abs_int(dz) | bytes 0x103b6..0x103e0 |

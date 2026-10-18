@@ -17979,6 +17979,17 @@ ushort atan2_fixed14(short param_1,short param_2) /* Original: FUN_000102d6 */
  *
  * Evidence: Capstone @0x10360+; sole BSR from 10b2e; AI also @0x182F4.
  */
+/* VERIFIED: bytes 0x10360..0x10556 match the C. Call-argument correction: the three
+ * FUN_00002de8() calls are abs_int(dx), abs_int(dy), abs_int(dz) (target - aircraft).
+ * *param_5 = height above ground (y + 0x2d * vy(+0xc) - ground +0x2e); below 4000 the
+ * aim point is raised by 4000 - height (flag 1 returned; FUN_00010cb2 at <= 1000).
+ * Beyond 0x8000 horizontally, dy is pulled toward a slope limit (horiz / 4 when |dy| >
+ * 0x800, else (horiz >> 8) * |dy| >> 5), blended linearly between 0x8000 and 0x10000.
+ * The vector, shifted to 16 bits, is rotated by the inverse attitude (-pitch, -heading,
+ * -roll; build_attitude_matrix_3ang_alt) into the aircraft frame at param_6 +2 / +6 / +10.
+ * *param_7 / *param_8 = fold(pitch) / fold(heading) to the target, from
+ * attitude_from_velocity's 6th / 7th outputs.
+ */
 undefined4
 build_relative_steer_sample(int *param_1,int param_2,int param_3,int param_4,int *param_5,int param_6,
             undefined2 *param_7,undefined2 *param_8) /* Original: FUN_00010360 */

@@ -2,10 +2,9 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** `build_relative_steer_sample` (`FUN_00010360`), which builds
-the vector and range that `apply_relative_heading_steer` consumes: verify it
-against the bytes. `apply_relative_heading_steer` is verified (bank-to-turn AI
-steering).
+**Next target:** `FUN_00010b2e` (steer_entity_toward_point), the caller that chains
+build_relative_steer_sample -> apply_relative_heading_steer: verify it against the bytes
+and confirm which outputs feed apply_relative_heading_steer's param_4 / param_5.
 
 The angle path feeding `attitude_from_velocity` is established:
 `acos_fixed14` and `atan_fixed14` match independent disassembly, and their
