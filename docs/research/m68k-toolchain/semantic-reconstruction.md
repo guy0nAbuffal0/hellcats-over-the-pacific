@@ -30,7 +30,7 @@ This pass produced **2120** function entries (artifact under `artifacts/reverse-
 ## Recommended loop
 
 1. Pick a `FUN_*` with a clear byte landmark (constants, distinctive prologue).  
-2. Disassemble the region with `tools/m68k/disasm_region.py`.  
+2. Inspect an independently generated disassembly of the region.
 3. Cross-check Ghidra C / headless function entry.  
 4. Write or update a **contract** doc; only then edit `.decomp.c` in a dedicated pass.  
 5. Add Godot / C vectors before claiming behavioral equivalence.

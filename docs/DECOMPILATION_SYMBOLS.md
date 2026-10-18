@@ -967,7 +967,15 @@ Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
 | `FUN_00003c48` (false entry inside `compute_camera_abs_metric`; was named `approx_dist3_from_abs`) | `approx_dist3_xyz` (file 0x3c68) | iteration 376: all 6 references are `lea.l $3c48.l`; 6 call sites corrected in the decomp |
 | `LAB_000028ba_2` (update_tracking_camera) | `transform_vecs12_by_matrix3` (file 0x28dc) | iteration 376: `lea.l $28bc.l` at 0x8dc6 |
 | `heap_roving_cursor_store` (FUN_00001a48, false entry) | `heap_alloc(size)` (file 0x1a68) | iteration 377: all 4 `lea.l $1a48.l` (overlay_main_entry ×2, 0x4e6e, 0xb4b6); 27 call sites corrected; resolves the old "$1A48 allocator ABI" blocker |
-| `heap_add_large_block_tail` (0x19b0), `heap_zero_payload_tail` (0x1b4c), `heap_realloc_grow_only_tail` (0x1be4), `reset_object_to_template_pose_tail` (0x4e4e), `overlay_rng_warmup_epilogue` (0x11544) | `heap_free_coalesce`, `heap_alloc_cleared`, `copy_object_vertex_buffer`, `activate_near_range_object`, `overlay_rng_next` (each + 0x20) | iteration 377 scan of all `lea.l` code operands; call sites not yet corrected |
+| `heap_add_large_block_tail` (0x19b0), `heap_zero_payload_tail` (0x1b4c), `heap_realloc_grow_only_tail` (0x1be4), `reset_object_to_template_pose_tail` (0x4e4e), `overlay_rng_warmup_epilogue` (0x11544) | `heap_free_coalesce`, `heap_alloc_cleared`, `copy_object_vertex_buffer`, `activate_near_range_object`, `overlay_rng_next` (each + 0x20) | iteration 377 scan of all `lea.l` code operands; overlay_rng_next done in iteration 378 (17 lea, 49 call sites, now PROVEN); the other four corrected in iteration 379 (activate_near_range_object ×3 and copy_object_vertex_buffer ×2 in init_mission_object_tables, heap_free_coalesce ×2 in deactivate_object, heap_alloc_cleared ×2 in create_wave_spawner_controller) |
+
+Iteration 380 completeness check [PROVEN, byte scan]: the 78 absolute `move.l #$xxxx`
+code-pointer stores (64 distinct targets) (state handlers, definition-table slots, renderer hooks) all point
+at file xxxx + 0x20, and the decomp already names those targets. The three `pea.l
+$xxx(pc)` callbacks (collect_map_features 0x6ec, nearest_type80_centroid_visitor 0xaba,
+anchor_point_visitor 0xc4c) are PC-relative, so they are plain file offsets with no
+shift. There are no absolute `jsr $xxxx.l`. Every overlay code reference has now been
+checked against the runtime-address rule.
 
 ## Call-argument corrections
 

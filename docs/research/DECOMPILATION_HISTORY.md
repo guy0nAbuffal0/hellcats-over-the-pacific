@@ -4822,3 +4822,35 @@ handle only after activation; a shell printing ticks alone does not wake this ag
     answered.
 - The other five misattributions are listed in the symbols doc for the next
   iterations.
+
+### Iteration 378 — 2026-10-18
+
+- FUN_00011544 call sites are PROVEN to be overlay_rng_next:
+  - all 17 references are `lea.l $11544.l`, a runtime address = file
+    0x11564;
+  - the 49 decomp call sites (rewritten earlier as [INFERRED]) now carry the
+    proof.
+- The overlay binary moved to sources/hellcats-over-the-pacific/ (user rename,
+  staged). Comment / doc only.
+
+### Iteration 379 — 2026-10-18
+
+- Corrected the last four runtime-address callee misattributions (one lea
+  each):
+  - activate_near_range_object ×3 and copy_object_vertex_buffer ×2 in
+    init_mission_object_tables;
+  - heap_free_coalesce ×2 in deactivate_object;
+  - heap_alloc_cleared ×2 in create_wave_spawner_controller.
+- The four fragments keep their tail names; their headers note that nothing
+  calls them.
+- All lea.l code operands in the overlay are now consistent with the
+  runtime-address rule.
+
+### Iteration 380 — 2026-10-18
+
+- Completeness check of the runtime-address rule [PROVEN, byte scan]:
+  - all 78 absolute `move.l #$xxxx` code-pointer stores (64 distinct targets) target xxxx + 0x20,
+    already named correctly;
+  - the three `pea.l $xxx(pc)` callbacks are PC-relative file offsets;
+  - there are no absolute `jsr $xxxx.l`.
+- No further misattributions. Doc-only.

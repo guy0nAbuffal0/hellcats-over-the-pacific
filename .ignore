@@ -1,8 +1,0 @@
-# Keep generated ResEdit prose/metadata out of default broad ripgrep results.
-# Explicit file queries still work; use tools/resedit.py for routine retrieval.
-sources/resedit/**/*.md
-sources/resedit/**/*.json
-!sources/resedit/inventory.json
-
-# Historical ledgers are explicit, on-demand evidence rather than broad-search context.
-docs/research/**

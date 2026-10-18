@@ -112,8 +112,6 @@ Five candidate groups merit action; none contains original evidence.
 | Candidate | Evidence | Classification | Recommended action |
 |---|---|---|---|
 | Eight legacy test scripts under `godot/hellcats/tests/*.gd` | The canonical runner lists only `res://tests/...` at `godot/tests/run_all.gd:6-25`. Commit `dacbc15` introduced the legacy tree during a test-layout refactor. | NEEDS_INVESTIGATION | Compare assertions against current unit/integration tests, migrate any unique cases, then archive/remove legacy scripts. |
-| `tools/run_headless_rng_test.sh` | Unreferenced; line 13 invokes the legacy path while the canonical runner uses `res://tests/unit/test_rng.gd`. | SAFE_TO_REMOVE or replace | Prefer one documented targeted Godot invocation; remove after verifying no external caller. |
-| `tools/mac_resources/extract_sounds.py` | Heuristic fixed-offset/raw-PCM carver with guessed 22,050 Hz at lines 15-49. Current resource parser decodes `snd ` structures deterministically. | ARCHIVE | Keep in Git history or research archive only; do not present as active extraction tooling. |
 | `sources/sounds/wrong_sample_rate_or_too_fast/*.wav` | Eleven unreferenced files, 40,006 bytes total, explicitly labeled incorrect; created by the superseded sound experiment. | SAFE_TO_REMOVE | Remove from active tree after confirming they are not needed as negative fixtures; Git history preserves them. |
 | `docs/TECHNICAL_OVERVIEW.md`, `docs/ROADMAP.md`, `docs/CONVERGENCE_BACKLOG.md`, `docs/CONVERGENCE_LOOP_TEMPLATE.md` as active workflow | They describe the older prototype convergence process (`TECHNICAL_OVERVIEW.md:99-119`, `169-181`) while `AGENTS.md:3-30` and `DECOMPILATION_PROGRESS.md:48-85` define the strict workflow. ROADMAP also contains superseded “next boundary” statements at lines 54-67. | CONSOLIDATE/ARCHIVE | Retain unique architectural/history facts, then route current work through README, project status, strict foundation, and the live checkpoint. |
 
@@ -230,7 +228,6 @@ low thousands.
 | P1 | Resource retrieval boundary | Configure searches/retrievers to exclude `sources/resedit/**/*.md|json` by default and use `resedit.py` | Avoids up to ~301k tokens on accidental bulk retrieval | Low | `tools/resedit.py:1360-1413`; resource measurements |
 | P1 | Overview/workflow documents | Reduce TECHNICAL_OVERVIEW/ROADMAP/IMPORT/CONVERGENCE files to unique facts and links; archive superseded prose | 5k–8k per broad architecture read | Medium; review unique claims first | D4 and deprecated table |
 | P1 | Legacy tests and fixtures | Diff assertion coverage, migrate unique cases, remove exact fixture copies and retired scripts | ~9.8k tokens/search plus fewer false test entry points | Medium for scripts, low for exact fixture copies | `godot/tests/run_all.gd:6-25`; D1/D2 |
-| P2 | Sound experiment | Archive heuristic carver; remove known-wrong unreferenced WAV outputs | Small token impact; ~40 KiB tree cleanup | Low after reference check | `extract_sounds.py:15-49`; named output directory |
 | P2 | Loader table views | Generate narrative table from fixture/proof metadata while retaining independent invariants | ~500–1,000 | Medium; do not weaken byte-level proof | D6 |
 | P2 | Large media/Git history | Consider LFS only for future clone/storage policy | No meaningful token impact | High if history rewritten | Largest-file and pack measurements |
 
@@ -328,8 +325,7 @@ launcher now invokes `res://tests/run_all.gd`.
   `godot/tests/run_all.gd`, `sources/resedit/inventory.json`,
   `tools/decomp/inventory_functions.py`, `tools/qa/test_re.py`,
   `tools/qa/test_regression.py`, `tools/re_query.py`,
-  `tools/recompilation/id05_rng/test_rng_id05.c`, `tools/resedit.py`, and
-  `tools/run_headless_rng_test.sh`.
+  `tools/recompilation/id05_rng/test_rng_id05.c`, and `tools/resedit.py`.
 - Archived: `docs/CONVERGENCE_BACKLOG.md` and
   `docs/CONVERGENCE_LOOP_TEMPLATE.md` under `docs/research/`.
 - Removed: the two duplicate fixtures and six superseded scripts under
@@ -367,5 +363,5 @@ launcher now invokes `res://tests/run_all.gd`.
 | D: canonical architecture startup | 5,658 | 2,168 | 61.7% |
 | E: representative flight regression | 4,056 | 711 | 82.5% |
 
-These are context estimates, not measured inference latency. P2 sound cleanup,
-loader-table generation, and any Git LFS/history policy remain deferred.
+These are context estimates, not measured inference latency. P2 loader-table
+generation and any Git LFS/history policy remain deferred.

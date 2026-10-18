@@ -2334,14 +2334,14 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
   }
   /* Publish selected child object pointers as globals, then run setup hooks. */
   DAT_0001bdb4 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x14); /* child[0] */
-  reset_object_to_template_pose_tail();
-  heap_realloc_grow_only_tail();
+  activate_near_range_object( /* args dropped by Ghidra; lea.l $4e4e.l at 0x17ba = runtime -> file 0x4e6e (iter 379) */);
+  copy_object_vertex_buffer( /* args dropped by Ghidra; lea.l $1be4.l at 0x17c8 = runtime -> file 0x1c04 (iter 379) */);
   DAT_0001bdb0 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x2c); /* child[1] @ +0x18+0x14 */
-  reset_object_to_template_pose_tail();
-  heap_realloc_grow_only_tail();
+  activate_near_range_object( /* args dropped by Ghidra; lea.l $4e4e.l at 0x17ba = runtime -> file 0x4e6e (iter 379) */);
+  copy_object_vertex_buffer( /* args dropped by Ghidra; lea.l $1be4.l at 0x17c8 = runtime -> file 0x1c04 (iter 379) */);
   if (*(short *)(DAT_0001b5a0 + 0x90) == 2) {
     DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x5c); /* child[3] */
-    reset_object_to_template_pose_tail();
+    activate_near_range_object( /* args dropped by Ghidra; lea.l $4e4e.l at 0x17ba = runtime -> file 0x4e6e (iter 379) */);
   }
   else {
     DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x44); /* child[2] */
@@ -2460,6 +2460,9 @@ undefined4 heap_add_large_block /* Original: FUN_0000199a */ (int param_1)
 /* Original: FUN_000019b0; source: Pacific Conflict.c. Recovered name: heap_add_large_block_tail [STRONG INFERENCE] (iteration 243).
  * Ghidra C reviewed (function at overlay offset 0x19b0).
  * Not a real function: Ghidra split the tail of heap_add_large_block at 0x19b0 (register inputs A0 / D2 / Z flag are the values left by the code before it). Same effect as the end of heap_add_large_block. Name kept for traceability only.
+ * Iteration 379 [PROVEN]: no code calls this fragment. Its only reference is a `lea.l`
+ * whose operand is a RUNTIME address = file + 0x20 = heap_free_coalesce (0x19d0), so the Ghidra calls to it
+ * were corrected to that function. The tail name stays accurate for the bytes here.
  */
 undefined4 heap_add_large_block_tail /* Original: FUN_000019b0 */ (void)
 
@@ -2677,6 +2680,9 @@ void heap_zero_payload(undefined4 *payload) /* Original: FUN_00001b38 */
 /* Original: FUN_00001b4c; source: Pacific Conflict.c. Recovered name: heap_zero_payload_tail [STRONG INFERENCE] (iteration 246).
  * Ghidra C reviewed (function at overlay offset 0x1b4c).
  * Not a real function: the tail of heap_zero_payload (0x1b38) that Ghidra split at 0x1b4c; it clears A0 for D0 * 8 bytes (memzero) with registers set by the preceding code. Name kept for traceability.
+ * Iteration 379 [PROVEN]: no code calls this fragment. Its only reference is a `lea.l`
+ * whose operand is a RUNTIME address = file + 0x20 = heap_alloc_cleared (0x1b6c), so the Ghidra calls to it
+ * were corrected to that function. The tail name stays accurate for the bytes here.
  */
 void heap_zero_payload_tail /* Original: FUN_00001b4c */ (void)
 
@@ -2769,6 +2775,9 @@ uint * heap_realloc_grow_only(uint *param_1,undefined4 *param_2) /* Original: FU
 /* Original: FUN_00001be4; source: Pacific Conflict.c. Recovered name: heap_realloc_grow_only_tail [STRONG INFERENCE] (iteration 246).
  * Ghidra C reviewed (function at overlay offset 0x1be4).
  * Not a real function: the tail of heap_realloc_grow_only split at 0x1be4 (memmove_block(old, new, old capacity) then heap_free_coalesce(old), with A2 / D2 / D3 from the preceding code). Name kept for traceability.
+ * Iteration 379 [PROVEN]: no code calls this fragment. Its only reference is a `lea.l`
+ * whose operand is a RUNTIME address = file + 0x20 = copy_object_vertex_buffer (0x1c04), so the Ghidra calls to it
+ * were corrected to that function. The tail name stays accurate for the bytes here.
  */
 void heap_realloc_grow_only_tail /* Original: FUN_00001be4 */ (void)
 
@@ -7097,6 +7106,9 @@ void reset_object_to_template_pose /* Original: FUN_00004e06 */ (int param_1)
 /* Original: FUN_00004e4e; source: Pacific Conflict.c. Recovered name: reset_object_to_template_pose_tail [STRONG INFERENCE] (iteration 247).
  * Ghidra C reviewed (function at overlay offset 0x4e4e).
  * Not a real function: the last two steps of reset_object_to_template_pose (+0x14 = template +0x12; apply_template_chain_xform) split off by Ghidra at 0x4e4e, with A0 / A3 set by the preceding code. Name kept for traceability.
+ * Iteration 379 [PROVEN]: no code calls this fragment. Its only reference is a `lea.l`
+ * whose operand is a RUNTIME address = file + 0x20 = activate_near_range_object (0x4e6e), so the Ghidra calls to it
+ * were corrected to that function. The tail name stays accurate for the bytes here.
  */
 void reset_object_to_template_pose_tail /* Original: FUN_00004e4e */ (void)
 
@@ -7403,8 +7415,8 @@ void deactivate_object /* Original: FUN_000052dc */ (char *param_1)
     if ((param_1[6] & 0x10U) != 0) {
       reset_object_to_template_pose((int)param_1);
     }
-    heap_add_large_block_tail();
-    heap_add_large_block_tail();
+    heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0 (iter 379) */);
+    heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0 (iter 379) */);
     param_1[0x44] = '\0';
     param_1[0x45] = '\0';
     param_1[0x46] = '\0';
@@ -8404,15 +8416,15 @@ void spawn_cloud_layer /* Original: FUN_0000640c */ (void)
       local_18[sVar8] = sVar9;
       sVar10 = (short)((uVar1 & 0xffff) % 5);
       if (sVar10 == 4) {
-        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         sVar7 = (short)((uVar1 & 0xffff) % 10) + 0xf;
-        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         iVar3 = (uint)(uVar6 & 0xfff) * 10 + 300000;
       }
       else {
-        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         sVar7 = (short)((uVar1 & 0xffff) % 10) + 0x23;
-        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         iVar3 = (uVar1 & 0xffff) % 1000 + 0xcc4c;
       }
       iVar4 = sin_fixed14( /* Original: FUN_00001d76 */(int)sVar9);
@@ -16387,10 +16399,10 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
       }
       param_1[3] = iVar23 - *(int *)(iVar1 + 0x1c);
     }
-    uVar13 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar13 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(short *)((int)param_1 + 0x61e) = (uVar13 & 0x7f) + *(short *)((int)param_1 + 0x61e);
     *(ushort *)(param_1 + 9) = *(short *)((int)param_1 + 0x61e) + *(short *)(param_1 + 9) & 0x3fff;
-    uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(short *)((int)param_1 + 0x61a) = *(short *)((int)param_1 + 0x61a) - ((ushort)uVar7 & 0x7f);
     uVar13 = *(short *)((int)param_1 + 0x61a) + *(short *)(param_1 + 8);
     *(ushort *)(param_1 + 8) = uVar13 & 0x3fff;
@@ -16943,9 +16955,9 @@ LAB_0000f192:
     if (iVar19 != 0x2d) {
       bVar6 = true;
     }
-    uVar16 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar16 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     uVar16 = uVar16 & 0x7f;
-    uVar13 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar13 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     uVar13 = (uVar13 & 0x7f) - 0x40;
     if (iVar25 < 0x438) {
       uVar13 = (ushort)((iVar25 * (short)uVar13) / 0x438);
@@ -17184,10 +17196,10 @@ LAB_0000f47c:
    * state_32=0xE772, clear movement_61a/61e. Skipped on 0x10 early return.
    */
   if ((*(byte *)((int)param_1 + 0x685) & 2) != 0) {
-    uVar8 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar8 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     psVar11 = (short *)(uVar8 & 0xffff003f);
     if ((uVar8 & 0x3f) == 0) {
-      psVar11 = (short *)overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      psVar11 = (short *)overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       if ((((uint)psVar11 & 1) == 0) || (*(char *)((int)param_1 + 0x67d) == '\0')) {
         if (*(char *)((int)param_1 + 0x67e) != '\0') {
           *(char *)((int)param_1 + 0x67e) = *(char *)((int)param_1 + 0x67e) + -1;
@@ -18148,10 +18160,10 @@ LAB_00010700:
                                   *(uint *)(pcVar1 + 0x20),param_1);
           }
           else {
-            piVar5 = (int *)overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+            piVar5 = (int *)overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
             if (((uint)piVar5 & 1) != 0) {
               uVar9 = uVar8 & 0xffbf;
-              piVar5 = (int *)overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+              piVar5 = (int *)overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
               if (((uint)piVar5 & 1) == 0) goto LAB_00010700;
               uVar10 = uVar9 | 0x80;
             }
@@ -18677,13 +18689,13 @@ undefined4 ai_script_try_fire_burst(int *param_1) /* Original: FUN_00010e28 */
     if (*(char *)(param_1 + 0x19f) == '\0') {
       return 1;
     }
-    if ((*(char *)(param_1 + 0x19d) == '\0') && (uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */), (uVar2 & 7) == 0)) {
+    if ((*(char *)(param_1 + 0x19d) == '\0') && (uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */), (uVar2 & 7) == 0)) {
       iVar1 = *param_1;
       *(undefined1 *)(param_1 + 0x19d) = 2;
       uVar4 = *(undefined2 *)(param_1 + 9);
-      uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       uVar2 = *(short *)((int)param_1 + 0x22) + -0x80 + (uVar2 & 0xff) & 0x3fff;
-      uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       spawn_weapon_entity( /* Original: FUN_00012840 */(short)*(undefined4 *)((int)param_1 + 0x62a),0,*(uint *)(iVar1 + 0x18),
                    *(uint *)(iVar1 + 0x1c),*(uint *)(iVar1 + 0x20),
                    *(short *)(param_1 + 8) + (uVar3 & 0x7f) & 0x3fff,uVar2,uVar4);
@@ -19159,6 +19171,10 @@ void overlay_rng_init(undefined4 param_1) /* Original: FUN_0001150a */
  * LEA/JSR $11544 but consume D0 as a single RNG u16 — executing this body
  * per tick is impossible. Call sites in this .decomp.c are rewritten to
  * overlay_rng_next with [INFERRED] note. See NOTES “FUN_00011544 call-site alias”.
+ * Iteration 378 [PROVEN]: all 17 references to this address are `lea.l $11544.l`
+ * (0x648a .. 0x19354). That operand is a RUNTIME address = file 0x11564 = overlay_rng_next,
+ * so the 49 rewritten call sites are exact, not inferred. The name stays: this fragment
+ * really is the tail of overlay_rng_init.
  */
 void overlay_rng_warmup_epilogue(void) /* Original: FUN_00011544 */
 {
@@ -22701,9 +22717,9 @@ void apply_hit_to_sinkable_object /* Original: FUN_00014f48 */ (int *param_1,int
   sVar6 = 0;
   sVar1 = *(short *)((int)param_1 + 0x32);
   if (sVar1 == 1) {
-    uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     sVar6 = (uVar5 & 0x3f) + 0x100;
-    uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     if ((uVar3 & 1) != 0) {
       sVar6 = -sVar6;
     }
@@ -22729,9 +22745,9 @@ joined_r0x0001504c:
     }
     if (sVar1 != 2) goto LAB_00015082;
   }
-  uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+  uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
   sVar7 = (uVar5 & 0x7f) + 0x200;
-  uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+  uVar3 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
   if ((uVar3 & 1) != 0) {
     sVar7 = -sVar7;
   }
@@ -22930,15 +22946,15 @@ void tick_firing_ship_controller /* Original: FUN_00015356 */ (int *param_1)
       *(short *)((int)param_1 + 0x52) = local_a;
     }
     if (*(short *)(param_1 + 0x14) != 0) {
-      cVar8 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      cVar8 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       if (cVar8 == '\x1b') {
         *(short *)(param_1 + 0x14) = *(short *)(param_1 + 0x14) + -1;
-        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         iVar15 = (int)(short)((int)(uint)uVar6 % (int)*(short *)((int)param_1 + 0x52));
         puVar2 = (uint *)(param_1 + iVar15 * 3 + 0x15);
-        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         local_6 = (*(short *)((int)param_1 + iVar15 * 6 + 0xe4) + (uVar6 & 0xff)) - 0x80 & 0x3fff;
-        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
         local_8 = (*(short *)((int)param_1 + iVar15 * 6 + 0xe6) + (uVar6 & 0xff)) - 0x80 & 0x3fff;
         if (DAT_0001b870 == 0) {
           uVar23 = 0;
@@ -22948,7 +22964,7 @@ void tick_firing_ship_controller /* Original: FUN_00015356 */ (int *param_1)
           iVar15 = 1;
           uVar6 = local_6;
           uVar22 = local_8;
-          uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+          uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
           spawn_weapon_entity( /* Original: FUN_00012840 */0x7fff - (uVar7 & 0xff),iVar15,uVar9,uVar20,uVar21,uVar6,uVar22,uVar23);
         }
       }
@@ -23346,11 +23362,11 @@ int spawn_ordnance_scattered(int param_1,int param_2,int param_3,int param_4,int
   local_e = 0;
   local_6 = (short)(param_1 >> 4) + 0x2015;
   transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,param_6);
-  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
   local_e = (uVar2 & 0x3f) + local_e + -0x20;
-  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
   local_a = (uVar2 & 0x3f) + local_a + -0x20;
-  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+  uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
   local_6 = (uVar2 & 0x3f) + local_6 + -0x20;
   iVar1 = spawn_mission_pool_object( /* Original: FUN_00005116 */DAT_0002664a,param_3 + (local_e >> 2),param_4 + (local_a >> 2),
                        param_5 + (local_6 >> 2),0,0,0,0);
@@ -24939,18 +24955,18 @@ int spawn_debris_fragment /* Original: FUN_000173fe */ (uint param_1,uint param_
   else {
     iVar1 = *(int *)(iVar1 + 8);
     *(int *)(iVar1 + 0x32) = DAT_0001b838 + 0x2d;
-    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(uint *)(iVar1 + 8) = (uVar2 & 0xff) - 0x7f;
-    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(uint *)(iVar1 + 0xc) = (uVar2 & 0xff) - 0x7f;
-    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(uint *)(iVar1 + 0x10) = (uVar2 & 0xff) - 0x7f;
     *(short *)(iVar1 + 0x36) = *(short *)(iVar1 + 0xe) << 4;
-    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(ushort *)(iVar1 + 0x20) = (uVar2 & 0xff) << 6;
-    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(ushort *)(iVar1 + 0x22) = (uVar2 & 0xff) << 6;
-    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar2 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     *(ushort *)(iVar1 + 0x24) = (uVar2 & 0xff) << 6;
   }
   return iVar1;
@@ -25616,16 +25632,16 @@ void tick_aircraft_spawner /* Original: FUN_00017dd4 */ (int *param_1)
       }
       attitude_from_velocity( /* Original: FUN_00001f22 */(short)(iVar8 - iVar2 >> ((int)sVar13 & 0x3fU)),0,
                    (short)(iVar3 - iVar4 >> ((int)sVar13 & 0x3fU)),0,0,(ushort *)0x0,&local_6);
-      uVar11 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      uVar11 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       local_6 = local_6 + ((uVar11 & 0x1f) - 0x10) * 0x40 & 0x3fff;
       iVar9 = *(int *)(iVar9 + 0xc);
       iVar8 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)local_6);
       sVar13 = (short)((iVar9 << 1) / 3 >> 5);
       local_e = *(int *)(iVar1 + 0x18) - ((int)(short)iVar8 * (int)sVar13 >> 7);
-      uVar11 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      uVar11 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       iVar9 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)local_6);
       uVar5 = *(int *)(iVar1 + 0x20) + ((int)sVar13 * (int)(short)iVar9 >> 7);
-      uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+      uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
       local_6 = local_6 + ((uVar12 & 0x1f) - 0x10) * 0x40 + 0x2000 & 0x3fff;
       sVar13 = 0;
       sVar14 = 0;
@@ -25634,9 +25650,9 @@ void tick_aircraft_spawner /* Original: FUN_00017dd4 */ (int *param_1)
           while (param_1[sVar13 + 0xd] != 0) {
             sVar13 = sVar13 + 1;
           }
-          uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+          uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
           local_e = (uVar12 & 0xffff0fff) + (local_e - 0x800);
-          uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+          uVar12 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
           uVar5 = (uVar12 & 0xffff0fff) + (uVar5 - 0x800);
           piVar10 = (int *)spawn_enemy_fighter(local_e,(uint)(uVar11 & 0xfff) * 10 + 30000,uVar5,0,local_6,
                                         0,1);
@@ -25693,14 +25709,14 @@ int * create_wave_spawner_controller /* Original: FUN_00018040 */ (int param_1,i
   int *piVar2;
   undefined2 *puVar3;
   
-  piVar2 = (int *)heap_zero_payload_tail();
+  piVar2 = (int *)heap_alloc_cleared( /* size dropped by Ghidra; lea.l $1b4c.l at 0x18050 = runtime -> file 0x1b6c (iter 379) */);
   *piVar2 = param_1;
   *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x130040;
   piVar2[1] = *(int *)(&DAT_0001b524 + param_2 * 4);
   *(undefined2 *)((int)piVar2 + 0x32) = 10;
   piVar2[0xd] = DAT_0001b838 + 0x546;
   if (*(short *)(DAT_0001b5a0 + 0x90) == 7) {
-    puVar3 = (undefined2 *)heap_zero_payload_tail();
+    puVar3 = (undefined2 *)heap_alloc_cleared( /* size dropped by Ghidra; lea.l $1b4c.l at 0x18050 = runtime -> file 0x1b6c (iter 379) */);
     uVar1 = *(undefined2 *)((int)piVar2 + 0x32);
     DAT_00020adc = puVar3;
     puVar3[1] = uVar1;
@@ -25728,13 +25744,13 @@ void tick_wave_spawner /* Original: FUN_000180c8 */ (int param_1)
   
   if (((*(short *)(param_1 + 0x32) != 0) && (DAT_0001b870 == 0)) &&
      (*(int *)(param_1 + 0x34) <= DAT_0001b838)) {
-    uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar5 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     uVar5 = uVar5 % 0x1540 - 0xa80 & 0x3fff;
-    sVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    sVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     iVar3 = sVar6 + 0x5a3c0 >> 4;
     iVar1 = sin_fixed14( /* Original: FUN_00001d76 */(int)(short)uVar5);
     iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */(int)(short)uVar5);
-    uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+    uVar7 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
     iVar3 = spawn_enemy_fighter(-(iVar3 * (short)iVar1 >> 8) - 0xb92670,40000,
                          (iVar3 * (short)iVar2 >> 8) + 0x7f8e4c,0,
                          (uVar7 & 0x1ff) + uVar5 + 0xdf00 & 0x3fff,0,1);
@@ -26470,17 +26486,17 @@ LAB_00018df2:
                   }
                   sVar11 = (short)(iVar8 >> 10);
                   *(int *)((int)param_1 + (short)uVar16 * 4 + 0xd2) = DAT_0001b838 + sVar11;
-                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                   iVar8 = *(int *)(iVar19 + 8);
-                  uVar10 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                  uVar10 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                   piVar2 = (int *)((int)param_1 + (short)uVar16 * 0xc + 0x5a);
                   iVar7 = (int)(short)((uVar9 & 0x3f) + sVar11);
                   *piVar2 = (uint)(uVar10 & 0xfff) +
                             *(int *)(iVar19 + 0x18) + *(int *)(iVar8 + 8) * iVar7 + -0x800;
-                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                   piVar2[1] = (uint)(uVar9 & 0xfff) +
                               *(int *)(iVar19 + 0x1c) + *(int *)(iVar8 + 0xc) * iVar7 + -0x800;
-                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                  uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                   piVar2[2] = (uint)(uVar9 & 0xfff) +
                               *(int *)(iVar19 + 0x20) + *(int *)(iVar8 + 0x10) * iVar7 + -0x800;
                   if (piVar2[1] + -500 < *(int *)(iVar8 + 0x2e)) {
@@ -26646,13 +26662,13 @@ void tick_turret /* Original: FUN_0001917c */ (undefined4 *param_1)
                        (ushort *)(param_1 + 0x13),(ushort *)((int)param_1 + 0x4e));
           if (DAT_0001b870 == 0) {
             if (*(short *)((int)param_1 + 0x4a) == 0) {
-              uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+              uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
               if ((uVar9 & 0xf) == 0) {
-                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                 *(ushort *)((int)param_1 + 0x4a) = (uVar9 & 7) + 7;
-                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                 *(ushort *)(param_1 + 0x14) = 0x80 - (uVar9 & 0xff);
-                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite [INFERRED≡next] */);
+                uVar9 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN iter 378: lea.l $11544.l = runtime -> file 0x11564] */);
                 *(ushort *)((int)param_1 + 0x52) = 0x80 - (uVar9 & 0xff);
               }
             }

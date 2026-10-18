@@ -64,7 +64,7 @@ Completion criterion: one recognizable original object and a documented scene su
 
 **6. Cockpit and instruments — medium effort once telemetry is mapped.** ID03 gauge drawing and overlay needle updates are documented for airspeed, altitude, climb, heading, RPM, manifold pressure, gear, flaps, ammunition and fuel. Start with a Godot cockpit panel using verified value-to-needle mappings, then refine original layout and artwork. Keep gauges whose underlying state is not yet modeled explicitly deferred. This gives visible authenticity and helps diagnose the simulation.
 
-**7. Sound — a comparatively small first feature, medium effort for original behavior.** Bring an engine loop into the live scene, then add original event priorities, looping/release behavior and engine/wind rate rules from `update_game_sounds`. Nothing in the current Godot asset tree imports the original audio. The 13 `snds` exports are now structurally verified classic format-1 `snd ` resources with exact 16.16 sample rates, loop points, 8-bit mono sample spans and names; use `tools/resedit.py` rather than the older heuristic `extract_sounds.py` carver. Playback priority and live engine/wind rate behavior still require implementation.
+**7. Sound — a comparatively small first feature, medium effort for original behavior.** Bring an engine loop into the live scene, then add original event priorities, looping/release behavior and engine/wind rate rules from `update_game_sounds`. Nothing in the current Godot asset tree imports the original audio. The 13 `snds` exports are now structurally verified classic format-1 `snd ` resources with exact 16.16 sample rates, loop points, 8-bit mono sample spans and names; use `tools/resedit.py` for deterministic retrieval. Playback priority and live engine/wind rate behavior still require implementation.
 
 Completion criterion: the engine responds to validated engine state, events trigger the appropriate sound with correct priority, and no incorrect sample rate is presented as original fidelity. See [SOUND_SYSTEM.md](../SOUND_SYSTEM.md) and [tools/mac_resources/README.md](../../tools/mac_resources/README.md).
 
@@ -479,7 +479,6 @@ Exit code **0**. Runner summary: **13 passed, 0 failed, 0 skipped.** No `SCRIPT 
 ### Not executed
 
 - `godot/hellcats/tests/*.gd`, including entity-control and movement-smoothing tests
-- `tools/run_headless_rng_test.sh`
 - Editor play: camera, controls, objective banners, stall, sea impact, restart
 
 ### What the passing tests actually cover

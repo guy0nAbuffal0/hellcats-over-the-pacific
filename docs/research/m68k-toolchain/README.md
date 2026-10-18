@@ -27,8 +27,6 @@ Disposable outputs: `artifacts/reverse-engineering/` (under gitignored `/artifac
 | Need | Location |
 |------|----------|
 | HFS extract / verify | `tools/mac_resources/extract.py`, `verify.py` |
-| m68k region disasm | `tools/m68k/disasm_region.py`, `compare_id05.py` |
-| Headless Ghidra ID05 | `tools/ghidra/run_id05_headless.sh`, `ExportId05.java` |
 | FUN_* inventory | `tools/decomp/inventory_functions.py` |
 | C RNG PoC | `tools/recompilation/id05_rng/` |
 | External clones | `/Users/math/Sites/tests/{resource_dasm,rsrcdump,python-rsrcfork,m68k-disasm}` |

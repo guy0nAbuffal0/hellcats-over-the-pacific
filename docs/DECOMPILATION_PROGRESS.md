@@ -5,13 +5,12 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 377 (2026-10-18)
-**Next target:** correct the remaining runtime-address callee misattributions found by the
-iteration-377 `lea.l` scan (one per iteration): `heap_add_large_block_tail` ->
-heap_free_coalesce, `heap_zero_payload_tail` -> heap_alloc_cleared,
-`heap_realloc_grow_only_tail` -> copy_object_vertex_buffer,
-`reset_object_to_template_pose_tail` -> activate_near_range_object,
-`overlay_rng_warmup_epilogue` -> overlay_rng_next (table in DECOMPILATION_SYMBOLS.md).
+**Last iteration:** 380 (2026-10-18)
+**Next target:** verify `update_tracking_camera` (FUN_00008c30) against the bytes. Its
+callees are now known: approx_dist3_xyz via lea $3c48, transform_vecs12_by_matrix3 via
+lea $28bc, place_camera_behind_object. Record its dropped call arguments as
+call-argument corrections. The overlay binary is at
+`sources/hellcats-over-the-pacific/Pacific Conflict`.
 
 **Verification policy (user decision, 2026-10-18):** a function may be marked
 VERIFIED when its body matches an independent disassembly of the bytes and any

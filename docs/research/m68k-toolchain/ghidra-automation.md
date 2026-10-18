@@ -13,19 +13,6 @@
 
 Do **not** reuse historical project leftovers under `/Users/math/Sites/tests/ghidra` as the primary project; disposable projects go under `artifacts/reverse-engineering/id05/ghidra_project/`.
 
-## Scripts
-
-| File | Role |
-|------|------|
-| `tools/ghidra/run_id05_headless.sh` | Import `ID05.bin` as raw binary, processor `68000:BE:32:default`, base `0` |
-| `tools/ghidra/ExportId05.java` | Post-script: write function list JSON |
-
-```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
-bash tools/ghidra/run_id05_headless.sh
-# → artifacts/reverse-engineering/id05/functions.json
-```
-
 ## Successful operations
 
 - Raw Binary loader, block name `CODE5`, base address `0x0`.

@@ -8,7 +8,6 @@ Target: `sources/ResEdit/CODE/ID05.bin`
 - LCG immediates: multiply `0x41c64e6d` at file offset **0x730**; add `0x3039` nearby (**0x738**).
 - Ghidra symbol: `FUN_00000728` (entry `0x728`).
 
-Scripts: `tools/m68k/disasm_region.py`, `tools/m68k/compare_id05.py`.
 JSON: `artifacts/reverse-engineering/id05/disassembly-comparison.json`.
 
 ## Landmarks
