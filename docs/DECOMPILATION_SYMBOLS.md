@@ -708,8 +708,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00001c5c` | `translate_int3_vecs` | PROVEN | `@0x1C5C`: DBRA count over int[3]; `dst = src + (dx,dy,dz)`. Sibling `scale_int3_vecs` uses `MULS.L`. |
 | `FUN_00001cac` | `scale_int3_vecs` | PROVEN body | `@0x1CAC`: same loop as translate but `dst = src * (sx,sy,sz)`. No overlay absolute/BSR refs found. |
 | `FUN_0000202a` | `load_attitude_angle_sincos` | PROVEN | `@0x202A`: for each of 4 angles, `cos_fixed14` then `sin_fixed14` into `DAT_0001d7fa/fc`, `f6/f8`, `f2/f4`, `ee/f0`. |
-| `FUN_00001d76` | `sin_fixed14` | PROVEN | `@0x1D76`: lerp on `DAT_0001ab6c[angle>>6]`; frac `&0x3F`. |
-| `FUN_00001dd8` | `cos_fixed14` | PROVEN | `@0x1DD8`: same as sin on `DAT_0001ad6c`. |
+| `FUN_00001d76` | `sin_fixed14` | PROVEN / VERIFIED | `@0x1D76`: lerp on `DAT_0001ab6c[angle>>6]`; frac `&0x3F`. `DAT_0001ab6c[i] = round(4096 sin(i pi / 128))`, 256 words, exact. |
+| `FUN_00001dd8` | `cos_fixed14` | PROVEN / VERIFIED | `@0x1DD8`: same as sin on `DAT_0001ad6c` (256 words, exact cosine over a full turn). |
 | `FUN_00001e3a` | `acos_fixed14` | PROVEN | Independent disassembly matches bytes `0x1e3a..0x1eba`. `DAT_0001ad6c[i] = round(4096 * cos(i * pi / 128))` for `i=0..0x80`; clamp ±0x1000, binary-search, then interpolate to `0..0x2000`. |
 | `FUN_00001ebc` | `atan_fixed14` | PROVEN mechanics / STRONG INFERENCE name | Independent disassembly matches bytes `0x1ebc..0x1f20`. Entries `0..126` of `DAT_0001af6c` equal `4096 * tan((i - 0x3f) * pi / 128)` within ±1; the function binary-searches and interpolates a 14-bit angle. Entry 127 is an unused non-monotonic quirk for current ratio callers. |
 | `FUN_000102d6` | `atan2_fixed14` | STRONG INFERENCE | `@0x102D6`: abs(dx),abs(dy) then `atan_fixed14` + 0x1000/0x2000 quadrants → 14-bit heading. |

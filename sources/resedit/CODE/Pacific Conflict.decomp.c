@@ -3001,6 +3001,9 @@ short * FUN_00001d56(void) /* Original: FUN_00001d56 — false entry; see header
  * load_attitude_angle_sincos JSRs here via PC-relative $1D76. Some sites
  * LEA $1D56 (false) instead — treat those as this function [INFERRED].
  */
+/* VERIFIED: bytes 0x1d76..0x1dd6 match (no calls). DAT_0001ab6c[i] = round(4096*sin(i*pi/128)), 256 words,
+ * exact over a full turn. i = angle >> 6 (C truncation); only i + 1 is masked & 0xff, so the
+ * angle must be 0..0x3fff (callers mask it). Result = 4.12 value as a sign-extended word. */
 int sin_fixed14(uint param_1) /* Original: FUN_00001d76 */
 {
   uint uVar1;
@@ -3064,6 +3067,9 @@ int FUN_00001db8(void) /* Original: FUN_00001db8 — false entry; see header */
  * file 0x1ad8c). Same >>6 index / 0x3F-frac lerp. Paired with sin in
  * load_attitude_angle_sincos. False LEA target $1DB8 → treat as this [INFERRED].
  */
+/* VERIFIED: bytes 0x1dd8..0x1e38 match (no calls). DAT_0001ad6c[i] = round(4096*cos(i*pi/128)), 256 words,
+ * exact over a full turn. i = angle >> 6 (C truncation); only i + 1 is masked & 0xff, so the
+ * angle must be 0..0x3fff (callers mask it). Result = 4.12 value as a sign-extended word. */
 int cos_fixed14(uint param_1) /* Original: FUN_00001dd8 */
 {
   uint uVar1;

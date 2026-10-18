@@ -2,8 +2,9 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** verify `bullet_hits_aircraft` (`FUN_000167f4`) against the
-bytes, including its nine arguments to `segment_point_min_distance`.
+**Next target:** the other `atan_fixed14` callers (overlay `0x10310` / `0x1033c`):
+check whether their inputs can exceed the tangent table's last valid entry (126).
+`sin_fixed14` / `cos_fixed14` are verified against the bytes (exact 256-word tables).
 
 The angle path feeding `attitude_from_velocity` is established:
 `acos_fixed14` and `atan_fixed14` match independent disassembly, and their
