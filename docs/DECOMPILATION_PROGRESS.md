@@ -5,10 +5,10 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 374 (2026-10-18)
-**Next target:** host word `+0x98` (replay / end-sequence state: 1 set by
-begin_replay_view, 2 on a live crash, 0 reset): find its writers and readers on both
-the overlay and host side and name it with evidence.
+**Last iteration:** 375 (2026-10-18)
+**Next target:** `update_tracking_camera` (FUN_00008c30): verify the whole function
+against the bytes now that its globals (DAT_0001b86e countdown, host +0x98 replay state,
+DAT_0001b884 / DAT_0001b888 targets) are named.
 
 **Verification policy (user decision, 2026-10-18):** a function may be marked
 VERIFIED when its body matches an independent disassembly of the bytes and any

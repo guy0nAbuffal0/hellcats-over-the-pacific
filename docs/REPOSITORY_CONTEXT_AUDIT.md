@@ -342,8 +342,8 @@ launcher now invokes `res://tests/run_all.gd`.
   support file reports `OK` (the existing manifest also emits one harmless
   “improperly formatted line” warning).
 - Registry: 736 records, 736 unique composite identities, zero migration
-  conflicts; current reconstruction states are 673 renamed, 57 semantically
-  verified, and 6 blocked.
+  conflicts; revalidation at `ae1e039` reports 662 renamed awaiting semantic
+  verification, 217 name-verified, 68 semantically verified, and 6 blocked.
 - Strict mapping sync: 3/3 mappings source-synchronized and behaviorally
   verified; none integrated.
 - ResEdit: 119 resources across 30 types verify; 116 parsed structures and 3
@@ -360,8 +360,8 @@ launcher now invokes `res://tests/run_all.gd`.
 
 | Workload | Before | After | Reduction |
 |---|---:|---:|---:|
-| A: large-function iteration (full baseline) | 11,085 | 3,344 | 69.8% |
-| A: former hand-filtered comparison | 3,863 | 3,344 | 13.4% |
+| A: large-function iteration (full baseline) | 11,085 | 3,420 | 69.1% |
+| A: former hand-filtered comparison | 3,863 | 3,420 | 11.5% |
 | B: strict-port translation | 29,011 | 3,507 | 87.9% |
 | C: DITL:137 inspection | 2,346 | 594 | 74.7% |
 | D: canonical architecture startup | 5,658 | 2,168 | 61.7% |

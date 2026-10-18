@@ -4782,3 +4782,14 @@ handle only after activation; a shell printing ticks alone does not wake this ag
   - Consumed by begin_replay_view (camera side) and cleared there.
   - Also cleared on respawn.
 - There are no Godot references. Call sites changed: 2 (plus the declaration).
+
+### Iteration 375 — 2026-10-18
+
+- Host word A5-0x12f0 (overlay host +0x98) = instant-replay state [PROVEN].
+  - 1 is set by the File menu "Instant Replay" (MENU 2 item 8, ⌘I) and by
+    begin_replay_view.
+  - 2 is set on a live crash (end sequence).
+  - 0 is reset by start_new_mission and by update_tracking_camera at the end
+    of the countdown.
+  - The Mission Summary buttons are enabled only when it is 0.
+- Comment / doc only.

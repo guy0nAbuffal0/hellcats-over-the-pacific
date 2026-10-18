@@ -9204,7 +9204,7 @@ LAB_0000744c:
       DAT_0001b870 = 2;
     }
   }
-  if (*(short *)(DAT_0001b5a0 + 0x98) != 0) {
+  if (*(short *)(DAT_0001b5a0 + 0x98) != 0) { /* host +0x98 = A5-0x12f0 instant-replay state (iter 375): 1 = File menu "Instant Replay" (MENU 2 item 8) or begin_replay_view, 2 = live crash end sequence, 0 = idle */
     if ((*(short *)(DAT_0001b5a0 + 0x98) == 2) && (DAT_0001b870 == 0)) {
       if ((*(int *)(DAT_0001b5a0 + 0x25e) != 0) &&
          (iVar5 = (**(code **)(DAT_0001b5a0 + 0x2b6))(0), iVar5 != 0)) {

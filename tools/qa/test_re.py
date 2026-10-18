@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -34,7 +35,19 @@ def main() -> int:
     assert "table_lerp_1b2c0" in function and "Original: FUN_0000e42a" in function
     assert "Pacific Conflict::FUN_0000e42a" in run("function", "--segment", "Pacific Conflict", "0xe42a")
     excerpt = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--lines", "120:135")
-    assert ":16359-16374" in excerpt and "void update_aircraft_entity" not in excerpt
+    excerpt_lines = excerpt.splitlines()
+    match = re.fullmatch(
+        r"// (sources/resedit/CODE/Pacific Conflict\.decomp\.c):(\d+)-(\d+) "
+        r"\[Pacific Conflict::FUN_0000e792 relative 120:135\]",
+        excerpt_lines[0],
+    )
+    assert match is not None, excerpt_lines[0]
+    source_path, start_text, end_text = match.groups()
+    start, end = int(start_text), int(end_text)
+    assert end - start == 15
+    source_lines = (ROOT / source_path).read_text(encoding="utf-8").splitlines()
+    assert excerpt_lines[1:] == source_lines[start - 1:end]
+    assert "void update_aircraft_entity" not in excerpt
     block = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--address", "0xf47c", "--limit", "12")
     assert "LAB_0000f47c:" in block and len(block.splitlines()) <= 14
     named_block = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--block", "Block 6c", "--limit", "8")
