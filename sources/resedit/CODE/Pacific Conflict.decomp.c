@@ -18392,9 +18392,10 @@ LAB_00010700:
  *
  * Entity steering update from a relative sample:
  *   param_1 — entity base
- *   param_2 — range/metric (bands at 0, 0x1000, 0x5000)
+ *   param_2 — height above ground from build_relative_steer_sample (bands at 0, 0x1000,
+ *             0x5000; both callers pass it) - corrected from "range/metric"
  *   param_3 — buffer; atan2 uses shorts at +2 and +6
- *   param_4 / param_5 — stick/command samples stored to entity +0x61a/+0x61c
+ *   param_4 / param_5 — pitch / heading error to the target (folded), stored to +0x61a/+0x61c
  *
  * Near-zero command path (|p4|,|p5|<0x501 and p2≥0): blend into prior
  * 0x61a/0x61c and skip atan2. Else: atan2_fixed14 → fold_angle_pm_0x2000,
@@ -18410,7 +18411,8 @@ LAB_00010700:
  * FUN_00002de8() calls are abs_int(param_5) then abs_int(param_4). Behaviour:
  *   small commands (|p4|, |p5| <= 0x500, p2 >= 0): elevator = 5*p4 - 4*prev(+0x61a),
  *     aileron = 2*p5 - prev(+0x61c), rudder = aileron >> 4 (word ops);
- *   else bank-to-turn: target = +0x24 + fold(atan2(v+2, v+6)), clamped to +-limit with
+ *   else bank-to-turn: target = +0x24 + fold(atan2(v+2, v+6)) (the target's angle around
+ *     the nose in the aircraft frame), clamped to +-limit (limit grows with height) with
  *     limit 0 (p2 < 0), p2 (< 0x1000), 0x1000 + (p2 - 0x1000) / 4 (< 0x5000), no clamp
  *     beyond; aileron = fold(target - +0x24), smoothed (3d - 2*prev(+0x61e)) / 2 when
  *     |d| <= 0x280; elevator = cos_fixed14(d) / 8; rudder = 0; +0x61e = d.
@@ -18499,6 +18501,9 @@ LAB_00010b0a:
  * Evidence: Capstone @0x10B2E–0x10B82; BSR $10360 then $109ba.
  * Callee: build_relative_steer_sample.
  */
+/* VERIFIED: bytes 0x10b2e..0x10b82 match the C. Steer toward world point (x, y, z):
+ * build_relative_steer_sample(aircraft, x, y, z, &height, v, &pitch_err, &heading_err), then
+ * apply_relative_heading_steer(aircraft, height, v, pitch_err, heading_err). */
 void steer_entity_toward_point(int *param_1,int param_2,int param_3,int param_4) /* Original: FUN_00010b2e */
 {
   short local_18;
