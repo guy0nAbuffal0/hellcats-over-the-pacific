@@ -758,7 +758,7 @@ revalidated here.
 | `DAT_00020ce4` | `attitude_compose_tag` (code ptr) | PROVEN use | `$2468`/`$26e0` secondary entries; `$2408` literal mid-`0229e` but `≡ finalize_…_3ang_alt−0x20` — A890 A6 check favors +0x20 false-address reading. |
 | `FUN_00003b98` | `update_object_camera_metric` | PROVEN | `@0x3B98`: abs(`+0x18/1c/20` − `d838/834/830`); `metric=max+((a+b)>>2)` → `obj+0x10` and D0. |
 | `FUN_00003c00` | `compute_camera_abs_metric` | PROVEN | `@0x3C00`: abs(x/y/z − `d838/834/830`); same metric; returns D0 only (no `+0x10` store). |
-| `FUN_00003be0` | *(false mid-`update_object_camera_metric`)* | BLOCKED | `@0x3BE0` = first axis-swap inside `@0x3B98`; not a real entry. |
+| `FUN_00003be0` | *(false mid-`update_object_camera_metric`)* | BLOCKED (bytes) | `@0x3BE0` = first axis-swap inside `@0x3B98`; not a real entry. Its only reference, `lea.l $3be0.l` at 0xbb8 (nearest_type80_centroid_visitor), is a RUNTIME address = file 0x3c00 = `compute_camera_abs_metric` [PROVEN]. |
 | `FUN_00001d56` | *(false mid-`matmul3x3_s16`)*; callsite→`sin_fixed14` | BLOCKED | `@0x1D56` = `$1D76−0x20` (ASR inside matmul). |
 | `FUN_00001db8` | *(false mid-`sin_fixed14`)*; callsite→`cos_fixed14` | BLOCKED | `@0x1DB8` = `$1DD8−0x20`. |
 | `FUN_00006fb8` | `reset_distance_base_globals` | STRONG INFERENCE | `@0x6FB8`: six `MOVE.L #$05F5E100` to `DAT_0001d710/14/18/1c/20/24`. |
@@ -781,7 +781,7 @@ revalidated here.
 | `FUN_000028dc` | `transform_vecs12_by_matrix3` | PROVEN | `@0x28DC`: count× transform shorts at +2/+6/+10 by 3×3 (`+0x800>>12`). |
 | `FUN_00002976` | `transform_vecs12_to_int3_by_matrix3` | PROVEN | `@0x2976`: same as `028dc` but MOVE.L int3 outs (`+0x800>>12`). |
 | `FUN_00002a0e` | `transform_listed_object_vecs12_by_1d744` | PROVEN | `@0x2A0E`: walk `1c9dc` objs; ASR `+0x32`; ×`1d744`; store vecs12 at `+0x4c`. |
-| `FUN_00002aba` | *(false mid-`transform_listed_object_vecs12_by_1d744`)* | BLOCKED | `@0x2ABA` = `move.w d0,$a(a1)` inside @0x2A0E loop. |
+| `FUN_00002aba` | *(false mid-`transform_listed_object_vecs12_by_1d744`)* | BLOCKED (bytes) | `@0x2ABA` = `move.w d0,$a(a1)` inside @0x2A0E loop. Its call sites use `lea.l $2aba.l`, a RUNTIME address = file 0x2ada = `transform_int3_vecs_by_matrix3` [PROVEN, e.g. transform_through_node_chain 0x566]. |
 | `FUN_0000e42a` | `table_lerp_1b2c0` | PROVEN algo | `@0xE42A`: banded lerp on `DAT_0001b2c0`; input typically `*(world+0x1c)`. |
 | `FUN_0000e468` | `damp_short_if_below_0x200` | PROVEN | `@0xE468`: if delta&lt;`0x200`, subtract `((0x200−delta)*v)>>12` from short. |
 | `FUN_0000e570` | `scale_template_field_38` | PROVEN | `@0xE570`: `*out = template[+0x38] * (0x551a/((in+0x105)>>3)) >> 8`. |
@@ -1006,6 +1006,9 @@ its dropped arguments are listed here.
 | `find_nearest_runway_approach_ends` (FUN_00019c5e) | `probe_nearest_facility_kind`; `approx_dist3_xyz` ×5; `store_xyz_asr` ×4 | probe(object); dist3(own, object) 3D; dist(P1,P2) / dist(P2,P3) horizontal (y = 0); dist3(own, M12) / dist3(own, M34); store_xyz_asr destination in register a1 = P1..P4 (frame -0xc / -0x18 / -0x24 / -0x30) | bytes 0x19ccc..0x19efc |
 | `tick_landing_approach_glide` (FUN_0001a1a6) | `approx_dist3_xyz` (FUN_00003c68) | own object pos, aim point 0x267bc / 0x267c0 / 0x267c4 (3D) | bytes 0x1a1d4..0x1a1e6 |
 | `tick_landing_approach_glide` (FUN_0001a1a6) | `abs_int` (Ghidra FUN_00002de8 via runtime `$2de8`) ×4 | own x - target x; own z - target z; vertical error (target y - own y); sext throttle target - (+0x62a >> 2) | bytes 0x1a31e / 0x1a330 / 0x1a5e8 / 0x1a602 |
+| `process_flight_input_and_outcome` (FUN_0000740a) | `probe_nearest_facility_kind` (FUN_00000354) | the player's object (*DAT_0001b738) | bytes 0x803e..0x8040 |
+| `point_near_camera_or_type80_object` (FUN_00000bea) | `compute_camera_abs_metric` (FUN_00003c00) ×2 | the point param_1[0..2] (x, y, z) | bytes 0xbf0..0xbfa / 0xc26..0xc30 |
+| `transform_through_node_chain` (FUN_000004f8) | `transform_int3_vecs_by_matrix3` (Ghidra FUN_00002aba, runtime `$2aba`) ×2; `translate_int3_vecs` (Ghidra LAB_00001c3a_2, runtime `$1c3c`) ×2 | (1, &p, &p, M); (1, &p, &p, node offset); (count +0x1a, src, buffer, M); (count, buffer, buffer, offset << shift +0x18) - Ghidra merged these into two garbled calls | bytes 0x55c..0x5d0 |
 | `flak_notice_object` (FUN_00018bba) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: gun pos (x, y, z), target pos (x, y, z) | bytes 0x18c10..0x18c28 |
 | `approx_dist3_xyz` (FUN_00003c68) itself | `abs_int` via Ghidra `FUN_00002de8` | its own 6 longs (x1, y1, z1, x2, y2, z2); each call gets x2 - x1 / y2 - y1 / z2 - z1 | bytes 0x3c70..0x3c9c |
 | `update_tracking_camera` (FUN_00008c30) | `approx_dist3_xyz` ×3 | 0x8cd0: player pos, target pos; 0x8e06 / 0x8e78: own pos + rotated (0, 0, 0x4000), other pos | bytes 0x8cb4..0x8e78 |

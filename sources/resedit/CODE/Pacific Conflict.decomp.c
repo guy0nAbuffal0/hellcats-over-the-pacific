@@ -1242,6 +1242,18 @@ void tally_destroyed_entity /* Original: FUN_00000488 */ (int param_1)
 /* Original: FUN_000004f8; source: Pacific Conflict.c. Recovered name: transform_through_node_chain [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x4f8).
  * Args: node-pointer stack top, count, object, out x / y / z, optional vertex output. Starts from the object position (+2 / +6 / +0xa); for each node popped from the stack: build_attitude_matrix_3ang from the node angles (+2, +4, +6), FUN_00002aba, then the vector transform at LAB_00001c3a_2 of the position with the node offset (+8, +0xc, +0x10); with a vertex buffer it also transforms the object vertex list (count +0x1a, scale shift +0x18, data at +0x22). Returns the world-space origin through the three out pointers [STRONG INFERENCE: hierarchical object placement]. Callers: FUN_000006ec (three calls) and FUN_00000aba. FUN_00000954 calls for_each_mission_scene_object(FUN_000006ec,...), so FUN_000006ec is the per-object visitor.
+ * Section check 0x4f8..0x5f8 [PROVEN; independent capstone disassembly]: p = the longs at
+ * param_3 +2 / +6 / +0xa; src = param_3 + 0x22; for param_2 nodes (dbra on the word count,
+ * walking the node-pointer array backwards from param_1): M =
+ * build_attitude_matrix_3ang(sext node +2, +4, +6); p = M p (transform_int3_vecs_by_matrix3,
+ * count 1, in place); p += node offset (+8 / +0xc / +0x10) (translate_int3_vecs, count 1);
+ * with an output buffer: the sext word +0x1a vertices of src are rotated into the buffer and
+ * translated by the node offset shifted left by sext word +0x18; src becomes the buffer, so
+ * each further (outer) node transforms the buffer in place. Finally *param_4 / *param_5 /
+ * *param_6 = p. The body above is the reconstruction of Ghidra's garbled calls.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the call reconstruction (transform_int3_vecs_by_matrix3 and
+ * translate_int3_vecs themselves are not yet verified).
  */
 void transform_through_node_chain /* Original: FUN_000004f8 */ (int *param_1,short param_2,int param_3,undefined4 *param_4,undefined4 *param_5,
                  undefined4 *param_6,int param_7)
@@ -1269,21 +1281,26 @@ void transform_through_node_chain /* Original: FUN_000004f8 */ (int *param_1,sho
     iVar1 = *local_26;
     build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar1 + 2),(int)*(short *)(iVar1 + 4),(int)*(short *)(iVar1 + 6),
                  (int)auStack_22);
-    FUN_00002aba();
-    (*(code *)&LAB_00001c3a_2)
-              (1,&local_10,&local_10,*(undefined4 *)(iVar1 + 8),*(undefined4 *)(iVar1 + 0xc),
-               *(undefined4 *)(iVar1 + 0x10));
+    /* CALL RECONSTRUCTION [PROVEN, bytes 0x55c..0x5d0]: Ghidra printed FUN_00002aba() with
+     * no arguments and merged the arguments of neighbouring calls into LAB_00001c3a_2.
+     * lea.l $2aba.l / $1c3c.l are RUNTIME addresses = file 0x2ada transform_int3_vecs_by_matrix3
+     * and file 0x1c5c translate_int3_vecs. Original Ghidra form:
+     *   FUN_00002aba(); (*LAB_00001c3a_2)(1,&local_10,&local_10,node+8,+0xc,+0x10);
+     *   [param_7] FUN_00002aba(); (*LAB_00001c3a_2)(count,param_7,param_7,off<<s..., iVar4,
+     *   iVar3,iVar5,puVar6)  - the last four are the arguments of the second matrix call. */
+    transform_int3_vecs_by_matrix3( /* Original: FUN_00002aba (runtime $2aba) */1,&local_10,(uint *)&local_10,(int)auStack_22);
+    translate_int3_vecs( /* Original: LAB_00001c3a_2 (runtime $1c3c) */1,&local_10,&local_10,*(int *)(iVar1 + 8),*(int *)(iVar1 + 0xc),
+                        *(int *)(iVar1 + 0x10));
     if (param_7 != 0) {
-      iVar4 = (int)*(short *)(param_3 + 0x1a);
-      iVar5 = param_7;
-      puVar6 = auStack_22;
-      FUN_00002aba();
-      uVar2 = (uint)*(short *)(param_3 + 0x18);
-      (*(code *)&LAB_00001c3a_2)
-                ((int)*(short *)(param_3 + 0x1a),param_7,param_7,
-                 *(int *)(iVar1 + 8) << (uVar2 & 0x3f),*(int *)(iVar1 + 0xc) << (uVar2 & 0x3f),
-                 *(int *)(iVar1 + 0x10) << (uVar2 & 0x3f),iVar4,iVar3,iVar5,puVar6);
-      iVar3 = param_7;
+      iVar4 = (int)*(short *)(param_3 + 0x1a); /* vertex count */
+      iVar5 = param_7;                          /* destination buffer */
+      puVar6 = auStack_22;                      /* this node's matrix */
+      transform_int3_vecs_by_matrix3( /* Original: FUN_00002aba */iVar4,(int *)iVar3,(uint *)iVar5,(int)puVar6);
+      uVar2 = (uint)*(short *)(param_3 + 0x18); /* scale shift */
+      translate_int3_vecs( /* Original: LAB_00001c3a_2 */(int)*(short *)(param_3 + 0x1a),(int *)param_7,(int *)param_7,
+                          *(int *)(iVar1 + 8) << (uVar2 & 0x3f),*(int *)(iVar1 + 0xc) << (uVar2 & 0x3f),
+                          *(int *)(iVar1 + 0x10) << (uVar2 & 0x3f));
+      iVar3 = param_7;                          /* later nodes transform the output in place */
     }
   }
   *param_4 = local_10;
@@ -1525,6 +1542,19 @@ void plot_mission_map_symbols /* Original: FUN_00000954 */ (int param_1,undefine
 /* Original: FUN_00000aba; source: Pacific Conflict.c. Recovered name: nearest_type80_centroid_visitor [STRONG INFERENCE mechanics].
  * Ghidra C reviewed (function at overlay offset 0xaba).
  * Scene visitor (for_each_mission_scene_object). For objects whose type nibble (+9 & 0xf0) is 0x80: transform_through_node_chain of the vertices; centroid of the face vertex list (count byte +8, indices from +0xe), each vertex shifted right by the object scale (+0x18), y + 100; if FUN_00003be0 ranks it nearer than the current best, stores it in the context triple (context[0..2]). Complete Ghidra C apart from the FUN_00003be0 register interface. What type 0x80 objects are is open [UNKNOWN].
+ * Resolved [PROVEN]: FUN_00003be0 is compute_camera_abs_metric reached through the runtime
+ * address $3be0 (file 0x3c00) with the three coordinates pushed on the stack - not a
+ * register interface (see the call site).
+ * Section check 0xaba..0xbe8 [PROVEN; independent capstone disassembly]: byte +9 & 0xf0 ==
+ * 0x80 of param_3; transform_through_node_chain(param_4, sext param_5, param_2, &p0, &p1,
+ * &p2, vertex buffer at frame -0x690) (0x1c bytes popped); sum over i < byte +8 (unsigned
+ * count, signed compare) of the buffer entry for word index +0xe[i] (12 bytes each: lea
+ * (a0,a0.l*2) then (a6,a0.l*4), extension word 0x8c00 = x4 that capstone omits), each
+ * component asr.l by word param_2 +0x18; then x / count, y / count + 100, z / count
+ * (divs.l, truncating - a zero count would raise the divide-by-zero trap); the centroid
+ * replaces param_1[0..2] when its metric is strictly lower (ble skips equal).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C with the FUN_00003be0 resolution.
  */
 void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *param_1,int param_2,int param_3,int *param_4,short param_5)
 
@@ -1559,6 +1589,9 @@ void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *param_1,
     local_6a0 = local_6a0 / (int)(uint)*(byte *)(param_3 + 8);
     local_69c = local_69c / (int)(uint)*(byte *)(param_3 + 8) + 100;
     local_698 = local_698 / (int)(uint)*(byte *)(param_3 + 8);
+    /* FUN_00003be0 = compute_camera_abs_metric (lea.l $3be0.l is a runtime address = file
+     * 0x3c00) [PROVEN, 0xbb2..0xbcc]: iVar1 = metric(this centroid), iVar2 = metric(current
+     * best param_1[0..2]); the nearer one (strictly) replaces the best. */
     iVar1 = FUN_00003be0();
     iVar2 = FUN_00003be0();
     if (iVar1 < iVar2) {
@@ -1575,6 +1608,18 @@ void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *param_1,
 /* Original: FUN_00000bea; source: Pacific Conflict.c. Recovered name: point_near_camera_or_type80_object [HYPOTHESIS name].
  * Ghidra C reviewed (function at overlay offset 0xbea).
  * Arg: point record (caller passes DAT_0001d824). Returns 1 when compute_camera_abs_metric < 0x33900; otherwise searches the nearest type-0x80 centroid (context initialised to 1000000000, nearest_type80_centroid_visitor) and returns 1 when one exists and the metric is then < 0x40741, else 0. Complete Ghidra C. Caller: Pacific Conflict.c ~9080. Meaning of the two thresholds [UNKNOWN].
+ * Call-argument correction [PROVEN]: both compute_camera_abs_metric calls receive the
+ * point itself, (param_1[0], param_1[1], param_1[2]) (pushes 0xbf0..0xbf8 / 0xc26..0xc2e);
+ * Ghidra shows no arguments. The callback is the pc-relative 0xaba
+ * (nearest_type80_centroid_visitor). Use [PROVEN flow]: it is the 'T' key of
+ * process_flight_input_and_outcome with the stored external-camera point 0x1d824 - the
+ * old point is kept while its metric is below 0x33900, otherwise the nearest type-0x80
+ * object centroid (y + 100) replaces it if its metric is below 0x40741; 1 = a point is
+ * available, which switches to view 6.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0xbea..0xc4a (cmpi.l #$338ff / ble, move.l #$3b9aca00, pea $aba(pc) + bsr $6a6,
+ * cmpi.l #$3b9aca00, cmpi.l #$40740 / ble, moveq #1 / clr.l d0); identical to the C with
+ * the call-argument correction.
  */
 undefined4 point_near_camera_or_type80_object /* Original: FUN_00000bea */ (int *param_1)
 
@@ -1582,7 +1627,7 @@ undefined4 point_near_camera_or_type80_object /* Original: FUN_00000bea */ (int 
   int iVar1;
   undefined4 uVar2;
   
-  iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
+  iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00; args dropped by Ghidra = (param_1[0], param_1[1], param_1[2]) [PROVEN] */);
   if (iVar1 < 0x33900) {
 LAB_00000c46:
     uVar2 = 1;
@@ -1591,7 +1636,7 @@ LAB_00000c46:
     *param_1 = 1000000000;
     for_each_mission_scene_object(FUN_00000aba,param_1);
     if (*param_1 != 1000000000) {
-      iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
+      iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00; args dropped by Ghidra = (param_1[0], param_1[1], param_1[2]) [PROVEN] */);
       if (iVar1 < 0x40741) goto LAB_00000c46;
     }
     uVar2 = 0;
@@ -2111,6 +2156,15 @@ void init_depth4_colour_state /* Original: FUN_0000131c */ (void)
 /* Original: FUN_0000147a; source: Pacific Conflict.c. Recovered name: queue_face_palette_entry [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x147a).
  * Arg: face record. Slot = face byte +0xf; owner table DAT_0001da7c[slot] = face. When _DAT_0001d85a is 0: pixel index = word DAT_0001d85c[slot] (the slot -> palette index map copied from host +0x34), face +4 = index in both bytes; appends a ColorSpec (index, R * 256 - 1, G * 256 - 1, B * 256 - 1, clamped at 0) to the colour table at host +0x72 (A5-0x1316) and increments its count word +6 - the pending entries the host applies with apply_pending_color_entries_a5safe (overlay service A5-0x1122) [STRONG INFERENCE]. Ghidra C (tail truncated in this view).
+  * Exact form [PROVEN]: DAT_0001da7c[byte +0xf] = face (slot owner). Alternate mode (word
+ * DAT_0001d85a != 0): v = r + g + low byte of (b divs.w 3), 0 -> 1; face +4 = v | v << 8.
+ * Otherwise idx = sext word DAT_0001d85c[slot]; face +4 = idx | idx << 8; the pending table
+ * at host +0x72 gets one more 8-byte entry (count word at +6, incremented first; entry at
+ * +8 + 8 * old count) = {idx, r * 256 - 1, g * 256 - 1, b * 256 - 1}, each component
+ * clamped to >= 0 (bpl). Reading [STRONG INFERENCE]: a Color Manager ColorSpec
+ * {value, red, green, blue} list for a later palette update.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x147a..0x1546; identical to the C.
  */
 void queue_face_palette_entry /* Original: FUN_0000147a */ (int param_1)
 
@@ -2172,6 +2226,11 @@ void queue_face_palette_entry /* Original: FUN_0000147a */ (int param_1)
 /* Original: FUN_00001548; source: Pacific Conflict.c. Recovered name: write_face_palette_slot [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x1548).
  * queue_face_palette_entry(face); when the multi-monitor flag host +0xb4 is set, also writes -face into the slot entry of the other device owner tables DAT_0001da70[1..3] (marking the slot as used on those screens). Complete Ghidra C.
+  * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x1548..0x159c: queue_face_palette_entry(face); when host word +0xb4 != 0, for the three
+ * slot tables DAT_0001da70 / 74 / 78 that are non-null and differ from the current one
+ * (DAT_0001da7c), table[byte +0xf] = -face (neg.l). The return value is only what is left
+ * in d0. Identical to the C.
  */
 uint write_face_palette_slot /* Original: FUN_00001548 */ (int param_1)
 
@@ -2205,6 +2264,17 @@ uint write_face_palette_slot /* Original: FUN_00001548 */ (int param_1)
 /* Original: FUN_0000159e; source: Pacific Conflict.c. Recovered name: assign_face_colour [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x159e).
  * Converts a face RGB (+0xc..+0xe) to something drawable for the current depth DAT_0001b826. Depth 1: luminance (19 R + 38 G + 7 B) / 64, contrast-stretched by 16 / 12 around 0x80, clamped 0..255, face +4 = host pattern table (+0x88 = A5-0x1300)[luminance] (a dither pattern). Depth 4: face +4 = entry of the DAT_0001da7c table indexed from the RGB bytes (fixed colours). Depth 8: if the face already owns its slot, re-queues it (queue_face_palette_entry); otherwise looks round-robin (DAT_0001bd80, 200 slots) for a slot not marked in either per-frame usage map DAT_0001d860 / DAT_0001d864, returns 1 when none is free, else stores the slot in +0xf, write_face_palette_slot and sets _DAT_0001daa2 (palette changed). Returns 0 on success. Ghidra C (one unreachable block removed by Ghidra).
+  * Exact paths [PROVEN]: depth 1 (DAT_0001b826 == 1): luma = (19 r + 38 g + 7 b) / 64
+ * (Rec.601 weights, truncating), stretched to (luma - 128) * 16 / 12 + 128, clamped 0..255,
+ * face +4 = sext word host table +0x88 [luma] (dither pattern). Depth 4: face +4 =
+ * DAT_0001da7c[25 r + 5 g + b] (a 5 x 5 x 5 colour cube; components 0..4). Both set byte
+ * +0xf = 0xff. Other depths: if DAT_0001da7c[byte +0xf] == -face, re-queue it
+ * (queue_face_palette_entry); otherwise search at most 200 slots round-robin from the
+ * long DAT_0001bd80 (wrap at 200) for one with both DAT_0001d860[i] and DAT_0001d864[i]
+ * zero: claim it (byte +0xf = low byte of the counter), write_face_palette_slot, word
+ * DAT_0001daa2 = 1, return 0; none free -> return 1.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x159e..0x16e0; identical to the C.
  */
 undefined4 assign_face_colour /* Original: FUN_0000159e */ (int param_1)
 
@@ -2901,7 +2971,12 @@ void copy_object_vertex_buffer /* Original: FUN_00001c04 */ (int param_1)
  * offsets (e.g. −d838/−d834/−d830).
  *
  * Sibling scale_int3_vecs multiplies components instead of adding.
- * Evidence: Capstone @0x1C5C–0x1CAA ADD.L loop.
+ * Evidence: Capstone @0x1C5C–0x1CAA ADD.L loop. * Runtime alias [PROVEN]: lea.l $1c3c.l (e.g. transform_through_node_chain, Ghidra's
+ * LAB_00001c3a_2) reaches this function (file 0x1c5c).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x1c5c..0x1caa (dbra d0 then clr.w / subq.l #1 / bcc: exactly param_1 records as an
+ * unsigned 32-bit count; three add.l of the stacked offsets; stride 0xc); identical to
+ * the C.
  */
 void translate_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6) /* Original: FUN_00001c5c */
 {
@@ -3732,7 +3807,12 @@ void build_attitude_matrix_from_dir_roll(int param_1,int param_2,int param_3,uin
  * Sole caller: build_attitude_matrix_3ang_alt (3-angle load + this finalize;
  * mirror of build_attitude_matrix_3ang → finalize_attitude_matrix_3ang).
  *
- * Evidence: Capstone @0x2428–0x2462; single BSR.B from @0x247E.
+ * Evidence: Capstone @0x2428–0x2462; single BSR.B from @0x247E. * Product [PROVEN]: out = (Ry * Rx) * Rz - the reverse of finalize_attitude_matrix_3ang
+ * - and no DAT_00020ce4 tag. Because each basis satisfies R(-a) = R(a)^T, the alt matrix
+ * of the negated angles is exactly the inverse (transpose) of the normal matrix.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x2428..0x2462 (bsr $20e6; (0x1d7bc, 0x1d7d4, temp) then (temp, 0x1d7a4, param_1) via
+ * lea $1d02(pc) / jsr); identical to the C.
  */
 void finalize_attitude_matrix_3ang_alt(int param_1) /* Original: FUN_00002428 */
 {
@@ -3758,7 +3838,12 @@ void finalize_attitude_matrix_3ang_alt(int param_1) /* Original: FUN_00002428 */
  * Callers (2): @0x104CC, @0x1848C — both pass negated entity attitude shorts
  * masked to 14 bits.
  *
- * Evidence: Capstone @0x2464–0x2486 mirrors @0x253E–0x2560 except BSR target.
+ * Evidence: Capstone @0x2464–0x2486 mirrors @0x253E–0x2560 except BSR target. * Composition [PROVEN]: M = Ry(p2) * Rx(p1) * Rz(p3). With the negated attitude its two
+ * callers pass, M = (Rz(a3) * Rx(a1) * Ry(a2))^-1: the world-to-body rotation, used to
+ * express a target relative to the aircraft (build_relative_steer_sample,
+ * ai_pursue_target).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x2464..0x2486; identical to the C.
  */
 void build_attitude_matrix_3ang_alt(uint param_1,uint param_2,uint param_3,int param_4) /* Original: FUN_00002464 */
 {
@@ -3836,7 +3921,12 @@ void build_attitude_matrix_x_alt(uint param_1,uint param_2,uint param_3,uint par
  * Sole caller: build_attitude_matrix_3ang. Sibling finalize_attitude_matrix_4ang (used by
  * build_attitude_matrix) does three matmuls without the 0x2408 tag.
  *
- * Evidence: Capstone @0x24F8–0x253C; single BSR from @0x2558.
+ * Evidence: Capstone @0x24F8–0x253C; single BSR from @0x2558. * Product [PROVEN]: with matmul3x3_s16(a, b) = a * b, out = (Rz * Rx) * Ry, Rx / Ry / Rz
+ * being the bases at 0x1d7d4 / 0x1d7bc / 0x1d7a4 of fill_attitude_rotation_bases. The
+ * long DAT_00020ce4 = 0x2408 has no reader identified here [UNKNOWN purpose].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x24f8..0x253c (move.l #$2408 $20ce4, bsr $20e6, pea $1d7d4 / $1d7a4 + lea $1d02(pc) /
+ * jsr, then (temp, $1d7bc, param_1)); identical to the C.
  */
 void finalize_attitude_matrix_3ang(int param_1) /* Original: FUN_000024f8 */
 {
@@ -3868,7 +3958,14 @@ void finalize_attitude_matrix_3ang(int param_1) /* Original: FUN_000024f8 */
  * Heavy use from apply_template_chain_xform{,_always} (slot +2/+4/+6) and
  * ordnance/camera helpers (e.g. FUN_00015d78).
  *
- * Evidence: Capstone @0x253E–0x2560; body is two calls only.
+ * Evidence: Capstone @0x253E–0x2560; body is two calls only. * Composition [PROVEN]: the arguments are passed in order (no rotation), so the sin / cos
+ * slots are 0x1d7fa <- p1, 0x1d7f6 <- p2, 0x1d7f2 <- p3, 0x1d7ee <- 0, and the result is
+ * M = Rz(p3) * Rx(p1) * Ry(p2). Called as (+0x20, +0x22, +0x24) it is exactly the
+ * 4-angle flight matrix of build_attitude_matrix without the leading R4 factor, applied
+ * the same way (row vector v * M).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x253e..0x2560 (clr.l + pushes $10 / $c / $8 (a6), bsr $202a, push $14 (a6), bsr $24f8,
+ * adda.w #$14); identical to the C.
  */
 void build_attitude_matrix_3ang(uint param_1,uint param_2,uint param_3,int param_4) /* Original: FUN_0000253e */
 {
@@ -4490,7 +4587,16 @@ void FUN_00002aba(void) /* false mid-label; do not rename call sites */
  * apply_template_chain_xform{,_always} after build_attitude_matrix_3ang.
  *
  * Evidence: Capstone load-9-shorts then count loop; call sites pass matrix
- * from build_attitude_matrix_3ang stack buffer.
+ * from build_attitude_matrix_3ang stack buffer. * Exact form [PROVEN]: the 9 shorts are sign-extended to longs m[i][j] (frame -0x24 +
+ * 12 i + 4 j); out_j = (x * m[0][j] + y * m[1][j] + z * m[2][j]) asr 12 using 32x32->64
+ * muls.l and add.l / addx.l, the result being bits 12..43 of the 64-bit sum (floor, no
+ * overflow): the row-vector convention v * M of transform_vecs12_by_matrix3 /
+ * matmul3x3_s16. x, y, z are loaded before any store, so in-place use is safe. Count
+ * param_1 is an unsigned long (subq.l #1 / bcc: 0 -> no record). The return value is just
+ * the last component left in d0. Runtime alias: lea.l $2aba.l (Ghidra FUN_00002aba,
+ * e.g. in transform_through_node_chain) reaches this function.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x2ada..0x2bd6; identical to the C.
  */
 short * transform_int3_vecs_by_matrix3(int param_1,int *param_2,uint *param_3,int param_4) /* Original: FUN_00002ada */
 {
@@ -4573,6 +4679,19 @@ short * transform_int3_vecs_by_matrix3(int param_1,int *param_2,uint *param_3,in
  * (obj, 36+3a, mesh, +0x44).
  *
  * Unknown: precise 0253e/02ada/01c5c math; slot schema beyond angles+xyz.
+ * Resolved [PROVEN]: the three callees are now VERIFIED - build_attitude_matrix_3ang =
+ * Rz(+6) * Rx(+2) * Ry(+4) of the slot angles, transform_int3_vecs_by_matrix3 = v * M with
+ * 64-bit products and a floor >> 12, translate_int3_vecs = + offset.
+ * Section check 0x2bd8..0x2d0e [PROVEN; independent capstone disassembly]: slot record =
+ * parent +0x30 + 0x18 * index (lea (a0,d0.l*2), asl.l #3), the index being the child's
+ * byte +2 (the object's first, then each parent's); rotation only when a slot angle word
+ * is non-zero; mesh path when BOTH buffers are given: rotate param_2 vertices src ->
+ * param_4, then translate by the slot offset shifted left by the OBJECT's word +0x34, the
+ * buffer becoming the source; otherwise the point copy is rotated / translated (count 1,
+ * no shift). The point is written back only when both buffers are null - with exactly
+ * one buffer null it is transformed and discarded (no effect) [PROVEN quirk].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
+ * to the C.
  */
 void apply_template_chain_xform(int param_1,uint param_2,uint *param_3,uint *param_4) /* Original: FUN_00002bd8 */
 {
@@ -4655,7 +4774,14 @@ void apply_template_chain_xform(int param_1,uint param_2,uint *param_3,uint *par
  * Call site: FUN_000168d2 allocates vertex buffer then xforms param_3 count
  * verts into it. False entry FUN_00002de8 is this function's epilogue tail.
  *
- * Evidence: Capstone @0x2D10–0x2E04; structural twin of 02bd8.
+ * Evidence: Capstone @0x2D10–0x2E04; structural twin of 02bd8. * Clarification [PROVEN]: the bytes at 0x2de8 are inside this function (commit test),
+ * but every lea.l $2de8.l call site elsewhere is the RUNTIME address of abs_int (file
+ * 0x2e08), not this epilogue.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x2d10..0x2e04 (same slot walk as apply_template_chain_xform; bsr $253e every node;
+ * mesh path (d6 count, d3 -> d4) then translate (d6, d4, d4, raw +8 / +c / +10); point
+ * path (1, d2, d2); shared adda.w #$28; commit only when d3 == d4 == 0); identical to the
+ * C.
  */
 void apply_template_chain_xform_always(int param_1,uint param_2,uint *param_3,uint *param_4) /* Original: FUN_00002d10 */
 {
@@ -5916,6 +6042,14 @@ void start_mission_scene /* Original: FUN_00003ac4 */ (int param_1)
  * Used by activate_near_range_object epilogue and 046da distance gate.
  *
  * Evidence: NOTES camera-abs axes + metric combine; Capstone sort+ASR#2.
+ * Clarification [PROVEN]: lea.l $2de8.l is the RUNTIME address of abs_int (file 0x2e08),
+ * not a false entry; the function runs past Ghidra's false split at 0x3be0 to the rts at
+ * 0x3bfe, and D0 still holds the metric at return (process_flight_input_and_outcome's
+ * view 6 uses it), which Ghidra's void signature hides.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x3b98..0x3bfe (suba.l camera words, lea $2de8 + jsr x3, signed cmp.l / ble swaps,
+ * add.l / asr.l #2 / add.l, move.l d0,$10(a3)); identical to the C apart from the
+ * documented D0 return.
  */
 void update_object_camera_metric(int param_1) /* Original: FUN_00003b98 */
 {
@@ -5988,7 +6122,14 @@ void FUN_00003be0(void) /* false mid-label; do not rename call sites yet */
  * Does not write obj+0x10.
  *
  * Evidence: Capstone @0x3C00–0x3C66 LINK frame; args $8/$c/$10(A6);
- * LEA $2DE8 abs; identical sort+ASR#2; RTS with D0=metric.
+ * LEA $2DE8 abs; identical sort+ASR#2; RTS with D0=metric. * Exact form [PROVEN]: a / b / c via abs_int (runtime $2de8 = file 0x2e08); b > a swaps
+ * them (signed), then c > max swaps in: result = max + (the other two summed) asr 2. The
+ * function runs past Ghidra's false split at 0x3c48 (moves / compare / swap / add.l /
+ * asr.l #2 / add.l to 0x3c66). Callers also reach it through lea.l $3be0.l (runtime) in
+ * nearest_type80_centroid_visitor, where Ghidra shows FUN_00003be0.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x3c00..0x3c66; identical to the C once the three stack arguments (x, y, z at
+ * $8 / $c / $10(a6)) that Ghidra lost are restored, as recorded above.
  */
 int compute_camera_abs_metric(void) /* Original: FUN_00003c00; args lost by Ghidra */
 {
@@ -6150,6 +6291,15 @@ int segment_point_min_distance /* Original: FUN_00003cca */ (void)
 /* Original: FUN_00003da8; source: Pacific Conflict.c. Recovered name: update_object_distance_band [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x3da8).
  * Distance-band update: band = object word +0x30; thresholds = ascending longs at DAT_0001b190 (band i covers [DAT_0001b18c[i], DAT_0001b190[i]) ). If the distance (arg 2; callers pass object +0x10, the camera metric) is still inside the current band returns 0; otherwise steps the band index up or down until it contains the distance, stores it and returns 1. Complete Ghidra C. The band selects the haze level in shade_object_faces.
+ * Data [PROVEN, file 0x1b1ac..]: T[-1] (DAT_0001b18c) = 0, then T[0..] = 40041, 81395,
+ * 124152, 168409, 214275, 261873, 311338, 362822, 416498, 472560, 531230, 592764, 657455, ...
+ * (ascending, the spacing growing slowly from ~41000 to ~65000); band b holds T[b-1] <= d <
+ * T[b]. The downward search stops on T[-1] = 0, so a negative distance would read below the
+ * table [not reachable: the metric is non-negative].
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x3da8..0x3e00 (movea.w band; cmp.l (a1,a0.l*4) / bge; cmp.l -4(a1,a0.l*4) / blt -
+ * extension words 0x8c00 / 0x8cfc, scale x4 that capstone omits; addi.w #-2 / subq.w loop;
+ * addq.w loop with bge; signed long compares; move.w band, d0 = 1 or 0); identical to the C.
  */
 undefined4 update_object_distance_band /* Original: FUN_00003da8 */ (int param_1,int param_2)
 
@@ -6212,6 +6362,10 @@ undefined4 update_record_distance_band /* Original: FUN_00003e02 */ (int param_1
 /* Original: FUN_00003e5c; source: Pacific Conflict.c. Recovered name: snapshot_face_colours [HYPOTHESIS name].
  * Ghidra C reviewed (function at overlay offset 0x3e5c).
  * For each face of the object (count +0x3a, 0x20-byte records from +0x48): copies the long at face +0xc (the RGB bytes +0xc..+0xe and the palette slot +0xf) into a 6-byte entry of an array placed after the faces (at +0x48 + faces * 0x20 + (+0x38) * 2) with a zero word. Called by shade_object_faces when haze is on and object flag (+6 & 2) is set. Complete Ghidra C.
+  * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x3e5c..0x3e9e: destination = +0x48 + 32 * n + 2 * word +0x38 (after the face records
+ * and the index trailer); per face a 6-byte record {long face +0xc, word 0}; identical to
+ * the C.
  */
 void snapshot_face_colours /* Original: FUN_00003e5c */ (int param_1)
 
@@ -6242,6 +6396,18 @@ void snapshot_face_colours /* Original: FUN_00003e5c */ (int param_1)
 /* Original: FUN_00003ea0; source: Pacific Conflict.c. Recovered name: shade_object_faces [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x3ea0).
  * Flat shading of a kind-2 object (not flagged +7 & 2). For each face (0x20-byte records from +0x48; base RGB bytes from the object definition reached through +0x24 / +0x28 and the scene data DAT_0001b5a0 + 0x8c): unless face flag +0x13 & 4, intensity = dot(face normal vector, light vector DAT_0001bd88 / -8a / -8c) >> 13, mapped to a 16-bit factor (0x4000..0xffff: 0.25 for faces turned away up to 1.0); face RGB +0xc..+0xe = base * factor. Depth 1 -> FUN_0000159e(face) (dither pattern); depth 4 -> rounded variant then FUN_0000159e; depth 8 -> when the haze option host +0xaa (A5-0x12de) is on and the object is not flagged (+4 & 0x1280), blends toward (0x7d, 0x84, 0xa8) by the distance band +0x30 (32 steps), then FUN_00001548(face) when the face owns its palette slot (+0xf) in DAT_0001da7c, else slot = 0. Afterwards snapshot_face_colours when haze is on and +6 & 2. The light vector and the bluish haze colour are [STRONG INFERENCE]; FUN_0000159e / FUN_00001548 are the depth-specific colour lookups [HYPOTHESIS].
+  * Part 2 0x4002..0x41ea [PROVEN; independent capstone disassembly]: intensity word s
+ * (zero-extended into d5): I >= 0 -> 0x8000 + I / 2 (lit, 0.5..1.0); I < 0 -> 0x4000 +
+ * (I + 0x10000) / 4 (turned away, 0.25..0.5), truncating. Colour bytes c (zero-extended):
+ * depth 1 -> c * s >> 16; depth 4 -> ((c * s) / 64 + 0x2000) >> 16; both then
+ * FUN_0000159e(face). Other depths: c * s >> 16, and with haze c = (c * (32 - band) +
+ * band * {0x7d, 0x84, 0xa8}) lsr 5 - a blend toward the sky colour (125, 132, 168); then
+ * FUN_00001548(face) when DAT_0001da7c[byte +0xf] == face, else byte +0xf = 0. Next colour
+ * record at + 0xe + 2 * byte +8 (extension word 0x2a0e, x2), next face + 0x20, loop while
+ * i < word +0x3a (signed). Afterwards, with haze on (host +0xaa) and word flag 0x200,
+ * FUN_00003e5c(object).
+ * VERIFIED: both parts 0x3ea0..0x41ea were checked against an independent capstone
+ * disassembly; identical to the C (in_D1w resolved as above).
  */
 void shade_object_faces /* Original: FUN_00003ea0 */ (char *param_1)
 
@@ -6320,6 +6486,19 @@ void shade_object_faces /* Original: FUN_00003ea0 */ (char *param_1)
       else {
         iVar10 = 0xffff;
       }
+      /* Section check 0x3ea0..0x4000 (part 1 of 2) [PROVEN, matches the C; independent
+       * capstone disassembly]: only for kind 2 objects without the retired bit (btst #1 of
+       * byte +7). Haze when host word +0xaa != 0: band b = word +0x30, haze steps b * 0x7d /
+       * b * 0x84 / b * 0xa8 (muls.w), switched off (local_2a = 0) by long +4 & 0x1280. The
+       * register d1 (Ghidra's in_D1w) is loaded ONLY on that haze path; 0x20 - d1 is formed
+       * at 0x3f80 regardless but USED only when the haze flag (-0x26) is non-zero, i.e. only
+       * after d1 was loaded - so in_D1w never matters [PROVEN, part 2]. Depth = host word +0xe. Light:
+       * per face i (faces at +0x48, count word +0x3a, stride 0x20 via a2), unless byte +0x13
+       * bit 2 (intensity 0xffff), I = (dz * L[0x1bd88] + dy * L[0x1bd8a] + dx * L[0x1bd8c])
+       * asr 13 with d = (normal point i - first vertex) taken as WORDS (sub.w), the normal
+       * points being the +0x44 buffer entries after the word +0x36 vertices. Colour source =
+       * template + 0x22 + 12 * (word +0x1a + word +0x1e) (extension words 0x9c22 / 0x8c00,
+       * scale x4 that capstone omits), 3 bytes per face. */
       if (sVar7 == 1) {
         if (iVar10 < 0) {
           iVar11 = iVar10 + 0x10000;
@@ -6523,6 +6702,19 @@ LAB_00004340:
  *     slots at *(entity+0x48)+0x1C (special ×5 when entity+8 == DAT_0001b738)
  *
  * Unknown: exact meaning of entity+0xC and the +0x48 sub-table values.
+ * Precision [PROVEN]: the four byte stores Ghidra shows (0, 'B', 0xb2, 9) are the single
+ * long move.l #$42b209 at 0x4404 - a clamp of +0xc to 0x42b209 (for kind 2, flag 0x1000 of
+ * word +6 clear). Gate: retired bit (byte +7 bit 1) clear and host word +0xa8 in 1..5
+ * (signed); scale = host +0xa8 - 1, or 1 when long +4 has 0x20000 (byte +5 bit 1); scale
+ * 0 halves (truncating) instead of multiplying (muls.l). The sentinel 1000000000 in +0xc
+ * is left untouched. Face pass (kind 2, param_2 == 0): face +0x1c = record +0xa * scale,
+ * x 5 for the player's own object (asl.l #2 + add.l), records stepping by 0xe + 2 * byte
+ * +8 (extension word 0x1a0e, x2) and faces by 0x20.
+ * Reading [STRONG INFERENCE]: +0xc and the face +0x1c values are durability scaled by a
+ * 1..5 level in host +0xa8 (0 / 1 / 2 / 3 / 4 x the table, half at the lowest), with the
+ * player's aircraft five times tougher per face.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x435a..0x44a2; identical to the C.
  */
 void apply_entity_mission_rates(char *entity, int path) /* Original: FUN_0000435a */
 {
@@ -6943,7 +7135,16 @@ void instantiate_mission_pool_slot(uint param_1,int param_2,int param_3) /* Orig
  * follow the 0x22-byte kind-2 descriptor and (desc +0x1a + desc +0x1e) 12-byte
  * vectors. In the data file there are four type-0x15 (carrier) descriptors at
  * 0x2409a / 0x33cb0 / 0x36142 / 0x3c402: deck (tag 1) codes 0x30, 0x30, 0x60, 0x60;
- * only 0x2409a and 0x36142 have a tag-3 face.
+ * only 0x2409a and 0x36142 have a tag-3 face. * Open reading of face +0x1c [UNKNOWN]: it is initialised here from packed long +0xa, and
+ * apply_entity_mission_rates (VERIFIED) later rewrites it as that same +0xa value times the
+ * 1..5 level scale (x 5 for the player) - consistent with per-face durability rather than
+ * a "detail threshold"; neither reading is proven.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x4808..0x4914 (size = sext word +0x3a asl 5, plus 6 * n + 2 * word +0x38 when btst #1 of
+ * byte +6; heap_alloc; per face clr.l +8, long / four bytes copied, zero-extended count word
+ * at +0x14, andi.b #$f0 / #$0f nibbles, long +0xa -> +0x1c, heap_alloc(count * 2) index copy,
+ * source += 0xe + 2 * count; trailer words 0..word +0x38 - 1; move.w #1 $1daa2); identical
+ * to the C.
  */
 void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004808 */
 {
@@ -7001,6 +7202,10 @@ void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004
 /* Original: FUN_00004916; source: Pacific Conflict.c. Recovered name: set_object_faces_bw_pattern [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x4916).
  * Args: object, pattern index. For each of the object faces (count +0x3a, 0x20-byte records from the pointer +0x48): face +4 = host pattern table word (host +0x88 = A5-0x1300)[index], face +0xf = 0xff. Used at depth 1 by refresh_object_colours_for_depth. Complete Ghidra C.
+  * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x4916..0x4956: for each of the word +0x3a faces (guarded do-while, signed word
+ * count) face +4 = sext word host +0x88 table [param_2] and byte +0xf = 0xff; identical to
+ * the C.
  */
 void set_object_faces_bw_pattern /* Original: FUN_00004916 */ (int param_1,int param_2)
 
@@ -7309,6 +7514,21 @@ void reset_object_to_template_pose_tail /* Original: FUN_00004e4e */ (void)
  *
  * Evidence: NOTES 04e6e kind2/02bd8; Capstone @0x4E6E–0x4F4A; callers from
  * instantiate_mission_pool_slot and mission init.
+  * Section check of part 2 0x4f88..0x5114 [PROVEN; independent capstone disassembly]: flag
+ * 0x10 of word +6 (btst #4 of byte +7): FUN_0000435a(object, 0), FUN_00003da8(object, +0x10),
+ * FUN_00015762(object, w34, w36, w38, w40) with the controller's words +0x34 / +0x36 / +0x38 /
+ * +0x40 when the controller's definition kind is 21..25 (ships), else zeros; byte +5 bit 4:
+ * translate_int3_vecs(sext n, source, +0x44, 0, 0, 0) - an unrotated copy - then the three
+ * updates (435a, 3da8, 3ea0); default: apply_template_chain_xform(object, sext n, source,
+ * +0x44) then the same three updates. Afterwards word +6 |= 0x800 unless bit 0x200 (btst #1
+ * of byte +6). Kind 3 (0x5072): far-list registration, +0x30 = heap_alloc(sext word +0x2e *
+ * 24), 24-byte child records copied from *(+0x28) + 0x1a with each +0x14 += world +0x8c, then
+ * instantiate_mission_pool_slot(object, i, i) for every child. Every path ends with
+ * update_object_camera_metric(object).
+ * VERIFIED: both parts 0x4e6e..0x5114 were checked against an independent capstone
+ * disassembly (part 1 in the body); identical to the C with the heap_alloc size n * 12
+ * recorded. The flag-branch callees 435a / 3da8 / 3ea0 / 4958 / 4916 / 15762 are not
+ * verified themselves.
  */
 void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
 {
@@ -7378,6 +7598,18 @@ void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
     (&DAT_0001c25c)[DAT_0001c1cc] = *(undefined4 *)(param_1 + 8);
     DAT_0001c1cc = DAT_0001c1cc + 1;
   }
+  /* Section check 0x4e6e..0x4f86 (part 1 of 2) [PROVEN, matches the C; independent capstone
+   * disassembly]: signed byte dispatch on +0 (2 = shape here, 3 = group at 0x5072, other ->
+   * 0x5108 metric only). Kind 2: far list DAT_0001d4a4 / count DAT_0001c1e0 when byte +7
+   * bit 0, else near list DAT_0001b5a4 / DAT_0001b734 (long counts, addq.l). n = word +0x36 +
+   * word +0x3a (word add); +0x4c = heap_alloc(sext n * 12) and +0x44 = heap_alloc(sext n *
+   * 12) - the size argument Ghidra dropped is n * 12 (lea (a0,a0.l*2), asl.l #2). Source =
+   * world +0x8c + the long at scene table *(+0x24)->+0x28 + 0x1a + 0x14 + 0x18 * byte +1
+   * (extension word 0x8e14, x8) + 0x22; build_object_poly_buffers(object, source + 12 n).
+   * Controller +8 set -> *controller = object and DAT_0001c25c[DAT_0001c1cc++] = controller.
+   * Flag 0x1000 of word +6 (btst #4 of byte +6) -> FUN_00004958(object, 0xb4e1, 0, 0x7fe4),
+   * then host word +0xe == 1 ? FUN_00004916(object, 0x80) : FUN_00003ea0(object). The other
+   * flag branches and the kind-3 path are part 2. */
   if ((param_1[6] & 0x10U) == 0) {
     if ((param_1[7] & 0x10U) == 0) {
       if ((param_1[5] & 0x10U) == 0) {
@@ -9308,6 +9540,14 @@ void begin_flight_for_rank /* Original: FUN_00007310 */ (int param_1)
 /* Original: FUN_0000739a; source: Pacific Conflict.c. Recovered name: copy_player_pose_to_camera [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x739a).
  * Camera globals from the player object (*DAT_0001b738): position DAT_0001d838 / -834 / -830 = x / y / z (+0x18 / +0x1c / +0x20); angles DAT_0001d810 / -80e / -80c = negated player angles (& 0x3fff, 0x4000 per turn); DAT_0001d808 = type-record +0x44 - player +0x626 (& 0x3fff). DAT_0001d838 / -834 / -830 are the camera position that compute_camera_abs_metric measures against. Complete Ghidra C.
+ * Reading [STRONG INFERENCE]: the view angles are the negated body angles (the view
+ * rotation is the inverse of the aircraft's), and DAT_0001d808 = definition +0x44 -
+ * +0x626 is minus (angle of attack - trim), the same correction ai_pursue_target removes
+ * for its gun line - so the cockpit view looks along the fuselage, not the flight path.
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x739a..0x7408 (three longs from the object, neg.w / andi.w #$3fff of words +0x20 /
+ * +0x22 / +0x24, movea.w definition +0x44 - suba.w +0x626 (both sign-extended) then
+ * andi.l #$3fff); identical to the C.
  */
 void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
 
@@ -9370,6 +9610,12 @@ void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
  * STRONG_INFERENCE: status 3 / 5 = POW / MIA from the STR# 129 status group.
  * Note: Ghidra writes DAT_0001b738 + 0xb / + 0x1a1 / + 0x19f on an int *: the byte
  * offsets are +0x2c / +0x684 / +0x67c.
+  * VERIFIED: every section 0x740a..0x8782 (prologue, key filter, the 0x7688 key table and
+ * every key case, throttle ramp, keyboard steering, gun trigger, outcome classifier, the
+ * 0x833e camera switch and the tail) was checked against an independent capstone
+ * disassembly; the "Section check" comments in the body record each range. Identical to
+ * the C with the recorded call-argument corrections (probe_nearest_facility_kind, and the
+ * fold_angle_pm_0x2000 / abs_int calls of view 6).
  */
 uint process_flight_input_and_outcome /* Original: FUN_0000740a */ (int param_1,int param_2)
 
@@ -9486,7 +9732,42 @@ switchD_00007684_caseD_1b:
    * == 3 lets every key through; event 4 only the space bar; any other event only
    * a A + - = _ 2 4 6 8 Z z > . X x ? / (keys whose RELEASE matters); otherwise 0x7dbe.
    * Dispatch: key - 9, unsigned > 0x75 -> 0x7dbe, word table at 0x7688 (ext 0x0a06,
-   * d0.l x2). The cases below are checked separately. */
+   * d0.l x2). The cases below are checked separately.
+   * Jump table 0x7688 decoded by hand [PROVEN]: the 0x76 word entries group exactly as the
+   * case labels below (61 entries -> default 0x7dbe; ESC / ` / ~ -> 0x7ffa; 'E' falls into
+   * 'V' at 0x79fc). Mac key codes 0x1c / 0x1d / 0x1e / 0x1f are the arrow keys, 0x09 Tab,
+   * 0x13 / 0x18 control-S / control-X.
+   * Section check of the cases 0x7774..0x79fa ('-' '+' '4' '6' '8' '2' '5' digits 'T')
+   * [PROVEN, matches the C]: view 6 uses '+' / '-' as a zoom stack (words 0x20b28 /
+   * 0x20b26 scaled by 1.5 with asr.w + add.w, up to 8 levels at 0x20b14 / 0x20afc, index
+   * 0x20af4); otherwise, in views <= 5 and not bailed out, '+' / '-' set the throttle ramp
+   * word 0x24cf6 to +1 / -1 on key down and 0 on release. When the player's state +0x32
+   * is 0xf7f0 (player_slew_mode, runtime address of file 0xf810) every digit key sets the
+   * throttle byte +0x668 = key - '0' and clears word flag 0x4000 (engine on); in normal
+   * flight the digits 0 1 3 7 9 do NOTHING, 4 / 6 / 8 / 2 drive the keyboard-mouse axes
+   * 0x24d2e = -1 / +1 and 0x24d2c = -1 / +1 (0 on release) and 5 recentres the mouse,
+   * each setting the keyboard-steer flag 0x24d34 = 1. 'T': view 6 -> back to view 1;
+   * otherwise point_near_camera_or_type80_object(&0x1d824) found -> view 6 with the
+   * camera at that point.
+   * Section check of the cases 0x79fc..0x7dbc [PROVEN, matches the C]: 'V' -> view 1,
+   * look offsets 0x24cf8 / 0x1d804 / 0x24cfc / 0x1d800 cleared, camera = player pos, the
+   * player object's long +4 bit 0x40 set (contact records dropped) if clear; 'C' (view 5)
+   * / 'E' (view 7, only with a target, airborne, else it falls into 'V') clear that bit
+   * instead; arrows (views <= 2): yaw 0x24cfc -+ 0x800, pitch 0x24cf8 -+ 0x540 limited at
+   * 0x3040 / 0xa80, all & 0x3fff; 'R' adds 0x2000 (look back), in other views resets to
+   * view 1 looking back; 'M' throttle 0 + engine off (word flag 0x4000); rudder word
+   * DAT_0001b858 = +0x40 ONLY for key-down 'Z' / '>', -0x40 ONLY for key-down 'X' / '?',
+   * every other event of those groups (lowercase z / x, '.', '/', releases) clears it;
+   * 'A' target lock 0x1b872 = key-down and a target exists; 'F' flaps toggle (0 -> 1, else
+   * negate) and 'G' gear toggle, unless bailed out (0x1b874) - 'G' only in the air: gear
+   * coming down with world word +0xa4 set -> try_begin_landing_approach(player): 0 ->
+   * word 0x1b83e = 1, else 0x1b83c = 1; otherwise +0x32 = 0xe772 (normal flight); 'B'
+   * bomb phase +0x674 = 1 when more than 0x43 above +0x2e; 'J' bail-out +0x677 = 1 in the
+   * air when not yet bailing; control-X sets word flag 0x100 (fire) on the target
+   * DAT_0001b888 [debug-style key]; control-S zeroes throttle, +0x678 and +0x62a and
+   * toggles +0x32 between 0xe772 and 0xf7f0 (slew); Tab cycle_view_distance; space: on
+   * the ground brakes +0x641 = key-down, in the air (keyboard steering 0x24d34 on) fire
+   * word 0x24cf4 = key-down; 'P' -> result 4 (0x8704). */
   switch(param_1) {
   case 9:
     cycle_view_distance();
@@ -9673,7 +9954,7 @@ LAB_0000796e:
     }
 LAB_00007992:
     _DAT_00024d34 = 0;
-    *(char *)(DAT_0001b738 + 0x19a) = (char)param_1 + -0x30; /* keys '0'..'9': throttle byte +0x668 */
+    *(char *)(DAT_0001b738 + 0x19a) = (char)param_1 + -0x30; /* keys '0'..'9': throttle byte +0x668 - reached only in slew mode (+0x32 == 0xf7f0) [PROVEN, 0x7980 / 0x789a] */
     *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) & 0xbfff; /* engine switched on: clear +0x684 bit 14 (0x79a6) */
     break;
   case 0x41:
@@ -9901,6 +10182,21 @@ LAB_00007f20:
     }
     _DAT_0001b852 = 1;
   }
+  /* Section check 0x7dbe..0x7ffe (throttle ramp, keyboard steering, gun trigger, view 8 / 9
+   * exit) [PROVEN, matches the C; independent capstone disassembly]: throttle ramp word
+   * 0x24cf6: |v| == 1 -> throttle byte +0x668 += low byte (+-1), clamped 0..9, or - with
+   * the engine off (word flag 0x4000) - throttle 0 and engine back on; then v <<= 1;
+   * otherwise v moves one step toward 0. While +/- is held v cycles 1 -> 2 -> 1, so the
+   * throttle changes by one notch every 2 frames. A real mouse move (host +0x33e / +0x340
+   * differ from 0x24d32 / 0x24d30) turns keyboard steering 0x24d34 off; off -> fire word
+   * 0x24cf4 = host word +0x342 (mouse button). Keyboard steering: per frame the mouse
+   * point moves by +-0x1e (h) / +-0x18 (v) while 4 / 6 / 8 / 2 is held, and otherwise
+   * back toward the view centre (a full step when farther than 0x1e / 0x18, else the
+   * whole remaining offset); it is first clamped to centre +-0xd5 (h) / +-0xab (v) -
+   * exactly the offsets at which apply_player_mouse_controls saturates aileron (0x140)
+   * and elevator (0x200). Gun: fire word set, ammo word +0x682 > 1, word flag 0x10 clear,
+   * not bailed out -> gun phase +0x676 = 1 when 0, word 0x1b852 = 1. Views 8 / 9 (0x7fe2):
+   * key-down '"' / '`' / ESC -> result 3. */
 LAB_00008000:
   apply_player_mouse_controls();
   if (DAT_0001b870 == 3) {
@@ -9912,7 +10208,7 @@ LAB_00008000:
   update_game_sounds();
   if (((7 < DAT_0001d858) || (*(int *)((int)DAT_0001b738 + 0x62a) != 0)) ||
      (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) goto LAB_00008324;
-  uVar6 = probe_nearest_facility_kind( /* Original: FUN_00000354 */);
+  uVar6 = probe_nearest_facility_kind( /* Original: FUN_00000354; arg dropped by Ghidra = the player's object (*DAT_0001b738) [PROVEN, 0x8040] */);
   if (*(short *)(DAT_0001b5a0 + 0xd4) == 1) {
     uVar6 = uVar6 | 1;
     goto switchD_0000833a_caseD_3;
@@ -10037,6 +10333,30 @@ LAB_0000824c:
       goto switchD_0000833a_caseD_3;
     }
   }
+  /* Section check 0x8000..0x8322 (per-frame calls + stopped-aircraft outcome classifier)
+   * [PROVEN, matches the C; independent capstone disassembly]: apply_player_mouse_controls,
+   * tick_flagged_object_controllers when replay state 0x1b870 == 3 else
+   * advance_frame_and_tick_controllers, update_game_sounds. The classifier runs only in
+   * views <= 7 with speed +0x62a == 0 and the aircraft on the ground (+0x63e): kind =
+   * probe_nearest_facility_kind(player object) (bit 0x100 / 0x200 = near a facility of
+   * either side). Host +0xd4 == 1 -> result kind | 1. Word flag 0x1000 (btst #4 of byte
+   * +0x684; set by water contact, surface 0x10, in update_aircraft_entity) = DITCHED:
+   * undamaged (word +0x684 & 0x3fe == 0) with fuel -> host +0xd4 = 4; otherwise random
+   * status: kind & 0x100 -> 1/2 status 3, else 1/4 (of the rest) status 1; kind & 0x200 ->
+   * 1/8 status 1; neither -> 1/4 status 1, else 1/4 status 3; result kind | 6. Not ditched,
+   * RPM +0x66a == 0, landing flag 0x1b868 == 2 (stopped after a touchdown): flags cleared;
+   * host +0xce > 0, kind == 0x200, surface byte +0x2c in {0x30, 0x60, 0x70} (runway /
+   * deck) and 0x1b86a == 0 -> 0x1b86a = 1, result 0x201; runway surface with kind ==
+   * 0x100 -> host +0xd4 = 3, result 0x10a; runway surface otherwise -> result kind | 9;
+   * off the runway, damaged or out of fuel -> the same odds with status 5 instead of 1,
+   * result kind | 8; off the runway, intact and fuelled -> kind == 0x100: 1/4 status 3,
+   * result kind | 9; else any_mission_kills_recorded() ? kind | 9 : no result. Not yet
+   * stopped after a touchdown, on a runway surface, not yet recorded (0x1b73c) and engine
+   * off (word flag 0x4000): host +0xb6 = (fuel +0x67d + fuel +0x67e) * 100 / definition
+   * word +0x1c (fuel percent; the binary computes the division twice and stores the
+   * first), host +0xb8 = bombs, 0x1b73c = 1, result kind | 2. The status numbers 3 / 5
+   * are POW / MIA per the STR# 129 reading above [STRONG INFERENCE]. Then the camera
+   * switch below (view - 1, unsigned > 8 -> exit, table at 0x833e). */
 LAB_00008324:
   uVar6 = 0;
   switch(DAT_0001d858) {
@@ -10115,12 +10435,15 @@ LAB_00008324:
     iVar9 = isqrt_floor( /* Original: FUN_0000e372 */iVar5);
     attitude_from_velocity( /* Original: FUN_00001f22 */(short)iVar11,(short)iVar8,(short)iVar3,(int)(short)iVar9,iVar5,&uStack_24,
                  &uStack_26);
+    /* LAB_0000e3e8_4 = fold_angle_pm_0x2000 (lea.l $e3ec.l = runtime -> file 0xe40c) and
+     * FUN_00002de8 = abs_int (runtime $2de8 -> file 0x2e08) of the two folded deltas;
+     * arguments dropped by Ghidra [PROVEN, 0x8632..0x8674]. */
     sVar10 = (*(code *)&LAB_0000e3e8_4)((int)(short)uStack_24 - DAT_00024d00);
     iVar5 = (int)sVar10;
     sVar10 = (*(code *)&LAB_0000e3e8_4)((int)(short)uStack_26 - DAT_00024d04);
     iVar11 = (int)sVar10;
-    iVar8 = FUN_00002de8();
-    if ((iVar8 < 0x1001) && (iVar8 = FUN_00002de8(), iVar8 < 0x1001)) {
+    iVar8 = FUN_00002de8( /* = abs_int(iVar5) */);
+    if ((iVar8 < 0x1001) && (iVar8 = FUN_00002de8( /* = abs_int(iVar11) */), iVar8 < 0x1001)) {
       if (iVar5 < 0) {
         iVar5 = iVar5 + 3;
       }
@@ -10183,6 +10506,25 @@ switchD_0000833a_caseD_3:
   if (DAT_0001d858 != sVar4) {
     _DAT_0001d856 = 1;
   }
+  /* Section check 0x8324..0x8782 (camera-mode switch + common tail) [PROVEN, matches the C;
+   * table at 0x833e decoded by hand: views 1 / 2 -> 0x8350, 3 / 4 -> exit, 5 -> 0x84a6,
+   * 6 -> 0x85a2, 7 -> 0x851a, 8 -> 0x858c, 9 -> 0x8592]. Views 1 / 2 (cockpit / look):
+   * copy_player_pose_to_camera; view 1 -> 2 when a look offset is set (player object
+   * hidden: long +4 bit 0x40); view 2 eases 0x1d804 / 0x1d800 toward 0x24cf8 / 0x24cfc by
+   * 1/4 of the folded difference when host +0xa0 is set (else copies), and returns to
+   * view 1 once both targets are 0 and both offsets within 0x20 of 0. View 5 (chase): the
+   * camera takes pose-ring entry (+0x612 - 7) mod 75 of the player (+0x36 + 0x14 * i):
+   * position and negated angles - 7 frames behind. View 7: the target's object position
+   * and negated attitude words +0x20 / +0x22 / +0x24, roll 0x1d808 = (definition +0x44 -
+   * +0x626) & 0x3fff. Views 8 / 9: update_tracking_camera / update_bailout_view, a non-zero
+   * value becomes the result. View 6 (fixed external camera): k = 1 + shifts bringing
+   * update_object_camera_metric(object) + object +0x14 below 0x8000; d = (object - camera)
+   * >> k; attitude_from_velocity(d, isqrt_floor(|d|^2), |d|^2, &yaw, &pitch); the stored
+   * look angles 0x24d00 / 0x24d04 snap when either folded delta exceeds 0x1000, else ease
+   * by 1/4. Tail 0x8704: pitch word 0x1d810 in 0x1001..0x2fff -> mirrored (0x2000 or
+   * 0x6000 - pitch) and heading 0x1d80e += 0x2000; a non-zero result clears the brakes
+   * +0x641, the target lock 0x1b872 and the throttle ramp 0x24cf6; a view change sets
+   * 0x1d856 = 1; returns the result (d6). */
   return uVar6;
 }
 
@@ -10388,6 +10730,17 @@ void place_camera_behind_object /* Original: FUN_000088a0 */ (int param_1,int pa
  * on the parachute's recorded pose (ring at controller +0x32, 0x14-byte entries, index
  * +0x60e + 1 wrapped past 0x4a with an unsigned bls) and looks at the parachute.
  * Returns 0, or the outcome on the exit path.
+ * Precision [PROVEN]: the ring entry used is index +0x60e + 1 - the OLDEST of the 75
+ * entries, so the camera trails 74 frames behind the parachute; the two-shot shift k is
+ * the plain count of asr #1 bringing the distance below 0x8000 (no +1 here); the
+ * distance call is approx_dist3_xyz(player object pos, parachute object pos) with the
+ * arguments dropped by Ghidra (recorded).
+ * VERIFIED: checked against an independent capstone disassembly of the bytes
+ * 0x8972..0x8abc (tst.l $1b87c, btst #1 7(a0), tst.w $61e / cmpi.w #$5a0 $614 / ble,
+ * bsr $879e; moveq #-0x4b + frame vs $40(a2) / ble, cmpi.l #$373; 6 pushes + bsr $3c68,
+ * cmpi.l #$9ab0 / bgt; bpl / addq / asr.l #1 midpoints, andi.w #$8000 shift loop, bsr
+ * $88a0; addq.w #1 / cmpi.w #$4a / bls / addi.w #$ffb5, lea (a0,a0.l*4) + asl.l #2 +
+ * #$32; bsr $8abe; clr.l d0); identical to the C.
  */
 uint update_bailout_view /* Original: FUN_00008972 */ (void)
 
@@ -10411,7 +10764,7 @@ uint update_bailout_view /* Original: FUN_00008972 */ (void)
      ((DAT_0001b838 + -0x4b <= *(int *)(iVar1 + 0x40) ||
       (0x373 < *(int *)(iVar1 + 0x1c) - *(int *)((int)DAT_0001b87c + 0x2e))))) {
     iVar5 = *DAT_0001b738;
-    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (player object pos, parachute object pos) [PROVEN, pushes 0x89de..0x89f2] */);
     if ((int)uVar2 < 0x9ab1) {
       iVar7 = *(int *)(iVar1 + 0x18) + *(int *)(iVar5 + 0x18);
       if (iVar7 < 0) {
@@ -17820,6 +18173,8 @@ LAB_0000f47c:
 /* Original: FUN_0000f810; source: Pacific Conflict.c. Recovered name: player_slew_mode [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0xf810).
  * Alternative player state handler 0xf7f0 (Ghidra 0xf810, + 0x20 rule): process_flight_input_and_outcome swaps the player +0x32 between 0xe772 (update_aircraft_entity, normal flight) and 0xf7f0 on character 0x13 (control-S), clearing the move command and speed. Each frame: heading / pitch += half the averaged control inputs (+0x666 / +0x662), roll = 0; the move command byte +0x668 (1..8, set by the keypad-digit keys of the same switch) picks an axis (byte +0x678: 1 x, 2 z, 3 y) and a direction, the speed +0x62a starting at +-1000 and growing by max(1000, |speed| / 2) per frame while the key repeats (5 stops); the step is rotated by the attitude (build_attitude_matrix_3ang, transform_int3_vecs_by_matrix3) and stored as the velocity >> 6, never below y 0x40; also fires (spawn_ordnance_oriented) when +0x676 is set. [STRONG INFERENCE: a slew / free-move mode for positioning the aircraft - a debug or editing aid] Ghidra C.
+  * VERIFIED: both parts 0xf810..0xfb28 were checked against an independent capstone
+ * disassembly (section checks in the body); identical to the C.
  */
 void player_slew_mode /* Original: FUN_0000f810 */ (int *param_1)
 
@@ -17945,6 +18300,17 @@ LAB_0000f9bc:
     }
   }
   *(undefined1 *)(param_1 + 0x19e) = 1;
+  /* Section check 0xf810..0xf9c6 (part 1 of 2) [PROVEN, matches the C; independent capstone
+   * disassembly]: pitch word +0x20 += (+0x662 / 2) and heading +0x22 += (+0x666 / 2)
+   * (truncating, & 0x3fff), roll +0x24 = 0; step = max(abs_int(+0x62a asr 1), 1000). The
+   * throttle byte +0x668 is read as a keypad direction and byte +0x678 is reused as the
+   * current slew axis: 5 -> speed +0x62a = 0, axis 0; 4 / 6 -> axis 1, 2 / 8 -> axis 2,
+   * 1 / 7 -> axis 3 (first key of each pair negative, second positive): from axis 0 the
+   * speed starts at -1000 / +1000, on the same axis it moves by the step (it grows by
+   * 1.5x per KEY EVENT: part 2 clears the throttle byte every frame, so only a key-down or
+   * auto-repeat re-applies it - corrected), from another axis it keeps its
+   * magnitude with the new sign; other values (0, 3, 9) change nothing. Part 2: see the
+   * check at the end of the function. */
 LAB_0000f9c8:
   local_8 = 0;
   local_10 = 0;
@@ -17998,6 +18364,17 @@ LAB_0000f9c8:
     *(char *)((int)param_1 + 0x679) = *(char *)((int)param_1 + 0x679) + '\x01';
     *(byte *)((int)param_1 + 0x67a) = *(byte *)((int)param_1 + 0x67a) | 2;
   }
+  /* Section check 0xf9c8..0xfb28 (part 2 of 2) [PROVEN, matches the C; independent capstone
+   * disassembly]: with an axis set, |speed| < 1000 makes the speed 1000 with the OPPOSITE
+   * sign (non-negative -> -1000, negative -> +1000; tst / blt / neg.l) - a quirk the C
+   * reproduces; the speed goes to frame -0xc (axis 1, x: keypad 4 / 6), -4 (axis 2, z:
+   * 2 / 8) or -8 (axis 3, y: 1 / 7), rotated by build_attitude_matrix_3ang(sext +0x20, sext
+   * +0x22, sext +0x24) and transform_int3_vecs_by_matrix3; velocity +8 / +0xc / +0x10 =
+   * x / y / z asr 6. Object height + vy <= 0x3f -> height 0x40, vy = 0. Then throttle byte
+   * +0x668 = 0 (every frame) and +0x626 = 0. Gun phase +0x676 == 1 ->
+   * spawn_ordnance_oriented(0, 1, object pos, sext +0x20 / +0x22 / +0x24, (0 - definition
+   * +0x44) & 0x3fff) with no ammunition used; phase counts to 2 then 0. Gear ramp as in
+   * update_aircraft_entity blk 7a. */
   return;
 }
 
