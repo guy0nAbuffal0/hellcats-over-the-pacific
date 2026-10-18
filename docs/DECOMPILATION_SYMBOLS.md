@@ -956,6 +956,19 @@ Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
 | turret controller +0x4c / +0x4e, +0x50 / +0x52 | aim angles (from attitude_from_velocity) / aim errors (±0x80 at burst start, × 7/8 per shot) | PROVEN | Iter 358. |
 | turret controller +0x46 | knocked out by gunfire (word, 0 / 1; set 1 hit in 16 by bullet_hits_shape, never cleared by turret code) | PROVEN (accesses) / STRONG_INFERENCE (permanent) | tst.w at 0x19220 / 0x1939e; move.w #1 at 0x1670e. Replaces "reloading". |
 
+## False entries and runtime-address callees — iteration 376
+
+`lea.l $xxxx.l` / `jsr (aN)` operands in the overlay are RUNTIME addresses (file offset
+- 0x20). Ghidra treated them as file offsets and invented functions at the wrong place.
+
+| Ghidra name | Real callee | Evidence |
+|---|---|---|
+| `FUN_00002de8` (false entry) | `abs_int` (file 0x2e08) | iteration 361 |
+| `FUN_00003c48` (false entry inside `compute_camera_abs_metric`; was named `approx_dist3_from_abs`) | `approx_dist3_xyz` (file 0x3c68) | iteration 376: all 6 references are `lea.l $3c48.l`; 6 call sites corrected in the decomp |
+| `LAB_000028ba_2` (update_tracking_camera) | `transform_vecs12_by_matrix3` (file 0x28dc) | iteration 376: `lea.l $28bc.l` at 0x8dc6 |
+| `heap_roving_cursor_store` (FUN_00001a48, false entry) | `heap_alloc(size)` (file 0x1a68) | iteration 377: all 4 `lea.l $1a48.l` (overlay_main_entry ×2, 0x4e6e, 0xb4b6); 27 call sites corrected; resolves the old "$1A48 allocator ABI" blocker |
+| `heap_add_large_block_tail` (0x19b0), `heap_zero_payload_tail` (0x1b4c), `heap_realloc_grow_only_tail` (0x1be4), `reset_object_to_template_pose_tail` (0x4e4e), `overlay_rng_warmup_epilogue` (0x11544) | `heap_free_coalesce`, `heap_alloc_cleared`, `copy_object_vertex_buffer`, `activate_near_range_object`, `overlay_rng_next` (each + 0x20) | iteration 377 scan of all `lea.l` code operands; call sites not yet corrected |
+
 ## Call-argument corrections
 
 Ghidra calls that lost their stack arguments; the bytes give the real list.

@@ -4793,3 +4793,32 @@ handle only after activation; a shell printing ticks alone does not wake this ag
     of the countdown.
   - The Mission Summary buttons are enabled only when it is 0.
 - Comment / doc only.
+
+### Iteration 376 — 2026-10-18
+
+- P0 wrong callee. Ghidra's FUN_00003c48 ("approx_dist3_from_abs") is a false
+  entry inside compute_camera_abs_metric (no prologue; 0x3c00..0x3c66).
+  - All 6 references are `lea.l $3c48.l`, a runtime address = file 0x3c68 =
+    approx_dist3_xyz.
+  - The 6 decomp call sites were corrected to approx_dist3_xyz.
+  - The definition was reset to FUN_00003c48 and the inventory set to BLOCKED
+    (now 7 blocked).
+- update_tracking_camera's LAB_000028ba_2 is transform_vecs12_by_matrix3
+  (`lea.l $28bc.l`).
+- FUN_00002de8's blocker now carries the answer. The generator also keeps the
+  old question from the historical tracker.
+- Tokens are identical to HEAD with both changes mapped. No Godot references.
+
+### Iteration 377 — 2026-10-18
+
+- Scan of every `lea.l $xxxx.l` code operand in the overlay (runtime address =
+  file offset - 0x20). Seven Ghidra callees are false entries whose real
+  targets are 0x20 later.
+- RESOLVED the long-standing $1A48 allocator blocker.
+  - All 4 `lea.l $1a48.l` sites target file 0x1a68 = heap_alloc.
+  - 27 call sites in overlay_main_entry, 0x4e6e (activate_near_range_object)
+    and 0xb4b6 were corrected to heap_alloc (size dropped by Ghidra).
+  - FUN_00001a48 itself stays a BLOCKED false entry, with the blocker
+    answered.
+- The other five misattributions are listed in the symbols doc for the next
+  iterations.

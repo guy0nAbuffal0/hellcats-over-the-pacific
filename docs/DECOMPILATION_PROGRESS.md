@@ -5,10 +5,13 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 375 (2026-10-18)
-**Next target:** `update_tracking_camera` (FUN_00008c30): verify the whole function
-against the bytes now that its globals (DAT_0001b86e countdown, host +0x98 replay state,
-DAT_0001b884 / DAT_0001b888 targets) are named.
+**Last iteration:** 377 (2026-10-18)
+**Next target:** correct the remaining runtime-address callee misattributions found by the
+iteration-377 `lea.l` scan (one per iteration): `heap_add_large_block_tail` ->
+heap_free_coalesce, `heap_zero_payload_tail` -> heap_alloc_cleared,
+`heap_realloc_grow_only_tail` -> copy_object_vertex_buffer,
+`reset_object_to_template_pose_tail` -> activate_near_range_object,
+`overlay_rng_warmup_epilogue` -> overlay_rng_next (table in DECOMPILATION_SYMBOLS.md).
 
 **Verification policy (user decision, 2026-10-18):** a function may be marked
 VERIFIED when its body matches an independent disassembly of the bytes and any
@@ -69,7 +72,7 @@ python3 tools/re_query.py source-map FUN_0001358c
 
 1. Verify `bullet_hits_aircraft` described above (`tick_bullet` verified in
    iteration 353).
-2. Revisit the blocked `$1A48` allocator ABI.
+2. ~~Revisit the blocked `$1A48` allocator ABI~~ (resolved in iteration 377: runtime address → heap_alloc).
 3. Continue independent verification of high-traffic Pacific Conflict functions.
 4. Resolve remaining ID09/ID05 segment-entry evidence.
 5. Investigate `FUN_00003cca` only when its dependencies are needed.

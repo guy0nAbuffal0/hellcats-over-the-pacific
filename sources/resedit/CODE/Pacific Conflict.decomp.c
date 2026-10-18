@@ -934,7 +934,7 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
   do {
     puVar7 = (undefined4 *)0x4a; /* nbytes */
     pcVar6 = pcVar3; /* src */
-    puVar1 = (undefined4 *)heap_roving_cursor_store(); /* [BLOCKED] JSR $1A48 does not allocate; D0 source unexplained — see heap_roving_cursor_store */
+    puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */); /* iter 377: resolved - the JSR target is heap_alloc (runtime address $1A48 = file 0x1a68) */
     puVar1 = copy_block_return_dst(puVar1,(undefined4 *)pcVar6,puVar7);
     /* table[sign_extend(*psVar4)] = cloned record */
     *(undefined4 **)(&DAT_0001b524 + *psVar4 * 4) = puVar1;
@@ -973,72 +973,72 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
    *
    * [HYPOTHESIS] Records are typed descriptors (small IDs appear in static
    * image fields); exact schema still UNKNOWN.
-   * [BLOCKED] Dest buffer still comes from JSR $1A48 (heap_roving_cursor_store).
+   * Dest buffer comes from heap_alloc (iteration 377: JSR $1A48 is a runtime address = file 0x1a68).
    */
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a8b8;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b538 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a8d2;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   PTR_DAT_0001b53c = (undefined *)copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a8ec;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   PTR_DAT_0001b540 = (undefined *)copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a906;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b54c = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a920;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b550 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a93a;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b544 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a954;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b548 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a96e;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b568 = copy_block_return_dst(puVar1,puVar7,puVar8);
   /* [PROVEN] nbytes=0x20 via PEA $20.W (not address-of overlay_patch_template_u16_pair). */
   pcVar5 = (code *)0x20;
   puVar7 = (undefined4 *)&DAT_0001a988;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b554 = copy_block_return_dst(puVar1,puVar7,(undefined4 *)pcVar5);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a9a8;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b558 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a9c2;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b55c = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a9dc;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b560 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001a9f6;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b564 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001aa10;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b56c = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001aa2a;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b570 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001aa44;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b574 = copy_block_return_dst(puVar1,puVar7,puVar8);
 
   /*
@@ -1053,7 +1053,7 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
   do {
     puVar9 = (undefined4 *)0x1c;
     puVar7 = puVar1;
-    puVar8 = (undefined4 *)heap_roving_cursor_store();
+    puVar8 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
     puVar7 = copy_block_return_dst(puVar8,puVar7,puVar9);
     *(undefined4 **)(&DAT_0001b524 + *psVar4 * 4) = puVar7;
     psVar4 = psVar4 + 0xe; /* +0x1C bytes */
@@ -1067,23 +1067,23 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
    */
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001aaea;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b58c = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001ab04;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b590 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001ab1e;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b594 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001ab38;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b598 = copy_block_return_dst(puVar1,puVar7,puVar8);
   puVar8 = (undefined4 *)0x1a;
   puVar7 = (undefined4 *)&DAT_0001ab52;
-  puVar1 = (undefined4 *)heap_roving_cursor_store();
+  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
   DAT_0001b59c = copy_block_return_dst(puVar1,puVar7,puVar8);
   return;
 }
@@ -2543,6 +2543,13 @@ void heap_free_coalesce(int param_1) /* Original: FUN_000019d0 */
  * Source: Pacific Conflict.c:2128 / binary @0x1A48
  * Proposed name: heap_roving_cursor_store
  * Confidence: [PROVEN] for the three-instruction body; [BLOCKED] for call-site ABI
+ *
+ * Iteration 377 resolution [PROVEN]: the "call-site ABI" problem was an address-space
+ * mix-up. Every caller loads `lea.l $1a48.l` (at 0x76 / 0x278 in overlay_main_entry, 0x4ed8,
+ * 0xb572) - a RUNTIME address, i.e. file 0x1a68 = heap_alloc(size). The callers therefore
+ * allocate normally; the size argument was dropped by Ghidra. Those call sites now read
+ * heap_alloc(...). This fragment (0x1a48: move.l a1,$20c60; bra to the shared epilogue) is
+ * only reached by the fall-through inside heap_free_coalesce, and stays a false entry.
  *
  * Body (PROVEN):
  *   MOVE.L  A1, DAT_00020c60
@@ -5840,14 +5847,20 @@ int compute_camera_abs_metric(void) /* Original: FUN_00003c00; args lost by Ghid
 
 /*
  * Original: FUN_00003c48
- * Proposed name: approx_dist3_from_abs
+ * Proposed name: approx_dist3_from_abs  -> WITHDRAWN (iteration 376); identifier reset to
+ *   FUN_00003c48. FALSE ENTRY [PROVEN, bytes]: 0x3c48 is inside compute_camera_abs_metric
+ *   (FUN_00003c00, link at 0x3c00, rts at 0x3c66) - between its `cmp.l d2,d3 / ble`
+ *   (0x3c42) and the swap; it has no prologue. All six references are `lea.l $3c48.l`, a
+ *   RUNTIME address = file 0x3c68 = approx_dist3_xyz, so every Ghidra call to "this"
+ *   function is really approx_dist3_xyz (call sites corrected). Status BLOCKED like the
+ *   other false entries (FUN_00002de8, FUN_00001a48).
  * Confidence: [PROVEN] formula
  *
  * Register ABI (D0,D1,D3 = |Δ| components): return max + ((a+b)>>2) after
  * ordering D1 vs D3. Same combine as approx_dist3_xyz epilogue. Capstone
  * @0x3C48–0x3C66 (0 BSR; used via register calls / shared tail).
  */
-int approx_dist3_from_abs(void) /* Original: FUN_00003c48 */
+int FUN_00003c48(void) /* Original: FUN_00003c48 */
 {
   int in_D0;
   int in_D1;
@@ -7109,7 +7122,8 @@ void reset_object_to_template_pose_tail /* Original: FUN_00004e4e */ (void)
  * Kind 2 [PROVEN Capstone @0x4E8E+]:
  *   - (obj+7)&1 → publish on DAT_0001d4a4[c1e0++]; else DAT_0001b5a4[b734++]
  *   - size = (s16(+0x36)+s16(+0x3a))*0xC; two JSR $1A48 → obj+0x4c then +0x44
- *     (Ghidra shows heap_roving_cursor_store() with no size — $1A48 still BLOCKED)
+ *     (Ghidra showed heap_roving_cursor_store() with no size; iteration 377: it is
+ *     heap_alloc - lea.l $1a48.l is a runtime address = file 0x1a68)
  *   - build_object_poly_buffers mesh/index setup; optional factory back-link at +8
  *   - Flag gate: 02bd8 only if bit4 clear on +5/+6/+7; else 01c5c / rates / 15762…
  *   - Ends with FUN_00003b98 metric refresh
@@ -7177,9 +7191,9 @@ void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
   }
   sVar12 = *(short *)(param_1 + 0x3a) + *(short *)(param_1 + 0x36);
   /* Capstone: push (sVar12 * 0xC), JSR $1A48 → D0; Ghidra dropped the size arg. */
-  uVar3 = heap_roving_cursor_store(); /* callsite≡alloc [INFERRED]; $1A48 BLOCKED */
+  uVar3 = heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */); /* iter 377: heap_alloc PROVEN (lea.l $1a48.l = runtime -> file 0x1a68) */
   *(undefined4 *)(param_1 + 0x4c) = uVar3;
-  uVar3 = heap_roving_cursor_store(); /* same size → +0x44 (spawn gate) */
+  uVar3 = heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */); /* same size → +0x44 (spawn gate) */
   *(undefined4 *)(param_1 + 0x44) = uVar3;
   puVar4 = (uint *)(*(int *)(DAT_0001b5a0 + 0x8c) +
                     *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
@@ -10322,14 +10336,14 @@ int update_tracking_camera /* Original: FUN_00008c30 */ (void)
             build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b738 + 8),(int)*(short *)((int)DAT_0001b738 + 0x22)
                          ,(int)*(short *)(DAT_0001b738 + 9),(int)auStack_22);
             (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
-            iVar3 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
+            iVar3 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 (iter 376) */);
             local_e = 0;
             local_a = 0;
             local_6 = 0x4000;
             build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b884 + 8),(int)*(short *)((int)DAT_0001b884 + 0x22)
                          ,(int)*(short *)(DAT_0001b884 + 9),(int)auStack_22);
             (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
-            iVar4 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
+            iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 (iter 376) */);
             iVar9 = iVar1;
             if (iVar3 <= iVar4) {
               iVar9 = iVar8;
@@ -12593,8 +12607,8 @@ uint draw_sky_and_ground /* Original: FUN_0000b4b6 */ (int param_1)
       DAT_00020ad4 = (short *)0x0;
     }
     if (DAT_0001b826 != 1) {
-      DAT_00020ad8 = (short *)heap_roving_cursor_store();
-      DAT_00020ad4 = (short *)heap_roving_cursor_store();
+      DAT_00020ad8 = (short *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
+      DAT_00020ad4 = (short *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc (iter 377) */);
     }
     reset_background_rows();
   }
@@ -27264,8 +27278,8 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
                 store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
                 piVar1 = (int *)(iVar5 + psVar3[3] * 0xc);
                 store_xyz_asr( /* Original: FUN_00019c26 */*piVar1,piVar1[1],piVar1[2],(int)*(short *)(pcVar2 + 0x34));
-                iVar5 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
-                iVar6 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
+                iVar5 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 (iter 376) */);
+                iVar6 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 (iter 376) */);
                 if (iVar6 < iVar5) {
                   local_10 = local_1c;
                   local_c = local_18;
@@ -27304,8 +27318,8 @@ undefined4 find_nearest_runway_approach_ends(undefined4 param_1,int *param_2,int
                 if (iVar10 < 0) {
                   iVar10 = iVar10 + 1;
                 }
-                iVar11 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
-                iVar12 = approx_dist3_from_abs( /* Original: FUN_00003c48 */);
+                iVar11 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 (iter 376) */);
+                iVar12 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 (iter 376) */);
                 local_58 = iVar5 >> 1;
                 local_54 = iVar6 >> 1;
                 local_50 = iVar10 >> 1;
