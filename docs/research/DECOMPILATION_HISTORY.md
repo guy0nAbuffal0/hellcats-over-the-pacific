@@ -4649,3 +4649,136 @@ handle only after activation; a shell printing ticks alone does not wake this ag
   - 48 other call sites reach 0x2e08 with a direct bsr.
 - Not VERIFIED because the C lost its arguments. A policy question for that
   pattern is recorded in the checkpoint.
+
+### Iteration 362 — 2026-10-18
+
+- apply_random_aircraft_damage (FUN_00016724) VERIFIED against the bytes
+  0x16724..0x167f2. Its only callee (overlay_rng_next) takes no arguments, so
+  the C is complete.
+- Finding [PROVEN]: it never sets +0x684 bit 7 (0x80); that comes from
+  elsewhere.
+- Inventory v2 row set to VERIFIED (name_verified / semantically_verified
+  true) and the registry regenerated.
+- tools/progress_stats.py: 672 renamed / 58 verified.
+
+### Iteration 363 — 2026-10-18
+
+- update_aircraft_damage_state damage ladder decoded from the bytes
+  0x1065c..0x1076c [PROVEN]. Rates are per frame:
+  - 0x40 (smoke) moves on at 1/2, to 0x80 or 0x200;
+  - 0x80 moves to 0x200 at 1/4;
+  - 0x200 waits for the next hit, which promotes it to 0x100;
+  - 0x100 (plume) moves to 0x400 (destroyed) at 1/2.
+- +0x688 = ladder freeze timer.
+- So bit 7 (0x80) is set here, answering the iteration-362 question.
+- Comment / doc only.
+
+### Iteration 364 — 2026-10-18
+
+- Aircraft word +0x68c = active smoke-trail count [PROVEN by its only three
+  byte references]:
+  - ++ in attach_smoke_trail;
+  - -- in destroy_trail_controller for a linked kind-0 trail;
+  - tested by the engine gate in update_aircraft_entity.
+- At damage stage 0x40 the engine runs only while its smoke trail exists.
+- Comment / doc only.
+
+### Iteration 365 — 2026-10-18
+
+- User policy: a function whose body matches the bytes is VERIFIED once its
+  Ghidra-dropped call arguments are documented as a call-argument correction.
+- Applied to the five functions checked in iterations 354–361:
+  - approx_dist3_xyz (FUN_00003c68);
+  - segment_point_min_distance (FUN_00003cca);
+  - bullet_hits_shape (FUN_0001665a);
+  - bullet_hits_aircraft (FUN_000167f4);
+  - flak_notice_object (FUN_00018bba).
+- Decomp header notes and inventory v2 rows updated; registry regenerated.
+  tools/progress_stats.py: 667 renamed / 63 verified.
+
+### Iteration 366 — 2026-10-18
+
+- attach_trailing_plume (FUN_00011670) VERIFIED against the bytes 0x11670..0x116e6:
+  - spawn_smoke_plume(0x48, 0, 0, 0, 0, x, y, z);
+  - 8 trail points at +0x40 + 12 i;
+  - plume flag bit 20 cleared and +0x34 = 0;
+  - +0x3c = aircraft object, with its reference byte +3 incremented.
+- The C is complete, so no call-argument correction was needed.
+- Inventory row VERIFIED; registry regenerated.
+
+### Iteration 367 — 2026-10-18
+
+- spawn_smoke_plume (FUN_000115fc) VERIFIED against the bytes 0x115fc..0x1166e.
+  Arguments, the full spawn_mission_pool_object call, the shifts by the object's
+  +0x34 and the end frame = DAT_0001b838 + duration all match.
+- Name kept at HYPOTHESIS (generic smoke / plume effect; name_verified left
+  false).
+- Inventory row: VERIFIED / semantically_verified true.
+
+### Iteration 368 — 2026-10-18
+
+- tick_smoke_plume (FUN_000116fc) VERIFIED against the bytes 0x116fc..0x11794.
+- Header correction: its "damage bit 0" test is word bit 8 (0x100, on fire), so
+  the plume trails a burning aircraft and retires when it is destroyed.
+- A free plume retires only on the exact end frame.
+- Inventory row VERIFIED; registry regenerated.
+
+### Iteration 369 — 2026-10-18
+
+- Byte/word sweep in update_aircraft_entity: two inline comments corrected
+  against the iteration-339 byte scan.
+  - "status bit 3" is word bit 11 (wreck early exit, 0xe80e).
+  - "status&0x40" is word bit 14 (engine off, 0xeb5c).
+- Comment-only.
+
+### Iteration 370 — 2026-10-18
+
+- aircraft_tick (FUN_0000e5aa) header: two byte/word slips corrected against the
+  bytes.
+  - "damage bit 2" is word bit 10, crashed (btst #2,$684 / $686 at
+    0xe722 / 0xe72a).
+  - "gear from flag 0x20" is word bit 13, gear lever up (btst #5,$684 at
+    0xe628 / 0xe6d4).
+- Comment-only.
+
+### Iteration 371 — 2026-10-18
+
+- The byte/word sweep for the status word is finished.
+- tick_ai_1b310_approach_fire header: "+0x684 bit0" corrected to word bit 8
+  (0x100, on fire; btst at 0x10f26).
+- update_tracking_camera: inline note that its byte & 4 test is word bit 10
+  (crashed).
+- The process_flight_input_and_outcome byte tests (~9573 / 9685 / 9794) were
+  already documented correctly (iterations 332 / 335 / 340).
+- Comment-only.
+
+### Iteration 372 — 2026-10-18
+
+- DAT_0001b86e = instant-replay / end-sequence frame countdown [PROVEN accesses,
+  all word ops].
+  - 0x69 from begin_replay_view: 75 replay frames + 30 hold.
+  - 0x1e for a crash end hold.
+  - Decremented by update_tracking_camera. At <= 0x1e it sets DAT_0001b870 = 3;
+    at 0 the outcome is decided.
+  - process_flight_input_and_outcome returns to live mode when it reaches 0.
+- Symbols row added. Comment / doc only.
+
+### Iteration 373 — 2026-10-18
+
+- begin_replay_view (FUN_00008ff4) VERIFIED against the bytes 0x8ff4..0x923c.
+- Facts [PROVEN]:
+  - the camera starts behind the recorded pose and glides to a side view of
+    the previous pose over 0x4b frames;
+  - its height is kept at least ground + 0x280;
+  - the countdown 0x69 is computed as 0x4b + 0x1e;
+  - the damage-ladder freeze +0x688 is cleared.
+- Inventory row VERIFIED; registry regenerated.
+
+### Iteration 374 — 2026-10-18
+
+- RENAME: FUN_00008784 set_state_word_1b86c -> request_instant_replay
+  [STRONG_INFERENCE]. VERIFIED against the bytes 0x8784..0x879c.
+- DAT_0001b86c = pending instant-replay request: 1 airborne, 2 on the ground.
+  - Consumed by begin_replay_view (camera side) and cleared there.
+  - Also cleared on respawn.
+- There are no Godot references. Call sites changed: 2 (plus the declaration).

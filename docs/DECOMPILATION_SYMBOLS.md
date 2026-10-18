@@ -289,7 +289,7 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00006e74` (Pacific Conflict) | `reset_span_row_lists` | STRONG INFERENCE | Iter 248: one background span per row. |
 | `FUN_00006ece` (Pacific Conflict) | `clear_flag_00020ae4` | PROVEN | Iter 248: one store. |
 | `FUN_0000823e` (Pacific Conflict) | `process_flight_input_tail` | STRONG INFERENCE | Iter 248: false split of the key handler. |
-| `FUN_00008784` (Pacific Conflict) | `set_state_word_1b86c` | HYPOTHESIS name | Iter 248: 2 / 1 by argument. |
+| `FUN_00008784` (Pacific Conflict) | `request_instant_replay` (was `set_state_word_1b86c`) | STRONG INFERENCE (iter 374) / VERIFIED | Iter 248: 2 / 1 by argument. Iter 374: sets the pending instant-replay request DAT_0001b86c (1 airborne, 2 on the ground). |
 | `FUN_00005832` (Pacific Conflict) | `dispatch_overlap_collisions` | STRONG INFERENCE | Iter 249: 1-D sweep over metric +/- radius, type handler +0x16. Iter 324: VERIFIED; walks the bit-15 list DAT_0001c1e4 (count DAT_0001c1c4), range +0xc, +0x28 scratch. |
 | `FUN_000058ec` (Pacific Conflict) | `build_visible_object_list` | STRONG INFERENCE | Iter 249: view-space transform and pyramid cull into DAT_0001c9dc. |
 | `FUN_000053f8` (Pacific Conflict) | `collect_near_objects` | STRONG INFERENCE | Iter 250: active array: view candidates, deactivation / retirement. |
@@ -545,6 +545,8 @@ Do not treat example names from planning docs as approved until revalidated here
 | `FUN_00003cca` (Pacific Conflict) | `segment_point_min_distance` | PROVEN | Iter 308: from bytes; bisection of segment (start + word deltas) against a point. |
 | `FUN_0000e512` (Pacific Conflict) | `compute_template_force_from_626_tail` | PROVEN | Iter 308: false split inside FUN_0000e4a4. |
 | `DAT_0001b870` (Pacific Conflict) | instant-replay state (kept as original identifier) | STRONG INFERENCE | Iter 267: 0 live, 1 rewind 0x4a frames, other non-zero replaying, 3 = controller tick restricted, -1 inside replay_logged_effects. |
+| `DAT_0001b86e` (Pacific Conflict) | instant-replay / end-sequence frame countdown (word; comment-only name replay_frames_left) | PROVEN (accesses) / STRONG_INFERENCE (name) | Iter 372: begin_replay_view = 0x69 (75 replay + 30 hold, with DAT_0001b870 = 1 and a 0x4b-frame camera glide); crash end hold = 0x1e (host +0x98 == 2, view mode 8, DAT_0001b870 = 3); update_tracking_camera subq.w each frame, <= 0x1e -> DAT_0001b870 = 3, at 0 decides the outcome (no crash -> -1; crash without parachute -> Dead; else resolve_bailout_outcome); process_flight_input_and_outcome returns to live (DAT_0001b870 = 0) when it is 0. All accesses are word ops (0x742a, 0x74f8, 0x7584, 0x75ae, 0x8efc, 0x8f6c, 0x8f72). |
+| `DAT_0001b86c` (Pacific Conflict) | pending instant-replay request (word: 0 none, 1 airborne, 2 on the ground) | PROVEN (accesses) / STRONG_INFERENCE (name) | Iter 374: set by request_instant_replay, consumed and cleared by begin_replay_view (camera side), cleared on respawn. |
 | `_DAT_0001b842` / `_DAT_0001b844` / `_DAT_0001b852` / `_DAT_0001b856` / `_DAT_0001b850` / `_DAT_0001b854` (Pacific Conflict) | sound events Hit / Ugh / Gun / Wheel / Ditch / Grass | PROVEN (slot names) | Iter 265: slot names from DATA 0; kept as original identifiers. |
 | `FUN_000052dc` (Pacific Conflict) | `deactivate_object` | STRONG INFERENCE | Iter 252: type 2 frees vertex / face buffers; type 3 releases child list. |
 | DAT_0001c9dc / DAT_0001c1d4 | visible object list / its count | STRONG INFERENCE | Iter 249. |
@@ -820,10 +822,10 @@ test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
 | 3 | 0x0008 | damage roll < 0x45 | 0xe8e6 | AILERON damage: +0x666 jitter, clamp ±0x140 | PROVEN flow / STRONG_INFERENCE (iter 349) |
 | 4 | 0x0010 | damage roll < 0x51 | 0x7fbc, 0xf652, 0x191c2 | guns damaged (Gun sound gate) | STRONG_INFERENCE |
 | 5 | 0x0020 | damage roll < 0x5e; tick_wave_spawner 0x1818a | 0x97e4 (gear sound), 0xf576 / 0xfb08 (gear step) | LANDING GEAR JAMMED: gear +0x679 cannot step 1..0x2c towards 0x2d (down) and its sound is suppressed; retraction (negative values) still runs | PROVEN flow / STRONG_INFERENCE (iter 350) |
-| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, iter 341) | progressive engine damage: 0x80 engine damaged, 0x100 / 0x200 engine out (0x100 also smoke / AI bail-out); 0x100 also forces elevator 0 / aileron -0x80 (roll-off, 0xe92c) | PROVEN ladder and engine effect / STRONG_INFERENCE names |
+| 6–9 | 0x03c0 | first heavy roll -> 0x40; 0x200 promoted to 0x100; cleared with mask 0xfc3f (0xe64e, 0x107fe) | tick_smoke_plume (0x100), AI bail-out (0x100), engine model (0x80 halves the manifold target; 0x100 / 0x200 zero it, iter 341) | damage ladder (iter 363, per frame): 0x40 heavy hit (smoke trail; 1/2 -> 0x80 or 0x200) -> 0x80 engine damaged (1/4 -> 0x200) -> 0x200 engine out (until the next heavy hit) -> 0x100 on fire (trailing plume, AI bail-out, elevator 0 / aileron -0x80; 1/2 -> 0x400 destroyed); word +0x688 = ladder freeze timer | PROVEN ladder and engine effect / STRONG_INFERENCE names |
 | 1–9 | 0x03fe | — | landing / ditch / bail-out outcomes | "aircraft damaged" | PROVEN use |
 | 10 | 0x0400 | hard landing 0xf136 / 0xf3a2, aircraft_collision, apply_blast_damage | 0x8fa0, 0xe722, 0x1077a | crashed / destroyed | STRONG_INFERENCE |
-| 11 | 0x0800 | crash at the end of update_aircraft_entity (0xf7ea / 0xf7f0: status = (s & 0x8000) \| 0x900, state handler +0x32 = 0xe772 = update_aircraft_entity) | update_aircraft_entity early exit (0xe80e: rests at ground - 0x16, jitter, engine off); surface 0x20 bad-contact skip (0xf372); update_aircraft_damage_state (0x1070c / 0x10740 / 0x10796; set_state_word_1b86c(!bit 11)) | WRECKED ON THE GROUND (0x900 = wreck + burning) | PROVEN flow / STRONG_INFERENCE (iter 351) |
+| 11 | 0x0800 | crash at the end of update_aircraft_entity (0xf7ea / 0xf7f0: status = (s & 0x8000) \| 0x900, state handler +0x32 = 0xe772 = update_aircraft_entity) | update_aircraft_entity early exit (0xe80e: rests at ground - 0x16, jitter, engine off); surface 0x20 bad-contact skip (0xf372); update_aircraft_damage_state (0x1070c / 0x10740 / 0x10796; request_instant_replay(!bit 11)) | WRECKED ON THE GROUND (0x900 = wreck + burning) | PROVEN flow / STRONG_INFERENCE (iter 351) |
 | 12 | 0x1000 | water contact 0xe832 / 0xf384; cleared on leaving the ground 0xf0d8 | 0x8066 (ditch outcome), 0xef90, 0x108da | in water | STRONG_INFERENCE |
 | 13 | 0x2000 | set while the gear retracts (+0x679 < 0, 0xf5a0), cleared while it extends (0xf588) | aircraft_tick replay 0xe628 / 0xe6d4 (gear = 0x2d when clear, 0 when set; on a change, re-derives the gear direction from the sign) | GEAR LEVER UP | PROVEN flow / STRONG_INFERENCE (iter 350) |
 | 14 | 0x4000 | aircraft_create 0xe11a, respawn (= 0x4000), key 'M' 0x7af6; cleared by keys '0'..'9' (0x79a6) and the throttle step (0x7df0) | 0x7de4, 0x82b6 (refuel snapshot), 0xeb5c, update_aircraft_entity (with +0x66e == 0 clears engine-running +0x669) | ENGINE SWITCHED OFF (iter 340) | PROVEN flow / STRONG_INFERENCE name |
@@ -937,6 +939,12 @@ Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
 | `DAT_0001b858` (Pacific Conflict) | rudder key input (word: +0x40 Z, -0x40 X, 0) | PROVEN | Iter 348: key handler cases 0x5a / 0x3e and 0x58 / 0x3f. |
 | bullet controller +0x36 (Pacific Conflict) | fired by the player (word: 1 / 0) | PROVEN | Iter 352: set only when the shooter is DAT_0001b738; tick_bullet calls tally_destroyed_entity only when it is non-zero; apply_random_aircraft_damage copies it to +0x684 bit 15. |
 
+## Aircraft smoke-trail count — iteration 364
+
+| Symbol | Meaning | Confidence | Evidence |
+|---|---|---|---|
+| aircraft controller +0x68c | active smoke trails (word): ++ in attach_smoke_trail, -- in destroy_trail_controller for a kind-0 trail still linked (+0x56); with damage bit 6 the engine runs only while it is non-zero | PROVEN | addq.w 0x16b84, subq.w 0x16df4, tst.w 0xe952 (the only three references) |
+
 ## Gun turret (definition key 0x1b) — iteration 357
 
 | Symbol | Meaning | Confidence | Evidence |
@@ -950,6 +958,8 @@ Notice +0x16: key 1 aircraft_notice_object, key 4 enemy_fighter_notice_object
 ## Call-argument corrections
 
 Ghidra calls that lost their stack arguments; the bytes give the real list.
+Under the 2026-10-18 policy, a function whose body matches the bytes is VERIFIED once
+its dropped arguments are listed here.
 
 | Caller | Callee | Real arguments | Evidence |
 |---|---|---|---|

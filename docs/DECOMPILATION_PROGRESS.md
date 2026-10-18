@@ -5,12 +5,15 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 361 (2026-10-18)
-**Next target:** decide with the user whether functions whose bodies match the
-bytes but whose Ghidra calls lost their stack arguments (approx_dist3_xyz,
-segment_point_min_distance, bullet_hits_*, flak_notice_object) may be marked
-VERIFIED once the argument lists are documented; meanwhile continue with
-`apply_random_aircraft_damage` (FUN_00016724) byte verification.
+**Last iteration:** 374 (2026-10-18)
+**Next target:** host word `+0x98` (replay / end-sequence state: 1 set by
+begin_replay_view, 2 on a live crash, 0 reset): find its writers and readers on both
+the overlay and host side and name it with evidence.
+
+**Verification policy (user decision, 2026-10-18):** a function may be marked
+VERIFIED when its body matches an independent disassembly of the bytes and any
+call arguments Ghidra dropped are documented as a call-argument correction in
+[`DECOMPILATION_SYMBOLS.md`](DECOMPILATION_SYMBOLS.md).
 
 ## Current coverage
 

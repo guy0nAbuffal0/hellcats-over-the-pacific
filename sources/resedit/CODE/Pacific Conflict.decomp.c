@@ -5878,8 +5878,9 @@ int approx_dist3_from_abs(void) /* Original: FUN_00003c48 */
  * long z2). Each FUN_00002de8() call is abs_int(x2 - x1) / (y2 - y1) / (z2 - z1): the
  * code loads lea.l $2de8.l, a runtime address = file 0x2e08 = abs_int. Result =
  * max + ((other two) >> 2) with asr.l (floor; the inputs are non-negative unless
- * abs_int(0x80000000) overflows). Not marked VERIFIED because the C lost every
- * argument.
+ * abs_int(0x80000000) overflows).
+ * VERIFIED (iteration 365, user policy): the body matches the bytes and the call
+ * arguments Ghidra dropped are documented above as a call-argument correction.
  */
 int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 {
@@ -5911,7 +5912,9 @@ int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
  * Disassembled at 0x3cca (Ghidra lost the stack arguments and shows a void signature). Stack arguments: start point x / y / z longs at 8(a6) / 0xc(a6) / 0x10(a6), segment deltas as words at 0x16 / 0x1a / 0x1e (sign-extended by adda.w), target point x / y / z at 0x20 / 0x24 / 0x28. Computes the distance (approx_dist3_xyz, 0x3c68) from the target to both segment ends, then five times (dbra d5 from 4) takes the midpoint, measures it and replaces the farther end - a bisection that returns the approximate minimum distance between the segment and the point (word in D0). Used by bullet_hits_aircraft / bullet_hits_shape with the path the bullet covered this frame, so fast bullets cannot skip over their target.
  *
  * Iteration 355 re-check against the bytes 0x3cca..0x3da6 [PROVEN]; the Ghidra C models
- * the control flow, but its calls lost every argument, so it is not marked VERIFIED.
+ * the control flow, but its calls lost every argument (documented below).
+ * VERIFIED (iteration 365, user policy): the body matches the bytes and the call
+ * arguments Ghidra dropped are documented above as a call-argument correction.
  * Real signature: int segment_point_min_distance(long x0, long y0, long z0, long dx,
  * long dy, long dz, long px, long py, long pz) - 9 longs (see bullet_hits_aircraft).
  * Width facts a port must keep:
@@ -9221,7 +9224,7 @@ LAB_0000744c:
       DAT_0001d830 = *(int *)(*DAT_0001b738 + 0x20) + (int)local_6;
     }
     if ((DAT_0001b86c == 0) && (DAT_0001b86e == 0)) {
-      set_state_word_1b86c((uint)(*(char *)((int)DAT_0001b738 + 0x63e) == '\0'));
+      request_instant_replay((uint)(*(char *)((int)DAT_0001b738 + 0x63e) == '\0'));
     }
   }
   if ((DAT_0001b86c != 0) && (DAT_0001b86e == 0)) {
@@ -9990,11 +9993,20 @@ uint process_flight_input_tail /* Original: FUN_0000823e */ (void)
 
 
 
-/* Original: FUN_00008784; source: Pacific Conflict.c. Recovered name: set_state_word_1b86c [HYPOTHESIS name] (iteration 248).
+/* Original: FUN_00008784; source: Pacific Conflict.c. Recovered name: request_instant_replay [STRONG_INFERENCE, iteration 374; was set_state_word_1b86c, iteration 248].
  * Ghidra C reviewed (function at overlay offset 0x8784).
  * DAT_0001b86c = 2 when the argument is 0, else 1. Called by process_flight_input_and_outcome with (player +0x63e == 0). Meaning of DAT_0001b86c [UNKNOWN]. Complete Ghidra C.
+ * RENAME (iteration 374): set_state_word_1b86c -> request_instant_replay [STRONG_INFERENCE].
+ * DAT_0001b86c = pending instant-replay request (word): 0 none, 1 airborne (callers pass
+ * "player +0x63e == 0" from process_flight_input_and_outcome, or "not a ground wreck,
+ * bit 11 clear" from update_aircraft_damage_state on a crash), 2 on the ground.
+ * process_flight_input_and_outcome calls begin_replay_view once it is non-zero and the
+ * countdown DAT_0001b86e is 0; begin_replay_view uses it for the camera side (1 -> z
+ * -0x513, 2 -> +0x513) and clears it; respawn_player_at_anchor clears it too.
+ * VERIFIED (iteration 374): bytes 0x8784..0x879c = tst.l 4(a7); 1 when non-zero, else 2
+ * (move.w to $1b86c) - identical to the C.
  */
-void set_state_word_1b86c /* Original: FUN_00008784 */ (int param_1)
+void request_instant_replay /* Original: FUN_00008784 */ (int param_1)
 
 {
   if (param_1 == 0) {
@@ -10350,10 +10362,10 @@ int update_tracking_camera /* Original: FUN_00008c30 */ (void)
     DAT_0001d830 = DAT_0001d814 + DAT_0001d830;
   }
 LAB_00008f6c:
-  DAT_0001b86e = DAT_0001b86e + -1;
+  DAT_0001b86e = DAT_0001b86e + -1; /* replay / end-sequence countdown (iter 372; 0x69 from begin_replay_view, 0x1e for a crash end hold) */
   if ((DAT_0001b86e < 0x1f) && (DAT_0001b870 = 3, DAT_0001b86e == 0)) {
     if (*(short *)(DAT_0001b5a0 + 0x98) != 2) {
-      if ((*(byte *)(DAT_0001b738 + 0x1a1) & 4) == 0) {
+      if ((*(byte *)(DAT_0001b738 + 0x1a1) & 4) == 0) { /* byte +0x684 & 4 = word bit 10 (0x400, crashed); iter 371 */
         local_24 = -1;
       }
       else if (DAT_0001b87c == 0) {
@@ -10376,6 +10388,17 @@ LAB_00008f6c:
 /* Original: FUN_00008ff4; source: Pacific Conflict.c. Recovered name: begin_replay_view [STRONG INFERENCE] (iteration 302).
  * Ghidra C reviewed (function at overlay offset 0x8ff4).
  * Enters mission state 8 (DAT_0001d858; collisions and sounds are suppressed in it): places the camera 1000 units behind the player pose recorded in the aircraft replay ring (+0x36, index +0x612) and sets a camera move over 75 frames (DAT_0001d81c / 818 / 814) towards a point beside an older recorded pose (+-0x513 sideways by DAT_0001b86c, -0x2ee), kept above the ground; resets the camera angles (0xc001) and clears the player-hidden flag (FUN_000137da). [STRONG INFERENCE: the external replay / fly-by view] Ghidra C.
+ *
+ * VERIFIED (iteration 373): independent capstone disassembly of 0x8ff4..0x923c is
+ * identical to the C; every call carries its arguments (drop_contact_records_for_object
+ * (object), update_view_clip_bounds(), build_attitude_matrix_3ang(0, heading, 0, matrix),
+ * transform_vecs12_by_matrix3(1, v, v, matrix), stop_all_sound_channels()). Facts
+ * [PROVEN]: start camera = recorded pose at ring index +0x612 plus (0, 0, -1000) turned
+ * by its heading; target = the previous pose (index - 1, wrapping to 0x4a) plus
+ * (-0x2ee, 0x183, +-0x513; sign by DAT_0001b86c == 1), y raised to at least ground
+ * +0x2e + 0x280; glide steps DAT_0001d81c / 18 / 14 = (target - start) / 0x4b (divs.l);
+ * +0x688 (damage-ladder freeze) cleared; countdown DAT_0001b86e = 0x4b + 0x1e = 0x69
+ * (computed from d3); DAT_0001b870 = 1; host +0x98 = 1.
  */
 void begin_replay_view /* Original: FUN_00008ff4 */ (void)
 
@@ -16133,7 +16156,7 @@ void scale_template_field_38(short param_1,int *param_2) /* Original: FUN_0000e5
 
 /* Original: FUN_0000e5aa; source: Pacific Conflict.c. Recovered name: aircraft_tick [STRONG INFERENCE] (iteration 282).
  * Ghidra C reviewed (function at overlay offset 0xe5aa).
- * Definition +2. Keeps a 75-entry ring (+0x36, 0x14 bytes, index +0x612) of position / attitude / damage word. Live (DAT_0001b870 == 0): runs the state handler at +0x32 (skipped, velocity zeroed, when crashed: damage bit 2 set this and last frame), then update_aircraft_damage_state, and records the pose. During a replay (from the object appear frame +0x40): on the rewind frame restores the recorded position and flags (gear byte +0x679 from flag 0x20, damage stage reset), otherwise sets the velocity to reach the recorded position and copies attitude and flags, then runs update_aircraft_damage_state; gear position follows the player. [STRONG INFERENCE: the 75-frame ring is the instant-replay history, cf. the 0x4a-frame rewind] Aircraft definition (key 1, file 0x1a7b0; iteration 281): +2 aircraft_tick, +6 aircraft_create, +0xa aircraft_destroy, +0xe FUN_0000fb2a, +0x12 aircraft_collision, +0x16 aircraft_notice_object [PROVEN bytes]. Ghidra C.
+ * Definition +2. Keeps a 75-entry ring (+0x36, 0x14 bytes, index +0x612) of position / attitude / damage word. Live (DAT_0001b870 == 0): runs the state handler at +0x32 (skipped, velocity zeroed, when crashed: word bit 10 = 0x400 set this and last frame - Ghidra's byte tests btst #2,$684 / #2,$686 at 0xe722 / 0xe72a; iteration 370 correction of "damage bit 2"), then update_aircraft_damage_state, and records the pose. During a replay (from the object appear frame +0x40): on the rewind frame restores the recorded position and flags (gear byte +0x679 from word bit 13 = 0x2000 gear lever up - btst #5,$684 at 0xe628 / 0xe6d4; iteration 370 correction of "flag 0x20" - damage stage reset), otherwise sets the velocity to reach the recorded position and copies attitude and flags, then runs update_aircraft_damage_state; gear position follows the player. [STRONG INFERENCE: the 75-frame ring is the instant-replay history, cf. the 0x4a-frame rewind] Aircraft definition (key 1, file 0x1a7b0; iteration 281): +2 aircraft_tick, +6 aircraft_create, +0xa aircraft_destroy, +0xe FUN_0000fb2a, +0x12 aircraft_collision, +0x16 aircraft_notice_object [PROVEN bytes]. Ghidra C.
  */
 void aircraft_tick /* Original: FUN_0000e5aa */ (int *param_1)
 
@@ -16331,6 +16354,8 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
            *(short *)(param_1 + 0x18d) + (short)*(char *)((int)param_1 + 0x67d);
   /*
    * Contact early-out [PROVEN]: status bit 3 at entity+0x684 (Ghidra: +0x1a1).
+   *   Iteration 369 correction: that is byte +0x684 bit 3 (btst #3,$684 at 0xe80e) =
+   *   WORD bit 11 (0x800, wrecked on the ground, iteration 351), not word bit 3.
    * Compare pos_2e to surface *(world+0x1c)-0x16; set position_velocity_c;
    * optional player DAT_0001b850; jitter 0x61a/0x61e via overlay_rng_next
    * (Ghidra FUN_00011544 callsite); clear
@@ -16419,7 +16444,11 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    * decrement 67d/67e via overlay_rng_next. [NOTES.md 14137–14163]
    * Iteration 342: sVar21 = throttle (+0x668). The engine runs (+0x669 = 1) only with
    * fuel (+0x67d / +0x67e), no damage bits 8 / 9 (word +0x684 & 0x300) and, if damage
-   * bit 6 (0x40) is set, word +0x68c != 0; bit 7 (0x80) halves the throttle. The word
+   * bit 6 (0x40) is set, word +0x68c != 0; bit 7 (0x80) halves the throttle.
+   * Iteration 364: +0x68c = number of active smoke trails attached to this aircraft
+   * (++ attach_smoke_trail 0x16b84, -- destroy_trail_controller 0x16df4, tested
+   * here at 0xe952 - its only 3 byte references) [PROVEN], so at damage stage 0x40
+   * the engine runs only while its smoke trail exists. The word
    * at Ghidra param_1 + 0x1a0 (byte +0x680, cleared by load_player_fuel_and_bombs)
    * is the FUEL-BURN accumulator: it integrates the throttle and, past template
    * +0x1e, burns one fuel unit [STRONG_INFERENCE].
@@ -16488,6 +16517,8 @@ short * update_aircraft_entity(int *param_1) /* Original: FUN_0000e792 */
    *   Bytes 0xea54..0xea9c: moveq #$11 / asl.l, divs.l #$1c20, addi.l #$a25 / asr #5,
    *   divs.w into 0x5e50, muls.w #$666, muls.l, asr #5 [PROVEN].
    * [PROVEN] Clear movement_669 when (status&0x40) && 0x66e==0.
+   *   Iteration 369 correction: byte +0x684 & 0x40 (btst #6,$684 at 0xeb5c) = WORD
+   *   bit 14 (0x4000, engine switched off, iteration 340).
    */
   if ((param_1 == DAT_0001b738) || (param_1 == DAT_0001b888)) {
     local_42 = (iVar20 << 0x11) / 0x1c20;
@@ -18038,6 +18069,20 @@ void enqueue_control_inputs_avg4(int param_1,short param_2,short param_3,short p
 /* Original: FUN_00010650; source: Pacific Conflict.c. Recovered name: update_aircraft_damage_state [STRONG INFERENCE] (iteration 266).
  * Ghidra C reviewed (function at overlay offset 0x10650).
  * Called twice from update_aircraft_entity. Arg: aircraft controller. Steps the damage word +0x684 (set by apply_random_aircraft_damage; previous value kept in +0x686, timer word +0x688): the 2-bit stage in bits 6..9 (0x40 / 0x80 / 0x100 / 0x200..) advances at random, spawning effects at the aircraft position the first time a stage is reached (FUN_00016b4c at 0x40, FUN_00011670 at 0x100) [STRONG INFERENCE: smoke, then fire]; bit 4 (0x10) newly set spawns FUN_00017102 at ground height +0x2e; bit 0 on a non-player aircraft may set +0x677 at random (not in mission 2 Flight School). For the player, bit 0 newly set sets _DAT_0001b874 = 1 and, unless DAT_0001b87c, the host word +0xd4 (A5-0x12b4, the pilot status written by conclude_mission) = 1 = Dead, and the sound event _DAT_0001b844 (sound 1 "Ugh") [STRONG INFERENCE: bit 0 = pilot killed]. Earlier gun check: the Gun sound needs flags_685 bit 4 clear (process_flight_input_and_outcome). Ghidra C.
+ *
+ * Iteration 363, damage ladder (word +0x684 bits 6..9, mask 0x3c0, one at a time)
+ * [PROVEN, bytes 0x1065c..0x1076c; transitions per call = per frame, aircraft_tick calls
+ * this every live frame; "prev" = last frame's copy +0x686]:
+ *   +0x688 != 0: decremented, and the ladder bits are masked out of the working copy
+ *     (andi #$fc3f), so nothing advances: a FREEZE timer (cleared by a new heavy hit in
+ *     apply_random_aircraft_damage; set to 0x16 for a burning wreck);
+ *   0x40 (heavy hit): first frame attach_smoke_trail; afterwards 1/2 per frame it moves
+ *     on, half to 0x200 and half to 0x80;
+ *   0x80 (engine damaged, half throttle): 1/4 per frame -> 0x200;
+ *   0x200 (engine out): stays until the next heavy hit promotes it to 0x100;
+ *   0x100 (on fire): first frame attach_trailing_plume; afterwards 1/2 per frame (always
+ *     when wrecked, bit 11) -> 0x400 (destroyed).
+ * Names STRONG_INFERENCE (smoke trail / plume / engine effects, iterations 341-351).
  */
 int * update_aircraft_damage_state /* Original: FUN_00010650 */ (int *param_1)
 
@@ -18128,7 +18173,7 @@ LAB_00010700:
     if (uVar8 == 0) {
       if (((*(byte *)(param_1 + 0x1a1) & 4) != 0) && ((*(byte *)((int)param_1 + 0x686) & 4) == 0)) {
         if (param_1 == DAT_0001b738) {
-          set_state_word_1b86c((uint)((*(byte *)(param_1 + 0x1a1) & 8) == 0));
+          request_instant_replay((uint)((*(byte *)(param_1 + 0x1a1) & 8) == 0));
           if (DAT_0001b870 == 0) {
             *(undefined2 *)(DAT_0001b5a0 + 0x98) = 2;
           }
@@ -18645,6 +18690,9 @@ undefined4 ai_script_try_fire_burst(int *param_1) /* Original: FUN_00010e28 */
  * Runs ensure_ai_script_1b310_tick, then advances +0x616 script:
  *   state 1 → 2 when FUN_00003c68 metric <50000, alt>20000, +0x684 bit0
  *             clear; sets fire timegate [0x1ab]=time+0x4b; may flag
+ *             (iteration 371 correction: "bit0" is Ghidra's byte test = WORD bit 8,
+ *             0x100 on fire - btst at 0x10f26 - so a burning aircraft never starts
+ *             the attack run)
  *             DAT_0001b5a0+0xce = −1.
  *   state 2 → 3 when ai_script_try_fire_burst returns nonzero.
  *
@@ -19190,6 +19238,13 @@ undefined4 register_smoke_template /* Original: FUN_000115da */ (undefined4 para
 /* Original: FUN_000115fc; source: Pacific Conflict.c. Recovered name: spawn_smoke_plume [HYPOTHESIS] (iteration 270).
  * Ghidra C reviewed (function at overlay offset 0x115fc).
  * Args: size a, size b, duration, word, unused, x, y, z. Spawns the template DAT_000260e8 (registered by register_smoke_template) at (x, y, z) and sets controller +0x36 = a and +0x34 = b (both << object shift), +0x32 = word, +0x38 = end frame DAT_0001b838 + duration. Used by the kind-2 / kind-3 effect animators after explosions (duration 0x2a3) and by attach_trailing_plume (a = 0x48) on damaged aircraft - a long-lived plume [HYPOTHESIS: smoke]. Returns the controller. Complete Ghidra C.
+ *
+ * VERIFIED (iteration 367): independent capstone disassembly of 0x115fc..0x1166e is
+ * identical to the C. Arguments at $8 / $c / $10 (longs), param_4 = the low word at $16,
+ * param_5 at $18 unused, x / y / z at $1c / $20 / $24; spawn_mission_pool_object(
+ * DAT_000260e8, x, y, z, 0, 0, 0, 0); both sizes are shifted by the OBJECT's shift word
+ * +0x34 (asl.l, register count mod 64) and stored as words; +0x38 = DAT_0001b838 +
+ * duration; returns the controller (or 0).
  */
 int spawn_smoke_plume /* Original: FUN_000115fc */ (int param_1,int param_2,int param_3,undefined2 param_4,undefined4 param_5,
                 uint param_6,uint param_7,uint param_8)
@@ -19217,6 +19272,14 @@ int spawn_smoke_plume /* Original: FUN_000115fc */ (int param_1,int param_2,int 
 /* Original: FUN_00011670; source: Pacific Conflict.c. Recovered name: attach_trailing_plume [STRONG INFERENCE] (iteration 270).
  * Ghidra C reviewed (function at overlay offset 0x11670).
  * Called by update_aircraft_damage_state when an aircraft reaches damage stage 0x100. Spawns a plume (spawn_smoke_plume(0x48, ...)) at (x, y, z), fills its eight trail points (+0x40.., 12 bytes each) with the plume position, clears flag 0x100000 and shift +0x34 of the plume object, links it to the aircraft object (+0x3c) and increments that object reference count (+3) [STRONG INFERENCE: smoke / fire trail following the damaged aircraft]. Complete Ghidra C.
+ *
+ * VERIFIED (iteration 366): independent capstone disassembly of 0x11670..0x116e6 is
+ * identical to the C. spawn_smoke_plume(0x48, 0, 0, 0, 0, x, y, z) (pea $48 pushed last
+ * = first argument); 8 trail points at plume controller +0x40 + 12 i (extension words
+ * 0x8a00 = a0.l*2 and 0x8c40 = a0.l*4, i.e. i * 3 * 4) filled with the plume object
+ * position; plume object flag-long bit 20 (proximity collision, iteration 322) cleared
+ * and shift +0x34 = 0; controller +0x3c = the aircraft object, whose reference byte +3
+ * is incremented (dropped again by destroy_plume_controller).
  */
 void attach_trailing_plume /* Original: FUN_00011670 */ (uint param_1,uint param_2,uint param_3,int *param_4)
 
@@ -19268,6 +19331,15 @@ void destroy_plume_controller /* Original: FUN_000116e8 */ (int param_1)
 /* Original: FUN_000116fc; source: Pacific Conflict.c. Recovered name: tick_smoke_plume [STRONG INFERENCE] (iteration 297).
  * Ghidra C reviewed (function at overlay offset 0x116fc).
  * Free plume: does nothing until its end frame (+0x38) arrives. Trailing plume (+0x3c set): while the aircraft exists and still has damage bit 0 (outside a replay rewind) pushes the aircraft position into an 8-entry ring of trail points (+0x40, index +0xa0) and moves the plume object along; otherwise winds down. Ghidra C (partly read). Plume definition key 7 (file 0x1a90c): +2 tick_smoke_plume, +0xa destroy_plume_controller, +0xe plume_pre_render [PROVEN bytes]; created through register_smoke_template -> create_plume_controller.
+ *
+ * VERIFIED (iteration 368): independent capstone disassembly of 0x116fc..0x11794 is
+ * identical to the C. Correction: "damage bit 0" above is Ghidra's byte test
+ * (btst #0,$684 at 0x11718) = WORD bit 8 (0x100, on fire), so a trailing plume follows
+ * the aircraft while it burns and retires when the fire becomes 0x400 (destroyed) or
+ * the aircraft goes away (+7 & 2). Ring index +0xa0 is decremented mod 8 before each
+ * point; +8 / +0xc / +0x10 = aircraft position - plume position; no trailing in replay
+ * mode 1. A free plume retires only on the exact end frame (cmp.l +0x38, DAT_0001b838 /
+ * bne), so it would survive if the frame counter jumped past it.
  */
 void tick_smoke_plume /* Original: FUN_000116fc */ (int *param_1)
 
@@ -23823,8 +23895,9 @@ LAB_00016358:
  *            on its next tick (destruction effect, kill credit for player rounds);
  *   clear -> solid: a bullet target is ignored; a type-0x1b target (gun turret) gets controller +0x46
  *            = 1 one time in 16 = knocked out (iteration 357); the bullet is retired.
- * So flag bit 10 = destructible by gunfire [STRONG_INFERENCE]. Not VERIFIED because the
- * C call lost its arguments.
+ * So flag bit 10 = destructible by gunfire [STRONG_INFERENCE].
+ * VERIFIED (iteration 365, user policy): the body matches the bytes and the call
+ * arguments Ghidra dropped are documented above as a call-argument correction.
  */
 uint bullet_hits_shape /* Original: FUN_0001665a */ (int param_1,int param_2)
 
@@ -23867,6 +23940,15 @@ uint bullet_hits_shape /* Original: FUN_0001665a */ (int param_1,int param_2)
 /* Original: FUN_00016724; source: Pacific Conflict.c. Recovered name: apply_random_aircraft_damage [STRONG INFERENCE] (iteration 263).
  * Ghidra C reviewed (function at overlay offset 0x16724).
  * Args: aircraft controller, flag (bullet controller word +0x36 = fired by the player, iteration 352; a non-zero flag sets +0x684 bit 15). Type 1 sets _DAT_0001b842; types 1 and 3 resist 3 hits in 4. Otherwise rolls a byte and sets one damage bit in the controller word +0x684: < 6 bit 0, < 0x2b bit 1, < 0x38 bit 2, < 0x45 bit 3, < 0x51 bit 4, < 0x5e bit 5; else bit 6 the first time, later bit 9 (0x200; Ghidra tests byte +0x684 & 2) is promoted to bit 8 (0x100) and word +0x688 is cleared [iteration 339 correction: not bit 1]. A non-zero flag sets bit 15. The low byte of this word is flags_685 (+0x685), whose bits gate / jitter the control inputs (enqueue_control_inputs_avg4) [PROVEN link]: hits degrade the flight controls. Also called from decomp ~19833. Ghidra C.
+ *
+ * VERIFIED (iteration 362): independent capstone disassembly of 0x16724..0x167f2 is
+ * identical to the C: type word 1 -> _DAT_0001b842 = 1, types 1 / 3 -> rng & 3 != 0
+ * returns (3 hits in 4 shrugged off); rng & 0xff vs 5 / 0x2a / 0x37 / 0x44 / 0x50 / 0x5d
+ * (cmpi.w / bgt) -> bits 0..5; otherwise bit 6 when +0x684 & 0x3c0 == 0, else bit 9 ->
+ * bit 8 (btst #1,$684 / andi #$fdff / ori #$100) and clr.w +0x688; tst.l of the long
+ * second argument -> ori #$8000. The only callee, overlay_rng_next, has no arguments.
+ * Note [PROVEN]: this function never sets bit 7 (0x80); it comes from elsewhere
+ * (update_aircraft_damage_state).
  */
 uint apply_random_aircraft_damage /* Original: FUN_00016724 */ (int param_1,int param_2)
 
@@ -23941,8 +24023,9 @@ LAB_00016758:
  * range +0x14 (cmp.l / bgt: hit when distance <= range). Everything else matches the
  * C: 1/8 (rng & 7 == 0) -> apply_random_aircraft_damage(b controller, sign-extended
  * bullet word +0x36 = fired by the player) and retire the bullet; otherwise, for the
- * player, 1/2 -> _DAT_0001b842 = 1 (hit sound, slot 2 "Hit"). Not marked VERIFIED
- * because the C call is incomplete.
+ * player, 1/2 -> _DAT_0001b842 = 1 (hit sound, slot 2 "Hit").
+ * VERIFIED (iteration 365, user policy): the body matches the bytes and the call
+ * arguments Ghidra dropped are documented above as a call-argument correction.
  */
 uint bullet_hits_aircraft /* Original: FUN_000167f4 */ (int param_1,int param_2)
 
@@ -26183,7 +26266,8 @@ void destroy_flak_controller /* Original: FUN_00018b98 */ (int param_1)
  *   no target yet -> target +0x36 = b, distance +0x3a = d; otherwise switch only when
  *     2 * d < current distance (more than twice as close); old target's reference
  *     byte +3 is decremented, the new one's incremented.
- * Not marked VERIFIED because the C distance call is incomplete.
+ * VERIFIED (iteration 365, user policy): the body matches the bytes and the call
+ * arguments Ghidra dropped are documented above as a call-argument correction.
  */
 uint flak_notice_object /* Original: FUN_00018bba */ (int param_1,int param_2)
 
