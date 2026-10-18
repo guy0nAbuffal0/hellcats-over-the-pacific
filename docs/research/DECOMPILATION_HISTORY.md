@@ -4628,3 +4628,24 @@ handle only after activation; a shell printing ticks alone does not wake this ag
 - +0x40 is the turret's "initialised" flag, which doubles as the flak shells
   gate.
 - Comment / doc only.
+
+### Iteration 360 — 2026-10-18
+
+- flak_notice_object (FUN_00018bba) logic matches the bytes 0x18bba..0x18c94.
+  - It runs on a 1/64 roll.
+  - Odds = 0x339000 / distance, halved when the gun already has a target.
+  - It switches only to a target more than twice as close.
+- Ghidra dropped approx_dist3_xyz's six arguments (gun pos, target pos);
+  recorded as a call-argument correction.
+- Not VERIFIED because the C call is incomplete. Comment / doc only.
+
+### Iteration 361 — 2026-10-18
+
+- approx_dist3_xyz (FUN_00003c68) logic matches the bytes 0x3c68..0x3cc8.
+- Real signature: 6 longs.
+- Ghidra's FUN_00002de8 call target is PROVEN to be abs_int:
+  - all 17 references are `lea.l $2de8.l`, a runtime address = file 0x2e08;
+  - the abs_int bytes there are 202f0004 6c02 4480 4e75;
+  - 48 other call sites reach 0x2e08 with a direct bsr.
+- Not VERIFIED because the C lost its arguments. A policy question for that
+  pattern is recorded in the checkpoint.

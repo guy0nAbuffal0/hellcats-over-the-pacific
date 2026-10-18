@@ -5,10 +5,12 @@ ledger and former 705-row Markdown tracker are preserved as historical evidence
 in [`research/DECOMPILATION_HISTORY.md`](research/DECOMPILATION_HISTORY.md), but
 must not be loaded wholesale for routine work.
 
-**Last iteration:** 359 (2026-10-18)
-**Next target:** `flak_notice_object` (FUN_00018bba): verify the rest of its target
-choice against the bytes (1/64 roll, 0x339000 / distance odds, halved when it already
-has a target, the "twice as close" switch rule).
+**Last iteration:** 361 (2026-10-18)
+**Next target:** decide with the user whether functions whose bodies match the
+bytes but whose Ghidra calls lost their stack arguments (approx_dist3_xyz,
+segment_point_min_distance, bullet_hits_*, flak_notice_object) may be marked
+VERIFIED once the argument lists are documented; meanwhile continue with
+`apply_random_aircraft_damage` (FUN_00016724) byte verification.
 
 ## Current coverage
 

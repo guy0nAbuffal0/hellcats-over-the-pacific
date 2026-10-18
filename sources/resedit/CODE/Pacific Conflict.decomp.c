@@ -5872,6 +5872,14 @@ int approx_dist3_from_abs(void) /* Original: FUN_00003c48 */
  * Stack: (x1,y1,z1, x2,y2,z2). Abs each Δ via LEA+$2DE8→abs_int, then
  * max(|Δ|) + ((sum of other two)>>2). Fast 3D distance approx (not Euclidean).
  * Capstone @0x3C68–0x3CC8; Ghidra often omits the six args.
+ *
+ * Iteration 361 re-check [PROVEN, bytes 0x3c68..0x3cc8; logic identical to the C]:
+ * real signature int approx_dist3_xyz(long x1, long y1, long z1, long x2, long y2,
+ * long z2). Each FUN_00002de8() call is abs_int(x2 - x1) / (y2 - y1) / (z2 - z1): the
+ * code loads lea.l $2de8.l, a runtime address = file 0x2e08 = abs_int. Result =
+ * max + ((other two) >> 2) with asr.l (floor; the inputs are non-negative unless
+ * abs_int(0x80000000) overflows). Not marked VERIFIED because the C lost every
+ * argument.
  */
 int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 {
@@ -26165,6 +26173,17 @@ void destroy_flak_controller /* Original: FUN_00018b98 */ (int param_1)
  * its "initialised" flag (1 after the first tick), so a turret never runs out of shells.
  * Consequence [PROVEN flow]: a turret whose first tick finds no base in range gets side 0
  * and never acquires a target.
+ *
+ * Iteration 360 [PROVEN, bytes 0x18bba..0x18c94; logic identical to the C]:
+ *   gate: side / type test as above and word +0x40 != 0, then rng & 0x3f == 0 (1/64);
+ *   CALL-ARGUMENT CORRECTION: approx_dist3_xyz(gun x, y, z, target x, y, z) - six
+ *     longs from +0x18 / +0x1c / +0x20 of a then b; Ghidra shows no arguments;
+ *   odds = 0x339000 / d (divs.l, signed; 0x7fffffff when d == 0), halved (asr.l) when
+ *     the gun already has a target; accepted when (rng & 0x7f, zero-extended) < odds;
+ *   no target yet -> target +0x36 = b, distance +0x3a = d; otherwise switch only when
+ *     2 * d < current distance (more than twice as close); old target's reference
+ *     byte +3 is decremented, the new one's incremented.
+ * Not marked VERIFIED because the C distance call is incomplete.
  */
 uint flak_notice_object /* Original: FUN_00018bba */ (int param_1,int param_2)
 
