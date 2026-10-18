@@ -850,10 +850,10 @@ test `btst #n,$684` means word bit n + 8. Word +0x686 is last frame's copy
 
 | Symbols | Ghidra signature | Corrected | Confidence | Evidence | Downstream |
 |---|---|---|---|---|---|
-| create_*_controller (16 functions, see DECOMPILATION_PROGRESS ) | `void f(...)` | returns the new controller (`uint *`) in D0 | PROVEN | D0 = heap_alloc_cleared result untouched to RTS; instantiate_object_from_desc stores it at object +8 | Godot `sim_core.gd` `_call_fun_00004690` / create handlers: review |
-| point_over_face_xz (FUN_000132c8) | `void` | returns int (point_in_polygon_xz result) | PROVEN | D0 untouched after the last bsr; call sites 0x15236 / 0x1527a test D0 | none found in godot/ |
-| surface_type_under_object (FUN_00013452) | `void` | returns the surface code | PROVEN | bsr surface_type_at_point then RTS; callers use D0 at 0xf148 / 0xf1d0 / 0x11e04 | godot sim_core.gd / flight_math.gd reference FUN_00013452: review |
-| begin_offscreen_drawing (FUN_0000c11e) | `void` | returns the host +0x286 result (previous port?) | PROVEN (return) / STRONG_INFERENCE (meaning) | caller keeps D0 in a3 at 0xc242 | none found in godot/ |
+| create_*_controller (16 functions, see DECOMPILATION_PROGRESS ) | `void f(...)` | returns the new controller (`uint *`) in D0 (applied in the semantic C for spinner / plume / camera_facing / basic_ship / firing_ship / sinking / bullet / trail) | PROVEN | D0 = heap_alloc_cleared result untouched to RTS; instantiate_object_from_desc stores it at object +8 | Godot `sim_core.gd` `_call_fun_00004690` / create handlers: review |
+| point_over_face_xz (FUN_000132c8) | `void` | returns int (point_in_polygon_xz result; applied in the semantic C) | PROVEN | D0 untouched after the last bsr; call sites 0x15236 / 0x1527a test D0 | none found in godot/ |
+| surface_type_under_object (FUN_00013452) | `void` | returns the surface code (applied in the semantic C: `int`, returns the call) | PROVEN | bsr surface_type_at_point then RTS; callers use D0 at 0xf148 / 0xf1d0 / 0x11e04 | godot sim_core.gd / flight_math.gd reference FUN_00013452: review |
+| begin_offscreen_drawing (FUN_0000c11e) | `void` | returns the host +0x286 result (previous port?; applied in the semantic C as `undefined4`) | PROVEN (return) / STRONG_INFERENCE (meaning) | caller keeps D0 in a3 at 0xc242 | none found in godot/ |
 
 ## Object flag long (+4)
 
@@ -1024,3 +1024,7 @@ its dropped arguments are listed here.
 | `DAT_0001b876` / `DAT_0001b878` (Pacific Conflict) | AI aim lag in frames (definition key 1 / other aircraft), set from the rank table | PROVEN (use) | ai_pursue_target extrapolates the target's replay ring by lag + 4 frames |
 | `ai_pursue_target` (FUN_0001820a) | `abs_int` ×4 (Ghidra FUN_00002de8) | abs_int(heading_err) (0x18324); abs_int(fold(target heading - own)) (0x18350); abs_int(pitch_err - (+0x626 - def +0x44)) (0x1852c); abs_int(heading_err) (0x1853c) | gun-fire decision ±0x7f |
 | `ai_pursue_target` (FUN_0001820a) | `approx_dist3_xyz` (FUN_00003c68) | 6 longs: target pos (*param_1 +0x18 / +0x1c / +0x20), manoeuvre waypoint (+0x69c / +0x6a0 / +0x6a4) | bytes 0x185f6..0x1860e |
+| `build_land_outline_at_detail` (FUN_00004958) | `approx_dist3_xyz` (FUN_00003c68), 2 calls | (last emitted x, 0, last emitted z, x, 0, z), then (DAT_0001d838, 0, DAT_0001d830, x, 0, z) | bytes 0x4aae..0x4ada |
+| `update_altitude_detail_bands` (FUN_00005a14) | `compute_camera_abs_metric` (FUN_00003c00), 2 calls | (DAT_0001d724, DAT_0001d720, DAT_0001d71c), then (DAT_0001d718, DAT_0001d714, DAT_0001d710) | bytes 0x5af8..0x5b54 |
+| `update_ground_scatter_objects` (FUN_00005e28) | `abs_int` (FUN_00002de8 label = runtime 0x2de8 = file 0x2e08), 2 calls | slot x - DAT_0001d838, then slot z - DAT_0001d830 | bytes 0x5ef6..0x5f28 |
+| `surface_type_at_point` (FUN_00013346) | `compute_camera_abs_metric` (FUN_00003c00), `approx_dist3_xyz` (FUN_00003c68) | (param_1, param_2, param_3); then (param_1, param_2, param_3, obj +0x18, +0x1c, +0x20) | bytes 0x1336e..0x133c2 |
