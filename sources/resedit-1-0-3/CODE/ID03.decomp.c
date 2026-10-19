@@ -2149,32 +2149,131 @@ void draw_panel_section_with_numbered_boxes /* Original: FUN_00004304 */ (void)
 
 
 
+/* VERIFIED (ID03::FUN_00004790): ID03.bin 0x4790..0x4b30 checked against an independent capstone disassembly.
+ * LINK -$2a; nw = nscale * 3 * 6, lw = nw + $aa; PenSize; box via JT $3ca / $382 / BSR 0x8a; PaintRect black; FrameRect level 3 / 2;
+ * x -= 20; bar rect, FrameRect; tx0 / tx1 / ty / barh; i 0..9 ticks (MULS barh * i, DIVS #9); BSR 0x2a8(3w'+4, 3h'+4);
+ * SetPort; SetOrigin(-2,-2); nscale and pen x3; PenSize(2pen/30); BSR 0x912(100) / (0); SetPort(A5-0x1496); BSR 0xa3c;
+ * BSR 0x33c; InsetRect(bar, 1, 1) -> A5-0x1186; RTS - identical to the C. */
 /* Original: FUN_00004790; source: ID03.c. Recovered name: draw_percent_scale_gauge [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x4790.
- * Caller: the panel redraw path of prepare_instrument_panel (0x681e) with design arguments (0x14a, 0x258, 7, scale_design_480_min10(10), 0x794, 0x898). Converts its box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800), PaintRect in colour level 0 and FrameRect ($A8A1) in level 3 (depth 1) or 2; draws ten tick marks (loop i = 0..9, MoveTo / LineTo, y step = height / 9); then into a 3x black-and-white port (new_offscreen_bw_port 0x2a8, SetOrigin(-2, -2)) draws the vector-font numbers 100 and 0 at the top and bottom of the scale (draw_vector_number 0x912), composites it with antialias_downsample_bw_3x (0xa3c) into the panel port A5-0x1496 and disposes the port (0x33c); stores its geometry in the record at A5-0x1186 [PROVEN calls and constants]. A vertical 0-100 percentage scale; which control it shows (throttle?) is open [HYPOTHESIS].
+ * Caller: the panel redraw path of prepare_instrument_panel (0x681e) with design arguments (0x14a, 0x258, 7, scale_design_480_min10(10), 0x794, 0x898). Args: w, h, numeral scale, pen, y, x (design units). Body rebuilt as C below [PROVEN, bytes 0x4790..0x4b30]: box (x - w/2, y - h/2) of scale(w) x scale(h), PaintRect black and FrameRect ($A8A1) in level 3 (depth 1) or 2; x -= 20; a 60-unit bar (left = x + lw/2 - 60 with label width lw = 18 * nscale + 170, from y - h/2 + 30 to y + h/2 - 30) framed; ten ticks from x + lw/2 - 140 (i = 0 and 9) or 30 units further in, to x + lw/2 - 90, at bar height * i / 9 above the bottom; then a 3x port (new_offscreen_bw_port 0x2a8, SetOrigin(-2, -2)), numeral scale * (3 * A5-0x149e / 480), pen * 3, the numbers 100 (y 210) and 0 (y 3h - 210) at x = 3w/2 - 3lw/2 + 270 (draw_vector_number 0x912), SetPort(panel A5-0x1496), antialias_downsample_bw_3x (0xa3c) onto the box, dispose (0x33c); the bar inset by 1 is stored at A5-0x1186. A vertical 0-100 percentage scale; which control it shows (throttle?) is open [HYPOTHESIS].
  */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_percent_scale_gauge /* Original: FUN_00004790 */ (void)
+void draw_percent_scale_gauge /* Original: FUN_00004790 */
+               (short w,short h,short nscale,short pen,short y,short x)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short barh;                                   /* -$28(A6) */
+  short v;                                      /* -$26(A6) */
+  short sx;                                     /* -$24(A6) */
+  short tx1;                                    /* -$20(A6) */
+  short ty;                                     /* -$1e(A6) */
+  short tx0;                                    /* -$1c(A6) */
+  int port;                                     /* -$1a(A6) */
+  short lw;                                     /* -$16(A6): label width */
+  short nw;                                     /* -$14(A6) */
+  short bar[4];                                 /* -$12(A6): top, left, bottom, right */
+  short box[4];                                 /* -$a(A6) */
+  short i;                                      /* -2(A6) */
+  short a;
+
+  nw = nscale * 3 * 6;
+  lw = nw + 0xaa;
+  PenSize((short)((int)pen / 10),(short)((int)pen / 10)); /* $A89B */
+  box[1] = (short)design_x_to_screen(x - (short)((int)w / 2)); /* JT $3ca */
+  box[0] = (short)design_y_to_screen(y - (short)((int)h / 2)); /* JT $382 */
+  box[3] = (short)scale_design_4800(w) + box[1]; /* BSR 0x8a */
+  box[2] = (short)scale_design_4800(h) + box[0];
+  set_draw_color_index((short)lookup_palette_index_for_rgb_level(0,0,0)); /* JT $45a, JT $36a */
+  PaintRect(box);                               /* $A8A2 */
+  if (*(short *)(unaff_A5 + -0x137a) == 1) {
+    set_draw_color_index((short)lookup_palette_index_for_rgb_level(3,3,3));
+  }
+  else {
+    set_draw_color_index((short)lookup_palette_index_for_rgb_level(2,2,2));
+  }
+  FrameRect(box);                               /* $A8A1 */
+  x = x + -0x14;
+  bar[1] = (short)design_x_to_screen(((short)((int)lw / 2) + x) + -0x3c);
+  bar[3] = (short)scale_design_4800(0x3c) + bar[1]; /* a 60-unit wide bar */
+  bar[0] = (short)design_y_to_screen((y - (short)((int)h / 2)) + 0x1e);
+  bar[2] = (short)design_y_to_screen(((short)((int)h / 2) + y) + -0x1e);
+  FrameRect(bar);
+  tx0 = ((short)((int)lw / 2) + x) + -0x8c;
+  tx1 = tx0 + 0x32;
+  ty = ((short)((int)h / 2) + y) + -0x1e;
+  barh = (bar[2] - bar[0]) + -1;
+  PenSize((short)((int)pen / 10),(short)((int)pen / 10));
+  for (i = 0; i < 10; i = i + 1) {              /* ten ticks left of the bar, long at 0 and 9 */
+    if ((i == 0) || (i == 9)) {
+      sx = tx0;
+    }
+    else {
+      sx = tx0 + 0x1e;
+    }
+    v = (short)design_y_to_screen(ty) - (short)((int)(short)(barh * i) / 9);
+    a = (short)design_x_to_screen(sx);
+    MoveTo(a,v + -1);                           /* $A893 */
+    a = (short)design_x_to_screen(tx1);
+    LineTo(a,v + -1);                           /* $A891 */
+  }
+  a = (short)scale_design_4800(w) * 3;
+  port = new_offscreen_bw_port(a + 4,(short)scale_design_4800(h) * 3 + 4); /* BSR 0x2a8 */
+  SetPort(port);                                /* $A873 */
+  SetOrigin(-2,-2);                             /* $A878 */
+  nscale = (short)((int)((unsigned int)3 * *(unsigned int *)(unaff_A5 + -0x149e)) / 0x1e0) * nscale;
+  pen = pen * 3;
+  PenSize((short)((int)(short)(pen * 2) / 0x1e),(short)((int)(short)(pen * 2) / 0x1e));
+  draw_vector_number(100,nscale,
+                     ((short)((int)(short)(w * 3) / 2) - (short)((int)(short)(lw * 3) / 2)) + 0x10e,0xd2); /* BSR 0x912: top */
+  draw_vector_number(0,nscale,
+                     ((short)((int)(short)(w * 3) / 2) - (short)((int)(short)(lw * 3) / 2)) + 0x10e,
+                     h * 3 + -0xd2);                /* bottom */
+  SetPort(*(int *)(unaff_A5 + -0x1496));        /* panel port */
+  antialias_downsample_bw_3x(port,box[1],box[0],box[2] - box[0],box[3] - box[1],(char *)0x0); /* BSR 0xa3c */
+  dispose_offscreen_bw_port(port);              /* BSR 0x33c */
+  InsetRect(bar,1,1);                           /* $A8A9 */
+  *(int *)(unaff_A5 + -0x1186) = *(int *)bar;   /* bar interior for the live level */
+  *(int *)(unaff_A5 + -0x1182) = *(int *)(bar + 2);
+  return;
 }
 
 
 
+/* VERIFIED (ID03::FUN_00004b32): ID03.bin 0x4b32..0x4c40 checked against an independent capstone disassembly.
+ * LINK -$24; PenSize 1; rect via JT $3ca / $382 / BSR 0x8a; black PaintRect; level 2 FrameRect; InsetRect 3,3; iw; right = iw/2
+ * + left - 1 -> A5-0x119c; right = left + iw, left = right - iw/2 + 1 -> A5-0x1194; RTS - identical to the C. */
 /* Original: FUN_00004b32; source: ID03.c. Recovered name: draw_split_display_box [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x4b32.
- * Caller: the panel redraw path of prepare_instrument_panel (0x6846) with design arguments (0x17c, 0x17c, 7, scale_design_480_min10(10), 0x474, -0x2a8). PenSize(1, 1); converts the box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800); PaintRect in colour level 0; FrameRect ($A8A1) in level 2; InsetRect(3, 3); then splits the inset rect at its horizontal centre into a left half stored at A5-0x119c and a right half stored at A5-0x1194 (8-byte Rects) [PROVEN, bytes 0x4b32..0x4c40]. A5-0x119c is the rect that ID02 draw_notched_frame_pair_a5safe (overlay service slot -0x10ea) draws into, and A5-0x1194 is read by ID02 0x1206 / 0x1222 - so this lays out a two-part indicator box on the panel whose contents the overlay draws; which indicator is open [UNKNOWN].
+ * Caller: the panel redraw path of prepare_instrument_panel (0x6846) with design arguments (0x17c, 0x17c, 7, scale_design_480_min10(10), 0x474, -0x2a8). PenSize(1, 1); converts the box to screen coordinates (design_x_to_screen / design_y_to_screen, scale_design_4800); PaintRect in colour level 0; FrameRect ($A8A1) in level 2; InsetRect(3, 3); then splits the inset rect (width iw) at its horizontal centre into a left half (right = left + iw/2 - 1) stored at A5-0x119c and a right half (left = right - iw/2 + 1) stored at A5-0x1194 (8-byte Rects), so a two-pixel gap stays between them [PROVEN, bytes 0x4b32..0x4c40]; the third and fourth argument words are never read. Body rebuilt as C below. A5-0x119c is the rect that ID02 draw_notched_frame_pair_a5safe (overlay service slot -0x10ea) draws into, and A5-0x1194 is read by ID02 0x1206 / 0x1222 - so this lays out a two-part indicator box on the panel whose contents the overlay draws; which indicator is open [UNKNOWN].
  */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_split_display_box /* Original: FUN_00004b32 */ (void)
+void draw_split_display_box /* Original: FUN_00004b32 */
+               (short w,short h,short unused1,short unused2,short y,short x)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short iw;                                     /* -$20(A6) */
+  short r[4];                                   /* -$a(A6): top, left, bottom, right */
+
+  PenSize(1,1);                                 /* $A89B */
+  r[1] = (short)design_x_to_screen(x - (short)((int)w / 2)); /* JT $3ca */
+  r[0] = (short)design_y_to_screen(y - (short)((int)h / 2)); /* JT $382 */
+  r[3] = (short)scale_design_4800(w) + r[1];    /* BSR 0x8a */
+  r[2] = (short)scale_design_4800(h) + r[0];
+  set_draw_color_index((short)lookup_palette_index_for_rgb_level(0,0,0)); /* JT $45a, JT $36a */
+  PaintRect(r);                                 /* $A8A2 */
+  set_draw_color_index((short)lookup_palette_index_for_rgb_level(2,2,2));
+  FrameRect(r);                                 /* $A8A1 */
+  InsetRect(r,3,3);                             /* $A8A9 */
+  iw = r[3] - r[1];
+  r[3] = ((short)((int)iw / 2) + r[1]) + -1;    /* left half */
+  *(int *)(unaff_A5 + -0x119c) = *(int *)r;
+  *(int *)(unaff_A5 + -0x1198) = *(int *)(r + 2);
+  r[3] = r[1] + iw;                             /* right half */
+  r[1] = (r[3] - (short)((int)iw / 2)) + 1;
+  *(int *)(unaff_A5 + -0x1194) = *(int *)r;
+  *(int *)(unaff_A5 + -0x1190) = *(int *)(r + 2);
+  return;
 }
 
 
@@ -2183,24 +2282,82 @@ void draw_split_display_box /* Original: FUN_00004b32 */ (void)
 // WARNING: Removing unreachable block (ram,0x00004cee)
 // WARNING: Removing unreachable block (ram,0x00004e00)
 
+/* VERIFIED (ID03::FUN_00004c42): ID03.bin 0x4c42..0x4eca checked against an independent capstone disassembly.
+ * LINK -$42; BSR 0x514(size, pen, y, x, 0); BSR 0x1538; i 0..8: angle ASL #12 / 8 + $80; DIVS #4 remainder major (ASL.W #2) /
+ * minor; SUBA x / ADD y end points, four BSR 0xa6, MoveTo / LineTo; TextFont 1, BSR 0x6(20), GetFontInfo, label A5-0xe1a;
+ * A5-0x1178 / -0x117a / -0x1176; BSR 0x1844; RTS - identical to the C. */
 /*
  * Original: FUN_00004c42; source: ID03.c:673.
  * Recovered name: draw_flaps_indicator [STRONG INFERENCE].
  * Not part of the draw_instrument type switch. Loads label slot 75 "FLAPS"
  * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
  * a bezel via draw_ring_with_status_indicators (BSR at file 0x4c58).
- * Gauge identity from the label [STRONG INFERENCE]; internals not annotated.
+ * Gauge identity from the label [STRONG INFERENCE]. Body rebuilt as C below
+ * [PROVEN, bytes 0x4c42..0x4eca]: args size, scale, pen, y, x;
+ * draw_ring_with_status_indicators(size, pen, y, x, 0) (no screws), then the
+ * draw_altimeter pattern with 9 ticks at angle i * 0x200 + 0x80 (a quarter
+ * turn from about 3 degrees), x mirrored (cx - r cos), majors (pen / 10,
+ * length 4 * scale) at i = 0, 4, 8, minors (2 * pen / 30, 2 * scale), no
+ * numerals; "FLAPS" at scale(cy - factor * 100) + ascent (font 1, size 20);
+ * then the needle record A5-0x117a centre h / -0x1178 centre v / -0x1176
+ * radius scale(size) / 2 - scale(50); finish_instrument_supersample.
  */
-void draw_flaps_indicator /* Original: FUN_00004c42 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void draw_flaps_indicator /* Original: FUN_00004c42 */ (short size,short scale,short pen,short y,short x)
 
 {
-  undefined4 auStack_36 [12];
-  
-  FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
-               CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short fi[4];                                  /* -$3e(A6): FontInfo, ascent first */
+  int port;                                     /* -$32(A6) */
+  unsigned char *label;                         /* -$1e(A6) */
+  int angle;                                    /* -$1a(A6): 1/0x4000 turn */
+  short radius;                                 /* -$16(A6) */
+  short y2;                                     /* -$14(A6) */
+  short x2;                                     /* -$12(A6) */
+  short y1;                                     /* -$10(A6) */
+  short x1;                                     /* -$e(A6) */
+  short cy;                                     /* -$c(A6) */
+  short cx;                                     /* -$a(A6) */
+  short factor;                                 /* -8(A6) */
+  short num;                                    /* -6(A6): cleared, never used */
+  short k;                                      /* -4(A6): tick length */
+  short i;                                      /* -2(A6) */
+  short sx;
+
+  draw_ring_with_status_indicators(size,pen,y,x,0); /* BSR 0x514: bezel, no screws */
+  begin_instrument_supersample(&size,&scale,&pen,y,x,&port,&radius,&cx,&cy,&factor); /* BSR 0x1538 */
+  num = 0;
+  for (i = 0; i < 9; i = i + 1) {               /* 9 ticks over a quarter turn */
+    angle = ((int)i << 0xc) / 8 + 0x80;         /* ASL.L #6 twice, DIVS.L #8, ADDI.L #$80 */
+    if (i % 4 == 0) {                           /* major ticks at i = 0, 4, 8 */
+      PenSize((short)((int)pen / 10),(short)((int)pen / 10)); /* $A89B */
+      k = scale << 2;
+    }
+    else {
+      PenSize((short)((int)(short)(pen * 2) / 0x1e),(short)((int)(short)(pen * 2) / 0x1e));
+      k = scale * 2;
+    }
+    x1 = (short)((int)cx - ((int)radius * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc)); /* mirrored: cx - r cos */
+    y1 = (short)(((int)radius * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc) + (int)cy);
+    x2 = (short)((int)cx - ((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc));
+    y2 = (short)(((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc) + (int)cy);
+    sx = scale_design_4800_pen_centred(x1);     /* BSR 0xa6 */
+    MoveTo(sx,scale_design_4800_pen_centred(y1)); /* $A893 */
+    sx = scale_design_4800_pen_centred(x2);
+    LineTo(sx,scale_design_4800_pen_centred(y2)); /* $A891 */
+  }
+  TextFont(1);                                  /* $A887 */
+  set_scaled_text_style(0x14);                  /* BSR 0x6 */
+  GetFontInfo(fi);                              /* $A88B */
+  label = *(unsigned char **)(unaff_A5 + -0xe1a); /* STR# 129 slot 75 "FLAPS" */
+  sx = (short)scale_design_4800(cx) - (short)((int)StringWidth(label) / 2); /* $A88C */
+  MoveTo(sx,(short)scale_design_4800(cy - factor * 100) + fi[0]);
+  DrawString(label);                            /* $A884 */
+  *(short *)(unaff_A5 + -0x1178) = (short)design_y_to_screen(y); /* needle centre v (JT $382) */
+  *(short *)(unaff_A5 + -0x117a) = (short)design_x_to_screen(x); /* needle centre h (JT $3ca) */
+  *(short *)(unaff_A5 + -0x1176) = (short)((int)(short)scale_design_4800(size) / 2) - (short)scale_design_4800(0x32);
+                                                /* needle radius */
+  finish_instrument_supersample(port,size,y,x); /* BSR 0x1844 */
+  return;
 }
 
 
@@ -2209,24 +2366,81 @@ void draw_flaps_indicator /* Original: FUN_00004c42 */ (undefined4 param_1,undef
 // WARNING: Removing unreachable block (ram,0x00004f7c)
 // WARNING: Removing unreachable block (ram,0x00005092)
 
+/* VERIFIED (ID03::FUN_00004ecc): ID03.bin 0x4ecc..0x5156 checked against an independent capstone disassembly.
+ * Same frame and calls as 0x4c42 with: i 0..12, angle MULU.L #$1555 / 12 + $555; DIVS #3 major; SUBA for x and y; label A5-0xe16
+ * at factor * 100 + cy without ascent; record A5-0x1154 / -0x1156 / -0x1152; RTS - identical to the C. */
 /*
  * Original: FUN_00004ecc; source: ID03.c:691.
  * Recovered name: draw_ammo_counter [STRONG INFERENCE].
  * Not part of the draw_instrument type switch. Loads label slot 76 "AMMO"
  * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
  * a bezel via draw_ring_with_status_indicators (BSR at file 0x4ee2).
- * Gauge identity from the label [STRONG INFERENCE]; internals not annotated.
+ * Gauge identity from the label [STRONG INFERENCE]. Body rebuilt as C below
+ * [PROVEN, bytes 0x4ecc..0x5156]: the draw_flaps_indicator frame with 13
+ * ticks at angle i * 0x1555 / 12 + 0x555 (30 to 150 degrees), majors
+ * (pen / 10, length 4 * scale) every 3rd, both axes mirrored (cx - r cos,
+ * cy - r sin: an arc over the top), "AMMO" at scale(cy + factor * 100) with
+ * no ascent added (font 1, size 20), needle record A5-0x1156 h / -0x1154 v /
+ * -0x1152 radius. A needle dial rather than a digit counter [STRONG
+ * INFERENCE; the name is kept].
  */
-void draw_ammo_counter /* Original: FUN_00004ecc */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void draw_ammo_counter /* Original: FUN_00004ecc */ (short size,short scale,short pen,short y,short x)
 
 {
-  undefined4 auStack_36 [12];
-  
-  FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
-               CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short fi[4];                                  /* -$3e(A6): FontInfo (fetched, not used) */
+  int port;                                     /* -$32(A6) */
+  unsigned char *label;                         /* -$1e(A6) */
+  int angle;                                    /* -$1a(A6): 1/0x4000 turn */
+  short radius;                                 /* -$16(A6) */
+  short y2;                                     /* -$14(A6) */
+  short x2;                                     /* -$12(A6) */
+  short y1;                                     /* -$10(A6) */
+  short x1;                                     /* -$e(A6) */
+  short cy;                                     /* -$c(A6) */
+  short cx;                                     /* -$a(A6) */
+  short factor;                                 /* -8(A6) */
+  short num;                                    /* -6(A6): cleared, never used */
+  short k;                                      /* -4(A6): tick length */
+  short i;                                      /* -2(A6) */
+  short sx;
+
+  draw_ring_with_status_indicators(size,pen,y,x,0); /* BSR 0x514: bezel, no screws */
+  begin_instrument_supersample(&size,&scale,&pen,y,x,&port,&radius,&cx,&cy,&factor); /* BSR 0x1538 */
+  num = 0;
+  for (i = 0; i < 0xd; i = i + 1) {             /* 13 ticks, 30 .. 150 degrees */
+    angle = (int)((unsigned int)(int)i * 0x1555) / 0xc + 0x555; /* MULU.L #$1555, DIVS.L #12, ADDI.L #$555 */
+    if (i % 3 == 0) {                           /* major ticks at i = 0, 3, 6, 9, 12 */
+      PenSize((short)((int)pen / 10),(short)((int)pen / 10)); /* $A89B */
+      k = scale << 2;
+    }
+    else {
+      PenSize((short)((int)(short)(pen * 2) / 0x1e),(short)((int)(short)(pen * 2) / 0x1e));
+      k = scale * 2;
+    }
+    /* both axes mirrored: cx - r cos, cy - r sin (an arc over the top) */
+    x1 = (short)((int)cx - ((int)radius * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc));
+    y1 = (short)((int)cy - ((int)radius * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc));
+    x2 = (short)((int)cx - ((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc));
+    y2 = (short)((int)cy - ((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc));
+    sx = scale_design_4800_pen_centred(x1);     /* BSR 0xa6 */
+    MoveTo(sx,scale_design_4800_pen_centred(y1)); /* $A893 */
+    sx = scale_design_4800_pen_centred(x2);
+    LineTo(sx,scale_design_4800_pen_centred(y2)); /* $A891 */
+  }
+  TextFont(1);                                  /* $A887 */
+  set_scaled_text_style(0x14);                  /* BSR 0x6 */
+  GetFontInfo(fi);                              /* $A88B */
+  label = *(unsigned char **)(unaff_A5 + -0xe16); /* STR# 129 slot 76 "AMMO" */
+  sx = (short)scale_design_4800(cx) - (short)((int)StringWidth(label) / 2); /* $A88C */
+  MoveTo(sx,(short)scale_design_4800(factor * 100 + cy)); /* below the centre, no ascent added */
+  DrawString(label);                            /* $A884 */
+  *(short *)(unaff_A5 + -0x1154) = (short)design_y_to_screen(y); /* needle centre v (JT $382) */
+  *(short *)(unaff_A5 + -0x1156) = (short)design_x_to_screen(x); /* needle centre h (JT $3ca) */
+  *(short *)(unaff_A5 + -0x1152) = (short)((int)(short)scale_design_4800(size) / 2) - (short)scale_design_4800(0x32);
+                                                /* needle radius */
+  finish_instrument_supersample(port,size,y,x); /* BSR 0x1844 */
+  return;
 }
 
 
@@ -2235,62 +2449,186 @@ void draw_ammo_counter /* Original: FUN_00004ecc */ (undefined4 param_1,undefine
 // WARNING: Removing unreachable block (ram,0x000051c0)
 // WARNING: Removing unreachable block (ram,0x0000532a)
 
+/* VERIFIED (ID03::FUN_00005158): ID03.bin 0x5158..0x532c checked against an independent capstone disassembly.
+ * LINK -$12; i 0..12: angle MULU.L #$1555 / 12 - $aab, ANDI $3fff; DIVS #4 major (ASL.W #2) / minor; TST $12: ADD or SUBA for x1
+ * then x2 (two cos calls), then y2, y1 via SUBA (two sin calls); four BSR 0xa6; MoveTo / LineTo; RTS - identical to the C. */
 /* Original: FUN_00005158; source: ID03.c. Recovered name: draw_arc_scale_ticks [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5158.
- * C args (words): +8, +0xa length, +0xc size, +0xe x, +0x10 y, +0x12 side flag. Loop over tick i: angle a = (i * 0x1555 / 12 - 0xaab) & 0x3fff in 1/0x4000 turns (10-degree steps starting at -60 degrees); every fourth tick is a major tick (PenSize(size / 10, size / 10), length 4 * len), the others minor (PenSize(2 * size / 30,...), length 2 * len); the end points come from the cosine / sine pointers A5-0x2118 / A5-0x211c (4.12) with the side flag selecting the mirrored arc, scaled with scale_design_4800_pen_centred (0xa6) and drawn with MoveTo / LineTo [PROVEN, bytes 0x5158..0x532c]. Callers: the unexported gauge at 0x532e (0x53b0 with flag 1, 0x53e8 with flag 0) - a gauge with a left and a right arc scale.
+ * C args (words): +8 radius, +0xa length, +0xc pen, +0xe y, +0x10 x, +0x12 side flag (corrected: $e goes with the sine, $10 with the cosine, and +8 is the radius). Loop over tick i = 0..12: angle a = (i * 0x1555 / 12 - 0xaab) & 0x3fff in 1/0x4000 turns (10-degree steps starting at -60 degrees); every fourth tick is a major tick (PenSize(size / 10, size / 10), length 4 * len), the others minor (PenSize(2 * size / 30,...), length 2 * len); the end points come from the cosine / sine pointers A5-0x2118 / A5-0x211c (4.12) with the side flag selecting the mirrored arc, scaled with scale_design_4800_pen_centred (0xa6) and drawn with MoveTo / LineTo [PROVEN, bytes 0x5158..0x532c]; y = y - r sin on both arcs, so they open upwards. Body rebuilt as C below. Callers: the unexported gauge at 0x532e (0x53b0 with flag 1, 0x53e8 with flag 0) - a gauge with a left and a right arc scale.
  * The following bytes 0x532e..0x54fc (not exported by Ghidra) are that gauge, called by the panel redraw path at 0x69c6: bezel (draw_ring_with_status_indicators flags 0x0f), begin_instrument_supersample, the two arcs above, a 24-point label (set_scaled_text_style, DrawString), positions stored at A5-0x1162..-0x1158, finish_instrument_supersample. Its label string and identity are not decoded yet [UNKNOWN].
  */
-void draw_arc_scale_ticks /* Original: FUN_00005158 */ (void)
+void draw_arc_scale_ticks /* Original: FUN_00005158 */
+               (short radius,short len,short pen,short y,short x,short right)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  int angle;                                    /* -$10(A6) */
+  short y2;                                     /* -$c(A6) */
+  short x2;                                     /* -$a(A6) */
+  short y1;                                     /* -8(A6) */
+  short x1;                                     /* -6(A6) */
+  short k;                                      /* -4(A6): tick length */
+  short i;                                      /* -2(A6) */
+  short sx;
+
+  for (i = 0; i < 0xd; i = i + 1) {             /* 13 ticks, -60 .. +60 degrees */
+    angle = ((int)((unsigned int)(int)i * 0x1555) / 0xc + -0xaab) & 0x3fff; /* MULU.L, DIVS.L #12, ADDI.L, ANDI.L */
+    if (i % 4 == 0) {                           /* major ticks at i = 0, 4, 8, 12 */
+      PenSize((short)((int)pen / 10),(short)((int)pen / 10)); /* $A89B */
+      k = len << 2;
+    }
+    else {
+      PenSize((short)((int)(short)(pen * 2) / 0x1e),(short)((int)(short)(pen * 2) / 0x1e));
+      k = len * 2;
+    }
+    if (right != 0) {                           /* arc on the right: x + r cos */
+      x1 = (short)(((int)radius * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc) + (int)x);
+      x2 = (short)(((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc) + (int)x);
+    }
+    else {                                      /* mirrored arc on the left: x - r cos */
+      x1 = (short)((int)x - ((int)radius * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc));
+      x2 = (short)((int)x - ((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc));
+    }
+    y2 = (short)((int)y - ((int)(short)(radius - k) * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc)); /* sin, inner first */
+    y1 = (short)((int)y - ((int)radius * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc));
+    sx = scale_design_4800_pen_centred(x1);     /* BSR 0xa6 */
+    MoveTo(sx,scale_design_4800_pen_centred(y1)); /* $A893 */
+    sx = scale_design_4800_pen_centred(x2);
+    LineTo(sx,scale_design_4800_pen_centred(y2)); /* $A891 */
+  }
+  return;
 }
 
 
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID03::FUN_0000532e): ID03.bin 0x532e..0x54fc checked against an independent capstone disassembly.
+ * LINK -$42; BSR 0x514(.., $f); BSR 0x1538; BSR 0x5158(2r/3, scale, pen, cy, cx - r + 40f, 1) and (.., cx + r - 40f, 0);
+ * TextFont 1, BSR 0x6(24), GetFontInfo, label A5-0xe12 at cy - factor * $e9 + ascent; JT $382 -> -0x115a / -0x1160; JT $3ca
+ * -> -0x1162 / -0x115c; radius -> -0x1158 / -0x115e; BSR 0x1844; RTS - identical to the C. */
 /*
  * Original: FUN_0000532e; source: ID03.c:720.
  * Recovered name: draw_fuel_gauge [STRONG INFERENCE].
  * Not part of the draw_instrument type switch. Loads label slot 77 "Fuel"
  * from the STR# 129 pointer table [PROVEN, bytes + resource dump] and draws
  * a bezel via draw_ring_with_status_indicators (BSR at file 0x5346).
- * Gauge identity from the label [STRONG INFERENCE]; internals not annotated.
+ * Gauge identity from the label [STRONG INFERENCE]. Body rebuilt as C below
+ * [PROVEN, bytes 0x532e..0x54fc]: args size, scale, pen, y, x; bezel with
+ * screw flags 0x0f; begin_instrument_supersample; two draw_arc_scale_ticks
+ * (radius 2r/3, length scale): pivot cx - r + 40 * factor with the arc to the
+ * right (flag 1) and pivot cx + r - 40 * factor with the arc to the left
+ * (flag 0) - two needles facing each other, presumably two tanks
+ * [HYPOTHESIS]; "Fuel" at scale(cy - factor * 233) + ascent (font 1, size
+ * 24); needle records left A5-0x1162 h / -0x1160 v / -0x115e radius and right
+ * -0x115c / -0x115a / -0x1158 (pivots at x -+ (size/2 - 40), radius
+ * 2 * scale(size/2) / 3 - scale(50)); finish_instrument_supersample.
  */
-void draw_fuel_gauge /* Original: FUN_0000532e */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void draw_fuel_gauge /* Original: FUN_0000532e */ (short size,short scale,short pen,short y,short x)
 
 {
-  undefined4 auStack_36 [12];
-  
-  FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
-               CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
-  draw_arc_scale_ticks();
-  draw_arc_scale_ticks();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short fi[4];                                  /* -$3e(A6): FontInfo, ascent first */
+  int port;                                     /* -$32(A6) */
+  unsigned char *label;                         /* -$1e(A6) */
+  short radius;                                 /* -$16(A6) */
+  short cy;                                     /* -$c(A6) */
+  short cx;                                     /* -$a(A6) */
+  short factor;                                 /* -8(A6) */
+  short sx;
+  short r;
+
+  draw_ring_with_status_indicators(size,pen,y,x,0xf); /* BSR 0x514: four screws */
+  begin_instrument_supersample(&size,&scale,&pen,y,x,&port,&radius,&cx,&cy,&factor); /* BSR 0x1538 */
+  draw_arc_scale_ticks((short)((int)(short)(radius * 2) / 3),scale,pen,cy,
+                       (cx - radius) + factor * 0x28,1); /* BSR 0x5158: pivot near the left edge, arc to the right */
+  draw_arc_scale_ticks((short)((int)(short)(radius * 2) / 3),scale,pen,cy,
+                       (cx + radius) - factor * 0x28,0); /* pivot near the right edge, arc to the left */
+  TextFont(1);                                  /* $A887 */
+  set_scaled_text_style(0x18);                  /* BSR 0x6 */
+  GetFontInfo(fi);                              /* $A88B */
+  label = *(unsigned char **)(unaff_A5 + -0xe12); /* STR# 129 slot 77 "Fuel" */
+  sx = (short)scale_design_4800(cx) - (short)((int)StringWidth(label) / 2); /* $A88C */
+  MoveTo(sx,(short)scale_design_4800(cy - factor * 0xe9) + fi[0]);
+  DrawString(label);                            /* $A884 */
+  /* two needle records (h, v, radius): left A5-0x1162 / -0x1160 / -0x115e, right A5-0x115c / -0x115a / -0x1158 */
+  sx = (short)design_y_to_screen(y);            /* JT $382 */
+  *(short *)(unaff_A5 + -0x115a) = sx;
+  *(short *)(unaff_A5 + -0x1160) = sx;
+  *(short *)(unaff_A5 + -0x1162) = (short)design_x_to_screen((x - (short)((int)size / 2)) + 0x28); /* JT $3ca */
+  *(short *)(unaff_A5 + -0x115c) = (short)design_x_to_screen(((short)((int)size / 2) + x) + -0x28);
+  r = (short)((int)(short)((short)scale_design_4800((short)((int)size / 2)) * 2) / 3) - (short)scale_design_4800(0x32);
+  *(short *)(unaff_A5 + -0x1158) = r;
+  *(short *)(unaff_A5 + -0x115e) = r;
+  finish_instrument_supersample(port,size,y,x); /* BSR 0x1844 */
+  return;
 }
 
 
 
+/* VERIFIED (ID03::FUN_000054fe): ID03.bin 0x54fe..0x5716 checked against an independent capstone disassembly.
+ * LINK -$46; BSR 0x514(.., $f); BSR 0x1538; pw = pen/10 max 3, PenSize; list loop at A5-0x1f80 to $63 ($62: skip word,
+ * MoveTo; else LineTo; MULS factor + centre, BSR 0xa6; +4); TextFont 1, BSR 0x6(24), GetFontInfo, label A5-0xe0e at
+ * cy - factor * $d9 + ascent; three lamp points (x -$96 / +$96 / 0, y +$25 / +$bb, v + 1) and BSR 0x8a($4b) radii; BSR 0x1844;
+ * RTS - identical to the C. */
 /* Original: FUN_000054fe; source: ID03.c. Recovered name: draw_landing_gear_indicator [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x54fe.
- * C args: +8 short size, +0xa short x, +0xc short y, +0xe, +0x10 (caller: the panel redraw path at 0x697e with 0x258, 7, scale_design_480_min10(10), 0x7a8, -0xb2c). draw_ring_with_status_indicators(size, flags 0x0f) (0x514); begin_instrument_supersample; PenSize; stroke drawing from the point table A5-0x1f80 (MoveTo / LineTo with scale_design_4800_pen_centred); TextFont(1), set_scaled_text_style(24) (0x6), GetFontInfo, StringWidth and DrawString of the label held at local -0x1a, loaded from A5-0xe0e = STR# 129 slot 78 "GEAR" (0x5628) [PROVEN]; then stores three screen points and radii at A5-0x1174 / -0x1172, -0x116e / -0x116c, -0x1168 / -0x1166 with radius scale_design_4800(75) in -0x1170, -0x116a, -0x1164 - three indicator lamps, presumably one per landing-gear leg, lit later by the overlay [STRONG INFERENCE]; finish_instrument_supersample (0x1844).
+ * C args: +8 size, +0xa scale, +0xc pen, +0xe y, +0x10 x (corrected: the common gauge order; caller: the panel redraw path at 0x697e with 0x258, 7, scale_design_480_min10(10), 0x7a8, -0xb2c). draw_ring_with_status_indicators(size, pen, y, x, 0x0f) (0x514); begin_instrument_supersample; PenSize(min(pen / 10, 3)); strokes from the word list A5-0x1f80: 'b' (0x62) makes the next (dx, dy) pair a MoveTo, other pairs are LineTo, 'c' (0x63) ends it; points are (dx * factor + cx, dy * factor + cy) through scale_design_4800_pen_centred [PROVEN; list contents are A5 initial data]; TextFont(1), set_scaled_text_style(24) (0x6), GetFontInfo, StringWidth and DrawString of the label held at local -0x1a, loaded from A5-0xe0e = STR# 129 slot 78 "GEAR" (0x5628) [PROVEN]; then stores three screen points and radii: (x - 150, y + 37) at A5-0x1174 / -0x1172, (x + 150, y + 37) at -0x116e / -0x116c, (x, y + 187) at -0x1168 / -0x1166 (each v + 1), radius scale_design_4800(75) in -0x1170, -0x116a, -0x1164 - three indicator lamps, presumably one per landing-gear leg, lit later by the overlay [STRONG INFERENCE]; finish_instrument_supersample (0x1844). Body rebuilt as C below.
  */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_landing_gear_indicator /* Original: FUN_000054fe */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void draw_landing_gear_indicator /* Original: FUN_000054fe */ (short size,short scale,short pen,short y,short x)
 
 {
-  undefined4 auStack_36 [12];
-  
-  FUN_00000514(CONCAT22(param_1._0_2_,param_2._0_2_));
-  begin_instrument_supersample((undefined2 *)&param_1,(short *)((int)&param_1 + 2),(short *)&param_2,
-               CONCAT22(param_2._2_2_,param_3._0_2_),auStack_36);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short *pts;                                   /* -$42(A6) */
+  short fi[4];                                  /* -$3e(A6): FontInfo, ascent first */
+  int port;                                     /* -$32(A6) */
+  unsigned char *label;                         /* -$1a(A6) */
+  short radius;                                 /* -$16(A6) */
+  short cy;                                     /* -$c(A6) */
+  short cx;                                     /* -$a(A6) */
+  short factor;                                 /* -8(A6) */
+  short pw;                                     /* -2(A6) */
+  short sx;
+  short r;
+
+  draw_ring_with_status_indicators(size,pen,y,x,0xf); /* BSR 0x514: four screws */
+  begin_instrument_supersample(&size,&scale,&pen,y,x,&port,&radius,&cx,&cy,&factor); /* BSR 0x1538 */
+  pw = (short)((int)pen / 10);
+  if (3 < pw) {
+    pw = 3;
+  }
+  PenSize(pw,pw);                               /* $A89B */
+  for (pts = (short *)(unaff_A5 + -0x1f80); *pts != 0x63; pts = pts + 2) { /* word list ended by 'c' */
+    if (*pts == 0x62) {                         /* 'b': next pair starts a new stroke */
+      pts = pts + 1;
+      sx = scale_design_4800_pen_centred(*pts * factor + cx); /* BSR 0xa6 */
+      MoveTo(sx,scale_design_4800_pen_centred(pts[1] * factor + cy)); /* $A893 */
+    }
+    else {
+      sx = scale_design_4800_pen_centred(*pts * factor + cx);
+      LineTo(sx,scale_design_4800_pen_centred(pts[1] * factor + cy)); /* $A891 */
+    }
+  }
+  TextFont(1);                                  /* $A887 */
+  set_scaled_text_style(0x18);                  /* BSR 0x6 */
+  GetFontInfo(fi);                              /* $A88B */
+  label = *(unsigned char **)(unaff_A5 + -0xe0e); /* STR# 129 slot 78 "GEAR" */
+  sx = (short)scale_design_4800(cx) - (short)((int)StringWidth(label) / 2); /* $A88C */
+  MoveTo(sx,(short)scale_design_4800(cy - factor * 0xd9) + fi[0]);
+  DrawString(label);                            /* $A884 */
+  /* three lamp records (h, v, radius): A5-0x1174.., -0x116e.., -0x1168.. */
+  *(short *)(unaff_A5 + -0x1174) = (short)design_x_to_screen(x + -0x96); /* JT $3ca: left */
+  *(short *)(unaff_A5 + -0x1172) = (short)design_y_to_screen(y + 0x25) + 1; /* JT $382 */
+  *(short *)(unaff_A5 + -0x116e) = (short)design_x_to_screen(x + 0x96); /* right */
+  *(short *)(unaff_A5 + -0x116c) = *(short *)(unaff_A5 + -0x1172);
+  *(short *)(unaff_A5 + -0x1168) = (short)design_x_to_screen(x); /* lower centre */
+  *(short *)(unaff_A5 + -0x1166) = (short)design_y_to_screen(y + 0xbb) + 1;
+  r = (short)scale_design_4800(0x4b);
+  *(short *)(unaff_A5 + -0x1164) = r;
+  *(short *)(unaff_A5 + -0x116a) = r;
+  *(short *)(unaff_A5 + -0x1170) = r;
+  finish_instrument_supersample(port,size,y,x); /* BSR 0x1844 */
+  return;
 }
 
 
@@ -2298,49 +2636,59 @@ void draw_landing_gear_indicator /* Original: FUN_000054fe */ (undefined4 param_
 // WARNING: Control flow encountered bad instruction data
 // WARNING: Removing unreachable block (ram,0x0000583a)
 
+/* VERIFIED (ID03::FUN_00005718): ID03.bin 0x5718..0x585e checked against an independent capstone disassembly.
+ * LINK -$16; centre / radius from the rect (EXT.L, DIVS #2); step -5 / 5 by TST $e; $e += step; a = start; loop while $e: angle
+ * ((a - $5a) ASL #14) / $168, +$4000 while < 0, -$4000 while > $4000; JSR (A5-0x2118) / (A5-0x211c) MULU.L ASR #12 + centre;
+ * a == start -> store via $10 / $14 and MoveTo, else LineTo; a += step; $e -= step; RTS - identical to the C. */
 /* Original: FUN_00005718; source: ID03.c. Recovered name: dial_point_at_angle [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5718.
- * C args: +8 Rect *dial, +0xc short angle in degrees, +0xe short radial offset, +0x10 short *x (out), +0x12 short *y (out). r = half the dial width; step = +5 or -5 by the sign of the offset; returns at once when offset + step == 0. a = (angle - 90) * 0x4000 / 360, normalised into 0..0x4000 (0x4000 = one turn); x = centre x + (A5-0x2118)(a) * r >> 12, y = centre y + (A5-0x211c)(a) * r >> 12 (4.12 fixed point) [PROVEN, Ghidra C]. With 0 degrees at the top (a = 270 degrees), A5-0x2118 behaves as cosine and A5-0x211c as sine [STRONG INFERENCE]; both are copied from A5-0x1062 / A5-0x1066 by prepare_instrument_panel. The truncated tail draws a radial tick (MoveTo / LineTo at 0x5836 / 0x5842). Callers: 0x6468, 0x6532, 0x674c, 0x67c6 (panel redraw path).
+ * C args: +8 Rect *dial, +0xc short start angle in degrees, +0xe short sweep in degrees, +0x10 short *x (out), +0x14 short *y (out) (corrected: two long pointers, and +0xe is a sweep, not a radial offset). Body rebuilt as C below [PROVEN, bytes 0x5718..0x585e]: centre and r = half the dial width; step = +5 or -5 by the sign of the sweep, sweep += step; then for a = start, start + step, ... while sweep != 0: angle = (a - 90) * 0x4000 / 360 normalised into 0..0x4000, point = centre + (A5-0x2118)(angle) * r >> 12, centre + (A5-0x211c)(angle) * r >> 12 (4.12); the first point is stored in *x / *y and is a MoveTo, the others LineTo - it draws an arc on the dial rim in 5-degree steps (the name is kept for traceability; draw_dial_arc would describe it better). With 0 degrees at the top (a = 270 degrees), A5-0x2118 behaves as cosine and A5-0x211c as sine [STRONG INFERENCE]; both are copied from A5-0x1062 / A5-0x1066 by prepare_instrument_panel. Callers: 0x6468, 0x6532, 0x674c, 0x67c6 (panel redraw path).
  */
-void dial_point_at_angle /* Original: FUN_00005718 */ (short *param_1,undefined4 param_2,short *param_3,short *param_4)
+void dial_point_at_angle /* Original: FUN_00005718 */
+               (short *dial,short start,short sweep,short *x,short *y)
 
 {
-  short sVar1;
-  short sVar2;
-  short sVar3;
-  short sVar4;
-  short sVar7;
-  int iVar5;
-  int iVar6;
   int unaff_A5;
-  int local_12;
-  short local_e;
-  
-  sVar2 = param_1[3];
-  sVar3 = param_1[1];
-  sVar4 = param_1[2];
-  sVar1 = *param_1;
-  sVar7 = (short)(param_1[3] - param_1[1]) / 2;
-  if (param_2._2_2_ < 0) {
-    local_e = -5;
+  short py;                                     /* -$12(A6) */
+  short px;                                     /* -$10(A6) */
+  int angle;                                    /* -$e(A6): 1/0x4000 turn */
+  short step;                                   /* -$a(A6) */
+  short r;                                      /* -8(A6) */
+  short cy;                                     /* -6(A6) */
+  short cx;                                     /* -4(A6) */
+  short a;                                      /* -2(A6): degrees */
+
+  cx = (short)((int)(short)(dial[3] + dial[1]) / 2);
+  cy = (short)((int)(short)(dial[2] + dial[0]) / 2);
+  r = (short)((int)(short)(dial[3] - dial[1]) / 2);
+  if (sweep < 0) {
+    step = -5;
   }
   else {
-    local_e = 5;
+    step = 5;
   }
-  if ((short)(local_e + param_2._2_2_) == 0) {
-    return;
+  sweep = sweep + step;                         /* include the end point */
+  for (a = start; sweep != 0; a = a + step) {   /* 5-degree steps */
+    angle = (((int)a + -0x5a) << 0xe) / 0x168;  /* MOVEA.W, LEA -$5a: long; degrees from the top -> 1/0x4000 turn */
+    while (angle < 0) {
+      angle = angle + 0x4000;
+    }
+    while (0x4000 < angle) {
+      angle = angle + -0x4000;
+    }
+    px = (short)(((int)r * (*(code **)(unaff_A5 + -0x2118))(angle) >> 0xc) + (int)cx); /* cos, 4.12 */
+    py = (short)(((int)r * (*(code **)(unaff_A5 + -0x211c))(angle) >> 0xc) + (int)cy); /* sin */
+    if (a == start) {
+      *x = px;                                  /* the start point is returned */
+      *y = py;
+      MoveTo(px,py);                            /* $A893 */
+    }
+    else {
+      LineTo(px,py);                            /* $A891 */
+    }
+    sweep = sweep - step;
   }
-  for (local_12 = ((param_2._0_2_ + -0x5a) * 0x4000) / 0x168; local_12 < 0;
-      local_12 = local_12 + 0x4000) {
-  }
-  for (; 0x4000 < local_12; local_12 = local_12 + -0x4000) {
-  }
-  iVar5 = (**(code **)(unaff_A5 + -0x2118))(local_12);
-  iVar6 = (**(code **)(unaff_A5 + -0x211c))(local_12);
-  *param_3 = (short)(sVar3 + sVar2) / 2 + (short)(iVar5 * sVar7 >> 0xc);
-  *param_4 = (short)(sVar1 + sVar4) / 2 + (short)(iVar6 * sVar7 >> 0xc);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  return;
 }
 
 

@@ -180,7 +180,7 @@ revalidated here.
 | `FUN_00004b32` (ID03) | `draw_split_display_box` | STRONG INFERENCE | halves A5-0x119c / A5-0x1194. |
 | `FUN_00004304` (ID03) | `draw_panel_section_with_numbered_boxes` | STRONG INFERENCE mechanics | boxes 1 / 3 / 15; purpose UNKNOWN. |
 | `FUN_000054fe` (ID03) | `draw_landing_gear_indicator` | STRONG INFERENCE | STR# 78 "GEAR" label, three lamp positions A5-0x1174..-0x1164. |
-| `FUN_00005718` (ID03) | `dial_point_at_angle` | STRONG INFERENCE | degrees -> 1/0x4000 turn; cos A5-0x2118 / sin A5-0x211c, 4.12. |
+| `FUN_00005718` (ID03) | `dial_point_at_angle` | STRONG INFERENCE (name kept; draws an arc) | (dial, start deg, sweep deg, *x, *y): polyline on the dial rim in 5-degree steps, first point returned; degrees -> 1/0x4000 turn; cos A5-0x2118 / sin A5-0x211c, 4.12. |
 | `FUN_00005158` (ID03) | `draw_arc_scale_ticks` | STRONG INFERENCE | 10-degree arc ticks via cos / sin pointers; documents unexported gauge 0x532e. |
 | `FUN_000071a2` (ID03) | `remap_panel_colours_identity` | STRONG INFERENCE | identity 256-entry table -> remap_cached_panel_colours. |
 | `FUN_00000038`..`FUN_000002ee` (ID02) | `ansi_div` … `ansi_strcmp` (20 C runtime functions) | PROVEN / STRONG INFERENCE | complete Ghidra C; ctype masks. |
