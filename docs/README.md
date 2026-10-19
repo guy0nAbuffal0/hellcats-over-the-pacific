@@ -18,7 +18,7 @@ by `python3 tools/progress_stats.py`; they are not copied into prose.
 | Executable behavioral expectations | [`contracts/`](contracts/) and [`briefs/`](briefs/) |
 
 Immutable Ghidra exports and original resource evidence remain under
-`sources/resedit/`. Semantic `*.decomp.c` files retain source-local identifiers,
+`sources/resedit-1-0-3/`. Semantic `*.decomp.c` files retain source-local identifiers,
 addresses, confidence, corrections, and unresolved facts. Superseded workflow
 narratives and chronological logs are kept outside the repository archive and
 are not active technical instructions.

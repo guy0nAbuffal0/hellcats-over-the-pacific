@@ -2,7 +2,7 @@
   "schema_version": 1,
   "functions": [
     {
-      "source_file": "sources/resedit/CODE/Pacific Conflict.decomp.c",
+      "source_file": "sources/resedit-1-0-3/CODE/Pacific Conflict.decomp.c",
       "source_function": "contact_pair_hash",
       "original_function": "FUN_0001358c",
       "source_address": "0x1358c",
@@ -19,7 +19,7 @@
       "blocked_by": []
     },
     {
-      "source_file": "sources/resedit/CODE/Pacific Conflict.decomp.c",
+      "source_file": "sources/resedit-1-0-3/CODE/Pacific Conflict.decomp.c",
       "source_function": "find_contact_record",
       "original_function": "FUN_000135a0",
       "source_address": "0x135a0",
@@ -36,7 +36,7 @@
       "blocked_by": []
     },
     {
-      "source_file": "sources/resedit/CODE/Pacific Conflict.decomp.c",
+      "source_file": "sources/resedit-1-0-3/CODE/Pacific Conflict.decomp.c",
       "source_function": "reset_radar_tracks",
       "original_function": "FUN_0001776a",
       "source_address": "0x1776a",

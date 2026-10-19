@@ -405,8 +405,8 @@ def cmd_tests(args: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------------
 
 PROTECTED = ROOT / "docs" / "DECOMPILATION_PROTECTED_CHECKSUMS.sha256"
-CODE_DIR = ROOT / "sources" / "resedit" / "CODE"
-OVERLAY_BINARY = ROOT / "sources" / "hellcats-over-the-pacific" / "Pacific Conflict"
+CODE_DIR = ROOT / "sources" / "resedit-1-0-3" / "CODE"
+OVERLAY_BINARY = ROOT / "sources" / "mac-os-9" / "Pacific Conflict"
 # docs/MISSION_DATA_LOCATIONS.md, "External file layout" (not in PROTECTED).
 OVERLAY_SHA256 = "ee6040c7c38586551f95bf62a96453eef41b8b27409bc89d7a6689dc2c8b5030"
 # docs/DECOMPILATION_SYMBOLS.md, "False entries and runtime-address callees":

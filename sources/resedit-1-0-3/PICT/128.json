@@ -1,0 +1,125 @@
+{
+  "claim_evidence": {
+    "binary_integrity": "SHA-256 and length checked against the extracted payload and source container",
+    "decoded_structure": "Deterministic parser offsets, element counts, consumed bytes, and trailing bytes",
+    "gameplay_role": "No direct executable reference established",
+    "identity": "Reviewed semantic mapping grounded in decoded content"
+  },
+  "claims": {
+    "binary_integrity": "VERIFIED",
+    "decoded_structure": "VERIFIED",
+    "gameplay_role": "INFERRED",
+    "identity": "INFERRED"
+  },
+  "code_references": [],
+  "decoded": {
+    "consumed_bytes": 10,
+    "elements": [],
+    "format": "QuickDraw Picture",
+    "properties": {
+      "actual_size_bytes": 43710,
+      "bounds": {
+        "bottom": 302,
+        "height": 302,
+        "left": 0,
+        "right": 480,
+        "top": 0,
+        "width": 480
+      },
+      "declared_size_word": 43710,
+      "opcode_decode_status": "not_implemented",
+      "opcode_stream_offset": 10,
+      "quickdraw_version": "version_2",
+      "render_exports": [
+        "sources/resedit-1-0-3/PICT/128.png",
+        "sources/resedit-1-0-3/PICT/128.bmp"
+      ],
+      "rendering_fidelity_status": "not_pixel_verified"
+    },
+    "trailing_bytes": 43700
+  },
+  "evidence": {
+    "appledouble_resource_fork_offset": 82,
+    "authoritative_export_path": null,
+    "binary_matches_resource_fork_payload": true,
+    "binary_origin": "recovered resource-fork payload",
+    "binary_path": "sources/resedit-1-0-3/PICT/128.bin",
+    "binary_size": 43710,
+    "comparison_container": "sources/mac-os-9/Hellcats_1_0_4.appledouble",
+    "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
+    "comparison_resource_name": "Hellcats About PICT RSRC",
+    "representations": [
+      {
+        "kind": "binary payload",
+        "path": "sources/resedit-1-0-3/PICT/128.bin",
+        "sha256": "7501ac1783490a6fb1380e42542d8f4b1cdc88cefc02368bb6750fca66a98898",
+        "size": 43710
+      },
+      {
+        "kind": "BMP render",
+        "path": "sources/resedit-1-0-3/PICT/128.bmp",
+        "sha256": "8c2aa3b0a5f86d3ae384d5d7b603ccf296073321950c57ae970a49c6d9083e4b",
+        "size": 434936
+      },
+      {
+        "kind": "ResEdit Markdown/hex annotation",
+        "path": "sources/resedit-1-0-3/PICT/128.md",
+        "sha256": "c6b9309d1be79a36aa1452f42a8ff7a4481f118dba0679af8d8fbc4732d38dc6",
+        "size": 40
+      },
+      {
+        "kind": "PNG render",
+        "path": "sources/resedit-1-0-3/PICT/128.png",
+        "sha256": "db56a5b4c6d0f9a414b3b69995b406a363221c5ed704b6c612bf3d184e551be0",
+        "size": 21612
+      }
+    ],
+    "resource_attributes": "0x20",
+    "resource_fork_payload_offset": 86649,
+    "resource_fork_payload_sha256": "7501ac1783490a6fb1380e42542d8f4b1cdc88cefc02368bb6750fca66a98898",
+    "resource_fork_payload_size": 43710,
+    "sha256": "7501ac1783490a6fb1380e42542d8f4b1cdc88cefc02368bb6750fca66a98898",
+    "source_exports": [
+      "sources/resedit-1-0-3/PICT/128.bin",
+      "sources/resedit-1-0-3/PICT/128.bmp",
+      "sources/resedit-1-0-3/PICT/128.md",
+      "sources/resedit-1-0-3/PICT/128.png"
+    ]
+  },
+  "relationships": {
+    "incoming": [
+      {
+        "evidence": "resource ID encoded in original DITL item data",
+        "kind": "dialog_item_1",
+        "source": "DITL:127",
+        "status": "PROVEN"
+      }
+    ],
+    "outgoing": []
+  },
+  "resource": {
+    "description": "QuickDraw Picture; 43710 curated payload bytes.",
+    "descriptive_name": "Hellcats Color About-Dialog Background Artwork",
+    "id": 128,
+    "key": "PICT:128",
+    "original_fourcc": "PICT",
+    "original_macintosh_name": "",
+    "original_name_bytes_hex": "",
+    "original_name_source": "sources/resedit-1-0-3/PICT/128.md",
+    "purpose": "Hellcats Color About-Dialog Background Artwork",
+    "type": "PICT"
+  },
+  "review": {
+    "claims": {
+      "not_cockpit_artwork": "VERIFIED"
+    },
+    "notes": [
+      "Decoded image and the PROVEN DITL:127 relationship identify this as color About-dialog artwork, not a cockpit or HUD asset."
+    ]
+  },
+  "schema": "hellcats-resedit-resource-v1",
+  "type_code_references": [],
+  "unresolved": [
+    "43700 trailing bytes are not decoded."
+  ]
+}

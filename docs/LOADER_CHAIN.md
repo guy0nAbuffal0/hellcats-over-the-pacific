@@ -6,7 +6,7 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 
 | Aspect | Conclusion | Citation |
 |--------|------------|----------|
-| **Overlay (Pacific Conflict)** | Mixed code+data; code from 0x20; no A5-relative globals; fixed base (Ghidra base 0). | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §1, §4, §5 (H3) |
+| **Overlay (Pacific Conflict)** | Mixed code+data; code from 0x20; no A5-relative globals; fixed base (Ghidra base 0). | [Pacific_Conflict_loader_analysis.md](../sources/resedit-1-0-3/CODE/Pacific_Conflict_loader_analysis.md) §1, §4, §5 (H3) |
 | **Identity mapping** | For overlay: `runtime_address = file_offset` when load base = 0. | Ibid. §6. Safe parsing: `0x20 ≤ A < 0x3e700`. |
 | **Relocation** | No reloc table. Only FUN_00000020 patches two cells: DAT_0001a7d2, DAT_0001a81c (base/handle from loader). | Ibid. §3. ResEdit/CODE/Pacific Conflict.c FUN_00000020. |
 | **CODE segments (ID01–ID09)** | Segment-local offsets; segment loaded by LoadSeg; A5 world for globals (unaff_A5 in ID02/ID05.c). | ID02.c, ID05.c; Apple Segment Manager (Inside Mac: RTArch-118). |
@@ -15,7 +15,7 @@ Evidence-first. Tags: **[RECONSTRUCTED]** (binary/decompiler), **[PROVEN]** (bin
 
 | Item | Conclusion | Citation |
 |------|------------|----------|
-| **Overlay init** | FUN_00000020(base) then FUN_00000054 set overlay globals; DAT_0001b5a0, DAT_0001b738 etc. used as mission/entity base. | [Pacific_Conflict_loader_analysis.md](../sources/resedit/CODE/Pacific_Conflict_loader_analysis.md) §7. ResEdit/CODE/Pacific Conflict.c 60, 73, 889, FUN_000044e8, FUN_0000740a. |
+| **Overlay init** | FUN_00000020(base) then FUN_00000054 set overlay globals; DAT_0001b5a0, DAT_0001b738 etc. used as mission/entity base. | [Pacific_Conflict_loader_analysis.md](../sources/resedit-1-0-3/CODE/Pacific_Conflict_loader_analysis.md) §7. ResEdit/CODE/Pacific Conflict.c 60, 73, 889, FUN_000044e8, FUN_0000740a. |
 | **Who loads overlay** | ID08 FUN_00000006 (resource traps 0x2a2, 0x2b2, 0x2aa) is the best candidate for loading the 255360-byte blob. | Ibid. §7. ID08.c. |
 | **ID00 role** | CODE 0 (ID00.bin): jump-table / segment-loader table for CODE 1–9, not overlay data. | Byte evidence retained below. |
 

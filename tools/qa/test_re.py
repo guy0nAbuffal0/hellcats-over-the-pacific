@@ -37,7 +37,7 @@ def main() -> int:
     excerpt = run("excerpt", "--segment", "Pacific Conflict", "FUN_0000e792", "--lines", "120:135")
     excerpt_lines = excerpt.splitlines()
     match = re.fullmatch(
-        r"// (sources/resedit/CODE/Pacific Conflict\.decomp\.c):(\d+)-(\d+) "
+        r"// (sources/resedit-1-0-3/CODE/Pacific Conflict\.decomp\.c):(\d+)-(\d+) "
         r"\[Pacific Conflict::FUN_0000e792 relative 120:135\]",
         excerpt_lines[0],
     )

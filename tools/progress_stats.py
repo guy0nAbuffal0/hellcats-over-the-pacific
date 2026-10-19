@@ -13,7 +13,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / "docs" / "DECOMPILATION_INVENTORY.json"
 STRICT_MAP = ROOT / "godot" / "strict_port" / "mappings" / "functions.json"
-RESOURCES = ROOT / "sources" / "resedit" / "inventory.json"
+RESOURCES = ROOT / "sources" / "resedit-1-0-3" / "inventory.json"
 
 
 def load(path: Path) -> dict[str, Any]:

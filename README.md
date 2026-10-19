@@ -44,9 +44,9 @@ python3 tools/progress_stats.py
 
 ```text
 sources/hellcats-over-the-pacific/  original disks, resource fork, manuals
-sources/resedit/CODE/*.c            immutable Ghidra exports
-sources/resedit/CODE/*.decomp.c     semantic reconstructions
-sources/resedit/<TYPE>/<ID>.*       resource payload, JSON, local identity
+sources/resedit-1-0-3/CODE/*.c            immutable Ghidra exports
+sources/resedit-1-0-3/CODE/*.decomp.c     semantic reconstructions
+sources/resedit-1-0-3/<TYPE>/<ID>.*       resource payload, JSON, local identity
 godot/strict_port/                  faithful C-to-GDScript translations
 godot/hellcats/                     playable prototype implementation
 godot/tests/                        deterministic and scene tests
@@ -95,7 +95,7 @@ Verify protected Ghidra exports from their directory because the checksum
 manifest uses local paths:
 
 ```sh
-cd sources/resedit/CODE
+cd sources/resedit-1-0-3/CODE
 shasum -a 256 -c ../../../docs/DECOMPILATION_PROTECTED_CHECKSUMS.sha256
 ```
 

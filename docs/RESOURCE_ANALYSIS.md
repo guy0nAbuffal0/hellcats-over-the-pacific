@@ -1,8 +1,8 @@
 # ResEdit resource analysis
 
 The curated resource tree is reproducible and locally inspectable. Each resource
-item under `sources/resedit/` has a sibling binary payload and JSON metadata
-record. `sources/resedit/inventory.json` is only an index; the resource-local
+item under `sources/resedit-1-0-3/` has a sibling binary payload and JSON metadata
+record. `sources/resedit-1-0-3/inventory.json` is only an index; the resource-local
 JSON files are the primary inspection records.
 
 ## Coverage

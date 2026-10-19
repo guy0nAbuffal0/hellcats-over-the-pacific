@@ -13,7 +13,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_CODE = ROOT / "sources" / "resedit" / "CODE"
+DEFAULT_CODE = ROOT / "sources" / "resedit-1-0-3" / "CODE"
 DEFAULT_OUTPUT = ROOT / "docs" / "DECOMPILATION_INVENTORY.json"
 STRICT_MAP = ROOT / "godot" / "strict_port" / "mappings" / "functions.json"
 FUN_RE = re.compile(

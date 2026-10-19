@@ -7,7 +7,7 @@ blitters `fill_span_rows_4bit_a` / `_4bit_b` / `_4bit_c` / `fill_span_rows_8bit`
 FUN_00003466 / FUN_00003608 / FUN_000037b4: `jmp (a5)` through the DAT_00020cec / DAT_00022cec tables;
 Ghidra's C treats each jump as call + return, so they need the table contents and a hand reconstruction).
 Overlay segments (all 30 ID02 C-runtime functions (abs_long..ansi_strncat) plus begin_overlay_session / ensure_free_memory_and_init_sound / run_flight_session / call_overlay_session_hooks / the four A5-safe drawing services 0xa42..0xca4 / the port, blit, fill, frame, text, colour and design-coordinate helpers 0xca6..0x19a0 / the memory and handle wrappers 0x19a2..0x1b3e / format_int_decimal_pstring / show_caution_alert_with_number / the two dialog helpers / the four sound-slot routines 0x1e68..0x2128 / reset_overlay_state / the display set-up routines 0x2192..0x2a42 / apply_settings_to_live_options / initialize_application / wait_for_click_or_key / show_resource_file_error_box / copy_pascal_string / handle_mouse_down / handle_activate_event / poll_and_dispatch_event / main / install_menus / update_menu_items / set_menu_item_enabled / set_view_size_option / start_new_mission / do_menu_command / the sound helpers 0x3d36..0x435c / all three VBL sound handlers 0x39a8..0x3d32 / the window placement helpers 0x435e..0x462a / the palette routines 0x462c..0x4b60 / the update helpers 0x4c18..0x4e18, both ID07 functions, the six ID01 divide helpers, all four ID08 bodies, four ID09 routines, all 24 ID05 functions and all 24 ID06 functions VERIFIED; each IDnn.bin maps Ghidra address = file offset,
-4-byte CODE header, cross-segment calls via JSR d16(A5) jump-table slots and Toolbox A-traps). Remaining overlay work in the ID01..ID09 segments (53 RENAMED: ID04 8, ID03 45; ID04 verified so far: 0x6..0x642, the dialog filters, the pilot-roster routines 0xf4e..0x1378, 0x14a0..0x2102 and 0x2d86..0x325e);
+4-byte CODE header, cross-segment calls via JSR d16(A5) jump-table slots and Toolbox A-traps). Remaining overlay work in the ID01..ID09 segments (45 RENAMED: ID03 45; ID04 complete: every exported function verified);
 ID01, ID02, ID05, ID06, ID07, ID08 and ID09 are complete. Functions whose C is only halt_baddata() need an
 evidence-backed reconstruction from the bytes before they can be verified (inline switch tables go through
 the ID01 0xbe range helper, JSR $3a(A5), or the ID01 0xaa long value-list helper, JSR $32(A5), or the ID01 0x96 word value-list helper, JSR $2a(A5)).
@@ -43,8 +43,8 @@ authoritative C-to-GDScript mapping.
 
 ## Canonical sources
 
-- Immutable Ghidra exports: `sources/resedit/CODE/*.c`
-- Semantic reconstructions: `sources/resedit/CODE/*.decomp.c`
+- Immutable Ghidra exports: `sources/resedit-1-0-3/CODE/*.c`
+- Semantic reconstructions: `sources/resedit-1-0-3/CODE/*.decomp.c`
 - Function inventory: `DECOMPILATION_INVENTORY.json`
 - Symbols, globals, fields, and confidence: `DECOMPILATION_SYMBOLS.md`
 - Immutable-source hashes: `DECOMPILATION_PROTECTED_CHECKSUMS.sha256`

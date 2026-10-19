@@ -13,7 +13,7 @@ behavior.
 
 ## Repository audit
 
-Ten `*.decomp.c` files exist, all in `sources/resedit/CODE/`: ID01 through ID09
+Ten `*.decomp.c` files exist, all in `sources/resedit-1-0-3/CODE/`: ID01 through ID09
 and `Pacific Conflict.decomp.c`. `DECOMPILATION_INVENTORY.json` is the canonical
 segment-qualified registry. Run `python3 tools/progress_stats.py` for current
 counts; reconstruction statuses must not be reported as Godot-port coverage.
@@ -33,7 +33,7 @@ The current Mission 01 dependency chain is `Main.tscn` →
 aircraft, input, flight-model and objective scripts plus three JSON data files.
 It does not call `SimCore.tick`. The main scene remains unchanged.
 
-`sources/resedit/` contains the inventoried resource corpus. Reusable
+`sources/resedit-1-0-3/` contains the inventoried resource corpus. Reusable
 evidence includes CODE binaries and metadata, PICT/BMP/PNG artwork, `clut/999`,
 icons, `snds`, mission/data resources, dialogs, menus, text and string tables.
 Exact palettes and original dimensions must be read from these resources; they

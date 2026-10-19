@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Deterministic inspector and metadata generator for sources/resedit.
+"""Deterministic inspector and metadata generator for sources/resedit-1-0-3.
 
 The comparison payloads come from the classic resource fork embedded in
-sources/hellcats-over-the-pacific/Hellcats_1_0_4.appledouble. Generated *.bin
+sources/mac-os-9/Hellcats_1_0_4.appledouble. Generated *.bin
 and *.json files are derived evidence; existing ResEdit exports are never
 rewritten.
 """
@@ -20,9 +20,9 @@ from pathlib import Path
 from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[1]
-RESEDIT = ROOT / "sources" / "resedit"
+RESEDIT = ROOT / "sources" / "resedit-1-0-3"
 APPLEDOUBLE = (
-    ROOT / "sources" / "hellcats-over-the-pacific" / "Hellcats_1_0_4.appledouble"
+    ROOT / "sources" / "mac-os-9" / "Hellcats_1_0_4.appledouble"
 )
 SCHEMA = "hellcats-resedit-resource-v1"
 
@@ -1493,12 +1493,12 @@ def cmd_verify(_: argparse.Namespace) -> int:
         errors.append(f"metadata key mismatch: missing={sorted(expected_keys-actual_keys)} extra={sorted(actual_keys-expected_keys)}")
     inventory_path = RESEDIT / "inventory.json"
     if not inventory_path.is_file():
-        errors.append("missing sources/resedit/inventory.json")
+        errors.append("missing sources/resedit-1-0-3/inventory.json")
     else:
         try:
             stored_inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
             if stored_inventory != inventory_document(records):
-                errors.append("inventory drift sources/resedit/inventory.json; rerun generate")
+                errors.append("inventory drift sources/resedit-1-0-3/inventory.json; rerun generate")
         except json.JSONDecodeError as exc:
             errors.append(f"invalid inventory JSON: {exc}")
     if errors:

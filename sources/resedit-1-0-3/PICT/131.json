@@ -1,0 +1,126 @@
+{
+  "claim_evidence": {
+    "binary_integrity": "SHA-256 and length checked against the extracted payload and source container",
+    "decoded_structure": "Deterministic parser offsets, element counts, consumed bytes, and trailing bytes",
+    "gameplay_role": "Explicit decompilation annotation",
+    "identity": "Reviewed semantic mapping grounded in decoded content"
+  },
+  "claims": {
+    "binary_integrity": "VERIFIED",
+    "decoded_structure": "VERIFIED",
+    "gameplay_role": "VERIFIED",
+    "identity": "INFERRED"
+  },
+  "code_references": [
+    {
+      "evidence": "* GetNewDialog(0x8a = DLOG 138 \"About Hellcats 1-Bit\") when A5-0x137a == 1, else GetNewDialog(0x7f = DLOG 127 \"About Hellcats\"); returns at once when it fails. JT $472; ShowWindow; DrawDialog; SetPort; GetDItem(item 3), MoveTo its box, TextFont(1), TextSize(8); GetResource(vers, 1) ($A9A0) and draws a 5-character version \"M.m.r\" from its first word: M = (word >> 8) + '0', m = ((word & 0xf0) >> 8) + '0' - always '0', an original bug (>> 4 was surely meant) [PROVEN, bytes] - r = (word & 0xf) + '0'",
+      "function_or_context": "show_about_dialog",
+      "line": 2277,
+      "source_path": "sources/resedit-1-0-3/CODE/ID04.decomp.c",
+      "status": "VERIFIED"
+    }
+  ],
+  "decoded": {
+    "consumed_bytes": 10,
+    "elements": [],
+    "format": "QuickDraw Picture",
+    "properties": {
+      "actual_size_bytes": 1302,
+      "bounds": {
+        "bottom": 750,
+        "height": 751,
+        "left": -1,
+        "right": 136,
+        "top": -1,
+        "width": 137
+      },
+      "declared_size_word": 1302,
+      "opcode_decode_status": "not_implemented",
+      "opcode_stream_offset": 10,
+      "quickdraw_version": "version_1",
+      "render_exports": [
+        "sources/resedit-1-0-3/PICT/131.png",
+        "sources/resedit-1-0-3/PICT/131.bmp"
+      ],
+      "rendering_fidelity_status": "not_pixel_verified"
+    },
+    "trailing_bytes": 1292
+  },
+  "evidence": {
+    "appledouble_resource_fork_offset": 82,
+    "authoritative_export_path": null,
+    "binary_matches_resource_fork_payload": true,
+    "binary_origin": "recovered resource-fork payload",
+    "binary_path": "sources/resedit-1-0-3/PICT/131.bin",
+    "binary_size": 1302,
+    "comparison_container": "sources/mac-os-9/Hellcats_1_0_4.appledouble",
+    "comparison_container_format": "AppleDouble with embedded classic resource fork (Hellcats 1.0.4)",
+    "comparison_resource_name": null,
+    "representations": [
+      {
+        "kind": "binary payload",
+        "path": "sources/resedit-1-0-3/PICT/131.bin",
+        "sha256": "b46dfb31745c10cf1902e86c550c9de1f4527d791dc32edb4bd67c3e1395663d",
+        "size": 1302
+      },
+      {
+        "kind": "BMP render",
+        "path": "sources/resedit-1-0-3/PICT/131.bmp",
+        "sha256": "58e81b757eac7224e34a8cbe1ddcb0ae8bd3c14af5b3a0a4e423c71d99b2f6f0",
+        "size": 15044
+      },
+      {
+        "kind": "ResEdit Markdown/hex annotation",
+        "path": "sources/resedit-1-0-3/PICT/131.md",
+        "sha256": "9d9e41ed4ab0a85dfc5c204f03eb2c0799d6e8bf51066673f509a10daa761091",
+        "size": 38
+      },
+      {
+        "kind": "PNG render",
+        "path": "sources/resedit-1-0-3/PICT/131.png",
+        "sha256": "7eda4d538601be83698a1cc4e153e1cce19ced56eafab5293c1330f95a8c3ab9",
+        "size": 3624
+      }
+    ],
+    "resource_attributes": "0x20",
+    "resource_fork_payload_offset": 137501,
+    "resource_fork_payload_sha256": "b46dfb31745c10cf1902e86c550c9de1f4527d791dc32edb4bd67c3e1395663d",
+    "resource_fork_payload_size": 1302,
+    "sha256": "b46dfb31745c10cf1902e86c550c9de1f4527d791dc32edb4bd67c3e1395663d",
+    "source_exports": [
+      "sources/resedit-1-0-3/PICT/131.bin",
+      "sources/resedit-1-0-3/PICT/131.bmp",
+      "sources/resedit-1-0-3/PICT/131.md",
+      "sources/resedit-1-0-3/PICT/131.png"
+    ]
+  },
+  "relationships": {
+    "incoming": [],
+    "outgoing": []
+  },
+  "resource": {
+    "description": "QuickDraw Picture; 1302 curated payload bytes.",
+    "descriptive_name": "Hellcats About and Credits Scroll Picture",
+    "id": 131,
+    "key": "PICT:131",
+    "original_fourcc": "PICT",
+    "original_macintosh_name": "",
+    "original_name_bytes_hex": "",
+    "original_name_source": "sources/resedit-1-0-3/PICT/131.md",
+    "purpose": "Hellcats About and Credits Scroll Picture",
+    "type": "PICT"
+  },
+  "review": {
+    "claims": {
+      "not_cockpit_artwork": "VERIFIED"
+    },
+    "notes": [
+      "The decoded tall picture is About/credits scroll content, not a cockpit or HUD asset."
+    ]
+  },
+  "schema": "hellcats-resedit-resource-v1",
+  "type_code_references": [],
+  "unresolved": [
+    "1292 trailing bytes are not decoded."
+  ]
+}

@@ -91,7 +91,7 @@ playback, and most proprietary data consumers remain unported.
 
 Resource provenance caveat: the protected ResEdit `CODE:2` payload is 19,994
 bytes, while the independently recovered 1.0.4 fork has a 24,832-byte segment.
-Both hashes are retained in `sources/resedit/CODE/ID02.json`; the protected input
+Both hashes are retained in `sources/resedit-1-0-3/CODE/ID02.json`; the protected input
 was not replaced.
 
 ## H) HUD / cockpit numeric fields
