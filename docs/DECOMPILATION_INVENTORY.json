@@ -19,8 +19,8 @@
     "BLOCKED": 0,
     "INVESTIGATING": 0,
     "NOT_STARTED": 0,
-    "RENAMED": 49,
-    "VERIFIED": 687
+    "RENAMED": 19,
+    "VERIFIED": 717
   },
   "conflicts": [],
   "functions": [
@@ -4483,25 +4483,25 @@
       "semantic_name": "set_scaled_text_style",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 21,
-        "line_end": 32,
-        "function_sha256": "1f494f70dbc9e40067aa20e8af6d94b76b3b30d19832470a8f3e76d1b37c991c"
+        "line_start": 25,
+        "line_end": 40,
+        "function_sha256": "39782a18963b9e960c5b445f4f5f5fb47258bf65210cc24a797cffbe91c61612"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:12",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:21-32"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:25-40"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "TextFace + scaled TextSize by mode",
         "validation": "Capstone (Ghidra truncated); token diff = renames"
       },
-      "source_revision": "1f494f70dbc9e40067aa20e8af6d94b76b3b30d19832470a8f3e76d1b37c991c",
+      "source_revision": "39782a18963b9e960c5b445f4f5f5fb47258bf65210cc24a797cffbe91c61612",
       "strict_port": null
     },
     {
@@ -4517,18 +4517,18 @@
       "semantic_name": "scale_design_480_min10",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 43,
-        "line_end": 57,
-        "function_sha256": "243e2348f4ff969cb77f3168bb3149a45f1626b3aa5c52ef1b6e1fbb9732ccab"
+        "line_start": 53,
+        "line_end": 64,
+        "function_sha256": "c9c5ede7503a7c8d4fd4f58e5b3548fe1fd794db9622ecdfc97f17abd95ba3d0"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:27",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:43-57"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:53-64"
       ],
       "known_blockers": [
         "A5−0x149e identity"
@@ -4537,7 +4537,7 @@
         "dependencies": "(A5−0x149e·v+5)/480, ≥10",
         "validation": "C complete; token diff = renames"
       },
-      "source_revision": "243e2348f4ff969cb77f3168bb3149a45f1626b3aa5c52ef1b6e1fbb9732ccab",
+      "source_revision": "c9c5ede7503a7c8d4fd4f58e5b3548fe1fd794db9622ecdfc97f17abd95ba3d0",
       "strict_port": null
     },
     {
@@ -4553,18 +4553,18 @@
       "semantic_name": "scale_design_4800",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 67,
-        "line_end": 73,
-        "function_sha256": "f23e23f85d22b34b01a1e49c00983f25ec45c7e6e5612c15169f03e155e18b36"
+        "line_start": 76,
+        "line_end": 82,
+        "function_sha256": "581e00fb69076a8b706ad4e94f4c6d40de20027626d3e21b9c84e84c908bf33e"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:45",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:67-73"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:76-82"
       ],
       "known_blockers": [
         "A5−0x149e identity"
@@ -4573,7 +4573,7 @@
         "dependencies": "A5−0x149e·v/4800; 13 call sites",
         "validation": "C complete; token diff = renames"
       },
-      "source_revision": "f23e23f85d22b34b01a1e49c00983f25ec45c7e6e5612c15169f03e155e18b36",
+      "source_revision": "581e00fb69076a8b706ad4e94f4c6d40de20027626d3e21b9c84e84c908bf33e",
       "strict_port": null
     },
     {
@@ -4589,18 +4589,18 @@
       "semantic_name": "scale_design_4800_pen_centred",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 83,
-        "line_end": 92,
-        "function_sha256": "b32182ef7f382ebfd1d436e654d9ff9fc0bb78a1a92dd008ddf904361603cdb6"
+        "line_start": 94,
+        "line_end": 101,
+        "function_sha256": "cd645dcb150762002b56dd512f072dc5239bbef85d11200d6d0e7ecde8ecf9eb"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:55",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:83-92"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:94-101"
       ],
       "known_blockers": [
         "A5−0x149e identity"
@@ -4609,7 +4609,7 @@
         "dependencies": "minus pnSize.h/2",
         "validation": "C complete; token diff = renames"
       },
-      "source_revision": "b32182ef7f382ebfd1d436e654d9ff9fc0bb78a1a92dd008ddf904361603cdb6",
+      "source_revision": "cd645dcb150762002b56dd512f072dc5239bbef85d11200d6d0e7ecde8ecf9eb",
       "strict_port": null
     },
     {
@@ -4625,18 +4625,18 @@
       "semantic_name": "max3_int",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 101,
-        "line_end": 111,
-        "function_sha256": "853ef47429107682c5b573c5ca127984aa4d7984941b163ae4b6ffa00d8c15e7"
+        "line_start": 112,
+        "line_end": 122,
+        "function_sha256": "66f1f8c204a1c83ee24e4f66a2f64bc8b75967af1a0a2eb083aa7f0a838a5648"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:68",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:101-111"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:112-122"
       ],
       "known_blockers": [
         "A5−0x149e identity"
@@ -4645,7 +4645,7 @@
         "dependencies": "max of three",
         "validation": "C complete; token diff = renames"
       },
-      "source_revision": "853ef47429107682c5b573c5ca127984aa4d7984941b163ae4b6ffa00d8c15e7",
+      "source_revision": "66f1f8c204a1c83ee24e4f66a2f64bc8b75967af1a0a2eb083aa7f0a838a5648",
       "strict_port": null
     },
     {
@@ -4661,18 +4661,18 @@
       "semantic_name": "nearest_palette_index_rgb",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 129,
-        "line_end": 189,
-        "function_sha256": "6d7f09647e5def3c5c77ee23716851e36293f485c61bf5c4d38f2e1d1acf42a9"
+        "line_start": 146,
+        "line_end": 200,
+        "function_sha256": "5f2b46e7e7f06c18b8eacd6a1cf57facdacd0f50ac1b347d69fcbeffd5f652be"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:82",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:129-189"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:146-200"
       ],
       "known_blockers": [
         "A5−0x149e identity"
@@ -4681,7 +4681,7 @@
         "dependencies": "Chebyshev nearest of 8 base + first-better extended entry",
         "validation": "C complete; token diff = renames"
       },
-      "source_revision": "6d7f09647e5def3c5c77ee23716851e36293f485c61bf5c4d38f2e1d1acf42a9",
+      "source_revision": "5f2b46e7e7f06c18b8eacd6a1cf57facdacd0f50ac1b347d69fcbeffd5f652be",
       "strict_port": null
     },
     {
@@ -4697,25 +4697,25 @@
       "semantic_name": "new_offscreen_bw_port",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 208,
-        "line_end": 218,
-        "function_sha256": "91fcf77167884c047a9e9de63bd4e5e7357ea7c54032ca4acd440390e4c3fc5f"
+        "line_start": 222,
+        "line_end": 244,
+        "function_sha256": "ca238f18e1f0e2a99332b8fa4674343d92efc6ee2dd3831d08e95cda788bd260"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:148",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:208-218"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:222-244"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "1-bit bitmap + OpenPort/SetPortBits/PortSize/RectRgn",
         "validation": "Capstone (Ghidra truncated); token diff = renames"
       },
-      "source_revision": "91fcf77167884c047a9e9de63bd4e5e7357ea7c54032ca4acd440390e4c3fc5f",
+      "source_revision": "ca238f18e1f0e2a99332b8fa4674343d92efc6ee2dd3831d08e95cda788bd260",
       "strict_port": null
     },
     {
@@ -4731,25 +4731,25 @@
       "semantic_name": "dispose_offscreen_bw_port",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 232,
-        "line_end": 237,
-        "function_sha256": "71a8e30d3973702f3556fbf54198b9fae48230bc9080bc4bad129fbdc4626fba"
+        "line_start": 258,
+        "line_end": 265,
+        "function_sha256": "cd8826d10466e8c852772166432f882f4622353c34c1753f6dc8ed513e2a5dd0"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:164",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:232-237"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:258-265"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "ClosePort + DisposPtr bits + port",
         "validation": "Capstone (Ghidra truncated); token diff = renames"
       },
-      "source_revision": "71a8e30d3973702f3556fbf54198b9fae48230bc9080bc4bad129fbdc4626fba",
+      "source_revision": "cd8826d10466e8c852772166432f882f4622353c34c1753f6dc8ed513e2a5dd0",
       "strict_port": null
     },
     {
@@ -4765,18 +4765,18 @@
       "semantic_name": "draw_spinning_disc_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 270,
-        "line_end": 275,
-        "function_sha256": "e2df141aafbc27970b3e9fbf28bbe1d1f94cefb0c56e875d8deeeada863391f0"
+        "line_start": 302,
+        "line_end": 352,
+        "function_sha256": "5395c45debfae4dc5bcc1d14476163c725e78fc53177eac70c465165604df263"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:175",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:270-275"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:302-352"
       ],
       "known_blockers": [
         "What it depicts"
@@ -4785,7 +4785,7 @@
         "dependencies": "ovals, clip region, 4-phase spoke A5−0x2112, size A5−0x2114; 5 callers in FUN_00000514",
         "validation": "Full Capstone decode"
       },
-      "source_revision": "e2df141aafbc27970b3e9fbf28bbe1d1f94cefb0c56e875d8deeeada863391f0",
+      "source_revision": "5395c45debfae4dc5bcc1d14476163c725e78fc53177eac70c465165604df263",
       "strict_port": null
     },
     {
@@ -4801,18 +4801,18 @@
       "semantic_name": "draw_ring_with_status_indicators",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 298,
-        "line_end": 312,
-        "function_sha256": "1fd0aa4628b2852a2c8d8df017a1ba5ee5526faf7e1b8a50c57ff624d06aeb20"
+        "line_start": 380,
+        "line_end": 426,
+        "function_sha256": "60553047b8751150e17809d3df3e76393412b6b94b5d3e648740c6b7b8526807"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics / HYPOTHESIS purpose",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:186",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:298-312"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:380-426"
       ],
       "known_blockers": [
         "Bit-4 position; caller"
@@ -4821,7 +4821,7 @@
         "dependencies": "black disc + grey ring; up to 5 spinning indicators at cos45 offsets by flag bits",
         "validation": "Capstone"
       },
-      "source_revision": "1fd0aa4628b2852a2c8d8df017a1ba5ee5526faf7e1b8a50c57ff624d06aeb20",
+      "source_revision": "60553047b8751150e17809d3df3e76393412b6b94b5d3e648740c6b7b8526807",
       "strict_port": null
     },
     {
@@ -4837,25 +4837,25 @@
       "semantic_name": "draw_vector_glyph_string_centred",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 322,
-        "line_end": 363,
-        "function_sha256": "e75160ca86b8c8cdb9decb1ec54958dacdb2f06471515a7bd669c50f934d1ba8"
+        "line_start": 438,
+        "line_end": 481,
+        "function_sha256": "68be02ba0bd498e73dd5d7691cc3ab884bbbbed81f06a51990d656b418ff7fd6"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:206",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:322-363"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:438-481"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "centred stroke-font string; glyph table A5-0x20b0 (6 glyphs)",
         "validation": "dis.py on ID03.bin; token diff = renames"
       },
-      "source_revision": "e75160ca86b8c8cdb9decb1ec54958dacdb2f06471515a7bd669c50f934d1ba8",
+      "source_revision": "68be02ba0bd498e73dd5d7691cc3ab884bbbbed81f06a51990d656b418ff7fd6",
       "strict_port": null
     },
     {
@@ -4871,18 +4871,18 @@
       "semantic_name": "draw_vector_number",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 383,
-        "line_end": 418,
-        "function_sha256": "496c45e66e942680ea753c6e327472d83be42a5f62fa29f889bc822775928e27"
+        "line_start": 506,
+        "line_end": 543,
+        "function_sha256": "5af9ae17d91fc125faa39a4551f85e21ab1e5511c51f05f3305e5e5d66eb1f07"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:253",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:383-418"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:506-543"
       ],
       "known_blockers": [
         "Loop tail not exported"
@@ -4891,7 +4891,7 @@
         "dependencies": "stroke font A5−0x1fde[digit]; scale_design_4800_pen_centred",
         "validation": "C (truncated)"
       },
-      "source_revision": "496c45e66e942680ea753c6e327472d83be42a5f62fa29f889bc822775928e27",
+      "source_revision": "5af9ae17d91fc125faa39a4551f85e21ab1e5511c51f05f3305e5e5d66eb1f07",
       "strict_port": null
     },
     {
@@ -4907,18 +4907,18 @@
       "semantic_name": "antialias_downsample_bw_3x",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 449,
-        "line_end": 454,
-        "function_sha256": "412704382917022dc49f5c2da5321b75b0a81afece3c384b34f624e2aea40be5"
+        "line_start": 581,
+        "line_end": 653,
+        "function_sha256": "f1d8e5d886ff8bf61f800033b43369833b7f433eefe8247dd1ff193d2ae8297f"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:294",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:449-454"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:581-653"
       ],
       "known_blockers": [
         "x0/y0 h/v roles"
@@ -4927,7 +4927,7 @@
         "dependencies": "7×7 Gaussian-like kernel /969; nearest_palette_index_rgb; MoveTo+Line(0,0) pixel plot; out buffer",
         "validation": "Full Capstone decode"
       },
-      "source_revision": "412704382917022dc49f5c2da5321b75b0a81afece3c384b34f624e2aea40be5",
+      "source_revision": "f1d8e5d886ff8bf61f800033b43369833b7f433eefe8247dd1ff193d2ae8297f",
       "strict_port": null
     },
     {
@@ -4943,25 +4943,25 @@
       "semantic_name": "composite_instrument_bitmap",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 464,
-        "line_end": 480,
-        "function_sha256": "cfcb84eb58106f14b671d803706f48b71923862b72f063b0d4e4e51d053a9468"
+        "line_start": 665,
+        "line_end": 693,
+        "function_sha256": "c9169cef1e6bc3c81d585035d29c4c5296b7ec7792eca45232b4b289b485e1cb"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:305",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:464-480"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:665-693"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "CopyBits (1-bit) or antialias_downsample_bw_3x into the panel port A5-0x1496",
         "validation": "dis.py on ID03.bin; token diff = renames"
       },
-      "source_revision": "cfcb84eb58106f14b671d803706f48b71923862b72f063b0d4e4e51d053a9468",
+      "source_revision": "c9169cef1e6bc3c81d585035d29c4c5296b7ec7792eca45232b4b289b485e1cb",
       "strict_port": null
     },
     {
@@ -4977,25 +4977,25 @@
       "semantic_name": "begin_instrument_supersample",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 496,
-        "line_end": 529,
-        "function_sha256": "f9f6f64c8c70208490c4f5aa5d689cab54dca5bd34f2e6455287c08241fdc706"
+        "line_start": 725,
+        "line_end": 802,
+        "function_sha256": "d30913012f3da247de63b7645ce247d39bbc3b89b5bbd64dbf8e093b4f113ea6"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:327",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:496-529"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:725-802"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "new_offscreen_bw_port 1× or 3×",
         "validation": "C (truncated)"
       },
-      "source_revision": "f9f6f64c8c70208490c4f5aa5d689cab54dca5bd34f2e6455287c08241fdc706",
+      "source_revision": "d30913012f3da247de63b7645ce247d39bbc3b89b5bbd64dbf8e093b4f113ea6",
       "strict_port": null
     },
     {
@@ -5011,25 +5011,25 @@
       "semantic_name": "finish_instrument_supersample",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 539,
-        "line_end": 544,
-        "function_sha256": "a780932c4d8ec8eeeb6cbc3aca961bac20891a27329ccd657ee537653b5dbb87"
+        "line_start": 812,
+        "line_end": 821,
+        "function_sha256": "8771a20946316691a11afe067c96fbb0db0ddff6a246f394fce75affd95a3234"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:366",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:539-544"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:812-821"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "SetPort(panel), composite, dispose_offscreen_bw_port",
         "validation": "dis.py on ID03.bin; token diff = renames"
       },
-      "source_revision": "a780932c4d8ec8eeeb6cbc3aca961bac20891a27329ccd657ee537653b5dbb87",
+      "source_revision": "8771a20946316691a11afe067c96fbb0db0ddff6a246f394fce75affd95a3234",
       "strict_port": null
     },
     {
@@ -5045,18 +5045,18 @@
       "semantic_name": "draw_altimeter",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 568,
-        "line_end": 577,
-        "function_sha256": "c4ad59d91dbf1fb3f3cdc365f46d41420c83ed5e7faa1a730dcabf4e2cb689eb"
+        "line_start": 857,
+        "line_end": 921,
+        "function_sha256": "1a3ea11312b274b24a5e4194f59bd6e2e99c3d4a88d833c26f73b5c913ff17c5"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:379",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:568-577"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:857-921"
       ],
       "known_blockers": [
         "Needle math"
@@ -5065,7 +5065,7 @@
         "dependencies": "label STR#129 slot 65 \"ALTITUDE\"; fn ptr A5−0x2118; draw_vector_number",
         "validation": "Capstone + resource dump"
       },
-      "source_revision": "c4ad59d91dbf1fb3f3cdc365f46d41420c83ed5e7faa1a730dcabf4e2cb689eb",
+      "source_revision": "1a3ea11312b274b24a5e4194f59bd6e2e99c3d4a88d833c26f73b5c913ff17c5",
       "strict_port": null
     },
     {
@@ -5081,18 +5081,18 @@
       "semantic_name": "draw_airspeed_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 591,
-        "line_end": 618,
-        "function_sha256": "471e954d651185411c7fde65518e108b051c6704cc77c46e7dc5cab94b44b92e"
+        "line_start": 950,
+        "line_end": 1041,
+        "function_sha256": "a33bc43141288c1ab5be7d24bca6f470a35b8495def071708c8cd64be47232c0"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:394",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:591-618"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:950-1041"
       ],
       "known_blockers": [
         "Drawing internals"
@@ -5101,7 +5101,7 @@
         "dependencies": "instrument type 1; label \"AIR SPEED\"",
         "validation": "STR#129 label scan"
       },
-      "source_revision": "471e954d651185411c7fde65518e108b051c6704cc77c46e7dc5cab94b44b92e",
+      "source_revision": "a33bc43141288c1ab5be7d24bca6f470a35b8495def071708c8cd64be47232c0",
       "strict_port": null
     },
     {
@@ -5117,18 +5117,18 @@
       "semantic_name": "draw_climb_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 632,
-        "line_end": 655,
-        "function_sha256": "37ce3795ff75c82e10e21cd285a9e6248b7d5b521a986083e13442d1862e763f"
+        "line_start": 1065,
+        "line_end": 1131,
+        "function_sha256": "eb15445f97abb5403dd6616c33e66b041c23cea261c4fa47b69ffc3c21ce2641"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:427",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:632-655"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1065-1131"
       ],
       "known_blockers": [
         "Drawing internals"
@@ -5137,7 +5137,7 @@
         "dependencies": "instrument type 3; label \"CLIMB\"",
         "validation": "STR#129 label scan"
       },
-      "source_revision": "37ce3795ff75c82e10e21cd285a9e6248b7d5b521a986083e13442d1862e763f",
+      "source_revision": "eb15445f97abb5403dd6616c33e66b041c23cea261c4fa47b69ffc3c21ce2641",
       "strict_port": null
     },
     {
@@ -5153,18 +5153,18 @@
       "semantic_name": "draw_tachometer",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 671,
-        "line_end": 680,
-        "function_sha256": "2b4b7d2b57041da6642cc2438295b2b8db3a108fa748099db45a39d30682caec"
+        "line_start": 1156,
+        "line_end": 1221,
+        "function_sha256": "8a4c9d938926f2770ef168d4d8dfd3cf586299d0672e11e950f6015689594f17"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:458",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:671-680"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1156-1221"
       ],
       "known_blockers": [
         "Drawing internals"
@@ -5173,7 +5173,7 @@
         "dependencies": "instrument type 5; label \"RPM\"",
         "validation": "STR#129 label scan"
       },
-      "source_revision": "2b4b7d2b57041da6642cc2438295b2b8db3a108fa748099db45a39d30682caec",
+      "source_revision": "8a4c9d938926f2770ef168d4d8dfd3cf586299d0672e11e950f6015689594f17",
       "strict_port": null
     },
     {
@@ -5189,18 +5189,18 @@
       "semantic_name": "draw_manifold_pressure_gauge",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 694,
-        "line_end": 717,
-        "function_sha256": "2e417f08e613faad0bdcd4f53ee7bc33cb37459da5e0710621e32d22d6e077b5"
+        "line_start": 1245,
+        "line_end": 1315,
+        "function_sha256": "5716ad54cbc5f5ed979d5397ea51e5cec69d1c78045528333d5ee6b00485a9d0"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:473",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:694-717"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1245-1315"
       ],
       "known_blockers": [
         "Drawing internals"
@@ -5209,7 +5209,7 @@
         "dependencies": "instrument type 4; label \"Manifold Pressure\"",
         "validation": "STR#129 label scan"
       },
-      "source_revision": "2e417f08e613faad0bdcd4f53ee7bc33cb37459da5e0710621e32d22d6e077b5",
+      "source_revision": "5716ad54cbc5f5ed979d5397ea51e5cec69d1c78045528333d5ee6b00485a9d0",
       "strict_port": null
     },
     {
@@ -5225,18 +5225,18 @@
       "semantic_name": "draw_direction_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 733,
-        "line_end": 742,
-        "function_sha256": "6d18a883922fec54e764741fec3feff6711dde1137be9986a7f8693883318547"
+        "line_start": 1345,
+        "line_end": 1429,
+        "function_sha256": "1f586a872a9378a03e3485c1de1458db8402c18f203d85655cc033fa42e7cc97"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:504",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:733-742"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1345-1429"
       ],
       "known_blockers": [
         "Drawing internals"
@@ -5245,7 +5245,7 @@
         "dependencies": "instrument type 6; label \"DIRECTION\"",
         "validation": "STR#129 label scan"
       },
-      "source_revision": "6d18a883922fec54e764741fec3feff6711dde1137be9986a7f8693883318547",
+      "source_revision": "1f586a872a9378a03e3485c1de1458db8402c18f203d85655cc033fa42e7cc97",
       "strict_port": null
     },
     {
@@ -5261,18 +5261,18 @@
       "semantic_name": "draw_turn_and_bank_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 756,
-        "line_end": 765,
-        "function_sha256": "2015be091017c4ad19eec9415c3d13317c39d0c193ff54bf471859646e7a395a"
+        "line_start": 1460,
+        "line_end": 1555,
+        "function_sha256": "de5c48ec012ee3896df5f9844153dcb767513fb3d218b02a945ecc2635f2759e"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:519",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:756-765"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1460-1555"
       ],
       "known_blockers": [
         "Drawing internals"
@@ -5281,7 +5281,7 @@
         "dependencies": "instrument type 2; label \"TURN BANK\"",
         "validation": "STR#129 label scan"
       },
-      "source_revision": "2015be091017c4ad19eec9415c3d13317c39d0c193ff54bf471859646e7a395a",
+      "source_revision": "de5c48ec012ee3896df5f9844153dcb767513fb3d218b02a945ecc2635f2759e",
       "strict_port": null
     },
     {
@@ -5297,18 +5297,18 @@
       "semantic_name": "draw_gyro_instrument",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 775,
-        "line_end": 780,
-        "function_sha256": "98e96343db054fc87e051e2edc1728582973d706a87a560be4acc23be256e14f"
+        "line_start": 1569,
+        "line_end": 1686,
+        "function_sha256": "75caae7d153f264a976dfeca638b66ccbc728107638ef289707b159082902d4a"
       },
       "renaming_confidence": "STRONG INFERENCE (HYPOTHESIS which gyro)",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:534",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:775-780"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1569-1686"
       ],
       "known_blockers": [
         "body details"
@@ -5317,7 +5317,7 @@
         "dependencies": "type 8; handles A5-0x11dc \"GyroInstrument\" / A5-0x11d4 \"GyroFlags\"",
         "validation": "dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames"
       },
-      "source_revision": "98e96343db054fc87e051e2edc1728582973d706a87a560be4acc23be256e14f",
+      "source_revision": "75caae7d153f264a976dfeca638b66ccbc728107638ef289707b159082902d4a",
       "strict_port": null
     },
     {
@@ -5333,18 +5333,18 @@
       "semantic_name": "make_inset_face_oval_region",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 790,
-        "line_end": 795,
-        "function_sha256": "0b1c00aa397b586c13e51aeb8ba71c8620bd80d4e5814175e53f4bb888e46615"
+        "line_start": 1697,
+        "line_end": 1715,
+        "function_sha256": "8ef8d27fe6a24a77178c2e7c744bd2f34d5933b4e03a0b10d218114fcae902ad"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:545",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:790-795"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1697-1715"
       ],
       "known_blockers": [
         "body details"
@@ -5353,7 +5353,7 @@
         "dependencies": "oval region of the face inside the bezel",
         "validation": "dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames"
       },
-      "source_revision": "0b1c00aa397b586c13e51aeb8ba71c8620bd80d4e5814175e53f4bb888e46615",
+      "source_revision": "8ef8d27fe6a24a77178c2e7c744bd2f34d5933b4e03a0b10d218114fcae902ad",
       "strict_port": null
     },
     {
@@ -5369,18 +5369,18 @@
       "semantic_name": "draw_artificial_horizon",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 805,
-        "line_end": 810,
-        "function_sha256": "746ed010260d14a1eaa03ebd245b3425df675f4e13a8b0583a21ba6d11396fc5"
+        "line_start": 1728,
+        "line_end": 1812,
+        "function_sha256": "4749f0f230738a401858944143cc9658d96e1433aaad55e7d2555a30df18ae63"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:556",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:805-810"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1728-1812"
       ],
       "known_blockers": [
         "body details"
@@ -5389,7 +5389,7 @@
         "dependencies": "type 9; region clip, rotated line; handle A5-0x11f6 \"HorizonInstrument\"",
         "validation": "dis.py on ID03.bin; AddResource names in ID03 0x5b5e..0x5d44; token diff = renames"
       },
-      "source_revision": "746ed010260d14a1eaa03ebd245b3425df675f4e13a8b0583a21ba6d11396fc5",
+      "source_revision": "4749f0f230738a401858944143cc9658d96e1433aaad55e7d2555a30df18ae63",
       "strict_port": null
     },
     {
@@ -5405,18 +5405,18 @@
       "semantic_name": "draw_instrument",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 841,
-        "line_end": 864,
-        "function_sha256": "fb7b35efc74052fcf9a6625f807534d6852d5f531dcd6506e41fe83c1bf97600"
+        "line_start": 1849,
+        "line_end": 1910,
+        "function_sha256": "02a9108308672f23d8982362ad03365f1d515f06fbfa7dff6af7f7a6edca04fb"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:567",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:841-864"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1849-1910"
       ],
       "known_blockers": [
         "Gauge identities; tail"
@@ -5425,7 +5425,7 @@
         "dependencies": "bezel ring + screws; type 0..9 switch to per-gauge drawers; record A5−0x12a2+type·16",
         "validation": "Capstone + switch table parsed"
       },
-      "source_revision": "fb7b35efc74052fcf9a6625f807534d6852d5f531dcd6506e41fe83c1bf97600",
+      "source_revision": "02a9108308672f23d8982362ad03365f1d515f06fbfa7dff6af7f7a6edca04fb",
       "strict_port": null
     },
     {
@@ -5441,25 +5441,25 @@
       "semantic_name": "draw_bevelled_frame",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 874,
-        "line_end": 885,
-        "function_sha256": "46809d14d0390516232bfdecead75792fcd2deba9b42ae423701df9bf2e25642"
+        "line_start": 1922,
+        "line_end": 1973,
+        "function_sha256": "6f1761ee6a24fc119d7924e0d1bb297a239c5fccf25e92a6b0756df6e69372ba"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:596",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:874-885"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1922-1973"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "four shaded polygons between outer and inner rects",
         "validation": "dis.py on ID03.bin; token diff = renames"
       },
-      "source_revision": "46809d14d0390516232bfdecead75792fcd2deba9b42ae423701df9bf2e25642",
+      "source_revision": "6f1761ee6a24fc119d7924e0d1bb297a239c5fccf25e92a6b0756df6e69372ba",
       "strict_port": null
     },
     {
@@ -5475,25 +5475,25 @@
       "semantic_name": "draw_numbered_bevel_box",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 895,
-        "line_end": 906,
-        "function_sha256": "f5ad5eb6d6acb28bd0e83f145163c4b3e25be62c0fe2db9b522e25e9ff963529"
+        "line_start": 1985,
+        "line_end": 2041,
+        "function_sha256": "b0bbdab3a28aa21367116489a3fd950b6a3a24fbb07e00209d6bb571a91b0ab4"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:613",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:895-906"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1985-2041"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "black box, bevel, vector-font number",
         "validation": "dis.py on ID03.bin; token diff = renames"
       },
-      "source_revision": "f5ad5eb6d6acb28bd0e83f145163c4b3e25be62c0fe2db9b522e25e9ff963529",
+      "source_revision": "b0bbdab3a28aa21367116489a3fd950b6a3a24fbb07e00209d6bb571a91b0ab4",
       "strict_port": null
     },
     {
@@ -5509,18 +5509,18 @@
       "semantic_name": "draw_panel_section_with_numbered_boxes",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 916,
-        "line_end": 929,
-        "function_sha256": "b9877977b9e5cc204d57f9ff88ab1b85a0f0de3ac2f02f03dd3ccf83aff4c99a"
+        "line_start": 2054,
+        "line_end": 2148,
+        "function_sha256": "8f66c57622638d40cefd0676321f48fe506f8453b67ca69f06318e89317e74b6"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics / UNKNOWN purpose",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:630",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:916-929"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2054-2148"
       ],
       "known_blockers": [
         "meaning"
@@ -5529,7 +5529,7 @@
         "dependencies": "dark area A5-0x11aa, line loops, bevel, boxes 1 / 3 / 15 -> A5-0x11c6 / -0x11be / -0x11b6",
         "validation": "dis.py on ID03.bin; token diff = renames"
       },
-      "source_revision": "b9877977b9e5cc204d57f9ff88ab1b85a0f0de3ac2f02f03dd3ccf83aff4c99a",
+      "source_revision": "8f66c57622638d40cefd0676321f48fe506f8453b67ca69f06318e89317e74b6",
       "strict_port": null
     },
     {
@@ -5545,8 +5545,8 @@
       "semantic_name": "draw_percent_scale_gauge",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 939,
-        "line_end": 944,
+        "line_start": 2158,
+        "line_end": 2163,
         "function_sha256": "4a47544850ab38a85198a421e4390dd344fb477c7d360fd360bd74bb5551764b"
       },
       "renaming_confidence": "STRONG INFERENCE (HYPOTHESIS role)",
@@ -5556,7 +5556,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:649",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:939-944"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2158-2163"
       ],
       "known_blockers": [
         "which control"
@@ -5581,8 +5581,8 @@
       "semantic_name": "draw_split_display_box",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 954,
-        "line_end": 959,
+        "line_start": 2173,
+        "line_end": 2178,
         "function_sha256": "7c99d61bfa8bdfd6754b91c19535dc08359d201d775940ab95a75cfd9906be44"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5592,7 +5592,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:660",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:954-959"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2173-2178"
       ],
       "known_blockers": [
         "which indicator"
@@ -5617,8 +5617,8 @@
       "semantic_name": "draw_flaps_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 975,
-        "line_end": 985,
+        "line_start": 2194,
+        "line_end": 2204,
         "function_sha256": "90896e30b8bfe5cb079168c4904906f9082a5898f18bd002ec9ed08f41a5a20b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5628,7 +5628,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:673",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:975-985"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2194-2204"
       ],
       "known_blockers": [
         "Internals"
@@ -5653,8 +5653,8 @@
       "semantic_name": "draw_ammo_counter",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1001,
-        "line_end": 1011,
+        "line_start": 2220,
+        "line_end": 2230,
         "function_sha256": "7f4830c62edf20e548b0ba813c7062597dfb1b98d20c27e0a12dc5e4c9c10a7e"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5664,7 +5664,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:691",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1001-1011"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2220-2230"
       ],
       "known_blockers": [
         "Internals"
@@ -5689,8 +5689,8 @@
       "semantic_name": "draw_arc_scale_ticks",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1024,
-        "line_end": 1029,
+        "line_start": 2243,
+        "line_end": 2248,
         "function_sha256": "81f8f927b954929e5f69e0c7708cecd5b5495c01ef327c67ba71351b0d66b5f5"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5700,7 +5700,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:709",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1024-1029"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2243-2248"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -5723,8 +5723,8 @@
       "semantic_name": "draw_fuel_gauge",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1043,
-        "line_end": 1055,
+        "line_start": 2262,
+        "line_end": 2274,
         "function_sha256": "4324b078b7d5033e1e05f68d2f55057abab256b14b11d47a6d22e59a8f7d9baf"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5734,7 +5734,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:720",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1043-1055"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2262-2274"
       ],
       "known_blockers": [
         "Internals"
@@ -5759,8 +5759,8 @@
       "semantic_name": "draw_landing_gear_indicator",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1065,
-        "line_end": 1075,
+        "line_start": 2284,
+        "line_end": 2294,
         "function_sha256": "dbee6a22700421d1a3236cfe0643c393347a99d61c255b408b83c7714375b322"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5770,7 +5770,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:738",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1065-1075"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2284-2294"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -5793,8 +5793,8 @@
       "semantic_name": "dial_point_at_angle",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1086,
-        "line_end": 1125,
+        "line_start": 2305,
+        "line_end": 2344,
         "function_sha256": "88083f20fed93c723f74bf403f65e252091a89edd123a5024f717ad3dcde1841"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5804,7 +5804,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:755",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1086-1125"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2305-2344"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -5827,8 +5827,8 @@
       "semantic_name": "compute_panel_screen_addresses",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1133,
-        "line_end": 1181,
+        "line_start": 2352,
+        "line_end": 2400,
         "function_sha256": "df8e5e444b9d820f6eb6af4a1436f251f011f948c8180ff4c47afbd3f3322006"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5838,7 +5838,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:798",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1133-1181"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2352-2400"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -5861,8 +5861,8 @@
       "semantic_name": "store_panel_bitmaps_as_resources",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1192,
-        "line_end": 1197,
+        "line_start": 2411,
+        "line_end": 2416,
         "function_sha256": "b5230a349e80000b1fadf833453901ba7056719c83bb3f36041adacb13e8258d"
       },
       "renaming_confidence": "PROVEN",
@@ -5872,7 +5872,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:852",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1192-1197"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2411-2416"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -5895,8 +5895,8 @@
       "semantic_name": "open_cport_on_buffer",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1207,
-        "line_end": 1215,
+        "line_start": 2426,
+        "line_end": 2434,
         "function_sha256": "55668edc2691712ba69adfe5e71d7f1e99f3c59a4e5e4760c92312f81ffe9527"
       },
       "renaming_confidence": "PROVEN",
@@ -5906,7 +5906,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:863",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1207-1215"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2426-2434"
       ],
       "known_blockers": [
         "redraw path after 0x5f20"
@@ -5931,8 +5931,8 @@
       "semantic_name": "close_port_glue",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1225,
-        "line_end": 1230,
+        "line_start": 2444,
+        "line_end": 2449,
         "function_sha256": "1b18dcd9cd8fd06c1abd1466df9199e39f294a6ddf9f5e4c74c01b8680344bb9"
       },
       "renaming_confidence": "PROVEN",
@@ -5942,7 +5942,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:877",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1225-1230"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2444-2449"
       ],
       "known_blockers": [
         "redraw path after 0x5f20"
@@ -5967,8 +5967,8 @@
       "semantic_name": "prepare_instrument_panel",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1240,
-        "line_end": 1245,
+        "line_start": 2459,
+        "line_end": 2464,
         "function_sha256": "4d57386b4ec68f481b0e8d3cefecec9638582625a618a230af9d7915d9195f70"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -5978,7 +5978,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:888",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1240-1245"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2459-2464"
       ],
       "known_blockers": [
         "redraw path after 0x5f20"
@@ -6003,8 +6003,8 @@
       "semantic_name": "remap_cached_panel_colours",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1255,
-        "line_end": 1284,
+        "line_start": 2474,
+        "line_end": 2503,
         "function_sha256": "92f466fd259f9608f46bbf45f688c69000af6f9650fe2d1dc689079a6a8f1831"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -6014,7 +6014,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:899",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1255-1284"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2474-2503"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -6037,8 +6037,8 @@
       "semantic_name": "remap_panel_colours_identity",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "line_start": 1292,
-        "line_end": 1303,
+        "line_start": 2511,
+        "line_end": 2522,
         "function_sha256": "adaab21a135584bbc8f6b3a106deeab86498dba01be3da41eabae8298a1fbe57"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -6048,7 +6048,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID03.c:932",
-        "sources/resedit-1-0-3/CODE/ID03.decomp.c:1292-1303"
+        "sources/resedit-1-0-3/CODE/ID03.decomp.c:2511-2522"
       ],
       "known_blockers": [],
       "technical_evidence": {

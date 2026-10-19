@@ -162,7 +162,7 @@ revalidated here.
 | `FUN_00003a56` (ID04) | `poll_click_or_key_event` | PROVEN | bytes; 1 for mouseDown / keyDown / autoKey. |
 | `FUN_00003a8c` (ID04) | `show_about_dialog` | STRONG INFERENCE | bytes; DLOG 127 / 138 (1-bit), vers 1 text; tail not decoded. |
 | `FUN_00001200` (ID04) | `draw_high_scores_table` | PROVEN | JT $e2; DLOG 134. |
-| `FUN_000032b8` (ID03) | `draw_gyro_instrument` | STRONG INFERENCE (HYPOTHESIS which gyro) | type 8; handles A5-0x11dc "GyroInstrument" / A5-0x11d4 "GyroFlags". |
+| `FUN_000032b8` (ID03) | `draw_gyro_instrument` | STRONG INFERENCE (directional gyro heading tape) | type 8; renders a 9-window-wide tape of 36 marks numbered 0, 33 .. 3 into A5-0x11dc "GyroInstrument"; A5-0x11d4 "GyroFlags" = antialias drawn-column flags; window record A5-0x11ee..-0x11e0. |
 | `FUN_00003832` (ID03) | `make_inset_face_oval_region` | STRONG INFERENCE | oval region of the face inside the bezel. |
 | `FUN_000038fc` (ID03) | `draw_artificial_horizon` | STRONG INFERENCE | type 9; region clip, rotated line; handle A5-0x11f6 "HorizonInstrument". |
 | `FUN_00005ab6` (ID03) | `store_panel_bitmaps_as_resources` | PROVEN | AddResource HEL2 200–500 + config. |
