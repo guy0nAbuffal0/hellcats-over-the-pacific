@@ -26,7 +26,7 @@ undefined DAT_00000059;
 /*
  * Original: FUN_00000048; source: ID09.c:26-103.
  * Recovered name: sysenvirons_glue_fallback [STRONG INFERENCE].
- * Status: RENAMED; exported body annotated, binary discrepancies open.
+ * Exported body annotated originally; discrepancies resolved by the rebuilt body below.
  * Confidence: [PROVEN] exported-C control flow; [UNKNOWN] selector meanings.
  * Input: param_1 points to writable storage for at least eight undefined2 words
  * in the analyzed block (16 bytes under the original 16-bit word model).
@@ -68,151 +68,101 @@ undefined DAT_00000059;
  * So this body runs only when the SysEnvirons trap is absent; this justifies
  * the rename. The preamble 0x00..0x47 is not exported as a Ghidra function.
  */
-void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1)
+/* VERIFIED (ID09::FUN_00000048): ID09.bin 0x48..0x188 checked against an independent capstone disassembly.
+ * Body rebuilt from the bytes; resolves the open discrepancies listed in the header: (1) DAT_216e0016/17
+ * are MOVEA.L $2ae.w,A0 then $8(A0) / $9(A0); (2) the CPUFlag path 0xc4..0xd4 (CMPI.B #2 / BGT, MOVE.B,
+ * ADDQ.W #1, MOVE.B to +7) is present; (3) the 0x13a..0x17a block: 61 CLR.W -(A7), $18 = $a58.w, MOVEQ #8
+ * $A260, BNE; $16 = $34, $A207, BNE; $30 = $5a, $1c = #'ERIK', MOVEQ #1 $A260, BNE; +$e = $16; ADDA.W #$7a;
+ * (4) the 'jumptable' at 0x188 is the Pascal return: A0 = A1, pop return address to A1, ADDQ.W #6,A7,
+ * MOVE.W #$ea84,(A7), JMP (A1). Machine-type tree, byte gates (+8 BTST #4 of $b22, +9 unsigned
+ * CMPI.W #$3fff / BHI), keyboard DBEQ scan, $291 / $1fb gate and $210 copy are otherwise as before -
+ * identical to the C. */
+/* Pascal convention: FUNCTION SysEnvirons(versionRequested: INTEGER; VAR theWorld: SysEnvRec): OSErr.
+ * theWorld at 4(A7), versionRequested at 8(A7) (never read), result word at $a(A7); entered by branch
+ * from the dispatcher at 0x20 with the caller's frame untouched. Low-memory names per Inside Macintosh
+ * [STRONG INFERENCE]; addresses and widths [PROVEN, bytes]. */
+short sysenvirons_glue_fallback /* Original: FUN_00000048 */ (short versionRequested,undefined2 *param_1)
 
 {
-  undefined1 *puVar1;
   short sVar2;
   undefined2 *puVar3;
+  char *rom;
   char *pcVar4;
-  undefined1 *puVar5;
-  code *UNRECOVERED_JUMPTABLE;
-  undefined2 uStack0000000a;
-  
-  /* Eight stores: counter values 7..0, stopping only after decrement to -1. */
-  sVar2 = 7;
+  undefined1 pb[0x7a];                          /* 61 words cleared on the stack (CLR.W -(A7) / DBRA) */
+
+  sVar2 = 7;                                    /* MOVE.W #$10,D0; ASR.W #1; SUBQ.W #1 */
   puVar3 = param_1;
   do {
     *puVar3 = 0;
     sVar2 = sVar2 + -1;
     puVar3 = puVar3 + 1;
   } while (sVar2 != -1);
-  *param_1 = 1;
-  /* Word 1 remains 0xfffe when the outer selector compares equal to -1.
-   * Keep plain-char tests as exported: do not assume signed-char portability. */
-  param_1[1] = 0xfffe;
-  /* Binary file 0x76: CMPI.B #$ff,$9(A0), after MOVEA.L $02ae.w,A0.
-   * File 0x7e tests signed byte +8. The labels below are retained artifacts;
-   * do not interpret them as independently established runtime globals.
-   *  [HYPOTHESIS]: word 1 is SysEnvRec.machineType, and the
-   * selectors are ROM header bytes (ROMBase)+8 / +9 (ROM version word).
-   * Constants: envXL=-2 (0xfffe), envMac=-1 (0xffff), envMachUnknown=0,
-   * env512KE=1, envMacPlus=2, envSE=3, envMacII=4. Byte +9 == 0xff -> XL;
-   * byte +8 <= 0 (64K/128K ROMs $0069/$0075) -> Mac, then 512KE if ROM85 >= 0,
-   * then Plus if HWCfgFlags bit 15 (SCSI) is set; byte +8 == 2 (SE ROM $0276)
-   * -> SE; == 1 (II ROM $0178) -> II; >= 3 -> unknown. ROM version values
-   * come from external documentation and are not checked against this binary. */
-  if (DAT_216e0017 != -1) {
-    if (DAT_216e0016 < '\x01') {
-      param_1[1] = 0xffff;
-      /* The comma assignment is observable: a nonnegative signed word at
-       * DAT_0000028e changes word 1 to 1 even when the second test is false;
-       * a negative _DAT_00000b22 signed word then changes it again to 2. */
-      if ((-1 < (short)DAT_0000028e) && (param_1[1] = 1, (short)_DAT_00000b22 < 0)) {
-        param_1[1] = 2;
+  *param_1 = 1;                                 /* environsVersion */
+  rom = *(char **)0x2ae;                        /* ROMBase; Ghidra's DAT_216e0016/17 were rom[8] / rom[9] */
+  param_1[1] = 0xfffe;                          /* machineType: envXL */
+  if (rom[9] != -1) {
+    if (rom[8] < 1) {
+      param_1[1] = 0xffff;                      /* envMac */
+      if (-1 < *(short *)0x28e) {               /* ROM85 */
+        param_1[1] = 1;                         /* env512KE */
+        if (*(short *)0xb22 < 0) {              /* HWCfgFlags bit 15 */
+          param_1[1] = 2;                       /* envMacPlus */
+        }
       }
     }
     else {
-      /* For stable, non-aliasing selector reads: 1 -> 4, 2 -> 3, >= 3 -> 0.
-       * These are raw result codes; hardware/runtime categories remain unknown. */
       param_1[1] = 0;
-      if (DAT_216e0016 < '\x03') {
-        if (DAT_216e0016 == '\x02') {
-          param_1[1] = 3;
+      if (rom[8] < 3) {
+        if (rom[8] == 2) {
+          param_1[1] = 3;                       /* envSE */
         }
         else {
-          param_1[1] = 4;
+          param_1[1] = 4;                       /* envMacII */
         }
       }
     }
   }
-  /* Preserve this second write even though the initial clear reached word 2. */
-  param_1[2] = 0;
-  /* Binary file 0xc4..0xd4 contains a path absent from this C export:
-   * compare signed byte at $012f to 2; if <= 2, load it into D0.B, add 1
-   * to D0.W, and store D0.B at output +7. Ghidra's unreachable-block warning
-   * names 0xcc. This discrepancy is documented, not silently reconstructed. */
-  /* Set output byte +8 only when the signed word test and bit 12 both pass.
-   * This is a byte store into word 4, not a word assignment; preserve width. */
-  if ((-1 < (short)DAT_0000028e) && ((_DAT_00000b22 & 0x1000) != 0)) {
-    *(undefined1 *)(param_1 + 4) = 1;
+  param_1[2] = 0;                               /* systemVersion (second clear kept) */
+  if (*(char *)0x12f < 3) {                     /* CPUFlag, signed byte; path Ghidra dropped */
+    *(char *)((int)param_1 + 7) = *(char *)0x12f + 1; /* processor low byte (ADDQ.W, MOVE.B) */
   }
-  /* Separate comparison of the unsigned word value sets byte +9. On the intended big-endian
-   * layout, +8/+9 are the high/low bytes of word 4; do not merge these stores. */
-  if (DAT_0000028e < 0x4000) {
-    *(undefined1 *)((int)param_1 + 9) = 1;
+  if ((-1 < *(short *)0x28e) && ((*(byte *)0xb22 & 0x10) != 0)) { /* BTST #4 of byte $b22 = word bit 12 */
+    *(undefined1 *)(param_1 + 4) = 1;           /* hasFPU byte */
   }
-  /* Scan the five bytes preceding this symbol, starting at symbol - 1.
-   * First match in reverse order wins: offsets -1..-5 yield codes 5..1.
-   * No match yields 0. The scalar declaration is a Ghidra artifact: no C
-   * array bounds or valid object provenance are established by this export.
-   *  binary evidence [PROVEN, bytes]: file 0xf8 MOVE.B $21e.w,D0;
-   * 0xfc LEA $59(PC),A0 (disp 0xff5b, PC-relative, so the table travels with
-   * the segment; DAT_00000059 is a segment-relative label, not low memory);
-   * 0x100 MOVE.W #4,D1; 0x104 CMP.B -(A0),D0; 0x106 DBEQ D1; 0x10a ADDQ.W #1;
-   * 0x10c MOVE.W D1,$a(A1). The table is a data island skipped by BRA.B at
-   * file 0x52 -> 0x5a: bytes 0x54..0x59 = 03 13 0b 02 01 00; only 0x54..0x58
-   * are scanned. Result mapping (word +0x0a):
-   *   0x01 -> 5, 0x02 -> 4, 0x0b -> 3, 0x13 -> 2, 0x03 -> 1, otherwise 0.
-   * [STRONG INFERENCE] $21e is Toolbox low-memory KbdType and the codes are
-   * SysEnvRec.keyBoardType (envStandADBKbd=5, envAExtendKbd=4, envMacPlusKbd=3,
-   * envMacAndPad=2, envMacKbd=1, envUnknownKbd=0); see docs/ID09_SYSENVIRONS_ANALYSIS.md. */
-  pcVar4 = &DAT_00000059;
+  if (*(ushort *)0x28e < 0x4000) {              /* CMPI.W #$3fff / BHI: unsigned */
+    *(undefined1 *)((int)param_1 + 9) = 1;      /* hasColorQD byte */
+  }
+  pcVar4 = &DAT_00000059;                       /* LEA $59(PC): in-segment table 0x54..0x58 = 03 13 0b 02 01 */
   sVar2 = 4;
   do {
     pcVar4 = pcVar4 + -1;
-    if (DAT_0000021e == *pcVar4) break;
+    if (*(char *)0x21e == *pcVar4) break;       /* KbdType; CMP.B -(A0) / DBEQ */
     sVar2 = sVar2 + -1;
   } while (sVar2 != -1);
-  param_1[5] = sVar2 + 1;
-  /* With the exported char comparison satisfied and low nibble == 1,
-   * copy source byte +7 to output byte +0x0d. Pointer validity and the
-   * meaning of this source record remain unknown; retain both gates. */
-  if ((-1 < DAT_00000291) && ((DAT_000001fb & 0xf) == 1)) {
-    *(undefined1 *)((int)param_1 + 0xd) = *(undefined1 *)(DAT_000002dc + 7);
+  param_1[5] = sVar2 + 1;                       /* keyBoardType */
+  if ((-1 < *(char *)0x291) && ((*(byte *)0x1fb & 0xf) == 1)) { /* PortBUse, SPConfig */
+    *(undefined1 *)((int)param_1 + 0xd) = *(undefined1 *)(*(int *)0x2dc + 7); /* ABusVars+7 -> atDrvrVersNum */
   }
-  /* Copy the word to output +0x0e; the following branch can overwrite it.
-   * Failed byte-store gates above perform no write (initial clear normally
-   * supplies zero). Keep reads/stores ordered: non-aliasing is not proven. */
-  param_1[7] = DAT_00000210;
-  /* Original ID09.c:84-96. A unique binary-pattern match independently locates
-   * TST.W $3f6 / BLT and CLR.W $e(a1) at file offsets 0x134..0x13c.
-   * Retain the inferred C type/test; the binary establishes a signed WORD test. */
-  if (-1 < _DAT_000003f6) {
+  param_1[7] = *(undefined2 *)0x210;            /* BootDrive -> sysVRefNum */
+  if (-1 < *(short *)0x3f6) {                   /* FSFCBLen >= 0: HFS present */
     param_1[7] = 0;
-    /* 61 loop passes (0x3c down through 0), not 60: 122 bytes cleared.
-     * Binary file 0x13e..0x148: MOVE.W #$3c,D1; CLR.W -(A7); DBRA;
-     * MOVEA.L A7,A0. register0x0000003c is a Ghidra register artifact,
-     * not a proven memory address 0x3c. Preserve its exported expression. */
-    sVar2 = 0x3c;
-    puVar1 = (undefined1 *)register0x0000003c;
-    do {
-      puVar5 = puVar1;
-      *(undefined2 *)(puVar5 + -2) = 0;
-      sVar2 = sVar2 + -1;
-      puVar1 = puVar5 + -2;
-    } while (sVar2 != -1);
-    /* At loop exit puVar5 = initial pointer - 120, puVar1 = initial - 122.
-     * Thus this write is final pointer + 24, matching binary file 0x14a:
-     * MOVE.W $a58.w,$18(A0). Pointer arithmetic is retained, not normalized. */
-    *(undefined2 *)(puVar5 + 0x16) = _DAT_00000a58;
-    /* Binary continues: MOVEQ #8, A-line word $A260, conditional branches,
-     * another A-line word $A207 and $A260, then stack restoration. This
-     * truncation is a decompiler artifact, not evidence of a runtime halt.
-     * No replacement is made: trap contracts and complete ABI are unresolved. */
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
-  }
-  /* Binary file 0x17a adds 0x7a to A7 after the allocated-stack path.
-   * The negative-word branch bypasses that allocation/restoration to 0x17e.
-   * File 0x17e..0x188 copies A1 to A0, pops A1, advances A7 by 6, writes
-   * #$ea84 at (A7), then JMP (A1). Keep Ghidra's indirect-call form below;
-   * neither a C callback nor a switch/jumptable is proven by those bytes. */
-  uStack0000000a = 0xea84;
-                    // WARNING: Could not recover jumptable at 0x00000188. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
-  return;
+    for (sVar2 = 0x3c; sVar2 != -1; sVar2 = sVar2 + -1) {
+      *(undefined2 *)(pb + sVar2 * 2) = 0;
+    }
+    *(undefined2 *)(pb + 0x18) = *(undefined2 *)0xa58;         /* ioRefNum = SysMap */
+    if (HFSDispatch(pb,8) == 0) {                              /* MOVEQ #8, $A260: PBGetFCBInfo */
+      *(undefined2 *)(pb + 0x16) = *(undefined2 *)(pb + 0x34); /* ioVRefNum = ioFCBVRefNum */
+      if (PBHGetVInfo(pb) == 0) {                              /* $A207 */
+        *(undefined4 *)(pb + 0x30) = *(undefined4 *)(pb + 0x5a); /* ioWDDirID = ioVFndrInfo[0] */
+        *(undefined4 *)(pb + 0x1c) = 0x4552494b;               /* ioWDProcID = 'ERIK' */
+        if (HFSDispatch(pb,1) == 0) {                          /* MOVEQ #1, $A260: PBOpenWD */
+          param_1[7] = *(undefined2 *)(pb + 0x16);             /* sysVRefNum = working directory */
+        }
+      }
+    }
+  }                                             /* ADDA.W #$7a,A7 */
+  return -0x157c;                               /* MOVE.W #$ea84 to the result slot after popping 6
+                                                   argument bytes, JMP (A1): envNotPresent */
 }
 
 
@@ -248,11 +198,27 @@ void sysenvirons_glue_fallback /* Original: FUN_00000048 */ (undefined2 *param_1
  * 0x344 GetVol ($A014), 0x368 GetEOF ($A011), 0x38c GetFPos ($A018).
  * Callers: none in the exports (inter-segment calls go via the jump table).
  */
-void fsopen_glue /* Original: FUN_000002a6 */ (void)
+/* VERIFIED (ID09::FUN_000002a6): ID09.bin 0x2a6..0x2dc checked against an independent capstone disassembly
+ * (ID09 maps Ghidra address = file offset): Pascal glue FSOpen(fileName, vRefNum, VAR refNum): OSErr -
+ * arguments at $e / $c / $8(A6) (pushed left to right), a 50-byte IOParam at -$32(A6) with ioNamePtr
+ * +0x12, ioVRefNum +0x16, ioVersNum +0x1a = 0, ioPermssn +0x1b = 0 (fsCurPerm), ioMisc +0x1c = 0,
+ * _Open ($A000) with A0 = &pb, *refNum = ioRefNum (+0x18), D0 -> result slot $12(A6), callee pops the
+ * 10 argument bytes (ADDA.W #$a,A7; JMP (A0)) - identical to the C (reconstructed from the bytes; the
+ * earlier halt_baddata was Ghidra's truncation at the A-line trap). */
+short fsopen_glue /* Original: FUN_000002a6 */ (Str255 *fileName,short vRefNum,short *refNum)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  IOParam pb;                    /* -$32(A6), 50 bytes */
+  short err;
+
+  pb.ioNamePtr = fileName;       /* +0x12 */
+  pb.ioVRefNum = vRefNum;        /* +0x16 */
+  pb.ioVersNum = 0;              /* +0x1a */
+  pb.ioPermssn = 0;              /* +0x1b fsCurPerm */
+  pb.ioMisc = 0;                 /* +0x1c */
+  err = PBOpenSync((ParmBlkPtr)&pb); /* _Open $A000, A0 = &pb, D0 = result */
+  *refNum = pb.ioRefNum;         /* +0x18 */
+  return err;                    /* MOVE.W D0,$12(A6) */
 }
 
 
@@ -278,15 +244,28 @@ void fsopen_glue /* Original: FUN_000002a6 */ (void)
  * 0x404 NumToString via $A9EE (Pack7, selector 0); 0x416 in-place C->Pascal
  * string conversion (c2pstr-like). Callers: none in the exports.
  */
-void swapmmumode_glue /* Original: FUN_000003c2 */ (void)
+/* VERIFIED (ID09::FUN_000003c2): ID09.bin 0x3c2..0x3d4 checked against an independent capstone disassembly:
+ * Pascal glue SwapMMUMode(VAR mode: SignedByte) - D0.B = *mode, _SwapMMUMode ($A05D), *mode = D0.B,
+ * callee pops the 4-byte argument (ADDQ.W #4,A7; JMP (A0)) - identical to the C (reconstructed from the
+ * bytes; the earlier halt_baddata was Ghidra's truncation at the A-line trap). */
+void swapmmumode_glue /* Original: FUN_000003c2 */ (char *mode)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  char d0;
+
+  d0 = *mode;                    /* MOVEA.L 4(A7),A0; MOVE.B (A0),D0 */
+  d0 = SwapMMUMode_trap(d0);     /* _SwapMMUMode $A05D: D0.B in, previous mode out */
+  *mode = d0;                    /* MOVE.B D0,(A0) */
+  return;
 }
 
 
 
+/* VERIFIED (ID09::FUN_00000432): ID09.bin 0x432..0x44a checked against an independent capstone disassembly:
+ * MOVEQ #0,D0; MOVE.B (A0),D0 (zero-extended count), BRA to DBRA D0 over MOVE.B 1(A0),(A0)+ (forward
+ * overlapping copy, a zero count copies nothing), CLR.B (A0), D0 = the original pointer, RTS (C
+ * convention, caller pops) - identical to the C (the ushort pre-decrement with the 0xffff sentinel is the
+ * DBRA). */
 /*
  * Original: FUN_00000432; source: ID09.c:129-143.
  * Recovered name: length_prefixed_bytes_to_c_string_in_place
@@ -301,8 +280,7 @@ void swapmmumode_glue /* Original: FUN_000003c2 */ (void)
  * cursor[1], then writes zero:142 returns the original pointer.
  * Local mapping: param_1 -> buffer; uVar1 -> remaining_count;
  * pbVar2 -> write_cursor.
- * Unknown: actual callers, encoding and binary address mapping/ABI. No binary
- * verification claimed; retain Ghidra's ushort decrement and 0xffff sentinel.
+ * Unknown: actual callers and encoding. Binary mapping and ABI now verified (see the VERIFIED note).
  */
 byte * length_prefixed_bytes_to_c_string_in_place(byte *buffer)
 

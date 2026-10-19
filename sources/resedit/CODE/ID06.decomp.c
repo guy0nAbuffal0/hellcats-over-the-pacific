@@ -23,6 +23,11 @@ uint *DAT_000003ca;
 int *DAT_000003ce;
 int DAT_00000904;
 
+/* VERIFIED (ID06::FUN_00000004): ID06.bin 0x4..0xaa checked against an independent capstone disassembly:
+ * 32 fill masks x 8 longs into *(A5-0x1eda) (m = m >> 1 | 0x80000000, from 0), then 64 B/W patterns x 8
+ * longs, each the byte A5-0x1ed6[i * 8 + j] replicated four times (LSL.L #8 / #16 with OR), then the
+ * 256-word map *(A5-0x1ede)[i] = ((i >> 4) * -4 + 0x3f) * 32 + 0x400 (ASR.W #4, LSL.W #2, ASL.W #3 + #2);
+ * returns 1 - identical to the C. */
 /*
  * Original: FUN_00000004; source: ID06.c:26.
  * Recovered name: init_pattern_tables [STRONG INFERENCE].
@@ -72,6 +77,9 @@ undefined4 init_pattern_tables /* Original: FUN_00000004 */ (void)
 
 
 
+/* VERIFIED (ID06::FUN_000000b0): ID06.bin 0xb0..0xec checked against an independent capstone disassembly:
+ * lazily alloc_aligned_clear(0xc00) -> A5-0x1eda and (0x200) -> A5-0x1ede (JSR 0x1dc), 0 on failure, then
+ * JSR 0x4 init_pattern_tables and return its D0 - identical to the C. */
 /*
  * Original: FUN_000000b0; source: ID06.c:63.
  * Recovered name: alloc_pattern_tables [STRONG INFERENCE].
@@ -106,6 +114,9 @@ undefined4 alloc_pattern_tables /* Original: FUN_000000b0 */ (void)
 
 
 
+/* VERIFIED (ID06::FUN_000000f4): ID06.bin 0xf4..0x114 checked against an independent capstone disassembly:
+ * when A5-0x1eda is 0, JSR $1dc(PC) = alloc_aligned_clear(0xc00), store, and return 0 on failure;
+ * otherwise return A5-0x1eda - identical to the C. */
 /*
  * Original: FUN_000000f4; source: ID06.c:90.
  * Recovered name: get_pattern_table [STRONG INFERENCE].
@@ -130,6 +141,10 @@ undefined4 get_pattern_table /* Original: FUN_000000f4 */ (void)
 
 
 
+/* VERIFIED (ID06::FUN_00000116): ID06.bin 0x116..0x158 checked against an independent capstone disassembly
+ * (Ghidra address = file offset): words r / g / b at 8 / $a / $c(A6), each LSR.W #8 then MULS.W 0x13 /
+ * 0x26 / 7, ADD.W, LSR.W #6 (unsigned, the C's ushort), ASR.W #2 (the C's short), 0x3f - that, ASL.W #3,
+ * ADDA.W (sign-extended) to A5-0x1ed6 - identical to the C. */
 /*
  * Original: FUN_00000116; source: ID06.c:108.
  * Recovered name: rgb_to_bw_pattern [STRONG INFERENCE].
@@ -153,6 +168,11 @@ int rgb_to_bw_pattern /* Original: FUN_00000116 */ (undefined4 param_1,undefined
 
 
 
+/* VERIFIED (ID06::FUN_0000017c): ID06.bin 0x17c..0x1a0 checked against an independent capstone disassembly:
+ * CMPI.W #$100 / BLT (signed) clamps to 0xff, EXT.L index * 2 into the word table *(A5-0x1ede), MOVE.W
+ * (A0),D0 leaves the address's high word in D0 (Ghidra's CONCAT22). The C compared and indexed the
+ * unsigned half-word; corrected to (short) so words >= 0x8000 index negatively as the bytes do -
+ * otherwise identical to the C. */
 /*
  * Original: FUN_0000017c; source: ID06.c:121.
  * Recovered name: lookup_colour_map [STRONG INFERENCE].
@@ -166,15 +186,18 @@ undefined4 lookup_colour_map /* Original: FUN_0000017c */ (undefined4 param_1)
   undefined2 *puVar1;
   int unaff_A5;
   
-  if (0xff < param_1._0_2_) {
+  if (0xff < (short)param_1._0_2_) { /* CORRECTED [PROVEN]: CMPI.W #$100 / BLT is a signed word compare */
     param_1._0_2_ = 0xff;
   }
-  puVar1 = (undefined2 *)(*(int *)(unaff_A5 + -0x1ede) + param_1._0_2_ * 2);
+  puVar1 = (undefined2 *)(*(int *)(unaff_A5 + -0x1ede) + (short)param_1._0_2_ * 2); /* EXT.L: signed index */
   return CONCAT22((short)((uint)puVar1 >> 0x10),*puVar1);
 }
 
 
 
+/* VERIFIED (ID06::FUN_000001a2): ID06.bin 0x1a2..0x1da checked against an independent capstone disassembly:
+ * signed word loop 0..0xff (CMPI.W #$100 / BLT) over the word table *(A5-0x1ede) (EXT.L * 2); on a match
+ * MOVE.W D6,D0 keeps the address's high word (Ghidra's CONCAT22), else MOVEQ #0 - identical to the C. */
 /*
  * Original: FUN_000001a2; source: ID06.c:136.
  * Recovered name: reverse_lookup_colour_map [STRONG INFERENCE].
@@ -213,42 +236,39 @@ undefined4 reverse_lookup_colour_map /* Original: FUN_000001a2 */ (undefined4 pa
  * 4-byte-aligned zeroed allocation [STRONG INFERENCE]. Ghidra's piVar3 stack
  * modelling is an artifact.
  */
-uint alloc_aligned_clear /* Original: FUN_000001dc */ (int param_1)
+/* VERIFIED (ID06::FUN_000001dc): ID06.bin 0x1dc..0x24a checked against an independent capstone disassembly.
+ * Jump-table slots resolved through CODE 0 to ID09 Memory Manager glue: $212 -> 0x1b2 _FreeMem ($A01C),
+ * $21a -> 0x1bc _MaxMem ($A11D; the glue stores A0 through the VAR grow argument), $232 -> 0x20c
+ * _NewPtrClear ($A31E). grow (-$c) = 0; FreeMem() < 500000 (CMPI.L #$7a120 / BGE) -> MaxMem(&grow), whose
+ * results are unused (heap compaction / purge); raw = NewPtrClear(size + 0xc) (PEA $c(A0)); 0 on failure;
+ * otherwise the block is (raw + 0xc) & ~3 with size at -4 and raw at -8 (read back by free_aligned) -
+ * identical to the C (reconstructed from the bytes; Ghidra's form simulated the glue's stack slots). */
+uint alloc_aligned_clear /* Original: FUN_000001dc */ (int size)
 
 {
-  int iVar1;
-  uint uVar2;
-  int unaff_A5;
-  int *piVar3;
-  int local_14 [4];
-  
-  local_14[1] = 0;
-  local_14[0] = 0;
-  (**(code **)(unaff_A5 + 0x212))();
-  piVar3 = local_14 + 1;
-  if (local_14[0] < 500000) {
-    local_14[0] = 0;
-    (**(code **)(unaff_A5 + 0x21a))(local_14 + 1);
-    piVar3 = local_14;
+  long grow;                                  /* -$c */
+  Ptr raw;                                    /* -$8 */
+  uint block;                                 /* -$4 */
+
+  grow = 0;
+  if (FreeMem() < 500000) {                   /* JT $212 -> ID09 0x1b2 _FreeMem */
+    MaxMem(&grow);                            /* JT $21a -> ID09 0x1bc _MaxMem; result unused */
   }
-  piVar3[0xffffffff] = 0;
-  piVar3[0xfffffffe] = param_1 + 0xc;
-  piVar3[0xfffffffd] = 0x20e;
-  (**(code **)(unaff_A5 + 0x232))();
-  iVar1 = piVar3[0xfffffffe];
-  if (iVar1 == 0) {
-    uVar2 = 0;
+  raw = NewPtrClear(size + 0xc);              /* JT $232 -> ID09 0x20c _NewPtrClear */
+  if (raw == (Ptr)0) {
+    return 0;
   }
-  else {
-    uVar2 = iVar1 + 0xcU & 0xfffffffc;
-    *(int *)(uVar2 - 4) = param_1;
-    *(int *)(uVar2 - 8) = iVar1;
-  }
-  return uVar2;
+  block = (uint)raw + 0xc & 0xfffffffc;
+  *(int *)(block - 4) = size;
+  *(Ptr *)(block - 8) = raw;
+  return block;
 }
 
 
 
+/* VERIFIED (ID06::FUN_0000024c): ID06.bin 0x24c..0x26a checked against an independent capstone disassembly:
+ * TST.L p; 0 -> D0 = 0; else JSR $23a(A5) (DisposPtr glue, callee pops) on *(p - 8) and D0 = 1 - identical
+ * to the C. */
 /*
  * Original: FUN_0000024c; source: ID06.c:195.
  * Recovered name: free_aligned [STRONG INFERENCE].
@@ -268,6 +288,11 @@ bool free_aligned /* Original: FUN_0000024c */ (int param_1)
 
 
 
+/* VERIFIED (ID06::FUN_0000026c): ID06.bin 0x26c..0x316 checked against an independent capstone disassembly:
+ * row table +0 = A5 + 0x192; +8 = lookup_colour_map(8(A6) word) (JSR 0x17c, one word pushed - Ghidra's
+ * CONCAT22 low half is unread); +0xa = 0xb; +0xc = target +4 - (short)(target +8 * target +6) / 8 (MULS.W, EXT.L
+ * of the low word, DIVS.W); for i < $a(A6) word: rows[+4][i] +8 = target +0xc + (i % 8) * 4; +0xe = that
+ * count, +0x10 = +0x14 = 0; returns 1 - identical to the C. */
 /*
  * Original: FUN_0000026c; source: ID06.c:208.
  * Recovered name: init_row_table_fields [STRONG INFERENCE].
@@ -306,6 +331,20 @@ undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 param_
 
 
 
+/* VERIFIED (ID06::FUN_00000318): ID06.bin 0x318..0x510 checked against an independent capstone disassembly.
+ * Hand-written register routine: its state lives in the PC-relative block 0x39e..0x3d6 (BRA over it at
+ * 0x39c) - 0x39e active base, 0x3a2 stride, 0x3a6 head, 0x3aa tail, then d3, d4, d5, d6, d7, a2, a3, a4,
+ * a5, a6 at 0x3ae..0x3d2 (MOVEM (A1) on a continue call, MOVEM to 0x3ae on exit); Ghidra's DAT_000003xx
+ * cells are exactly those registers, and A5 / A6 serve as general registers inside the loop (no A5
+ * globals are read there). First band: base / stride / head / tail stored, d7 = a5 = base, a3 = 0,
+ * *base = tail, d6 left from the caller (unaff_D6), a6 = frame pointer. Per row: bucket edges
+ * insertion-sorted into the active array (head sentinel at base - 4 bounds the scan); with the row flag,
+ * edges whose +0x22 equals the row counter compacted out; priority list rebuilt only if a3 | flag | new
+ * edges is non-zero (the C carries a3 in DAT_000003c6): node +0x1e = current top colour, NOT.W parity
+ * +0x20 removes or key-orders (+0x24, BGT) the polygon in the +0x10 / +0x14 list, then *end = tail; spans:
+ * mask = pattern[(prev x >> 6) & 0x3e0], d6 = (d6 & mask) | (~mask & colour) (AND / NOT / AND / OR), stored
+ * dbra-count times (entered at DBRA), x += slope with insertion re-sort, walk through the tail sentinel
+ * (BLS); dest += stride; DBRA over the rows - identical to the C. */
 /*
  * Original: FUN_00000318; source: ID06.c:236.
  * Recovered name: render_scanline_spans [STRONG INFERENCE].
@@ -476,6 +515,9 @@ void render_scanline_spans /* Original: FUN_00000318 */ (undefined4 param_1,uint
 
 
 
+/* VERIFIED (ID06::FUN_00000512): ID06.bin 0x512..0x580 checked against an independent capstone disassembly:
+ * free_aligned (JSR 0x24c) on row table +4, +0x1c, +0x20 when set, then the table itself, then A5-0x1cd2 =
+ * 0 - identical to the C. */
 /*
  * Original: FUN_00000512; source: ID06.c:382.
  * Recovered name: free_row_table [STRONG INFERENCE].
@@ -506,6 +548,11 @@ void free_row_table /* Original: FUN_00000512 */ (void)
 
 
 
+/* VERIFIED (ID06::FUN_00000598): ID06.bin 0x598..0x664 checked against an independent capstone disassembly:
+ * 0 without a target; free_row_table (JSR 0x512) when the table holds fewer rows than $a(A6); if none,
+ * alloc_aligned_clear(0x24) -> A5-0x1cd2 and (rows * 12, MULU.L #$c of the sign-extended word) -> +4, 0 on
+ * failure; clears the three longs of each row; tail call init_row_table_fields(8(A6), $a(A6) words) -
+ * identical to the C. */
 /*
  * Original: FUN_00000598; source: ID06.c:405.
  * Recovered name: alloc_row_table [STRONG INFERENCE].
@@ -554,6 +601,12 @@ undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
 
 
 
+/* VERIFIED (ID06::FUN_00000666): ID06.bin 0x666..0x7ae checked against an independent capstone disassembly:
+ * 0 without a row table; pool alloc_aligned_clear(0x5e9c) once -> A5-0x1cd6; head +0x898 = pool + 0x8ac,
+ * tail +0x89c = pool + 0x5e74, cross-linked through +0x10 / +0x14; head +0 = 0; both sentinels +0x1c /
+ * +0x1e = row table word +8 and +0x22 = -10; tail +0 = (sign-extended target +8) LSL.L by (row table +0x10
+ * + sign-extended +0xa) (count mod 64, the C's & 0x3f); pool +0 = head; +0x8a0 = +0x8a4 = pool + 0x8d4;
+ * +0x8a8 = pool + 0x5b7c; returns 1 - identical to the C. */
 /*
  * Original: FUN_00000666; source: ID06.c:443.
  * Recovered name: init_edge_pool [STRONG INFERENCE].
@@ -616,6 +669,12 @@ undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
 
 
 
+/* VERIFIED (ID06::FUN_000007b0): ID06.bin 0x7b0..0x856 checked against an independent capstone disassembly:
+ * alloc_pattern_tables (JSR 0xb0, TST.W), target record alloc_aligned_clear(0x10) once -> A5-0x1cce,
+ * +0 = 8(A6), +4 = $c word, +6 = 1, +8 = $10 word, +$a = $12 word, +$c = get_pattern_table (JSR 0xf4);
+ * alloc_row_table($e, $12 words) (JSR 0x598), init_edge_pool (JSR 0x666), each 0 on a zero word result;
+ * centre A5-0x1cca / -0x1cc8 = width / height ASR.W #1 (the C's half-words corrected to (short) so the
+ * shift is arithmetic as in the bytes); returns 1 - otherwise identical to the C. */
 /*
  * Original: FUN_000007b0; source: ID06.c:494.
  * Recovered name: init_raster_target [STRONG INFERENCE].
@@ -662,8 +721,8 @@ undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,u
         uVar1 = 0;
       }
       else {
-        *(short *)(unaff_A5 + -0x1cca) = param_3._0_2_ >> 1;
-        *(short *)(unaff_A5 + -0x1cc8) = param_3._2_2_ >> 1;
+        *(short *)(unaff_A5 + -0x1cca) = (short)param_3._0_2_ >> 1; /* CORRECTED [PROVEN]: ASR.W #1, arithmetic */
+        *(short *)(unaff_A5 + -0x1cc8) = (short)param_3._2_2_ >> 1; /* CORRECTED [PROVEN]: ASR.W #1, arithmetic */
         uVar1 = 1;
       }
     }
@@ -673,6 +732,8 @@ undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,u
 
 
 
+/* VERIFIED (ID06::FUN_0000087a): ID06.bin 0x87a..0x88e checked against an independent capstone disassembly:
+ * if the target A5-0x1cce is set, its +0 = 8(A6) - identical to the C. */
 /*
  * Original: FUN_0000087a; source: ID06.c:541.
  * Recovered name: set_raster_target_base [STRONG INFERENCE].
@@ -692,6 +753,11 @@ void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 param_1)
 
 
 
+/* VERIFIED (ID06::FUN_000008a2): ID06.bin 0x8a2..0x900 checked against an independent capstone disassembly:
+ * saves A5 / D2 and loads A5 from CurrentA5 ($904 = Ghidra's DAT_00000904); with target and row table
+ * present, param clamped to the target height (+0xa, sign-extended, CMPA.L / BLT) when larger or < 1
+ * (CMPI.L #1 / BGE), its low word stored at row table +0xe; then A5-0x1cc6 = row table +0xe
+ * unconditionally (even with no row table, as in the C) - identical to the C. */
 /*
  * Original: FUN_000008a2; source: ID06.c:554.
  * Recovered name: set_active_row_count [STRONG INFERENCE].
@@ -718,6 +784,9 @@ void set_active_row_count /* Original: FUN_000008a2 */ (int param_1)
 
 
 
+/* VERIFIED (ID06::FUN_00000916): ID06.bin 0x916..0x940 checked against an independent capstone disassembly:
+ * if the target A5-0x1cce is set, *8(A6) = its +8 word, *$c(A6) = its +$a word, D0 = 1, else 0 - identical
+ * to the C. */
 /*
  * Original: FUN_00000916; source: ID06.c:572.
  * Recovered name: get_raster_target_size [STRONG INFERENCE].
@@ -740,6 +809,10 @@ bool get_raster_target_size /* Original: FUN_00000916 */ (undefined2 *param_1,un
 
 
 
+/* VERIFIED (ID06::FUN_00000942): ID06.bin 0x942..0x96c checked against an independent capstone disassembly:
+ * pushes the row count word then 8(A6) word (the same four bytes as Ghidra's CONCAT22 argument), JSR 0x598
+ * alloc_row_table; TST.W D0 zero -> 0, else JSR 0x666 init_edge_pool and 0 when its word result is 0,
+ * otherwise its D0 - identical to the C. */
 /*
  * Original: FUN_00000942; source: ID06.c:588.
  * Recovered name: realloc_row_table [STRONG INFERENCE].
@@ -768,6 +841,11 @@ undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 param_1)
 
 
 
+/* VERIFIED (ID06::FUN_0000096e): ID06.bin 0x96e..0x9d6 checked against an independent capstone disassembly:
+ * A5 from CurrentA5 ($904); row count word - 1 into D7 (SUBQ.L, DBRA on the word, body entered first so
+ * 0 rows wraps to 65536 like the C's do-while), clearing 8 of every 12 bytes of row table +4; pool cursor
+ * +0x8a4 = start +0x8a0; +0x14 = (+0x14 == 0) via SEQ / NEG.B / EXT.W / EXT.L; A5-0x1cc6 = 0 - identical to
+ * the C. */
 /*
  * Original: FUN_0000096e; source: ID06.c:609.
  * Recovered name: reset_edge_table [STRONG INFERENCE].
@@ -803,6 +881,18 @@ void reset_edge_table /* Original: FUN_0000096e */ (void)
 
 
 
+/* VERIFIED (ID06::FUN_000009d8): ID06.bin 0x9d8..0xd00 checked against an independent capstone disassembly:
+ * A5 from CurrentA5 ($904); x range scan (min from the target width, max from 0) rejects max == 0 or
+ * min == width; pool cursor >= limit (BCS, unsigned) rejects; first node gets +0x1c / +0x24 = the low
+ * words of the $c / $10 slots; edges from the last point (d5 / d4 = previous, d7 / d6 = current, ordered
+ * so (d7, d6) is the top; -$c doubles as the swap temporary, the C's dead local_10 = iVar12), horizontal
+ * edges and edges outside rows [0, rows) skipped, the top clipped to row 0, then per x-clip case (x <= 0,
+ * inside, >= width, with the bottom x <= 0 / >= width / inside - the last leaves local_10 unchanged as in
+ * the bytes) the split row by 64-bit MULS.L / DIVS.L (the C's longlong forms), slope ((dx << s1) / dy) << s2,
+ * node +4 slope, +8 x << (s1 + s2), +0xc / bucket push at the top row (MULU.L #$c), +0x18 first node,
+ * +0x22 = rows - end - 1, end-row flag; continues while the split row is below the bottom and inside the
+ * rows; returns cursor != first (SNE / NEG.B / EXT.W). DIVS.L overflow (quotient beyond 32 bits leaves D0
+ * unchanged) is not modelled by the C; it needs extreme slopes. Otherwise identical to the C. */
 /*
  * Original: FUN_000009d8; source: ID06.c:635.
  * Recovered name: add_polygon_edges [STRONG INFERENCE].
@@ -964,6 +1054,10 @@ bool add_polygon_edges /* Original: FUN_000009d8 */ (int param_1,undefined2 para
 
 
 
+/* VERIFIED (ID06::FUN_00000d02): ID06.bin 0xd02..0xd82 checked against an independent capstone disassembly:
+ * eight sign-extended (MOVEA.W) longs at -$30(A6): (x0 $a, y0 $c), (x1 $e, y0), (x1, y1 $10), (x0, y1);
+ * lookup_colour_map(8(A6) word) (JSR 0x17c, one word - Ghidra's CONCAT22 low half unread); EXT.L D0;
+ * add_polygon_edges(4, colour, 0, list) (JSR 0x9d8) - identical to the C. */
 /*
  * Original: FUN_00000d02; source: ID06.c:779.
  * Recovered name: add_rect_polygon [STRONG INFERENCE].
@@ -1002,6 +1096,9 @@ void add_rect_polygon /* Original: FUN_00000d02 */ (undefined4 param_1,undefined
 
 
 
+/* VERIFIED (ID06::FUN_00000d84): ID06.bin 0xd84..0xdc8 checked against an independent capstone disassembly:
+ * node +0x22 word = +0x22 + 8(A6) word - row table +0xe, stride 0x28 from pool +0x8a0 while < +0x8a4 (BCS,
+ * unsigned) - identical to the C. */
 /*
  * Original: FUN_00000d84; source: ID06.c:808.
  * Recovered name: rebase_edge_rows_for_band [STRONG INFERENCE].
@@ -1026,6 +1123,9 @@ void rebase_edge_rows_for_band /* Original: FUN_00000d84 */ (undefined4 param_1)
 
 
 
+/* VERIFIED (ID06::FUN_00000dca): ID06.bin 0xdca..0xe0e checked against an independent capstone disassembly:
+ * node +0x22 word = +0x22 - 8(A6) word + row table +0xe over the same unsigned pool walk - identical to the
+ * C. */
 /*
  * Original: FUN_00000dca; source: ID06.c:825.
  * Recovered name: restore_edge_rows_after_band [STRONG INFERENCE].
@@ -1049,6 +1149,15 @@ void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 param
 
 
 
+/* VERIFIED (ID06::FUN_00000e10): ID06.bin 0xe10..0xf64 checked against an independent capstone disassembly:
+ * A5 from CurrentA5 ($904); with a row table, re-links the head / tail sentinels (empty active list);
+ * dest 8(A6) == 0 -> one call of the row-table renderer (JT A5+0x192 = render_scanline_spans, ID06 0x318);
+ * else bands of min($c(A6), remaining) rows: rebase / restore_edge_rows_for_band around the renderer
+ * (flag word 0 then 1, band word, dest long, stride long = ((short)(w * d + 0xf) >> 4) * 2 - (short)(w * d) / 8
+ * with w = A5-0x1372, d = A5-0x137a), then JT $322 (ID02 0xd3a blit_offscreen_frame_to_window)(dest,
+ * rows - remaining, band, $10(A6) long). Corrected from the pushes: the renderer gets the whole dest
+ * pointer (not (short)), the dest == 0 call is (0 << 16 | rows, base, (short) +0xc), and param_3 is the
+ * long forwarded to JT $322 - otherwise identical to the C. */
 /*
  * Original: FUN_00000e10; source: ID06.c:842.
  * Recovered name: rasterize_and_present [STRONG INFERENCE].
@@ -1061,7 +1170,7 @@ void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 param
  * mode). Rasterises the edge table and presents it in bands [STRONG INFERENCE].
  * The renderer callback is JT A5+0x192 (installed by init_row_table_fields).
  */
-void rasterize_and_present /* Original: FUN_00000e10 */ (int param_1,int param_2,undefined2 param_3)
+void rasterize_and_present /* Original: FUN_00000e10 */ (int param_1,int param_2,int param_3)
 
 {
   short sVar1;
@@ -1084,10 +1193,12 @@ void rasterize_and_present /* Original: FUN_00000e10 */ (int param_1,int param_2
     *(undefined4 *)(*(int *)(*(int *)(iVar5 + -0x1cd6) + 0x89c) + 0x14) =
          *(undefined4 *)(*(int *)(iVar5 + -0x1cd6) + 0x898);
     if (param_1 == 0) {
+      /* CORRECTED [PROVEN, 0xf34..0xf54]: pushes (word 0, word rows, long target base, long
+       * sign-extended row table +0xc) = render_scanline_spans(0 << 16 | rows, base, stride) */
       (*(code *)**(undefined4 **)(iVar5 + -0x1cd2))
-                (*(undefined2 *)(*(int *)(iVar5 + -0x1cd2) + 0xe),
-                 (short)**(undefined4 **)(iVar5 + -0x1cce),
-                 *(undefined2 *)(*(int *)(iVar5 + -0x1cd2) + 0xc));
+                (CONCAT22(0,*(undefined2 *)(*(int *)(iVar5 + -0x1cd2) + 0xe)),
+                 (uint *)**(undefined4 **)(iVar5 + -0x1cce),
+                 (int)*(short *)(*(int *)(iVar5 + -0x1cd2) + 0xc));
     }
     else {
       sVar1 = *(short *)(iVar5 + -0x1372);
@@ -1106,7 +1217,7 @@ void rasterize_and_present /* Original: FUN_00000e10 */ (int param_1,int param_2
         sVar6 = *(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe) - (local_e._2_2_ - local_6);
         rebase_edge_rows_for_band(CONCAT22(sVar6,uVar7));
         (*(code *)**(undefined4 **)(iVar5 + -0x1cd2))
-                  (CONCAT22(local_8,local_6),(short)param_1,
+                  (CONCAT22(local_8,local_6),(uint *)param_1, /* CORRECTED [PROVEN]: MOVE.L 8(A6) pushes the whole dest */
                    ((short)(sVar1 * sVar2 + 0xf) >> 4) * 2 - (short)(sVar3 * sVar4) / 8);
         local_8 = 1;
         restore_edge_rows_after_band(CONCAT22(sVar6,uVar7));

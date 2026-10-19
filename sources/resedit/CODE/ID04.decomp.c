@@ -10,214 +10,330 @@ typedef unsigned char    byte;
 
 int DAT_00000904;
 
+/* VERIFIED (ID04::FUN_00000006): ID04.bin 0x6..0x2c checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; HiliteControl(handle, $ff) $A95D - identical to the C. */
 /* Original: FUN_00000006; source: ID04.c. Recovered name: disable_dialog_control [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
  * bytes at file 0x6.
  * GetDItem(dialog, item, &type, &handle, &box) ($A98D) then HiliteControl(handle, 255) ($A95D): dims the control. Args (C stack): +8 DialogPtr, +0xc short item. Callers: ID04 0x2ea0, 0x2eae (show_mission_summary_dialog).
  */
 // WARNING: Control flow encountered bad instruction data
 
-void disable_dialog_control /* Original: FUN_00000006 */ (void)
+void disable_dialog_control /* Original: FUN_00000006 */ (int param_1,short param_2)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
 
-
-
-/* Original: FUN_0000002e; source: ID04.c. Recovered name: enable_dialog_control [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x2e.
- * GetDItem ($A98D) then HiliteControl(handle, 0) ($A95D): re-enables the control. Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x1952, 0x1966.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void enable_dialog_control /* Original: FUN_0000002e */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00000054; source: ID04.c. Recovered name: hide_dialog_control [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x54.
- * GetDItem ($A98D) then HideControl(handle) ($A958). Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x2f20, 0x2f2e, 0x2fce.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void hide_dialog_control /* Original: FUN_00000054 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00000078; source: ID04.c. Recovered name: show_dialog_control [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x78.
- * GetDItem ($A98D) then ShowControl(handle) ($A957). Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x2f66, 0x2f74.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void show_dialog_control /* Original: FUN_00000078 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_0000009c; source: ID04.c. Recovered name: set_dialog_item_text [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x9c.
- * GetDItem ($A98D) then SetIText(handle, text) ($A98F). Args: +8 DialogPtr, +0xc short item, +0xe Pascal string pointer. Callers: ID04 0x2dda, 0x35ec, 0x37e4, 0x38b0.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void set_dialog_item_text /* Original: FUN_0000009c */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_000000c4; source: ID04.c. Recovered name: set_dialog_control_title [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0xc4.
- * GetDItem ($A98D) then SetCTitle(handle, title) ($A95F). Args: +8 DialogPtr, +0xc short item, +0xe Pascal string pointer. Caller: ID04 0x2ece (show_mission_summary_dialog, item 3).
- */
-// WARNING: Control flow encountered bad instruction data
-
-void set_dialog_control_title /* Original: FUN_000000c4 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_000000ec; source: ID04.c. Recovered name: set_dialog_user_item_proc [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0xec.
- * GetDItem ($A98D) then SetDItem(dialog, item, type, proc, &box) ($A98E): keeps type and box, replaces the item handle with a user-item procedure pointer. Args: +8 DialogPtr, +0xc short item, +0xe ProcPtr. 14 callers in ID04 (e.g. 0x8a6 item 0x27 and 0x13ba item 8 with JT $142 = draw_grey_user_item; 0x2e40.. with JT $aa).
- */
-// WARNING: Control flow encountered bad instruction data
-
-void set_dialog_user_item_proc /* Original: FUN_000000ec */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00000120; source: ID04.c. Recovered name: frame_dialog_item_box [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x120.
- * Saves thePort (A5-0x160c), SetPort(dialog) ($A873), GetDItem, InsetRect(&box, -2, -2) ($A8A9), PenSize(1, 1) ($A89B), FrameRect(&box) ($A8A1), restores the port. Draws a 1-pixel frame 2 pixels outside the item. Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x1daa, 0x1df0, 0x1f70, 0x33ec.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void frame_dialog_item_box /* Original: FUN_00000120 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_0000016e; source: ID04.c. Recovered name: draw_default_button_outline [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x16e.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). Ignores its item argument and uses the word at A5-0x225e: GetDItem, PenSize(3, 3), InsetRect(&box, -4, -4), FrameRoundRect(&box, 16, 16) ($A8B0) - the standard bold default-button ring. Reached through JT $12a (ID00 entry -> ID04 0x16e). The unexported routine at ID04 0x1b8 installs JT $12a as a user item with SetDItem and stores the default-button item number in A5-0x225e [PROVEN, bytes 0x1de/0x1e8].
- */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_default_button_outline /* Original: FUN_0000016e */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_000001f2; source: ID04.c. Recovered name: draw_grey_user_item [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
- * bytes at file 0x1f2.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes): GetDItem then FillRect(&box, gray) ($A8A5) with the QuickDraw pattern at A5-0x1624 (gray, next to white -0x1614 / black -0x161c) [STRONG INFERENCE for gray]. Reached through JT $142, installed by set_dialog_user_item_proc at ID04 0x8a6 and 0x13ba. [HYPOTHESIS] a grey separator / divider in a dialog.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_grey_user_item /* Original: FUN_000001f2 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00000220; source: ID04.c. Recovered name: draw_percent_bar_item [PROVEN].
- * Decoded from ID04.bin bytes at file 0x220.
- * C args: +8 DialogPtr, +0xc short item. GetDItem -> box; split = box.left + width * A5-0x225c / 100 (MULU.L / DIVS.L); FillRect(left part, dkGray A5-0x1634) ($A8A5), FillRect(right part from split + 1, white A5-0x1614); InsetRect(&box, -1, -1), PenSize(1, 1), FrameRect. A5-0x225c is a 0..100 value set by mouse tracking at 0xb3c..0xb9a (100 * (mouse - left) / width, clamped) and copied to/from settings word +0x22 of the handle A5-0x13ac and the live option A5-0x12d2 [PROVEN]. So this draws a percentage slider in the settings dialog [STRONG INFERENCE; which option it controls is open]. Callers: percent_bar_user_item_proc, 0xb9a.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_percent_bar_item /* Original: FUN_00000220 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_000002c0; source: ID04.c. Recovered name: percent_bar_user_item_proc [PROVEN].
- * Decoded from ID04.bin bytes at file 0x2c0.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes, which Ghidra read as an unrecoverable jump table): calls draw_percent_bar_item. Reached through JT $8a (CODE 0 entry -> ID04 0x2c0).
- * The following bytes 0x2dc..0x360 (not exported by Ghidra) are set_radio_group_selection [PROVEN, bytes]: C args +8 DialogPtr, +0xc short *items, +0x10 short count, +0x12 short selected. If items[0] <= selected <= items[count - 1], for each item: GetDItem, SetCtlValue(handle, item == selected) ($A963; SEQ/NEG gives 1 or 0). Callers: 0xcc4, 0xcdc, 0xd2c, 0xd44, 0xeda, 0xf0a.
- */
-void percent_bar_user_item_proc /* Original: FUN_000002c0 */ (void)
-
-{
-  code *UNRECOVERED_JUMPTABLE;
-  
-  draw_percent_bar_item();
-                    // WARNING: Could not recover jumptable at 0x000002da. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  HiliteControl(handle,0xff);                   /* $A95D */
   return;
 }
 
 
 
-/* Original: FUN_00000362; source: ID04.c. Recovered name: get_radio_group_selection [PROVEN].
- * Decoded from ID04.bin bytes at file 0x362.
- * C args: +8 DialogPtr, +0xc short *items, +0x10 short count. Returns the first items[i] whose control value (GetCtlValue $A960) is non-zero, or -1 when none is set (and when count < 1, the case Ghidra decoded) [PROVEN, bytes 0x362..0x3c0]. Pairs with set_radio_group_selection (0x2dc). Callers: 0xd5a, 0xda2, 0xf20.
+/* VERIFIED (ID04::FUN_0000002e): ID04.bin 0x2e..0x52 checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; HiliteControl(handle, CLR.W) $A95D - identical to the C. */
+/* Original: FUN_0000002e; source: ID04.c. Recovered name: enable_dialog_control [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x2e.
+ * GetDItem ($A98D) then HiliteControl(handle, 0) ($A95D): re-enables the control. Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x1952, 0x1966.
  */
 // WARNING: Control flow encountered bad instruction data
 
-undefined4 get_radio_group_selection /* Original: FUN_00000362 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void enable_dialog_control /* Original: FUN_0000002e */ (int param_1,short param_2)
 
 {
-  if (param_3._0_2_ < 1) {
-    return 0xffffffff;
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  HiliteControl(handle,0);                      /* $A95D */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_00000054): ID04.bin 0x54..0x76 checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; HideControl(handle) $A958 - identical to the C. */
+/* Original: FUN_00000054; source: ID04.c. Recovered name: hide_dialog_control [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x54.
+ * GetDItem ($A98D) then HideControl(handle) ($A958). Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x2f20, 0x2f2e, 0x2fce.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void hide_dialog_control /* Original: FUN_00000054 */ (int param_1,short param_2)
+
+{
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  HideControl(handle);                          /* $A958 */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_00000078): ID04.bin 0x78..0x9a checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; ShowControl(handle) $A957 - identical to the C. */
+/* Original: FUN_00000078; source: ID04.c. Recovered name: show_dialog_control [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x78.
+ * GetDItem ($A98D) then ShowControl(handle) ($A957). Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x2f66, 0x2f74.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void show_dialog_control /* Original: FUN_00000078 */ (int param_1,short param_2)
+
+{
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  ShowControl(handle);                          /* $A957 */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_0000009c): ID04.bin 0x9c..0xc2 checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; SetIText(handle, long $e) $A98F - identical to the C. */
+/* Original: FUN_0000009c; source: ID04.c. Recovered name: set_dialog_item_text [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x9c.
+ * GetDItem ($A98D) then SetIText(handle, text) ($A98F). Args: +8 DialogPtr, +0xc short item, +0xe Pascal string pointer. Callers: ID04 0x2dda, 0x35ec, 0x37e4, 0x38b0.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void set_dialog_item_text /* Original: FUN_0000009c */ (int param_1,short param_2,void *param_3)
+
+{
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  SetIText(handle,param_3);                     /* $A98F */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_000000c4): ID04.bin 0xc4..0xea checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; SetCTitle(handle, long $e) $A95F - identical to the C. */
+/* Original: FUN_000000c4; source: ID04.c. Recovered name: set_dialog_control_title [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0xc4.
+ * GetDItem ($A98D) then SetCTitle(handle, title) ($A95F). Args: +8 DialogPtr, +0xc short item, +0xe Pascal string pointer. Caller: ID04 0x2ece (show_mission_summary_dialog, item 3).
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void set_dialog_control_title /* Original: FUN_000000c4 */ (int param_1,short param_2,void *param_3)
+
+{
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  SetCTitle(handle,param_3);                    /* $A95F */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_000000ec): ID04.bin 0xec..0x11e checked against an independent capstone disassembly.
+ * LINK -$e; GetDItem(long 8, word $c, PEA -2, PEA -6, PEA -$e) $A98D; SetDItem(8, word $c, word -2, long $e, PEA -$e) $A98E - identical to the C. */
+/* Original: FUN_000000ec; source: ID04.c. Recovered name: set_dialog_user_item_proc [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0xec.
+ * GetDItem ($A98D) then SetDItem(dialog, item, type, proc, &box) ($A98E): keeps type and box, replaces the item handle with a user-item procedure pointer. Args: +8 DialogPtr, +0xc short item, +0xe ProcPtr. 14 callers in ID04 (e.g. 0x8a6 item 0x27 and 0x13ba item 8 with JT $142 = draw_grey_user_item; 0x2e40.. with JT $aa).
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void set_dialog_user_item_proc /* Original: FUN_000000ec */ (int param_1,short param_2,void *param_3)
+
+{
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  SetDItem(param_1,param_2,itemType,param_3,box); /* $A98E: same type and box, new proc */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_00000120): ID04.bin 0x120..0x16c checked against an independent capstone disassembly.
+ * LINK -$12; -$12 = thePort; SetPort(8); GetDItem; InsetRect(-$e, -2, -2) $A8A9; PenSize(1, 1); FrameRect(-$e) $A8A1;
+ * SetPort(-$12) - identical to the C. */
+/* Original: FUN_00000120; source: ID04.c. Recovered name: frame_dialog_item_box [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x120.
+ * Saves thePort (A5-0x160c), SetPort(dialog) ($A873), GetDItem, InsetRect(&box, -2, -2) ($A8A9), PenSize(1, 1) ($A89B), FrameRect(&box) ($A8A1), restores the port. Draws a 1-pixel frame 2 pixels outside the item. Args: +8 DialogPtr, +0xc short item. Callers: ID04 0x1daa, 0x1df0, 0x1f70, 0x33ec.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void frame_dialog_item_box /* Original: FUN_00000120 */ (int param_1,short param_2)
+
+{
+  int unaff_A5;
+  int saved;                                    /* -$12(A6) */
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  saved = *(int *)(unaff_A5 + -0x160c);         /* thePort */
+  SetPort(param_1);                             /* $A873 */
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  InsetRect(box,-2,-2);                         /* $A8A9 */
+  PenSize(1,1);                                 /* $A89B */
+  FrameRect(box);                               /* $A8A1 */
+  SetPort(saved);
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_0000016e): ID04.bin 0x16e..0x1b6 checked against an independent capstone disassembly.
+ * GetDItem(long $a, word A5-0x225e, -2, -6, -$e); PenSize(3, 3); InsetRect(-$e, -4, -4); FrameRoundRect(-$e, 16, 16)
+ * $A8B0; Pascal return popping 6 - identical to the C. */
+/* Original: FUN_0000016e; source: ID04.c. Recovered name: draw_default_button_outline [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x16e.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). Ignores its item argument and uses the word at A5-0x225e: GetDItem, PenSize(3, 3), InsetRect(&box, -4, -4), FrameRoundRect(&box, 16, 16) ($A8B0) - the standard bold default-button ring. Reached through JT $12a (ID00 entry -> ID04 0x16e). The unexported routine at ID04 0x1b8 installs JT $12a as a user item with SetDItem and stores the default-button item number in A5-0x225e [PROVEN, bytes 0x1de/0x1e8].
+ */
+// WARNING: Control flow encountered bad instruction data
+
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void draw_default_button_outline /* Original: FUN_0000016e */ (int dlg,short item)
+
+{
+  int unaff_A5;
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(dlg,*(short *)(unaff_A5 + -0x225e),&itemType,&handle,box); /* $A98D: the item argument is ignored */
+  PenSize(3,3);                                 /* $A89B */
+  InsetRect(box,-4,-4);                         /* $A8A9 */
+  FrameRoundRect(box,0x10,0x10);                /* $A8B0 */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_000001f2): ID04.bin 0x1f2..0x21e checked against an independent capstone disassembly.
+ * GetDItem(long $a, word 8, ...); FillRect(-$e, A5-0x1624) $A8A5; Pascal return popping 6 - identical to the C. */
+/* Original: FUN_000001f2; source: ID04.c. Recovered name: draw_grey_user_item [PROVEN].
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
+ * bytes at file 0x1f2.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes): GetDItem then FillRect(&box, gray) ($A8A5) with the QuickDraw pattern at A5-0x1624 (gray, next to white -0x1614 / black -0x161c) [STRONG INFERENCE for gray]. Reached through JT $142, installed by set_dialog_user_item_proc at ID04 0x8a6 and 0x13ba. [HYPOTHESIS] a grey separator / divider in a dialog.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void draw_grey_user_item /* Original: FUN_000001f2 */ (int dlg,short item)
+
+{
+  int unaff_A5;
+  short itemType;                               /* -2(A6) */
+  int handle;                                   /* -6(A6) */
+  short box[4];                                 /* -$e(A6): Rect */
+
+  GetDItem(dlg,item,&itemType,&handle,box);     /* $A98D */
+  FillRect(box,(void *)(unaff_A5 + -0x1624));   /* $A8A5, QD gray */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_00000220): ID04.bin 0x220..0x2be checked against an independent capstone disassembly.
+ * GetDItem(8, $c, -2, -$a, -$12); copy to -$1a; -4 = right - left, -6 = right; right = (MULU.L of MOVEA.W A5-0x225c
+ * and w) DIVS.L #$64 + MOVEA.W left; FillRect(-$12, A5-0x1634); left = right + 1, right = -6; FillRect(-$12, A5-0x1614);
+ * InsetRect(-$1a, -1, -1); PenSize(1, 1); FrameRect(-$1a) - identical to the C. */
+/* Original: FUN_00000220; source: ID04.c. Recovered name: draw_percent_bar_item [PROVEN].
+ * Decoded from ID04.bin bytes at file 0x220.
+ * C args: +8 DialogPtr, +0xc short item. GetDItem -> box; split = box.left + width * A5-0x225c / 100 (MULU.L / DIVS.L); FillRect(left part, dkGray A5-0x1634) ($A8A5), FillRect(right part from split + 1, white A5-0x1614); InsetRect(&box, -1, -1), PenSize(1, 1), FrameRect. A5-0x225c is a 0..100 value set by mouse tracking at 0xb3c..0xb9a (100 * (mouse - left) / width, clamped) and copied to/from settings word +0x22 of the handle A5-0x13ac and the live option A5-0x12d2 [PROVEN]. So this draws a percentage slider in the settings dialog [STRONG INFERENCE; which option it controls is open]. Callers: percent_bar_user_item_proc, 0xb9a. Body rebuilt as C below.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+void draw_percent_bar_item /* Original: FUN_00000220 */ (int param_1,short param_2)
+
+{
+  int unaff_A5;
+  short frame[4];                               /* -$1a(A6) */
+  short box[4];                                 /* -$12(A6): top, left (-$10), bottom (-$e), right (-$c) */
+  int handle;                                   /* -$a(A6) */
+  short right;                                  /* -6(A6) */
+  short w;                                      /* -4(A6) */
+  short itemType;                               /* -2(A6) */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  *(Rect *)frame = *(Rect *)box;
+  w = box[3] - box[1];
+  right = box[3];
+  box[3] = (short)((int)w * (int)*(short *)(unaff_A5 + -0x225c) / 100 + (int)box[1]); /* MULU.L, DIVS.L #$64 */
+  FillRect(box,(void *)(unaff_A5 + -0x1634));   /* $A8A5, QD dkGray: filled part */
+  box[1] = box[3] + 1;
+  box[3] = right;
+  FillRect(box,(void *)(unaff_A5 + -0x1614));   /* QD white: the rest */
+  InsetRect(frame,-1,-1);                       /* $A8A9 */
+  PenSize(1,1);                                 /* $A89B */
+  FrameRect(frame);                             /* $A8A1 */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_000002c0): ID04.bin 0x2c0..0x2da checked against an independent capstone disassembly.
+ * Push word 8 then long $a, BSR 0x220, ADDQ.L #6; Pascal return popping 6 - identical to the C. */
+/* Original: FUN_000002c0; source: ID04.c. Recovered name: percent_bar_user_item_proc [PROVEN].
+ * Decoded from ID04.bin bytes at file 0x2c0.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes, which Ghidra read as an unrecoverable jump table): calls draw_percent_bar_item. Reached through JT $8a (CODE 0 entry -> ID04 0x2c0).
+ * The following bytes 0x2dc..0x360 (not exported by Ghidra) are set_radio_group_selection [PROVEN, bytes]: C args +8 DialogPtr, +0xc short *items, +0x10 short count, +0x12 short selected. If items[0] <= selected <= items[count - 1], for each item: GetDItem, SetCtlValue(handle, item == selected) ($A963; SEQ/NEG gives 1 or 0). Callers: 0xcc4, 0xcdc, 0xd2c, 0xd44, 0xeda, 0xf0a.
+ */
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void percent_bar_user_item_proc /* Original: FUN_000002c0 */ (int dlg,short item)
+
+{
+  draw_percent_bar_item(dlg,item);              /* BSR 0x220; Ghidra read the JMP (A0) return as a jump table */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_00000362): ID04.bin 0x362..0x3c0 checked against an independent capstone disassembly.
+ * word i from 0 while i < word $10 (BLT); GetDItem(8, items[EXT.L i], -4, -8, -$10); GetCtlValue(-8) $A960 TST.W / BEQ
+ * next, else D0 = items[i]; MOVEQ #-1 after the loop - identical to the C. */
+/* Original: FUN_00000362; source: ID04.c. Recovered name: get_radio_group_selection [PROVEN].
+ * Decoded from ID04.bin bytes at file 0x362.
+ * C args: +8 DialogPtr, +0xc short *items, +0x10 short count. Returns the first items[i] whose control value (GetCtlValue $A960) is non-zero, or -1 when none is set (and when count < 1, the case Ghidra decoded) [PROVEN, bytes 0x362..0x3c0]. Body rebuilt as C below. Pairs with set_radio_group_selection (0x2dc). Callers: 0xd5a, 0xda2, 0xf20.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+short get_radio_group_selection /* Original: FUN_00000362 */ (int param_1,short *param_2,short param_3)
+
+{
+  short i;                                      /* -2(A6) */
+  int handle;                                   /* -8(A6) */
+  short box[4];                                 /* -$10(A6) */
+  short itemType;                               /* -4(A6) */
+
+  for (i = 0; i < param_3; i = i + 1) {
+    GetDItem(param_1,param_2[i],&itemType,&handle,box); /* $A98D */
+    if (GetCtlValue(handle) != 0) {             /* $A960 */
+      return param_2[i];
+    }
   }
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  return -1;
 }
 
 

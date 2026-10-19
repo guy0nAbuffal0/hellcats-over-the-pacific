@@ -6,6 +6,20 @@ typedef unsigned char    byte;
 
 
 
+/* VERIFIED (ID08::FUN_00000006): ID08.bin 0x06..0x336 checked against an independent capstone disassembly.
+ * Body rebuilt from the bytes (Ghidra's stack-confused body and halt_baddata dropped). Every JSR d16(A5) was
+ * resolved through CODE 0 (entry = slot - 2, segment word): $2a2 ID09 0x2a6 FSOpen, $4d2 ID02 0x2ee4,
+ * $fa ID04 0x44e, $23a ID09 0x218 DisposPtr, $2b2 ID09 0x2fa FSRead, $4ba ID02 0x1d48, $232 ID09 0x20c
+ * NewPtrClear, $4c2 ID02 0x212a, $2aa ID09 0x2de FSClose ($A001), $53a/$542/$582/$552/$54a/$532/$572/$55a/
+ * $57a ID05 0x7f6/0x8b8/0x160/0xb84/0x934/0x8b2/0x560/0x85e/0x1bc, $2ba ID09 0x344 GetVol, $2fa ID09 0x432,
+ * $51a ID02 0x2ee, $47a ID02 0x442e, $21a ID09 0x1bc MaxMem. Second FSOpen passes vRefNum 0; the open
+ * failure is the only RETURN 0 (BRA.W to UNLK); header-read, NewPtrClear and relocation failures BRA.W to
+ * 0x226 (CLR.L A5-0x1006) and still close, skip the protection block, check the volume and return 1.
+ * Alignment: (4 - (p & 3)) & 3 added. Relocation: count = (A5-0x100e)/8 + (A5-0x100a)/8 (DIVS.L ext
+ * 0x0800), flags long at rec+4: ASR #7 BTST #0 skip, ASR #4 BTST #0 error, (ASR #5) & 3 != 2 error, else
+ * base added at base + off (i < nA, signed BGE) or base + A5-0x1022 + off. Volume test: 0x102-byte copy of
+ * A5-0x1a24, GetVol, strcmp == 0 -> position_alert_template(0x105), StopAlert(0x105, nil) $A986,
+ * ExitToShell. TickCount ($A975) is the third argument to 0x8b8 - identical to the C. */
 /*
  * Original: FUN_00000006
  * Proposed name: load_overlay_from_resource
@@ -24,8 +38,8 @@ typedef unsigned char    byte;
  *   $2ba / $2fa / $51a — post-load setup; success returns 1
  *
  * Capstone @0x0006–0x0336: LINK A6,#$FDD6 … UNLK/RTS; success MOVEQ #1,D0.
- * Ghidra body is stack-confused (unaff_A5) and has halt_baddata artifacts
- * near Mac traps $A986/$A9F4 — preserve expressions; do not “fix” traps.
+ * Ghidra's body was stack-confused (unaff_A5) with halt_baddata artifacts
+ * near Mac traps $A986/$A9F4; replaced by the byte-level rebuild below.
  *
  * Callee: alloc_and_read_resource_payload (FUN_00000348). Globals: A5-0x13ac
  * type/name block; A5-0x1006 loaded-image pointer.
@@ -34,229 +48,113 @@ typedef unsigned char    byte;
  * Unknown: exact Toolbox trap names for each A5 slot; which resource ID is
  * the 255360-byte overlay.
  */
-undefined4 load_overlay_from_resource(void) /* Original: FUN_00000006 */
+int load_overlay_from_resource(void) /* Original: FUN_00000006 */
 
 {
-  int iVar1;
-  int iVar2;
-  int *piVar3;
-  short sVar5;
-  undefined4 uVar4;
-  undefined4 *puVar6;
-  undefined4 *puVar8;
   int unaff_A5;
-  undefined2 *puVar10;
-  undefined1 *puVar11;
-  undefined1 *puVar12;
-  undefined2 uStack_242;
-  undefined2 local_240;
-  int iStack_23e;
-  undefined4 local_23a;
-  undefined2 local_236;
-  int iStack_234;
-  undefined2 local_230;
-  undefined1 auStack_22e [2];
-  undefined4 uStack_22c;
-  undefined2 auStack_228 [126];
-  int local_12c;
-  int local_128;
-  undefined1 auStack_124 [260];
-  int local_20;
-  int local_1c;
-  int local_18;
-  undefined4 local_14;
-  short local_10;
-  undefined2 local_e;
-  undefined4 local_c;
-  int local_8;
-  undefined4 *puVar7;
-  undefined4 *puVar9;
-  
-  local_c = 0;
-  local_230 = 0;
-  iStack_234 = **(int **)(unaff_A5 + -0x13ac) + 0x2a;
-  local_236 = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x28);
-  local_23a = &local_e;
-  iStack_23e = 0x2c;
-  (**(code **)(unaff_A5 + 0x2a2))();
-  puVar10 = (undefined2 *)((int)&local_23a + 2);
-  if (local_23a._0_2_ != 0) {
-    local_23a = (undefined2 *)((uint)local_23a & 0xffff);
-    iStack_23e = **(int **)(unaff_A5 + -0x13ac) + 0x2a;
-    local_240 = 0;
-    sVar5 = (short)((uint)&local_e >> 0x10);
-    uStack_242 = SUB42(&local_e,0);
-    (**(code **)(unaff_A5 + 0x2a2))();
-    puVar10 = &uStack_242;
-    if (sVar5 != 0) {
-      (**(code **)(unaff_A5 + 0x4d2))
-                ((short)**(undefined4 **)(unaff_A5 + -0x13ac) + 0x2a,(short)auStack_124);
-      (**(code **)(unaff_A5 + 0xfa))((short)auStack_124);
-      return 0;
+  int hdr;                                      /* *(Handle)A5-0x13ac: file name at +0x2a, vRefNum at +0x28 */
+  int i;                                        /* -4(A6) */
+  int grow;                                     /* -8(A6) */
+  short refNum;                                 /* -$a(A6) */
+  short err;                                    /* -$c(A6) */
+  int count;                                    /* -$10(A6) */
+  int total;                                    /* -$14(A6) */
+  int nA;                                       /* -$18(A6) */
+  int nB;                                       /* -$1c(A6) */
+  byte msg[256];                                /* -$120(A6) */
+  int rec[2];                                   /* -$128(A6): offset, flags */
+  int a;                                        /* -$12c(A6) */
+  int b;                                        /* -$130(A6) */
+  byte volName[0x102];                          /* -$228(A6) */
+  short vRefNum;                                /* -$22a(A6) */
+
+  grow = 0;
+  hdr = **(int **)(unaff_A5 + -0x13ac);
+  if ((fsopen_glue((Str255 *)(hdr + 0x2a),*(short *)(hdr + 0x28),&refNum) != 0) && /* JT $2a2 -> ID09 0x2a6 */
+      (fsopen_glue((Str255 *)(**(int **)(unaff_A5 + -0x13ac) + 0x2a),0,&refNum) != 0)) {
+    copy_pascal_string((byte *)(**(int **)(unaff_A5 + -0x13ac) + 0x2a),msg); /* JT $4d2 -> ID02 0x2ee4 */
+    show_scenery_open_error_alert(msg);         /* JT $fa -> ID04 0x44e */
+    return 0;
+  }
+  if (*(int *)(unaff_A5 + -0x1006) != 0) {
+    DisposPtr(*(Ptr *)(unaff_A5 + -0x1006));    /* JT $23a -> ID09 0x218 */
+  }
+  count = 0x20;
+  err = FSRead(refNum,&count,(Ptr)(unaff_A5 + -0x1026)); /* JT $2b2 -> ID09 0x2fa: 32-byte header */
+  if (err != 0) {
+    show_caution_alert_with_number(*(int *)(unaff_A5 + -0xdf6),err); /* JT $4ba -> ID02 0x1d48 */
+    goto fail;
+  }
+  total = *(int *)(unaff_A5 + -0x1022) + *(int *)(unaff_A5 + -0x101e) + *(int *)(unaff_A5 + -0x101a);
+  *(Ptr *)(unaff_A5 + -0x1006) = NewPtrClear(total + 4); /* JT $232 -> ID09 0x20c */
+  if (*(int *)(unaff_A5 + -0x1006) == 0) {
+    show_caution_alert_with_number(*(int *)(unaff_A5 + -0xdf2),0);
+    goto fail;
+  }
+  *(int *)(unaff_A5 + -0x1006) =
+       *(int *)(unaff_A5 + -0x1006) + ((4 - (*(uint *)(unaff_A5 + -0x1006) & 3)) & 3); /* long-align */
+  count = *(int *)(unaff_A5 + -0x1022);
+  FSRead(refNum,&count,*(Ptr *)(unaff_A5 + -0x1006)); /* code part; OSErr discarded */
+  if (*(int *)(unaff_A5 + -0x101e) != 0) {
+    count = *(int *)(unaff_A5 + -0x101e);
+    FSRead(refNum,&count,(Ptr)(*(int *)(unaff_A5 + -0x1006) + *(int *)(unaff_A5 + -0x1022)));
+  }
+  nA = *(int *)(unaff_A5 + -0x100e) / 8;        /* DIVS.L #8 (extension 0x0800, quotient only) */
+  nB = *(int *)(unaff_A5 + -0x100a) / 8;
+  for (i = 0; i < nA + nB; i = i + 1) {
+    count = 8;
+    FSRead(refNum,&count,(Ptr)rec);             /* one 8-byte relocation record */
+    if ((rec[1] >> 7 & 1U) != 0) {
+      continue;                                 /* flag bit 7: skip */
+    }
+    if ((rec[1] >> 4 & 1U) != 0) {
+      show_caution_alert_with_number(*(int *)(unaff_A5 + -0xdee),0);
+      goto fail;
+    }
+    if ((rec[1] >> 5 & 3U) != 2) {
+      show_caution_alert_with_number(*(int *)(unaff_A5 + -0xdea),0);
+      goto fail;
+    }
+    if (i < nA) {
+      *(int *)(*(int *)(unaff_A5 + -0x1006) + rec[0]) =
+           *(int *)(*(int *)(unaff_A5 + -0x1006) + rec[0]) + *(int *)(unaff_A5 + -0x1006);
+    }
+    else {
+      *(int *)(*(int *)(unaff_A5 + -0x1006) + *(int *)(unaff_A5 + -0x1022) + rec[0]) =
+           *(int *)(*(int *)(unaff_A5 + -0x1006) + *(int *)(unaff_A5 + -0x1022) + rec[0]) +
+           *(int *)(unaff_A5 + -0x1006);
     }
   }
-  puVar11 = (undefined1 *)puVar10;
+  alloc_and_read_resource_payload(refNum);      /* BSR 0x348 */
+  reset_overlay_state();                        /* JT $4c2 -> ID02 0x212a */
+  goto close;
+fail:
+  *(int *)(unaff_A5 + -0x1006) = 0;
+close:
+  FSClose(refNum);                              /* JT $2aa -> ID09 0x2de ($A001); OSErr discarded */
   if (*(int *)(unaff_A5 + -0x1006) != 0) {
-    puVar11 = (undefined1 *)((int)puVar10 + -4);
-    *(undefined4 *)((int)puVar10 + -4) = *(undefined4 *)(unaff_A5 + -0x1006);
-    *(undefined4 *)((int)puVar10 + -8) = 0x80;
-    (**(code **)(unaff_A5 + 0x23a))();
-  }
-  local_14 = 0x20;
-  *(undefined2 *)(puVar11 + -2) = 0;
-  *(undefined2 *)(puVar11 + -4) = local_e;
-  *(undefined4 **)(puVar11 + -8) = &local_14;
-  *(int *)(puVar11 + -0xc) = unaff_A5 + -0x1026;
-  *(undefined4 *)(puVar11 + -0x10) = 0x98;
-  (**(code **)(unaff_A5 + 0x2b2))();
-  local_10 = *(short *)(puVar11 + -0xc);
-  if (local_10 == 0) {
-    local_18 = *(int *)(unaff_A5 + -0x101a) +
-               *(int *)(unaff_A5 + -0x101e) + *(int *)(unaff_A5 + -0x1022);
-    *(undefined4 *)(puVar11 + -0xe) = 0;
-    *(int *)(puVar11 + -0x12) = local_18 + 4;
-    *(undefined4 *)(puVar11 + -0x16) = 0xd2;
-    (**(code **)(unaff_A5 + 0x232))();
-    iVar1 = *(int *)(puVar11 + -0x12);
-    *(int *)(unaff_A5 + -0x1006) = iVar1;
-    if (iVar1 != 0) {
-      *(int *)(unaff_A5 + -0x1006) =
-           (4 - (*(uint *)(unaff_A5 + -0x1006) & 3) & 3) + *(int *)(unaff_A5 + -0x1006);
-      local_14 = *(undefined4 *)(unaff_A5 + -0x1022);
-      *(undefined2 *)(puVar11 + -0x10) = 0;
-      *(undefined2 *)(puVar11 + -0x12) = local_e;
-      *(undefined4 **)(puVar11 + -0x16) = &local_14;
-      *(undefined4 *)(puVar11 + -0x1a) = *(undefined4 *)(unaff_A5 + -0x1006);
-      *(undefined4 *)(puVar11 + -0x1e) = 0x11a;
-      (**(code **)(unaff_A5 + 0x2b2))();
-      puVar12 = puVar11 + -0x18;
-      if (*(int *)(unaff_A5 + -0x101e) != 0) {
-        local_14 = *(undefined4 *)(unaff_A5 + -0x101e);
-        iVar1 = *(int *)(unaff_A5 + -0x1006);
-        iVar2 = *(int *)(unaff_A5 + -0x1022);
-        *(undefined2 *)(puVar11 + -0x1a) = 0;
-        *(undefined2 *)(puVar11 + -0x1c) = local_e;
-        *(undefined4 **)(puVar11 + -0x20) = &local_14;
-        *(int *)(puVar11 + -0x24) = iVar2 + iVar1;
-        *(undefined4 *)(puVar11 + -0x28) = 0x140;
-        (**(code **)(unaff_A5 + 0x2b2))();
-        puVar12 = puVar11 + -0x22;
-      }
-      local_1c = *(int *)(unaff_A5 + -0x100e) / 8;
-      local_20 = *(int *)(unaff_A5 + -0x100a) / 8;
-      puVar11 = puVar12;
-      for (local_8 = 0; local_8 < local_20 + local_1c; local_8 = local_8 + 1) {
-        local_14 = 8;
-        *(undefined2 *)(puVar11 + -2) = 0;
-        *(undefined2 *)(puVar11 + -4) = local_e;
-        *(undefined4 **)(puVar11 + -8) = &local_14;
-        *(int **)(puVar11 + -0xc) = &local_12c;
-        *(undefined4 *)(puVar11 + -0x10) = 0x182;
-        (**(code **)(unaff_A5 + 0x2b2))();
-        if ((local_128 >> 7 & 1U) == 0) {
-          if ((local_128 >> 4 & 1U) != 0) {
-            *(undefined2 *)(puVar11 + -0xc) = 0;
-            *(undefined4 *)(puVar11 + -0x10) = *(undefined4 *)(unaff_A5 + -0xdee);
-            *(undefined4 *)(puVar11 + -0x14) = 0x1a8;
-            (**(code **)(unaff_A5 + 0x4ba))();
-            puVar11 = puVar11 + -10;
-            goto LAB_00000226;
-          }
-          if ((local_128 >> 5 & 3U) != 2) {
-            *(undefined2 *)(puVar11 + -0xc) = 0;
-            *(undefined4 *)(puVar11 + -0x10) = *(undefined4 *)(unaff_A5 + -0xdea);
-            *(undefined4 *)(puVar11 + -0x14) = 0x1fe;
-            (**(code **)(unaff_A5 + 0x4ba))();
-            puVar11 = puVar11 + -10;
-            goto LAB_00000226;
-          }
-          if (local_8 < local_1c) {
-            piVar3 = (int *)(local_12c + *(int *)(unaff_A5 + -0x1006));
-            *piVar3 = *(int *)(unaff_A5 + -0x1006) + *piVar3;
-          }
-          else {
-            piVar3 = (int *)(local_12c + *(int *)(unaff_A5 + -0x1022) + *(int *)(unaff_A5 + -0x1006)
-                            );
-            *piVar3 = *(int *)(unaff_A5 + -0x1006) + *piVar3;
-          }
-        }
-        puVar11 = puVar11 + -10;
-      }
-      *(undefined2 *)(puVar11 + -2) = local_e;
-      *(undefined4 *)(puVar11 + -6) = 0x21e;
-      alloc_and_read_resource_payload( /* Original: FUN_00000348 */*(undefined4 *)(puVar11 + -2));
-      *(undefined4 *)(puVar11 + -4) = 0x224;
-      (**(code **)(unaff_A5 + 0x4c2))();
-      goto LAB_0000022a;
+    poison_overlay_bytes(*(int *)(unaff_A5 + -0x1006),*(uint *)(unaff_A5 + -0x1022)); /* JT $53a -> ID05 0x7f6 */
+    init_protection_table(unaff_A5 + -0x1cc4,0x38,TickCount()); /* $A975; JT $542 -> ID05 0x8b8 (no inventory entry) */
+    read_DATA128_pair(&a,&b);                   /* JT $582 -> ID05 0x160 */
+    if (record_code_index_equals(a,encode_code28_to_buf54(b)) != 0) { /* JT $54a -> 0x934, $552 -> 0xb84 */
+      FUN_000008b2();                           /* JT $532 -> ID05 0x8b2: ADDQ.W #1,A5-0xbc (no inventory entry) */
     }
-    *(undefined2 *)(puVar11 + -0x10) = 0;
-    *(undefined4 *)(puVar11 + -0x14) = *(undefined4 *)(unaff_A5 + -0xdf2);
-    *(undefined4 *)(puVar11 + -0x18) = 0xe8;
-    (**(code **)(unaff_A5 + 0x4ba))();
-    puVar11 = puVar11 + -0xe;
+    run_protection_dialog(&a,&b);               /* JT $572 -> ID05 0x560 */
+    restore_poisoned_overlay_bytes();           /* JT $55a -> ID05 0x85e */
+    if (record_code_index_equals(a,encode_code28_to_buf54(b)) != 0) {
+      write_DATA128_pair(a,b);                  /* JT $57a -> ID05 0x1bc */
+    }
   }
-  else {
-    *(short *)(puVar11 + -0xc) = local_10;
-    *(undefined4 *)(puVar11 + -0x10) = *(undefined4 *)(unaff_A5 + -0xdf6);
-    *(undefined4 *)(puVar11 + -0x14) = 0xae;
-    (**(code **)(unaff_A5 + 0x4ba))();
-    puVar11 = puVar11 + -10;
+  memcpy(volName,(void *)(unaff_A5 + -0x1a24),0x102); /* 63 longs + 1 word */
+  GetVol(volName,&vRefNum);                     /* JT $2ba -> ID09 0x344 ($A014); OSErr discarded */
+  if (ansi_strcmp(length_prefixed_bytes_to_c_string_in_place(volName),(char *)(unaff_A5 + -0x16e2)) == 0) {
+                                                /* JT $2fa -> ID09 0x432, JT $51a -> ID02 0x2ee */
+    position_alert_template(0x105);             /* JT $47a -> ID02 0x442e */
+    StopAlert(0x105,0);                         /* $A986, result discarded */
+    ExitToShell();                              /* $A9F4 */
   }
-LAB_00000226:
-  *(undefined4 *)(unaff_A5 + -0x1006) = 0;
-LAB_0000022a:
-  *(undefined2 *)(puVar11 + -2) = 0;
-  *(undefined2 *)(puVar11 + -4) = local_e;
-  *(undefined4 *)(puVar11 + -8) = 0x234;
-  (**(code **)(unaff_A5 + 0x2aa))();
-  if (*(int *)(unaff_A5 + -0x1006) != 0) {
-    *(undefined4 *)(puVar11 + -6) = *(undefined4 *)(unaff_A5 + -0x1022);
-    *(undefined4 *)(puVar11 + -10) = *(undefined4 *)(unaff_A5 + -0x1006);
-    *(undefined4 *)(puVar11 + -0xe) = 0x24a;
-    (**(code **)(unaff_A5 + 0x53a))();
-    *(undefined4 *)(puVar11 + -6) = 0;
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
-  }
-  sVar5 = 0x3e;
-  puVar6 = &uStack_22c;
-  puVar8 = (undefined4 *)(unaff_A5 + -0x1a24);
-  do {
-    puVar9 = puVar8 + 1;
-    puVar7 = puVar6 + 1;
-    *puVar6 = *puVar8;
-    sVar5 = sVar5 + -1;
-    puVar6 = puVar7;
-    puVar8 = puVar9;
-  } while (sVar5 != -1);
-  *(undefined2 *)puVar7 = *(undefined2 *)puVar9;
-  *(undefined2 *)(puVar11 + -4) = 0;
-  *(undefined4 **)(puVar11 + -8) = &uStack_22c;
-  *(undefined1 **)(puVar11 + -0xc) = auStack_22e;
-  *(undefined4 *)(puVar11 + -0x10) = 0x2ea;
-  (**(code **)(unaff_A5 + 0x2ba))();
-  *(undefined4 **)(puVar11 + -0xe) = &uStack_22c;
-  *(undefined4 *)(puVar11 + -0x12) = 0x2f4;
-  uVar4 = (**(code **)(unaff_A5 + 0x2fa))();
-  *(int *)(puVar11 + -0xe) = unaff_A5 + -0x16e2;
-  *(undefined4 *)(puVar11 + -0x12) = uVar4;
-  *(undefined4 *)(puVar11 + -0x16) = 0x300;
-  sVar5 = (**(code **)(unaff_A5 + 0x51a))();
-  if (sVar5 != 0) {
-    *(undefined4 *)(puVar11 + -0xe) = 0;
-    *(undefined4 **)(puVar11 + -0x12) = &local_c;
-    *(undefined4 *)(puVar11 + -0x16) = 0x330;
-    (**(code **)(unaff_A5 + 0x21a))();
-    return 1;
-  }
-  *(undefined2 *)(puVar11 + -0xc) = 0x105;
-  *(undefined4 *)(puVar11 + -0x10) = 0x316;
-  (**(code **)(unaff_A5 + 0x47a))();
-  *(undefined2 *)(puVar11 + -0xc) = 0;
-  *(undefined2 *)(puVar11 + -0xe) = 0x105;
-  *(undefined4 *)(puVar11 + -0x12) = 0;
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  MaxMem(&grow);                                /* JT $21a -> ID09 0x1bc; result discarded */
+  return 1;                                     /* also after a header / alloc / relocation failure */
 }
 
 
@@ -277,12 +175,15 @@ LAB_0000022a:
  *
  * Evidence: Capstone bytes; Inside Macintosh trap numbers A9C8/A9F4.
  */
+/* VERIFIED (ID08::FUN_00000338): ID08.bin 0x338..0x346 checked against an independent capstone disassembly:
+ * LINK, MOVE.W #$64,-(A7), _SysBeep ($A9C8), _ExitToShell ($A9F4), UNLK / RTS (unreachable) - identical
+ * to the C (reconstructed from the bytes; Ghidra stopped at the A-line traps). */
 void sysbeep_and_exit_to_shell(void) /* Original: FUN_00000338 */
 
 {
-  /* Reconstructed from Capstone — Ghidra could not decode A-line traps */
-  /* SysBeep(100); ExitToShell; */
-  return;
+  SysBeep(100);   /* MOVE.W #$64,-(A7); _SysBeep $A9C8 */
+  ExitToShell();  /* _ExitToShell $A9F4; does not return */
+  return;         /* UNLK A6 / RTS, unreachable */
 }
 
 
@@ -304,27 +205,26 @@ void sysbeep_and_exit_to_shell(void) /* Original: FUN_00000338 */
  *
  * Evidence: Capstone ID08.bin; sole caller in load_overlay_from_resource.
  */
-undefined2 alloc_and_read_resource_payload(undefined4 param_1) /* Original: FUN_00000348 */
+/* VERIFIED (ID08::FUN_00000348): ID08.bin 0x348..0x39a checked against an independent capstone disassembly.
+ * The jump-table slots resolve through CODE 0 (ID00.bin entry n = (off - 0x22) / 8, file = segment offset
+ * + 4) to the MPW File / Memory Manager glue in ID09, identified by their traps: $2ca -> ID09 0x38c
+ * _GetFPos ($A018), $2c2 -> 0x368 _GetEOF ($A011), $22a -> 0x200 _NewPtr ($A11E), $2b2 -> 0x2fa FSRead
+ * (_Read $A002). The argument is a word (the only caller, ID08 0x216, pushes MOVE.W -$a(A6) and pops 2):
+ * the open file's refNum. Reads from the current mark to the end of the file into a new block stored at
+ * A5-0x12fc and returns FSRead's OSErr (MOVE.W (A7)+,D0); the GetFPos / GetEOF results are discarded -
+ * identical to the C (reconstructed from the bytes; Ghidra mangled the stack arguments and the return). */
+short alloc_and_read_resource_payload(short refNum) /* Original: FUN_00000348 */
 
 {
   int unaff_A5;
-  undefined4 uVar1;
-  undefined2 local_20;
-  undefined2 uVar2;
-  int local_c;
-  int local_8;
-  
-  /* Binary: GetStart/GetEnd-style pair then NewPtr then read — see header */
-  (**(code **)(unaff_A5 + 0x2ca))(&local_c,0);
-  (**(code **)(unaff_A5 + 0x2c2))((short)&local_8);
-  local_8 = local_8 - local_c;
-  local_20 = (undefined2)((uint)local_8 >> 0x10);
-  uVar2 = (undefined2)local_8;
-  (**(code **)(unaff_A5 + 0x22a))(uVar2,0,param_1._0_2_);
-  *(uint *)(unaff_A5 + -0x12fc) = CONCAT22(local_20,uVar2);
-  uVar1 = *(undefined4 *)(unaff_A5 + -0x12fc);
-  (**(code **)(unaff_A5 + 0x2b2))(uVar1,&local_8,0);
-  return (short)((uint)uVar1 >> 0x10);
+  long start;
+  long size;
+
+  GetFPos(refNum,&start);                      /* JT $2ca -> ID09 0x38c _GetFPos; OSErr discarded */
+  GetEOF(refNum,&size);                        /* JT $2c2 -> ID09 0x368 _GetEOF; OSErr discarded */
+  size = size - start;                         /* SUB.L D0,-$4(A6) */
+  *(Ptr *)(unaff_A5 + -0x12fc) = NewPtr(size); /* JT $22a -> ID09 0x200 _NewPtr */
+  return FSRead(refNum,&size,*(Ptr *)(unaff_A5 + -0x12fc)); /* JT $2b2 -> ID09 0x2fa _Read */
 }
 
 
@@ -348,11 +248,44 @@ undefined2 alloc_and_read_resource_payload(undefined4 param_1) /* Original: FUN_
  * Evidence: Capstone; JSR target 0x6 proven (disp $FBC4); 'HELL' immediate.
  * Unknown: exact Toolbox names for $A97C/$A982; meaning of 'HELL' check.
  */
+/* VERIFIED (ID08::FUN_0000039c): ID08.bin 0x39c..0x446 checked against an independent capstone disassembly:
+ * GetNewDialog(-4000 = the standard Get File dialog, nil, (WindowPtr)-1) ($A97C) only to place it:
+ * position_window_on_screen (JT $48a -> ID02 0x435e), then its portRect top-left (+0x10 / +0x12) is
+ * converted to global coordinates with SetPort ($A873) / LocalToGlobal ($A870) / SetPort(saved thePort
+ * A5-0x160c), and the dialog is disposed ($A982 DisposDialog). SFGetFile(where, prompt A5-0x16d8, nil,
+ * 1, {'HELL'}, nil, &reply) through JT $30a -> ID09 0x1a, the _Pack3 ($ADEA) selector-2 entry of the
+ * package glue at 0x4 (selector = (return address - 0x18) / 2). On reply.good (-0x5a) the file name
+ * (reply.fName -0x50) is copied by copy_pascal_string (JT $4d2 -> ID02 0x2ee4) to the record at
+ * *(A5-0x13ac) + 0x2a, its +0x28 = reply.vRefNum (-0x54), A5-0x138a = 1, and
+ * load_overlay_from_resource (JSR 0x6) runs - identical to the C (reconstructed from the bytes; Ghidra
+ * stopped at the A-line traps). */
 void bootstrap_window_and_load_overlay(void) /* Original: FUN_0000039c */
 
 {
-  /* Body omitted in Ghidra (A-line traps). See Capstone summary in header.
-   * Terminal call: load_overlay_from_resource (ID08 @0x0006). */
+  int unaff_A5;
+  DialogPtr dialog;                 /* -$5e */
+  GrafPtr savedPort;                /* -$62 */
+  Point where;                      /* -$66: v = top, h = left */
+  OSType typeList[1];               /* -$10 */
+  SFReply reply;                    /* -$5a: good, vRefNum -$54, fName -$50 */
+
+  dialog = GetNewDialog(-4000,(Ptr)0,(WindowPtr)-1);       /* $A97C */
+  position_window_on_screen((int)dialog);                  /* JT $48a -> ID02 0x435e */
+  where.v = *(short *)((int)dialog + 0x10);                /* portRect.top */
+  where.h = *(short *)((int)dialog + 0x12);                /* portRect.left */
+  savedPort = *(GrafPtr *)(unaff_A5 + -0x160c);            /* thePort */
+  SetPort((GrafPtr)dialog);                                /* $A873 */
+  LocalToGlobal(&where);                                   /* $A870 */
+  SetPort(savedPort);                                      /* $A873 */
+  DisposDialog(dialog);                                    /* $A982 */
+  typeList[0] = 0x48454c4c;                                /* 'HELL' */
+  SFGetFile(where,(Str255 *)(unaff_A5 + -0x16d8),(ProcPtr)0,1,typeList,(ProcPtr)0,&reply); /* JT $30a -> ID09 0x1a, _Pack3 selector 2 */
+  if (reply.good != 0) {
+    copy_pascal_string((char *)reply.fName,(char *)(**(int **)(unaff_A5 + -0x13ac) + 0x2a)); /* JT $4d2 */
+    *(short *)(**(int **)(unaff_A5 + -0x13ac) + 0x28) = reply.vRefNum;
+    *(short *)(unaff_A5 + -0x138a) = 1;
+    load_overlay_from_resource();                          /* JSR 0x6(PC) at 0x440 */
+  }
   return;
 }
 
