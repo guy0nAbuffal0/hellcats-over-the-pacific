@@ -1104,3 +1104,12 @@ inventory yet.
 | --- | --- | --- | --- |
 | 0x4d0 | host +0x302 (stored 0x4b0) | bytes 0x4d0..0x4f6 | returns 1 when DAT_0001b738 is null or player y - ctl ground +0x2e > 4999, else 0 [PROVEN] |
 | 0xd25a | host +0x316 (stored 0xd23a) | starts at 0xd25a right after the 0xd258 rts | first call update_view_readouts_and_overlays(0); body not yet reviewed |
+
+## Readable global names (readability pass)
+
+`#define` aliases added to the `*.decomp.c` files; the Ghidra symbol stays the real name.
+
+| File | Alias | Ghidra symbol | Evidence |
+|---|---|---|---|
+| ID02 | `CurrentA5` | `DAT_00000904` | low-memory global $0904, read by every A5-safe routine to load the application A5 |
+| ID02 | `vbl_ch0_a5_cache` | `DAT_000039c4` | PC-relative long at entry + 0x1c of the VBL handler 0x39a8; 0 until the priming call stores CurrentA5 there |

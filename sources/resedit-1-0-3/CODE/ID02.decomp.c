@@ -10,6 +10,10 @@ typedef unsigned short    ushort;
 
 
 int DAT_00000904;
+
+/* Readable global names (readability pass; the Ghidra name stays the real symbol) */
+#define CurrentA5 DAT_00000904 /* low-memory global $0904: the application's A5 world */
+#define vbl_ch0_a5_cache DAT_000039c4 /* long inside the code of vbl_sound_handler_ch0_unrolled: A5 cached on the first call */
 undefined4 DAT_00000904;
 short DAT_00000baa;
 int DAT_000039c4;
@@ -673,54 +677,54 @@ char * ansi_strstr /* Original: FUN_0000038c */ (char *s /* param_1: haystack cu
  * Decoded from ID02.bin bytes at file 0x3aa.
  * strtok(s, delims): with s == NULL continues from the saved pointer A5-0x1508; skips leading delimiters, NUL-terminates the token and saves the next position in A5-0x1508 (0 when the string ends). Complete Ghidra C.
  */
-char * ansi_strtok /* Original: FUN_000003aa */ (char *param_1,char *param_2)
+char * ansi_strtok /* Original: FUN_000003aa */ (char *s /* param_1: string, or NULL to continue from the saved position A5-0x1508 */,char *delim /* param_2 */)
 
 {
-  char cVar1;
-  char *pcVar2;
-  char *pcVar3;
-  char *pcVar4;
-  char *pcVar5;
+  char dc; /* cVar1: byte of delim */
+  char *next; /* pcVar2 */
+  char *tok; /* pcVar3: token start (first non-delimiter) */
+  char *end; /* pcVar4: scan for the token end */
+  char *d; /* pcVar5: delim cursor */
   int unaff_A5;
   
-  if (param_1 != (char *)0x0) goto LAB_000003b6;
+  if (s != (char *)0x0) goto LAB_000003b6;
   do {
-    param_1 = *(char **)(unaff_A5 + -0x1508);
-    if (param_1 == (char *)0x0) {
+    s = *(char **)(unaff_A5 + -0x1508);
+    if (s == (char *)0x0) {
       return (char *)0x0;
     }
 LAB_000003b6:
     *(undefined4 *)(unaff_A5 + -0x1508) = 0;
     while( true ) {
-      pcVar3 = param_1;
-      pcVar5 = param_2;
-      if (*pcVar3 == '\0') break;
+      tok = s;
+      d = delim;
+      if (*tok == '\0') break;
       do {
-        cVar1 = *pcVar5;
-        pcVar2 = pcVar3 + 1;
-        if (cVar1 == '\0') {
+        dc = *d;
+        next = tok + 1;
+        if (dc == '\0') {
           do {
-            pcVar4 = pcVar2;
-            pcVar5 = param_2;
-            if (*pcVar4 == '\0') {
-              return pcVar3;
+            end = next;
+            d = delim;
+            if (*end == '\0') {
+              return tok;
             }
             while( true ) {
-              cVar1 = *pcVar5;
-              pcVar2 = pcVar4 + 1;
-              if (cVar1 == '\0') break;
-              pcVar5 = pcVar5 + 1;
-              if (cVar1 == *pcVar4) {
-                *(char **)(unaff_A5 + -0x1508) = pcVar4 + 1;
-                *pcVar4 = '\0';
-                return pcVar3;
+              dc = *d;
+              next = end + 1;
+              if (dc == '\0') break;
+              d = d + 1;
+              if (dc == *end) {
+                *(char **)(unaff_A5 + -0x1508) = end + 1;
+                *end = '\0';
+                return tok;
               }
             }
           } while( true );
         }
-        param_1 = pcVar3 + 1;
-        pcVar5 = pcVar5 + 1;
-      } while (cVar1 != *pcVar3);
+        s = tok + 1;
+        d = d + 1;
+      } while (dc != *tok);
     }
   } while( true );
 }
@@ -734,22 +738,22 @@ LAB_000003b6:
  * Decoded from ID02.bin bytes at file 0x3f6.
  * strncpy(dst, src, n): copies n bytes, padding with NULs once src ends (the source pointer stops advancing at its NUL). Complete Ghidra C.
  */
-char * ansi_strncpy /* Original: FUN_000003f6 */ (char *param_1,char *param_2,int param_3)
+char * ansi_strncpy /* Original: FUN_000003f6 */ (char *dst /* param_1 */,char *src /* param_2 */,int count /* param_3 */)
 
 {
-  char cVar1;
-  char *pcVar2;
+  char ch; /* cVar1 */
+  char *out; /* pcVar2: write cursor */
 
-  pcVar2 = param_1;                             /* MOVE.L 4(A7),D0: dst is the return value */
-  for (; param_3 != 0; param_3 = param_3 + -1) {
-    cVar1 = *param_2;
-    *pcVar2 = cVar1;
-    if (cVar1 != '\0') {
-      param_2 = param_2 + 1;
+  out = dst;                             /* MOVE.L 4(A7),D0: dst is the return value */
+  for (; count != 0; count = count + -1) {
+    ch = *src;
+    *out = ch;
+    if (ch != '\0') {
+      src = src + 1;
     }
-    pcVar2 = pcVar2 + 1;
+    out = out + 1;
   }
-  return param_1;
+  return dst;
 }
 
 
@@ -761,34 +765,34 @@ char * ansi_strncpy /* Original: FUN_000003f6 */ (char *param_1,char *param_2,in
  * Decoded from ID02.bin bytes at file 0x412.
  * strncat(dst, src, n): appends at most n bytes of src to dst and always NUL-terminates. Complete Ghidra C.
  */
-char * ansi_strncat /* Original: FUN_00000412 */ (char *param_1,char *param_2,int param_3)
+char * ansi_strncat /* Original: FUN_00000412 */ (char *dst /* param_1 */,char *src /* param_2 */,int count /* param_3 */)
 
 {
-  char cVar1;
-  char *pcVar2;
-  char *pcVar3;
-  char *pcVar4;
+  char ch; /* cVar1 */
+  char *after; /* pcVar2: one past the byte written */
+  char *out; /* pcVar3: dst terminator, then the write cursor */
+  char *scan; /* pcVar4 */
 
-  if (param_3 != 0) {                           /* D0 = dst before the test: returned on every path */
-    pcVar4 = param_1;
+  if (count != 0) {                           /* D0 = dst before the test: returned on every path */
+    scan = dst;
     do {
-      pcVar3 = pcVar4;
-      pcVar4 = pcVar3 + 1;
-    } while (*pcVar3 != '\0');
+      out = scan;
+      scan = out + 1;
+    } while (*out != '\0');
     do {
-      cVar1 = *param_2;
-      pcVar2 = pcVar3 + 1;
-      *pcVar3 = cVar1;
-      if (cVar1 == '\0') {
-        return param_1;
+      ch = *src;
+      after = out + 1;
+      *out = ch;
+      if (ch == '\0') {
+        return dst;
       }
-      param_3 = param_3 + -1;
-      pcVar3 = pcVar2;
-      param_2 = param_2 + 1;
-    } while (param_3 != 0);
-    *pcVar2 = '\0';
+      count = count + -1;
+      out = after;
+      src = src + 1;
+    } while (count != 0);
+    *after = '\0';
   }
-  return param_1;
+  return dst;
 }
 
 
@@ -1085,14 +1089,14 @@ restart:                                        /* 0x51a */
  * Decoded from ID02.bin bytes at file 0x930.
  * Calls the overlay hook pointers in order: A5-0x1082, A5-0x107e, A5-0x107a(arg1, arg2), A5-0x1076 - the same hooks begin_overlay_session / end_overlay_session use (begin, after memory set-up, run, end) [STRONG INFERENCE for the roles]. Caller: ID02 0x4e0a. Complete Ghidra C.
  */
-void call_overlay_session_hooks /* Original: FUN_00000930 */ (undefined4 param_1,undefined4 param_2)
+void call_overlay_session_hooks /* Original: FUN_00000930 */ (undefined4 step_arg1 /* param_1: forwarded to the frame-step hook A5-0x107a */,undefined4 step_arg2 /* param_2 */)
 
 {
   int unaff_A5;
   
   (**(code **)(unaff_A5 + -0x1082))();
   (**(code **)(unaff_A5 + -0x107e))();
-  (**(code **)(unaff_A5 + -0x107a))(param_1,param_2);
+  (**(code **)(unaff_A5 + -0x107a))(step_arg1,step_arg2);
   (**(code **)(unaff_A5 + -0x1076))();
   return;
 }
@@ -1118,16 +1122,16 @@ void call_overlay_session_hooks /* Original: FUN_00000930 */ (undefined4 param_1
  * by the overlay.
  */
 void draw_thick_line_pixel_index_a5safe /* Original: FUN_00000a42 */
-               (undefined4 param_1,int param_2,int param_3,int param_4,int param_5)
+               (undefined4 colour_index /* param_1: raw pixel index stored in fgColor */,int h0 /* param_2 */,int v0 /* param_3 */,int h1 /* param_4 */,int v1 /* param_5 */)
 
 {
   int unaff_A5;
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; caller's A5 / D2 saved and restored */
-  *(undefined4 *)(*(int *)(unaff_A5 + -0x160c) + 0x50) = param_1; /* thePort->fgColor = raw index */
+  *(undefined4 *)(*(int *)(unaff_A5 + -0x160c) + 0x50) = colour_index; /* thePort->fgColor = raw index */
   PenSize(2,2);                                 /* $A89B */
-  MoveTo((short)param_2,(short)param_3);        /* $A893; low words $e / $12(A6) */
-  LineTo((short)param_4,(short)param_5);        /* $A891; low words $16 / $1a(A6) */
+  MoveTo((short)h0,(short)v0);        /* $A893; low words $e / $12(A6) */
+  LineTo((short)h1,(short)v1);        /* $A891; low words $16 / $1a(A6) */
   return;
 }
 
@@ -1149,14 +1153,14 @@ void draw_thick_line_pixel_index_a5safe /* Original: FUN_00000a42 */
  * XOR mode makes the line erasable by redrawing it [STRONG INFERENCE].
  * Mode constants per Inside Macintosh; note 0 is restored, not patCopy (8).
  */
-void draw_thick_xor_line_a5safe /* Original: FUN_00000a86 */ (int param_1,int param_2,int param_3,int param_4)
+void draw_thick_xor_line_a5safe /* Original: FUN_00000a86 */ (int h0 /* param_1 */,int v0 /* param_2 */,int h1 /* param_3 */,int v1 /* param_4 */)
 
 {
   ForeColor(0x21);                              /* $A862, blackColor */
   PenMode(2);                                   /* $A89C, srcXor */
   PenSize(2,2);                                 /* $A89B */
-  MoveTo((short)param_1,(short)param_2);        /* $A893; low words $a / $e(A6) */
-  LineTo((short)param_3,(short)param_4);        /* $A891; low words $12 / $16(A6) */
+  MoveTo((short)h0,(short)v0);        /* $A893; low words $a / $e(A6) */
+  LineTo((short)h1,(short)v1);        /* $A891; low words $12 / $16(A6) */
   PenMode(0);                                   /* srcCopy restored */
   return;                                       /* A5 = CurrentA5 ($904) around the body, then restored */
 }
@@ -1198,8 +1202,8 @@ void draw_thick_xor_line_a5safe /* Original: FUN_00000a86 */ (int param_1,int pa
  * fill of the 3-D view (artificial horizon background).
  */
 void paint_view_horizon_bands_a5safe /* Original: FUN_00000ad0 */
-               (int param_1,int param_2,int param_3,int param_4,int param_5,int param_6,int param_7,
-               int param_8,int param_9)
+               (int band_top /* param_1: end of the top band, rows below the view top */,int band_bottom /* param_2: start of the bottom band */,int unused /* param_3: never read */,int top_colour /* param_4 */,int bottom_colour /* param_5 */,int split_h_top /* param_6: dividing x on the band_top row */,int split_h_bottom /* param_7: dividing x on the band_bottom row */,
+               int left_colour /* param_8: polygon left of the divide */,int right_colour /* param_9: polygon right of the divide */)
 
 {
   int unaff_A5;
@@ -1222,35 +1226,35 @@ void paint_view_horizon_bands_a5safe /* Original: FUN_00000ad0 */
   r[0] = v0;
   r[1] = h0;
   r[3] = right;
-  r[2] = (short)(v0 + param_1);                 /* MOVEA.W D7 + long 8(A6), low word */
-  set_draw_color_index((short)param_4);         /* BSR 0x15cc, word $16(A6) */
+  r[2] = (short)(v0 + band_top);                 /* MOVEA.W D7 + long 8(A6), low word */
+  set_draw_color_index((short)top_colour);         /* BSR 0x15cc, word $16(A6) */
   PaintRect(r);                                 /* $A8A2: top band */
-  if (param_1 <= param_2) {                     /* CMP.L / BGT: signed */
+  if (band_top <= band_bottom) {                     /* CMP.L / BGT: signed */
     poly = OpenPoly();                          /* $A8CB */
-    MoveTo(h0,(short)(v0 + param_1));           /* $A893 (h pushed first) */
-    LineTo((short)param_6,(short)(v0 + param_1)); /* $A891, word $1e */
-    LineTo((short)param_7,(short)(v0 + param_2)); /* word $22 */
-    LineTo(h0,(short)(v0 + param_2));
-    LineTo(h0,(short)(v0 + param_1));
+    MoveTo(h0,(short)(v0 + band_top));           /* $A893 (h pushed first) */
+    LineTo((short)split_h_top,(short)(v0 + band_top)); /* $A891, word $1e */
+    LineTo((short)split_h_bottom,(short)(v0 + band_bottom)); /* word $22 */
+    LineTo(h0,(short)(v0 + band_bottom));
+    LineTo(h0,(short)(v0 + band_top));
     ClosePoly();                                /* $A8CC */
-    set_draw_color_index((short)param_8);       /* word $26 */
+    set_draw_color_index((short)left_colour);       /* word $26 */
     PaintPoly(poly);                            /* $A8C7 */
     KillPoly(poly);                             /* $A8CD */
     poly = OpenPoly();
-    MoveTo(right,(short)(v0 + param_1));
-    LineTo(right,(short)(v0 + param_2));
-    LineTo((short)param_7,(short)(v0 + param_2));
-    LineTo((short)param_6,(short)(v0 + param_1));
-    LineTo(right,(short)(v0 + param_1));
+    MoveTo(right,(short)(v0 + band_top));
+    LineTo(right,(short)(v0 + band_bottom));
+    LineTo((short)split_h_bottom,(short)(v0 + band_bottom));
+    LineTo((short)split_h_top,(short)(v0 + band_top));
+    LineTo(right,(short)(v0 + band_top));
     ClosePoly();
-    set_draw_color_index((short)param_9);       /* word $2a */
+    set_draw_color_index((short)right_colour);       /* word $2a */
     PaintPoly(poly);
     KillPoly(poly);
-    r[0] = (short)(v0 + param_2);
+    r[0] = (short)(v0 + band_bottom);
     r[1] = h0;
     r[3] = right;
     r[2] = bottom;
-    set_draw_color_index((short)param_5);       /* word $1a */
+    set_draw_color_index((short)bottom_colour);       /* word $1a */
     PaintRect(r);                               /* bottom band */
   }
   PenPat((void *)(unaff_A5 + -0x161c));         /* $A89D */
@@ -1313,7 +1317,7 @@ void apply_pending_color_entries_a5safe /* Original: FUN_00000c68 */ (void)
  * caller blit_offscreen_frame_to_window already does) and uses bounds as
  * portRect directly. No NULL check. JT $402; also called from ID03 0x3788.
  */
-int new_offscreen_cport /* Original: FUN_00000ca6 */ (short param_1,int param_2,Rect param_3)
+int new_offscreen_cport /* Original: FUN_00000ca6 */ (short rowBytes /* param_1 */,int baseAddr /* param_2 */,Rect bounds /* param_3 */)
 
 {
   int unaff_A5;
@@ -1324,11 +1328,11 @@ int new_offscreen_cport /* Original: FUN_00000ca6 */ (short param_1,int param_2,
   saved = *(int *)(unaff_A5 + -0x160c);         /* thePort */
   OpenCPort(port);                              /* $AA00 */
   SetPort(saved);                               /* $A873 */
-  *(short *)(**(int **)(port + 2) + 4) = param_1;   /* (**portPixMap).rowBytes */
-  *(int *)**(int **)(port + 2) = param_2;           /* .baseAddr */
-  *(Rect *)(**(int **)(port + 2) + 6) = param_3;    /* .bounds (two MOVE.L) */
-  *(Rect *)(port + 0x10) = param_3;                 /* portRect */
-  RectRgn(*(int *)(port + 0x18),&param_3);      /* $A8DF: visRgn = bounds */
+  *(short *)(**(int **)(port + 2) + 4) = rowBytes;   /* (**portPixMap).rowBytes */
+  *(int *)**(int **)(port + 2) = baseAddr;           /* .baseAddr */
+  *(Rect *)(**(int **)(port + 2) + 6) = bounds;    /* .bounds (two MOVE.L) */
+  *(Rect *)(port + 0x10) = bounds;                 /* portRect */
+  RectRgn(*(int *)(port + 0x18),&bounds);      /* $A8DF: visRgn = bounds */
   return port;
 }
 
@@ -1350,11 +1354,11 @@ int new_offscreen_cport /* Original: FUN_00000ca6 */ (short param_1,int param_2,
  * routine FUN_00000d3a (re)creates it when A5-0x103a == 0 (offscreen bitmap
  * with rowBytes = ((width * depth + 15) >> 4) * 2) - to be confirmed next.
  */
-void close_and_dispose_port /* Original: FUN_00000d24 */ (int param_1)
+void close_and_dispose_port /* Original: FUN_00000d24 */ (int port /* param_1: GrafPtr allocated by new_offscreen_cport */)
 
 {
-  ClosePort(param_1);                           /* $A87D */
-  DisposPtr((Ptr)param_1);                      /* JT $23a -> ID09 0x218 ($A01F glue) */
+  ClosePort(port);                           /* $A87D */
+  DisposPtr((Ptr)port);                      /* JT $23a -> ID09 0x218 ($A01F glue) */
   return;
 }
 
@@ -1391,43 +1395,43 @@ void close_and_dispose_port /* Original: FUN_00000d24 */ (int param_1)
  * ID02 file 0x1b6a LEA $322(A5) (address taken - likely handed to the
  * overlay as a callback [HYPOTHESIS]).
  */
-void blit_offscreen_frame_to_window /* Original: FUN_00000d3a */ (undefined4 param_1,int param_2,int param_3,int param_4)
+void blit_offscreen_frame_to_window /* Original: FUN_00000d3a */ (undefined4 pixels /* param_1: frame buffer base address */,int dst_top /* param_2: window row of the first line */,int rows /* param_3: lines to copy */,int shift_mode /* param_4: 2 = shift left, 3 = shift right by A5-0x137e */)
 
 {
-  int iVar1;
+  int a5; /* iVar1: copy of CurrentA5 */
   short rowBytes;                               /* -$42(A6) */
 
-  iVar1 = DAT_00000904;                         /* CurrentA5; D2-D7 / A3-A5 saved with MOVEM */
-  if (*(int *)(DAT_00000904 + -0x103a) == 0) {
-    *(undefined2 *)(DAT_00000904 + -0x14f0) = 0;
-    *(undefined2 *)(iVar1 + -0x14f2) = 0;
-    *(undefined2 *)(iVar1 + -0x14ec) = *(undefined2 *)(iVar1 + -0x1372);
-    *(undefined2 *)(iVar1 + -0x14ee) = *(undefined2 *)(iVar1 + -0x1370);
-    *(undefined4 *)(iVar1 + -0x14ea) = *(undefined4 *)(iVar1 + -0x14f2);
-    *(undefined4 *)(iVar1 + -0x14e6) = *(undefined4 *)(iVar1 + -0x14ee);
-    rowBytes = ((short)(*(short *)(iVar1 + -0x1372) * *(short *)(iVar1 + -0x137a) + 0xf) >> 4) * 2 | 0x8000;
+  a5 = CurrentA5;                         /* CurrentA5; D2-D7 / A3-A5 saved with MOVEM */
+  if (*(int *)(CurrentA5 + -0x103a) == 0) {
+    *(undefined2 *)(CurrentA5 + -0x14f0) = 0;
+    *(undefined2 *)(a5 + -0x14f2) = 0;
+    *(undefined2 *)(a5 + -0x14ec) = *(undefined2 *)(a5 + -0x1372);
+    *(undefined2 *)(a5 + -0x14ee) = *(undefined2 *)(a5 + -0x1370);
+    *(undefined4 *)(a5 + -0x14ea) = *(undefined4 *)(a5 + -0x14f2);
+    *(undefined4 *)(a5 + -0x14e6) = *(undefined4 *)(a5 + -0x14ee);
+    rowBytes = ((short)(*(short *)(a5 + -0x1372) * *(short *)(a5 + -0x137a) + 0xf) >> 4) * 2 | 0x8000;
                                                 /* MULS.W, ADDI.W #$f, ASR.W #4, ADD.W, ORI.W #$8000 */
-    *(undefined4 *)(iVar1 + -0x103a) =
-         new_offscreen_cport(rowBytes,param_1,*(Rect *)(iVar1 + -0x14ea)); /* BSR 0xca6, Rect by value */
+    *(undefined4 *)(a5 + -0x103a) =
+         new_offscreen_cport(rowBytes,pixels,*(Rect *)(a5 + -0x14ea)); /* BSR 0xca6, Rect by value */
   }
-  *(undefined4 *)**(undefined4 **)(*(int *)(iVar1 + -0x103a) + 2) = param_1;
-  *(short *)(iVar1 + -0x14ee) = (short)param_3; /* low words $12 / $e(A6) */
-  *(short *)(iVar1 + -0x14ea) = (short)param_2;
-  *(short *)(iVar1 + -0x14e6) = (short)(param_2 + param_3); /* ADD.L, low word */
-  *(undefined2 *)(iVar1 + -0x14e8) = *(undefined2 *)(iVar1 + -0x14f0);
-  *(undefined2 *)(iVar1 + -0x14e4) = *(undefined2 *)(iVar1 + -0x14ec);
-  if (param_4 == 2) {
-    *(short *)(iVar1 + -0x14e8) = *(short *)(iVar1 + -0x14e8) - *(short *)(iVar1 + -0x137e);
-    *(short *)(iVar1 + -0x14e4) = *(short *)(iVar1 + -0x14e4) - *(short *)(iVar1 + -0x137e);
+  *(undefined4 *)**(undefined4 **)(*(int *)(a5 + -0x103a) + 2) = pixels;
+  *(short *)(a5 + -0x14ee) = (short)rows; /* low words $12 / $e(A6) */
+  *(short *)(a5 + -0x14ea) = (short)dst_top;
+  *(short *)(a5 + -0x14e6) = (short)(dst_top + rows); /* ADD.L, low word */
+  *(undefined2 *)(a5 + -0x14e8) = *(undefined2 *)(a5 + -0x14f0);
+  *(undefined2 *)(a5 + -0x14e4) = *(undefined2 *)(a5 + -0x14ec);
+  if (shift_mode == 2) {
+    *(short *)(a5 + -0x14e8) = *(short *)(a5 + -0x14e8) - *(short *)(a5 + -0x137e);
+    *(short *)(a5 + -0x14e4) = *(short *)(a5 + -0x14e4) - *(short *)(a5 + -0x137e);
   }
-  else if (param_4 == 3) {
-    *(short *)(iVar1 + -0x14e8) = *(short *)(iVar1 + -0x137e) + *(short *)(iVar1 + -0x14e8);
-    *(short *)(iVar1 + -0x14e4) = *(short *)(iVar1 + -0x137e) + *(short *)(iVar1 + -0x14e4);
+  else if (shift_mode == 3) {
+    *(short *)(a5 + -0x14e8) = *(short *)(a5 + -0x137e) + *(short *)(a5 + -0x14e8);
+    *(short *)(a5 + -0x14e4) = *(short *)(a5 + -0x137e) + *(short *)(a5 + -0x14e4);
   }
   ForeColor(0x21);                              /* $A862 blackColor */
   BackColor(0x1e);                              /* $A863 whiteColor */
-  CopyBits((void *)(*(int *)(iVar1 + -0x103a) + 2),(void *)(*(int *)(iVar1 + -0x160c) + 2),
-           (Rect *)(iVar1 + -0x14f2),(Rect *)(iVar1 + -0x14ea),0,0); /* $A8EC, srcCopy, no mask */
+  CopyBits((void *)(*(int *)(a5 + -0x103a) + 2),(void *)(*(int *)(a5 + -0x160c) + 2),
+           (Rect *)(a5 + -0x14f2),(Rect *)(a5 + -0x14ea),0,0); /* $A8EC, srcCopy, no mask */
   return;
 }
 
@@ -1451,19 +1455,19 @@ void blit_offscreen_frame_to_window /* Original: FUN_00000d3a */ (undefined4 par
  * General form of blit_offscreen_frame_to_window [STRONG INFERENCE].
  */
 void blit_pixels_via_port_a5safe /* Original: FUN_00000e3e */
-               (int param_1,undefined4 param_2,Rect *param_3,int param_4,Rect *param_5)
+               (int src_port /* param_1 */,undefined4 pixels /* param_2: base address for the source pixmap */,Rect *src_rect /* param_3 */,int dst_port /* param_4: 0 = thePort */,Rect *dst_rect /* param_5 */)
 
 {
   int unaff_A5;
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; A5 / D2 restored on exit */
-  *(undefined4 *)**(undefined4 **)(param_1 + 2) = param_2;
+  *(undefined4 *)**(undefined4 **)(src_port + 2) = pixels;
   ForeColor(0x21);                              /* $A862 */
   BackColor(0x1e);                              /* $A863 */
-  if (param_4 == 0) {
-    param_4 = *(int *)(unaff_A5 + -0x160c);     /* thePort, stored back into $14(A6) */
+  if (dst_port == 0) {
+    dst_port = *(int *)(unaff_A5 + -0x160c);     /* thePort, stored back into $14(A6) */
   }
-  CopyBits((void *)(param_1 + 2),(void *)(param_4 + 2),param_3,param_5,0,0); /* $A8EC */
+  CopyBits((void *)(src_port + 2),(void *)(dst_port + 2),src_rect,dst_rect,0,0); /* $A8EC */
   return;
 }
 
@@ -1489,7 +1493,7 @@ void blit_pixels_via_port_a5safe /* Original: FUN_00000e3e */
  * new_offscreen_cport (FUN_00000ca6) performs the same steps inline on a
  * freshly allocated port (it does not call this routine).
  */
-void open_offscreen_cport_a5safe /* Original: FUN_00000e9e */ (int param_1,int param_2,int param_3,short *param_4)
+void open_offscreen_cport_a5safe /* Original: FUN_00000e9e */ (int port /* param_1: caller-allocated CGrafPort */,int rowBytes /* param_2: OR 0x8000 = PixMap */,int baseAddr /* param_3 */,short *bounds /* param_4: Rect */)
 
 {
   int unaff_A5;
@@ -1498,17 +1502,17 @@ void open_offscreen_cport_a5safe /* Original: FUN_00000e9e */ (int param_1,int p
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; A5 / D2 restored on exit */
   saved = *(int *)(unaff_A5 + -0x160c);
-  OpenCPort(param_1);                           /* $AA00 */
+  OpenCPort(port);                           /* $AA00 */
   SetPort(saved);                               /* $A873 */
-  *(short *)(**(int **)(param_1 + 2) + 4) = (short)(param_2 | 0x8000); /* OR.L, low word */
-  *(int *)**(int **)(param_1 + 2) = param_3;
-  *(Rect *)(**(int **)(param_1 + 2) + 6) = *(Rect *)param_4;
+  *(short *)(**(int **)(port + 2) + 4) = (short)(rowBytes | 0x8000); /* OR.L, low word */
+  *(int *)**(int **)(port + 2) = baseAddr;
+  *(Rect *)(**(int **)(port + 2) + 6) = *(Rect *)bounds;
   r[1] = 0;
   r[0] = 0;
-  r[3] = param_4[3] - param_4[1];
-  r[2] = param_4[2] - param_4[0];
-  *(Rect *)(param_1 + 0x10) = *(Rect *)r;
-  RectRgn(*(int *)(param_1 + 0x18),r);          /* $A8DF */
+  r[3] = bounds[3] - bounds[1];
+  r[2] = bounds[2] - bounds[0];
+  *(Rect *)(port + 0x10) = *(Rect *)r;
+  RectRgn(*(int *)(port + 0x18),r);          /* $A8DF */
   return;
 }
 
@@ -1525,10 +1529,10 @@ void open_offscreen_cport_a5safe /* Original: FUN_00000e9e */ (int param_1,int p
  * Bytes 0xf52..0xf72 [PROVEN]: CurrentA5 thunk; ClosePort(port long arg) $A87D.
  * Ghidra lost the argument.
  */
-void close_port_a5safe /* Original: FUN_00000f52 */ (int param_1)
+void close_port_a5safe /* Original: FUN_00000f52 */ (int port /* param_1 */)
 
 {
-  ClosePort(param_1);                           /* $A87D; A5 = CurrentA5 around it, A5 / D2 restored */
+  ClosePort(port);                           /* $A87D; A5 = CurrentA5 around it, A5 / D2 restored */
   return;
 }
 
@@ -1547,7 +1551,7 @@ void close_port_a5safe /* Original: FUN_00000f52 */ (int param_1)
  * SetPort(port arg) $A873; returns old in D0. Ghidra lost argument and result
  * (body rebuilt as C).
  */
-int swap_port_a5safe /* Original: FUN_00000f74 */ (int param_1)
+int swap_port_a5safe /* Original: FUN_00000f74 */ (int port /* param_1: the new current port */)
 
 {
   int unaff_A5;
@@ -1555,7 +1559,7 @@ int swap_port_a5safe /* Original: FUN_00000f74 */ (int param_1)
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; A5 / D2 restored before the return */
   old = *(int *)(unaff_A5 + -0x160c);           /* thePort */
-  SetPort(param_1);                             /* $A873 */
+  SetPort(port);                             /* $A873 */
   return old;
 }
 
@@ -1575,14 +1579,14 @@ int swap_port_a5safe /* Original: FUN_00000f74 */ (int param_1)
  * PenPat(A5-0x161c) $A89D (restore pattern). Ghidra truncated after the colour call
  * (body rebuilt as C).
  */
-void paint_rect_color_index_a5safe /* Original: FUN_00000fa0 */ (Rect *param_1,int param_2)
+void paint_rect_color_index_a5safe /* Original: FUN_00000fa0 */ (Rect *rect /* param_1 */,int colour_index /* param_2 */)
 
 {
   int unaff_A5;
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; A5 / D2 restored on exit */
-  set_draw_color_index((short)param_2);         /* BSR 0x15cc, word $e(A6) */
-  PaintRect(param_1);                           /* $A8A2 */
+  set_draw_color_index((short)colour_index);         /* BSR 0x15cc, word $e(A6) */
+  PaintRect(rect);                           /* $A8A2 */
   PenPat((void *)(unaff_A5 + -0x161c));         /* $A89D */
   return;
 }
@@ -1612,7 +1616,7 @@ void paint_rect_color_index_a5safe /* Original: FUN_00000fa0 */ (Rect *param_1,i
  * y is negated (world-up to screen-down) [STRONG INFERENCE]; the 1-bit branch is
  * taken when the depth word A5-0x137a == 1 [PROVEN] (body rebuilt as C).
  */
-void paint_polygon_rgb_a5safe /* Original: FUN_00000fd2 */ (int *param_1,int param_2,uint param_3)
+void paint_polygon_rgb_a5safe /* Original: FUN_00000fd2 */ (int *points /* param_1: (x, y) long pairs, y negated when drawn */,int count /* param_2: number of points */,uint rgb /* param_3: 0xRRGGBB00, one byte per component */)
 
 {
   int unaff_A5;
@@ -1621,13 +1625,13 @@ void paint_polygon_rgb_a5safe /* Original: FUN_00000fd2 */ (int *param_1,int par
   short i;                                      /* -2(A6) */
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; A5 / D2 restored on exit */
-  c[0] = (short)(((int)param_3 >> 0x18 & 0xffU) << 8);
-  c[1] = (short)(((int)param_3 >> 0x10 & 0xffU) << 8);
-  c[2] = (short)(((int)param_3 >> 8 & 0xffU) << 8);
+  c[0] = (short)(((int)rgb >> 0x18 & 0xffU) << 8);
+  c[1] = (short)(((int)rgb >> 0x10 & 0xffU) << 8);
+  c[2] = (short)(((int)rgb >> 8 & 0xffU) << 8);
   poly = OpenPoly();                            /* $A8CB */
-  MoveTo((short)param_1[(param_2 + -1) * 2],(short)-param_1[(param_2 + -1) * 2 + 1]); /* $A893, h first */
-  for (i = 0; (int)i < param_2; i = i + 1) {
-    LineTo((short)param_1[(int)i * 2],(short)-param_1[(int)i * 2 + 1]); /* $A891 */
+  MoveTo((short)points[(count + -1) * 2],(short)-points[(count + -1) * 2 + 1]); /* $A893, h first */
+  for (i = 0; (int)i < count; i = i + 1) {
+    LineTo((short)points[(int)i * 2],(short)-points[(int)i * 2 + 1]); /* $A891 */
   }
   ClosePoly();                                  /* $A8CC */
   if (*(short *)(unaff_A5 + -0x137a) == 1) {    /* 1-bit screen */
@@ -1725,7 +1729,7 @@ int build_notched_frame_poly /* Original: FUN_000010ce */ (short top,short left,
  * (A5-0x1192 - A5-0x119a); KillPoly both; PenPat(A5-0x161c).
  * [UNKNOWN] What the shapes are (possibly a bevelled UI frame drawn twice).
  */
-void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (int param_1,int param_2,int param_3)
+void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (int solid /* param_1: 0 = fill the inner frame with the A5-0x14e2 pattern, else paint it */,int colour_index /* param_2: inner frame colour, first pass */,int colour_index2 /* param_3: inner frame colour, second pass */)
 
 {
   int unaff_A5;
@@ -1742,10 +1746,10 @@ void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (int param_1,in
   ForeColor(0x21);                              /* $A862 */
   BackColor(0x1e);                              /* $A863 */
   for (i = 0; i < 2; i = i + 1) {
-    set_draw_color_index((short)param_2);       /* BSR 0x15cc, word $e(A6) */
+    set_draw_color_index((short)colour_index);       /* BSR 0x15cc, word $e(A6) */
     set_back_color_index(*(short *)(unaff_A5 + -0x118c)); /* BSR 0x1632 */
     PenSize(1,1);
-    if (param_1 == 0) {
+    if (solid == 0) {
       FillPoly(inner,(void *)(unaff_A5 + -0x14e2)); /* $A8CA */
     }
     else {
@@ -1760,7 +1764,7 @@ void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (int param_1,in
     dx = *(short *)(unaff_A5 + -0x1192) - *(short *)(unaff_A5 + -0x119a);
     OffsetPoly(inner,dx,0);                     /* $A8CE */
     OffsetPoly(outer,dx,0);
-    param_2 = param_3;                          /* second pass uses the $10(A6) colour */
+    colour_index = colour_index2;                          /* second pass uses the $10(A6) colour */
   }
   KillPoly(inner);                              /* $A8CD */
   KillPoly(outer);
@@ -1801,7 +1805,7 @@ void draw_notched_frame_pair_a5safe /* Original: FUN_000011ec */ (int param_1,in
  * (status / score line HYPOTHESIS).
  */
 void draw_text_in_columns_a5safe /* Original: FUN_00001308 */
-               (void *param_1,int param_2,int param_3,int param_4,int param_5,int param_6)
+               (void *text /* param_1 */,int column /* param_2: column 0..3 */,int first_byte /* param_3 */,int byte_count /* param_4 */,int layout /* param_5: nonzero = draw the bar and its labels */,int three_columns /* param_6: nonzero = omit the fourth label */)
 
 {
   int unaff_A5;
@@ -1810,7 +1814,7 @@ void draw_text_in_columns_a5safe /* Original: FUN_00001308 */
   short pen[2];                                 /* -6(A6): Point v, h (-4) */
 
   unaff_A5 = *(int *)0x904;                     /* CurrentA5; A5 / D2 restored on exit */
-  if (param_5 != 0) {                           /* lay out the bar and its labels */
+  if (layout != 0) {                           /* lay out the bar and its labels */
     r[1] = 0;
     r[3] = *(short *)(unaff_A5 + -0x1372);
     r[0] = *(short *)(unaff_A5 + -0x1370) + -0x14;
@@ -1840,7 +1844,7 @@ void draw_text_in_columns_a5safe /* Original: FUN_00001308 */
     *(short *)(unaff_A5 + -0x14d6) = pen[1] + charW;
     *(short *)(unaff_A5 + -0x14ce) = charW << 2;
     Move(charW * 2 + *(short *)(unaff_A5 + -0x14ce),0);
-    if (param_6 == 0) {
+    if (three_columns == 0) {
       DrawString(*(void **)(unaff_A5 + -0xdd6));
       GetPen(pen);
       *(short *)(unaff_A5 + -0x14d4) = pen[1] + charW;
@@ -1848,16 +1852,16 @@ void draw_text_in_columns_a5safe /* Original: FUN_00001308 */
     }
   }
   else {                                        /* redraw one column's value */
-    r[1] = *(short *)(unaff_A5 + -0x14da + param_2 * 2);
-    r[3] = r[1] + *(short *)(unaff_A5 + -0x14d2 + param_2 * 2);
+    r[1] = *(short *)(unaff_A5 + -0x14da + column * 2);
+    r[3] = r[1] + *(short *)(unaff_A5 + -0x14d2 + column * 2);
     r[0] = *(short *)(unaff_A5 + -0x1370) + -0x13;
     r[2] = *(short *)(unaff_A5 + -0x1370);
     ForeColor(0x21);
     BackColor(0x1e);
     FillRect(r,(void *)(unaff_A5 + -0x1614));
     TextFace(1);
-    MoveTo(*(short *)(unaff_A5 + -0x14da + param_2 * 2),*(short *)(unaff_A5 + -0x1370) + -5);
-    DrawText(param_1,(short)param_3,(short)param_4); /* $A885; words $12 / $16(A6) */
+    MoveTo(*(short *)(unaff_A5 + -0x14da + column * 2),*(short *)(unaff_A5 + -0x1370) + -5);
+    DrawText(text,(short)first_byte,(short)byte_count); /* $A885; words $12 / $16(A6) */
   }
   return;
 }
@@ -1878,7 +1882,7 @@ void draw_text_in_columns_a5safe /* Original: FUN_00001308 */
 void swap_mmu_mode_a5safe /* Original: FUN_000014e6 */ (void)
 
 {
-  (**(code **)(DAT_00000904 + 0x2e2))(DAT_00000904 + -0x1000);
+  (**(code **)(CurrentA5 + 0x2e2))(CurrentA5 + -0x1000);
   return;
 }
 
@@ -1896,7 +1900,7 @@ void swap_mmu_mode_a5safe /* Original: FUN_000014e6 */ (void)
 int get_blended_fill_pattern /* Original: FUN_0000150a */ (void)
 
 {
-  int iVar1;
+  int pattern; /* iVar1 */
   int unaff_A5;
   ushort *fg;                                   /* -4(A6) */
   ushort *bg;                                   /* -8(A6) */
@@ -1918,12 +1922,12 @@ int get_blended_fill_pattern /* Original: FUN_0000150a */ (void)
     mix[0] = (ushort)(fg[0] + bg[0]) >> 1;      /* ADD.W, LSR.W #1: the sum wraps at 16 bits */
     mix[1] = (ushort)(fg[1] + bg[1]) >> 1;
     mix[2] = (ushort)(fg[2] + bg[2]) >> 1;
-    iVar1 = rgb_to_bw_pattern(*(RGBColor *)mix); /* JT $1ca -> ID06 0x116, 6 bytes by value */
+    pattern = rgb_to_bw_pattern(*(RGBColor *)mix); /* JT $1ca -> ID06 0x116, 6 bytes by value */
   }
   else {
-    iVar1 = unaff_A5 + -0x1624;                 /* QD gray pattern */
+    pattern = unaff_A5 + -0x1624;                 /* QD gray pattern */
   }
-  return iVar1;
+  return pattern;
 }
 
 
@@ -1944,24 +1948,24 @@ int get_blended_fill_pattern /* Original: FUN_0000150a */ (void)
  * Callers: paint_view_horizon_bands_a5safe (4x), paint_rect_color_index_a5safe
  * (FUN_00000fa0, ID02.c:799).
  */
-void set_draw_color_index /* Original: FUN_000015cc */ (short param_1)
+void set_draw_color_index /* Original: FUN_000015cc */ (short index /* param_1: palette index */)
 
 {
   int unaff_A5;
   ushort *entry;                                /* -4(A6) */
 
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
-    *(short *)(unaff_A5 + -0x13ba) = param_1;
-    if (param_1 < 9) {                          /* CMPI.W #8 / BLE */
-      entry = (ushort *)(unaff_A5 + -0x350 + param_1 * 6);
+    *(short *)(unaff_A5 + -0x13ba) = index;
+    if (index < 9) {                          /* CMPI.W #8 / BLE */
+      entry = (ushort *)(unaff_A5 + -0x350 + index * 6);
     }
     else {
-      entry = (ushort *)(*(int *)(unaff_A5 + -0x14a6) + (short)(param_1 + -8) * 6);
+      entry = (ushort *)(*(int *)(unaff_A5 + -0x14a6) + (short)(index + -8) * 6);
     }
     PenPat((void *)rgb_to_bw_pattern(*(RGBColor *)entry)); /* JT $1ca -> ID06 0x116; $A89D */
     return;
   }
-  *(int *)(*(int *)(unaff_A5 + -0x160c) + 0x50) = (int)param_1; /* MOVEA.W: sign-extended */
+  *(int *)(*(int *)(unaff_A5 + -0x160c) + 0x50) = (int)index; /* MOVEA.W: sign-extended */
   return;
 }
 
@@ -1977,16 +1981,16 @@ void set_draw_color_index /* Original: FUN_000015cc */ (short param_1)
  * set_draw_color_index: 1-bit mode (A5-0x137a == 1) -> word A5-0x13b8 =
  * colour; else thePort->bkColor (+0x54) = (long)colour.
  */
-void set_back_color_index /* Original: FUN_00001632 */ (short param_1)
+void set_back_color_index /* Original: FUN_00001632 */ (short index /* param_1: palette index */)
 
 {
   int unaff_A5;
 
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
-    *(short *)(unaff_A5 + -0x13b8) = param_1;
+    *(short *)(unaff_A5 + -0x13b8) = index;
   }
   else {
-    *(int *)(*(int *)(unaff_A5 + -0x160c) + 0x54) = (int)param_1; /* MOVEA.W: sign-extended */
+    *(int *)(*(int *)(unaff_A5 + -0x160c) + 0x54) = (int)index; /* MOVEA.W: sign-extended */
   }
   return;
 }
@@ -2005,12 +2009,12 @@ void set_back_color_index /* Original: FUN_00001632 */ (short param_1)
  * MULU.L on the sign-extended word (low 32 bits equal the signed product) and
  * DIVS.L #$12c0.
  */
-int design_x_to_screen /* Original: FUN_00001656 */ (short param_1)
+int design_x_to_screen /* Original: FUN_00001656 */ (short design_x /* param_1 */)
 
 {
   int unaff_A5;
   
-  return (*(int *)(unaff_A5 + -0x149e) * (int)param_1) / 0x12c0 + /* MOVEA.W: sign-extended */
+  return (*(int *)(unaff_A5 + -0x149e) * (int)design_x) / 0x12c0 + /* MOVEA.W: sign-extended */
          (int)(*(short *)(unaff_A5 + -0x1372) / 2);
 }
 
@@ -2024,12 +2028,12 @@ int design_x_to_screen /* Original: FUN_00001656 */ (short param_1)
  * JT $382; sign-extended word argument (C corrected). Same as design_x_to_screen with view height
  * (A5-0x1370) / 2 -> screen y.
  */
-int design_y_to_screen /* Original: FUN_00001680 */ (short param_1)
+int design_y_to_screen /* Original: FUN_00001680 */ (short design_y /* param_1 */)
 
 {
   int unaff_A5;
   
-  return (*(int *)(unaff_A5 + -0x149e) * (int)param_1) / 0x12c0 + /* MOVEA.W: sign-extended */
+  return (*(int *)(unaff_A5 + -0x149e) * (int)design_y) / 0x12c0 + /* MOVEA.W: sign-extended */
          (int)(*(short *)(unaff_A5 + -0x1370) / 2);
 }
 
@@ -2186,7 +2190,7 @@ void run_segment3_entry_and_unload_a5safe /* Original: FUN_0000197c */ (void)
 
 {
   prepare_instrument_panel();                   /* JSR $17a(A5) -> ID03 0x5cc4; A5 = CurrentA5 */
-  UnloadSeg((void *)(DAT_00000904 + 0x18a));    /* $A9F1; PEA $18a(A5) = a segment 3 JT entry */
+  UnloadSeg((void *)(CurrentA5 + 0x18a));    /* $A9F1; PEA $18a(A5) = a segment 3 JT entry */
   return;
 }
 
@@ -2205,12 +2209,12 @@ void run_segment3_entry_and_unload_a5safe /* Original: FUN_0000197c */ (void)
  * Ghidra errors (return type / value: it returned param_1, bytes return h; the MemError
  * result was modelled as always 0) corrected in the rebuilt body. Service slot A5-0x10c2.
  */
-int new_handle_clear_or_die_a5safe /* Original: FUN_000019a2 */ (int param_1)
+int new_handle_clear_or_die_a5safe /* Original: FUN_000019a2 */ (int size /* param_1 */)
 
 {
   int h;                                        /* -4(A6) */
 
-  h = NewHandleClear(param_1);                  /* JT $252 -> ID09 0x242 ($A322); A5 = CurrentA5 */
+  h = NewHandleClear(size);                  /* JT $252 -> ID09 0x242 ($A322); A5 = CurrentA5 */
   if (MemError() != 0) {                        /* JT $29a -> ID09 0x29e (word $0220) */
     fatal_memory_error_exit(); /* Original: FUN_000019e2 */
   }
@@ -2262,10 +2266,10 @@ void fatal_memory_error_exit /* Original: FUN_000019e2 */ (void)
  * ($A023 DisposHandle glue) with the handle argument, restores A5/D2. Ghidra shows the
  * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10be.
  */
-void dispose_handle_a5safe /* Original: FUN_00001a04 */ (undefined4 param_1)
+void dispose_handle_a5safe /* Original: FUN_00001a04 */ (undefined4 h /* param_1: Handle */)
 
 {
-  (**(code **)(DAT_00000904 + 0x25a))(param_1);
+  (**(code **)(CurrentA5 + 0x25a))(h);
   return;
 }
 
@@ -2289,16 +2293,16 @@ void dispose_handle_a5safe /* Original: FUN_00001a04 */ (undefined4 param_1)
  * branch look dead) corrected in the rebuilt body.
  * Overlay service slot A5-0x10ba (JT $40a).
  */
-void realloc_and_clear_handle_a5safe /* Original: FUN_00001a28 */ (undefined4 *param_1,int param_2)
+void realloc_and_clear_handle_a5safe /* Original: FUN_00001a28 */ (undefined4 *h /* param_1: Handle */,int size /* param_2 */)
 
 {
-  ReallocHandle(param_1,param_2);               /* JT $26a -> ID09 0x264 ($A027); A5 = CurrentA5 */
+  ReallocHandle(h,size);               /* JT $26a -> ID09 0x264 ($A027); A5 = CurrentA5 */
   if (MemError() != 0) {                        /* JT $29a */
     fatal_memory_error_exit(); /* Original: FUN_000019e2 */
   }
-  HLock(param_1);                               /* JT $272 */
-  FUN_000002b0(*param_1,0,param_2);             /* BSR 0x2b0: memset-like (ptr, word value, long count) */
-  HUnlock(param_1);                             /* JT $27a */
+  HLock(h);                               /* JT $272 */
+  FUN_000002b0(*h,0,size);             /* BSR 0x2b0: memset-like (ptr, word value, long count) */
+  HUnlock(h);                             /* JT $27a */
   return;
 }
 
@@ -2313,10 +2317,10 @@ void realloc_and_clear_handle_a5safe /* Original: FUN_00001a28 */ (undefined4 *p
  * ($A029 HLock glue) with the handle argument, restores A5/D2. Ghidra shows the
  * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10b6.
  */
-void hlock_a5safe /* Original: FUN_00001a84 */ (undefined4 param_1)
+void hlock_a5safe /* Original: FUN_00001a84 */ (undefined4 h /* param_1: Handle */)
 
 {
-  (**(code **)(DAT_00000904 + 0x272))(param_1);
+  (**(code **)(CurrentA5 + 0x272))(h);
   return;
 }
 
@@ -2331,10 +2335,10 @@ void hlock_a5safe /* Original: FUN_00001a84 */ (undefined4 param_1)
  * ($A02A HUnlock glue) with the handle argument, restores A5/D2. Ghidra shows the
  * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10b2.
  */
-void hunlock_a5safe /* Original: FUN_00001aa8 */ (undefined4 param_1)
+void hunlock_a5safe /* Original: FUN_00001aa8 */ (undefined4 h /* param_1: Handle */)
 
 {
-  (**(code **)(DAT_00000904 + 0x27a))(param_1);
+  (**(code **)(CurrentA5 + 0x27a))(h);
   return;
 }
 
@@ -2349,10 +2353,10 @@ void hunlock_a5safe /* Original: FUN_00001aa8 */ (undefined4 param_1)
  * ($A049 HPurge glue) with the handle argument, restores A5/D2. Ghidra shows the
  * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10ae.
  */
-void hpurge_a5safe /* Original: FUN_00001acc */ (undefined4 param_1)
+void hpurge_a5safe /* Original: FUN_00001acc */ (undefined4 h /* param_1: Handle */)
 
 {
-  (**(code **)(DAT_00000904 + 0x282))(param_1);
+  (**(code **)(CurrentA5 + 0x282))(h);
   return;
 }
 
@@ -2367,10 +2371,10 @@ void hpurge_a5safe /* Original: FUN_00001acc */ (undefined4 param_1)
  * ($A04A HNoPurge glue) with the handle argument, restores A5/D2. Ghidra shows the
  * call through DAT_00000904 + JT offset. Overlay service slot A5-0x10aa.
  */
-void hnopurge_a5safe /* Original: FUN_00001af0 */ (undefined4 param_1)
+void hnopurge_a5safe /* Original: FUN_00001af0 */ (undefined4 h /* param_1: Handle */)
 
 {
-  (**(code **)(DAT_00000904 + 0x28a))(param_1);
+  (**(code **)(CurrentA5 + 0x28a))(h);
   return;
 }
 
@@ -2422,42 +2426,42 @@ int freemem_a5safe /* Original: FUN_00001b14 */ (void)
  * INT_MIN negation overflow preserved as exported. Caller:
  * show_caution_alert_with_number.
  */
-char * format_int_decimal_pstring /* Original: FUN_00001c8a */ (int param_1,char *param_2)
+char * format_int_decimal_pstring /* Original: FUN_00001c8a */ (int v /* param_1: the value, then reused for the length byte and the copy count */,char *buf /* param_2: Pascal string out (digits built backwards from buf + 10) */)
 
 {
-  char *pcVar1;
-  bool bVar2;
-  char *local_e;
-  char *local_a;
+  char *digit; /* pcVar1: next digit slot */
+  bool negative; /* bVar2 */
+  char *out; /* local_e, -$e(A6): copy destination */
+  char *p; /* local_a, -$a(A6): first digit, then copy source */
   
-  bVar2 = param_1 < 0;
-  if (bVar2) {
-    param_1 = -param_1;
+  negative = v < 0;
+  if (negative) {
+    v = -v;
   }
-  pcVar1 = param_2 + 10;
+  digit = buf + 10;
   do {
-    local_a = pcVar1;
-    pcVar1 = local_a + -1;
-    *pcVar1 = (char)(param_1 % 10) + '0';
-    param_1 = param_1 / 10;
-  } while (param_1 != 0);
-  if (bVar2) {
-    local_a[-2] = '-';
-    pcVar1 = local_a + -2;
+    p = digit;
+    digit = p + -1;
+    *digit = (char)(v % 10) + '0';
+    v = v / 10;
+  } while (v != 0);
+  if (negative) {
+    p[-2] = '-';
+    digit = p + -2;
   }
-  local_a = pcVar1;
-  param_1._3_1_ = (char)((int)param_2 - (int)local_a) + '\n';
-  local_a[-1] = (char)param_1;
-  local_e = param_2;
-  param_1 = ((int)param_2 - (int)local_a) + 0xb;
-  local_a = local_a + -1;
-  while (param_1 != 0) {
-    *local_e = *local_a;
-    param_1 = param_1 + -1;
-    local_e = local_e + 1;
-    local_a = local_a + 1;
+  p = digit;
+  v._3_1_ = (char)((int)buf - (int)p) + '\n';
+  p[-1] = (char)v;
+  out = buf;
+  v = ((int)buf - (int)p) + 0xb;
+  p = p + -1;
+  while (v != 0) {
+    *out = *p;
+    v = v + -1;
+    out = out + 1;
+    p = p + 1;
   }
-  return param_2;
+  return buf;
 }
 
 
@@ -2485,29 +2489,29 @@ char * format_int_decimal_pstring /* Original: FUN_00001c8a */ (int param_1,char
  *   CautionAlert(258, nil) $A988; p2cstr(msg) (JT $2fa).
  * Callers: fatal_memory_error_exit (STR# 129[93], 0); ID02.c:1542; ID08 via JT $4ba.
  */
-void show_caution_alert_with_number /* Original: FUN_00001d48 */ (int param_1,short param_2)
+void show_caution_alert_with_number /* Original: FUN_00001d48 */ (int msg /* param_1: C string, converted to Pascal and back in place */,short number /* param_2: 0 = no number */)
 
 {
   int unaff_A5;
   char buf[10];                                 /* -$a(A6) */
   char *s;                                      /* -$e(A6) */
 
-  c2pstr_in_place(param_1);                     /* JT $302 -> ID09 0x416, also when msg == 0 */
-  if (param_2 == 0) {
-    ParamText(param_1,unaff_A5 + -0xd0e,unaff_A5 + -0xd0c,unaff_A5 + -0xd0a); /* $A98B */
+  c2pstr_in_place(msg);                     /* JT $302 -> ID09 0x416, also when msg == 0 */
+  if (number == 0) {
+    ParamText(msg,unaff_A5 + -0xd0e,unaff_A5 + -0xd0c,unaff_A5 + -0xd0a); /* $A98B */
   }
   else {
-    s = format_int_decimal_pstring((int)param_2,buf); /* BSR 0x1c8a, sign-extended */
-    if (param_1 != 0) {
-      ParamText(param_1,(int)s,unaff_A5 + -0xd08,unaff_A5 + -0xd06);
+    s = format_int_decimal_pstring((int)number,buf); /* BSR 0x1c8a, sign-extended */
+    if (msg != 0) {
+      ParamText(msg,(int)s,unaff_A5 + -0xd08,unaff_A5 + -0xd06);
     }
     else {
-      ParamText(param_1,(int)s,unaff_A5 + -0xd04,unaff_A5 + -0xd02);
+      ParamText(msg,(int)s,unaff_A5 + -0xd04,unaff_A5 + -0xd02);
     }
   }
   position_alert_template(0x102);               /* BSR 0x442e */
   CautionAlert(0x102,0);                        /* $A988, result discarded */
-  length_prefixed_bytes_to_c_string_in_place(param_1); /* JT $2fa -> ID09 0x432 */
+  length_prefixed_bytes_to_c_string_in_place(msg); /* JT $2fa -> ID09 0x432 */
   return;
 }
 
@@ -2611,7 +2615,7 @@ void release_sound_slots /* Original: FUN_00001e68 */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-short load_named_sound_into_slot /* Original: FUN_00001edc */ (void *param_1,short param_2)
+short load_named_sound_into_slot /* Original: FUN_00001edc */ (void *name /* param_1: Pascal resource name */,short slot /* param_2: index into the handle table A5-0xd62 */)
 
 {
   int unaff_A5;
@@ -2619,7 +2623,7 @@ short load_named_sound_into_slot /* Original: FUN_00001edc */ (void *param_1,sho
   short attrs;                                  /* -6(A6) */
   int grow;                                     /* -$a(A6) */
 
-  h = GetNamedResource(0x736e6420,param_1);     /* $A9A1, 'snd ' */
+  h = GetNamedResource(0x736e6420,name);     /* $A9A1, 'snd ' */
   if (h == 0) {
     return 1;
   }
@@ -2636,7 +2640,7 @@ short load_named_sound_into_slot /* Original: FUN_00001edc */ (void *param_1,sho
     SetResAttrs(h,attrs | 0x20);                /* $A9A7, resPurgeable */
     ChangedResource(h);                         /* $A9AA */
   }
-  *(int *)(unaff_A5 + -0xd62 + (int)param_2 * 4) = h;
+  *(int *)(unaff_A5 + -0xd62 + (int)slot * 4) = h;
   return 0;
 }
 
@@ -3156,46 +3160,46 @@ void refresh_display_if_changed /* Original: FUN_000029f2 */ (void)
 void apply_settings_to_live_options /* Original: FUN_00002a44 */ (void)
 
 {
-  undefined2 uVar1;
-  short sVar2;
-  short sVar3;
-  short sVar4;
-  short sVar5;
-  bool bVar6;
+  undefined2 opt_0c; /* uVar1: settings +0xc, copied to A5-0x12ea and A5-0x103c */
+  short prev; /* sVar2: previous value of the option being compared */
+  short prev_12d8; /* sVar3: previous A5-0x12d8 */
+  short prev_12e6; /* sVar4: previous A5-0x12e6 */
+  short prev_12dc; /* sVar5: previous A5-0x12dc */
+  bool changed; /* bVar6: a redraw is needed */
   int unaff_A5;
   
-  bVar6 = false;
+  changed = false;
   *(undefined2 *)(unaff_A5 + -0x12ee) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 2);
   *(undefined2 *)(unaff_A5 + -0x12ec) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 4);
-  uVar1 = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0xc);
-  *(undefined2 *)(unaff_A5 + -0x12ea) = uVar1;
-  *(undefined2 *)(unaff_A5 + -0x103c) = uVar1;
-  sVar2 = *(short *)(unaff_A5 + -0x12e0);
-  sVar3 = *(short *)(unaff_A5 + -0x12d8);
-  sVar4 = *(short *)(unaff_A5 + -0x12e6);
-  sVar5 = *(short *)(unaff_A5 + -0x12dc);
+  opt_0c = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0xc);
+  *(undefined2 *)(unaff_A5 + -0x12ea) = opt_0c;
+  *(undefined2 *)(unaff_A5 + -0x103c) = opt_0c;
+  prev = *(short *)(unaff_A5 + -0x12e0);
+  prev_12d8 = *(short *)(unaff_A5 + -0x12d8);
+  prev_12e6 = *(short *)(unaff_A5 + -0x12e6);
+  prev_12dc = *(short *)(unaff_A5 + -0x12dc);
   *(undefined2 *)(unaff_A5 + -0x12e0) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x10);
   *(undefined2 *)(unaff_A5 + -0x12d8) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x18);
   *(undefined2 *)(unaff_A5 + -0x12e6) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 8);
   *(undefined2 *)(unaff_A5 + -0x12dc) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x14);
-  if (((((*(short *)(unaff_A5 + -0x12e0) != sVar2) || (*(short *)(unaff_A5 + -0x12d8) != sVar3)) ||
-       (*(short *)(unaff_A5 + -0x12e6) != sVar4)) || (*(short *)(unaff_A5 + -0x12dc) != sVar5)) &&
+  if (((((*(short *)(unaff_A5 + -0x12e0) != prev) || (*(short *)(unaff_A5 + -0x12d8) != prev_12d8)) ||
+       (*(short *)(unaff_A5 + -0x12e6) != prev_12e6)) || (*(short *)(unaff_A5 + -0x12dc) != prev_12dc)) &&
      (*(int *)(unaff_A5 + -0x1006) != 0)) {
     (**(code **)(unaff_A5 + -0x1092))();
-    bVar6 = true;
+    changed = true;
   }
-  sVar2 = *(short *)(unaff_A5 + -0x12da);
+  prev = *(short *)(unaff_A5 + -0x12da);
   *(undefined2 *)(unaff_A5 + -0x12da) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x16);
-  if ((sVar2 != *(short *)(unaff_A5 + -0x12da)) && (*(int *)(unaff_A5 + -0x1006) != 0)) {
+  if ((prev != *(short *)(unaff_A5 + -0x12da)) && (*(int *)(unaff_A5 + -0x1006) != 0)) {
     (**(code **)(unaff_A5 + -0x104e))();
-    bVar6 = true;
+    changed = true;
   }
   if (*(short *)(unaff_A5 + -0x137a) == 8) {
-    sVar2 = *(short *)(unaff_A5 + -0x12de);
+    prev = *(short *)(unaff_A5 + -0x12de);
     *(undefined2 *)(unaff_A5 + -0x12de) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x12);
-    if ((*(short *)(unaff_A5 + -0x12de) != sVar2) && (*(int *)(unaff_A5 + -0x1006) != 0)) {
+    if ((*(short *)(unaff_A5 + -0x12de) != prev) && (*(int *)(unaff_A5 + -0x1006) != 0)) {
       (**(code **)(unaff_A5 + -0x1096))();
-      bVar6 = true;
+      changed = true;
     }
     *(undefined2 *)(unaff_A5 + -0x12d6) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x1a);
   }
@@ -3208,7 +3212,7 @@ void apply_settings_to_live_options /* Original: FUN_00002a44 */ (void)
   *(undefined2 *)(unaff_A5 + -0x12e8) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 6);
   *(undefined2 *)(unaff_A5 + -0x12d4) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 0x1c);
   *(undefined2 *)(unaff_A5 + -0x12e4) = *(undefined2 *)(**(int **)(unaff_A5 + -0x13ac) + 10);
-  if (bVar6) {
+  if (changed) {
     redraw_main_window(); /* Original: FUN_00004db0 */
   }
   return;
@@ -3457,21 +3461,21 @@ void show_resource_file_error_box /* Original: FUN_00002e36 */ (void)
  * Decoded from ID02.bin bytes at file 0x2ee4.
  * Copies the length byte and then that many bytes from src (+8) to dst (+0xc). Complete Ghidra C. Caller: 0x2d26.
  */
-void copy_pascal_string /* Original: FUN_00002ee4 */ (char *param_1,char *param_2)
+void copy_pascal_string /* Original: FUN_00002ee4 */ (char *src /* param_1: Pascal string */,char *dst /* param_2 */)
 
 {
-  char cVar1;
-  short sVar2;
+  char len; /* cVar1: length byte */
+  short left; /* sVar2: bytes still to copy */
   
-  cVar1 = *param_1;
-  *param_2 = cVar1;
-  sVar2 = (short)cVar1;
+  len = *src;
+  *dst = len;
+  left = (short)len;
   while( true ) {
-    param_1 = param_1 + 1;
-    param_2 = param_2 + 1;
-    sVar2 = sVar2 + -1;
-    if (sVar2 < 0) break;
-    *param_2 = *param_1;
+    src = src + 1;
+    dst = dst + 1;
+    left = left + -1;
+    if (left < 0) break;
+    *dst = *src;
   }
   return;
 }
@@ -3499,24 +3503,24 @@ void copy_pascal_string /* Original: FUN_00002ee4 */ (char *param_1,char *param_
  *                        HideWindow(main_window) $A916
  * Part codes / traps: Inside Macintosh [STRONG INFERENCE].
  */
-void handle_mouse_down /* Original: FUN_00002f1e */ (short *param_1)
+void handle_mouse_down /* Original: FUN_00002f1e */ (short *evt /* param_1: EventRecord */)
 
 {
   int unaff_A5;
   int win;                                      /* -4(A6) */
   short part;                                   /* -6(A6) */
 
-  part = FindWindow(*(int *)(param_1 + 5),&win); /* $A92C, evt->where (+$a) */
+  part = FindWindow(*(int *)(evt + 5),&win); /* $A92C, evt->where (+$a) */
   switch (part) {                               /* JSR $3a(A5) -> ID01 0xbe, table 0x2f40 lo 1 hi 6 */
   case 1:                                       /* inMenuBar */
-    do_menu_command(MenuSelect(*(int *)(param_1 + 5))); /* $A93D; BSR 0x36a2 */
+    do_menu_command(MenuSelect(*(int *)(evt + 5))); /* $A93D; BSR 0x36a2 */
     break;
   case 2:                                       /* inSysWindow */
-    SystemClick(param_1,win);                   /* $A9B3 */
+    SystemClick(evt,win);                   /* $A9B3 */
     break;
   case 6:                                       /* inGoAway */
     if ((win == *(int *)(unaff_A5 + -0x14ca)) &&
-       (TrackGoAway(*(int *)(unaff_A5 + -0x14ca),*(int *)(param_1 + 5)) != 0)) { /* $A91E */
+       (TrackGoAway(*(int *)(unaff_A5 + -0x14ca),*(int *)(evt + 5)) != 0)) { /* $A91E */
       HideWindow(*(int *)(unaff_A5 + -0x14ca)); /* $A916 */
     }
     break;
@@ -3546,13 +3550,13 @@ void handle_mouse_down /* Original: FUN_00002f1e */ (short *param_1)
  * Macintosh]; i.e. on activation of the main window, force a full redraw.
  * Caller: poll_and_dispatch_event (activateEvt).
  */
-void handle_activate_event /* Original: FUN_00002fa0 */ (undefined8 param_1,undefined4 param_2,ushort param_3)
+void handle_activate_event /* Original: FUN_00002fa0 */ (undefined8 evt_what_message /* param_1: EventRecord by value, what + message (the WindowPtr at ._2_4_) + start of when */,undefined4 evt_rest /* param_2: rest of the record, unused */,ushort modifiers /* param_3: EventRecord modifiers (activeFlag in the low bits) */)
 
 {
   int unaff_A5;
   
-  if ((((*(short *)(unaff_A5 + -0x14c6) != 0) && ((param_3 & 3) == 3)) &&
-      (param_1._2_4_ == *(int *)(unaff_A5 + -0x14ca))) && (*(int *)(unaff_A5 + -0x14ca) != 0)) {
+  if ((((*(short *)(unaff_A5 + -0x14c6) != 0) && ((modifiers & 3) == 3)) &&
+      (evt_what_message._2_4_ == *(int *)(unaff_A5 + -0x14ca))) && (*(int *)(unaff_A5 + -0x14ca) != 0)) {
     InvalRect((Rect *)(*(int *)(unaff_A5 + -0x14ca) + 0x10)); /* $A928, portRect */
   }
   return;
@@ -3827,16 +3831,16 @@ void update_menu_items /* Original: FUN_00003174 */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void set_menu_item_enabled /* Original: FUN_00003590 */ (int param_1,short param_2,short param_3)
+void set_menu_item_enabled /* Original: FUN_00003590 */ (int menu /* param_1: MenuHandle */,short item /* param_2: 0 = the whole menu */,short enabled /* param_3 */)
 
 {
-  if (param_3 != 0) {
-    EnableItem(param_1,param_2);                /* $A939 */
+  if (enabled != 0) {
+    EnableItem(menu,item);                /* $A939 */
   }
   else {
-    DisableItem(param_1,param_2);               /* $A93A */
+    DisableItem(menu,item);               /* $A93A */
   }
-  if (param_2 == 0) {                           /* whole menu: redraw the bar */
+  if (item == 0) {                           /* whole menu: redraw the bar */
     DrawMenuBar();                              /* $A937 */
   }
   return;
@@ -3850,13 +3854,13 @@ void set_menu_item_enabled /* Original: FUN_00003590 */ (int param_1,short param
  * Decoded from ID02.bin bytes at file 0x35bc.
  * C arg +8 short size (1..4). When it differs from settings word +0xe (handle A5-0x13ac): stores it and calls configure_display_from_main_device (0x27e4) to relayout the view. Ghidra C complete apart from the call; the unsigned undefined2 parameter is corrected to short (CMP.W).
  */
-void set_view_size_option /* Original: FUN_000035bc */ (short param_1)
+void set_view_size_option /* Original: FUN_000035bc */ (short size_option /* param_1: settings +0xe */)
 
 {
   int unaff_A5;
   
-  if (*(short *)(**(int **)(unaff_A5 + -0x13ac) + 0xe) != param_1) { /* CMP.W: word compare */
-    *(short *)(**(int **)(unaff_A5 + -0x13ac) + 0xe) = param_1;
+  if (*(short *)(**(int **)(unaff_A5 + -0x13ac) + 0xe) != size_option) { /* CMP.W: word compare */
+    *(short *)(**(int **)(unaff_A5 + -0x13ac) + 0xe) = size_option;
     configure_display_from_main_device();       /* BSR 0x27e4 */
   }
   return;
@@ -3878,15 +3882,15 @@ void set_view_size_option /* Original: FUN_000035bc */ (short param_1)
 void start_new_mission /* Original: FUN_000035e4 */ (void)
 
 {
-  short sVar1;
+  short ok; /* sVar1: dialog result, 0 = cancelled */
   int unaff_A5;
   int saved;                                    /* -6(A6) */
-  short local_2;                                /* -2(A6) */
+  short i; /* local_2 */                                /* -2(A6) */
   
-  sVar1 = (**(code **)(unaff_A5 + 0x132))();    /* JT $132 -> ID04 0x644: duty roster dialog */
-  if (sVar1 != 0) {
-    sVar1 = (**(code **)(unaff_A5 + 0x82))();   /* JT $82 -> ID04 0xc02: scenario selection dialog */
-    if (sVar1 != 0) {
+  ok = (**(code **)(unaff_A5 + 0x132))();    /* JT $132 -> ID04 0x644: duty roster dialog */
+  if (ok != 0) {
+    ok = (**(code **)(unaff_A5 + 0x82))();   /* JT $82 -> ID04 0xc02: scenario selection dialog */
+    if (ok != 0) {
       (**(code **)(unaff_A5 + -0x109a))((int)*(short *)(unaff_A5 + -0x12f8)); /* overlay hook */
       if (*(short *)(unaff_A5 + -0x14c6) != 0) {
         saved = *(int *)(unaff_A5 + -0x160c);   /* thePort */
@@ -3895,9 +3899,9 @@ void start_new_mission /* Original: FUN_000035e4 */ (void)
         SetPort(saved);
       }
       *(undefined2 *)(unaff_A5 + -0x12f0) = 0;
-      for (local_2 = 0; local_2 < 0xc; local_2 = local_2 + 1) {
-        *(undefined2 *)(local_2 * 2 + unaff_A5 + -0x13a2) = 0;
-        *(undefined2 *)(local_2 * 2 + unaff_A5 + -0x12ce) = 0;
+      for (i = 0; i < 0xc; i = i + 1) {
+        *(undefined2 *)(i * 2 + unaff_A5 + -0x13a2) = 0;
+        *(undefined2 *)(i * 2 + unaff_A5 + -0x12ce) = 0;
       }
       *(undefined2 *)(unaff_A5 + -0x12b4) = 0;
       *(undefined2 *)(unaff_A5 + -0x12b6) = 0;
@@ -3984,7 +3988,7 @@ void start_new_mission /* Original: FUN_000035e4 */ (void)
  * Trap names: Inside Macintosh [STRONG INFERENCE]. Menu titles UNKNOWN until
  * MENU resources are examined.
  */
-void do_menu_command /* Original: FUN_000036a2 */ (int param_1)
+void do_menu_command /* Original: FUN_000036a2 */ (int menu_result /* param_1: MenuSelect / MenuKey result, menu ID << 16 | item */)
 
 {
   int unaff_A5;
@@ -3993,8 +3997,8 @@ void do_menu_command /* Original: FUN_000036a2 */ (int param_1)
   short item;                                   /* -4(A6) */
   short menu;                                   /* -2(A6) */
 
-  menu = HiWord(param_1);                       /* $A86A */
-  item = LoWord(param_1);                       /* $A86B */
+  menu = HiWord(menu_result);                       /* $A86A */
+  item = LoWord(menu_result);                       /* $A86B */
   switch (menu) {                               /* JSR $3a(A5) -> ID01 0xbe, table 0x36ca lo 1 hi 5 */
   case 1:                                       /* Apple */
     if (item == 1) {                            /* table 0x36e2 */
@@ -4171,102 +4175,102 @@ void do_menu_command /* Original: FUN_000036a2 */ (int param_1)
 undefined8 vbl_sound_handler_ch0_unrolled /* Original: FUN_000039a8 */ (void)
 
 {
-  int iVar1;
-  uint uVar2;
-  uint uVar3;
-  uint uVar4;
-  undefined4 in_D0;
-  int iVar5;
-  int iVar6;
-  undefined4 in_D1;
-  uint uVar7;
-  int iVar8;
-  short sVar9;
-  int iVar10;
-  int *piVar11;
-  undefined1 *puVar12;
-  bool bVar13;
+  int step_int; /* iVar1: A5-0xc32, integer part of the sample step */
+  uint step_frac; /* uVar2: A5-0xc2e, fraction of the step */
+  uint frac_b; /* uVar3: running fraction (second sample) */
+  uint frac_c; /* uVar4: running fraction (third sample) */
+  undefined4 reg_d0; /* in_D0: passed through untouched (registers are saved and restored) */
+  int a5; /* iVar5: the cached A5; also reused as a scratch position in the unrolled path */
+  int pos; /* iVar6: sample position, integer part */
+  undefined4 reg_d1; /* in_D1 */
+  uint pos_frac; /* uVar7: sample position, fraction */
+  int end; /* iVar8: end of the current sample (record +0x10) */
+  short n; /* sVar9: DBRA counter */
+  int samples; /* iVar10: sample data base (record +8) */
+  int *chan; /* piVar11: channel record *(A5-2000): pos, frac, base, start, end, -, next */
+  undefined1 *out; /* puVar12: SoundBase output cursor (every other byte) */
+  bool carry; /* bVar13 */
   
-  iVar5 = DAT_000039c4;                         /* in-code A5 cache at 0x39c4 */
-  if (DAT_000039c4 != 0) {
-    piVar11 = *(int **)(DAT_000039c4 + -2000);
-    iVar6 = *piVar11;
-    uVar7 = piVar11[1];
-    iVar10 = piVar11[2];
-    iVar8 = piVar11[4];
-    iVar1 = *(int *)(DAT_000039c4 + -0xc32);
-    uVar2 = *(uint *)(DAT_000039c4 + -0xc2e);
-    puVar12 = *(undefined1 **)0x266 + 4;       /* SoundBase + 4 (Ghidra: &DAT_66fa4e79) */
-    if (*(int *)(DAT_000039c4 + -0xc2a) < iVar8 - iVar6) {
-      sVar9 = 0x5b;
+  a5 = vbl_ch0_a5_cache;                         /* in-code A5 cache at 0x39c4 */
+  if (vbl_ch0_a5_cache != 0) {
+    chan = *(int **)(vbl_ch0_a5_cache + -2000);
+    pos = *chan;
+    pos_frac = chan[1];
+    samples = chan[2];
+    end = chan[4];
+    step_int = *(int *)(vbl_ch0_a5_cache + -0xc32);
+    step_frac = *(uint *)(vbl_ch0_a5_cache + -0xc2e);
+    out = *(undefined1 **)0x266 + 4;       /* SoundBase + 4 (Ghidra: &DAT_66fa4e79) */
+    if (*(int *)(vbl_ch0_a5_cache + -0xc2a) < end - pos) {
+      n = 0x5b;
       do {
-        *puVar12 = *(undefined1 *)(iVar10 + iVar6);
-        iVar5 = iVar1 + iVar6 + (uint)CARRY4(uVar2,uVar7);
-        puVar12[2] = *(undefined1 *)(iVar10 + iVar5);
-        uVar3 = uVar2 + uVar2 + uVar7;
-        iVar5 = iVar1 + iVar5 + (uint)CARRY4(uVar2,uVar2 + uVar7);
-        puVar12[4] = *(undefined1 *)(iVar10 + iVar5);
-        uVar4 = uVar2 + uVar3;
-        iVar5 = iVar1 + iVar5 + (uint)CARRY4(uVar2,uVar3);
-        puVar12[6] = *(undefined1 *)(iVar10 + iVar5);
-        puVar12 = puVar12 + 8;
-        uVar7 = uVar2 + uVar4;
-        iVar6 = iVar1 + iVar5 + (uint)CARRY4(uVar2,uVar4);
-        sVar9 = sVar9 + -1;
-      } while (sVar9 != -1);
-      **(undefined1 **)0x266 = *(undefined1 *)(iVar10 + iVar6); /* SoundBase + 0 */
-      uVar3 = uVar2 + uVar7;
-      iVar5 = iVar1 + iVar6 + (uint)CARRY4(uVar2,uVar7);
-      *(*(undefined1 **)0x266 + 2) = *(undefined1 *)(iVar10 + iVar5); /* SoundBase + 2 */
-      uVar7 = uVar2 + uVar3;
-      iVar6 = iVar1 + iVar5 + (uint)CARRY4(uVar2,uVar3);
+        *out = *(undefined1 *)(samples + pos);
+        a5 = step_int + pos + (uint)CARRY4(step_frac,pos_frac);
+        out[2] = *(undefined1 *)(samples + a5);
+        frac_b = step_frac + step_frac + pos_frac;
+        a5 = step_int + a5 + (uint)CARRY4(step_frac,step_frac + pos_frac);
+        out[4] = *(undefined1 *)(samples + a5);
+        frac_c = step_frac + frac_b;
+        a5 = step_int + a5 + (uint)CARRY4(step_frac,frac_b);
+        out[6] = *(undefined1 *)(samples + a5);
+        out = out + 8;
+        pos_frac = step_frac + frac_c;
+        pos = step_int + a5 + (uint)CARRY4(step_frac,frac_c);
+        n = n + -1;
+      } while (n != -1);
+      **(undefined1 **)0x266 = *(undefined1 *)(samples + pos); /* SoundBase + 0 */
+      frac_b = step_frac + pos_frac;
+      a5 = step_int + pos + (uint)CARRY4(step_frac,pos_frac);
+      *(*(undefined1 **)0x266 + 2) = *(undefined1 *)(samples + a5); /* SoundBase + 2 */
+      pos_frac = step_frac + frac_b;
+      pos = step_int + a5 + (uint)CARRY4(step_frac,frac_b);
     }
     else {
-      sVar9 = 0x16f;
+      n = 0x16f;
       do {
-        if (iVar8 <= iVar6) {
-          piVar11 = (int *)piVar11[6];
-          iVar10 = piVar11[2];
-          iVar6 = piVar11[3];
-          uVar7 = 0;
-          iVar8 = piVar11[4];
-          *(int **)(iVar5 + -2000) = piVar11;
+        if (end <= pos) {
+          chan = (int *)chan[6];
+          samples = chan[2];
+          pos = chan[3];
+          pos_frac = 0;
+          end = chan[4];
+          *(int **)(a5 + -2000) = chan;
         }
-        *puVar12 = *(undefined1 *)(iVar10 + iVar6);
-        puVar12 = puVar12 + 2;
-        bVar13 = CARRY4(uVar2,uVar7);
-        uVar7 = uVar2 + uVar7;
-        iVar6 = iVar1 + iVar6 + (uint)bVar13;
-        sVar9 = sVar9 + -1;
-      } while (sVar9 != -1);
-      puVar12 = *(undefined1 **)0x266;         /* SoundBase (Ghidra: &DAT_66fa4e75) */
-      sVar9 = 1;
+        *out = *(undefined1 *)(samples + pos);
+        out = out + 2;
+        carry = CARRY4(step_frac,pos_frac);
+        pos_frac = step_frac + pos_frac;
+        pos = step_int + pos + (uint)carry;
+        n = n + -1;
+      } while (n != -1);
+      out = *(undefined1 **)0x266;         /* SoundBase (Ghidra: &DAT_66fa4e75) */
+      n = 1;
       do {
-        if (iVar8 <= iVar6) {
-          piVar11 = (int *)piVar11[6];
-          iVar10 = piVar11[2];
-          iVar6 = piVar11[3];
-          uVar7 = 0;
-          iVar8 = piVar11[4];
-          *(int **)(iVar5 + -2000) = piVar11;
+        if (end <= pos) {
+          chan = (int *)chan[6];
+          samples = chan[2];
+          pos = chan[3];
+          pos_frac = 0;
+          end = chan[4];
+          *(int **)(a5 + -2000) = chan;
         }
-        *puVar12 = *(undefined1 *)(iVar10 + iVar6);
-        puVar12 = puVar12 + 2;
-        bVar13 = CARRY4(uVar2,uVar7);
-        uVar7 = uVar2 + uVar7;
-        iVar6 = iVar1 + iVar6 + (uint)bVar13;
-        sVar9 = sVar9 + -1;
-      } while (sVar9 != -1);
+        *out = *(undefined1 *)(samples + pos);
+        out = out + 2;
+        carry = CARRY4(step_frac,pos_frac);
+        pos_frac = step_frac + pos_frac;
+        pos = step_int + pos + (uint)carry;
+        n = n + -1;
+      } while (n != -1);
     }
-    *piVar11 = iVar6;
-    piVar11[1] = uVar7;
-    (**(code **)(iVar5 + -0xc36))();          /* MOVE.L -$c36(A5),$3c(A7) filled the reserved slot: the
+    *chan = pos;
+    chan[1] = pos_frac;
+    (**(code **)(a5 + -0xc36))();          /* MOVE.L -$c36(A5),$3c(A7) filled the reserved slot: the
                                                  final RTS tail-chains to the previous Lvl1DT[1] handler
                                                  with all registers restored */
-    return CONCAT44(in_D0,in_D1);
+    return CONCAT44(reg_d0,reg_d1);
   }
-  DAT_000039c4 = DAT_00000904;                  /* first call: cache CurrentA5 in the code; plain return */
-  return CONCAT44(in_D0,in_D1);
+  vbl_ch0_a5_cache = CurrentA5;                  /* first call: cache CurrentA5 in the code; plain return */
+  return CONCAT44(reg_d0,reg_d1);
 }
 
 
