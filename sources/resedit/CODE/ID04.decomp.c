@@ -1971,12 +1971,16 @@ void stop_named_sound /* Original: FUN_00003178 */ (void)
 
 
 
+/* VERIFIED (ID04::FUN_000031aa): ID04.bin 0x31aa..0x325e checked against an independent capstone disassembly.
+ * LINK -6; copies A5-0x14c4 / -0x14c2 to unused locals; one-shot sound gate (sets -0x14c2 before testing -0x12ee); mission-over
+ * flag; BSR 0x2de6(-1, code, long $a); BSR 0x3178 if -0x12ee; status write-back with ChangedResource + UpdateResFile;
+ * D0 = result; RTS - identical to the C. */
 // WARNING: Control flow encountered bad instruction data
 
 /*
  * Original: FUN_000031aa; source: ID04.c:864.
  * Recovered name: conclude_mission [STRONG INFERENCE].
- * Exported C kept (truncated after the status write). JT $da; callers
+ * Body rebuilt as C below (Ghidra truncated after the status write). JT $da; callers
  * [PROVEN, bytes]: ID02 file 0x8cc and 0x3752 (do_menu_command menu 2 item 5,
  * which passes code 3 and long A5-0xd6a).
  * Args: word code (param_1 high), long (second arg).
@@ -1986,40 +1990,45 @@ void stop_named_sound /* Original: FUN_00003178 */ (void)
  *   if (code != 3 && status != 0) A5-0x14c4 = 1;   ("mission over": makes
  *       confirm_end_mission return 2 without asking)
  *   r = show_mission_summary_dialog (FUN_00002de6)(-1, code); if (option A5-0x12ee) stop_named_sound (FUN_00003178);
- *   current pilot record (A5-0x13a4) +0x20 = status if it changed... [rest
- *   truncated by Ghidra].
+ *   if current pilot record (A5-0x13a4) +0x20 != status: store it,
+ *   ChangedResource(roster) $A9AA, UpdateResFile(A5-0x1002) $A999; return r
+ *   [PROVEN, bytes 0x321c..0x325e].
  * Status values follow the A5-0xfae strings (0 Active, 1 Dead, 2 Retired,
  * 3 POW, 4 Discharged, 5 MIA) [STRONG INFERENCE: status 1 triggers the
  * special one-shot path].
  */
-undefined4 conclude_mission /* Original: FUN_000031aa */ (undefined4 param_1)
+short conclude_mission /* Original: FUN_000031aa */ (short code,void *title)
 
 {
-  int iVar1;
-  undefined2 uVar2;
   int unaff_A5;
-  
+  short overCopy;                               /* -2(A6): A5-0x14c4 on entry, never read */
+  short soundCopy;                              /* -4(A6): A5-0x14c2 on entry, never read */
+  short result;                                 /* -6(A6) */
+
+  overCopy = *(short *)(unaff_A5 + -0x14c4);
+  soundCopy = *(short *)(unaff_A5 + -0x14c2);
   if ((((*(short *)(unaff_A5 + -0x12f8) != 2) && (*(short *)(unaff_A5 + -0x12b4) == 1)) &&
-      (param_1._0_2_ != 3)) &&
-     ((*(short *)(unaff_A5 + -0x14c2) == 0 &&
-      (*(undefined2 *)(unaff_A5 + -0x14c2) = 1, *(short *)(unaff_A5 + -0x12ee) != 0)))) {
-    play_named_sound_async();
+      (code != 3)) && (*(short *)(unaff_A5 + -0x14c2) == 0)) {
+    *(short *)(unaff_A5 + -0x14c2) = 1;         /* one-shot */
+    if (*(short *)(unaff_A5 + -0x12ee) != 0) {
+      play_named_sound_async();                 /* BSR 0x3124 */
+    }
   }
-  if ((param_1._0_2_ != 3) && (*(short *)(unaff_A5 + -0x12b4) != 0)) {
-    *(undefined2 *)(unaff_A5 + -0x14c4) = 1;
+  if ((code != 3) && (*(short *)(unaff_A5 + -0x12b4) != 0)) {
+    *(short *)(unaff_A5 + -0x14c4) = 1;         /* mission over */
   }
-  uVar2 = show_mission_summary_dialog(CONCAT22(0xffff,param_1._0_2_));
+  result = show_mission_summary_dialog(-1,code,title); /* BSR 0x2de6, ADDQ #8 */
   if (*(short *)(unaff_A5 + -0x12ee) != 0) {
-    stop_named_sound();
+    stop_named_sound();                         /* BSR 0x3178 */
   }
-  iVar1 = **(int **)(unaff_A5 + -0x13a8) + *(short *)(unaff_A5 + -0x13a4) * 0x40;
-  if (*(short *)(iVar1 + 0x20) != *(short *)(unaff_A5 + -0x12b4)) {
-    *(undefined2 *)(**(int **)(unaff_A5 + -0x13a8) + *(short *)(unaff_A5 + -0x13a4) * 0x40 + 0x20) =
-         *(undefined2 *)(unaff_A5 + -0x12b4);
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+  if (*(short *)((int)*(short *)(unaff_A5 + -0x13a4) * 0x40 + **(int **)(unaff_A5 + -0x13a8) + 0x20) !=
+      *(short *)(unaff_A5 + -0x12b4)) {
+    *(short *)((int)*(short *)(unaff_A5 + -0x13a4) * 0x40 + **(int **)(unaff_A5 + -0x13a8) + 0x20) =
+         *(short *)(unaff_A5 + -0x12b4);        /* pilot status */
+    ChangedResource(*(int *)(unaff_A5 + -0x13a8)); /* $A9AA: roster */
+    UpdateResFile(*(short *)(unaff_A5 + -0x1002)); /* $A999 */
   }
-  return CONCAT22((short)((uint)iVar1 >> 0x10),uVar2);
+  return result;
 }
 
 
