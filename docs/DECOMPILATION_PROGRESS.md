@@ -2,13 +2,14 @@
 
 This is the concise entry point for focused semantic reconstruction.
 
-**Next target:** Pacific Conflict is at 439/443 VERIFIED. Remaining there: only the four computed-jump span
-blitters `fill_span_rows_4bit_a` / `_4bit_b` / `_4bit_c` / `fill_span_rows_8bit` (FUN_000032ba /
-FUN_00003466 / FUN_00003608 / FUN_000037b4: `jmp (a5)` through the DAT_00020cec / DAT_00022cec tables;
-Ghidra's C treats each jump as call + return, so they need the table contents and a hand reconstruction).
+**Next target:** none - every function is VERIFIED (Pacific Conflict 443/443, ID01..ID09 complete).
+The four computed-jump span blitters `fill_span_rows_4bit_a` / `_4bit_b` / `_4bit_c` / `fill_span_rows_8bit`
+(FUN_000032ba / FUN_00003466 / FUN_00003608 / FUN_000037b4) were the last: delta span renderers that redraw only
+changed spans through self-patched tail tables (c is a byte copy of b; the 8-bit one swaps two 2048-entry tables by
+destination parity) - see their headers.
 Overlay segments (all 30 ID02 C-runtime functions (abs_long..ansi_strncat) plus begin_overlay_session / ensure_free_memory_and_init_sound / run_flight_session / call_overlay_session_hooks / the four A5-safe drawing services 0xa42..0xca4 / the port, blit, fill, frame, text, colour and design-coordinate helpers 0xca6..0x19a0 / the memory and handle wrappers 0x19a2..0x1b3e / format_int_decimal_pstring / show_caution_alert_with_number / the two dialog helpers / the four sound-slot routines 0x1e68..0x2128 / reset_overlay_state / the display set-up routines 0x2192..0x2a42 / apply_settings_to_live_options / initialize_application / wait_for_click_or_key / show_resource_file_error_box / copy_pascal_string / handle_mouse_down / handle_activate_event / poll_and_dispatch_event / main / install_menus / update_menu_items / set_menu_item_enabled / set_view_size_option / start_new_mission / do_menu_command / the sound helpers 0x3d36..0x435c / all three VBL sound handlers 0x39a8..0x3d32 / the window placement helpers 0x435e..0x462a / the palette routines 0x462c..0x4b60 / the update helpers 0x4c18..0x4e18, both ID07 functions, the six ID01 divide helpers, all four ID08 bodies, four ID09 routines, all 24 ID05 functions and all 24 ID06 functions VERIFIED; each IDnn.bin maps Ghidra address = file offset,
-4-byte CODE header, cross-segment calls via JSR d16(A5) jump-table slots and Toolbox A-traps). Remaining overlay work in the ID01..ID09 segments (7 RENAMED: ID03 7; ID03 verified so far: 0x6..0x585e; ID04 complete: every exported function verified);
-ID01, ID02, ID05, ID06, ID07, ID08 and ID09 are complete. Functions whose C is only halt_baddata() need an
+4-byte CODE header, cross-segment calls via JSR d16(A5) jump-table slots and Toolbox A-traps). No overlay work remains in the ID01..ID09 segments:
+ID01 through ID09 are all complete (every exported function verified). Functions whose C is only halt_baddata() need an
 evidence-backed reconstruction from the bytes before they can be verified (inline switch tables go through
 the ID01 0xbe range helper, JSR $3a(A5), or the ID01 0xaa long value-list helper, JSR $32(A5), or the ID01 0x96 word value-list helper, JSR $2a(A5)).
 

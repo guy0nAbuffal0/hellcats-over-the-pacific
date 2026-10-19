@@ -244,43 +244,43 @@
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2696,
+        "annotation_line": 2700,
         "kind": "known_function",
         "original_symbol": "FUN_00005860",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2752,
+        "annotation_line": 2755,
         "kind": "known_function",
         "original_symbol": "FUN_00005ab6",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2768,
+        "annotation_line": 2816,
         "kind": "known_function",
         "original_symbol": "FUN_00005c36",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2786,
+        "annotation_line": 2844,
         "kind": "known_function",
         "original_symbol": "FUN_00005cb6",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2801,
+        "annotation_line": 2865,
         "kind": "known_function",
         "original_symbol": "FUN_00005cc4",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2816,
+        "annotation_line": 3126,
         "kind": "known_function",
         "original_symbol": "FUN_00006c1c",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
       },
       {
-        "annotation_line": 2855,
+        "annotation_line": 3241,
         "kind": "known_function",
         "original_symbol": "FUN_000071a2",
         "source_path": "sources/resedit-1-0-3/CODE/ID03.decomp.c"
@@ -331,8 +331,8 @@
       {
         "kind": "C/decompilation export",
         "path": "sources/resedit-1-0-3/CODE/ID03.decomp.c",
-        "sha256": "9c35f3b01d9eb0c1eab709e98ddf89df2b59b7055bbf36f1951b6e5ae7fd8bef",
-        "size": 167242
+        "sha256": "0aac1cf8bdf7ea2c4e362daaf6649ac1f0a72ff22a86ead0fd0ca6065764daa6",
+        "size": 196546
       }
     ],
     "resource_attributes": "0x38",

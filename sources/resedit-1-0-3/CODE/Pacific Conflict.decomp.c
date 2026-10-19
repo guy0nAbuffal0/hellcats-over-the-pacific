@@ -5644,131 +5644,136 @@ void init_span_table_32ba /* Original: FUN_00003266 */ (void)
 
 
 
+/* VERIFIED (FUN_000032ba): 0x32ba..0x33ec checked against an independent capstone disassembly and found identical to the C:
+ * MOVEM D2-D7/A2-A5; list cursors A0 / A1 from $2c / $30(A7), table A2 = 0x3242, dst A3 = $38(A7); row loop D7 = D0 + D1 - 1;
+ * merge with SNE, CMP.L / BLT / BEQ, SWAP D3, LSR.W #8 when D5 < 0, ANDI.W #1 parity; skip paths (LSR.W #1 / ADD #1, ADDA.W);
+ * low-nibble EOR / AND #$f0 / EOR; long fill above 8 (0x3382); JMP (A2, D3.W*4) targets 0x3354 / 0x335a / 0x336c / 0x3374 /
+ * 0x3378 / 0x33a4 x4; ADDA.L $3c(A7); SUBQ.L #1 $34(A7); NEG.L / CLR.W D5; cursors - 4 stored back; RTS. */
 /* Original: FUN_000032ba; source: Pacific Conflict.c. Recovered name: fill_span_rows_4bit_a [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x32ba).
- * 4-bit span row filler (variant a). Args: two run-list cursors (in / out), row count, destination byte pointer, row stride. For each row it merges two lists of (colour, end-x) runs (16-bit fields of longs) and writes 4-bit pixels: whole bytes or longs (colour byte replicated) for long runs, a masked nibble write (byte ^ ((byte ^ dst) & 0xf0)) for odd edges, and jumps into the per-length tail table patched by init_span_table_32ba; advances the destination by the stride and stores the list cursors back at the end. configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
+ * 4-bit span row filler (variant a). Body rebuilt as C below [PROVEN, bytes 0x32ba..0x33ec]. Args: uint **listA (new run list), uint **listB (previous run list), long rows, byte *dst, long skip (added after each row: the bytes between the end of a row and the next one). Each row of a list is a count long followed by runs (end x << 16 | colour word). Per row the two lists are merged boundary by boundary (count A + count B - 1 steps, one less whenever both runs end together); a span is drawn only when the new colour differs from the old one (SNE) - a delta update of the previous frame - and skipped otherwise. The colour word holds two dither bytes: the low byte on even rows, the high byte on odd rows (D5's high word changes sign every row). Pixels are 4-bit: a span starting on an odd pixel first writes the low nibble of the current byte; spans longer than 8 pixels fill longs, the rest goes through the nine-entry table at 0x3242 patched by init_span_table_32ba: 0 nothing, 1 high nibble, 2 one byte, 3 a byte and a high nibble, 4 two bytes, 5..8 byte pairs then the remainder. At the end both cursors are stored back one long early (the next row's count). configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
  */
-void fill_span_rows_4bit_a /* Original: FUN_000032ba */ (int *param_1,int *param_2,int param_3,byte *param_4,int param_5)
+void fill_span_rows_4bit_a /* Original: FUN_000032ba */
+               (uint **listA,uint **listB,int rows,byte *dst,int skip)
 
 {
-  uint uVar1;
-  ushort uVar2;
-  undefined4 uVar3;
-  undefined4 uVar5;
-  ushort uVar8;
-  int iVar7;
-  int iVar9;
-  undefined2 uVar10;
-  uint uVar11;
-  short sVar12;
-  undefined4 *puVar13;
-  int *piVar14;
-  int *piVar15;
-  byte *pbVar16;
-  bool bVar17;
-  int iVar4;
-  ushort uVar6;
-  
-  puVar13 = (undefined4 *)*param_1 + 1;
-  uVar5 = *(undefined4 *)*param_1;
-  piVar15 = (int *)*param_2 + 1;
-  iVar7 = *(int *)*param_2;
-  uVar11 = 0;
-  do {
-    sVar12 = (short)iVar7 + (short)uVar5 + -1;
-    iVar9 = 0;
-    iVar7 = *piVar15;
-    uVar3 = *puVar13;
-    puVar13 = puVar13 + 1;
-    piVar14 = piVar15 + 1;
-    do {
-      while( true ) {
-        uVar6 = (ushort)uVar3;
-        uVar8 = (ushort)iVar7;
-        bVar17 = uVar8 == uVar6;
-        uVar2 = (ushort)((uint)uVar3 >> 0x10);
-        iVar4 = CONCAT22(uVar2,uVar8);
-        if (iVar7 < iVar4) {
-          uVar8 = (ushort)((uint)(iVar7 - iVar9) >> 0x10);
-          uVar2 = (ushort)((uint)iVar7 >> 0x10);
-          piVar15 = piVar14 + 1;
-          iVar7 = *piVar14;
-          uVar5 = uVar3;
+  uint *a;                                      /* A0: new run list */
+  uint *b;                                      /* A1: previous run list */
+  uint ra;                                      /* D0: (end x << 16) | colour word, or a row count */
+  uint rb;                                      /* D1 */
+  uint x;                                       /* D2: end of the previous run << 16 */
+  ushort cnt;                                   /* D3.W: run length in pixels */
+  ushort colour;                                /* D4.W */
+  int phase;                                    /* D5: high word = row dither phase, low word = x parity */
+  bool differ;                                  /* D6.B (SNE) */
+  short n;                                      /* D7.W */
+  short k;                                      /* D6.W loop counters */
+  uint fill;
+
+  a = *listA;
+  b = *listB;
+  ra = *a++;                                    /* the rows start with their run counts */
+  rb = *b++;
+  phase = 0;
+  for (;;) {
+    n = (short)(ra + rb) + -1;                  /* ADD.L, SUBQ.W #1: one step per run boundary */
+    x = 0;
+    ra = *a++;
+    rb = *b++;
+    do {                                        /* DBRA D7 */
+      colour = (ushort)ra;
+      differ = (ushort)rb != colour;            /* only spans whose colour changed are drawn */
+      ra = (ra & 0xffff0000) | (ushort)rb;
+      if ((int)rb < (int)ra) {                  /* the old run ends first */
+        ra = (ra & 0xffff0000) | colour;
+        cnt = (ushort)((rb - x) >> 0x10);
+        x = rb;
+        rb = *b++;
+      }
+      else if (rb == ra) {                      /* both end together: one boundary less */
+        cnt = (ushort)((ra - x) >> 0x10);
+        x = ra;
+        ra = *a++;
+        rb = *b++;
+        n = n + -1;
+      }
+      else {                                    /* the new run ends first */
+        cnt = (ushort)((ra - x) >> 0x10);
+        x = ra;
+        ra = *a++;
+      }
+      x = x & 0xffff0000;
+      if (phase < 0) {
+        colour = colour >> 8;                   /* odd rows: the high byte (dither) */
+      }
+      phase = (phase & 0xffff0000) | (phase & 1);
+      if ((phase & 1) == 0) {                   /* run starts on a byte boundary */
+        phase = (phase & 0xffff0000) | (ushort)((short)phase + cnt);
+        if (!differ) {
+          dst = dst + (short)(cnt >> 1);        /* LSR.W #1, ADDA.W */
+          continue;
         }
-        else if (iVar7 == iVar4) {
-          uVar8 = (ushort)((uint)(iVar4 - iVar9) >> 0x10);
-          piVar15 = piVar14 + 1;
-          iVar7 = *piVar14;
-          sVar12 = sVar12 + -1;
-          uVar5 = *puVar13;
-          puVar13 = puVar13 + 1;
+      }
+      else {                                    /* run starts on the low nibble */
+        if (cnt == 0) continue;
+        phase = (phase & 0xffff0000) | (ushort)((short)phase + cnt);
+        if (!differ) {
+          dst = dst + (short)((ushort)(cnt + 1) >> 1);
+          continue;
         }
-        else {
-          uVar8 = (ushort)((uint)(iVar4 - iVar9) >> 0x10);
-          uVar5 = *puVar13;
-          puVar13 = puVar13 + 1;
-          piVar15 = piVar14;
+        *dst = ((*dst ^ (byte)colour) & 0xf0) ^ (byte)colour; /* low nibble = colour */
+        dst = dst + 1;
+        cnt = cnt + -1;
+        if ((short)cnt < 1) continue;
+      }
+      if (8 < (short)cnt) {                     /* 0x3382: whole longs of 8 pixels */
+        colour = colour & 0xff;
+        fill = ((uint)((colour << 8) | colour) << 0x10) | ((colour << 8) | colour);
+        colour = (ushort)fill;
+        for (k = (short)(cnt >> 3) + -1; k != -1; k = k + -1) {
+          *(uint *)dst = fill;
+          dst = dst + 4;
         }
-        iVar9 = (uint)uVar2 << 0x10;
-        if ((int)uVar11 < 0) {
-          uVar6 = (ushort)((uint)uVar3 >> 8) & 0xff;
+        cnt = cnt & 7;
+      }
+      for (;;) {                                /* JMP through the table at 0x3242 (init_span_table_32ba) */
+        if (cnt == 1) {                         /* 0x335a: high nibble = colour */
+          *dst = ((*dst ^ (byte)colour) & 0xf) ^ (byte)colour;
         }
-        uVar1 = uVar11 & 1;
-        uVar11 = uVar11 & 0xffff0001;
-        uVar10 = (undefined2)(uVar11 >> 0x10);
-        uVar3 = uVar5;
-        piVar14 = piVar15;
-        pbVar16 = param_4;
-        if (uVar1 != 0) break;
-        uVar11 = CONCAT22(uVar10,uVar8 + (short)uVar11);
-        if (!bVar17) {
-LAB_0000332c:
-          if (8 < (short)uVar8) {
-            uVar2 = uVar6 & 0xff | (uVar6 & 0xff) << 8;
-            sVar12 = (uVar8 >> 3) - 1;
-            do {
-              *(uint *)pbVar16 = CONCAT22(uVar2,uVar2);
-              sVar12 = sVar12 + -1;
-              pbVar16 = pbVar16 + 4;
-            } while (sVar12 != -1);
-            uVar8 = uVar8 & 7;
+        else if (cnt == 2) {                    /* 0x336c */
+          *dst = (byte)colour;
+          dst = dst + 1;
+        }
+        else if (cnt == 3) {                    /* 0x3374: a byte, then the high nibble */
+          *dst = (byte)colour;
+          dst = dst + 1;
+          *dst = ((*dst ^ (byte)colour) & 0xf) ^ (byte)colour;
+        }
+        else if (cnt == 4) {                    /* 0x3378 */
+          *dst = (byte)colour;
+          dst[1] = (byte)colour;
+          dst = dst + 2;
+        }
+        else if (cnt != 0) {                    /* 5..8 -> 0x33a4: byte pairs, then the rest */
+          for (k = (short)(cnt >> 2) + -1; k != -1; k = k + -1) {
+            *dst = (byte)colour;
+            dst[1] = (byte)colour;
+            dst = dst + 2;
           }
-                    // WARNING: Could not recover jumptable at 0x00003336. Too many branches
-                    // WARNING: Treating indirect jump as call
-          (*(code *)(&DAT_00003242)[(short)uVar8])();
-          return;
+          cnt = cnt & 3;
+          continue;
         }
-LAB_000033be:
-        pbVar16 = param_4 + (short)(uVar8 >> 1);
-        sVar12 = sVar12 + -1;
-        param_4 = pbVar16;
-        if (sVar12 == -1) goto LAB_000033c6;
+        break;                                  /* 0 -> 0x3354 */
       }
-      if (uVar8 != 0) {
-        uVar11 = CONCAT22(uVar10,uVar8 + (short)uVar11);
-        if (bVar17) {
-          uVar8 = uVar8 + 1;
-          goto LAB_000033be;
-        }
-        pbVar16 = param_4 + 1;
-        *param_4 = (byte)uVar6 ^ ((byte)uVar6 ^ *param_4) & 0xf0;
-        bVar17 = SBORROW2(uVar8,1);
-        uVar8 = uVar8 - 1;
-        if (uVar8 != 0 && bVar17 == (int)((uint)uVar8 << 0x10) < 0) goto LAB_0000332c;
-      }
-      sVar12 = sVar12 + -1;
-      param_4 = pbVar16;
-    } while (sVar12 != -1);
-LAB_000033c6:
-    param_4 = pbVar16 + param_5;
-    param_3 = param_3 + -1;
-    if (param_3 == 0) {
-      *param_1 = (int)(puVar13 + -1);
-      *param_2 = (int)(piVar15 + -1);
-      return;
-    }
-    uVar11 = -uVar11 & 0xffff0000;
-  } while( true );
+    } while (n-- != 0);
+    dst = dst + skip;                           /* ADDA.L $3c(A7): to the next row */
+    rows = rows + -1;
+    if (rows == 0) break;
+    phase = -phase & 0xffff0000;                /* NEG.L, CLR.W: alternate the dither phase */
+  }
+  *listA = a + -1;                              /* give back the unread row count */
+  *listB = b + -1;
+  return;
 }
 
 
@@ -5798,127 +5803,138 @@ void init_span_table_3466 /* Original: FUN_00003412 */ (void)
 
 
 
+/* VERIFIED (FUN_00003466): 0x3466..0x358e checked against an independent capstone disassembly and found identical to the C:
+ * an instruction-by-instruction diff against FUN_000032ba differs only in the missing MOVEA.L (A0),A0 / (A1),A1, the table
+ * LEA 0x33ee, the missing TST.L D5 / BGE / LSR.W #8, and branch targets shifted by 0x1a2; tail table targets 0x34f6 / 0x34fc /
+ * 0x350e / 0x3516 / 0x351a / 0x3546 x4; cursors stored through $2c / $30(A7); RTS. */
 /* Original: FUN_00003466; source: Pacific Conflict.c. Recovered name: fill_span_rows_4bit_b [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x3466).
- * 4-bit span row filler (variant b). Args: two run-list cursors (in / out), row count, destination byte pointer, row stride. For each row it merges two lists of (colour, end-x) runs (16-bit fields of longs) and writes 4-bit pixels: whole bytes or longs (colour byte replicated) for long runs, a masked nibble write (byte ^ ((byte ^ dst) & 0xf0)) for odd edges, and jumps into the per-length tail table patched by init_span_table_3466; advances the destination by the stride and stores the list cursors back at the end. configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
+ * 4-bit span row filler (variant b). Body rebuilt as C below [PROVEN, bytes 0x3466..0x358e]: the same delta span
+ * renderer as fill_span_rows_4bit_a (see there) with its own tail table at 0x33ee (init_span_table_3466: the same nine
+ * targets shifted by 0x1a2), and two differences: (1) the first two arguments are the run lists themselves (MOVEA.L
+ * $2c(A7),A0 without the second MOVEA.L (A0),A0), yet at the end the cursors are still stored through them, so the end
+ * cursor overwrites the first long of each list [PROVEN, bytes 0x357a..0x3588]; (2) no dither: the LSR.W #8 on odd
+ * rows is absent, so the colour word's low byte is used on every row (the row phase is still flipped but never read).
+ * configure_renderer_for_display selects it as one of the three depth-4 variants.
  */
-void fill_span_rows_4bit_b /* Original: FUN_00003466 */ (undefined4 *param_1,int *param_2,int param_3,byte *param_4,int param_5)
+void fill_span_rows_4bit_b /* Original: FUN_00003466 */
+               (uint *listA,uint *listB,int rows,byte *dst,int skip)
 
 {
-  ushort uVar1;
-  undefined4 uVar2;
-  undefined4 uVar4;
-  ushort uVar7;
-  int iVar6;
-  int iVar8;
-  ushort uVar9;
-  ushort uVar10;
-  ushort uVar11;
-  short sVar12;
-  undefined4 *puVar13;
-  int *piVar14;
-  int *piVar15;
-  byte *pbVar16;
-  bool bVar17;
-  int iVar3;
-  ushort uVar5;
-  
-  puVar13 = param_1 + 1;
-  uVar4 = *param_1;
-  piVar15 = param_2 + 1;
-  iVar6 = *param_2;
-  do {
-    uVar11 = 0;
-    sVar12 = (short)iVar6 + (short)uVar4 + -1;
-    iVar8 = 0;
-    iVar6 = *piVar15;
-    uVar2 = *puVar13;
-    puVar13 = puVar13 + 1;
-    piVar14 = piVar15 + 1;
-    do {
-      while( true ) {
-        uVar5 = (ushort)uVar2;
-        uVar7 = (ushort)iVar6;
-        uVar1 = (ushort)((uint)uVar2 >> 0x10);
-        iVar3 = CONCAT22(uVar1,uVar7);
-        if (iVar6 < iVar3) {
-          uVar9 = (ushort)((uint)(iVar6 - iVar8) >> 0x10);
-          uVar1 = (ushort)((uint)iVar6 >> 0x10);
-          piVar15 = piVar14 + 1;
-          iVar6 = *piVar14;
-          uVar4 = uVar2;
+  uint *a;                                      /* A0: new run list */
+  uint *b;                                      /* A1: previous run list */
+  uint ra;                                      /* D0: (end x << 16) | colour word, or a row count */
+  uint rb;                                      /* D1 */
+  uint x;                                       /* D2: end of the previous run << 16 */
+  ushort cnt;                                   /* D3.W: run length in pixels */
+  ushort colour;                                /* D4.W */
+  int phase;                                    /* D5: high word = row dither phase, low word = x parity */
+  bool differ;                                  /* D6.B (SNE) */
+  short n;                                      /* D7.W */
+  short k;                                      /* D6.W loop counters */
+  uint fill;
+
+  a = listA;                                    /* the arguments are the lists themselves (no dereference) */
+  b = listB;
+  ra = *a++;                                    /* the rows start with their run counts */
+  rb = *b++;
+  phase = 0;
+  for (;;) {
+    n = (short)(ra + rb) + -1;                  /* ADD.L, SUBQ.W #1: one step per run boundary */
+    x = 0;
+    ra = *a++;
+    rb = *b++;
+    do {                                        /* DBRA D7 */
+      colour = (ushort)ra;
+      differ = (ushort)rb != colour;            /* only spans whose colour changed are drawn */
+      ra = (ra & 0xffff0000) | (ushort)rb;
+      if ((int)rb < (int)ra) {                  /* the old run ends first */
+        ra = (ra & 0xffff0000) | colour;
+        cnt = (ushort)((rb - x) >> 0x10);
+        x = rb;
+        rb = *b++;
+      }
+      else if (rb == ra) {                      /* both end together: one boundary less */
+        cnt = (ushort)((ra - x) >> 0x10);
+        x = ra;
+        ra = *a++;
+        rb = *b++;
+        n = n + -1;
+      }
+      else {                                    /* the new run ends first */
+        cnt = (ushort)((ra - x) >> 0x10);
+        x = ra;
+        ra = *a++;
+      }
+      x = x & 0xffff0000;                         /* no dither: the colour word is used as is */
+      phase = (phase & 0xffff0000) | (phase & 1);
+      if ((phase & 1) == 0) {                   /* run starts on a byte boundary */
+        phase = (phase & 0xffff0000) | (ushort)((short)phase + cnt);
+        if (!differ) {
+          dst = dst + (short)(cnt >> 1);        /* LSR.W #1, ADDA.W */
+          continue;
         }
-        else if (iVar6 == iVar3) {
-          uVar9 = (ushort)((uint)(iVar3 - iVar8) >> 0x10);
-          piVar15 = piVar14 + 1;
-          iVar6 = *piVar14;
-          sVar12 = sVar12 + -1;
-          uVar4 = *puVar13;
-          puVar13 = puVar13 + 1;
+      }
+      else {                                    /* run starts on the low nibble */
+        if (cnt == 0) continue;
+        phase = (phase & 0xffff0000) | (ushort)((short)phase + cnt);
+        if (!differ) {
+          dst = dst + (short)((ushort)(cnt + 1) >> 1);
+          continue;
         }
-        else {
-          uVar9 = (ushort)((uint)(iVar3 - iVar8) >> 0x10);
-          uVar4 = *puVar13;
-          puVar13 = puVar13 + 1;
-          piVar15 = piVar14;
+        *dst = ((*dst ^ (byte)colour) & 0xf0) ^ (byte)colour; /* low nibble = colour */
+        dst = dst + 1;
+        cnt = cnt + -1;
+        if ((short)cnt < 1) continue;
+      }
+      if (8 < (short)cnt) {                     /* 0x3524: whole longs of 8 pixels */
+        colour = colour & 0xff;
+        fill = ((uint)((colour << 8) | colour) << 0x10) | ((colour << 8) | colour);
+        colour = (ushort)fill;
+        for (k = (short)(cnt >> 3) + -1; k != -1; k = k + -1) {
+          *(uint *)dst = fill;
+          dst = dst + 4;
         }
-        iVar8 = (uint)uVar1 << 0x10;
-        uVar1 = uVar11 & 1;
-        piVar14 = piVar15;
-        pbVar16 = param_4;
-        if ((uVar11 & 1) != 0) break;
-        uVar10 = uVar9;
-        if (uVar7 != uVar5) {
-LAB_000034ce:
-          if (8 < (short)uVar9) {
-            uVar11 = uVar5 & 0xff | (uVar5 & 0xff) << 8;
-            sVar12 = (uVar9 >> 3) - 1;
-            do {
-              *(uint *)pbVar16 = CONCAT22(uVar11,uVar11);
-              sVar12 = sVar12 + -1;
-              pbVar16 = pbVar16 + 4;
-            } while (sVar12 != -1);
-            uVar9 = uVar9 & 7;
+        cnt = cnt & 7;
+      }
+      for (;;) {                                /* JMP through the table at 0x33ee (init_span_table_3466) */
+        if (cnt == 1) {                         /* 0x34fc: high nibble = colour */
+          *dst = ((*dst ^ (byte)colour) & 0xf) ^ (byte)colour;
+        }
+        else if (cnt == 2) {                    /* 0x350e */
+          *dst = (byte)colour;
+          dst = dst + 1;
+        }
+        else if (cnt == 3) {                    /* 0x3516: a byte, then the high nibble */
+          *dst = (byte)colour;
+          dst = dst + 1;
+          *dst = ((*dst ^ (byte)colour) & 0xf) ^ (byte)colour;
+        }
+        else if (cnt == 4) {                    /* 0x351a */
+          *dst = (byte)colour;
+          dst[1] = (byte)colour;
+          dst = dst + 2;
+        }
+        else if (cnt != 0) {                    /* 5..8 -> 0x3546: byte pairs, then the rest */
+          for (k = (short)(cnt >> 2) + -1; k != -1; k = k + -1) {
+            *dst = (byte)colour;
+            dst[1] = (byte)colour;
+            dst = dst + 2;
           }
-                    // WARNING: Could not recover jumptable at 0x000034d8. Too many branches
-                    // WARNING: Treating indirect jump as call
-          (*(code *)(&DAT_000033ee)[(short)uVar9])();
-          return;
+          cnt = cnt & 3;
+          continue;
         }
-LAB_00003560:
-        uVar11 = uVar9 + uVar1;
-        pbVar16 = param_4 + (short)(uVar10 >> 1);
-        sVar12 = sVar12 + -1;
-        uVar2 = uVar4;
-        param_4 = pbVar16;
-        if (sVar12 == -1) goto LAB_00003568;
+        break;                                  /* 0 -> 0x34f6 */
       }
-      uVar11 = uVar1;
-      if (uVar9 != 0) {
-        uVar11 = uVar9 + uVar1;
-        if (uVar7 == uVar5) {
-          uVar10 = uVar9 + 1;
-          goto LAB_00003560;
-        }
-        pbVar16 = param_4 + 1;
-        *param_4 = (byte)uVar2 ^ ((byte)uVar2 ^ *param_4) & 0xf0;
-        bVar17 = SBORROW2(uVar9,1);
-        uVar9 = uVar9 - 1;
-        if (uVar9 != 0 && bVar17 == (int)((uint)uVar9 << 0x10) < 0) goto LAB_000034ce;
-      }
-      sVar12 = sVar12 + -1;
-      uVar2 = uVar4;
-      param_4 = pbVar16;
-    } while (sVar12 != -1);
-LAB_00003568:
-    param_4 = pbVar16 + param_5;
-    param_3 = param_3 + -1;
-    if (param_3 == 0) {
-      *param_1 = puVar13 + -1;
-      *param_2 = (int)(piVar15 + -1);
-      return;
-    }
-  } while( true );
+    } while (n-- != 0);
+    dst = dst + skip;                           /* ADDA.L $3c(A7): to the next row */
+    rows = rows + -1;
+    if (rows == 0) break;
+    phase = -phase & 0xffff0000;                /* NEG.L, CLR.W (kept, though this variant never reads the sign) */
+  }
+  *(uint **)listA = a + -1;                     /* stored THROUGH the list pointers (MOVEA.L $2c(A7),A2; MOVE.L A0,(A2)): */
+  *(uint **)listB = b + -1;                     /* the end cursors overwrite the first long of each list */
+  return;
 }
 
 
@@ -5948,127 +5964,135 @@ void init_span_table_3608 /* Original: FUN_000035b4 */ (void)
 
 
 
+/* VERIFIED (FUN_00003608): 0x3608..0x3730 checked against an independent capstone disassembly and found identical to the C:
+ * the bytes equal those of FUN_00003466 at 0x3466..0x358e exactly; the disassembly differs from it only in absolute branch
+ * targets (+0x1a2) and the table address 0x3590. */
 /* Original: FUN_00003608; source: Pacific Conflict.c. Recovered name: fill_span_rows_4bit_c [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x3608).
- * 4-bit span row filler (variant c). Args: two run-list cursors (in / out), row count, destination byte pointer, row stride. For each row it merges two lists of (colour, end-x) runs (16-bit fields of longs) and writes 4-bit pixels: whole bytes or longs (colour byte replicated) for long runs, a masked nibble write (byte ^ ((byte ^ dst) & 0xf0)) for odd edges, and jumps into the per-length tail table patched by init_span_table_3608; advances the destination by the stride and stores the list cursors back at the end. configure_renderer_for_display selects the three variants at depth 4 (DAT_00020ac0 / _DAT_00020abc / _DAT_00020ab8 = 0x329a / 0x3446 / 0x35e8, i.e. 0x32ba / 0x3466 / 0x3608 with the +0x20 rule); at depth 8 all three point at 0x37b4. Differences between the variants not decoded [UNKNOWN]. Ghidra C (indirect tail jump unrecovered).
+ * 4-bit span row filler (variant c). Body rebuilt as C below [PROVEN, bytes 0x3608..0x3730]: a byte-for-byte copy of
+ * fill_span_rows_4bit_b (296 bytes, 0 differences - every branch and the table LEA are PC-relative), so the same delta
+ * renderer without dither, with the lists passed directly and the end cursors stored through them; its own tail table is
+ * at 0x3590 (patched by FUN_000035b4 with the same nine targets shifted by 0x1a2: 0x3698 / 0x369e / 0x36b0 / 0x36b8 /
+ * 0x36bc / 0x36e8 x4). Why a third copy exists (separate self-modified tables per caller?) is not known [UNKNOWN].
  */
-void fill_span_rows_4bit_c /* Original: FUN_00003608 */ (undefined4 *param_1,int *param_2,int param_3,byte *param_4,int param_5)
+void fill_span_rows_4bit_c /* Original: FUN_00003608 */
+               (uint *listA,uint *listB,int rows,byte *dst,int skip)
 
 {
-  ushort uVar1;
-  undefined4 uVar2;
-  undefined4 uVar4;
-  ushort uVar7;
-  int iVar6;
-  int iVar8;
-  ushort uVar9;
-  ushort uVar10;
-  ushort uVar11;
-  short sVar12;
-  undefined4 *puVar13;
-  int *piVar14;
-  int *piVar15;
-  byte *pbVar16;
-  bool bVar17;
-  int iVar3;
-  ushort uVar5;
-  
-  puVar13 = param_1 + 1;
-  uVar4 = *param_1;
-  piVar15 = param_2 + 1;
-  iVar6 = *param_2;
-  do {
-    uVar11 = 0;
-    sVar12 = (short)iVar6 + (short)uVar4 + -1;
-    iVar8 = 0;
-    iVar6 = *piVar15;
-    uVar2 = *puVar13;
-    puVar13 = puVar13 + 1;
-    piVar14 = piVar15 + 1;
-    do {
-      while( true ) {
-        uVar5 = (ushort)uVar2;
-        uVar7 = (ushort)iVar6;
-        uVar1 = (ushort)((uint)uVar2 >> 0x10);
-        iVar3 = CONCAT22(uVar1,uVar7);
-        if (iVar6 < iVar3) {
-          uVar9 = (ushort)((uint)(iVar6 - iVar8) >> 0x10);
-          uVar1 = (ushort)((uint)iVar6 >> 0x10);
-          piVar15 = piVar14 + 1;
-          iVar6 = *piVar14;
-          uVar4 = uVar2;
+  uint *a;                                      /* A0: new run list */
+  uint *b;                                      /* A1: previous run list */
+  uint ra;                                      /* D0: (end x << 16) | colour word, or a row count */
+  uint rb;                                      /* D1 */
+  uint x;                                       /* D2: end of the previous run << 16 */
+  ushort cnt;                                   /* D3.W: run length in pixels */
+  ushort colour;                                /* D4.W */
+  int phase;                                    /* D5: high word = row dither phase, low word = x parity */
+  bool differ;                                  /* D6.B (SNE) */
+  short n;                                      /* D7.W */
+  short k;                                      /* D6.W loop counters */
+  uint fill;
+
+  a = listA;                                    /* the arguments are the lists themselves (no dereference) */
+  b = listB;
+  ra = *a++;                                    /* the rows start with their run counts */
+  rb = *b++;
+  phase = 0;
+  for (;;) {
+    n = (short)(ra + rb) + -1;                  /* ADD.L, SUBQ.W #1: one step per run boundary */
+    x = 0;
+    ra = *a++;
+    rb = *b++;
+    do {                                        /* DBRA D7 */
+      colour = (ushort)ra;
+      differ = (ushort)rb != colour;            /* only spans whose colour changed are drawn */
+      ra = (ra & 0xffff0000) | (ushort)rb;
+      if ((int)rb < (int)ra) {                  /* the old run ends first */
+        ra = (ra & 0xffff0000) | colour;
+        cnt = (ushort)((rb - x) >> 0x10);
+        x = rb;
+        rb = *b++;
+      }
+      else if (rb == ra) {                      /* both end together: one boundary less */
+        cnt = (ushort)((ra - x) >> 0x10);
+        x = ra;
+        ra = *a++;
+        rb = *b++;
+        n = n + -1;
+      }
+      else {                                    /* the new run ends first */
+        cnt = (ushort)((ra - x) >> 0x10);
+        x = ra;
+        ra = *a++;
+      }
+      x = x & 0xffff0000;                         /* no dither: the colour word is used as is */
+      phase = (phase & 0xffff0000) | (phase & 1);
+      if ((phase & 1) == 0) {                   /* run starts on a byte boundary */
+        phase = (phase & 0xffff0000) | (ushort)((short)phase + cnt);
+        if (!differ) {
+          dst = dst + (short)(cnt >> 1);        /* LSR.W #1, ADDA.W */
+          continue;
         }
-        else if (iVar6 == iVar3) {
-          uVar9 = (ushort)((uint)(iVar3 - iVar8) >> 0x10);
-          piVar15 = piVar14 + 1;
-          iVar6 = *piVar14;
-          sVar12 = sVar12 + -1;
-          uVar4 = *puVar13;
-          puVar13 = puVar13 + 1;
+      }
+      else {                                    /* run starts on the low nibble */
+        if (cnt == 0) continue;
+        phase = (phase & 0xffff0000) | (ushort)((short)phase + cnt);
+        if (!differ) {
+          dst = dst + (short)((ushort)(cnt + 1) >> 1);
+          continue;
         }
-        else {
-          uVar9 = (ushort)((uint)(iVar3 - iVar8) >> 0x10);
-          uVar4 = *puVar13;
-          puVar13 = puVar13 + 1;
-          piVar15 = piVar14;
+        *dst = ((*dst ^ (byte)colour) & 0xf0) ^ (byte)colour; /* low nibble = colour */
+        dst = dst + 1;
+        cnt = cnt + -1;
+        if ((short)cnt < 1) continue;
+      }
+      if (8 < (short)cnt) {                     /* 0x36c6: whole longs of 8 pixels */
+        colour = colour & 0xff;
+        fill = ((uint)((colour << 8) | colour) << 0x10) | ((colour << 8) | colour);
+        colour = (ushort)fill;
+        for (k = (short)(cnt >> 3) + -1; k != -1; k = k + -1) {
+          *(uint *)dst = fill;
+          dst = dst + 4;
         }
-        iVar8 = (uint)uVar1 << 0x10;
-        uVar1 = uVar11 & 1;
-        piVar14 = piVar15;
-        pbVar16 = param_4;
-        if ((uVar11 & 1) != 0) break;
-        uVar10 = uVar9;
-        if (uVar7 != uVar5) {
-LAB_00003670:
-          if (8 < (short)uVar9) {
-            uVar11 = uVar5 & 0xff | (uVar5 & 0xff) << 8;
-            sVar12 = (uVar9 >> 3) - 1;
-            do {
-              *(uint *)pbVar16 = CONCAT22(uVar11,uVar11);
-              sVar12 = sVar12 + -1;
-              pbVar16 = pbVar16 + 4;
-            } while (sVar12 != -1);
-            uVar9 = uVar9 & 7;
+        cnt = cnt & 7;
+      }
+      for (;;) {                                /* JMP through the table at 0x3590 (patched by FUN_000035b4) */
+        if (cnt == 1) {                         /* 0x369e: high nibble = colour */
+          *dst = ((*dst ^ (byte)colour) & 0xf) ^ (byte)colour;
+        }
+        else if (cnt == 2) {                    /* 0x36b0 */
+          *dst = (byte)colour;
+          dst = dst + 1;
+        }
+        else if (cnt == 3) {                    /* 0x36b8: a byte, then the high nibble */
+          *dst = (byte)colour;
+          dst = dst + 1;
+          *dst = ((*dst ^ (byte)colour) & 0xf) ^ (byte)colour;
+        }
+        else if (cnt == 4) {                    /* 0x36bc */
+          *dst = (byte)colour;
+          dst[1] = (byte)colour;
+          dst = dst + 2;
+        }
+        else if (cnt != 0) {                    /* 5..8 -> 0x36e8: byte pairs, then the rest */
+          for (k = (short)(cnt >> 2) + -1; k != -1; k = k + -1) {
+            *dst = (byte)colour;
+            dst[1] = (byte)colour;
+            dst = dst + 2;
           }
-                    // WARNING: Could not recover jumptable at 0x0000367a. Too many branches
-                    // WARNING: Treating indirect jump as call
-          (*(code *)(&DAT_00003590)[(short)uVar9])();
-          return;
+          cnt = cnt & 3;
+          continue;
         }
-LAB_00003702:
-        uVar11 = uVar9 + uVar1;
-        pbVar16 = param_4 + (short)(uVar10 >> 1);
-        sVar12 = sVar12 + -1;
-        uVar2 = uVar4;
-        param_4 = pbVar16;
-        if (sVar12 == -1) goto LAB_0000370a;
+        break;                                  /* 0 -> 0x3698 */
       }
-      uVar11 = uVar1;
-      if (uVar9 != 0) {
-        uVar11 = uVar9 + uVar1;
-        if (uVar7 == uVar5) {
-          uVar10 = uVar9 + 1;
-          goto LAB_00003702;
-        }
-        pbVar16 = param_4 + 1;
-        *param_4 = (byte)uVar2 ^ ((byte)uVar2 ^ *param_4) & 0xf0;
-        bVar17 = SBORROW2(uVar9,1);
-        uVar9 = uVar9 - 1;
-        if (uVar9 != 0 && bVar17 == (int)((uint)uVar9 << 0x10) < 0) goto LAB_00003670;
-      }
-      sVar12 = sVar12 + -1;
-      uVar2 = uVar4;
-      param_4 = pbVar16;
-    } while (sVar12 != -1);
-LAB_0000370a:
-    param_4 = pbVar16 + param_5;
-    param_3 = param_3 + -1;
-    if (param_3 == 0) {
-      *param_1 = puVar13 + -1;
-      *param_2 = (int)(piVar15 + -1);
-      return;
-    }
-  } while( true );
+    } while (n-- != 0);
+    dst = dst + skip;                           /* ADDA.L $3c(A7): to the next row */
+    rows = rows + -1;
+    if (rows == 0) break;
+    phase = -phase & 0xffff0000;                /* NEG.L, CLR.W (kept, though this variant never reads the sign) */
+  }
+  *(uint **)listA = a + -1;                     /* stored THROUGH the list pointers (MOVEA.L $2c(A7),A2; MOVE.L A0,(A2)): */
+  *(uint **)listB = b + -1;                     /* the end cursors overwrite the first long of each list */
+  return;
 }
 
 
@@ -6134,100 +6158,182 @@ void init_code_pointer_tables /* Original: FUN_00003734 */ (void)
 
 
 
+/* VERIFIED (FUN_000037b4): 0x37b4..0x38f2 checked against an independent capstone disassembly and found identical to the C:
+ * MOVEM D2-D7/A2-A5; cursors dereferenced; A2 = 0x20cec, A4 = 0x22cec; row loop D7 = D0 + D1 - 1, CLR.W D2; three merge cases
+ * (BLT / BEQ) with CMP.W D4,D1 skip tests (0x38be / 0x38c0 / 0x38c2: ADDA.W, BTST #0, EXG); JMP (A2, D3.W*4) into 0x3836 /
+ * 0x3842 / 0x3850 / 0x3840 / 0x384e / 0x383e / 0x3858 and 0x3882 / 0x388c / 0x389c / 0x38a8 / 0x3898 / 0x38b6; long fill
+ * BTST #1 of A3, SWAP-replicated D4; ADDA.L $3c(A7); SUBQ.L #1 $34(A7); cursors - 4 stored back; RTS. */
 /* Original: FUN_000037b4; source: Pacific Conflict.c. Recovered name: fill_span_rows_8bit [STRONG INFERENCE].
  * Ghidra C reviewed (function at overlay offset 0x37b4).
- * Depth-8 counterpart of fill_span_rows_4bit_a / b / c: configure_renderer_for_display points all three span-filler slots at 0x37b4 (stored 0x3794 + 0x20) at depth 8. Args: two run-list cursors, row count. Merges the two run lists row by row like the 4-bit fillers and dispatches each run through the 2048-entry code tables DAT_00020cec / DAT_00022cec filled by init_code_pointer_tables (one entry per run length). Ghidra C (dispatch jumps unrecovered).
+ * Depth-8 counterpart of fill_span_rows_4bit_a / b / c: configure_renderer_for_display points all three span-filler
+ * slots at 0x37b4 (stored 0x3794 + 0x20) at depth 8. Body rebuilt as C below [PROVEN, bytes 0x37b4..0x38f2]. Args (as
+ * fill_span_rows_4bit_a; corrected from "three"): uint **listA, uint **listB, long rows, byte *dst, long skip. The same
+ * delta merge of the new and the previous run list (a span is drawn only when its colour changed, otherwise skipped), one
+ * byte per pixel and no dither. Dispatch goes through two 2048-entry tables filled by init_code_pointer_tables:
+ * 0x20cec while dst is even (1 byte, 1 word, word + byte, 2 words, 2 words + byte, then 0x3858 for 6 and more) and
+ * 0x22cec while dst is odd (byte, 2 bytes, byte + word, byte + word + byte, byte + 2 words, 3 bytes + word + byte, then
+ * 0x38b6 for 7 and more: one byte then 0x3858); the two table registers are exchanged (EXG A2,A4) whenever an odd
+ * number of bytes is written or skipped, and the state is not reset between rows. 0x3858 writes a word to reach a long
+ * boundary, then longs of the colour word in both halves, then the remaining 1..3 bytes through the even table.
+ * Cursors are stored back one long early, as in variant a.
  */
-void fill_span_rows_8bit /* Original: FUN_000037b4 */ (int *param_1,int *param_2,int param_3)
+void fill_span_rows_8bit /* Original: FUN_000037b4 */
+               (uint **listA,uint **listB,int rows,byte *dst,int skip)
 
 {
-  short sVar1;
-  short sVar2;
-  undefined4 uVar3;
-  short sVar5;
-  int iVar4;
-  short sVar6;
-  ushort uVar7;
-  short sVar8;
-  undefined4 *puVar9;
-  int *piVar10;
-  int *piVar11;
-  undefined4 *puVar12;
-  undefined4 *puVar13;
-  undefined4 *puVar14;
-  
-  puVar12 = &DAT_00020cec;
-  puVar14 = &DAT_00022cec;
-  puVar9 = (undefined4 *)*param_1 + 1;
-  uVar3 = *(undefined4 *)*param_1;
-  piVar11 = (int *)*param_2 + 1;
-  iVar4 = *(int *)*param_2;
-  do {
-    sVar8 = (short)iVar4 + (short)uVar3 + -1;
-    sVar6 = 0;
-    uVar3 = *puVar9;
-    iVar4 = *piVar11;
-    puVar9 = puVar9 + 1;
-    piVar10 = piVar11 + 1;
-    puVar13 = puVar12;
-    do {
-      sVar1 = (short)uVar3;
-      sVar5 = (short)iVar4;
-      sVar2 = (short)((uint)uVar3 >> 0x10);
-      if (iVar4 < CONCAT22(sVar2,sVar5)) {
-        uVar7 = (short)((uint)iVar4 >> 0x10) - sVar6;
-        if (sVar5 != sVar1) {
-                    // WARNING: Could not recover jumptable at 0x0000381a. Too many branches
-                    // WARNING: Treating indirect jump as call
-          (*(code *)puVar13[(short)uVar7])();
-          return;
+  uint *a;                                      /* A0: new run list */
+  uint *b;                                      /* A1: previous run list */
+  uint ra;                                      /* D0: (end x << 16) | colour word, or a row count */
+  uint rb;                                      /* D1 */
+  ushort x;                                     /* D2.W: end of the previous run */
+  ushort cnt;                                   /* D3.W: run length in pixels (= bytes) */
+  uint colour;                                  /* D4: colour word (made a long by the long fill) */
+  short n;                                      /* D7.W */
+  short k;                                      /* D6.W */
+  bool odd;                                     /* A2 / A4 swapped (EXG): dst is at an odd address */
+  bool same;
+
+  a = *listA;
+  b = *listB;
+  odd = false;                                  /* A2 = table 0x20cec (even dst), A4 = 0x22cec (odd dst) */
+  ra = *a++;
+  rb = *b++;
+  for (;;) {
+    n = (short)(ra + rb) + -1;                  /* run boundaries in this row */
+    x = 0;                                      /* CLR.W D2 */
+    ra = *a++;
+    rb = *b++;
+    do {                                        /* DBRA D7 */
+      colour = (colour & 0xffff0000) | (ushort)ra;
+      ra = (ra & 0xffff0000) | (ushort)rb;
+      if ((int)rb < (int)ra) {                  /* the old run ends first */
+        ra = (ra & 0xffff0000) | (ushort)colour;
+        cnt = (ushort)(rb >> 0x10) - x;
+        x = x + cnt;
+        same = (ushort)rb == (ushort)colour;
+        rb = *b++;
+      }
+      else if (rb == ra) {                      /* both end together */
+        cnt = (ushort)(ra >> 0x10) - x;
+        x = x + cnt;
+        ra = *a++;
+        same = (ushort)rb == (ushort)colour;
+        rb = *b++;
+        n = n + -1;
+      }
+      else {                                    /* the new run ends first */
+        cnt = (ushort)(ra >> 0x10) - x;
+        x = x + cnt;
+        ra = *a++;
+        same = (ushort)rb == (ushort)colour;
+      }
+      if (same) {                               /* unchanged span: skip it (0x38c2) */
+        dst = dst + (short)cnt;
+        if ((cnt & 1) != 0) {
+          odd = !odd;                           /* EXG A2,A4 */
         }
-LAB_000038c0:
-        piVar11 = piVar10 + 1;
-        iVar4 = *piVar10;
+        continue;
+      }
+      /* JMP (A2, D3.W*4): table 0x20cec when even, 0x22cec when odd (filled by init_code_pointer_tables) */
+      if (odd && (6 < cnt)) {                   /* 0x38b6: one byte to reach an even address */
+        *dst++ = (byte)colour;
+        odd = false;
+        cnt = cnt + -1;
+        goto long_fill;
+      }
+      if (!odd && (5 < cnt)) {                  /* 0x3858 */
+long_fill:
+        if (((uint)dst & 2) != 0) {             /* BTST #1 of the address: reach a long boundary */
+          *(ushort *)dst = (ushort)colour;
+          dst = dst + 2;
+          cnt = cnt + -2;
+        }
+        colour = (colour << 0x10) | (ushort)colour; /* the colour word in both halves */
+        for (k = (short)(cnt >> 2) + -1; k != -1; k = k + -1) {
+          *(uint *)dst = colour;
+          dst = dst + 4;
+        }
+        cnt = cnt & 3;
+        if (cnt == 0) continue;                 /* even here: falls to the even table entries 1..3 */
+      }
+      if (!odd) {
+        switch (cnt) {
+        case 1:                                 /* 0x3842 */
+          *dst++ = (byte)colour;
+          odd = true;
+          break;
+        case 2:                                 /* 0x3850 */
+          *(ushort *)dst = (ushort)colour;
+          dst = dst + 2;
+          break;
+        case 3:                                 /* 0x3840 */
+          *(ushort *)dst = (ushort)colour;
+          dst[2] = (byte)colour;
+          dst = dst + 3;
+          odd = true;
+          break;
+        case 4:                                 /* 0x384e */
+          *(ushort *)dst = (ushort)colour;
+          *(ushort *)(dst + 2) = (ushort)colour;
+          dst = dst + 4;
+          break;
+        case 5:                                 /* 0x383e */
+          *(ushort *)dst = (ushort)colour;
+          *(ushort *)(dst + 2) = (ushort)colour;
+          dst[4] = (byte)colour;
+          dst = dst + 5;
+          odd = true;
+          break;
+        }                                       /* 0 -> 0x3836 */
       }
       else {
-        if (iVar4 == CONCAT22(sVar2,sVar5)) {
-          uVar7 = sVar2 - sVar6;
-          uVar3 = *puVar9;
-          if (sVar5 != sVar1) {
-                    // WARNING: Could not recover jumptable at 0x00003834. Too many branches
-                    // WARNING: Treating indirect jump as call
-            (*(code *)puVar13[(short)uVar7])();
-            return;
-          }
-          sVar8 = sVar8 + -1;
-          puVar9 = puVar9 + 1;
-          goto LAB_000038c0;
-        }
-        uVar7 = sVar2 - sVar6;
-        uVar3 = *puVar9;
-        puVar9 = puVar9 + 1;
-        piVar11 = piVar10;
-        if (sVar5 != sVar1) {
-                    // WARNING: Could not recover jumptable at 0x00003802. Too many branches
-                    // WARNING: Treating indirect jump as call
-          (*(code *)puVar13[(short)uVar7])();
-          return;
+        switch (cnt) {
+        case 1:                                 /* 0x3842 */
+          *dst++ = (byte)colour;
+          odd = false;
+          break;
+        case 2:                                 /* 0x3882 */
+          dst[0] = (byte)colour;
+          dst[1] = (byte)colour;
+          dst = dst + 2;
+          break;
+        case 3:                                 /* 0x388c: a byte, then a word */
+          dst[0] = (byte)colour;
+          *(ushort *)(dst + 1) = (ushort)colour;
+          dst = dst + 3;
+          odd = false;
+          break;
+        case 4:                                 /* 0x389c: byte, word, byte */
+          dst[0] = (byte)colour;
+          *(ushort *)(dst + 1) = (ushort)colour;
+          dst[3] = (byte)colour;
+          dst = dst + 4;
+          break;
+        case 5:                                 /* 0x38a8: byte, word, word */
+          dst[0] = (byte)colour;
+          *(ushort *)(dst + 1) = (ushort)colour;
+          *(ushort *)(dst + 3) = (ushort)colour;
+          dst = dst + 5;
+          odd = false;
+          break;
+        case 6:                                 /* 0x3898: byte, byte, byte, word, byte */
+          dst[0] = (byte)colour;
+          dst[1] = (byte)colour;
+          dst[2] = (byte)colour;
+          *(ushort *)(dst + 3) = (ushort)colour;
+          dst[5] = (byte)colour;
+          dst = dst + 6;
+          break;
         }
       }
-      sVar6 = uVar7 + sVar6;
-      puVar12 = puVar13;
-      if ((uVar7 & 1) != 0) {
-        puVar12 = puVar14;
-        puVar14 = puVar13;
-      }
-      sVar8 = sVar8 + -1;
-      piVar10 = piVar11;
-      puVar13 = puVar12;
-    } while (sVar8 != -1);
-    param_3 = param_3 + -1;
-    if (param_3 == 0) {
-      *param_1 = (int)(puVar9 + -1);
-      *param_2 = (int)(piVar11 + -1);
-      return;
-    }
-  } while( true );
+    } while (n-- != 0);
+    dst = dst + skip;                           /* the A2 / A4 swap state carries over to the next row */
+    rows = rows + -1;
+    if (rows == 0) break;
+  }
+  *listA = a + -1;                              /* give back the unread row count */
+  *listB = b + -1;
+  return;
 }
 
 

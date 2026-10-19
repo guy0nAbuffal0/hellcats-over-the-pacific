@@ -2693,179 +2693,566 @@ void dial_point_at_angle /* Original: FUN_00005718 */
 
 
 
+/* VERIFIED (ID03::FUN_00005860): ID03.bin 0x5860..0x59f2 checked against an independent capstone disassembly.
+ * LINK -$28; JT $382(-300 / -100 / 100 +2 / 300 +2), JT $3ca(0 / -300 / -100 / 100 +2 / 300 +2) with DIVS #2, ADD.W, JT $382(0),
+ * each EXT.L into a local and MOVE.W to A5-0x1150..-0x113e; four addresses MOVEA.W rowBytes MULU.L y + base + x DIVS.L
+ * (8 DIVS.W depth, EXT.L) -> A5-0x113c / -0x1138 / -0x1134 / -0x1130; RTS - identical to the C. */
 /* Original: FUN_00005860; source: ID03.c. Recovered name: compute_panel_screen_addresses [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x5860.
- * No arguments (complete Ghidra C below). Converts fixed design coordinates with design_y_to_screen (JT $382) and design_x_to_screen (JT $3ca, rounded down to even) into a rectangle and four column / row values (A5-0x1150..-0x113e), then four screen byte addresses A5-0x113c / -0x1138 / -0x1134 / -0x1130 = base A5-0x1382 + y * rowBytes A5-0x1378 + x / (8 / depth), with depth = A5-0x137a [PROVEN arithmetic: 8 / depth = pixels per byte, so A5-0x137a is the pixel depth 1 / 4 / 8 - it is also compared with 4 in remap_cached_panel_colours]. Which panel areas these addresses delimit is not yet known [UNKNOWN]. Caller: prepare_instrument_panel (0x5d46; only BSR found in ID03).
+ * No arguments. Body rebuilt as C below (Ghidra's C dropped the design constants). Converts fixed design coordinates with design_y_to_screen (JT $382) and design_x_to_screen (JT $3ca, rounded down to even): A5-0x1150 = Y(-300), -0x114e = Y(-100), -0x114c = Y(100) + 2, -0x114a = Y(300) + 2, -0x1148 = X(0), -0x1146 = X(-300), -0x1144 = X(-100), -0x1142 = X(100) + 2, -0x1140 = X(300) + 2, -0x113e = Y(0) [PROVEN, bytes 0x5860..0x59f2], then four screen byte addresses A5-0x113c / -0x1138 / -0x1134 / -0x1130 = base A5-0x1382 + y * rowBytes A5-0x1378 + x / (8 / depth), with depth = A5-0x137a [PROVEN arithmetic: 8 / depth = pixels per byte, so A5-0x137a is the pixel depth 1 / 4 / 8 - it is also compared with 4 in remap_cached_panel_colours]. The addresses are the starts of the upper (X(0), Y(-300)), lower (X(0), Y(100) + 2), left (X(-300), Y(0)) and right (X(100) + 2, Y(0)) arms of a cross with a gap from -100 to 100 around the view centre - a gunsight crosshair drawn straight into screen memory [STRONG INFERENCE]. Caller: prepare_instrument_panel (0x5d46; only BSR found in ID03).
  */
 void compute_panel_screen_addresses /* Original: FUN_00005860 */ (void)
 
 {
-  short sVar1;
-  short sVar2;
-  short sVar3;
-  undefined2 uVar4;
-  short sVar5;
-  short sVar6;
-  short sVar7;
   int unaff_A5;
-  
-  sVar3 = (**(code **)(unaff_A5 + 0x382))();
-  *(short *)(unaff_A5 + -0x1150) = sVar3;
-  uVar4 = (**(code **)(unaff_A5 + 0x382))();
-  *(undefined2 *)(unaff_A5 + -0x114e) = uVar4;
-  sVar5 = (**(code **)(unaff_A5 + 0x382))();
-  *(short *)(unaff_A5 + -0x114c) = sVar5 + 2;
-  sVar6 = (**(code **)(unaff_A5 + 0x382))();
-  *(short *)(unaff_A5 + -0x114a) = sVar6 + 2;
-  sVar6 = (**(code **)(unaff_A5 + 0x3ca))();
-  sVar1 = (sVar6 / 2) * 2;
-  *(short *)(unaff_A5 + -0x1148) = sVar1;
-  sVar6 = (**(code **)(unaff_A5 + 0x3ca))();
-  sVar2 = (sVar6 / 2) * 2;
-  *(short *)(unaff_A5 + -0x1146) = sVar2;
-  sVar6 = (**(code **)(unaff_A5 + 0x3ca))();
-  *(short *)(unaff_A5 + -0x1144) = (sVar6 / 2) * 2;
-  sVar6 = (**(code **)(unaff_A5 + 0x3ca))();
-  sVar6 = (sVar6 / 2) * 2 + 2;
-  *(short *)(unaff_A5 + -0x1142) = sVar6;
-  sVar7 = (**(code **)(unaff_A5 + 0x3ca))();
-  *(short *)(unaff_A5 + -0x1140) = (sVar7 / 2) * 2 + 2;
-  sVar7 = (**(code **)(unaff_A5 + 0x382))();
-  *(short *)(unaff_A5 + -0x113e) = sVar7;
-  *(int *)(unaff_A5 + -0x113c) =
-       (int)sVar1 / (int)(short)(8 / (int)*(short *)(unaff_A5 + -0x137a)) +
-       *(int *)(unaff_A5 + -0x1382) + (int)sVar3 * (int)*(short *)(unaff_A5 + -0x1378);
-  *(int *)(unaff_A5 + -0x1138) =
-       (int)sVar1 / (int)(short)(8 / (int)*(short *)(unaff_A5 + -0x137a)) +
-       *(int *)(unaff_A5 + -0x1382) + (int)(short)(sVar5 + 2) * (int)*(short *)(unaff_A5 + -0x1378);
-  *(int *)(unaff_A5 + -0x1134) =
-       (int)sVar2 / (int)(short)(8 / (int)*(short *)(unaff_A5 + -0x137a)) +
-       *(int *)(unaff_A5 + -0x1382) + (int)sVar7 * (int)*(short *)(unaff_A5 + -0x1378);
-  *(int *)(unaff_A5 + -0x1130) =
-       (int)sVar6 / (int)(short)(8 / (int)*(short *)(unaff_A5 + -0x137a)) +
-       *(int *)(unaff_A5 + -0x1382) + (int)sVar7 * (int)*(short *)(unaff_A5 + -0x1378);
+  int y0;                                       /* -$28(A6): Y(0) */
+  int xr1;                                      /* -$20(A6): X(100) even + 2 */
+  int xl0;                                      /* -$18(A6): X(-300) even */
+  int xc;                                       /* -$14(A6): X(0) even */
+  int t;                                        /* -$1c / -$10 / -8(A6): stored only */
+  int yb0;                                      /* -$c(A6): Y(100) + 2 */
+  int yt0;                                      /* -4(A6): Y(-300) */
+
+  /* a crosshair around the view centre: arms from 100 to 300 design units out */
+  yt0 = (int)(short)design_y_to_screen(-300);   /* JT $382 */
+  *(short *)(unaff_A5 + -0x1150) = (short)yt0;  /* upper arm top */
+  t = (int)(short)design_y_to_screen(-100);
+  *(short *)(unaff_A5 + -0x114e) = (short)t;    /* upper arm bottom */
+  yb0 = (int)(short)((short)design_y_to_screen(100) + 2);
+  *(short *)(unaff_A5 + -0x114c) = (short)yb0;  /* lower arm top */
+  t = (int)(short)((short)design_y_to_screen(300) + 2);
+  *(short *)(unaff_A5 + -0x114a) = (short)t;    /* lower arm bottom */
+  xc = (int)(short)((short)((int)(short)design_x_to_screen(0) / 2) * 2); /* JT $3ca, rounded down to even */
+  *(short *)(unaff_A5 + -0x1148) = (short)xc;
+  xl0 = (int)(short)((short)((int)(short)design_x_to_screen(-300) / 2) * 2);
+  *(short *)(unaff_A5 + -0x1146) = (short)xl0;  /* left arm start */
+  t = (int)(short)((short)((int)(short)design_x_to_screen(-100) / 2) * 2);
+  *(short *)(unaff_A5 + -0x1144) = (short)t;    /* left arm end */
+  xr1 = (int)(short)((short)((int)(short)design_x_to_screen(100) / 2) * 2 + 2);
+  *(short *)(unaff_A5 + -0x1142) = (short)xr1;  /* right arm start */
+  t = (int)(short)((short)((int)(short)design_x_to_screen(300) / 2) * 2 + 2);
+  *(short *)(unaff_A5 + -0x1140) = (short)t;    /* right arm end */
+  y0 = (int)(short)design_y_to_screen(0);
+  *(short *)(unaff_A5 + -0x113e) = (short)y0;
+  /* screen byte addresses: base A5-0x1382 + y * rowBytes A5-0x1378 + x / (8 / depth A5-0x137a) */
+  *(int *)(unaff_A5 + -0x113c) = (int)((unsigned int)(int)*(short *)(unaff_A5 + -0x1378) * yt0) +
+       *(int *)(unaff_A5 + -0x1382) + xc / (int)(short)(8 / *(short *)(unaff_A5 + -0x137a));  /* upper arm */
+  *(int *)(unaff_A5 + -0x1138) = (int)((unsigned int)(int)*(short *)(unaff_A5 + -0x1378) * yb0) +
+       *(int *)(unaff_A5 + -0x1382) + xc / (int)(short)(8 / *(short *)(unaff_A5 + -0x137a));  /* lower arm */
+  *(int *)(unaff_A5 + -0x1134) = (int)((unsigned int)(int)*(short *)(unaff_A5 + -0x1378) * y0) +
+       *(int *)(unaff_A5 + -0x1382) + xl0 / (int)(short)(8 / *(short *)(unaff_A5 + -0x137a)); /* left arm */
+  *(int *)(unaff_A5 + -0x1130) = (int)((unsigned int)(int)*(short *)(unaff_A5 + -0x1378) * y0) +
+       *(int *)(unaff_A5 + -0x1382) + xr1 / (int)(short)(8 / *(short *)(unaff_A5 + -0x137a)); /* right arm */
   return;
 }
 
 
 
+/* VERIFIED (ID03::FUN_00005ab6): ID03.bin 0x5ab6..0x5c34 checked against an independent capstone disassembly.
+ * LINK -8; CLR count; SetResLoad(0); four GetResource('HEL2', c + $c8 / $12c / $190 / $1f4) + RmveResource if found;
+ * SetResLoad(1); UpdateResFile; four AddResource + ResError ADD.W; TST count: flag +$c = 0 and A5-0x14a0 = 1, else flag = 1
+ * (MULS #$160 + *cache); ChangedResource(cache); UpdateResFile; RTS - identical to the C. */
 /* Original: FUN_00005ab6; source: ID03.c. Recovered name: store_panel_bitmaps_as_resources [PROVEN].
  * Decoded from ID03.bin bytes at file 0x5ab6.
- * No arguments. With panel configuration c = A5-0x13ae: SetResLoad(false) ($A99B); for ids 200, 300, 400, 500 + c: GetResource(HEL2, id) ($A9A0) and RmveResource ($A9AD) of any old copy; SetResLoad(true); UpdateResFile(A5-0x1002) ($A999); then AddResource ($A9AB) of the handles A5-0x12b0, -0x11f6, -0x11dc, -0x11d4 as HEL2 200 / 300 / 400 / 500 + c with the names STR# 129 slots 79 "Bitmap", 80 "HorizonInstrument", 81 "GyroInstrument", 82 "GyroFlags", adding each ResError ($A9AF) to a local count. If any failed: cache entry flag +0xc = 0 (cache = HEL2 127 "Bitmap Cache" at A5-0x13b2, 0x160 bytes per configuration) and A5-0x14a0 = 1, which makes the ID04 routine at 0x432 show STR# 129 slot 1 "Unable to store instrument panel to disk"; otherwise flag +0xc = 1. Finally ChangedResource(cache) ($A9AA) and UpdateResFile. Caller: ID03 0x6ba4.
+ * No arguments. With panel configuration c = A5-0x13ae: SetResLoad(false) ($A99B); for ids 200, 300, 400, 500 + c: GetResource(HEL2, id) ($A9A0) and RmveResource ($A9AD) of any old copy; SetResLoad(true); UpdateResFile(A5-0x1002) ($A999); then AddResource ($A9AB) of the handles A5-0x12b0, -0x11f6, -0x11dc, -0x11d4 as HEL2 200 / 300 / 400 / 500 + c with the names STR# 129 slots 79 "Bitmap", 80 "HorizonInstrument", 81 "GyroInstrument", 82 "GyroFlags", adding each ResError ($A9AF) to a local count. If any failed: cache entry flag +0xc = 0 (cache = HEL2 127 "Bitmap Cache" at A5-0x13b2, 0x160 bytes per configuration) and A5-0x14a0 = 1, which makes the ID04 routine at 0x432 show STR# 129 slot 1 "Unable to store instrument panel to disk"; otherwise flag +0xc = 1. Finally ChangedResource(cache) ($A9AA) and UpdateResFile. Caller: ID03 0x6ba4. Body rebuilt as C below.
  * Related (inside the Ghidra range of FUN_00005860, not exported): file 0x59f4..0x5ab4 releases the same four handles - ReleaseResource ($A9A3) when the cache entry of configuration A5-0x211e is flagged as stored, else DisposHandle (ID09 JT $25a) - and clears them [PROVEN, bytes]; callers 0x5ed2, 0x61d6.
  */
-// WARNING: Control flow encountered bad instruction data
-
 void store_panel_bitmaps_as_resources /* Original: FUN_00005ab6 */ (void)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00005c36; source: ID03.c. Recovered name: open_cport_on_buffer [PROVEN].
- * Decoded from ID03.bin bytes at file 0x5c36.
- * C args: +8 CGrafPort *port (0x6c bytes), +0xc short rowBytes, +0xe Ptr baseAddr, +0x12 Rect bounds (by value). Clears the 0x6c bytes (JT $4f2, ID02 0x2b0), OpenCPort(port) ($AA00), restores thePort; sets the port PixMap (handle at +2): rowBytes (+4), baseAddr (+0), bounds (+6) = bounds; portRect (+0x10) = bounds; RectRgn(visRgn +0x18, &bounds) ($A8DF); returns port. Caller: prepare_instrument_panel (0x5da8, port A5-0x1492 -> A5-0x1496).
- */
-// WARNING: Control flow encountered bad instruction data
-
-void open_cport_on_buffer /* Original: FUN_00005c36 */ (undefined4 param_1)
-
-{
   int unaff_A5;
-  
-  (**(code **)(unaff_A5 + 0x4f2))(param_1);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
+  int old;                                      /* -8(A6) */
+  short errs;                                   /* -4(A6) */
 
-
-
-/* Original: FUN_00005cb6; source: ID03.c. Recovered name: close_port_glue [PROVEN].
- * Decoded from ID03.bin bytes at file 0x5cb6.
- * ClosePort(port +8) ($A87D). Callers: prepare_instrument_panel (0x5d72 for A5-0x11cc, 0x5d92 for A5-0x1496).
- */
-// WARNING: Control flow encountered bad instruction data
-
-void close_port_glue /* Original: FUN_00005cb6 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00005cc4; source: ID03.c. Recovered name: prepare_instrument_panel [STRONG INFERENCE].
- * Decoded from ID03.bin bytes at file 0x5cc4.
- * Reached through JT $17a (CODE 0 entry -> ID03 0x5cc4). Partly decoded [PROVEN, bytes 0x5cc4..0x5f20]: saves CurResFile ($A994) and UseResFile(A5-0x1002) ($A998); panel scale A5-0x149e = A5-0x149a = (w / 2 + w) / 2 for the half view width w = A5-0x1372 (the factor used by scale_design_4800); copies A5-0x1066 / -0x1062 to A5-0x211c / -0x2118; cache = GetResource(HEL2, 127) -> A5-0x13b2, or NewHandleClear(0x580) added as HEL2 127 "Bitmap Cache" (STR# 129 slot 83) - 4 entries of 0x160 bytes; calls FUN_00005860; closes the old ports A5-0x11cc / A5-0x1496 (close_port_glue) and disposes the region A5-0x13b6 ($A8D9); opens A5-0x1492 with open_cport_on_buffer; then searches the 4 cache entries for one whose +0 / +2 / +4 / +6 / +8 equal A5-0x137a (1-bit mode), A5-0x137e, A5-0x137c, A5-0x1372, A5-0x1370 (view size) and that is the current configuration A5-0x13ae or flagged stored (+0xc); for a stored entry it copies its ten 16-byte instrument records (+0x12) to A5-0x12a2 and 20 bytes (+0xb2) to A5-0x1202, releases the current bitmaps (0x59f4) and loads HEL2 300 + entry... as A5-0x11f6 and the others. So rendered panels are reused from disk when the display configuration matches [STRONG INFERENCE]; the rest of the function (redraw path) is not yet decoded.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void prepare_instrument_panel /* Original: FUN_00005cc4 */ (void)
-
-{
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_00006c1c; source: ID03.c. Recovered name: remap_cached_panel_colours [STRONG INFERENCE].
- * Decoded from ID03.bin bytes at file 0x6c1c.
- * Reached through JT $182 (CODE 0 entry -> ID03 0x6c1c). Returns at once unless the current configuration A5-0x13ae has a cache entry (A5-0x13b2) whose key (+0 depth, +2, +4, +6 / +8 view size) matches the display. In 1-bit mode calls JT $482 (ID02 0x4b62, the standard colour index set-up). Otherwise builds a 256-word translation table on the stack, keyed by the entry word +0xa & 0x1fff and a switch on the depth (JT $2a), walks the pixels of the panel bitmaps (A5-0x12b0, port A5-0x1496, A5-0x11dc with mask A5-0x11de and sizes A5-0x11e2 / -0x11e4) replacing bytes through the table, and refreshes many palette-index globals (A5-0x11fa, -0x11f8, -0x11ae, -0x11ac, -0x11a2, -0x118c, -0x118a, -0x1188, -0x117e, -0x117c, -0x112c, -0x12a4) with lookup_palette_index_for_rgb_level (JT $45a); at depth 4 some are OR-combined with themselves shifted (0x70a0 / 0x7184) [PROVEN calls]. So a panel loaded from the cache is re-coloured for the current palette [STRONG INFERENCE]. Exact table semantics not decoded.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void remap_cached_panel_colours /* Original: FUN_00006c1c */ (void)
-
-{
-  short sVar1;
-  int unaff_A5;
-  undefined2 local_204 [256];
-  
-  if ((((-1 < *(short *)(unaff_A5 + -0x13ae)) && (*(int *)(unaff_A5 + -0x13b2) != 0)) &&
-      (*(short *)(**(int **)(unaff_A5 + -0x13b2) + *(short *)(unaff_A5 + -0x13ae) * 0x160) ==
-       *(short *)(unaff_A5 + -0x137a))) &&
-     (((*(short *)(**(int **)(unaff_A5 + -0x13b2) + *(short *)(unaff_A5 + -0x13ae) * 0x160 + 2) ==
-        *(short *)(unaff_A5 + -0x137e) &&
-       (*(short *)(**(int **)(unaff_A5 + -0x13b2) + *(short *)(unaff_A5 + -0x13ae) * 0x160 + 4) ==
-        *(short *)(unaff_A5 + -0x137c))) &&
-      ((*(short *)(**(int **)(unaff_A5 + -0x13b2) + *(short *)(unaff_A5 + -0x13ae) * 0x160 + 6) ==
-        *(short *)(unaff_A5 + -0x1372) &&
-       (*(short *)(**(int **)(unaff_A5 + -0x13b2) + *(short *)(unaff_A5 + -0x13ae) * 0x160 + 8) ==
-        *(short *)(unaff_A5 + -0x1370))))))) {
-    if (*(short *)(unaff_A5 + -0x137a) != 1) {
-      for (sVar1 = 0; sVar1 < 0x100; sVar1 = sVar1 + 1) {
-        local_204[sVar1] = 0;
-      }
-      (**(code **)(unaff_A5 + 0x2a))();
-                    // WARNING: Bad instruction - Truncating control flow here
-      halt_baddata();
-    }
-    (**(code **)(unaff_A5 + 0x482))();
+  errs = 0;
+  SetResLoad(0);                                /* $A99B */
+  old = GetResource(0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0xc8); /* $A9A0: 'HEL2' */
+  if (old != 0) {
+    RmveResource(old);                          /* $A9AD */
   }
+  old = GetResource(0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0x12c); /* $A9A0: 'HEL2' */
+  if (old != 0) {
+    RmveResource(old);                          /* $A9AD */
+  }
+  old = GetResource(0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0x190); /* $A9A0: 'HEL2' */
+  if (old != 0) {
+    RmveResource(old);                          /* $A9AD */
+  }
+  old = GetResource(0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0x1f4); /* $A9A0: 'HEL2' */
+  if (old != 0) {
+    RmveResource(old);                          /* $A9AD */
+  }
+  SetResLoad(1);
+  UpdateResFile(*(short *)(unaff_A5 + -0x1002)); /* $A999 */
+  AddResource(*(int *)(unaff_A5 + -0x12b0),0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0xc8,*(unsigned char **)(unaff_A5 + -0xe0a));
+                                                /* $A9AB: STR# 129 slot 79 "Bitmap" */
+  errs = errs + ResError();                     /* $A9AF */
+  AddResource(*(int *)(unaff_A5 + -0x11f6),0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0x12c,*(unsigned char **)(unaff_A5 + -0xe06));
+                                                /* $A9AB: STR# 129 slot 80 "HorizonInstrument" */
+  errs = errs + ResError();                     /* $A9AF */
+  AddResource(*(int *)(unaff_A5 + -0x11dc),0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0x190,*(unsigned char **)(unaff_A5 + -0xe02));
+                                                /* $A9AB: STR# 129 slot 81 "GyroInstrument" */
+  errs = errs + ResError();                     /* $A9AF */
+  AddResource(*(int *)(unaff_A5 + -0x11d4),0x48454c32,*(short *)(unaff_A5 + -0x13ae) + 0x1f4,*(unsigned char **)(unaff_A5 + -0xdfe));
+                                                /* $A9AB: STR# 129 slot 82 "GyroFlags" */
+  errs = errs + ResError();                     /* $A9AF */
+  if (errs != 0) {
+    *(short *)(**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160) + 0xc) = 0; /* cache entry: not stored */
+    *(short *)(unaff_A5 + -0x14a0) = 1;         /* "Unable to store instrument panel to disk" */
+  }
+  else {
+    *(short *)(**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160) + 0xc) = 1; /* stored */
+  }
+  ChangedResource(*(int *)(unaff_A5 + -0x13b2)); /* $A9AA: "Bitmap Cache" */
+  UpdateResFile(*(short *)(unaff_A5 + -0x1002));
   return;
 }
 
 
 
+/* VERIFIED (ID03::FUN_00005c36): ID03.bin 0x5c36..0x5cb4 checked against an independent capstone disassembly.
+ * LINK -$16; JT $4f2(port, 0, $6c); save thePort; OpenCPort; SetPort(saved); PixMap rowBytes / baseAddr / bounds via **(port+2);
+ * portRect = bounds; RectRgn(visRgn, &bounds $12(A6)); D0 = port; RTS - identical to the C. */
+/* Original: FUN_00005c36; source: ID03.c. Recovered name: open_cport_on_buffer [PROVEN].
+ * Decoded from ID03.bin bytes at file 0x5c36.
+ * C args: +8 CGrafPort *port (0x6c bytes), +0xc short rowBytes, +0xe Ptr baseAddr, +0x12 Rect bounds (by value). Clears the 0x6c bytes (JT $4f2, ID02 0x2b0), OpenCPort(port) ($AA00), restores thePort; sets the port PixMap (handle at +2): rowBytes (+4), baseAddr (+0), bounds (+6) = bounds; portRect (+0x10) = bounds; RectRgn(visRgn +0x18, &bounds) ($A8DF); returns port. Caller: prepare_instrument_panel (0x5da8, port A5-0x1492 -> A5-0x1496). Body rebuilt as C below.
+ */
+// WARNING: Control flow encountered bad instruction data
+
+int open_cport_on_buffer /* Original: FUN_00005c36 */ (int port,short rowBytes,int baseAddr,Rect bounds)
+
+{
+  int unaff_A5;
+  int savedPort;                                /* -$12(A6) */
+
+  FUN_000002b0(port,0,0x6c);                    /* JT $4f2 (ID02 0x2b0): clear the CGrafPort */
+  savedPort = *(int *)(unaff_A5 + -0x160c);     /* thePort */
+  OpenCPort(port);                              /* $AA00 */
+  SetPort(savedPort);                           /* $A873 */
+  *(short *)(**(int **)(port + 2) + 4) = rowBytes; /* (*portPixMap)->rowBytes */
+  **(int **)(port + 2) = baseAddr;              /* (*portPixMap)->baseAddr */
+  *(Rect *)(**(int **)(port + 2) + 6) = bounds; /* (*portPixMap)->bounds */
+  *(Rect *)(port + 0x10) = bounds;              /* portRect */
+  RectRgn(*(int *)(port + 0x18),&bounds);       /* $A8DF: visRgn */
+  return port;
+}
+
+
+
+/* VERIFIED (ID03::FUN_00005cb6): ID03.bin 0x5cb6..0x5cc2 checked against an independent capstone disassembly.
+ * LINK #0; ClosePort(8(A6)); RTS - identical to the C. */
+/* Original: FUN_00005cb6; source: ID03.c. Recovered name: close_port_glue [PROVEN].
+ * Decoded from ID03.bin bytes at file 0x5cb6.
+ * ClosePort(port +8) ($A87D); body rebuilt as C below. Callers: prepare_instrument_panel (0x5d72 for A5-0x11cc, 0x5d92 for A5-0x1496).
+ */
+void close_port_glue /* Original: FUN_00005cb6 */ (int port)
+
+{
+  ClosePort(port);                              /* $A87D */
+  return;
+}
+
+
+
+/* VERIFIED (ID03::FUN_00005cc4): ID03.bin 0x5cc4..0x6c1a checked against an independent capstone disassembly.
+ * LINK -$30; CurResFile / UseResFile; scale; trig pointers; HEL2 127 or NewHandleClear($580) + AddResource; BSR 0x5860; rect;
+ * port cleanup; BSR 0x5c36; entry loop (five key compares, current / stored tests, load block with ten 16-byte copies, BSR
+ * 0x59f4, GetResource 300 / 400 / 500 / 200, LRU update, block copies, UpdateResFile, BSR 0x71a2), blank gyro window, BRA tail;
+ * redraw path (JT $49a, LRU min / max scans, NewHandle / NewHandleClear, key and rowBytes, JT $26a, regions and arcs, 3-pixel
+ * outline, sixteen instrument calls with the listed constants, copies back, JT $27a, DisposDialog, BSR 0x5ab6, BSR 0x71a2);
+ * tail (BSR 0x5c36 at depth 1 / 4, BSR 0x3832 at depth 1, UseResFile); RTS - identical to the C (block copies written as
+ * memcpy; MOVE.L / DBRA loops in the binary). */
+/* Original: FUN_00005cc4; source: ID03.c. Recovered name: prepare_instrument_panel [STRONG INFERENCE].
+ * Decoded from ID03.bin bytes at file 0x5cc4.
+ * Reached through JT $17a (CODE 0 entry -> ID03 0x5cc4). Body rebuilt as C below [PROVEN, bytes 0x5cc4..0x6c1a]: saves CurResFile ($A994) and UseResFile(A5-0x1002) ($A998); panel scale A5-0x149e = A5-0x149a = (w / 2 + w) / 2 for the half view width w = A5-0x1372 (the factor used by scale_design_4800); copies A5-0x1066 / -0x1062 to A5-0x211c / -0x2118; cache = GetResource(HEL2, 127) -> A5-0x13b2, or NewHandleClear(0x580) added as HEL2 127 "Bitmap Cache" (STR# 129 slot 83) - 4 entries of 0x160 bytes; calls FUN_00005860; closes the old ports A5-0x11cc / A5-0x1496 (close_port_glue) and disposes the region A5-0x13b6 ($A8D9); opens A5-0x1492 with open_cport_on_buffer; then searches the 4 cache entries for one whose +0 / +2 / +4 / +6 / +8 equal A5-0x137a (1-bit mode), A5-0x137e, A5-0x137c, A5-0x1372, A5-0x1370 (view size) and that is the current configuration A5-0x13ae or flagged stored (+0xc); for a stored entry it copies its ten 16-byte instrument records (+0x12) to A5-0x12a2 and 20 bytes (+0xb2) to A5-0x1202, releases the current bitmaps (0x59f4) and loads HEL2 300 + entry... as A5-0x11f6 and the others. So rendered panels are reused from disk when the display configuration matches [STRONG INFERENCE]. A matching current entry, or a freshly loaded one, gets its gyro window blanked black and the function goes to the tail. Otherwise (redraw path): show_creating_panel_dialog (JT $49a); the least recently used entry (smallest use counter +0xe) becomes current; FUN_000059f4; NewHandle(1) (ID09 0x236, $A122) for "Bitmap" and NewHandleClear(1) (ID09 0x242, $A322) for the other three; use counter = max + 1, key and rowBytes ((w * depth + 15) >> 4) * 2 | 0x8000 written, ReallocHandle of the bitmap to the panel height; panel painted black; region A = view frame (draw_view_frame_outline, JT $3ba) minus region B (the panel's upper edge built from two dial_point_at_angle corner arcs at design x -2665..-2135 and 2135..2665, y 1010..1540, lines to (-2394 / 2394, 2400) and (-1060 / 1060, 670)) filled with the blended pattern in level 1 on level 0, region B painted; a 3-pixel black outline along the same edges plus (-3200, 1200)..(4000, 1200); then the instruments at their design positions (size, scale, pen, y, x): numbered boxes (screw size 40), percent gauge (330, 600, 7, -, 1940, 2200), split box (380, 380, 7, -, 1140, -680), altimeter (780, 10, s(12), 1860, -1660), airspeed (780, 9, -, 1860, -800), turn and bank (640, 7, -, 1940, 0), climb (680, 8, -, 1920, 800), manifold (680, 7, -, 1920, 1660), tachometer (560, 7, -, 1348, 2200), direction (540, 7, -, 1360, -2200), gear (600, 7, -, 1960, -2860), flaps (400, 7, -, 1410, -2900), fuel (600, 9, -, 1960, 2860), ammo (400, 7, -, 1410, 2900), horizon (720, 10, -, 1180, 1230; screw size 50) and gyro (600, 9, -, 1140, -1230) (pen = scale_design_480_min10(10) unless noted); the screen records are copied into the entry; DisposDialog, store_panel_bitmaps_as_resources, remap_panel_colours_identity. Tail: at depth 1 or 4 a colour port A5-0x1426 on the gyro tape (A5-0x11cc); at depth 1 the horizon face region A5-0x13b6 (make_inset_face_oval_region(720, 1180, 1230)); UseResFile(saved).
+ */
+void prepare_instrument_panel /* Original: FUN_00005cc4 */ (void)
+
+{
+  int unaff_A5;
+  short face[4];                                /* -$30(A6) */
+  short savedRes;                               /* -$28(A6) */
+  int dlg;                                      /* -$26(A6) */
+  int savedPort;                                /* -$22(A6) */
+  short r[4];                                   /* -$1e(A6): top, left, bottom, right */
+  int rgnB;                                     /* -$16(A6) */
+  int rgnA;                                     /* -$12(A6) */
+  int best;                                     /* -$e(A6): use counter */
+  short unused;                                 /* -$a(A6): cleared, never read */
+  short py;                                     /* -8(A6) */
+  short px;                                     /* -6(A6) */
+  short k;                                      /* -4(A6) */
+  short i;                                      /* -2(A6) */
+  short sx;
+/* 0x160-byte cache entry of slot n in "Bitmap Cache" (HEL2 127) */
+#define ENT_(n) (**(int **)(unaff_A5 + -0x13b2) + (int)(short)((n) * 0x160))
+#define CUR_ (*(short *)(unaff_A5 + -0x13ae))
+#define DX_(v) ((short)design_x_to_screen(v))
+#define DY_(v) ((short)design_y_to_screen(v))
+
+  unused = 0;
+  savedRes = CurResFile();                      /* $A994 */
+  UseResFile(*(short *)(unaff_A5 + -0x1002));   /* $A998 */
+  *(int *)(unaff_A5 + -0x149e) =
+       (int)(short)((int)(short)((short)((int)*(short *)(unaff_A5 + -0x1372) / 2) +
+                                 *(short *)(unaff_A5 + -0x1372)) / 2); /* panel scale = 3/4 of the half view width */
+  *(int *)(unaff_A5 + -0x149a) = *(int *)(unaff_A5 + -0x149e);
+  *(int *)(unaff_A5 + -0x211c) = *(int *)(unaff_A5 + -0x1066); /* sine pointer from the overlay */
+  *(int *)(unaff_A5 + -0x2118) = *(int *)(unaff_A5 + -0x1062); /* cosine pointer */
+  *(int *)(unaff_A5 + -0x13b2) = GetResource(0x48454c32,0x7f); /* $A9A0: 'HEL2' 127 */
+  if (*(int *)(unaff_A5 + -0x13b2) == 0) {
+    *(int *)(unaff_A5 + -0x13b2) = NewHandleClear(0x580); /* JT $252 (ID09 0x242, $A322): 4 entries */
+    AddResource(*(int *)(unaff_A5 + -0x13b2),0x48454c32,0x7f,*(unsigned char **)(unaff_A5 + -0xdfa));
+                                                /* $A9AB: STR# 129 slot 83 "Bitmap Cache" */
+  }
+  compute_panel_screen_addresses();             /* BSR 0x5860 */
+  r[1] = 0;
+  r[3] = *(short *)(unaff_A5 + -0x1372);
+  r[0] = DY_(0x29e);                            /* JT $382: panel top at design y 670 */
+  r[2] = *(short *)(unaff_A5 + -0x1370);
+  if (*(int *)(unaff_A5 + -0x11cc) != 0) {
+    close_port_glue(*(int *)(unaff_A5 + -0x11cc)); /* BSR 0x5cb6 */
+    *(int *)(unaff_A5 + -0x11cc) = 0;
+  }
+  if (*(int *)(unaff_A5 + -0x13b6) != 0) {
+    DisposeRgn(*(int *)(unaff_A5 + -0x13b6));   /* $A8D9 (not cleared) */
+  }
+  if (*(int *)(unaff_A5 + -0x1496) != 0) {
+    close_port_glue(*(int *)(unaff_A5 + -0x1496));
+  }
+  *(int *)(unaff_A5 + -0x1496) = open_cport_on_buffer(unaff_A5 + -0x1492,0,0,*(Rect *)r); /* BSR 0x5c36: panel port */
+  for (i = 0; i < 4; i = i + 1) {               /* look for a cached panel of this configuration */
+    if ((*(short *)ENT_(i) != *(short *)(unaff_A5 + -0x137a)) ||
+        (*(short *)(ENT_(i) + 2) != *(short *)(unaff_A5 + -0x137e)) ||
+        (*(short *)(ENT_(i) + 4) != *(short *)(unaff_A5 + -0x137c)) ||
+        (*(short *)(ENT_(i) + 6) != *(short *)(unaff_A5 + -0x1372)) ||
+        (*(short *)(ENT_(i) + 8) != *(short *)(unaff_A5 + -0x1370))) continue;
+    if ((CUR_ != i) && (*(short *)(ENT_(i) + 0xc) == 0)) continue; /* neither current nor stored */
+    if ((CUR_ != i) && (*(short *)(ENT_(i) + 0xc) != 0)) { /* load the stored panel */
+      for (k = 0; k < 10; k = k + 1) {          /* ten 16-byte instrument records */
+        memcpy((void *)(unaff_A5 + -0x12a2 + (int)k * 0x10),(void *)(ENT_(i) + (int)k * 0x10 + 0x12),0x10);
+      }
+      FUN_000059f4();                           /* BSR 0x59f4: release the current bitmaps */
+      memcpy((void *)(unaff_A5 + -0x1202),(void *)(ENT_(i) + 0xb2),0x14);
+      *(int *)(unaff_A5 + -0x11f6) = GetResource(0x48454c32,i + 300); /* "HorizonInstrument" */
+      memcpy((void *)(unaff_A5 + -0x11ee),(void *)(ENT_(i) + 0xc6),0x22); /* gyro window record */
+      *(int *)(unaff_A5 + -0x11dc) = GetResource(0x48454c32,i + 400); /* "GyroInstrument" */
+      *(int *)(unaff_A5 + -0x11d4) = GetResource(0x48454c32,i + 500); /* "GyroFlags" */
+      for (k = 0; k < 4; k = k + 1) {           /* make this entry the most recently used */
+        if (*(int *)(ENT_(i) + 0xe) < *(int *)(ENT_(k) + 0xe)) {
+          *(int *)(ENT_(i) + 0xe) = *(int *)(ENT_(k) + 0xe) + 1;
+          ChangedResource(*(int *)(unaff_A5 + -0x13b2)); /* $A9AA */
+        }
+      }
+      memcpy((void *)(unaff_A5 + -0x11c8),(void *)(ENT_(i) + 0xe8),0x2c);
+      memcpy((void *)(unaff_A5 + -0x119c),(void *)(ENT_(i) + 0x114),0x16);
+      memcpy((void *)(unaff_A5 + -0x1186),(void *)(ENT_(i) + 0x12a),0xc);
+      memcpy((void *)(unaff_A5 + -0x117a),(void *)(ENT_(i) + 0x136),0x18);
+      memcpy((void *)(unaff_A5 + -0x1162),(void *)(ENT_(i) + 0x14e),0xc);
+      memcpy((void *)(unaff_A5 + -0x1156),(void *)(ENT_(i) + 0x15a),6);
+      *(int *)(unaff_A5 + -0x12b0) = GetResource(0x48454c32,i + 200); /* "Bitmap" */
+      *(short *)(unaff_A5 + -0x12a8) = *(short *)(ENT_(i) + 10) & 0x1fff;
+      *(short *)(unaff_A5 + -0x12a6) = DY_(0x29e);
+      *(short *)(unaff_A5 + -0x211e) = i;
+      CUR_ = i;
+      UpdateResFile(*(short *)(unaff_A5 + -0x1002)); /* $A999 */
+      remap_panel_colours_identity();           /* BSR 0x71a2 */
+    }
+    HLock(*(int *)(unaff_A5 + -0x12b0));        /* JT $272 */
+    savedPort = *(int *)(unaff_A5 + -0x160c);
+    **(int **)(*(int *)(unaff_A5 + -0x1496) + 2) = **(int **)(unaff_A5 + -0x12b0); /* pixmap base = bitmap */
+    *(short *)(**(int **)(*(int *)(unaff_A5 + -0x1496) + 2) + 4) = *(short *)(ENT_(CUR_) + 10);
+    SetPort(*(int *)(unaff_A5 + -0x1496));      /* $A873 */
+    r[1] = *(short *)(unaff_A5 + -0x11ec);
+    r[0] = *(short *)(unaff_A5 + -0x11ee);
+    r[3] = r[1] + *(short *)(unaff_A5 + -0x11ea);
+    r[2] = r[0] + *(short *)(unaff_A5 + -0x11e8);
+    ForeColor(0x21);                            /* $A862: blackColor */
+    PaintRect(r);                               /* $A8A2: blank the gyro window */
+    SetPort(savedPort);
+    HUnlock(*(int *)(unaff_A5 + -0x12b0));      /* JT $27a */
+    goto finish;                                /* BRA.W 0x6bac */
+  }
+  /* no usable cache entry: render the panel into the least recently used slot */
+  dlg = show_creating_panel_dialog();           /* JT $49a */
+  best = 0x7fffffff;
+  k = 0;
+  for (i = 0; i < 4; i = i + 1) {
+    if (*(int *)(ENT_(i) + 0xe) < best) {
+      best = *(int *)(ENT_(i) + 0xe);
+      k = i;
+    }
+  }
+  FUN_000059f4();                               /* release the current bitmaps */
+  *(short *)(unaff_A5 + -0x211e) = k;
+  CUR_ = k;
+  *(int *)(unaff_A5 + -0x12b0) = NewHandle(1);  /* JT $24a (ID09 0x236, $A122) */
+  *(int *)(unaff_A5 + -0x11f6) = NewHandleClear(1);
+  *(int *)(unaff_A5 + -0x11dc) = NewHandleClear(1);
+  *(int *)(unaff_A5 + -0x11d4) = NewHandleClear(1);
+  best = (int)0x80000000;
+  for (i = 0; i < 4; i = i + 1) {
+    if (best < *(int *)(ENT_(i) + 0xe)) {
+      best = *(int *)(ENT_(i) + 0xe);
+      k = i;
+    }
+  }
+  *(int *)(ENT_(CUR_) + 0xe) = best + 1;        /* newest use */
+  ChangedResource(*(int *)(unaff_A5 + -0x13b2));
+  *(short *)ENT_(CUR_) = *(short *)(unaff_A5 + -0x137a); /* key: depth, */
+  *(short *)(ENT_(CUR_) + 2) = *(short *)(unaff_A5 + -0x137e);
+  *(short *)(ENT_(CUR_) + 4) = *(short *)(unaff_A5 + -0x137c);
+  *(short *)(ENT_(CUR_) + 6) = *(short *)(unaff_A5 + -0x1372); /* view size */
+  *(short *)(ENT_(CUR_) + 8) = *(short *)(unaff_A5 + -0x1370);
+  *(short *)(ENT_(CUR_) + 10) =
+       ((short)(*(short *)(unaff_A5 + -0x1372) * *(short *)(unaff_A5 + -0x137a) + 0xf) >> 4) * 2 | 0x8000; /* rowBytes */
+  ReallocHandle(*(int *)(unaff_A5 + -0x12b0),
+                (int)(short)(r[2] - r[0]) * (int)(unsigned short)(*(short *)(ENT_(CUR_) + 10) & 0x1fff)); /* JT $26a */
+  *(short *)(unaff_A5 + -0x12a8) = *(short *)(ENT_(CUR_) + 10) & 0x1fff;
+  *(short *)(unaff_A5 + -0x12a6) = DY_(0x29e);
+  HLock(*(int *)(unaff_A5 + -0x12b0));
+  savedPort = *(int *)(unaff_A5 + -0x160c);
+  **(int **)(*(int *)(unaff_A5 + -0x1496) + 2) = **(int **)(unaff_A5 + -0x12b0);
+  *(short *)(**(int **)(*(int *)(unaff_A5 + -0x1496) + 2) + 4) = *(short *)(ENT_(CUR_) + 10);
+  SetPort(*(int *)(unaff_A5 + -0x1496));
+  set_draw_color_index((short)lookup_palette_index_for_rgb_level(0,0,0)); /* JT $45a, JT $36a */
+  PaintRect((short *)(*(int *)(unaff_A5 + -0x1496) + 0x10)); /* the whole panel black */
+  PenSize(1,1);                                 /* $A89B */
+  rgnA = NewRgn();                              /* $A8D8 */
+  OpenRgn();                                    /* $A8DA */
+  draw_view_frame_outline();                    /* JT $3ba: the view window */
+  CloseRgn(rgnA);                               /* $A8DB */
+  rgnB = NewRgn();                              /* the panel's upper edge */
+  OpenRgn();
+  r[1] = DX_(-0xa69);  r[0] = DY_(0x3f2) + 1;  r[3] = DX_(-0x857);  r[2] = DY_(0x604) + 1;
+  dial_point_at_angle(r,-0xe,-0x5a,&px,&py);    /* BSR 0x5718: left corner arc */
+  sx = DX_(-0x95a);  LineTo(sx,DY_(0x960) + 1); /* $A891 */
+  sx = DX_(0x95a);   LineTo(sx + -3,DY_(0x960) + 1);
+  MoveTo(px,py);                                /* $A893 */
+  sx = DX_(-0x424);  LineTo(sx,DY_(0x29e));
+  r[1] = DX_(0x857);  r[0] = DY_(0x3f2) + 1;  r[3] = DX_(0xa69);  r[2] = DY_(0x604) + 1;
+  dial_point_at_angle(r,0xe,0x5a,&px,&py);      /* right corner arc */
+  sx = DX_(0x95a);   LineTo(sx + -3,DY_(0x960) + 1);
+  MoveTo(px,py);
+  sx = DX_(0x424);   LineTo(sx + -4,DY_(0x29e));
+  sx = DX_(-0x424);  LineTo(sx,DY_(0x29e));
+  CloseRgn(rgnB);
+  DiffRgn(rgnA,rgnB,rgnA);                      /* $A8E6 */
+  set_draw_color_index((short)lookup_palette_index_for_rgb_level(1,1,1));
+  set_back_color_index((short)lookup_palette_index_for_rgb_level(0,0,0)); /* JT $3a2 */
+  FillRgn(rgnA,get_blended_fill_pattern());     /* JT $3e2, $A8D6 */
+  PaintRgn(rgnB);                               /* $A8D3 */
+  set_draw_color_index((short)lookup_palette_index_for_rgb_level(0,0,0));
+  DisposeRgn(rgnB);                             /* $A8D9 */
+  DisposeRgn(rgnA);
+  PenSize(3,3);                                 /* outline in black */
+  draw_view_frame_outline();
+  sx = DX_(-0xc80);  MoveTo(sx + -1,DY_(0x4b0));
+  sx = DX_(-0xc80);  LineTo(sx,DY_(0x4b0));
+  sx = DX_(-0x424);  LineTo(sx,DY_(0x29e));
+  sx = DX_(0x424);   LineTo(sx + -4,DY_(0x29e));
+  sx = DX_(0xc80);   LineTo(sx + -4,DY_(0x4b0));
+  sx = DX_(0xfa0);   LineTo(sx,DY_(0x4b0));
+  r[1] = DX_(-0xa69);  r[0] = DY_(0x3f2) + 1;  r[3] = DX_(-0x857);  r[2] = DY_(0x604) + 1;
+  dial_point_at_angle(r,-0xe,-0x5a,&px,&py);
+  sx = DX_(-0x95a);  LineTo(sx,DY_(0x960) + 1);
+  r[1] = DX_(0x857);  r[0] = DY_(0x3f2) + 1;  r[3] = DX_(0xa69);  r[2] = DY_(0x604) + 1;
+  dial_point_at_angle(r,0xe,0x5a,&px,&py);
+  sx = DX_(0x95a);   LineTo(sx + -3,DY_(0x960) + 1);
+  /* the instruments (design units: size, scale, pen, y, x) */
+  *(short *)(unaff_A5 + -0x2114) = 0x28;        /* screw size */
+  draw_panel_section_with_numbered_boxes();     /* BSR 0x4304 */
+  draw_percent_scale_gauge(0x14a,0x258,7,scale_design_480_min10(10),0x794,0x898); /* BSR 0x4790 */
+  draw_split_display_box(0x17c,0x17c,7,scale_design_480_min10(10),0x474,-0x2a8); /* BSR 0x4b32 */
+  draw_instrument(0,0x30c,10,scale_design_480_min10(0xc),0x744,-0x67c); /* BSR 0x3c02: altimeter */
+  draw_instrument(1,0x30c,9,scale_design_480_min10(10),0x744,-800);     /* airspeed */
+  draw_instrument(2,0x280,7,scale_design_480_min10(10),0x794,0);        /* turn and bank */
+  draw_instrument(3,0x2a8,8,scale_design_480_min10(10),0x780,800);      /* climb */
+  draw_instrument(4,0x2a8,7,scale_design_480_min10(10),0x780,0x67c);    /* manifold pressure */
+  draw_instrument(5,0x230,7,scale_design_480_min10(10),0x544,0x898);    /* tachometer */
+  draw_instrument(6,0x21c,7,scale_design_480_min10(10),0x550,-0x898);   /* direction */
+  draw_landing_gear_indicator(0x258,7,scale_design_480_min10(10),0x7a8,-0xb2c); /* BSR 0x54fe */
+  draw_flaps_indicator(400,7,scale_design_480_min10(10),0x582,-0xb54);  /* BSR 0x4c42 */
+  draw_fuel_gauge(0x258,9,scale_design_480_min10(10),0x7a8,0xb2c);      /* BSR 0x532e */
+  draw_ammo_counter(400,7,scale_design_480_min10(10),0x582,0xb54);      /* BSR 0x4ecc */
+  *(short *)(unaff_A5 + -0x2114) = 0x32;
+  draw_instrument(9,0x2d0,10,scale_design_480_min10(10),0x49c,0x4ce);   /* artificial horizon */
+  *(short *)(unaff_A5 + -0x2114) = 0x28;
+  draw_instrument(8,0x258,9,scale_design_480_min10(10),0x474,-0x4ce);   /* gyro */
+  /* store the screen records in the cache entry */
+  memcpy((void *)(ENT_(CUR_) + 0xb2),(void *)(unaff_A5 + -0x1202),0x14);
+  memcpy((void *)(ENT_(CUR_) + 0xc6),(void *)(unaff_A5 + -0x11ee),0x22);
+  for (k = 0; k < 10; k = k + 1) {
+    memcpy((void *)(ENT_(CUR_) + (int)k * 0x10 + 0x12),(void *)(unaff_A5 + -0x12a2 + (int)k * 0x10),0x10);
+  }
+  memcpy((void *)(ENT_(CUR_) + 0xe8),(void *)(unaff_A5 + -0x11c8),0x2c);
+  memcpy((void *)(ENT_(CUR_) + 0x114),(void *)(unaff_A5 + -0x119c),0x16);
+  memcpy((void *)(ENT_(CUR_) + 0x12a),(void *)(unaff_A5 + -0x1186),0xc);
+  memcpy((void *)(ENT_(CUR_) + 0x136),(void *)(unaff_A5 + -0x117a),0x18);
+  memcpy((void *)(ENT_(CUR_) + 0x14e),(void *)(unaff_A5 + -0x1162),0xc);
+  memcpy((void *)(ENT_(CUR_) + 0x15a),(void *)(unaff_A5 + -0x1156),6);
+  SetPort(savedPort);
+  HUnlock(*(int *)(unaff_A5 + -0x12b0));
+  DisposDialog(dlg);                            /* $A983 */
+  store_panel_bitmaps_as_resources();           /* BSR 0x5ab6 */
+  remap_panel_colours_identity();               /* BSR 0x71a2 */
+finish:
+  if ((*(short *)(unaff_A5 + -0x137a) == 1) || (*(short *)(unaff_A5 + -0x137a) == 4)) {
+    r[1] = 0;
+    r[0] = 0;
+    r[3] = *(short *)(unaff_A5 + -0x11e4);
+    r[2] = *(short *)(unaff_A5 + -0x11e2);
+    *(int *)(unaff_A5 + -0x11cc) =
+         open_cport_on_buffer(unaff_A5 + -0x1426,*(short *)(unaff_A5 + -0x11de),0,*(Rect *)r); /* port on the gyro tape */
+  }
+  if (*(short *)(unaff_A5 + -0x137a) == 1) {
+    *(int *)(unaff_A5 + -0x13b6) = make_inset_face_oval_region(face,0x2d0,0x49c,0x4ce); /* BSR 0x3832: horizon face */
+  }
+  UseResFile(savedRes);
+  return;
+#undef ENT_
+#undef CUR_
+#undef DX_
+#undef DY_
+}
+
+
+
+/* VERIFIED (ID03::FUN_00006c1c): ID03.bin 0x6c1c..0x71a0 checked against an independent capstone disassembly.
+ * LINK -$200, MOVEM D5-D7/A3-A4; TST A5-0x13ae / -0x13b2 and five key compares -> exit; depth 1: JT $482; clear inv; D5 = +$a &
+ * $1fff; JT $2a (4 -> 0x6d16, 8 -> 0x6ede, else 0x704a); depth 4: inv over 0..12, nibble remap of A5-0x12b0 and A5-0x11dc,
+ * A5-0x11fa / -0x11f8 four-nibble words; depth 8: inv over 200..216, byte remap, two-byte words; common block of ten JT $45a
+ * lookups through newIdx with the two depth-4 nibble doublings; MOVEM restore; RTS - identical to the C. */
+/* Original: FUN_00006c1c; source: ID03.c. Recovered name: remap_cached_panel_colours [STRONG INFERENCE].
+ * Decoded from ID03.bin bytes at file 0x6c1c.
+ * Reached through JT $182 (CODE 0 entry -> ID03 0x6c1c). Returns at once unless the current configuration A5-0x13ae has a cache entry (A5-0x13b2) whose key (+0 depth, +2, +4, +6 / +8 view size) matches the display. In 1-bit mode calls JT $482 (ID02 0x4b62, the standard colour index set-up). Args: short *oldIdx (the colour index each palette slot had when the panel was rendered), short *newIdx (the current index per slot). Otherwise, body rebuilt as C below [PROVEN, bytes 0x6c1c..0x71a0]: inv[256] = 0 and inv[oldIdx[k]] = k for valid indices (0..255) over slots k = 0..12 at depth 4 or k = 200..216 at depth 8 (switch JT $2a); every pixel of the "Bitmap" handle A5-0x12b0 (rows / width from the panel port A5-0x1496, row stride = cache entry +0xa & 0x1fff) and of the "GyroInstrument" tape A5-0x11dc (stride A5-0x11de & 0x1fff, A5-0x11e2 rows, A5-0x11e4 pixels) becomes newIdx[inv[pixel]] (two nibbles per byte at depth 4, the low byte at depth 8); A5-0x11fa / -0x11f8 = the new indices of levels (0, 0, 4) and (1, 1, 1) repeated in every pixel of a word; then A5-0x11ae, -0x11ac, -0x11a2, -0x118c, -0x1188, -0x118a, -0x117c, -0x117e, -0x112c, -0x12a4 = newIdx of the levels (0,2,0), (0,0,0), (3,3,3), (0,0,0), (2,2,2) x3, (0,0,0) x2, (3,3,3), with -0x11a2 and -0x12a4 doubled into both nibbles at depth 4. Other depths skip the pixel pass. So a panel loaded from the cache is re-coloured for the current palette [STRONG INFERENCE for the purpose; the mapping is PROVEN].
+ */
+void remap_cached_panel_colours /* Original: FUN_00006c1c */ (short *oldIdx,short *newIdx)
+
+{
+  int unaff_A5;
+  short inv[256];                               /* -$200(A6): old colour index -> slot */
+  unsigned char *p;                             /* A4 */
+  unsigned char *q;                             /* A3 */
+  short k;                                      /* D7 */
+  short rows;                                   /* D7 */
+  short cols;                                   /* D6 */
+  short stride;                                 /* D5 */
+  short n;
+
+  if (*(short *)(unaff_A5 + -0x13ae) < 0) return;
+  if (*(int *)(unaff_A5 + -0x13b2) == 0) return;
+  if ((*(short *)(**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160)) != *(short *)(unaff_A5 + -0x137a)) ||       /* cache key: depth, */
+      (*(short *)((**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160)) + 2) != *(short *)(unaff_A5 + -0x137e)) ||
+      (*(short *)((**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160)) + 4) != *(short *)(unaff_A5 + -0x137c)) ||
+      (*(short *)((**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160)) + 6) != *(short *)(unaff_A5 + -0x1372)) || /* view size */
+      (*(short *)((**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160)) + 8) != *(short *)(unaff_A5 + -0x1370))) {
+    return;
+  }
+  if (*(short *)(unaff_A5 + -0x137a) == 1) {
+    FUN_00004b62();                             /* JT $482 (ID02 0x4b62, init_standard_colour_indices) */
+    return;
+  }
+  for (k = 0; k < 0x100; k = k + 1) {
+    inv[k] = 0;
+  }
+  stride = *(short *)((**(int **)(unaff_A5 + -0x13b2) + (int)(short)(*(short *)(unaff_A5 + -0x13ae) * 0x160)) + 10) & 0x1fff;       /* rowBytes of the cached panel bitmap */
+  switch (*(short *)(unaff_A5 + -0x137a)) {   /* JT $2a (ID01 0x96, word table at 0x6d0a) */
+  case 4:
+  for (k = 0; k < 0xd; k = k + 1) {
+    if ((-1 < oldIdx[k]) && (oldIdx[k] < 0x100)) {
+      inv[oldIdx[k]] = k;
+    }
+  }
+  p = *(unsigned char **)*(int *)(unaff_A5 + -0x12b0);                 /* "Bitmap": rows / width of the panel port A5-0x1496 */
+  stride = stride;
+  for (rows = *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x14) - *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x10); rows-- != 0; p = p + stride) {
+    q = p;
+    for (cols = (short)(*(short *)(*(int *)(unaff_A5 + -0x1496) + 0x16) - *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x12)) >> 1; cols-- != 0; q = q + 1) { /* two 4-bit pixels per byte */
+      *q = (unsigned char)((newIdx[inv[*q >> 4]] << 4) | newIdx[inv[*q & 0xf]]);
+    }
+  }
+  p = *(unsigned char **)*(int *)(unaff_A5 + -0x11dc);                 /* "GyroInstrument" tape */
+  stride = *(short *)(unaff_A5 + -0x11de) & 0x1fff;
+  for (rows = *(short *)(unaff_A5 + -0x11e2); rows-- != 0; p = p + stride) {
+    q = p;
+    for (cols = *(short *)(unaff_A5 + -0x11e4) >> 1; cols-- != 0; q = q + 1) { /* two 4-bit pixels per byte */
+      *q = (unsigned char)((newIdx[inv[*q >> 4]] << 4) | newIdx[inv[*q & 0xf]]);
+    }
+  }
+    n = newIdx[(short)lookup_palette_index_for_rgb_level(0,0,4)];
+    *(short *)(unaff_A5 + -0x11fa) = (n << 0xc) | (n << 8) | (n << 4) | n; /* the colour in all four nibbles */
+    n = newIdx[(short)lookup_palette_index_for_rgb_level(1,1,1)];
+    *(short *)(unaff_A5 + -0x11f8) = (n << 0xc) | (n << 8) | (n << 4) | n;
+    break;
+  case 8:
+  for (k = 0xc8; k < 0xd9; k = k + 1) {
+    if ((-1 < oldIdx[k]) && (oldIdx[k] < 0x100)) {
+      inv[oldIdx[k]] = k;
+    }
+  }
+  p = *(unsigned char **)*(int *)(unaff_A5 + -0x12b0);                 /* "Bitmap" */
+  stride = stride;
+  for (rows = *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x14) - *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x10); rows-- != 0; p = p + stride) {
+    q = p;
+    for (cols = *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x16) - *(short *)(*(int *)(unaff_A5 + -0x1496) + 0x12); cols-- != 0; q = q + 1) {
+      *q = (unsigned char)newIdx[inv[*q]];      /* MOVE.B 1(A0): low byte */
+    }
+  }
+  p = *(unsigned char **)*(int *)(unaff_A5 + -0x11dc);                 /* "GyroInstrument" tape */
+  stride = *(short *)(unaff_A5 + -0x11de) & 0x1fff;
+  for (rows = *(short *)(unaff_A5 + -0x11e2); rows-- != 0; p = p + stride) {
+    q = p;
+    for (cols = *(short *)(unaff_A5 + -0x11e4); cols-- != 0; q = q + 1) {
+      *q = (unsigned char)newIdx[inv[*q]];      /* MOVE.B 1(A0): low byte */
+    }
+  }
+    n = (short)lookup_palette_index_for_rgb_level(0,0,4);
+    *(short *)(unaff_A5 + -0x11fa) = (newIdx[n] << 8) | newIdx[n]; /* the colour in both bytes */
+    n = (short)lookup_palette_index_for_rgb_level(1,1,1);
+    *(short *)(unaff_A5 + -0x11f8) = (newIdx[n] << 8) | newIdx[n];
+    break;
+  }
+  /* palette-index globals read by the panel animation, through the new table */
+  *(short *)(unaff_A5 + -0x11ae) = newIdx[(short)lookup_palette_index_for_rgb_level(0,2,0)];
+  *(short *)(unaff_A5 + -0x11ac) = newIdx[(short)lookup_palette_index_for_rgb_level(0,0,0)];
+  *(short *)(unaff_A5 + -0x11a2) = newIdx[(short)lookup_palette_index_for_rgb_level(3,3,3)];
+  if (*(short *)(unaff_A5 + -0x137a) == 4) {
+    *(short *)(unaff_A5 + -0x11a2) = (*(short *)(unaff_A5 + -0x11a2) << 4) | *(short *)(unaff_A5 + -0x11a2);
+  }
+  *(short *)(unaff_A5 + -0x118c) = newIdx[(short)lookup_palette_index_for_rgb_level(0,0,0)];
+  *(short *)(unaff_A5 + -0x1188) = newIdx[(short)lookup_palette_index_for_rgb_level(2,2,2)];
+  *(short *)(unaff_A5 + -0x118a) = newIdx[(short)lookup_palette_index_for_rgb_level(2,2,2)];
+  *(short *)(unaff_A5 + -0x117c) = newIdx[(short)lookup_palette_index_for_rgb_level(2,2,2)];
+  *(short *)(unaff_A5 + -0x117e) = newIdx[(short)lookup_palette_index_for_rgb_level(0,0,0)];
+  *(short *)(unaff_A5 + -0x112c) = newIdx[(short)lookup_palette_index_for_rgb_level(0,0,0)];
+  *(short *)(unaff_A5 + -0x12a4) = newIdx[(short)lookup_palette_index_for_rgb_level(3,3,3)];
+  if (*(short *)(unaff_A5 + -0x137a) == 4) {
+    *(short *)(unaff_A5 + -0x12a4) = (*(short *)(unaff_A5 + -0x12a4) << 4) | *(short *)(unaff_A5 + -0x12a4);
+  }
+  return;                                       /* MOVEM restores D5-D7 / A3-A4 */
+}
+
+
+
+/* VERIFIED (ID03::FUN_000071a2): ID03.bin 0x71a2..0x71d4 checked against an independent capstone disassembly.
+ * LINK -$200, save D7; D7 0..255: -$200[D7] = D7; push long A5-0x1354, pea -$200; BSR 0x6c1c; ADDQ #8; restore D7; RTS -
+ * identical to the C. */
 /* Original: FUN_000071a2; source: ID03.c. Recovered name: remap_panel_colours_identity [STRONG INFERENCE].
  * Decoded from ID03.bin bytes at file 0x71a2.
- * Builds an identity table of 256 words on the stack (t[i] = i) and calls remap_cached_panel_colours(t, A5-0x1354) (0x6c1c). Note for remap_cached_panel_colours: its first argument is this 256-entry index table and its second is A5-0x1354 [PROVEN, bytes 0x71a2..0x71d2]. Callers: 0x60e2 and 0x6ba8 (prepare_instrument_panel).
+ * Builds an identity table of 256 words on the stack (t[i] = i) and calls remap_cached_panel_colours(t, the long held at A5-0x1354) (0x6c1c). Note for remap_cached_panel_colours: its first argument is this 256-entry index table and its second is the value of A5-0x1354 (MOVE.L, not its address) [PROVEN, bytes 0x71a2..0x71d4]. Body rewritten as typed C below. Callers: 0x60e2 and 0x6ba8 (prepare_instrument_panel).
  */
 void remap_panel_colours_identity /* Original: FUN_000071a2 */ (void)
 
 {
-  short sVar1;
-  short local_204 [256];
-  
-  for (sVar1 = 0; sVar1 < 0x100; sVar1 = sVar1 + 1) {
-    local_204[sVar1] = sVar1;
+  int unaff_A5;
+  short i;                                      /* D7 (saved and restored) */
+  short map[256];                               /* -$200(A6) */
+
+  for (i = 0; i < 0x100; i = i + 1) {
+    map[i] = i;                                 /* identity colour map */
   }
-  remap_cached_panel_colours();
+  remap_cached_panel_colours(map,*(int *)(unaff_A5 + -0x1354)); /* BSR 0x6c1c */
   return;
 }
 
