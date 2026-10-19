@@ -19,8 +19,8 @@
     "BLOCKED": 0,
     "INVESTIGATING": 0,
     "NOT_STARTED": 0,
-    "RENAMED": 95,
-    "VERIFIED": 641
+    "RENAMED": 58,
+    "VERIFIED": 678
   },
   "conflicts": [],
   "functions": [
@@ -6513,18 +6513,18 @@
       "semantic_name": "run_with_temporary_window",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 361,
-        "line_end": 374,
-        "function_sha256": "bd4c7372646c5aafec44d738bc39ed4ebb378cb23d61af5052be858a541b7931"
+        "line_start": 365,
+        "line_end": 383,
+        "function_sha256": "aff8ff331e6a8602911a3270ca42cef2ae2e2c9a716a2bffedb29d3adaa56aeb"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:164",
-        "sources/resedit/CODE/ID04.decomp.c:361-374"
+        "sources/resedit/CODE/ID04.decomp.c:365-383"
       ],
       "known_blockers": [
         "Purpose of ID02 0x2db8"
@@ -6533,7 +6533,7 @@
         "dependencies": "NewWindow \"Hellcats\" inset 100; Show / ID02 0x2db8 / Hide",
         "validation": "Capstone"
       },
-      "source_revision": "bd4c7372646c5aafec44d738bc39ed4ebb378cb23d61af5052be858a541b7931",
+      "source_revision": "aff8ff331e6a8602911a3270ca42cef2ae2e2c9a716a2bffedb29d3adaa56aeb",
       "strict_port": null
     },
     {
@@ -6549,25 +6549,25 @@
       "semantic_name": "show_scenery_open_error_alert",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 384,
-        "line_end": 389,
-        "function_sha256": "4f2fe381b8d8fcb18991961dca5bb3d5ec28922853720a0f4269e2f097142159"
+        "line_start": 396,
+        "line_end": 402,
+        "function_sha256": "05013233579d41785f6a9c5ac0a02fb9338a41fda752048c517cc1e70319c669"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:183",
-        "sources/resedit/CODE/ID04.decomp.c:384-389"
+        "sources/resedit/CODE/ID04.decomp.c:396-402"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "ParamText + StopAlert(256) \"Unable to open Hellcats scenery file\"; JT $fa",
         "validation": "dis.py; CODE0 JT; ALRT/DLOG/DITL dump; token diff = renames"
       },
-      "source_revision": "4f2fe381b8d8fcb18991961dca5bb3d5ec28922853720a0f4269e2f097142159",
+      "source_revision": "05013233579d41785f6a9c5ac0a02fb9338a41fda752048c517cc1e70319c669",
       "strict_port": null
     },
     {
@@ -6583,25 +6583,25 @@
       "semantic_name": "show_paused_dialog",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 399,
-        "line_end": 404,
-        "function_sha256": "ed4877124c3a4de36f40aa8655f78a9d09a16f91335f2edb372e21742355c8d6"
+        "line_start": 415,
+        "line_end": 435,
+        "function_sha256": "1abd3c8dbd9d48d3c91f1f30d849415f012cea305c2eeac0ebcca60ade127c29"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:194",
-        "sources/resedit/CODE/ID04.decomp.c:399-404"
+        "sources/resedit/CODE/ID04.decomp.c:415-435"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "DLOG 131 \"Paused\", wait for key down + up; JT $122",
         "validation": "dis.py; CODE0 JT; ALRT/DLOG/DITL dump; token diff = renames"
       },
-      "source_revision": "ed4877124c3a4de36f40aa8655f78a9d09a16f91335f2edb372e21742355c8d6",
+      "source_revision": "1abd3c8dbd9d48d3c91f1f30d849415f012cea305c2eeac0ebcca60ade127c29",
       "strict_port": null
     },
     {
@@ -6617,25 +6617,25 @@
       "semantic_name": "ask_save_changes",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 419,
-        "line_end": 427,
-        "function_sha256": "576e0f06789c68b690812e257e3704259a5e5c75ef6ae01b04601cfaafd106bd"
+        "line_start": 452,
+        "line_end": 457,
+        "function_sha256": "80fca7f8041a958d7d398c0f2aa371987fbc8f02f6d569614bb917045df8e05e"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:205",
-        "sources/resedit/CODE/ID04.decomp.c:419-427"
+        "sources/resedit/CODE/ID04.decomp.c:452-457"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "ALRT 257 Save / Cancel / Don't Save; JT $ba",
         "validation": "Capstone + ALRT/DITL dump"
       },
-      "source_revision": "576e0f06789c68b690812e257e3704259a5e5c75ef6ae01b04601cfaafd106bd",
+      "source_revision": "80fca7f8041a958d7d398c0f2aa371987fbc8f02f6d569614bb917045df8e05e",
       "strict_port": null
     },
     {
@@ -6651,25 +6651,25 @@
       "semantic_name": "confirm_end_mission",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 447,
-        "line_end": 469,
-        "function_sha256": "36d58ea8457c4581ff1332bb3afe8185d2f3d180a2dc6d6d6bb66f275fd9755e"
+        "line_start": 480,
+        "line_end": 491,
+        "function_sha256": "30e84811b092409e5b0e47c2accdbf35e689313b67f37ce7fa32fd79e3190534"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:219",
-        "sources/resedit/CODE/ID04.decomp.c:447-469"
+        "sources/resedit/CODE/ID04.decomp.c:480-491"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "ALRT 259 Cancel / End Mission; mission state A5−0x12f8 ≥ 3, A5−0x14c4 == 0; JT $13a",
         "validation": "Capstone + ALRT/DITL dump"
       },
-      "source_revision": "36d58ea8457c4581ff1332bb3afe8185d2f3d180a2dc6d6d6bb66f275fd9755e",
+      "source_revision": "30e84811b092409e5b0e47c2accdbf35e689313b67f37ce7fa32fd79e3190534",
       "strict_port": null
     },
     {
@@ -6685,25 +6685,25 @@
       "semantic_name": "confirm_erase_high_scores",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 483,
-        "line_end": 491,
-        "function_sha256": "41e1a98e0e50e4017eece82cc504f43931ed780f6a9d972e32fe761220dbb7fe"
+        "line_start": 507,
+        "line_end": 512,
+        "function_sha256": "1a94324d44375e92703bd4bc1868d24793fc43d0fa4997a4a51de7f7876771bb"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:247",
-        "sources/resedit/CODE/ID04.decomp.c:483-491"
+        "sources/resedit/CODE/ID04.decomp.c:507-512"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "ALRT 260 Cancel / Erase",
         "validation": "Capstone + ALRT/DITL dump"
       },
-      "source_revision": "41e1a98e0e50e4017eece82cc504f43931ed780f6a9d972e32fe761220dbb7fe",
+      "source_revision": "1a94324d44375e92703bd4bc1868d24793fc43d0fa4997a4a51de7f7876771bb",
       "strict_port": null
     },
     {
@@ -6719,18 +6719,18 @@
       "semantic_name": "compute_pilot_score",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 513,
-        "line_end": 526,
-        "function_sha256": "f1fba2bcb7482a4104aaab0aa0f56aacefd23afeaee4f0a7316b1653edada5ca"
+        "line_start": 537,
+        "line_end": 551,
+        "function_sha256": "f008b13e34c8ec2fc71f2ab9155dfb8dfc208d798431f32d790f66e3927c6558"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:259",
-        "sources/resedit/CODE/ID04.decomp.c:513-526"
+        "sources/resedit/CODE/ID04.decomp.c:537-551"
       ],
       "known_blockers": [
         "Tally 10/11 meaning"
@@ -6739,7 +6739,7 @@
         "dependencies": "12 tallies ×12 weights (A5−0xf5e); HEL1 128 records",
         "validation": "C complete + resource dump"
       },
-      "source_revision": "f1fba2bcb7482a4104aaab0aa0f56aacefd23afeaee4f0a7316b1653edada5ca",
+      "source_revision": "f008b13e34c8ec2fc71f2ab9155dfb8dfc208d798431f32d790f66e3927c6558",
       "strict_port": null
     },
     {
@@ -6755,25 +6755,25 @@
       "semantic_name": "duty_roster_filter_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 537,
-        "line_end": 546,
-        "function_sha256": "ef34bda51ee9115298d0c840be0a25c9848344c36df2298bd16516323af1a995"
+        "line_start": 567,
+        "line_end": 584,
+        "function_sha256": "39fb9b728e36830abc5f82e4e6a7a922678db66322e31ec48dd346981ee228a4"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:278",
-        "sources/resedit/CODE/ID04.decomp.c:537-546"
+        "sources/resedit/CODE/ID04.decomp.c:567-584"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $c2 filter; documents unexported run_duty_roster_dialog 0x644 (JT $132, DLOG 130)",
         "validation": "dis.py; CODE0 JT; ALRT/DLOG/DITL dump; token diff = renames"
       },
-      "source_revision": "ef34bda51ee9115298d0c840be0a25c9848344c36df2298bd16516323af1a995",
+      "source_revision": "39fb9b728e36830abc5f82e4e6a7a922678db66322e31ec48dd346981ee228a4",
       "strict_port": null
     },
     {
@@ -6789,25 +6789,25 @@
       "semantic_name": "draw_select_mission_title",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 556,
-        "line_end": 561,
-        "function_sha256": "f4eb14dbe01bca39a30455dbb7c4324f43351da0be84682da47115e84addf0d7"
+        "line_start": 599,
+        "line_end": 624,
+        "function_sha256": "068fb39be46de9d2edb034b95b9c29b17557f1e1092d23cdb3a383e94aea078b"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:293",
-        "sources/resedit/CODE/ID04.decomp.c:556-561"
+        "sources/resedit/CODE/ID04.decomp.c:599-624"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $11a user item 4 of DLOG 129; STR# 64 centred, size 24",
         "validation": "dis.py; CODE0 JT; token diff = renames"
       },
-      "source_revision": "f4eb14dbe01bca39a30455dbb7c4324f43351da0be84682da47115e84addf0d7",
+      "source_revision": "068fb39be46de9d2edb034b95b9c29b17557f1e1092d23cdb3a383e94aea078b",
       "strict_port": null
     },
     {
@@ -6823,25 +6823,25 @@
       "semantic_name": "fuel_slider_dialog_filter",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 569,
-        "line_end": 584,
-        "function_sha256": "9f8bcbde0b4a77fdc72fcc51865b497a7117f9090c260658f2ef3f4564e0c5ff"
+        "line_start": 638,
+        "line_end": 688,
+        "function_sha256": "e497c6e464e6771a5e10622a662ca814177a6de92e182c3dfbb60ee2e7fcbc3c"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:302",
-        "sources/resedit/CODE/ID04.decomp.c:569-584"
+        "sources/resedit/CODE/ID04.decomp.c:638-688"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "Return/Enter, slider tracking (StillDown/GetMouse), update events",
         "validation": "dis.py; CODE0 JT; DLOG/DITL 129 / 132 dump; token diff = renames"
       },
-      "source_revision": "9f8bcbde0b4a77fdc72fcc51865b497a7117f9090c260658f2ef3f4564e0c5ff",
+      "source_revision": "e497c6e464e6771a5e10622a662ca814177a6de92e182c3dfbb60ee2e7fcbc3c",
       "strict_port": null
     },
     {
@@ -6857,25 +6857,25 @@
       "semantic_name": "scenario_selection_filter_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 624,
-        "line_end": 637,
-        "function_sha256": "19e2fb905b1b972157d13f3251031de20dc0e75906f8c8ea455a77f4143285f7"
+        "line_start": 732,
+        "line_end": 737,
+        "function_sha256": "e313bcc2181edcb52efd402c42a543edbd5b257ed8ce0dc443614f08995d735e"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:321",
-        "sources/resedit/CODE/ID04.decomp.c:624-637"
+        "sources/resedit/CODE/ID04.decomp.c:732-737"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $112 filter, DLOG 129, slider item 5",
         "validation": "dis.py; CODE0 JT; DLOG/DITL 129 / 132 dump; token diff = renames"
       },
-      "source_revision": "19e2fb905b1b972157d13f3251031de20dc0e75906f8c8ea455a77f4143285f7",
+      "source_revision": "e313bcc2181edcb52efd402c42a543edbd5b257ed8ce0dc443614f08995d735e",
       "strict_port": null
     },
     {
@@ -6891,25 +6891,25 @@
       "semantic_name": "refuel_dialog_filter_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 667,
-        "line_end": 680,
-        "function_sha256": "1bd39bf09f3a3283f79e12c8e7e4c80bb636d34d0dd4fe030624d1cc75bb5034"
+        "line_start": 770,
+        "line_end": 775,
+        "function_sha256": "507856abd6bd6f8e0fc5d8f2be7dbc7bf9106a1bd2fa325b389fa575e0e5708a"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:338",
-        "sources/resedit/CODE/ID04.decomp.c:667-680"
+        "sources/resedit/CODE/ID04.decomp.c:770-775"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $14a filter, DLOG 132, slider item 3",
         "validation": "dis.py; CODE0 JT; DLOG/DITL 129 / 132 dump; token diff = renames"
       },
-      "source_revision": "1bd39bf09f3a3283f79e12c8e7e4c80bb636d34d0dd4fe030624d1cc75bb5034",
+      "source_revision": "507856abd6bd6f8e0fc5d8f2be7dbc7bf9106a1bd2fa325b389fa575e0e5708a",
       "strict_port": null
     },
     {
@@ -6925,18 +6925,18 @@
       "semantic_name": "rank_pilots_by_score",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 694,
-        "line_end": 762,
-        "function_sha256": "e515fe3b101ab968b6a744e253a1f55f8783aedcd9cc15bf8cd8ae74c3ac888d"
+        "line_start": 794,
+        "line_end": 828,
+        "function_sha256": "749c0fabd0aafd4d603ad133724d2733e92396d9426f3a4f8a0591e050602f48"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:355",
-        "sources/resedit/CODE/ID04.decomp.c:694-762"
+        "sources/resedit/CODE/ID04.decomp.c:794-828"
       ],
       "known_blockers": [
         "Tie-break / JT $512 role"
@@ -6945,7 +6945,7 @@
         "dependencies": "scores + sorted order for 20 pilots",
         "validation": "C"
       },
-      "source_revision": "e515fe3b101ab968b6a744e253a1f55f8783aedcd9cc15bf8cd8ae74c3ac888d",
+      "source_revision": "749c0fabd0aafd4d603ad133724d2733e92396d9426f3a4f8a0591e050602f48",
       "strict_port": null
     },
     {
@@ -6961,18 +6961,18 @@
       "semantic_name": "reset_pilot_record",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 773,
-        "line_end": 790,
-        "function_sha256": "19914ce3e06625b32834418febd65872fdf4ce512229c3cb4061f6c0df3b013a"
+        "line_start": 842,
+        "line_end": 859,
+        "function_sha256": "4b5da0f7dd3d3bc54be3786969d7a05a46754630f5988976ab931ba95cb592d1"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:427",
-        "sources/resedit/CODE/ID04.decomp.c:773-790"
+        "sources/resedit/CODE/ID04.decomp.c:842-859"
       ],
       "known_blockers": [
         "Tie-break / JT $512 role"
@@ -6981,7 +6981,7 @@
         "dependencies": "clear +0x20..+0x26 and tallies",
         "validation": "C"
       },
-      "source_revision": "19914ce3e06625b32834418febd65872fdf4ce512229c3cb4061f6c0df3b013a",
+      "source_revision": "4b5da0f7dd3d3bc54be3786969d7a05a46754630f5988976ab931ba95cb592d1",
       "strict_port": null
     },
     {
@@ -6997,25 +6997,25 @@
       "semantic_name": "prune_inactive_pilots_beyond_ten",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 800,
-        "line_end": 828,
-        "function_sha256": "00c33fe1ff9d5d36258ab27fa176180d7c5adba0e150c3cfe0419572fd99790d"
+        "line_start": 873,
+        "line_end": 901,
+        "function_sha256": "a7337c3c7ddb576162021eb6db7702f9b9ccc8863efc5d8b152463d0cf9047ba"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:450",
-        "sources/resedit/CODE/ID04.decomp.c:800-828"
+        "sources/resedit/CODE/ID04.decomp.c:873-901"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "clears non-Active records after the best ten; WriteResource roster",
         "validation": "dis.py; CODE0 JT; token diff = renames"
       },
-      "source_revision": "00c33fe1ff9d5d36258ab27fa176180d7c5adba0e150c3cfe0419572fd99790d",
+      "source_revision": "a7337c3c7ddb576162021eb6db7702f9b9ccc8863efc5d8b152463d0cf9047ba",
       "strict_port": null
     },
     {
@@ -7031,25 +7031,25 @@
       "semantic_name": "draw_high_scores_table",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 839,
-        "line_end": 848,
-        "function_sha256": "119249e90cf8c1fe80e47c6815d002e2109cd186f70ff5120e1a0ecfc8894644"
+        "line_start": 915,
+        "line_end": 962,
+        "function_sha256": "999553681f4de4180c5c3874ba478154222b3f78e354c77e497e14835a8b30b8"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:484",
-        "sources/resedit/CODE/ID04.decomp.c:839-848"
+        "sources/resedit/CODE/ID04.decomp.c:915-962"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $e2 user item 10 of DLOG 134; documents unexported run_high_scores_dialog 0x137a (JT $102)",
         "validation": "dis.py; CODE0 JT; DLOG/DITL 134; token diff = renames"
       },
-      "source_revision": "119249e90cf8c1fe80e47c6815d002e2109cd186f70ff5120e1a0ecfc8894644",
+      "source_revision": "999553681f4de4180c5c3874ba478154222b3f78e354c77e497e14835a8b30b8",
       "strict_port": null
     },
     {
@@ -7065,25 +7065,25 @@
       "semantic_name": "draw_scrolling_text_item",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 858,
-        "line_end": 863,
-        "function_sha256": "120fe5d7c14df8c92d7f4eeaa58503191bd9823c85bd4b0dd31efce641d73d11"
+        "line_start": 975,
+        "line_end": 990,
+        "function_sha256": "e7a7f3e6d9f6b16f34232634e2c01a5bf48d86f4191aa4b0c9cb1c2993fd6298"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:499",
-        "sources/resedit/CODE/ID04.decomp.c:858-863"
+        "sources/resedit/CODE/ID04.decomp.c:975-990"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "EraseRect viewRect, TEUpdate, frame",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "120fe5d7c14df8c92d7f4eeaa58503191bd9823c85bd4b0dd31efce641d73d11",
+      "source_revision": "e7a7f3e6d9f6b16f34232634e2c01a5bf48d86f4191aa4b0c9cb1c2993fd6298",
       "strict_port": null
     },
     {
@@ -7099,25 +7099,25 @@
       "semantic_name": "scrolling_text_user_item_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 871,
-        "line_end": 881,
-        "function_sha256": "58a71acad80944884676a0d71867a1012340ce49ebb512578f5b50623b08cd70"
+        "line_start": 1001,
+        "line_end": 1006,
+        "function_sha256": "e8fe67f7c4ca94d80a5e3105efdb0295249914b801b7ef3d030b3dd325616f9f"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:508",
-        "sources/resedit/CODE/ID04.decomp.c:871-881"
+        "sources/resedit/CODE/ID04.decomp.c:1001-1006"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "Pascal user item, JT $92",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "58a71acad80944884676a0d71867a1012340ce49ebb512578f5b50623b08cd70",
+      "source_revision": "e8fe67f7c4ca94d80a5e3105efdb0295249914b801b7ef3d030b3dd325616f9f",
       "strict_port": null
     },
     {
@@ -7133,25 +7133,25 @@
       "semantic_name": "sync_text_scroll_to_control",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 891,
-        "line_end": 896,
-        "function_sha256": "f3a205ac1b823d60d2ae353a7dc1dc5838ba1b422820e788503e92a573482451"
+        "line_start": 1019,
+        "line_end": 1034,
+        "function_sha256": "eda2e6038dc4101497c8d85ecb2dd1b5a0253f10b809377427750bdb7b08a0bb"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:524",
-        "sources/resedit/CODE/ID04.decomp.c:891-896"
+        "sources/resedit/CODE/ID04.decomp.c:1019-1034"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "TEScroll by ctl value × lineHeight",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "f3a205ac1b823d60d2ae353a7dc1dc5838ba1b422820e788503e92a573482451",
+      "source_revision": "eda2e6038dc4101497c8d85ecb2dd1b5a0253f10b809377427750bdb7b08a0bb",
       "strict_port": null
     },
     {
@@ -7167,25 +7167,25 @@
       "semantic_name": "update_scroll_bar_maximum",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 906,
-        "line_end": 911,
-        "function_sha256": "138743e2161b7dce0bbd222fdb5dd97a6ec5d32f503b25b6d3b200f97d9640b4"
+        "line_start": 1047,
+        "line_end": 1056,
+        "function_sha256": "dfa329df0a4e423e3e9616d5d0bc26ac9d7eb08770529f65c3f7025c46c77c25"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:535",
-        "sources/resedit/CODE/ID04.decomp.c:906-911"
+        "sources/resedit/CODE/ID04.decomp.c:1047-1056"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "SetCtlMax(nLines − visible)",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "138743e2161b7dce0bbd222fdb5dd97a6ec5d32f503b25b6d3b200f97d9640b4",
+      "source_revision": "dfa329df0a4e423e3e9616d5d0bc26ac9d7eb08770529f65c3f7025c46c77c25",
       "strict_port": null
     },
     {
@@ -7201,25 +7201,25 @@
       "semantic_name": "scroll_text_to_show_selection",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 921,
-        "line_end": 928,
-        "function_sha256": "71619d614a1687008062383f87108dca5cec15da673cc812a9b6ca20bf3c84e8"
+        "line_start": 1070,
+        "line_end": 1093,
+        "function_sha256": "df07c93b8e9680ca7f4b1c2d5064f2dc0b17d3f4ce2fe3071e9ae796b502ee66"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:546",
-        "sources/resedit/CODE/ID04.decomp.c:921-928"
+        "sources/resedit/CODE/ID04.decomp.c:1070-1093"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "centre line holding selStart",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "71619d614a1687008062383f87108dca5cec15da673cc812a9b6ca20bf3c84e8",
+      "source_revision": "df07c93b8e9680ca7f4b1c2d5064f2dc0b17d3f4ce2fe3071e9ae796b502ee66",
       "strict_port": null
     },
     {
@@ -7235,25 +7235,25 @@
       "semantic_name": "fit_text_view_to_box",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 938,
-        "line_end": 957,
-        "function_sha256": "31965ffc4185b5379242c8f0fe7f04fd48d4a9624956404dd04bb65ab5b6511d"
+        "line_start": 1106,
+        "line_end": 1125,
+        "function_sha256": "b6fa28ac0dbc3e1bb1c77be2f2ed4ce6f0360f3bd1d941c94cdcfb93dd704d7d"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:559",
-        "sources/resedit/CODE/ID04.decomp.c:938-957"
+        "sources/resedit/CODE/ID04.decomp.c:1106-1125"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "viewRect = box − 16, whole lines, TECalText",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "31965ffc4185b5379242c8f0fe7f04fd48d4a9624956404dd04bb65ab5b6511d",
+      "source_revision": "b6fa28ac0dbc3e1bb1c77be2f2ed4ce6f0360f3bd1d941c94cdcfb93dd704d7d",
       "strict_port": null
     },
     {
@@ -7269,25 +7269,25 @@
       "semantic_name": "scroll_bar_action_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 968,
-        "line_end": 990,
-        "function_sha256": "cda9a68529a78f848f4fefa9795e9d383a2e40551e9b725a018ba4959c05467f"
+        "line_start": 1142,
+        "line_end": 1171,
+        "function_sha256": "49ad1ddc9435d0ddb4668732ed5e5d3cf0ad83fdd5fa29e141f5401cf1215af2"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:584",
-        "sources/resedit/CODE/ID04.decomp.c:968-990"
+        "sources/resedit/CODE/ID04.decomp.c:1142-1171"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $16a TrackControl action; parts 20..23; also documents unexported click handler 0x1752",
         "validation": "dis.py on ID04.bin; CODE0 JT; ID01 switch table bytes; token diff = renames"
       },
-      "source_revision": "cda9a68529a78f848f4fefa9795e9d383a2e40551e9b725a018ba4959c05467f",
+      "source_revision": "49ad1ddc9435d0ddb4668732ed5e5d3cf0ad83fdd5fa29e141f5401cf1215af2",
       "strict_port": null
     },
     {
@@ -7303,18 +7303,18 @@
       "semantic_name": "create_scrolling_text_item",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1001,
-        "line_end": 1006,
-        "function_sha256": "32f996b438378e897c78a81a718735934698bfac835246f8f61cf1d167547373"
+        "line_start": 1186,
+        "line_end": 1210,
+        "function_sha256": "dd1b66ad21f92e6bc11910b234b9c7fe8827813ee4b52d415ed693b76b42d5b1"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:612",
-        "sources/resedit/CODE/ID04.decomp.c:1001-1006"
+        "sources/resedit/CODE/ID04.decomp.c:1186-1210"
       ],
       "known_blockers": [
         "Caller path for text fill; JT $92 proc (0x14f2)"
@@ -7323,7 +7323,7 @@
         "dependencies": "TENew -> A5-0x223a; NewControl scrollBarProc -> A5-0x2236; user item JT $92",
         "validation": "dis.py on ID04.bin; CODE0 JT parse; token diff = renames"
       },
-      "source_revision": "32f996b438378e897c78a81a718735934698bfac835246f8f61cf1d167547373",
+      "source_revision": "dd1b66ad21f92e6bc11910b234b9c7fe8827813ee4b52d415ed693b76b42d5b1",
       "strict_port": null
     },
     {
@@ -7339,18 +7339,18 @@
       "semantic_name": "dispose_scrolling_text_item",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1017,
-        "line_end": 1022,
-        "function_sha256": "962ab2de7726427668c91b4653431d94dd8cc7f1c0c90cb7a758d00289cfadd0"
+        "line_start": 1223,
+        "line_end": 1231,
+        "function_sha256": "fcc2953828f22347e976f739973e477b89e1dbe03999af31980cd5a9d5089d4a"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:623",
-        "sources/resedit/CODE/ID04.decomp.c:1017-1022"
+        "sources/resedit/CODE/ID04.decomp.c:1223-1231"
       ],
       "known_blockers": [
         "Callers"
@@ -7359,7 +7359,7 @@
         "dependencies": "TEDispose + DisposeControl",
         "validation": "dis.py on ID04.bin; CODE0 JT parse; token diff = renames"
       },
-      "source_revision": "962ab2de7726427668c91b4653431d94dd8cc7f1c0c90cb7a758d00289cfadd0",
+      "source_revision": "fcc2953828f22347e976f739973e477b89e1dbe03999af31980cd5a9d5089d4a",
       "strict_port": null
     },
     {
@@ -7375,18 +7375,18 @@
       "semantic_name": "append_line_to_scrolling_text",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1033,
-        "line_end": 1041,
-        "function_sha256": "ccb30f8717c6f68e6296bd6a65d8f67b59507d47fa60989a91557d4efe692f48"
+        "line_start": 1245,
+        "line_end": 1254,
+        "function_sha256": "ba6969b0a982944b0f13c03c0efbcbfb355f10252cb10bf0cc0f198578328b8a"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:634",
-        "sources/resedit/CODE/ID04.decomp.c:1033-1041"
+        "sources/resedit/CODE/ID04.decomp.c:1245-1254"
       ],
       "known_blockers": [
         "Separator byte A5-0x213a; callers"
@@ -7395,7 +7395,7 @@
         "dependencies": "strlen (ID02 0x3e8) + TEInsert ×2 + 0x158c scroll update",
         "validation": "dis.py on ID04.bin; CODE0 JT parse; token diff = renames"
       },
-      "source_revision": "ccb30f8717c6f68e6296bd6a65d8f67b59507d47fa60989a91557d4efe692f48",
+      "source_revision": "ba6969b0a982944b0f13c03c0efbcbfb355f10252cb10bf0cc0f198578328b8a",
       "strict_port": null
     },
     {
@@ -7411,18 +7411,18 @@
       "semantic_name": "get_mission_kill_report_state",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1049,
-        "line_end": 1071,
+        "line_start": 1265,
+        "line_end": 1287,
         "function_sha256": "baf418bdd9b80a95fcac8f406ab2adff273f115e1382e3eedd0689fe0d7b6f55"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:646",
-        "sources/resedit/CODE/ID04.decomp.c:1049-1071"
+        "sources/resedit/CODE/ID04.decomp.c:1265-1287"
       ],
       "known_blockers": [
         "State 2 meaning"
@@ -7447,18 +7447,18 @@
       "semantic_name": "update_summary_dialog_buttons",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1081,
-        "line_end": 1100,
-        "function_sha256": "c4897d7288c9ff35612de8d3c53fa49e188f26c1602d4dcaea34fe2dac4360ac"
+        "line_start": 1302,
+        "line_end": 1335,
+        "function_sha256": "9a46c5992eb12797743b37b1d4570aaad01c8bbc7c6e1261baeedaf070b1eb74"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:674",
-        "sources/resedit/CODE/ID04.decomp.c:1081-1100"
+        "sources/resedit/CODE/ID04.decomp.c:1302-1335"
       ],
       "known_blockers": [
         "A5-0x12f0 / -0x2228 / -0x2230 roles"
@@ -7467,7 +7467,7 @@
         "dependencies": "enables items 1/3; moves default ring A5-0x225e to item 1",
         "validation": "dis.py on ID04.bin; STR# 129 / DITL 133 dump; token diff = renames"
       },
-      "source_revision": "c4897d7288c9ff35612de8d3c53fa49e188f26c1602d4dcaea34fe2dac4360ac",
+      "source_revision": "9a46c5992eb12797743b37b1d4570aaad01c8bbc7c6e1261baeedaf070b1eb74",
       "strict_port": null
     },
     {
@@ -7483,18 +7483,18 @@
       "semantic_name": "build_rank_and_name_string",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1131,
-        "line_end": 1154,
-        "function_sha256": "3c25942b35a8d2a8442899bb91322a725368b3c4190aec97e0962b627a5964d3"
+        "line_start": 1372,
+        "line_end": 1406,
+        "function_sha256": "60061e30300099925e4e4bc56d51fd7cebbd647e58e67cb1c237ef3446613b7d"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:699",
-        "sources/resedit/CODE/ID04.decomp.c:1131-1154"
+        "sources/resedit/CODE/ID04.decomp.c:1372-1406"
       ],
       "known_blockers": [
         "Tie-break / JT $512 role"
@@ -7503,7 +7503,7 @@
         "dependencies": "rank group + separator + name",
         "validation": "C"
       },
-      "source_revision": "3c25942b35a8d2a8442899bb91322a725368b3c4190aec97e0962b627a5964d3",
+      "source_revision": "60061e30300099925e4e4bc56d51fd7cebbd647e58e67cb1c237ef3446613b7d",
       "strict_port": null
     },
     {
@@ -7519,18 +7519,18 @@
       "semantic_name": "draw_targets_destroyed_row",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1167,
-        "line_end": 1175,
-        "function_sha256": "f5fec27f3c0bae25f12683b7f286adaf6d3e883533155eab11cc22364a03b9ce"
+        "line_start": 1426,
+        "line_end": 1479,
+        "function_sha256": "226abcfaab1da00ec847b4334ebe6934732a50730ef4f9f13f642f433b665c48"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:728",
-        "sources/resedit/CODE/ID04.decomp.c:1167-1175"
+        "sources/resedit/CODE/ID04.decomp.c:1426-1479"
       ],
       "known_blockers": [
         "Separator text A5-0x2136"
@@ -7539,7 +7539,7 @@
         "dependencies": "skips types 2/4/8; 7 rows; \"name sep n … n×weight\" right-aligned",
         "validation": "dis.py; token diff = renames"
       },
-      "source_revision": "f5fec27f3c0bae25f12683b7f286adaf6d3e883533155eab11cc22364a03b9ce",
+      "source_revision": "226abcfaab1da00ec847b4334ebe6934732a50730ef4f9f13f642f433b665c48",
       "strict_port": null
     },
     {
@@ -7555,25 +7555,25 @@
       "semantic_name": "draw_targets_destroyed_list",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1184,
-        "line_end": 1198,
-        "function_sha256": "433537c90154f8ccb801a480c8177e6857c685e9d9558dfc6ccffd232dc5dc43"
+        "line_start": 1492,
+        "line_end": 1502,
+        "function_sha256": "7795de9d074f7a3fe6a745b9de9b994cadf484425ace1872b6bf358dc41514fa"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:740",
-        "sources/resedit/CODE/ID04.decomp.c:1184-1198"
+        "sources/resedit/CODE/ID04.decomp.c:1492-1502"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "JT $aa user item 6; also documents unexported draw_mission_awards (0x1dde, JT $152, cicn 512–519)",
         "validation": "dis.py; CODE0 JT; DITL/cicn dump"
       },
-      "source_revision": "433537c90154f8ccb801a480c8177e6857c685e9d9558dfc6ccffd232dc5dc43",
+      "source_revision": "7795de9d074f7a3fe6a745b9de9b994cadf484425ace1872b6bf358dc41514fa",
       "strict_port": null
     },
     {
@@ -7589,18 +7589,18 @@
       "semantic_name": "draw_aircraft_kill_markers",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1208,
-        "line_end": 1214,
-        "function_sha256": "e716accec106438fbd326dd3763bb31503bc3de1cd2e2327455253121b524f2f"
+        "line_start": 1514,
+        "line_end": 1576,
+        "function_sha256": "8e29dde608890d132cd50f5eba926615a2a3a8732507cba90482318667292250"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:760",
-        "sources/resedit/CODE/ID04.decomp.c:1208-1214"
+        "sources/resedit/CODE/ID04.decomp.c:1514-1576"
       ],
       "known_blockers": [
         "Lifetime vs mission count"
@@ -7609,7 +7609,7 @@
         "dependencies": "tally[0]+tally[1] (≤24) markers in a 6-column grid; red PaintOval in a frame",
         "validation": "dis.py; DITL 133 placement; token diff = renames"
       },
-      "source_revision": "e716accec106438fbd326dd3763bb31503bc3de1cd2e2327455253121b524f2f",
+      "source_revision": "8e29dde608890d132cd50f5eba926615a2a3a8732507cba90482318667292250",
       "strict_port": null
     },
     {
@@ -7625,25 +7625,25 @@
       "semantic_name": "aircraft_kill_markers_user_item_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1222,
-        "line_end": 1232,
-        "function_sha256": "088479be6513df4c2d2b7cc0ada3fd1bf7f58c6f99c8d97116be8caf5859fc40"
+        "line_start": 1588,
+        "line_end": 1593,
+        "function_sha256": "9d3b9d39bb94527f9aea5bf40c599f9645e397ef0847368928ee0298725008ba"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:770",
-        "sources/resedit/CODE/ID04.decomp.c:1222-1232"
+        "sources/resedit/CODE/ID04.decomp.c:1588-1593"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "Pascal user item, JT $ea, item 7 of DLOG 133",
         "validation": "dis.py; CODE0 JT"
       },
-      "source_revision": "088479be6513df4c2d2b7cc0ada3fd1bf7f58c6f99c8d97116be8caf5859fc40",
+      "source_revision": "9d3b9d39bb94527f9aea5bf40c599f9645e397ef0847368928ee0298725008ba",
       "strict_port": null
     },
     {
@@ -7659,25 +7659,25 @@
       "semantic_name": "set_score_item_text",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1398,
-        "line_end": 1417,
-        "function_sha256": "df880c2bdd099fe32d2b7a413fcf8b9cd5961ee8909db06f2ac10bdd8e30a702"
+        "line_start": 1762,
+        "line_end": 1775,
+        "function_sha256": "e4dd2913687c95d1432e04a31c47f4cff2f5d28ad6d0eb6f8f57f2ca168d93d1"
       },
       "renaming_confidence": "PROVEN",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": true,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:784",
-        "sources/resedit/CODE/ID04.decomp.c:1398-1417"
+        "sources/resedit/CODE/ID04.decomp.c:1762-1775"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "\"Score: \" (STR# 58) + compute_pilot_score; strcpy/strcat ID02 0x2c8/0x2d8; ID09 0x432/0x416",
         "validation": "dis.py; STR# dump; token diff = renames"
       },
-      "source_revision": "df880c2bdd099fe32d2b7a413fcf8b9cd5961ee8909db06f2ac10bdd8e30a702",
+      "source_revision": "e4dd2913687c95d1432e04a31c47f4cff2f5d28ad6d0eb6f8f57f2ca168d93d1",
       "strict_port": null
     },
     {
@@ -7693,18 +7693,18 @@
       "semantic_name": "show_mission_summary_dialog",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1438,
-        "line_end": 1451,
-        "function_sha256": "c8c8e4786ef32bcfe8ae91ece2a60d2592bb763c418288546e637563602e90af"
+        "line_start": 1804,
+        "line_end": 1900,
+        "function_sha256": "ec8660463f4d99303e8af5c04e18b7f42d32c5f606272d0df1ea80a07fc6ec56"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:809",
-        "sources/resedit/CODE/ID04.decomp.c:1438-1451"
+        "sources/resedit/CODE/ID04.decomp.c:1804-1900"
       ],
       "known_blockers": [
         "Item helpers 0xec/0x06/0xc4/0x54/0x78/0x1b8/0x17e6"
@@ -7713,7 +7713,7 @@
         "dependencies": "DLOG 133 \"Mission Summary\"; 12-tally loop; local item helpers",
         "validation": "Capstone + DLOG/DITL dump"
       },
-      "source_revision": "c8c8e4786ef32bcfe8ae91ece2a60d2592bb763c418288546e637563602e90af",
+      "source_revision": "ec8660463f4d99303e8af5c04e18b7f42d32c5f606272d0df1ea80a07fc6ec56",
       "strict_port": null
     },
     {
@@ -7729,18 +7729,18 @@
       "semantic_name": "play_named_sound_async",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1470,
-        "line_end": 1479,
-        "function_sha256": "3ef227c9cb95b1e35baf5a7cb23b7f976d26a81ddc6aea8361c03c25b8623c58"
+        "line_start": 1922,
+        "line_end": 1939,
+        "function_sha256": "8b5262bb4f4efde0616e0cf5f51de9c7cb07215e3ba7ee49a4c550a812e9fb0b"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:828",
-        "sources/resedit/CODE/ID04.decomp.c:1470-1479"
+        "sources/resedit/CODE/ID04.decomp.c:1922-1939"
       ],
       "known_blockers": [
         "Sound name"
@@ -7749,7 +7749,7 @@
         "dependencies": "GetNamedResource('snd ', A5−0x2128); SndNewChannel; SndPlay async",
         "validation": "Capstone"
       },
-      "source_revision": "3ef227c9cb95b1e35baf5a7cb23b7f976d26a81ddc6aea8361c03c25b8623c58",
+      "source_revision": "8b5262bb4f4efde0616e0cf5f51de9c7cb07215e3ba7ee49a4c550a812e9fb0b",
       "strict_port": null
     },
     {
@@ -7765,25 +7765,25 @@
       "semantic_name": "stop_named_sound",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1493,
-        "line_end": 1508,
-        "function_sha256": "b288aed43ef25776ce26d9382536463cbacf3179e82db64bd448b7059870dd1f"
+        "line_start": 1955,
+        "line_end": 1970,
+        "function_sha256": "0818c9c9fef55b4bda6d12a48682dc95bf4349088fb22f3989a6af3aca40e28d"
       },
       "renaming_confidence": "STRONG INFERENCE",
-      "reconstruction_status": "RENAMED",
+      "reconstruction_status": "VERIFIED",
       "name_verified": false,
-      "semantically_verified": false,
+      "semantically_verified": true,
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:843",
-        "sources/resedit/CODE/ID04.decomp.c:1493-1508"
+        "sources/resedit/CODE/ID04.decomp.c:1955-1970"
       ],
       "known_blockers": [],
       "technical_evidence": {
         "dependencies": "SndDisposeChannel; HUnlock; ReleaseResource",
         "validation": "Capstone"
       },
-      "source_revision": "b288aed43ef25776ce26d9382536463cbacf3179e82db64bd448b7059870dd1f",
+      "source_revision": "0818c9c9fef55b4bda6d12a48682dc95bf4349088fb22f3989a6af3aca40e28d",
       "strict_port": null
     },
     {
@@ -7799,8 +7799,8 @@
       "semantic_name": "conclude_mission",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1533,
-        "line_end": 1561,
+        "line_start": 1995,
+        "line_end": 2023,
         "function_sha256": "1a2c902230ecee07d66e27de1634310def584d275e36e655059ce1e4d09c07aa"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -7810,7 +7810,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:864",
-        "sources/resedit/CODE/ID04.decomp.c:1533-1561"
+        "sources/resedit/CODE/ID04.decomp.c:1995-2023"
       ],
       "known_blockers": [
         "FUN_00003124 / 2de6 / 3178 roles"
@@ -7835,8 +7835,8 @@
       "semantic_name": "draw_map_grid_and_centre_mark",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1571,
-        "line_end": 1576,
+        "line_start": 2033,
+        "line_end": 2038,
         "function_sha256": "2c0d13b436ba8008170fb10f9177508d98855ebdfbbfefa90bc765e7cc638419"
       },
       "renaming_confidence": "PROVEN",
@@ -7846,7 +7846,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:898",
-        "sources/resedit/CODE/ID04.decomp.c:1571-1576"
+        "sources/resedit/CODE/ID04.decomp.c:2033-2038"
       ],
       "known_blockers": [
         "A5-0x1052 target"
@@ -7871,8 +7871,8 @@
       "semantic_name": "plot_map_symbol_callback",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1586,
-        "line_end": 1594,
+        "line_start": 2048,
+        "line_end": 2056,
         "function_sha256": "7b10378c84366ce476641b02077d476258d2afb689bb2e82aeead60f9f7cbaf9"
       },
       "renaming_confidence": "PROVEN",
@@ -7882,7 +7882,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:909",
-        "sources/resedit/CODE/ID04.decomp.c:1586-1594"
+        "sources/resedit/CODE/ID04.decomp.c:2048-2056"
       ],
       "known_blockers": [
         "A5-0x1052 target"
@@ -7907,8 +7907,8 @@
       "semantic_name": "draw_map_view_item",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1604,
-        "line_end": 1613,
+        "line_start": 2066,
+        "line_end": 2075,
         "function_sha256": "387f101e16aed6aad0486f455e0c03be527d267c61b1bab21ba805d96fe80803"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -7918,7 +7918,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:923",
-        "sources/resedit/CODE/ID04.decomp.c:1604-1613"
+        "sources/resedit/CODE/ID04.decomp.c:2066-2075"
       ],
       "known_blockers": [
         "A5-0x1052 target"
@@ -7943,8 +7943,8 @@
       "semantic_name": "map_view_user_item_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1622,
-        "line_end": 1632,
+        "line_start": 2084,
+        "line_end": 2094,
         "function_sha256": "dfa5680112cfc2d754d9ba21fa5f4cb1c3136336cc2a43fc44007343a8f43910"
       },
       "renaming_confidence": "PROVEN",
@@ -7954,7 +7954,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:936",
-        "sources/resedit/CODE/ID04.decomp.c:1622-1632"
+        "sources/resedit/CODE/ID04.decomp.c:2084-2094"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -7977,8 +7977,8 @@
       "semantic_name": "map_dialog_filter_proc",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1643,
-        "line_end": 1652,
+        "line_start": 2105,
+        "line_end": 2114,
         "function_sha256": "88bbfdde4df6caa1ee50765f77264d4a714970d59f750b0ff08e4a7f79195c48"
       },
       "renaming_confidence": "PROVEN",
@@ -7988,7 +7988,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:952",
-        "sources/resedit/CODE/ID04.decomp.c:1643-1652"
+        "sources/resedit/CODE/ID04.decomp.c:2105-2114"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -8011,8 +8011,8 @@
       "semantic_name": "poll_click_or_key_event",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1662,
-        "line_end": 1667,
+        "line_start": 2124,
+        "line_end": 2129,
         "function_sha256": "a4a00fe287c2c1289d14e93c37ed56676fc3265c8389530f6b3c59d861158b6c"
       },
       "renaming_confidence": "PROVEN",
@@ -8022,7 +8022,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:967",
-        "sources/resedit/CODE/ID04.decomp.c:1662-1667"
+        "sources/resedit/CODE/ID04.decomp.c:2124-2129"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -8045,8 +8045,8 @@
       "semantic_name": "show_about_dialog",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1677,
-        "line_end": 1688,
+        "line_start": 2139,
+        "line_end": 2150,
         "function_sha256": "f4fd0218d0f9f98acff307b6b689f67ab4e6d39933e2285b00a4c63509c715c4"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8056,7 +8056,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:978",
-        "sources/resedit/CODE/ID04.decomp.c:1677-1688"
+        "sources/resedit/CODE/ID04.decomp.c:2139-2150"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -8079,8 +8079,8 @@
       "semantic_name": "check_system_requirements",
       "semantic_source": {
         "path": "sources/resedit/CODE/ID04.decomp.c",
-        "line_start": 1705,
-        "line_end": 1723,
+        "line_start": 2167,
+        "line_end": 2185,
         "function_sha256": "cc7efce5f5572fa7c8b4ac92ed8e1a492ac8c1a2251140d3c5db59040685351a"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8090,7 +8090,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit/CODE/ID04.c:993",
-        "sources/resedit/CODE/ID04.decomp.c:1705-1723"
+        "sources/resedit/CODE/ID04.decomp.c:2167-2185"
       ],
       "known_blockers": [],
       "technical_evidence": {

@@ -340,6 +340,10 @@ short get_radio_group_selection /* Original: FUN_00000362 */ (int param_1,short 
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID04::FUN_000003c2): ID04.bin 0x3c2..0x430 checked against an independent capstone disassembly.
+ * TST.L A5-0x225a / BNE; copy A5-0x1680 Rect to A5-0x14be and -8; InsetRect(-8, 100, 100); NewWindow pushes nil, -8,
+ * long A5-0xe4e, byte 1, word 3, -1, byte 1, long 0 ($A913) to A5-0x225a; SetPort, ShowWindow, JT $4aa, HideWindow -
+ * identical to the C. */
 /*
  * Original: FUN_000003c2; source: ID04.c:164.
  * Recovered name: run_with_temporary_window [STRONG INFERENCE mechanics]
@@ -351,7 +355,7 @@ short get_radio_group_selection /* Original: FUN_00000362 */ (int param_1,short 
  *       (long A5-0xe4e), visible, procID 3, (WindowPtr)-1, goAway, 0) $A913;
  *   }
  *   SetPort(w) $A873; ShowWindow(w) $A915; JT $4aa (ID02 file 0x2db8,
- *   not yet named); HideWindow(w) $A916.
+ *   wait_for_click_or_key); HideWindow(w) $A916. Body rebuilt as C below.
  * The window is created once and only shown around the ID02 call.
  * Note: the following unexported routine at file 0x432..0x44c (no Ghidra
  * entry) is the user of STR# 129 slot 1: if word A5-0x14a0 { JT $462 (ID02
@@ -362,51 +366,80 @@ void run_with_temporary_window /* Original: FUN_000003c2 */ (void)
 
 {
   int unaff_A5;
-  
+  short r[4];                                   /* -8(A6) */
+
   if (*(int *)(unaff_A5 + -0x225a) == 0) {
-    *(undefined4 *)(unaff_A5 + -0x14be) = *(undefined4 *)(unaff_A5 + -0x1680);
-    *(undefined4 *)(unaff_A5 + -0x14ba) = *(undefined4 *)(unaff_A5 + -0x167c);
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+    *(Rect *)(unaff_A5 + -0x14be) = *(Rect *)(unaff_A5 + -0x1680); /* screenBits.bounds */
+    *(Rect *)r = *(Rect *)(unaff_A5 + -0x14be);
+    InsetRect(r,100,100);                       /* $A8A9 */
+    *(int *)(unaff_A5 + -0x225a) =
+         NewWindow(0,r,*(int *)(unaff_A5 + -0xe4e),1,3,-1,1,0); /* $A913: visible, procID 3, goAway */
   }
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  SetPort(*(int *)(unaff_A5 + -0x225a));        /* $A873 */
+  ShowWindow(*(int *)(unaff_A5 + -0x225a));     /* $A915 */
+  wait_for_click_or_key();                      /* JT $4aa -> ID02 0x2db8 */
+  HideWindow(*(int *)(unaff_A5 + -0x225a));     /* $A916 */
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_0000044e): ID04.bin 0x44e..0x476 checked against an independent capstone disassembly.
+ * ParamText(8, nil, nil, nil) $A98B; JT $47a(word $100); StopAlert($100, nil) $A986 result in D0 - identical to the
+ * C. */
 /* Original: FUN_0000044e; source: ID04.c. Recovered name: show_scenery_open_error_alert [PROVEN].
  * Decoded from ID04.bin bytes at file 0x44e.
- * C arg +8: Pascal string (file name). ParamText(name, NULL, NULL, NULL) ($A98B); JT $47a(0x100) (ID02 0x442e, also called before ALRT 259 by confirm_end_mission); returns StopAlert(256, NULL) ($A986). ALRT 256 is "Unable to Open Scenery": DITL 256 text "Unable to open Hellcats scenery file '^0'." with an OK button. Reached through JT $fa (CODE 0 entry -> ID04 0x44e).
+ * C arg +8: Pascal string (file name). ParamText(name, NULL, NULL, NULL) ($A98B); JT $47a(0x100) (ID02 0x442e, also called before ALRT 259 by confirm_end_mission); returns StopAlert(256, NULL) ($A986). ALRT 256 is "Unable to Open Scenery": DITL 256 text "Unable to open Hellcats scenery file '^0'." with an OK button. Reached through JT $fa (CODE 0 entry -> ID04 0x44e). Body rebuilt as C below.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void show_scenery_open_error_alert /* Original: FUN_0000044e */ (void)
+short show_scenery_open_error_alert /* Original: FUN_0000044e */ (void *param_1)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  ParamText(param_1,0,0,0);                     /* $A98B */
+  position_alert_template(0x100);               /* JT $47a -> ID02 0x442e */
+  return StopAlert(0x100,0);                    /* $A986 */
 }
 
 
 
+/* VERIFIED (ID04::FUN_00000478): ID04.bin 0x478..0x4ee checked against an independent capstone disassembly.
+ * GetNewDialog($83, nil, -1) to -4; JT $48a; ShowWindow; DrawDialog; CLR.W -$16; loop GetNextEvent($18, -$14) TST.B
+ * BEQ: state 0 && what 3, or state 1 && what 4 -> ADDQ state; until CMPI.W #2; DisposDialog $A983 - identical to the C. */
 /* Original: FUN_00000478; source: ID04.c. Recovered name: show_paused_dialog [PROVEN].
  * Decoded from ID04.bin bytes at file 0x478.
- * GetNewDialog(0x83 = DLOG 131 "Paused Dialog", NULL, (WindowPtr)-1) ($A97C); JT $48a (ID02 0x435e); ShowWindow; DrawDialog ($A981); then polls GetNextEvent(0x18 = keyDown | keyUp mask) ($A970) until it has seen a keyDown (what 3) followed by a keyUp (what 4); DisposDialog. DITL 131 text: "Paused... Press any key to continue." Reached through JT $122 (-> ID04 0x478).
+ * GetNewDialog(0x83 = DLOG 131 "Paused Dialog", NULL, (WindowPtr)-1) ($A97C); JT $48a (ID02 0x435e); ShowWindow; DrawDialog ($A981); then polls GetNextEvent(0x18 = keyDown | keyUp mask) ($A970) until it has seen a keyDown (what 3) followed by a keyUp (what 4); DisposDialog. DITL 131 text: "Paused... Press any key to continue." Reached through JT $122 (-> ID04 0x478). Body rebuilt as C below.
  */
 // WARNING: Control flow encountered bad instruction data
 
 void show_paused_dialog /* Original: FUN_00000478 */ (void)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int dlg;                                      /* -4(A6) */
+  short evt[8];                                 /* -$14(A6): what */
+  short state;                                  /* -$16(A6) */
+
+  dlg = GetNewDialog(0x83,0,-1);                /* $A97C: DLOG 131 */
+  position_window_on_screen(dlg);               /* JT $48a -> ID02 0x435e */
+  ShowWindow(dlg);                              /* $A915 */
+  DrawDialog(dlg);                              /* $A981 */
+  state = 0;
+  do {
+    if ((GetNextEvent(0x18,evt) != '\0') &&     /* $A970, keyDown | keyUp */
+       (((state == 0) && (evt[0] == 3)) || ((state == 1) && (evt[0] == 4)))) {
+      state = state + 1;
+    }
+  } while (state != 2);
+  DisposDialog(dlg);                            /* $A983 */
+  return;
 }
 
 
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID04::FUN_000004f0): ID04.bin 0x4f0..0x514 checked against an independent capstone disassembly.
+ * JT $47a(word $101); CautionAlert($101, nil) $A988 to -2, D0 = -2 - identical to the C. */
 /*
  * Original: FUN_000004f0; source: ID04.c:205.
  * Recovered name: ask_save_changes [STRONG INFERENCE].
@@ -416,20 +449,20 @@ void show_paused_dialog /* Original: FUN_00000478 */ (void)
  * artifacts/reverse-engineering/resources/resource_dasm_Hellcats_app]: item 1 "Save", 2 "Cancel", 3 "Don't Save" - matches the
  * quit_application switch (1 save, 2 cancel, else discard).
  */
-void ask_save_changes /* Original: FUN_000004f0 */ (void)
+short ask_save_changes /* Original: FUN_000004f0 */ (void)
 
 {
-  int unaff_A5;
-  
-  (**(code **)(unaff_A5 + 0x47a))();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  position_alert_template(0x101);               /* JT $47a -> ID02 0x442e */
+  return CautionAlert(0x101,0);                 /* $A988 (result via a local word) */
 }
 
 
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID04::FUN_00000516): ID04.bin 0x516..0x55e checked against an independent capstone disassembly.
+ * CMPI.W #3 A5-0x12f8 BLT / TST.W A5-0x14c4 -> MOVEQ #2; BSR 0x18e0 TST.W BNE else 2; JT $47a($103); CautionAlert($103,
+ * nil) via -4 - identical to the C. */
 /*
  * Original: FUN_00000516; source: ID04.c:219.
  * Recovered name: confirm_end_mission [STRONG INFERENCE].
@@ -444,58 +477,49 @@ void ask_save_changes /* Original: FUN_000004f0 */ (void)
  * A5-0x12f8 >= 3 && A5-0x14c4 == 0 therefore means "mission in progress"
  * [STRONG INFERENCE].
  */
-undefined4 confirm_end_mission /* Original: FUN_00000516 */ (void)
+short confirm_end_mission /* Original: FUN_00000516 */ (void)
 
 {
-  bool bVar1;
-  undefined4 uVar2;
   int unaff_A5;
   
-  if ((*(short *)(unaff_A5 + -0x12f8) < 3) || (*(short *)(unaff_A5 + -0x14c4) != 0)) {
-    bVar1 = false;
+  if (((*(short *)(unaff_A5 + -0x12f8) < 3) || (*(short *)(unaff_A5 + -0x14c4) != 0)) ||
+     (get_mission_kill_report_state() == 0)) {  /* BSR 0x18e0 */
+    return 2;
   }
-  else {
-    bVar1 = true;
-  }
-  if (bVar1) {
-    uVar2 = get_mission_kill_report_state();
-    if ((short)uVar2 != 0) {
-      (**(code **)(unaff_A5 + 0x47a))();
-                    // WARNING: Bad instruction - Truncating control flow here
-      halt_baddata();
-    }
-  }
-  return 2;
+  position_alert_template(0x103);               /* JT $47a -> ID02 0x442e */
+  return CautionAlert(0x103,0);                 /* $A988 */
 }
 
 
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID04::FUN_00000560): ID04.bin 0x560..0x584 checked against an independent capstone disassembly.
+ * JT $47a(word $104); CautionAlert($104, nil) $A988 via -4 to D0 - identical to the C. */
 /*
  * Original: FUN_00000560; source: ID04.c:247.
  * Recovered name: confirm_erase_high_scores [STRONG INFERENCE].
  * Bytes 0x560..0x584 [PROVEN]: JT $47a(0x104); return CautionAlert(260, nil).
  * ALRT 260 "Erase Hi Score" / DITL 260 [PROVEN, dump]: item 1 "Cancel",
  * 2 "Erase"; text "Are you sure you want to erase all non-active duty high
- * scores?". Ghidra lost the return value.
+ * scores?". Ghidra lost the return value (restored below).
  */
-void confirm_erase_high_scores /* Original: FUN_00000560 */ (void)
+short confirm_erase_high_scores /* Original: FUN_00000560 */ (void)
 
 {
-  int unaff_A5;
-  
-  (**(code **)(unaff_A5 + 0x47a))();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  position_alert_template(0x104);               /* JT $47a -> ID02 0x442e */
+  return CautionAlert(0x104,0);                 /* $A988 (result via a local word) */
 }
 
 
 
+/* VERIFIED (ID04::FUN_00000588): ID04.bin 0x588..0x5e2 checked against an independent capstone disassembly.
+ * CLR.L -6; word k 0..11: record = (EXT.L i ASL.L #6) + *(A5-0x13a8), MOVEA.W +$28 + 2k, MOVEA.W A5-0xf5e[k], MULU.L,
+ * ADD.L to -6; D0 = -6 - identical to the C. */
 /*
  * Original: FUN_00000588; source: ID04.c:259.
  * Recovered name: compute_pilot_score [STRONG INFERENCE].
- * Exported C complete. Arg: word record index i.
+ * Arg: word record index i (sign-extended; the C parameter is now short, Ghidra's undefined2 was unsigned).
  *   score = sum over k < 12 of (short) record[i].tally[k] * (short) weight[k]
  *   record = *(HEL1 128 handle A5-0x13a8) + i * 0x40, tallies at +0x28
  *   (12 words); weights = 12 words at A5-0xf5e (A5 initial data, not read).
@@ -510,84 +534,167 @@ void confirm_erase_high_scores /* Original: FUN_00000560 */ (void)
  * [HYPOTHESIS] tallies 0..9 count destroyed targets of those categories;
  * the remaining two tallies are UNKNOWN.
  */
-int compute_pilot_score /* Original: FUN_00000588 */ (undefined4 param_1)
+int compute_pilot_score /* Original: FUN_00000588 */ (short param_1)
 
 {
   int unaff_A5;
-  undefined4 local_a;
-  undefined2 local_6;
+  int local_a;                                  /* -6(A6) */
+  short local_6;                                /* -2(A6) */
   
   local_a = 0;
   for (local_6 = 0; local_6 < 0xc; local_6 = local_6 + 1) {
-    local_a = (int)*(short *)(local_6 * 2 + **(int **)(unaff_A5 + -0x13a8) + param_1._0_2_ * 0x40 +
+    local_a = (int)*(short *)(local_6 * 2 + **(int **)(unaff_A5 + -0x13a8) + (int)param_1 * 0x40 +
                              0x28) * (int)*(short *)(local_6 * 2 + unaff_A5 + -0xf5e) + local_a;
+                                                /* EXT.L index (signed), MULU.L of sign-extended words */
   }
   return local_a;
 }
 
 
 
+/* VERIFIED (ID04::FUN_000005e4): ID04.bin 0x5e4..0x642 checked against an independent capstone disassembly.
+ * JSR $2a(A5) on evt->what (table 0x5f2: 3 -> 0x5fe, 6 -> 0x62c, default 0x636); key: (message AND.L #$ff) to JSR $32(A5)
+ * (table 0x610: $d / 3 -> 0x620, default 0x636); 0x620: *itemHit = 1, D0 = 1; update: JT $492(evt); 0x636: D0 = 0;
+ * Pascal return popping 12, MOVE.B D0 result - identical to the C. */
 /* Original: FUN_000005e4; source: ID04.c. Recovered name: duty_roster_filter_proc [PROVEN].
  * Decoded from ID04.bin bytes at file 0x5e4.
- * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes, Boolean result). Switch on event->what through JT $2a (table at 0x5f2: keyDown 3 -> 0x5fe, updateEvt 6 -> 0x62c, default -> 0x636): keyDown Return (13) / Enter (3) -> *itemHit = 1, return true; updateEvt -> JT $492 (ID02 0x4d6a), false. Reached through JT $c2 (-> ID04 0x5e4).
+ * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes, Boolean result); body rebuilt as C below. Switch on event->what through JT $2a = ID01 0x96 (count word, then (offset word, value word) pairs, the last offset is the default; target = offset-word address + offset; table at 0x5f2: keyDown 3 -> 0x5fe, updateEvt 6 -> 0x62c, default -> 0x636): keyDown Return (13) / Enter (3) -> *itemHit = 1, return true; updateEvt -> JT $492 (ID02 0x4d6a), false. Reached through JT $c2 (-> ID04 0x5e4).
  * The following bytes 0x644..0x9ec (not exported by Ghidra) are run_duty_roster_dialog [STRONG INFERENCE name], JT $132 (-> ID04 0x644) [PROVEN, bytes]: GetNewDialog(0x82 = DLOG 130 "Duty Roster"); JT $472; rank_pilots_by_score(scores, order); prune_inactive_pilots_beyond_ten(order); for up to ten pilots in score order whose status +0x20 == 0 (Active), row r: SetIText item 5 + r = rank name (A5-0xffe[record +0x22]), item 15 + r = pilot name (editable), item 25 + r = decimal compute_pilot_score; row -> pilot map in a local array. Current pilot = settings +0x20 (A5-0x13ac) -> A5-0x13a4; the row whose pilot equals it (and whose name is set or score non-zero) gets SelIText(item 15 + r, 0, 1000) ($A97E). Default ring on user item 2 (default 1), grey user item 39 (JT $142); ShowWindow; loop ModalDialog(JT $c2): item 3 Cancel -> DisposDialog, return 0; item 4 "Dossier..." -> show_mission_summary_dialog(pilot of the active edit field (dialog->editField + 1 - 15 = row), 0, STR# 63 "OK") - shows that pilot's summary; item 1 OK: for each row GetIText ($A990), p2c both names (ID09 0x432), compare 30 bytes (JT $502, ID02 0x434) and copy when different (JT $50a, ID02 0x3f6), c2p; if any name changed, ChangedResource + WriteResource (roster); A5-0x13a4 = pilot of the active edit field; DisposDialog; return 1.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void duty_roster_filter_proc /* Original: FUN_000005e4 */ (void)
+/* Pascal ModalDialog filter: dlg $10(A6), evt $c(A6), itemHit 8(A6); pops 12 bytes, BOOLEAN result byte. */
+char duty_roster_filter_proc /* Original: FUN_000005e4 */ (int dlg,short *evt,short *itemHit)
 
 {
-  int unaff_A5;
-  
-  (**(code **)(unaff_A5 + 0x2a))();
-  (**(code **)(unaff_A5 + 0x32))();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  switch (evt[0]) {                             /* JSR $2a(A5) -> ID01 0x96 (word value table at 0x5f2) */
+  case 3:                                       /* keyDown */
+    switch (*(uint *)(evt + 1) & 0xff) {        /* JSR $32(A5) -> ID01 0xaa (long value table at 0x610) */
+    case 3:                                     /* Enter */
+    case 0xd:                                   /* Return */
+      *itemHit = 1;
+      return 1;
+    }
+    break;
+  case 6:                                       /* updateEvt */
+    handle_update_event(evt);                   /* JT $492 -> ID02 0x4d6a */
+    break;
+  }
+  return 0;
 }
 
 
 
+/* VERIFIED (ID04::FUN_000009ee): ID04.bin 0x9ee..0xa8c checked against an independent capstone disassembly.
+ * -$20 = long A5-0xe46; GetDItem($a, 8, -2, -6, -$16); width / height; TextSize($18) $A88A; StringWidth $A88C to -$18;
+ * GetFontInfo(-$e) $A88B; MoveTo((width DIVS #2) + left - (w DIVS #2), (height DIVS #2) + top + (ascent DIVS #2)); DrawString;
+ * TextSize(0); Pascal return popping 6 - identical to the C. */
 /* Original: FUN_000009ee; source: ID04.c. Recovered name: draw_select_mission_title [PROVEN].
  * Decoded from ID04.bin bytes at file 0x9ee.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). Text = STR# 129 slot 64 "Select a Mission" (pointer A5-0xe46, kept as a Pascal string by the loader). GetDItem -> box; TextSize(24) ($A88A); w = StringWidth ($A88C); GetFontInfo ($A88B); MoveTo(box.left + width / 2 - w / 2, box.top + height / 2 + ascent / 2) ($A893); DrawString ($A884); TextSize(0). Reached through JT $11a (CODE 0 entry -> ID04 0x9ee), installed for item 4 of DLOG 129 "Scenario Selection" by run_scenario_selection_dialog (0xc66).
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). Text = STR# 129 slot 64 "Select a Mission" (pointer A5-0xe46, kept as a Pascal string by the loader). GetDItem -> box; TextSize(24) ($A88A); w = StringWidth ($A88C); GetFontInfo ($A88B); MoveTo(box.left + width / 2 - w / 2, box.top + height / 2 + ascent / 2) ($A893); DrawString ($A884); TextSize(0). Reached through JT $11a (CODE 0 entry -> ID04 0x9ee), installed for item 4 of DLOG 129 "Scenario Selection" by run_scenario_selection_dialog (0xc66). Body rebuilt as C below.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void draw_select_mission_title /* Original: FUN_000009ee */ (void)
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void draw_select_mission_title /* Original: FUN_000009ee */ (int dlg,short item)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  void *s;                                      /* -$20(A6): "Select a Mission" */
+  short height;                                 /* -$1c(A6) */
+  short width;                                  /* -$1a(A6) */
+  short w;                                      /* -$18(A6) */
+  short box[4];                                 /* -$16(A6): top, left (-$14), bottom (-$12), right (-$10) */
+  short fi[4];                                  /* -$e(A6): FontInfo, ascent first */
+  int handle;                                   /* -6(A6) */
+  short itemType;                               /* -2(A6) */
+
+  s = *(void **)(unaff_A5 + -0xe46);            /* STR# 129 slot 64 */
+  GetDItem(dlg,item,&itemType,&handle,box);     /* $A98D */
+  width = box[3] - box[1];
+  height = box[2] - box[0];
+  TextSize(0x18);                               /* $A88A */
+  w = StringWidth(s);                           /* $A88C */
+  GetFontInfo(fi);                              /* $A88B */
+  MoveTo(((short)((int)width / 2) + box[1]) - (short)((int)w / 2),
+         ((short)((int)height / 2) + box[0]) + (short)((int)fi[0] / 2)); /* $A893 */
+  DrawString(s);                                /* $A884 */
+  TextSize(0);
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00000a8e): ID04.bin 0xa8e..0xbd8 checked against an independent capstone disassembly.
+ * JSR $2a(A5) table 0xa9c (3 -> 0xaac, 1 -> 0xae8, 6 -> 0xbca, default 0xbd4); key: CMPI.L #$d / #3 of message & $ff ->
+ * *$10 = 1, D0 = 1; mouse: GetDItem(8, word $14, -4, -8, -$10), -$18 = thePort, SetPort(8), -$14 = where, GlobalToLocal,
+ * PtInRect(-$14, -$10) TST.B BNE.W 0xba6 else SetPort(-$18), 0; loop at 0xba6 StillDown TST.B: h in [left, right] -> EXT.L
+ * MULU.L #$64 DIVS.L (right - left), else 0 / 100; CMP.W A5-0x225c BEQ, else store + BSR 0x220(8, $14); GetMouse(-$14);
+ * then *$10 = $14, SetPort(-$18), D0 = 1; update: JT $492(evt), 0 - identical to the C. */
 /* Original: FUN_00000a8e; source: ID04.c. Recovered name: fuel_slider_dialog_filter [STRONG INFERENCE].
  * Decoded from ID04.bin bytes at file 0xa8e.
- * C args: +8 DialogPtr, +0xc EventRecord *, +0x10 short *itemHit, +0x14 short slider item; returns 1 when the event is handled. Switch on event->what through JT $2a (sparse table at 0xa9c: keyDown 3 -> 0xaac, mouseDown 1 -> 0xae8, updateEvt 6 -> 0xbca, default -> 0xbd4) [PROVEN]: keyDown Return (13) / Enter (3) -> *itemHit = 1, return 1 (the case Ghidra decoded); mouseDown -> GetDItem(slider), SetPort, GlobalToLocal(where), PtInRect ($A8AD); if inside, while StillDown ($A973): GetMouse ($A972), value = 100 * (h - left) / (right - left) clamped to 0..100, and when it changes A5-0x225c = value and draw_percent_bar_item(dialog, slider); then *itemHit = slider, return 1; updateEvt -> JT $492 (ID02 0x4d6a), return 0. The slider is the fuel bar of DLOG 129 "Scenario Selection" and DLOG 132 "Refuel" (labels "Fuel:" "E" "F" in DITL 132), so A5-0x225c = fuel load percentage [STRONG INFERENCE].
+ * C args: +8 DialogPtr, +0xc EventRecord *, +0x10 short *itemHit, +0x14 short slider item; returns 1 when the event is handled. Switch on event->what through JT $2a (sparse table at 0xa9c: keyDown 3 -> 0xaac, mouseDown 1 -> 0xae8, updateEvt 6 -> 0xbca, default -> 0xbd4) [PROVEN]: keyDown Return (13) / Enter (3) -> *itemHit = 1, return 1 (the case Ghidra decoded); mouseDown -> GetDItem(slider), SetPort, GlobalToLocal(where), PtInRect ($A8AD); if inside, while StillDown ($A973): GetMouse ($A972), value = 100 * (h - left) / (right - left) clamped to 0..100, and when it changes A5-0x225c = value and draw_percent_bar_item(dialog, slider); then *itemHit = slider, return 1; updateEvt -> JT $492 (ID02 0x4d6a), return 0. The slider is the fuel bar of DLOG 129 "Scenario Selection" and DLOG 132 "Refuel" (labels "Fuel:" "E" "F" in DITL 132), so A5-0x225c = fuel load percentage [STRONG INFERENCE]. Body rebuilt as C below (Ghidra had only the keyDown case).
  */
-undefined4 fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (undefined4 param_1,int param_2,undefined2 *param_3)
+short fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (int param_1,short *param_2,short *param_3,short param_4)
 
 {
-  undefined4 uVar1;
   int unaff_A5;
-  
-  (**(code **)(unaff_A5 + 0x2a))();
-  if (((*(uint *)(param_2 + 2) & 0xff) == 0xd) || ((*(uint *)(param_2 + 2) & 0xff) == 3)) {
-    *param_3 = 1;
-    uVar1 = 1;
+  int saved;                                    /* -$18(A6) */
+  short pt[2];                                  /* -$14(A6): Point v, h (-$12) */
+  short box[4];                                 /* -$10(A6): top, left (-$e), bottom, right (-$a) */
+  int handle;                                   /* -8(A6) */
+  short itemType;                               /* -4(A6) */
+  short value;                                  /* -2(A6) */
+
+  switch (param_2[0]) {                         /* JSR $2a(A5) -> ID01 0x96, table 0xa9c */
+  case 3:                                       /* keyDown */
+    if (((*(uint *)(param_2 + 1) & 0xff) == 0xd) || ((*(uint *)(param_2 + 1) & 0xff) == 3)) {
+      *param_3 = 1;
+      return 1;
+    }
+    break;
+  case 1:                                       /* mouseDown */
+    GetDItem(param_1,param_4,&itemType,&handle,box); /* $A98D */
+    saved = *(int *)(unaff_A5 + -0x160c);       /* thePort */
+    SetPort(param_1);                           /* $A873 */
+    *(int *)pt = *(int *)(param_2 + 5);         /* evt->where */
+    GlobalToLocal(pt);                          /* $A871 */
+    if (PtInRect(*(int *)pt,box) == '\0') {     /* $A8AD */
+      SetPort(saved);
+      return 0;
+    }
+    while (StillDown() != '\0') {               /* $A973; the first pass uses the click point */
+      if ((pt[1] < box[1]) || (box[3] < pt[1])) {
+        value = (pt[1] < box[1]) ? 0 : 100;
+      }
+      else {
+        value = (short)((int)(short)(pt[1] - box[1]) * 100 / (int)(short)(box[3] - box[1]));
+                                                /* MULU.L #$64, DIVS.L (quotient only) */
+      }
+      if (value != *(short *)(unaff_A5 + -0x225c)) {
+        *(short *)(unaff_A5 + -0x225c) = value;
+        draw_percent_bar_item(param_1,param_4); /* BSR 0x220 */
+      }
+      GetMouse(pt);                             /* $A972 */
+    }
+    *param_3 = param_4;
+    SetPort(saved);
+    return 1;
+  case 6:                                       /* updateEvt */
+    handle_update_event(param_2);               /* JT $492 -> ID02 0x4d6a */
+    break;
   }
-  else {
-    uVar1 = 0;
-  }
-  return uVar1;
+  return 0;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00000bda): ID04.bin 0xbda..0xc00 checked against an independent capstone disassembly.
+ * Push word 5, long 8, $c, $10 (C order dlg, evt, itemHit, 5), BSR 0xa8e, LEA $e; Pascal return popping 12 with MOVE.B D0
+ * - identical to the C. */
 /* Original: FUN_00000bda; source: ID04.c. Recovered name: scenario_selection_filter_proc [PROVEN].
  * Decoded from ID04.bin bytes at file 0xbda.
- * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes and returns a Boolean byte, which Ghidra read as an unrecoverable jump table): fuel_slider_dialog_filter(dialog, event, itemHit, 5). Reached through JT $112 (CODE 0 entry -> ID04 0xbda), passed at 0xcea by the code that runs GetNewDialog(0x81 = DLOG 129 "Scenario Selection", call at 0xc38), whose item 5 (dump item 4) is the percent bar (JT $8a installed at 0xc8e).
+ * Pascal ModalDialog filter (DialogPtr +0x10, EventRecord * +0xc, itemHit * +8; pops 0xc bytes and returns a Boolean byte, which Ghidra read as an unrecoverable jump table): fuel_slider_dialog_filter(dialog, event, itemHit, 5). Body rebuilt as C below. Reached through JT $112 (CODE 0 entry -> ID04 0xbda), passed at 0xcea by the code that runs GetNewDialog(0x81 = DLOG 129 "Scenario Selection", call at 0xc38), whose item 5 (dump item 4) is the percent bar (JT $8a installed at 0xc8e).
  *: the following bytes 0xc02..0xe46 (not exported by Ghidra)
  * are run_scenario_selection_dialog [STRONG INFERENCE name], reached
  * through JT $82 (CODE 0 entry -> ID04 0xc02); returns the chosen mission
@@ -621,26 +728,21 @@ undefined4 fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (undefined4 pa
  * destroyed", 6 Scramble! -> Henderson field bombed. Bomb radio items 6..8
  * = "0", "1", "2" (bombs = item - 6).
  */
-void scenario_selection_filter_proc /* Original: FUN_00000bda */ (undefined2 *param_1,int param_2,undefined4 param_3)
+/* Pascal ModalDialog filter: dlg $10(A6), evt $c(A6), itemHit 8(A6); pops 12 bytes, BOOLEAN result byte. */
+char scenario_selection_filter_proc /* Original: FUN_00000bda */ (int dlg,short *evt,short *itemHit)
 
 {
-  undefined4 uVar1;
-  code *UNRECOVERED_JUMPTABLE;
-  undefined1 uStack00000010;
-  
-  uVar1 = fuel_slider_dialog_filter(param_3,param_2,param_1);
-  uStack00000010 = (undefined1)uVar1;
-                    // WARNING: Could not recover jumptable at 0x00000c00. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
-  return;
+  return (char)fuel_slider_dialog_filter(dlg,evt,itemHit,5); /* BSR 0xa8e; Ghidra read the JMP (A0) return
+                                                     as a jump table and reversed the parameters */
 }
 
 
 
+/* VERIFIED (ID04::FUN_00000e48): ID04.bin 0xe48..0xe6e checked against an independent capstone disassembly.
+ * Same as 0xbda with slider word 3 - identical to the C. */
 /* Original: FUN_00000e48; source: ID04.c. Recovered name: refuel_dialog_filter_proc [PROVEN].
  * Decoded from ID04.bin bytes at file 0xe48.
- * Pascal ModalDialog filter, as scenario_selection_filter_proc but with slider item 3: fuel_slider_dialog_filter(dialog, event, itemHit, 3). Reached through JT $14a (-> ID04 0xe48), passed at 0xee8 by the code that runs GetNewDialog(0x84 = DLOG 132 "Refuel", 0xe88..0xe92); item 3 (dump item 2) is the fuel bar, radio buttons "0" "1" "2" next to "Bombs:" [PROVEN placement].
+ * Pascal ModalDialog filter, as scenario_selection_filter_proc but with slider item 3: fuel_slider_dialog_filter(dialog, event, itemHit, 3). Body rebuilt as C below. Reached through JT $14a (-> ID04 0xe48), passed at 0xee8 by the code that runs GetNewDialog(0x84 = DLOG 132 "Refuel", 0xe88..0xe92); item 3 (dump item 2) is the fuel bar, radio buttons "0" "1" "2" next to "Bombs:" [PROVEN placement].
  *: the following bytes 0xe70..0xf4c (not exported by Ghidra)
  * are run_refuel_dialog [STRONG INFERENCE name], reached through JT $9a
  * (CODE 0 entry -> ID04 0xe70) [PROVEN, bytes]:
@@ -664,120 +766,87 @@ void scenario_selection_filter_proc /* Original: FUN_00000bda */ (undefined2 *pa
  * flight, and A5-0x2240 holds the bomb radio items 4, 5, 6 [STRONG
  * INFERENCE; the list contents are A5 initial data].
  */
-void refuel_dialog_filter_proc /* Original: FUN_00000e48 */ (undefined2 *param_1,int param_2,undefined4 param_3)
+/* Pascal ModalDialog filter: dlg $10(A6), evt $c(A6), itemHit 8(A6); pops 12 bytes, BOOLEAN result byte. */
+char refuel_dialog_filter_proc /* Original: FUN_00000e48 */ (int dlg,short *evt,short *itemHit)
 
 {
-  undefined4 uVar1;
-  code *UNRECOVERED_JUMPTABLE;
-  undefined1 uStack00000010;
-  
-  uVar1 = fuel_slider_dialog_filter(param_3,param_2,param_1);
-  uStack00000010 = (undefined1)uVar1;
-                    // WARNING: Could not recover jumptable at 0x00000e6e. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
+  return (char)fuel_slider_dialog_filter(dlg,evt,itemHit,3); /* BSR 0xa8e; Ghidra read the JMP (A0) return
+                                                     as a jump table and reversed the parameters */
+}
+
+
+
+/* VERIFIED (ID04::FUN_00000f4e): ID04.bin 0xf4e..0x1104 checked against an independent capstone disassembly.
+ * word i 0..19: scores[i] = BSR 0x588(i), order[i] = i; i 0..18 (CMPI.W #$13 BLT.W), j = i + 1..19: pi / pj = order
+ * EXT.L ASL.L #6 + roster; CMP.L scores[j] with scores[i] BGT -> swap, BNE -> next; TST.B (pi) BEQ -> swap; TST.B (pi) /
+ * (pj) BEQ -> next; JT $2ea(pi, pj) TST.W BLT -> next; swap via -8 (long, then word read back from -6) - identical to
+ * the C. */
+/*
+ * Original: FUN_00000f4e; source: ID04.c:355.
+ * Recovered name: rank_pilots_by_score [STRONG INFERENCE].
+ * Args: long scores[20] (param_1), short order[20] (param_2). For i < 20: scores[i] =
+ * compute_pilot_score(i), order[i] = i; then an exchange sort (i < 19, j = i + 1..19) by
+ * descending score; equal scores: an empty name at i always yields, an empty name at j
+ * never does, otherwise IUCompString(name i, name j) (JT $2ea -> ID09 0x3d6, Pack6
+ * selector 10) < 0 keeps the order [PROVEN]. Body rebuilt as C below (Ghidra's
+ * label-and-stack version replaced). Used to build the high-score list.
+ */
+void rank_pilots_by_score /* Original: FUN_00000f4e */ (int *param_1,short *param_2)
+
+{
+  int unaff_A5;
+  char *pi;                                     /* -$c(A6) */
+  char *pj;                                     /* -$10(A6) */
+  int tmp;                                      /* -8(A6) */
+  short i;                                      /* -2(A6) */
+  short j;                                      /* -4(A6) */
+
+  for (i = 0; i < 0x14; i = i + 1) {
+    param_1[i] = compute_pilot_score(i);        /* BSR 0x588 */
+    param_2[i] = i;
+  }
+  for (i = 0; i < 0x13; i = i + 1) {
+    for (j = i + 1; j < 0x14; j = j + 1) {
+      pi = (char *)(**(int **)(unaff_A5 + -0x13a8) + (int)param_2[i] * 0x40);
+      pj = (char *)(**(int **)(unaff_A5 + -0x13a8) + (int)param_2[j] * 0x40);
+      if (param_1[j] <= param_1[i]) {
+        if (param_1[j] != param_1[i]) continue;
+        if (*pi != '\0') {                       /* tie: an empty first name always yields */
+          if ((*pi == '\0') || (*pj == '\0')) continue;
+          if (IUCompString(pi,pj) < 0) continue; /* JT $2ea -> ID09 0x3d6 (Pack6 selector 10) */
+        }
+      }
+      tmp = param_1[j];                         /* exchange */
+      param_1[j] = param_1[i];
+      param_1[i] = tmp;
+      tmp = (int)param_2[j];                    /* MOVEA.W to the long -8 ... */
+      param_2[j] = param_2[i];
+      param_2[i] = (short)tmp;                  /* ... read back as its low word -6 */
+    }
+  }
   return;
 }
 
 
 
-/*
- * Original: FUN_00000f4e; source: ID04.c:355.
- * Recovered name: rank_pilots_by_score [STRONG INFERENCE].
- * Exported C complete (control flow partly via labels). Args: long scores[20]
- * (param_1), short order[20] (param_2). For i < 20: scores[i] =
- * compute_pilot_score(i), order[i] = i; then sorts order by scores (pairwise
- * comparisons over 0x14 entries; equal scores compare the two records'
- * names via pcVar2/pcVar3 [HYPOTHESIS: tie-break]). Used to build the
- * high-score list.
- */
-void rank_pilots_by_score /* Original: FUN_00000f4e */ (int param_1,int param_2)
-
-{
-  undefined4 uVar1;
-  char *pcVar2;
-  char *pcVar3;
-  int iVar4;
-  int unaff_A5;
-  short *psVar5;
-  undefined1 *puVar6;
-  undefined1 *puVar7;
-  undefined4 uStackY_26;
-  short local_22 [2];
-  undefined4 local_1e;
-  undefined2 uVar8;
-  undefined2 uStack_16;
-  short local_8;
-  short local_6;
-  
-  puVar7 = &stack0xffffffe8;
-  for (local_6 = 0; local_6 < 0x14; local_6 = local_6 + 1) {
-    iVar4 = param_1 + local_6 * 4;
-    uVar8 = (undefined2)((uint)iVar4 >> 0x10);
-    uStack_16 = (undefined2)iVar4;
-    iVar4 = compute_pilot_score(CONCAT22(local_6,uVar8));
-    *(int *)CONCAT22(uVar8,uStack_16) = iVar4;
-    *(short *)(param_2 + local_6 * 2) = local_6;
-  }
-  local_6 = 0;
-  do {
-    local_8 = local_6;
-    if (0x12 < local_6) {
-      return;
-    }
-LAB_000010ea:
-    local_8 = local_8 + 1;
-    if (local_8 < 0x14) {
-      pcVar2 = (char *)(**(int **)(unaff_A5 + -0x13a8) + *(short *)(param_2 + local_6 * 2) * 0x40);
-      pcVar3 = (char *)(**(int **)(unaff_A5 + -0x13a8) + *(short *)(param_2 + local_8 * 2) * 0x40);
-      puVar6 = puVar7;
-      if (*(int *)(param_1 + local_8 * 4) <= *(int *)(param_1 + local_6 * 4)) break;
-      goto LAB_00001060;
-    }
-    local_6 = local_6 + 1;
-  } while( true );
-  if (*(int *)(param_1 + local_8 * 4) == *(int *)(param_1 + local_6 * 4)) {
-    if (*pcVar2 != '\0') {
-      if ((*pcVar2 == '\0') || (*pcVar3 == '\0')) goto LAB_000010ea;
-      *(undefined2 *)(puVar7 + -2) = 0;
-      *(char **)(puVar7 + -6) = pcVar2;
-      psVar5 = (short *)(puVar7 + -10);
-      *(char **)(puVar7 + -10) = pcVar3;
-      *(undefined4 *)(puVar7 + -0xe) = 0x1058;
-      (**(code **)(unaff_A5 + 0x2ea))();
-      puVar6 = puVar7 + -8;
-      puVar7 = puVar7 + -8;
-      if (*psVar5 < 0) goto LAB_000010ea;
-    }
-LAB_00001060:
-    uVar1 = *(undefined4 *)(param_1 + local_8 * 4);
-    *(undefined4 *)(param_1 + local_8 * 4) = *(undefined4 *)(param_1 + local_6 * 4);
-    *(undefined4 *)(param_1 + local_6 * 4) = uVar1;
-    uVar8 = *(undefined2 *)(param_2 + local_8 * 2);
-    *(undefined2 *)(param_2 + local_8 * 2) = *(undefined2 *)(param_2 + local_6 * 2);
-    *(undefined2 *)(param_2 + local_6 * 2) = uVar8;
-    puVar7 = puVar6;
-  }
-  goto LAB_000010ea;
-}
-
-
-
+/* VERIFIED (ID04::FUN_00001106): ID04.bin 0x1106..0x1168 checked against an independent capstone disassembly.
+ * -6 = (EXT.L i ASL.L #6) + *(A5-0x13a8); CLR.W +$22, +$20, +$24, +$26; word k 0..11 CLR.W +$28 + 2k; CLR.B (record) - identical
+ * to the C. */
 /*
  * Original: FUN_00001106; source: ID04.c:427.
  * Recovered name: reset_pilot_record [STRONG INFERENCE].
- * Exported C complete. Arg: word i. record = *(HEL1 128) + i * 0x40:
- * clears words +0x20, +0x22 (rank), +0x24, +0x26 and the 12 tallies at +0x28.
- * The name at +0x00 is not cleared here.
+ * Arg: word i (sign-extended; parameter now short). record = *(HEL1 128) + i * 0x40:
+ * clears words +0x22 (rank), +0x20, +0x24, +0x26 and the 12 tallies at +0x28, then the
+ * name's length byte at +0x00 (corrected: the name is emptied).
  */
-void reset_pilot_record /* Original: FUN_00001106 */ (undefined4 param_1)
+void reset_pilot_record /* Original: FUN_00001106 */ (short param_1)
 
 {
-  undefined1 *puVar1;
+  undefined1 *puVar1;                           /* -6(A6) */
   int unaff_A5;
-  short local_6;
+  short local_6;                                /* -2(A6) */
   
-  puVar1 = (undefined1 *)(**(int **)(unaff_A5 + -0x13a8) + param_1._0_2_ * 0x40);
+  puVar1 = (undefined1 *)(**(int **)(unaff_A5 + -0x13a8) + (int)param_1 * 0x40); /* EXT.L, ASL.L #6 */
   *(undefined2 *)(puVar1 + 0x22) = 0;
   *(undefined2 *)(puVar1 + 0x20) = 0;
   *(undefined2 *)(puVar1 + 0x24) = 0;
@@ -785,105 +854,164 @@ void reset_pilot_record /* Original: FUN_00001106 */ (undefined4 param_1)
   for (local_6 = 0; local_6 < 0xc; local_6 = local_6 + 1) {
     *(undefined2 *)(puVar1 + local_6 * 2 + 0x28) = 0;
   }
-  *puVar1 = 0;
+  *puVar1 = 0;                                  /* empties the Pascal name (length byte) */
   return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_0000116a): ID04.bin 0x116a..0x11fe checked against an independent capstone disassembly.
+ * JT $272 HLock(A5-0x13a8); count / changed / i = 0; word i < 20: rec = order[i] EXT.L ASL.L #6 + roster, TST.W +$20
+ * BEQ; D0 = count, ADDQ count, CMPI.W #$a D0 BLT; else BSR 0x1106(order[i]), changed = 1; JT $27a HUnlock; TST.W changed
+ * -> ChangedResource $A9AA, WriteResource $A9B0 - identical to the C. */
 /* Original: FUN_0000116a; source: ID04.c. Recovered name: prune_inactive_pilots_beyond_ten [STRONG INFERENCE].
  * Decoded from ID04.bin bytes at file 0x116a.
- * Arg +8: short order[20] (pilot indices sorted by rank_pilots_by_score). HLock(roster A5-0x13a8) (JT $272); walks order[0..19]; for each record whose status +0x20 != 0 (not Active), counts it, and every such record after the first ten is cleared with reset_pilot_record; HUnlock (JT $27a); if anything was cleared, ChangedResource ($A9AA) and WriteResource ($A9B0) on the roster [PROVEN, bytes 0x116a..0x11fe]. So the roster keeps at most ten retired / dead / POW / discharged / MIA pilots, the best scores first. Caller: ID04 0x678, right after rank_pilots_by_score at 0x66e. Ghidra stopped before the resource calls.
+ * Arg +8: short order[20] (pilot indices sorted by rank_pilots_by_score). HLock(roster A5-0x13a8) (JT $272); walks order[0..19]; for each record whose status +0x20 != 0 (not Active), counts it, and every such record after the first ten is cleared with reset_pilot_record; HUnlock (JT $27a); if anything was cleared, ChangedResource ($A9AA) and WriteResource ($A9B0) on the roster [PROVEN, bytes 0x116a..0x11fe]. So the roster keeps at most ten retired / dead / POW / discharged / MIA pilots, the best scores first. Caller: ID04 0x678, right after rank_pilots_by_score at 0x66e. Ghidra stopped before the resource calls; body rebuilt as C below.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void prune_inactive_pilots_beyond_ten /* Original: FUN_0000116a */ (int param_1)
+void prune_inactive_pilots_beyond_ten /* Original: FUN_0000116a */ (short *param_1)
 
 {
-  bool bVar1;
-  short sVar2;
-  bool bVar3;
   int unaff_A5;
-  undefined2 uVar4;
-  undefined2 local_8;
-  undefined2 local_6;
-  
-  uVar4 = (undefined2)((uint)*(undefined4 *)(unaff_A5 + -0x13a8) >> 0x10);
-  (**(code **)(unaff_A5 + 0x272))((short)*(undefined4 *)(unaff_A5 + -0x13a8));
-  local_8 = 0;
-  bVar3 = false;
-  for (local_6 = 0; local_6 < 0x14; local_6 = local_6 + 1) {
-    if ((*(short *)(**(int **)(unaff_A5 + -0x13a8) + *(short *)(param_1 + local_6 * 2) * 0x40 + 0x20
-                   ) != 0) && (sVar2 = local_8 + 1, bVar1 = 9 < local_8, local_8 = sVar2, bVar1)) {
-      reset_pilot_record(CONCAT22(*(undefined2 *)(param_1 + local_6 * 2),uVar4));
-      bVar3 = true;
+  int rec;                                      /* -$a(A6) */
+  short changed;                                /* -6(A6) */
+  short count;                                  /* -4(A6) */
+  short i;                                      /* -2(A6) */
+
+  HLock(*(int *)(unaff_A5 + -0x13a8));          /* JT $272 */
+  count = 0;
+  changed = 0;
+  for (i = 0; i < 0x14; i = i + 1) {
+    rec = **(int **)(unaff_A5 + -0x13a8) + (int)param_1[i] * 0x40;
+    if (*(short *)(rec + 0x20) != 0) {          /* not Active */
+      count = count + 1;
+      if (9 < (short)(count - 1)) {             /* old count >= 10: the 11th and later */
+        reset_pilot_record(param_1[i]);         /* BSR 0x1106 */
+        changed = 1;
+      }
     }
   }
-  (**(code **)(unaff_A5 + 0x27a))((short)*(undefined4 *)(unaff_A5 + -0x13a8));
-  if (bVar3) {
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+  HUnlock(*(int *)(unaff_A5 + -0x13a8));        /* JT $27a */
+  if (changed != 0) {
+    ChangedResource(*(int *)(unaff_A5 + -0x13a8)); /* $A9AA */
+    WriteResource(*(int *)(unaff_A5 + -0x13a8)); /* $A9B0 */
   }
   return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00001200): ID04.bin 0x1200..0x1378 checked against an independent capstone disassembly.
+ * LINK -$10c; rank_pilots_by_score(-$6c, -$94); GetDItem/EraseRect; k 0..3: GetDItem(item k+4) -> colX[k] = left; JT $272;
+ * GetFontInfo; i 0..19: rec = order[i]*64 + *roster; skip when name byte and scores[i] are both 0; y = row*20 + ascent + top;
+ * four MoveTo/DrawString; row == 10 exits; JT $27a; Pascal return popping 6 - identical to the C. */
 /* Original: FUN_00001200; source: ID04.c. Recovered name: draw_high_scores_table [PROVEN].
  * Decoded from ID04.bin bytes at file 0x1200.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). rank_pilots_by_score(scores, order); GetDItem -> box, EraseRect; column x = left edge of items 4..7 (DITL 134 labels "Rank", "Name", "Status", "Score"); HLock(roster) (JT $272); GetFontInfo; for pilots in score order whose name is set or whose score is non-zero, at most ten rows 20 pixels apart (baseline box.top + ascent + 20 * row): DrawString of the rank name (A5-0xffe[record +0x22]), the pilot name (record +0), the status name (A5-0xfae[record +0x20]) and the decimal score (JT $4a2); HUnlock (JT $27a) [PROVEN, bytes 0x1200..0x1378]. Reached through JT $e2 (CODE 0 entry -> ID04 0x1200); installed for item 10 of DLOG 134 "High Scores". Ghidra stopped after the first call.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes). rank_pilots_by_score(scores, order); GetDItem -> box, EraseRect; column x = left edge of items 4..7 (DITL 134 labels "Rank", "Name", "Status", "Score"); HLock(roster) (JT $272); GetFontInfo; for pilots in score order whose name is set or whose score is non-zero, at most ten rows 20 pixels apart (baseline box.top + ascent + 20 * row): DrawString of the rank name (A5-0xffe[record +0x22]), the pilot name (record +0), the status name (A5-0xfae[record +0x20]) and the decimal score (JT $4a2); HUnlock (JT $27a) [PROVEN, bytes 0x1200..0x1378]. Reached through JT $e2 (CODE 0 entry -> ID04 0x1200); installed for item 10 of DLOG 134 "High Scores". Ghidra stopped after the first call. Body rebuilt as C below.
  * The following bytes 0x137a..0x149e (not exported by Ghidra) are run_high_scores_dialog [STRONG INFERENCE name], JT $102 (-> ID04 0x137a) [PROVEN, bytes]: GetNewDialog(0x86 = DLOG 134); JT $472; 0x1b8(dialog, 2, 1) default ring; grey user item 8 (JT $142); item 10 = this table (JT $e2); ShowWindow; loop ModalDialog(NULL): item 3 "Erase Nonactive..." -> if confirm_erase_high_scores == 2: reset_pilot_record for every record whose status +0x20 != 0 (roster locked meanwhile); if any was cleared, ChangedResource + WriteResource and InvalRect(item 10) so the table redraws; until item 1 (OK); DisposDialog.
  */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_high_scores_table /* Original: FUN_00001200 */ (void)
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void draw_high_scores_table /* Original: FUN_00001200 */ (int dlg,short item)
 
 {
-  undefined1 auStack_98 [40];
-  undefined1 auStack_70 [108];
-  
-  rank_pilots_by_score((int)auStack_70,(int)auStack_98);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short fi[4];                                  /* -$10c(A6): FontInfo, ascent first */
+  unsigned char num[100];                       /* -$104(A6): Pascal string */
+  int rec;                                      /* -$a0(A6) */
+  short colX[4];                                /* -$9c(A6): Rank, Name, Status, Score */
+  short order[20];                              /* -$94(A6) */
+  int scores[20];                               /* -$6c(A6) */
+  short col[4];                                 /* -$1c(A6): label item rect */
+  short box[4];                                 /* -$14(A6): top, left, bottom, right */
+  int itemHandle;                               /* -$c(A6) */
+  short itemType;                               /* -8(A6) */
+  short y;                                      /* -6(A6) */
+  short row;                                    /* -4(A6) */
+  short i;                                      /* -2(A6) */
+
+  rank_pilots_by_score(scores,order);           /* BSR 0xf4e */
+  GetDItem(dlg,item,&itemType,&itemHandle,box); /* $A98D */
+  EraseRect(box);                               /* $A8A3 */
+  for (i = 0; i < 4; i = i + 1) {
+    GetDItem(dlg,i + 4,&itemType,&itemHandle,col);
+    colX[i] = col[1];                           /* left edge of label items 4..7 */
+  }
+  row = 0;
+  HLock(*(int *)(unaff_A5 + -0x13a8));          /* JT $272: glue ID09 0x270 pops its own argument */
+  GetFontInfo(fi);                              /* $A88B */
+  for (i = 0; i < 0x14; i = i + 1) {
+    rec = (int)order[i] * 0x40 + **(int **)(unaff_A5 + -0x13a8);  /* EXT.L, ASL.L #6, ADD.L (A0) */
+    if ((*(char *)rec != '\0') || (scores[i] != 0)) {
+      y = row * 0x14 + fi[0] + box[0];          /* MULS.W #20 + ascent + box.top */
+      MoveTo(colX[0],y);                        /* $A893 */
+      DrawString(*(unsigned char **)(unaff_A5 + -0xffe + (int)*(short *)(rec + 0x22) * 4)); /* $A884: rank name */
+      MoveTo(colX[1],y);
+      DrawString((unsigned char *)rec);         /* pilot name, record +0 */
+      MoveTo(colX[2],y);
+      DrawString(*(unsigned char **)(unaff_A5 + -0xfae + (int)*(short *)(rec + 0x20) * 4)); /* status name */
+      format_int_decimal_pstring(scores[i],num); /* JT $4a2 */
+      MoveTo(colX[3],y);
+      DrawString(num);
+      row = row + 1;
+      if (row == 10) break;
+    }
+  }
+  HUnlock(*(int *)(unaff_A5 + -0x13a8));        /* JT $27a */
+  return;                                       /* Pascal JMP (A0) return */
 }
 
 
 
+/* VERIFIED (ID04::FUN_000014a0): ID04.bin 0x14a0..0x14f0 checked against an independent capstone disassembly.
+ * GetDItem(8, $c, -2, -$a, -$12); EraseRect(*A5-0x223a + 8) $A8A3; TEUpdate(-$12, A5-0x223a) $A9D3; InsetRect(-2, -2);
+ * PenSize(1, 1); FrameRect - identical to the C. */
 /* Original: FUN_000014a0; source: ID04.c. Recovered name: draw_scrolling_text_item [PROVEN].
- * Decoded from ID04.bin bytes at file 0x14a0.
+ * Decoded from ID04.bin bytes at file 0x14a0. Body rebuilt as C below.
  * Args (C): +8 DialogPtr, +0xc short item. GetDItem ($A98D) -> box; EraseRect(&(*A5-0x223a)->viewRect) ($A8A3, TERec +8); TEUpdate(&box, A5-0x223a) ($A9D3); InsetRect(&box, -2, -2), PenSize(1, 1), FrameRect(&box) ($A8A1). Redraws the scrolling text field and its 1-pixel frame. Caller: draw proc 0x14f2.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void draw_scrolling_text_item /* Original: FUN_000014a0 */ (void)
+void draw_scrolling_text_item /* Original: FUN_000014a0 */ (int param_1,short param_2)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
+  int unaff_A5;
+  short box[4];                                 /* -$12(A6) */
+  int handle;                                   /* -$a(A6) */
+  short itemType;                               /* -2(A6) */
 
-
-
-/* Original: FUN_000014f2; source: ID04.c. Recovered name: scrolling_text_user_item_proc [PROVEN].
- * Decoded from ID04.bin bytes at file 0x14f2.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; RTS after popping 6 bytes, which Ghidra read as an unrecoverable jump table). Calls draw_scrolling_text_item(dialog, item). Reached through JT $92 (CODE 0 entry -> ID04 0x14f2), installed by create_scrolling_text_item.
- */
-void scrolling_text_user_item_proc /* Original: FUN_000014f2 */ (void)
-
-{
-  code *UNRECOVERED_JUMPTABLE;
-  
-  draw_scrolling_text_item();
-                    // WARNING: Could not recover jumptable at 0x0000150c. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  EraseRect((void *)(**(int **)(unaff_A5 + -0x223a) + 8)); /* $A8A3: (*hTE)->viewRect */
+  TEUpdate(box,*(int *)(unaff_A5 + -0x223a));   /* $A9D3 */
+  InsetRect(box,-2,-2);                         /* $A8A9 */
+  PenSize(1,1);                                 /* $A89B */
+  FrameRect(box);                               /* $A8A1 */
   return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_000014f2): ID04.bin 0x14f2..0x150c checked against an independent capstone disassembly.
+ * Push word 8, long $a, BSR 0x14a0, ADDQ #6; Pascal return popping 6 - identical to the C. */
+/* Original: FUN_000014f2; source: ID04.c. Recovered name: scrolling_text_user_item_proc [PROVEN].
+ * Decoded from ID04.bin bytes at file 0x14f2.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; RTS after popping 6 bytes, which Ghidra read as an unrecoverable jump table). Calls draw_scrolling_text_item(dialog, item) (body rebuilt as C below). Reached through JT $92 (CODE 0 entry -> ID04 0x14f2), installed by create_scrolling_text_item.
+ */
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void scrolling_text_user_item_proc /* Original: FUN_000014f2 */ (int dlg,short item)
+
+{
+  draw_scrolling_text_item(dlg,item);           /* BSR 0x14a0; Ghidra read the JMP (A0) return as a jump table */
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_0000150e): ID04.bin 0x150e..0x1560 checked against an independent capstone disassembly.
+ * -2 = (*hTE)+8 - (*hTE)+0; GetCtlValue(A5-0x2236) MULS.W (*hTE)+$18 to -4; -6 = -2 - -4; TST.W / BEQ else TEScroll(0, -6,
+ * hTE) $A9DD - identical to the C. */
 /* Original: FUN_0000150e; source: ID04.c. Recovered name: sync_text_scroll_to_control [PROVEN].
- * Decoded from ID04.bin bytes at file 0x150e.
+ * Decoded from ID04.bin bytes at file 0x150e. Body rebuilt as C below.
  * TERec of A5-0x223a: delta = viewRect.top (+8) - destRect.top (+0) - GetCtlValue(A5-0x2236) ($A960) * lineHeight (+0x18); if delta != 0, TEScroll(0, delta, hTE) ($A9DD). Scrolls the text so that its first visible line equals the scroll-bar value. Callers: 0x159e, 0x162c, 0x1744, 0x17ba.
  */
 // WARNING: Control flow encountered bad instruction data
@@ -891,14 +1019,27 @@ void scrolling_text_user_item_proc /* Original: FUN_000014f2 */ (void)
 void sync_text_scroll_to_control /* Original: FUN_0000150e */ (void)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short top;                                    /* -2(A6) */
+  short pix;                                    /* -4(A6) */
+  short delta;                                  /* -6(A6) */
+
+  top = *(short *)(**(int **)(unaff_A5 + -0x223a) + 8) - *(short *)**(int **)(unaff_A5 + -0x223a);  /* viewRect.top - destRect.top */
+  pix = GetCtlValue(*(int *)(unaff_A5 + -0x2236)) * *(short *)(**(int **)(unaff_A5 + -0x223a) + 0x18); /* $A960; MULS.W lineHeight */
+  delta = top - pix;
+  if (delta != 0) {
+    TEScroll(0,delta,*(int *)(unaff_A5 + -0x223a)); /* $A9DD */
+  }
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00001562): ID04.bin 0x1562..0x158a checked against an independent capstone disassembly.
+ * No LINK, D7 saved; D7 = (*hTE)+$5e - A5-0x2232; TST.W BLE -> 0 else MOVEA.W D7; SetCtlMax(A5-0x2236, D0) $A965 -
+ * identical to the C. */
 /* Original: FUN_00001562; source: ID04.c. Recovered name: update_scroll_bar_maximum [PROVEN].
- * Decoded from ID04.bin bytes at file 0x1562.
+ * Decoded from ID04.bin bytes at file 0x1562. Body rebuilt as C below.
  * No frame (saves D7 only). max = nLines (TERec +0x5e) - visible lines (A5-0x2232), clamped to >= 0; SetCtlMax(A5-0x2236, max) ($A965). Caller: 0x159a.
  */
 // WARNING: Control flow encountered bad instruction data
@@ -906,32 +1047,59 @@ void sync_text_scroll_to_control /* Original: FUN_0000150e */ (void)
 void update_scroll_bar_maximum /* Original: FUN_00001562 */ (void)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  short max;                                    /* D7 */
+
+  max = *(short *)(**(int **)(unaff_A5 + -0x223a) + 0x5e) - *(short *)(unaff_A5 + -0x2232); /* nLines - visible lines */
+  SetCtlMax(*(int *)(unaff_A5 + -0x2236),(0 < max) ? max : 0); /* $A965 */
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_0000158c): ID04.bin 0x158c..0x1636 checked against an independent capstone disassembly.
+ * MOVEM D5-D7; -4 = A5-0x223a; BSR 0x1562, 0x150e; D7 = GetCtlValue, D6 = D7 + A5-0x2232; selStart (+$20) CMP.W
+ * lineStarts[D7] (+$60) BLT -> recentre, CMP.W lineStarts[D6] BLT -> done; recentre: D5 from 0 while selStart >=
+ * lineStarts[D5] (BGE ADDQ); SetCtlValue(ctl, D5 - (A5-0x2232 DIVS #2)) $A963; BSR 0x150e - identical to the C. */
 /* Original: FUN_0000158c; source: ID04.c. Recovered name: scroll_text_to_show_selection [STRONG INFERENCE].
  * Decoded from ID04.bin bytes at file 0x158c.
- * Calls update_scroll_bar_maximum and sync_text_scroll_to_control. Then, with v = GetCtlValue ($A960) and the TERec lineStarts array (+0x60): if selStart (+0x20) is before lineStarts[v] or at/after lineStarts[v + visible lines (A5-0x2232)], it finds the line d5 containing selStart, SetCtlValue(ctl, d5 - visible/2) ($A963) and syncs again (centres the insertion line). Callers: append_line_to_scrolling_text 0x18d8 and others. Ghidra stopped after the first two calls.
+ * Calls update_scroll_bar_maximum and sync_text_scroll_to_control. Then, with v = GetCtlValue ($A960) and the TERec lineStarts array (+0x60): if selStart (+0x20) is before lineStarts[v] or at/after lineStarts[v + visible lines (A5-0x2232)], it finds d5 = the first line whose start is past selStart (the containing line + 1; corrected), SetCtlValue(ctl, d5 - visible/2) ($A963) and syncs again (roughly centres the insertion line). Callers: append_line_to_scrolling_text 0x18d8 and others. Ghidra stopped after the first two calls; body rebuilt as C below.
  */
 // WARNING: Control flow encountered bad instruction data
 
 void scroll_text_to_show_selection /* Original: FUN_0000158c */ (void)
 
 {
-  update_scroll_bar_maximum();
-  sync_text_scroll_to_control();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  int *hTE;                                     /* -4(A6) */
+  short first;                                  /* D7 */
+  short last;                                   /* D6 */
+  short line;                                   /* D5 */
+
+  hTE = *(int **)(unaff_A5 + -0x223a);
+  update_scroll_bar_maximum();                  /* BSR 0x1562 */
+  sync_text_scroll_to_control();                /* BSR 0x150e */
+  first = GetCtlValue(*(int *)(unaff_A5 + -0x2236)); /* $A960 */
+  last = first + *(short *)(unaff_A5 + -0x2232);
+  if ((*(short *)(*hTE + 0x20) < *(short *)(*hTE + (int)first * 2 + 0x60)) ||
+     (*(short *)(*hTE + (int)last * 2 + 0x60) <= *(short *)(*hTE + 0x20))) {
+                                                /* selStart outside lineStarts[first .. last) */
+    for (line = 0; *(short *)(*hTE + (int)line * 2 + 0x60) <= *(short *)(*hTE + 0x20); line = line + 1) {
+    }                                           /* line = the first line starting after selStart */
+    SetCtlValue(*(int *)(unaff_A5 + -0x2236),line - (short)((int)*(short *)(unaff_A5 + -0x2232) / 2)); /* $A963 */
+    sync_text_scroll_to_control();
+  }
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00001638): ID04.bin 0x1638..0x16c2 checked against an independent capstone disassembly.
+ * viewRect = *box (two MOVE.L to (*hTE)+8); ADDI.W #-$10 +$e; A5-0x2232 = EXT.L(bottom - top) DIVS.W lineHeight +$18;
+ * bottom = top + lineHeight MULS.W A5-0x2232; destRect.right +6 = +$e; TECalText(hTE) $A9D0 - identical to the C. */
 /* Original: FUN_00001638; source: ID04.c. Recovered name: fit_text_view_to_box [PROVEN].
  * Decoded from ID04.bin bytes at file 0x1638.
- * Arg +8: Rect *box. On TERec A5-0x223a: viewRect (+8) = *box; viewRect.right (+0xe) -= 16 (scroll-bar width); visible lines A5-0x2232 = viewRect height / lineHeight (+0x18); viewRect.bottom = viewRect.top + lineHeight * visible lines (whole lines only); destRect.right (+6) = viewRect.right; TECalText(hTE) ($A9D0). Caller: create_scrolling_text_item 0x1878. Ghidra stopped before TECalText.
+ * Arg +8: Rect *box. On TERec A5-0x223a: viewRect (+8) = *box; viewRect.right (+0xe) -= 16 (scroll-bar width); visible lines A5-0x2232 = viewRect height / lineHeight (+0x18); viewRect.bottom = viewRect.top + lineHeight * visible lines (whole lines only); destRect.right (+6) = viewRect.right; TECalText(hTE) ($A9D0). Caller: create_scrolling_text_item 0x1878. Ghidra stopped before TECalText (completed below).
  */
 // WARNING: Control flow encountered bad instruction data
 
@@ -952,63 +1120,101 @@ void fit_text_view_to_box /* Original: FUN_00001638 */ (undefined4 *param_1)
   *(short *)(*piVar2 + 0xc) =
        *(short *)(*piVar2 + 8) + *(short *)(*piVar2 + 0x18) * *(short *)(unaff_A5 + -0x2232);
   *(undefined2 *)(*piVar2 + 6) = *(undefined2 *)(*piVar2 + 0xe);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
-/* Original: FUN_000016c4; source: ID04.c. Recovered name: scroll_bar_action_proc [PROVEN].
- * Decoded from ID04.bin bytes at file 0x16c4.
- * Pascal control action procedure (ControlHandle at +0xa, part code at +8; pops 6 bytes). Reached through JT $16a (CODE 0 entry -> ID04 0x16c4), passed to TrackControl by the click handler at 0x1752. If part != 0: page = visible lines - 1, then a switch through the ID01 helper (JSR $3a(A5)); its inline table at file 0x16fe is lo 20, hi 23, default +0x2c, cases 20 inUpButton -> -1, 21 inDownButton -> +1, 22 inPageUp -> -page, 23 inPageDown -> +page. Ghidra decoded that table as the three "*unaff_A4 |=..." lines below (artifact, not real stores). Then SetCtlValue(ctl, GetCtlValue(ctl) + delta) and sync_text_scroll_to_control. The default path (part outside 20..23) adds the uninitialised local delta (original behaviour, bytes 0x1702/0x172e).
- * The code that follows in this Ghidra range (file 0x1752..0x17e4, not exported as a function) is the click handler: C args +8 DialogPtr, +0xc EventRecord *; GetPort/SetPort, GlobalToLocal(where) ($A871), FindControl ($A96C); returns 0 when no control or another control is hit; on the scroll bar A5-0x2236: inThumb (129) -> TrackControl(ctl, where, NULL) ($A968) then sync, else TrackControl(ctl, where, JT $16a); returns 1 when handled; restores the port [PROVEN, bytes].
- */
-// WARNING: Control flow encountered bad instruction data
-
-void scroll_bar_action_proc /* Original: FUN_000016c4 */ (undefined4 param_1)
-
-{
-  byte *unaff_A4;
-  int unaff_A5;
-  code *UNRECOVERED_JUMPTABLE;
-  
-  if (param_1._0_2_ != 0) {
-    (**(code **)(unaff_A5 + 0x3a))
-              ((short)(*(short *)(**(int **)(unaff_A5 + -0x223a) + 0xc) -
-                      *(short *)(**(int **)(unaff_A5 + -0x223a) + 8)) /
-               *(short *)(**(int **)(unaff_A5 + -0x223a) + 0x18) + -1);
-    *unaff_A4 = *unaff_A4 | 0x17;
-    unaff_A4[0xe] = unaff_A4[0xe] | 8;
-    *unaff_A4 = *unaff_A4 | 0x1e;
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
-  }
-                    // WARNING: Could not recover jumptable at 0x00001750. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
+  TECalText((int)piVar2);                        /* $A9D0 */
   return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_000016c4): ID04.bin 0x16c4..0x1750 checked against an independent capstone disassembly.
+ * TST.W part / BEQ.W out; -2 = EXT.L(bottom - top of (*hTE)+8) DIVS.W lineHeight +$18, SUBQ #1; JSR $3a(A5) table 0x16fe
+ * (20 -> 0x170c -1, 21 -> 0x1714 +1, 22 -> 0x171c NEG -2, 23 -> 0x1728 -2, default 0x172e); SetCtlValue(ctl, GetCtlValue(ctl)
+ * + -4); BSR 0x150e; Pascal return popping 6 - identical to the C. The click handler after it (0x1752..0x17e4) has no
+ * inventory entry. */
+/* Original: FUN_000016c4; source: ID04.c. Recovered name: scroll_bar_action_proc [PROVEN].
+ * Decoded from ID04.bin bytes at file 0x16c4.
+ * Pascal control action procedure (ControlHandle at +0xa, part code at +8; pops 6 bytes). Reached through JT $16a (CODE 0 entry -> ID04 0x16c4), passed to TrackControl by the click handler at 0x1752. If part != 0: page = visible lines - 1, then a switch through the ID01 helper (JSR $3a(A5)); its inline table at file 0x16fe is lo 20, hi 23, default +0x2c, cases 20 inUpButton -> -1, 21 inDownButton -> +1, 22 inPageUp -> -page, 23 inPageDown -> +page. Ghidra had decoded that table as stores through unaff_A4 (artifacts, not real stores); body rebuilt as C below. Then SetCtlValue(ctl, GetCtlValue(ctl) + delta) and sync_text_scroll_to_control. The default path (part outside 20..23) adds the uninitialised local delta (original behaviour, bytes 0x1702/0x172e).
+ * The code that follows in this Ghidra range (file 0x1752..0x17e4, not exported as a function) is the click handler: C args +8 DialogPtr, +0xc EventRecord *; GetPort/SetPort, GlobalToLocal(where) ($A871), FindControl ($A96C); returns 0 when no control or another control is hit; on the scroll bar A5-0x2236: inThumb (129) -> TrackControl(ctl, where, NULL) ($A968) then sync, else TrackControl(ctl, where, JT $16a); returns 1 when handled; restores the port [PROVEN, bytes].
+ */
+// WARNING: Control flow encountered bad instruction data
+
+/* Pascal control action procedure: ctl at $a(A6), part at 8(A6); pops 6 bytes (JMP (A0) return). */
+void scroll_bar_action_proc /* Original: FUN_000016c4 */ (int ctl,short part)
+
+{
+  int unaff_A5;
+  short page;                                   /* -2(A6) */
+  short delta;                                  /* -4(A6): uninitialised on the default path */
+
+  if (part != 0) {
+    page = (short)((int)(short)(*(short *)(**(int **)(unaff_A5 + -0x223a) + 0xc) -
+                                *(short *)(**(int **)(unaff_A5 + -0x223a) + 8)) /
+                   (int)*(short *)(**(int **)(unaff_A5 + -0x223a) + 0x18)) + -1; /* visible lines - 1 */
+    switch (part) {                             /* JSR $3a(A5) -> ID01 0xbe, table 0x16fe lo 20 hi 23 */
+    case 0x14:                                  /* inUpButton */
+      delta = -1;
+      break;
+    case 0x15:                                  /* inDownButton */
+      delta = 1;
+      break;
+    case 0x16:                                  /* inPageUp */
+      delta = -page;
+      break;
+    case 0x17:                                  /* inPageDown */
+      delta = page;
+      break;
+    }
+    SetCtlValue(ctl,GetCtlValue(ctl) + delta);  /* $A960 / $A963 */
+    sync_text_scroll_to_control();              /* BSR 0x150e */
+  }
+  return;
+}
+
+
+
+/* VERIFIED (ID04::FUN_000017e6): ID04.bin 0x17e6..0x189a checked against an independent capstone disassembly.
+ * GetDItem(8, $c, -2, -$a, -$12); copy to -$1a, left -$18 = right - 16; InsetRect(-$1a, 0, -2); OffsetRect(-$1a, 2, 0) $A8A8;
+ * GetPort(-$1e); SetPort(8); TENew(-$12, -$12) $A9D2 to A5-0x223a; NewControl(8, -$1a, A5-0x213c, byte 1, 0, 0, 0, $10, 0)
+ * $A954 to A5-0x2236; BSR 0x1638(-$12); BSR 0xec(8, $c, $92(A5)); SetPort(-$1e) - identical to the C. */
 /* Original: FUN_000017e6; source: ID04.c. Recovered name: create_scrolling_text_item [STRONG INFERENCE].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
  * bytes at file 0x17e6.
  * Args (C): +8 DialogPtr, +0xc short item. GetDItem ($A98D) -> box; scroll-bar rect = box with left = box.right - 16, InsetRect(0, -2) ($A8A9), OffsetRect(2, 0) ($A8A8). GetPort/SetPort(dialog). TENew(&box, &box) ($A9D2) -> TEHandle A5-0x223a [PROVEN]. NewControl(dialog, &barRect, title A5-0x213c, visible 1, value/min/max 0, procID 16 = scrollBarProc, refCon 0) ($A954) -> ControlHandle A5-0x2236 [PROVEN]. JSR 0x1638 (FUN_00001638, adjusts the TE rects to the box, -16 right). Installs JT $92 (-> ID04 0x14f2) as the item user-item procedure via set_dialog_user_item_proc, then restores the port. Caller: show_mission_summary_dialog 0x2ebc. [STRONG INFERENCE] the scrolling text field of DLOG 133 (mission awards / narrative, cf. its "Skip Text" button).
  */
 // WARNING: Control flow encountered bad instruction data
 
-void create_scrolling_text_item /* Original: FUN_000017e6 */ (void)
+void create_scrolling_text_item /* Original: FUN_000017e6 */ (int param_1,short param_2)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+  int saved;                                    /* -$1e(A6) */
+  short bar[4];                                 /* -$1a(A6): top, left (-$18), bottom, right */
+  short box[4];                                 /* -$12(A6): right at -$c */
+  int handle;                                   /* -$a(A6) */
+  short itemType;                               /* -2(A6) */
+
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  *(Rect *)bar = *(Rect *)box;
+  bar[1] = box[3] + -0x10;                      /* 16-pixel bar on the right edge */
+  InsetRect(bar,0,-2);                          /* $A8A9 */
+  OffsetRect(bar,2,0);                          /* $A8A8 */
+  GetPort(&saved);                              /* $A874 */
+  SetPort(param_1);                             /* $A873 */
+  *(int *)(unaff_A5 + -0x223a) = TENew(box,box); /* $A9D2: destRect, viewRect */
+  *(int *)(unaff_A5 + -0x2236) =
+       NewControl(param_1,bar,(void *)(unaff_A5 + -0x213c),1,0,0,0,0x10,0); /* $A954, scrollBarProc */
+  fit_text_view_to_box((undefined4 *)box);      /* BSR 0x1638 */
+  set_dialog_user_item_proc(param_1,param_2,(void *)(unaff_A5 + 0x92)); /* BSR 0xec; JT $92 -> 0x14f2 */
+  SetPort(saved);
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_0000189c): ID04.bin 0x189c..0x18ae checked against an independent capstone disassembly.
+ * TEDispose(A5-0x223a) $A9CD; DisposeControl(A5-0x2236) $A955 - identical to the C. */
 /* Original: FUN_0000189c; source: ID04.c. Recovered name: dispose_scrolling_text_item [PROVEN].
- * Ghidra could not decode this body (halt_baddata); decoded from ID04.bin
+ * Ghidra could not decode this body (rebuilt as C below); decoded from ID04.bin
  * bytes at file 0x189c.
  * TEDispose(A5-0x223a) ($A9CD) then DisposeControl(A5-0x2236) ($A955): releases what create_scrolling_text_item allocated. No direct JSR found in ID04 bytes [UNKNOWN caller path].
  */
@@ -1017,31 +1223,41 @@ void create_scrolling_text_item /* Original: FUN_000017e6 */ (void)
 void dispose_scrolling_text_item /* Original: FUN_0000189c */ (void)
 
 {
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  int unaff_A5;
+
+  TEDispose(*(int *)(unaff_A5 + -0x223a));      /* $A9CD */
+  DisposeControl(*(int *)(unaff_A5 + -0x2236)); /* $A955 */
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_000018b0): ID04.bin 0x18b0..0x18de checked against an independent capstone disassembly.
+ * JT $522($e) (ID02 0x3e8 strlen) to D0; TEInsert($e, D0, hTE) $A9DE; TEInsert(A5-0x213a, 1, hTE); BSR 0x158c - identical
+ * to the C. */
 /* Original: FUN_000018b0; source: ID04.c. Recovered name: append_line_to_scrolling_text [STRONG INFERENCE].
- * Ghidra truncated this body after the first call (halt_baddata); decoded from ID04.bin
+ * Ghidra truncated this body after the first call (rebuilt as C below); decoded from ID04.bin
  * bytes at file 0x18b0.
  * Arg +0xe: C string. JSR $522(A5) = ID02 0x3e8 (strlen: counts bytes to NUL) [PROVEN]; TEInsert(text, len, A5-0x223a) ($A9DE); TEInsert(A5-0x213a, 1, A5-0x223a) inserts one separator byte (probably CR) [HYPOTHESIS for CR]; then JSR 0x158c (FUN_0000158c, scroll-bar value / scroll update via GetCtlValue $A960, SetCtlValue $A963). Args +8..+0xd are not used. No direct JSR found in ID04 bytes [UNKNOWN caller path].
  */
 // WARNING: Control flow encountered bad instruction data
 
-void append_line_to_scrolling_text /* Original: FUN_000018b0 */ (void)
+void append_line_to_scrolling_text /* Original: FUN_000018b0 */ (int unused_8,short unused_c,char *param_3)
 
 {
   int unaff_A5;
-  
-  (**(code **)(unaff_A5 + 0x522))();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+
+  TEInsert(param_3,FUN_000003e8(param_3),*(int *)(unaff_A5 + -0x223a)); /* JT $522 -> ID02 0x3e8 strlen; $A9DE */
+  TEInsert((void *)(unaff_A5 + -0x213a),1,*(int *)(unaff_A5 + -0x223a)); /* one separator byte */
+  scroll_text_to_show_selection();              /* BSR 0x158c */
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_000018e0): ID04.bin 0x18e0..0x192c checked against an independent capstone disassembly.
+ * CMPI.W #2 A5-0x12f8 -> MOVEQ #0; TST.W A5-0x14c0 BNE / TST.W A5-0x12ba BLE else MOVEQ #2; word i 0..9 TST.W A5-0x12ce[i] ->
+ * MOVEQ #1; MOVEQ #0 - identical to the C. */
 /* Original: FUN_000018e0; source: ID04.c. Recovered name: get_mission_kill_report_state [STRONG INFERENCE].
  * Decoded from ID04.bin bytes at file 0x18e0.
  * Returns 0 when the mission state A5-0x12f8 == 2; 2 when A5-0x14c0 == 0 and A5-0x12ba > 0; 1 when any of the ten words at A5-0x12ce is non-zero; otherwise 0 [PROVEN, bytes 0x18e4..0x192a]. Ten words = ten target types (STR# 129 slots 106-115) [STRONG INFERENCE: per-mission kill counts]. Callers: confirm_end_mission 0x532 (result 0 -> returns 2 without asking), summary text builders 0x263a and 0x29b6; at 0x29c4 a 0 result appends STR# slot 50 "No new kills to report." (A5-0xe7e). Meaning of state 2 (A5-0x14c0 / A5-0x12ba) [UNKNOWN].
@@ -1072,29 +1288,48 @@ undefined4 get_mission_kill_report_state /* Original: FUN_000018e0 */ (void)
 
 
 
+/* VERIFIED (ID04::FUN_0000192e): ID04.bin 0x192e..0x1a0c checked against an independent capstone disassembly.
+ * CLR.L A5-0x2230; enable(8, 3) unless A5-0x14c4 && !A5-0x12f0 && A5-0x2228 == -1; enable(8, 1) if !A5-0x12f0; CMPI.W #3
+ * $c / TST.W A5-0x14c4 / CMPI.W #-1 A5-0x2228 / CMPI.W #1 A5-0x225e; -$12 = thePort, SetPort(8); twice GetDItem(8, item
+ * A5-0x225e then 1, -2, -6, -$e), InsetRect(-4, -4), EraseRect $A8A3, InvalRect $A928; A5-0x225e = 1; SetPort(-$12) -
+ * identical to the C. */
 /* Original: FUN_0000192e; source: ID04.c. Recovered name: update_summary_dialog_buttons [STRONG INFERENCE].
  * Decoded from ID04.bin bytes at file 0x192e.
- * C args: +8 DialogPtr, +0xc short phase. Clears A5-0x2230. Calls enable_dialog_control(dialog, 3) unless (mission-over flag A5-0x14c4 set, A5-0x12f0 == 0 and A5-0x2228 == -1); calls enable_dialog_control(dialog, 1) when A5-0x12f0 == 0. If phase != 3, A5-0x14c4 set, A5-0x2228 == -1 and the default item A5-0x225e != 1: SetPort(dialog), then for the current default item and for item 1 GetDItem, InsetRect(-4, -4), EraseRect ($A8A3), InvalRect ($A928); sets A5-0x225e = 1 and restores the port, so draw_default_button_outline redraws the ring around item 1 [PROVEN, bytes 0x1932..0x1a0c]. Ghidra truncated the ring-moving block. In DITL 133 (dump items are 0-based, Toolbox items 1-based) item 1 is "End Mission" and item 3 is "OK" [PROVEN for DITL 133; STRONG INFERENCE that this dialog is DLOG 133]. Callers: 0x21b8 (phase 0) and 0x3050, both after FUN_000021d6 returns non-zero.
+ * C args: +8 DialogPtr, +0xc short phase. Clears A5-0x2230. Calls enable_dialog_control(dialog, 3) unless (mission-over flag A5-0x14c4 set, A5-0x12f0 == 0 and A5-0x2228 == -1); calls enable_dialog_control(dialog, 1) when A5-0x12f0 == 0. If phase != 3, A5-0x14c4 set, A5-0x2228 == -1 and the default item A5-0x225e != 1: SetPort(dialog), then for the current default item and for item 1 GetDItem, InsetRect(-4, -4), EraseRect ($A8A3), InvalRect ($A928); sets A5-0x225e = 1 and restores the port, so draw_default_button_outline redraws the ring around item 1 [PROVEN, bytes 0x1932..0x1a0c]. Ghidra truncated the ring-moving block (and dropped the enable_dialog_control arguments); body rebuilt as C below. In DITL 133 (dump items are 0-based, Toolbox items 1-based) item 1 is "End Mission" and item 3 is "OK" [PROVEN for DITL 133; STRONG INFERENCE that this dialog is DLOG 133]. Callers: 0x21b8 (phase 0) and 0x3050, both after FUN_000021d6 returns non-zero.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void update_summary_dialog_buttons /* Original: FUN_0000192e */ (undefined4 param_1,undefined4 param_2)
+void update_summary_dialog_buttons /* Original: FUN_0000192e */ (int param_1,short param_2)
 
 {
   int unaff_A5;
+  int saved;                                    /* -$12(A6) */
+  short box[4];                                 /* -$e(A6) */
+  int handle;                                   /* -6(A6) */
+  short itemType;                               /* -2(A6) */
   
   *(undefined4 *)(unaff_A5 + -0x2230) = 0;
   if (((*(short *)(unaff_A5 + -0x14c4) == 0) || (*(short *)(unaff_A5 + -0x12f0) != 0)) ||
      (*(short *)(unaff_A5 + -0x2228) != -1)) {
-    enable_dialog_control();
+    enable_dialog_control(param_1,3);           /* BSR 0x2e */
   }
   if (*(short *)(unaff_A5 + -0x12f0) == 0) {
-    enable_dialog_control();
+    enable_dialog_control(param_1,1);
   }
-  if (((param_2._0_2_ != 3) && (*(short *)(unaff_A5 + -0x14c4) != 0)) &&
+  if (((param_2 != 3) && (*(short *)(unaff_A5 + -0x14c4) != 0)) &&
      ((*(short *)(unaff_A5 + -0x2228) == -1 && (*(short *)(unaff_A5 + -0x225e) != 1)))) {
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+    saved = *(int *)(unaff_A5 + -0x160c);       /* thePort */
+    SetPort(param_1);                           /* $A873 */
+    GetDItem(param_1,*(short *)(unaff_A5 + -0x225e),&itemType,&handle,box); /* old default item */
+    InsetRect(box,-4,-4);                       /* $A8A9 */
+    EraseRect(box);                             /* $A8A3 */
+    InvalRect(box);                             /* $A928 */
+    GetDItem(param_1,1,&itemType,&handle,box);  /* new default item 1 */
+    InsetRect(box,-4,-4);
+    EraseRect(box);
+    InvalRect(box);
+    *(short *)(unaff_A5 + -0x225e) = 1;         /* draw_default_button_outline now rings item 1 */
+    SetPort(saved);
   }
   return;
 }
@@ -1103,10 +1338,15 @@ void update_summary_dialog_buttons /* Original: FUN_0000192e */ (undefined4 para
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID04::FUN_00001a0e): ID04.bin 0x1a0e..0x1b3c checked against an independent capstone disassembly.
+ * -2 = A5-0x13a4; rank = A5-0xffe[(record +$22) EXT.L ASL.L #2] to -$86; JT $2fa(rank); JT $52a(-$82, rank); JT $512(-$82,
+ * A5-0x2138); JT $512(-$82, JT $2fa(record)); JT $302 on record, rank, -$82; GetDItem($a, 8, -4, -8, -$18); widths; StringWidth
+ * $A88C to -$1a; GetFontInfo(-$10); EraseRect(-$18); MoveTo with DIVS.W #2 halves; DrawString(-$82); Pascal return popping 6
+ * - identical to the C. draw_rank_insignia (0x1b3e) has no inventory entry. */
 /*
  * Original: FUN_00001a0e; source: ID04.c:699.
  * Recovered name: build_rank_and_name_string [STRONG INFERENCE].
- * Exported C kept (truncated). For the current pilot (word A5-0x13a4):
+ * Body rebuilt as C below. For the current pilot (word A5-0x13a4):
  * rank = rank-group string A5-0xffe[record +0x22] (Ensign... Captain);
  * p2cstr(rank) (JT $2fa); buf = copy of rank (JT $52a); append A5-0x2138
  * (separator, JT $512); append p2cstr(record name at +0x00); converts the
@@ -1118,8 +1358,8 @@ void update_summary_dialog_buttons /* Original: FUN_0000192e */ (undefined4 para
  * is installed for item 9 of the Mission Summary (dump item 8, title strip
  * (110,5)-(391,21)); after building the string it calls GetDItem,
  * StringWidth ($A88C), GetFontInfo ($A88B), EraseRect, MoveTo ($A893) and
- * DrawString ($A884) - it draws "rank name" in that item [PROVEN traps;
- * exact centring arithmetic not re-derived]. The name is kept for
+ * DrawString ($A884) - it draws "rank name" in that item, at (width / 2 + left -
+ * textWidth / 2, height / 2 + top + ascent / 2), each half a separate DIVS.W [PROVEN]. The name is kept for
  * traceability; "draw_rank_and_name_item" would describe it more fully.
  * The following bytes 0x1b3e..0x1bc6 (not exported by Ghidra) are
  * draw_rank_insignia [STRONG INFERENCE name]: Pascal user item reached through
@@ -1128,107 +1368,228 @@ void update_summary_dialog_buttons /* Original: FUN_0000192e */ (undefined4 para
  * box sized to the icon bounds, DisposCIcon [PROVEN, bytes]; cicn 256 is
  * named "Ensign" in the dump (rank 0).
  */
-void build_rank_and_name_string /* Original: FUN_00001a0e */ (void)
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void build_rank_and_name_string /* Original: FUN_00001a0e */ (int dlg,short item)
 
 {
-  undefined4 uVar1;
   int unaff_A5;
-  undefined4 uVar2;
-  undefined1 auStack_86 [128];
-  short local_6;
-  
-  local_6 = *(short *)(unaff_A5 + -0x13a4);
-  uVar2 = *(undefined4 *)
-           (*(short *)(**(int **)(unaff_A5 + -0x13a8) + local_6 * 0x40 + 0x22) * 4 +
-           unaff_A5 + -0xffe);
-  (**(code **)(unaff_A5 + 0x2fa))(uVar2,uVar2);
-  (**(code **)(unaff_A5 + 0x52a))((short)auStack_86,uVar2);
-  (**(code **)(unaff_A5 + 0x512))((short)auStack_86,unaff_A5 + -0x2138);
-  uVar1 = (**(code **)(unaff_A5 + 0x2fa))(**(int **)(unaff_A5 + -0x13a8) + local_6 * 0x40);
-  (**(code **)(unaff_A5 + 0x512))((short)auStack_86,uVar1);
-  (**(code **)(unaff_A5 + 0x302))(**(int **)(unaff_A5 + -0x13a8) + local_6 * 0x40);
-  (**(code **)(unaff_A5 + 0x302))(uVar2);
-  (**(code **)(unaff_A5 + 0x302))(auStack_86);
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  char *rank;                                   /* -$86(A6) */
+  char buf[0x7c];                               /* -$82(A6) */
+  short height;                                 /* -$1e(A6) */
+  short width;                                  /* -$1c(A6) */
+  short w;                                      /* -$1a(A6) */
+  short box[4];                                 /* -$18(A6): top, left (-$16), bottom, right (-$12) */
+  short fi[4];                                  /* -$10(A6): FontInfo, ascent first */
+  int handle;                                   /* -8(A6) */
+  short itemType;                               /* -4(A6) */
+  short pilot;                                  /* -2(A6) */
+
+  pilot = *(short *)(unaff_A5 + -0x13a4);
+  rank = *(char **)(unaff_A5 + -0xffe + (int)*(short *)((char *)(**(int **)(unaff_A5 + -0x13a8) + (int)pilot * 0x40) + 0x22) * 4); /* Ensign .. Captain */
+  length_prefixed_bytes_to_c_string_in_place(rank); /* JT $2fa -> ID09 0x432 */
+  ansi_strcpy(buf,rank);                        /* JT $52a -> ID02 0x2c8 */
+  ansi_strcat(buf,(char *)(unaff_A5 + -0x2138)); /* JT $512 -> ID02 0x2d8: separator */
+  ansi_strcat(buf,length_prefixed_bytes_to_c_string_in_place((char *)(**(int **)(unaff_A5 + -0x13a8) + (int)pilot * 0x40))); /* the pilot name */
+  c2pstr_in_place((char *)(**(int **)(unaff_A5 + -0x13a8) + (int)pilot * 0x40));                       /* JT $302 -> ID09 0x416, three times */
+  c2pstr_in_place(rank);
+  c2pstr_in_place(buf);
+  GetDItem(dlg,item,&itemType,&handle,box);     /* $A98D */
+  width = box[3] - box[1];
+  height = box[2] - box[0];
+  w = StringWidth(buf);                         /* $A88C */
+  GetFontInfo(fi);                              /* $A88B */
+  EraseRect(box);                               /* $A8A3 */
+  MoveTo(((short)((int)width / 2) + box[1]) - (short)((int)w / 2),
+         ((short)((int)height / 2) + box[0]) + (short)((int)fi[0] / 2)); /* $A893 */
+  DrawString(buf);                              /* $A884 */
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00001bc8): ID04.bin 0x1bc8..0x1d9c checked against an independent capstone disassembly.
+ * -$94 = thePort+$44, -$98 = thePort (before the test); CMPI.W #2 / #4 / #8 $e BEQ.W exit; row = type, SUBQ for each of 2 / 4 / 8
+ * below it (CMPI.W BLE); SetPort, ClipRect(thePort+$10) $A87B, GetDItem(8, $c, -8, -$c, -$14), InsetRect(4, 0), GetFontInfo(-$92);
+ * -2 = row MULS.W #$17 + ascent + top + 3; top = row * $17 + top + 3, bottom = top + $10; EraseRect; MoveTo(left, -2); n = (A5-0x2226)[type]
+ * TST.W: strcpy name (A5-0xf86[type]) [+ strcat A5-0x2136 + strcat JT $2fa(JT $4a2(n, -$8a))]; JT $302; TextFont(1); DrawString;
+ * JT $4a2(n MULU.L A5-0xf5e[type], -$80); MoveTo(right - StringWidth, -2); DrawString; TextFont(-$94); SetPort(-$98) - identical
+ * to the C. */
 /* Original: FUN_00001bc8; source: ID04.c. Recovered name: draw_targets_destroyed_row [STRONG INFERENCE].
  * Decoded from ID04.bin bytes at file 0x1bc8.
  * C args: +8 DialogPtr, +0xc short item, +0xe short target type (0..9, STR# 129 slots 106-115). Returns at once for types 2 (Tank), 4 (Vehicle) and 8 (PT Boat); otherwise the row index is the type minus the number of skipped types below it (0..6), so seven rows are listed [PROVEN, bytes 0x1bdc..0x1c22]. Saves thePort and its txFont (+0x44), SetPort(dialog), ClipRect(portRect), GetDItem -> box, InsetRect(&box, 4, 0), GetFontInfo ($A88B). Row rect: top = box.top + 23 * row + 3, bottom = top + 16, EraseRect; baseline y = top + ascent; MoveTo(box.left, y).
  *  [PROVEN, bytes 0x1c4a..0x1d9a]: n = counts[type], counts = word array at *A5-0x2226. Label = target name (STR# group A5-0xf86[type]) copied with strcpy (JT $52a); if n != 0, strcat the text at A5-0x2136 and the decimal n (format_int_decimal_pstring, JT $4a2, then ID09 0x432 to a C string); c2p in place (JT $302); TextFont(1) ($A887); DrawString. Points = n * weight[type] (words at A5-0xf5e, the weights used by compute_pilot_score; MULU.L), formatted with JT $4a2 and drawn right-aligned (MoveTo(box.right - StringWidth, y)). Restores txFont and the port.
  * A5-0x2226 points to the local array -0x4a(A6) of show_mission_summary_dialog (set at 0x2e00); the text step adds kills to it (0x2b0c) and to A5-0x13a2 (0x2af8) while the summary runs [PROVEN]. So each row reads "<target> <sep> <n>...  <points>" [STRONG INFERENCE for the layout; the separator text at A5-0x2136 is A5 initial data, not yet read].
- * Caller: draw_targets_destroyed_list.
+ * Caller: draw_targets_destroyed_list. Body rebuilt as C below.
  */
 // WARNING: Control flow encountered bad instruction data
 
-void draw_targets_destroyed_row /* Original: FUN_00001bc8 */ (undefined4 param_1,short param_2)
+void draw_targets_destroyed_row /* Original: FUN_00001bc8 */ (int param_1,short param_2,short param_3)
 
 {
-  if (((param_2 != 2) && (param_2 != 4)) && (param_2 != 8)) {
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+  int unaff_A5;
+  int savedPort;                                /* -$98(A6) */
+  short savedFont;                              /* -$94(A6) */
+  short fi[4];                                  /* -$92(A6): FontInfo, ascent first */
+  char tmp[10];                                 /* -$8a(A6) */
+  char buf[0x74];                               /* -$80(A6) */
+  short box[4];                                 /* -$14(A6): top, left (-$12), bottom (-$10), right (-$e) */
+  int handle;                                   /* -$c(A6) */
+  short itemType;                               /* -8(A6) */
+  short row;                                    /* -6(A6) */
+  short y;                                      /* -2(A6) */
+
+  savedFont = *(short *)(*(int *)(unaff_A5 + -0x160c) + 0x44); /* thePort->txFont */
+  savedPort = *(int *)(unaff_A5 + -0x160c);
+  if (((param_3 == 2) || (param_3 == 4)) || (param_3 == 8)) {
+    return;                                     /* Tank, Vehicle, PT Boat are not listed */
   }
+  row = param_3;
+  if (2 < param_3) row = row + -1;
+  if (4 < param_3) row = row + -1;
+  if (8 < param_3) row = row + -1;
+  SetPort(param_1);                             /* $A873 */
+  ClipRect((void *)(*(int *)(unaff_A5 + -0x160c) + 0x10)); /* $A87B, portRect */
+  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  InsetRect(box,4,0);                           /* $A8A9 */
+  GetFontInfo(fi);                              /* $A88B */
+  y = row * 0x17 + fi[0] + box[0] + 3;          /* MULS.W #$17: baseline */
+  box[0] = row * 0x17 + box[0] + 3;             /* row rect */
+  box[2] = box[0] + 0x10;
+  EraseRect(box);                               /* $A8A3 */
+  MoveTo(box[1],y);                             /* $A893 */
+  if (*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)param_3 * 2) == 0) {
+    ansi_strcpy(buf,*(char **)(unaff_A5 + -0xf86 + (int)param_3 * 4)); /* JT $52a: target name */
+  }
+  else {
+    ansi_strcpy(buf,*(char **)(unaff_A5 + -0xf86 + (int)param_3 * 4));
+    ansi_strcat(buf,(char *)(unaff_A5 + -0x2136)); /* JT $512: separator */
+    ansi_strcat(buf,length_prefixed_bytes_to_c_string_in_place(
+                    format_int_decimal_pstring((int)*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)param_3 * 2),tmp))); /* JT $4a2, JT $2fa */
+  }
+  c2pstr_in_place(buf);                         /* JT $302 */
+  TextFont(1);                                  /* $A887 */
+  DrawString(buf);                              /* $A884 */
+  format_int_decimal_pstring((int)*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)param_3 * 2) * (int)*(short *)(unaff_A5 + -0xf5e + (int)param_3 * 2),buf);
+                                                /* points = n * weight (MULU.L of sign-extended words) */
+  MoveTo(box[3] - StringWidth(buf),y);          /* right-aligned; $A88C */
+  DrawString(buf);
+  TextFont(savedFont);
+  SetPort(savedPort);
   return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00001d9e): ID04.bin 0x1d9e..0x1ddc checked against an independent capstone disassembly.
+ * Push word 8, long $a, BSR 0x120, ADDQ #6; word t 0..9: push t, word 8, long $a, BSR 0x1bc8, ADDQ #8; Pascal return popping 6
+ * - identical to the C. draw_mission_awards (0x1dde) has no inventory entry. */
 /* Original: FUN_00001d9e; source: ID04.c. Recovered name: draw_targets_destroyed_list [PROVEN].
  * Decoded from ID04.bin bytes at file 0x1d9e.
- * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes): frame_dialog_item_box(dialog, item), then draw_targets_destroyed_row(dialog, item, t) for t = 0..9. Reached through JT $aa (CODE 0 entry -> ID04 0x1d9e); installed for item 6 by show_mission_summary_dialog (0x2e34). Item 6 = DITL 133 dump item 5, box (215,130)-(389,291) under the "Targets Destroyed" label.
+ * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes): frame_dialog_item_box(dialog, item), then draw_targets_destroyed_row(dialog, item, t) for t = 0..9. Reached through JT $aa (CODE 0 entry -> ID04 0x1d9e); installed for item 6 by show_mission_summary_dialog (0x2e34). Item 6 = DITL 133 dump item 5, box (215,130)-(389,291) under the "Targets Destroyed" label. Body rebuilt as C below.
  * The following bytes 0x1dde..0x1f5c, inside this Ghidra range and not exported, are draw_mission_awards [STRONG INFERENCE name]: Pascal user item reached through JT $152 (-> ID04 0x1dde), installed for item 5 (dump item 4, (10,130)-(201,200), under "Mission Awards"). frame_dialog_item_box; SetPort; ClipRect(portRect); GetDItem; flags = word +0x26 of the current pilot record; for bit i = 0..7 (flags >>= 1 each step): if set, place a cell in a 3-column grid (x = w * col / 3, y = h * row / 3), GetCIcon(0x200 + i) ($AA1E), PlotCIcon right/bottom-aligned in the cell ($AA1F), DisposCIcon ($AA25) [PROVEN, bytes]. The application has cicn 512..519 (dump). So pilot record +0x26 is an awards bitmask, one bit per award icon [STRONG INFERENCE].
  */
-void draw_targets_destroyed_list /* Original: FUN_00001d9e */ (undefined8 param_1)
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void draw_targets_destroyed_list /* Original: FUN_00001d9e */ (int dlg,short item)
 
 {
-  code *UNRECOVERED_JUMPTABLE;
-  undefined2 local_6;
-  
-  frame_dialog_item_box();
-  for (local_6 = 0; local_6 < 10; local_6 = local_6 + 1) {
-    draw_targets_destroyed_row(param_1._2_4_,local_6);
+  short t_;                                     /* -2(A6) */
+
+  frame_dialog_item_box(dlg,item);              /* BSR 0x120 */
+  for (t_ = 0; t_ < 10; t_ = t_ + 1) {
+    draw_targets_destroyed_row(dlg,item,t_);    /* BSR 0x1bc8 */
   }
-                    // WARNING: Could not recover jumptable at 0x00001ddc. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
+  return;                                       /* Ghidra read the JMP (A0) return as a jump table */
+}
+
+
+
+/* VERIFIED (ID04::FUN_00001f5e): ID04.bin 0x1f5e..0x20e6 checked against an independent capstone disassembly.
+ * LINK -$36; thePort copy; BSR 0x120; SetPort; ClipRect(portRect+$10); GetDItem; tally record via EXT.L/ASL.L #6; cap 24;
+ * grid loop with MULS/DIVS #6 and #4, OffsetRect(left+15, top+10), FrameRect, InsetRect(3,3), RGBForeColor, PaintOval,
+ * ForeColor(33); SetPort(saved); RTS (C convention) - identical to the C. */
+/* Original: FUN_00001f5e; source: ID04.c. Recovered name: draw_aircraft_kill_markers [STRONG INFERENCE].
+ * Decoded from ID04.bin bytes at file 0x1f5e.
+ * C args: +8 DialogPtr, +0xc short item. frame_dialog_item_box(dialog, item); SetPort(dialog); ClipRect(&thePort->portRect) ($A87B); GetDItem -> box (w, h). count = tally[0] + tally[1] of the current pilot record (*A5-0x13a8 + A5-0x13a4 * 0x40 + 0x28; tally 0 / 1 = Fighter / Bomber per STR# 129 slots 106/107 [STRONG INFERENCE]), capped at 24. For i < count, in a 6-column grid (col 0..5, then row++): x = w * col / 6, y = h * row / 4; frames a 26 x 16 rect centred on (x, y) offset by (dh = box.left + 15, dv = box.top + 10) (OffsetRect $A8A8, FrameRect $A8A1; corrected from the push order); then a 16-wide rect from x + box.left + 7, InsetRect(3, 3), RGBForeColor({0xffff, 0, 0}) ($AA14), PaintOval ($A8B8), ForeColor(33 = blackColor) ($A862). Restores the port [PROVEN, bytes 0x1f5e..0x20e6]. Draws one kill marker (red disc in a frame) per aircraft destroyed [STRONG INFERENCE]. Its item is item 7 of DLOG 133 (DITL dump item 6, 191 x 70 box directly under the "Total Aircraft Destroyed" label) [PROVEN placement]. Ghidra stopped after the first call; body rebuilt as C below.
+ */
+void draw_aircraft_kill_markers /* Original: FUN_00001f5e */ (int dlg,short item)
+
+{
+  short i;                                      /* -2(A6) */
+  short count;                                  /* -4(A6), capped */
+  short countRaw;                               /* -6(A6), written, never read */
+  short col;                                    /* -8(A6) */
+  short row;                                    /* -$a(A6) */
+  short w;                                      /* -$c(A6) */
+  short h;                                      /* -$e(A6) */
+  short x;                                      /* -$10(A6) */
+  short y;                                      /* -$12(A6) */
+  short *tally;                                 /* -$16(A6) */
+  short itemType;                               /* -$18(A6) */
+  int itemHandle;                               /* -$1c(A6) */
+  short box[4];                                 /* -$24(A6): top, left, bottom, right */
+  short r[4];                                   /* -$2c(A6): top, left, bottom, right */
+  int savedPort;                                /* -$30(A6) */
+  short red[3];                                 /* -$36(A6): RGBColor */
+
+  savedPort = *(int *)(unaff_A5 + -0x160c);     /* thePort */
+  frame_dialog_item_box(dlg,item);              /* BSR 0x120, ADDQ #6 */
+  SetPort(dlg);                                 /* $A873 */
+  ClipRect((short *)(*(int *)(unaff_A5 + -0x160c) + 0x10)); /* $A87B: &thePort->portRect */
+  GetDItem(dlg,item,&itemType,&itemHandle,box); /* $A98D */
+  w = box[3] - box[1];
+  h = box[2] - box[0];
+  col = 0;
+  row = 0;
+  tally = (short *)((int)*(short *)(unaff_A5 + -0x13a4) * 0x40 + **(int **)(unaff_A5 + -0x13a8) + 0x28);
+                                                /* EXT.L, ASL.L #6, ADD.L (A0), ADDI.L #$28 */
+  count = tally[0] + tally[1];
+  countRaw = count;
+  if (0x18 < count) {
+    count = 0x18;
+  }
+  red[0] = -1;
+  red[1] = 0;
+  red[2] = 0;
+  for (i = 0; i < count; i = i + 1) {
+    x = (short)((int)(short)(w * col) / 6);     /* MULS.W, EXT.L, DIVS.W #6 */
+    y = (short)((int)(short)(h * row) / 4);     /* MULS.W, EXT.L, DIVS.W #4 */
+    r[1] = x + -0xd;
+    r[3] = r[1] + 0x1a;
+    r[0] = y + -8;
+    r[2] = r[0] + 0x10;
+    OffsetRect(r,box[1] + 0xf,box[0] + 10);     /* $A8A8: dh = box.left + 15, dv = box.top + 10 */
+    FrameRect(r);                               /* $A8A1 */
+    r[1] = x + box[1] + 7;
+    r[3] = r[1] + 0x10;
+    InsetRect(r,3,3);                           /* $A8A9 */
+    RGBForeColor(red);                          /* $AA14 */
+    PaintOval(r);                               /* $A8B8 */
+    ForeColor(0x21);                            /* $A862: blackColor */
+    col = col + 1;
+    if (col == 6) {
+      col = 0;
+      row = row + 1;
+    }
+  }
+  SetPort(savedPort);
   return;
 }
 
 
 
-/* Original: FUN_00001f5e; source: ID04.c. Recovered name: draw_aircraft_kill_markers [STRONG INFERENCE].
- * Decoded from ID04.bin bytes at file 0x1f5e.
- * C args: +8 DialogPtr, +0xc short item. frame_dialog_item_box(dialog, item); SetPort(dialog); ClipRect(&thePort->portRect) ($A87B); GetDItem -> box (w, h). count = tally[0] + tally[1] of the current pilot record (*A5-0x13a8 + A5-0x13a4 * 0x40 + 0x28; tally 0 / 1 = Fighter / Bomber per STR# 129 slots 106/107 [STRONG INFERENCE]), capped at 24. For i < count, in a 6-column grid (col 0..5, then row++): x = w * col / 6, y = h * row / 4; frames a 26 x 16 rect centred on (x, y) offset by (box.left + 10, box.top + 15) (OffsetRect $A8A8, FrameRect $A8A1); then a 16-wide rect from x + box.left + 7, InsetRect(3, 3), RGBForeColor({0xffff, 0, 0}) ($AA14), PaintOval ($A8B8), ForeColor(33 = blackColor) ($A862). Restores the port [PROVEN, bytes 0x1f5e..0x20e6]. Draws one kill marker (red disc in a frame) per aircraft destroyed [STRONG INFERENCE]. Its item is item 7 of DLOG 133 (DITL dump item 6, 191 x 70 box directly under the "Total Aircraft Destroyed" label) [PROVEN placement]. Ghidra stopped after the first call.
- */
-// WARNING: Control flow encountered bad instruction data
-
-void draw_aircraft_kill_markers /* Original: FUN_00001f5e */ (void)
-
-{
-  frame_dialog_item_box();
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
-}
-
-
-
+/* VERIFIED (ID04::FUN_000020e8): ID04.bin 0x20e8..0x2102 checked against an independent capstone disassembly.
+ * LINK #0; push word 8(A6), long $a(A6); BSR 0x1f5e; ADDQ #6; Pascal return popping 6 - identical to the C.
+ * The bytes 0x2104..0x2d84 after it stay described in the comment below (not exported). */
 /* Original: FUN_000020e8; source: ID04.c. Recovered name: aircraft_kill_markers_user_item_proc [PROVEN].
  * Decoded from ID04.bin bytes at file 0x20e8.
  * Pascal user-item procedure (DialogPtr at +0xa, item at +8; pops 6 bytes, which Ghidra read as an unrecoverable jump table): calls draw_aircraft_kill_markers(dialog, item). Reached through JT $ea (CODE 0 entry -> ID04 0x20e8); installed for item 7 by show_mission_summary_dialog (pea $ea(A5) at 0x2e5c, set_dialog_user_item_proc at 0x2e68). See the comment after this function for the two unexported routines in the rest of its Ghidra range.
  */
-void aircraft_kill_markers_user_item_proc /* Original: FUN_000020e8 */ (void)
+/* Pascal user-item procedure: dlg at $a(A6), item at 8(A6); pops 6 bytes (UNLK, MOVEA.L (A7)+,A0, LEA 6(A7), JMP (A0)) */
+void aircraft_kill_markers_user_item_proc /* Original: FUN_000020e8 */ (int dlg,short item)
 
 {
-  code *UNRECOVERED_JUMPTABLE;
-  
-  draw_aircraft_kill_markers();
-                    // WARNING: Could not recover jumptable at 0x00002102. Too many branches
-                    // WARNING: Treating indirect jump as call
-  (*UNRECOVERED_JUMPTABLE)();
-  return;
+  draw_aircraft_kill_markers(dlg,item);         /* push word 8, long $a; BSR 0x1f5e; ADDQ #6 */
+  return;                                       /* Ghidra read the JMP (A0) return as a jump table */
 }
 
 
@@ -1383,6 +1744,9 @@ void aircraft_kill_markers_user_item_proc /* Original: FUN_000020e8 */ (void)
  *     original hellcat..." when it is 0, as the bytes say.
  */
 
+/* VERIFIED (ID04::FUN_00002d86): ID04.bin 0x2d86..0x2de4 checked against an independent capstone disassembly.
+ * LINK #0; JT $52a(A5-0x2174, *(A5-0xe5e)); BSR 0x588(word A5-0x13a4); JT $4a2(D0, A5-0x2160); JT $2fa; JT $512;
+ * JT $302; BSR 0x9c(long 8, word $c, A5-0x2174); RTS (C convention) - identical to the C. */
 /* Original: FUN_00002d86; source: ID04.c. Recovered name: set_score_item_text [PROVEN].
  * C args: +8 DialogPtr, +0xc short item. strcpy (JT $52a = ID02 0x2c8) the
  * STR# 129 slot 58 text "Score: " (A5-0xe5e) into A5-0x2174;
@@ -1395,24 +1759,18 @@ void aircraft_kill_markers_user_item_proc /* Original: FUN_000020e8 */ (void)
  * strcat loops; ID09 0x416 shifts bytes right and stores the length
  * [PROVEN, bytes].
  */
-void set_score_item_text /* Original: FUN_00002d86 */ (void)
+void set_score_item_text /* Original: FUN_00002d86 */ (int dlg,short item)
 
 {
-  short sVar1;
-  int iVar2;
-  undefined2 uVar3;
   int unaff_A5;
-  undefined4 unaff_A6;
-  
-  uVar3 = (undefined2)((uint)unaff_A6 >> 0x10);
-  sVar1 = (short)unaff_A5;
-  (**(code **)(unaff_A5 + 0x52a))(sVar1 + -0x2174,(short)*(undefined4 *)(unaff_A5 + -0xe5e));
-  iVar2 = compute_pilot_score(CONCAT22(*(undefined2 *)(unaff_A5 + -0x13a4),uVar3));
-  (**(code **)(unaff_A5 + 0x4a2))((short)iVar2,sVar1 + -0x2160);
-  uVar3 = (**(code **)(unaff_A5 + 0x2fa))(sVar1 + -0x2160);
-  (**(code **)(unaff_A5 + 0x512))(sVar1 + -0x2174,uVar3);
-  (**(code **)(unaff_A5 + 0x302))(sVar1 + -0x2174);
-  set_dialog_item_text();
+
+  ansi_strcpy((char *)(unaff_A5 + -0x2174),*(char **)(unaff_A5 + -0xe5e)); /* JT $52a: "Score: " */
+  format_int_decimal_pstring(compute_pilot_score(*(short *)(unaff_A5 + -0x13a4)), /* BSR 0x588 */
+                             (unsigned char *)(unaff_A5 + -0x2160)); /* JT $4a2 */
+  ansi_strcat((char *)(unaff_A5 + -0x2174),
+              length_prefixed_bytes_to_c_string_in_place((unsigned char *)(unaff_A5 + -0x2160))); /* JT $512, JT $2fa */
+  c2pstr_in_place((char *)(unaff_A5 + -0x2174)); /* JT $302 */
+  set_dialog_item_text(dlg,item,(void *)(unaff_A5 + -0x2174)); /* BSR 0x9c, LEA $a(A7) */
   return;
 }
 
@@ -1420,12 +1778,20 @@ void set_score_item_text /* Original: FUN_00002d86 */ (void)
 
 // WARNING: Control flow encountered bad instruction data
 
+/* VERIFIED (ID04::FUN_00002de6): ID04.bin 0x2de6..0x3122 checked against an independent capstone disassembly.
+ * LINK -$4a; itemHit = 1; saves A5-0x13a4 / -0x225e; early exit to 0x3116; GetNewDialog(0x85), JT $472, five BSR 0xec,
+ * BSR 0x6 x2, 0x17e6, 0xc4; pilot / current-mission branches with JT $4ea (0x18 bytes) and BSR 0x54 / 0x78; mode 3 adds
+ * A5-0x12ce[0..11]; three BSR 0x1b8 variants; BSR 0x2d86; ShowWindow; TickCount; BSR 0x21d6 -> 0x192e; ModalDialog(JT $ca)
+ * loop with exits on 3, 1 (+ confirm_end_mission == 2); BSR 0x189c; DisposDialog; award flag; SelectWindow; restores;
+ * D0 = itemHit; RTS - identical to the C. */
 /*
  * Original: FUN_00002de6; source: ID04.c:809.
  * Recovered name: show_mission_summary_dialog [STRONG INFERENCE].
- * Exported C kept (only the early-out branch survives). Bytes 0x2de6..0x3122
- * [PROVEN, condensed]: A5-0x2226 = local work buffer; if (mode A5-0x12f8 == 2
- * && param == -1) return 1 (no summary); else GetNewDialog(133,...) $A97C,
+ * C args +8 short pilot (-1 = the current mission), +0xa short mode, +0xc
+ * title of item 3; returns the last itemHit. Body rebuilt as C below.
+ * Bytes 0x2de6..0x3122 [PROVEN]: A5-0x2226 = local tallies (12 words); if
+ * (mission A5-0x12f8 == 2 && pilot == -1) return 1 restoring only A5-0x13a4
+ * (no summary); else GetNewDialog(133,...) $A97C,
  * JT $472 (ID02 0x4582); many item set-up calls through local helpers (0xec,
  * 0x06, 0xc4, 0x54, 0x78, 0x1b8, 0x17e6) and a 12-pass loop (the 12
  * tallies), list/record work through JT $4ea (ID02 0x232); second arg code 3
@@ -1435,29 +1801,115 @@ void set_score_item_text /* Original: FUN_00002d86 */ (void)
  * "Targets Destroyed", "Total Aircraft Destroyed", "Score", "Score: 123456".
  * Called by conclude_mission with (-1, code).
  */
-undefined2 show_mission_summary_dialog /* Original: FUN_00002de6 */ (undefined4 param_1)
+short show_mission_summary_dialog /* Original: FUN_00002de6 */ (short pilot,short mode,void *title)
 
 {
   int unaff_A5;
-  undefined1 auStack_4e [74];
-  
-  *(undefined1 **)(unaff_A5 + -0x2226) = auStack_4e;
-  if ((*(short *)(unaff_A5 + -0x12f8) == 2) && (param_1._0_2_ == -1)) {
-    *(undefined2 *)(unaff_A5 + -0x13a4) = *(undefined2 *)(unaff_A5 + -0x13a4);
-    return 1;
+  short savedPilot;                             /* -$30(A6) */
+  short savedDefault;                           /* -$32(A6) */
+  short tallies[12];                            /* -$4a(A6), 0x18 bytes */
+  short itemHit;                                /* -$c(A6) */
+  int dlg;                                      /* -$a(A6) */
+  short i;                                      /* -2(A6) */
+
+  itemHit = 1;
+  savedPilot = *(short *)(unaff_A5 + -0x13a4);
+  savedDefault = *(short *)(unaff_A5 + -0x225e);
+  *(short **)(unaff_A5 + -0x2226) = tallies;    /* read by draw_targets_destroyed_row */
+  if ((*(short *)(unaff_A5 + -0x12f8) == 2) && (pilot == -1)) {
+    goto restore_pilot;                         /* BEQ.W 0x3116: Flight School, no summary */
   }
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+  dlg = GetNewDialog(0x85,0,-1);                /* $A97C: DLOG 133 "Mission Summary" */
+  centre_window_on_screen(dlg);                 /* JT $472 */
+  set_dialog_user_item_proc(dlg,6,(void *)(unaff_A5 + 0xaa));  /* BSR 0xec: draw_targets_destroyed_list */
+  set_dialog_user_item_proc(dlg,5,(void *)(unaff_A5 + 0x152)); /* draw_mission_awards (0x1dde) */
+  set_dialog_user_item_proc(dlg,7,(void *)(unaff_A5 + 0xea));  /* aircraft_kill_markers_user_item_proc */
+  set_dialog_user_item_proc(dlg,9,(void *)(unaff_A5 + 0x7a));
+  set_dialog_user_item_proc(dlg,0xf,(void *)(unaff_A5 + 0x15a));
+  disable_dialog_control(dlg,3);                /* BSR 0x6 */
+  disable_dialog_control(dlg,1);
+  create_scrolling_text_item(dlg,8);            /* BSR 0x17e6 */
+  set_dialog_control_title(dlg,3,title);        /* BSR 0xc4 */
+  *(short *)(unaff_A5 + -0x2228) = pilot;
+  if (*(short *)(unaff_A5 + -0x2228) != -1) {
+    *(short *)(unaff_A5 + -0x13a4) = *(short *)(unaff_A5 + -0x2228);
+    *(int *)(unaff_A5 + -0x2230) = 1;           /* text step delay */
+    ansi_memcpy(tallies,(void *)((int)*(short *)(unaff_A5 + -0x13a4) * 0x40 + **(int **)(unaff_A5 + -0x13a8) + 0x28),0x18);
+                                                /* JT $4ea: the pilot record's 12 tallies */
+    hide_dialog_control(dlg,1);                 /* BSR 0x54 */
+    hide_dialog_control(dlg,4);
+  }
+  else {
+    *(short *)(unaff_A5 + -0x13a4) = *(short *)(**(int **)(unaff_A5 + -0x13ac) + 0x20); /* settings +0x20 */
+    *(int *)(unaff_A5 + -0x2230) = 0x2d;
+    ansi_memcpy(tallies,(void *)(unaff_A5 + -0x13a2),0x18); /* JT $4ea */
+    show_dialog_control(dlg,1);                 /* BSR 0x78 */
+    show_dialog_control(dlg,4);
+  }
+  if (mode == 3) {
+    for (i = 0; i < 0xc; i = i + 1) {
+      tallies[i] = tallies[i] + *(short *)(unaff_A5 + -0x12ce + (int)i * 2);
+    }
+    FUN_000001b8(dlg,2,3);                      /* BSR 0x1b8: default ring on user item 2, default item 3 */
+    hide_dialog_control(dlg,4);
+  }
+  else if ((*(short *)(unaff_A5 + -0x14c4) != 0) && (*(short *)(unaff_A5 + -0x2228) == -1)) {
+    FUN_000001b8(dlg,2,1);
+  }
+  else {
+    FUN_000001b8(dlg,2,3);
+  }
+  set_score_item_text(dlg,0xe);                 /* BSR 0x2d86 */
+  ShowWindow(dlg);                              /* $A915 */
+  *(int *)(unaff_A5 + -0x222c) = TickCount();   /* $A975 */
+  *(short *)(unaff_A5 + -0x2222) = 0;           /* text state */
+  *(short *)(unaff_A5 + -0x2220) = mode;
+  if (FUN_000021d6(dlg,8,mode) != 0) {          /* BSR 0x21d6: advance_mission_summary_text */
+    update_summary_dialog_buttons(dlg,mode);    /* BSR 0x192e */
+  }
+  while (true) {
+    ModalDialog((void *)(unaff_A5 + 0xca),&itemHit); /* $A991 */
+    if (itemHit == 3) break;
+    if ((itemHit == 4) && (*(int *)(unaff_A5 + -0x2230) != 0)) {
+      *(int *)(unaff_A5 + -0x2230) = 1;         /* "Skip Text": shortest step delay */
+    }
+    if (itemHit == 1) {
+      if (*(short *)(unaff_A5 + -0x2228) != -1) break;
+      if (((mode & 0xff) == 1) && (*(short *)(unaff_A5 + -0x12b4) != 1)) {
+        *(short *)(unaff_A5 + -0x14c0) = 1;
+      }
+      if (confirm_end_mission() == 2) break;    /* BSR 0x516 */
+    }
+  }
+  dispose_scrolling_text_item();                /* BSR 0x189c; (dlg, 8) pushed but unused */
+  DisposDialog(dlg);                            /* $A983 */
+  if (((*(short *)(unaff_A5 + -0x2228) == -1) && ((mode & 0xff) == 1)) &&
+      (*(short *)(unaff_A5 + -0x12b4) != 1)) {
+    *(short *)(unaff_A5 + -0x14c0) = 1;
+  }
+  if ((itemHit == 1) && (*(short *)(unaff_A5 + -0x2228) == -1)) {
+    *(short *)(unaff_A5 + -0x12f8) = 0;         /* mission number */
+    SelectWindow(*(int *)(unaff_A5 + -0x14ca)); /* $A916: main window */
+    *(short *)(unaff_A5 + -0x14c6) = 0;
+    *(short *)(unaff_A5 + -0x14c4) = 1;
+  }
+  *(short *)(unaff_A5 + -0x225e) = savedDefault;
+restore_pilot:
+  *(short *)(unaff_A5 + -0x13a4) = savedPilot;
+  return itemHit;                               /* MOVE.W -$c(A6),D0; RTS */
 }
 
 
 
+/* VERIFIED (ID04::FUN_00003124): ID04.bin 0x3124..0x3176 checked against an independent capstone disassembly.
+ * No LINK; CLR.L both globals; GetNamedResource('snd ', A5-0x2128); BEQ out; JT $272; SndNewChannel(&chan, 0, $80, nil);
+ * TST chan; SndPlay(chan, h, 1); RTS - identical to the C. */
 // WARNING: Control flow encountered bad instruction data
 
 /*
  * Original: FUN_00003124; source: ID04.c:828.
  * Recovered name: play_named_sound_async [STRONG INFERENCE].
- * Ghidra truncated after clearing the globals. Bytes 0x3124..0x3176 [PROVEN]:
+ * Ghidra truncated after clearing the globals; body rebuilt as C below. Bytes 0x3124..0x3176 [PROVEN]:
  *   A5-0x2156 = A5-0x2152 = 0;
  *   h = GetNamedResource('snd ' (0x736e6420), name = Pascal string at
  *       A5-0x2128) $A9A1 -> A5-0x2156; if (!h) return;
@@ -1471,15 +1923,25 @@ void play_named_sound_async /* Original: FUN_00003124 */ (void)
 
 {
   int unaff_A5;
-  
-  *(undefined4 *)(unaff_A5 + -0x2156) = 0;
-  *(undefined4 *)(unaff_A5 + -0x2152) = 0;
-                    // WARNING: Bad instruction - Truncating control flow here
-  halt_baddata();
+
+  *(int *)(unaff_A5 + -0x2156) = 0;             /* sound handle */
+  *(int *)(unaff_A5 + -0x2152) = 0;             /* SndChannelPtr */
+  *(int *)(unaff_A5 + -0x2156) = GetNamedResource(0x736e6420,(unsigned char *)(unaff_A5 + -0x2128)); /* $A9A1: 'snd ' */
+  if (*(int *)(unaff_A5 + -0x2156) == 0) {
+    return;
+  }
+  HLock(*(int *)(unaff_A5 + -0x2156));          /* JT $272 (glue pops its argument) */
+  SndNewChannel((int *)(unaff_A5 + -0x2152),0,0x80,0); /* $A807: synth 0, init 0x80, no callback; OSErr ignored */
+  if (*(int *)(unaff_A5 + -0x2152) != 0) {
+    SndPlay(*(int *)(unaff_A5 + -0x2152),*(int *)(unaff_A5 + -0x2156),1); /* $A805: async; OSErr ignored */
+  }
+  return;
 }
 
 
 
+/* VERIFIED (ID04::FUN_00003178): ID04.bin 0x3178..0x31a8 checked against an independent capstone disassembly.
+ * chan: SndDisposeChannel(chan, 1), CLR.L; h: JT $27a, ReleaseResource, CLR.L; RTS - identical to the C. */
 // WARNING: Control flow encountered bad instruction data
 
 /*
@@ -1494,15 +1956,15 @@ void stop_named_sound /* Original: FUN_00003178 */ (void)
 
 {
   int unaff_A5;
-  
+
   if (*(int *)(unaff_A5 + -0x2152) != 0) {
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+    SndDisposeChannel(*(int *)(unaff_A5 + -0x2152),1); /* $A801: quitNow; OSErr ignored */
+    *(int *)(unaff_A5 + -0x2152) = 0;
   }
   if (*(int *)(unaff_A5 + -0x2156) != 0) {
-    (**(code **)(unaff_A5 + 0x27a))((short)*(undefined4 *)(unaff_A5 + -0x2156));
-                    // WARNING: Bad instruction - Truncating control flow here
-    halt_baddata();
+    HUnlock(*(int *)(unaff_A5 + -0x2156));      /* JT $27a */
+    ReleaseResource(*(int *)(unaff_A5 + -0x2156)); /* $A9A3 */
+    *(int *)(unaff_A5 + -0x2156) = 0;
   }
   return;
 }
