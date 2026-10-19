@@ -31,13 +31,13 @@ undefined2 DAT_00000baa;
  * Exported C complete: signed absolute value (INT_MIN unchanged by wraparound).
  * JT $4da; used by ID03 nearest_palette_index_rgb.
  */
-int abs_long /* Original: FUN_0000001e */ (int param_1)
+int abs_long /* Original: FUN_0000001e */ (int value /* param_1 */)
 
 {
-  if (param_1 < 0) {
-    param_1 = -param_1;
+  if (value < 0) {
+    value = -value;
   }
-  return param_1;
+  return value;
 }
 
 
@@ -50,14 +50,14 @@ int abs_long /* Original: FUN_0000001e */ (int param_1)
  * Decoded from ID02.bin bytes at file 0x38.
  * div: stores {numer / denom, numer % denom} (16-bit quotient and remainder, DIVS) through the result pointer +8 (struct return). Complete Ghidra C.
  */
-void ansi_div /* Original: FUN_00000038 */ (undefined4 *param_1,undefined4 param_2)
+void ansi_div /* Original: FUN_00000038 */ (undefined4 *result /* param_1 */,undefined4 operands /* param_2: numerator word, denominator word */)
 
 {
-  undefined4 local_8;
+  undefined4 quot_rem; /* local_8, -8(A6): quotient word, remainder word */
   
-  local_8 = CONCAT22((short)param_2._0_2_ / (short)param_2._2_2_,(short)param_2._0_2_ % (short)param_2._2_2_);
+  quot_rem = CONCAT22((short)operands._0_2_ / (short)operands._2_2_,(short)operands._0_2_ % (short)operands._2_2_);
                                                 /* DIVS.W: signed; undefined2 is unsigned in this file */
-  *param_1 = local_8;
+  *result = quot_rem;
   return;
 }
 
@@ -71,17 +71,17 @@ void ansi_div /* Original: FUN_00000038 */ (undefined4 *param_1,undefined4 param
  * Decoded from ID02.bin bytes at file 0x66.
  * ldiv: result {quot, rem} from the long division helpers JT $5a / $62 (ID01 0x152 / 0x172) stored through the result pointer. Complete Ghidra C.
  */
-void ansi_ldiv /* Original: FUN_00000066 */ (undefined4 *param_1,undefined4 param_2,undefined4 param_3)
+void ansi_ldiv /* Original: FUN_00000066 */ (undefined4 *result /* param_1 */,undefined4 numer /* param_2 */,undefined4 denom /* param_3 */)
 
 {
-  undefined4 uVar1;
-  undefined4 uVar2;
+  undefined4 quot; /* uVar1 */
+  undefined4 rem; /* uVar2 */
   int unaff_A5;
   
-  uVar1 = rt_sdiv32(param_2,param_3);          /* JT $5a -> ID01 0x152 */
-  uVar2 = rt_smod32(param_2,param_3);          /* JT $62 -> ID01 0x172 */
-  *param_1 = uVar1;
-  param_1[1] = uVar2;
+  quot = rt_sdiv32(numer,denom);          /* JT $5a -> ID01 0x152 */
+  rem = rt_smod32(numer,denom);          /* JT $62 -> ID01 0x172 */
+  *result = quot;
+  result[1] = rem;
   return;
 }
 
@@ -94,12 +94,12 @@ void ansi_ldiv /* Original: FUN_00000066 */ (undefined4 *param_1,undefined4 para
  * Decoded from ID02.bin bytes at file 0x9a.
  * C runtime ctype test: returns _ctype[c] & 0xd0, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-ushort ansi_isalnum /* Original: FUN_0000009a */ (undefined4 param_1)
+ushort ansi_isalnum /* Original: FUN_0000009a */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return (short)*(char *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0xd0;
+  return (short)*(char *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0xd0;
 }
 
 
@@ -111,12 +111,12 @@ ushort ansi_isalnum /* Original: FUN_0000009a */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0xb6.
  * C runtime ctype test: returns _ctype[c] & 0xc0, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-ushort ansi_isalpha /* Original: FUN_000000b6 */ (undefined4 param_1)
+ushort ansi_isalpha /* Original: FUN_000000b6 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return (short)*(char *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0xc0;
+  return (short)*(char *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0xc0;
 }
 
 
@@ -128,12 +128,12 @@ ushort ansi_isalpha /* Original: FUN_000000b6 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0xd2.
  * C runtime ctype test: returns _ctype[c] & 0x03, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-byte ansi_iscntrl /* Original: FUN_000000d2 */ (undefined4 param_1)
+byte ansi_iscntrl /* Original: FUN_000000d2 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return *(byte *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 3;
+  return *(byte *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 3;
 }
 
 
@@ -145,12 +145,12 @@ byte ansi_iscntrl /* Original: FUN_000000d2 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0xee.
  * C runtime ctype test: returns _ctype[c] & 0x10, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-byte ansi_isdigit /* Original: FUN_000000ee */ (undefined4 param_1)
+byte ansi_isdigit /* Original: FUN_000000ee */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return *(byte *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0x10;
+  return *(byte *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0x10;
 }
 
 
@@ -162,12 +162,12 @@ byte ansi_isdigit /* Original: FUN_000000ee */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x10a.
  * C runtime ctype test: returns _ctype[c] & 0xd8, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-ushort ansi_isgraph /* Original: FUN_0000010a */ (undefined4 param_1)
+ushort ansi_isgraph /* Original: FUN_0000010a */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return (short)*(char *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0xd8;
+  return (short)*(char *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0xd8;
 }
 
 
@@ -179,12 +179,12 @@ ushort ansi_isgraph /* Original: FUN_0000010a */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x126.
  * C runtime ctype test: returns _ctype[c] & 0x80, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-ushort ansi_islower /* Original: FUN_00000126 */ (undefined4 param_1)
+ushort ansi_islower /* Original: FUN_00000126 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return (short)*(char *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0x80;
+  return (short)*(char *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0x80;
 }
 
 
@@ -196,12 +196,12 @@ ushort ansi_islower /* Original: FUN_00000126 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x142.
  * C runtime ctype test: returns _ctype[c] & 0xdc, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-ushort ansi_isprint /* Original: FUN_00000142 */ (undefined4 param_1)
+ushort ansi_isprint /* Original: FUN_00000142 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return (short)*(char *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0xdc;
+  return (short)*(char *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0xdc;
 }
 
 
@@ -213,12 +213,12 @@ ushort ansi_isprint /* Original: FUN_00000142 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x15e.
  * C runtime ctype test: returns _ctype[c] & 0x08, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-byte ansi_ispunct /* Original: FUN_0000015e */ (undefined4 param_1)
+byte ansi_ispunct /* Original: FUN_0000015e */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return *(byte *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 8;
+  return *(byte *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 8;
 }
 
 
@@ -230,12 +230,12 @@ byte ansi_ispunct /* Original: FUN_0000015e */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x17a.
  * C runtime ctype test: returns _ctype[c] & 0x06, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-byte ansi_isspace /* Original: FUN_0000017a */ (undefined4 param_1)
+byte ansi_isspace /* Original: FUN_0000017a */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return *(byte *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 6;
+  return *(byte *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 6;
 }
 
 
@@ -247,12 +247,12 @@ byte ansi_isspace /* Original: FUN_0000017a */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x196.
  * C runtime ctype test: returns _ctype[c] & 0x40, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-byte ansi_isupper /* Original: FUN_00000196 */ (undefined4 param_1)
+byte ansi_isupper /* Original: FUN_00000196 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return *(byte *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0x40;
+  return *(byte *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0x40;
 }
 
 
@@ -264,12 +264,12 @@ byte ansi_isupper /* Original: FUN_00000196 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x1b2.
  * C runtime ctype test: returns _ctype[c] & 0x30, the class table being the 256 bytes at A5-0x1608 [PROVEN, complete Ghidra C]. Bit layout derived from the eleven masks of this ANSI-ordered group (0x9a..0x1b2): 0x80 lower, 0x40 upper, 0x10 digit, 0x20 hex letter, 0x08 punctuation, 0x04 space character, 0x02 white space, 0x01 control; names follow the ANSI <ctype.h> order isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, isxdigit, which matches every mask [STRONG INFERENCE].
  */
-byte ansi_isxdigit /* Original: FUN_000001b2 */ (undefined4 param_1)
+byte ansi_isxdigit /* Original: FUN_000001b2 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
   int unaff_A5;
   
-  return *(byte *)((int)(short)(ushort)param_1._1_1_ + unaff_A5 + -0x1608) & 0x30;
+  return *(byte *)((int)(short)(ushort)c._1_1_ + unaff_A5 + -0x1608) & 0x30;
 }
 
 
@@ -281,17 +281,17 @@ byte ansi_isxdigit /* Original: FUN_000001b2 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x1ce.
  * toupper: if _ctype[c] & 0x80 (lower case) returns c ^ 0x20, else c. Complete Ghidra C.
  */
-ushort ansi_toupper /* Original: FUN_000001ce */ (undefined4 param_1)
+ushort ansi_toupper /* Original: FUN_000001ce */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
-  ushort uVar1;
+  ushort index; /* uVar1: ctype table index */
   int unaff_A5;
   
-  uVar1 = (ushort)param_1._1_1_;
-  if (((short)*(char *)((int)(short)uVar1 + unaff_A5 + -0x1608) & 0x80U) != 0) {
-    param_1._0_2_ = param_1._0_2_ ^ 0x20;
+  index = (ushort)c._1_1_;
+  if (((short)*(char *)((int)(short)index + unaff_A5 + -0x1608) & 0x80U) != 0) {
+    c._0_2_ = c._0_2_ ^ 0x20;
   }
-  return param_1._0_2_;
+  return c._0_2_;
 }
 
 
@@ -303,17 +303,17 @@ ushort ansi_toupper /* Original: FUN_000001ce */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x200.
  * tolower: if _ctype[c] & 0x40 (upper case) returns c ^ 0x20, else c. Complete Ghidra C.
  */
-ushort ansi_tolower /* Original: FUN_00000200 */ (undefined4 param_1)
+ushort ansi_tolower /* Original: FUN_00000200 */ (undefined4 c /* param_1: character in the low byte of the int */)
 
 {
-  ushort uVar1;
+  ushort index; /* uVar1: ctype table index */
   int unaff_A5;
   
-  uVar1 = (ushort)param_1._1_1_;
-  if ((*(byte *)((int)(short)uVar1 + unaff_A5 + -0x1608) & 0x40) != 0) {
-    param_1._0_2_ = param_1._0_2_ ^ 0x20;
+  index = (ushort)c._1_1_;
+  if ((*(byte *)((int)(short)index + unaff_A5 + -0x1608) & 0x40) != 0) {
+    c._0_2_ = c._0_2_ ^ 0x20;
   }
-  return param_1._0_2_;
+  return c._0_2_;
 }
 
 
@@ -325,18 +325,18 @@ ushort ansi_tolower /* Original: FUN_00000200 */ (undefined4 param_1)
  * Decoded from ID02.bin bytes at file 0x232.
  * memcpy(dst, src, n): forward byte copy of n bytes. Complete Ghidra C.
  */
-undefined1 * ansi_memcpy /* Original: FUN_00000232 */ (undefined1 *param_1,undefined1 *param_2,int param_3)
+undefined1 * ansi_memcpy /* Original: FUN_00000232 */ (undefined1 *dst /* param_1 */,undefined1 *src /* param_2 */,int count /* param_3 */)
 
 {
-  undefined1 *puVar1;
+  undefined1 *out; /* puVar1: write cursor */
 
-  puVar1 = param_1;                             /* MOVE.L 4(A7),D0: dst is the return value */
-  for (; param_3 != 0; param_3 = param_3 + -1) {
-    *puVar1 = *param_2;
-    puVar1 = puVar1 + 1;
-    param_2 = param_2 + 1;
+  out = dst;                             /* MOVE.L 4(A7),D0: dst is the return value */
+  for (; count != 0; count = count + -1) {
+    *out = *src;
+    out = out + 1;
+    src = src + 1;
   }
-  return param_1;
+  return dst;
 }
 
 
@@ -349,33 +349,33 @@ undefined1 * ansi_memcpy /* Original: FUN_00000232 */ (undefined1 *param_1,undef
  * Decoded from ID02.bin bytes at file 0x24a.
  * memmove(dst, src, n): copies backwards when dst >= src (overlap safe), else forwards. Complete Ghidra C; reached through JT $4fa (used by ID07 load_str129_string_table).
  */
-undefined1 * ansi_memmove /* Original: FUN_0000024a */ (undefined1 *param_1,undefined1 *param_2,int param_3)
+undefined1 * ansi_memmove /* Original: FUN_0000024a */ (undefined1 *dst /* param_1 */,undefined1 *src /* param_2 */,int count /* param_3 */)
 
 {
-  undefined1 *puVar1;
-  undefined1 *puVar2;
+  undefined1 *out; /* puVar1: write cursor */
+  undefined1 *in; /* puVar2: read cursor (backward copy) */
 
-  if (param_3 != 0) {                           /* D0 = dst before the test: returned on every path */
-    if (param_2 <= param_1) {                   /* CMPA.L A0,A1 / BHI: unsigned */
-      puVar1 = param_1 + param_3;
-      puVar2 = param_2 + param_3;
+  if (count != 0) {                           /* D0 = dst before the test: returned on every path */
+    if (src <= dst) {                   /* CMPA.L A0,A1 / BHI: unsigned */
+      out = dst + count;
+      in = src + count;
       do {
-        puVar2 = puVar2 + -1;
-        puVar1 = puVar1 + -1;
-        *puVar1 = *puVar2;
-        param_3 = param_3 + -1;
-      } while (param_3 != 0);
-      return param_1;
+        in = in + -1;
+        out = out + -1;
+        *out = *in;
+        count = count + -1;
+      } while (count != 0);
+      return dst;
     }
-    puVar1 = param_1;
+    out = dst;
     do {
-      *puVar1 = *param_2;
-      param_3 = param_3 + -1;
-      puVar1 = puVar1 + 1;
-      param_2 = param_2 + 1;
-    } while (param_3 != 0);
+      *out = *src;
+      count = count + -1;
+      out = out + 1;
+      src = src + 1;
+    } while (count != 0);
   }
-  return param_1;
+  return dst;
 }
 
 
@@ -392,20 +392,20 @@ Low-level Error: Cannot properly adjust input varnodes
  * Decoded from ID02.bin bytes at file 0x2c8.
  * strcpy(dst, src): copies bytes up to and including the NUL, returns dst (bytes 0x2c8..0x2d6, ). Reached through JT $52a.
  */
-char * ansi_strcpy /* Original: FUN_000002c8 */ (char *param_1,char *param_2)
+char * ansi_strcpy /* Original: FUN_000002c8 */ (char *dst /* param_1 */,char *src /* param_2 */)
 
 {
-  char cVar1;
-  char *pcVar2;
+  char ch; /* cVar1 */
+  char *out; /* pcVar2: write cursor */
   
-  pcVar2 = param_1;
+  out = dst;
   do {
-    cVar1 = *param_2;
-    *pcVar2 = cVar1;
-    pcVar2 = pcVar2 + 1;
-    param_2 = param_2 + 1;
-  } while (cVar1 != '\0');
-  return param_1;
+    ch = *src;
+    *out = ch;
+    out = out + 1;
+    src = src + 1;
+  } while (ch != '\0');
+  return dst;
 }
 
 
@@ -417,25 +417,25 @@ char * ansi_strcpy /* Original: FUN_000002c8 */ (char *param_1,char *param_2)
  * Decoded from ID02.bin bytes at file 0x2d8.
  * strcat(dst, src): finds the NUL of dst, appends src including its NUL, returns dst (bytes 0x2d8..0x2ec, ). Reached through JT $512.
  */
-char * ansi_strcat /* Original: FUN_000002d8 */ (char *param_1,char *param_2)
+char * ansi_strcat /* Original: FUN_000002d8 */ (char *dst /* param_1 */,char *src /* param_2 */)
 
 {
-  char cVar1;
-  char *pcVar2;
-  char *pcVar3;
+  char ch; /* cVar1 */
+  char *scan; /* pcVar2: one past the byte tested */
+  char *out; /* pcVar3: the terminator, then the write cursor */
   
-  pcVar2 = param_1;
+  scan = dst;
   do {
-    pcVar3 = pcVar2;
-    pcVar2 = pcVar3 + 1;
-  } while (*pcVar3 != '\0');
+    out = scan;
+    scan = out + 1;
+  } while (*out != '\0');
   do {
-    cVar1 = *param_2;
-    *pcVar3 = cVar1;
-    pcVar3 = pcVar3 + 1;
-    param_2 = param_2 + 1;
-  } while (cVar1 != '\0');
-  return param_1;
+    ch = *src;
+    *out = ch;
+    out = out + 1;
+    src = src + 1;
+  } while (ch != '\0');
+  return dst;
 }
 
 
@@ -447,24 +447,24 @@ char * ansi_strcat /* Original: FUN_000002d8 */ (char *param_1,char *param_2)
  * Decoded from ID02.bin bytes at file 0x2ee.
  * strcmp(a, b): unsigned byte compare; returns -1 / 0 / 1 at the first difference or 0 at a common NUL. Complete Ghidra C.
  */
-int ansi_strcmp /* Original: FUN_000002ee */ (byte *param_1,byte *param_2)
+int ansi_strcmp /* Original: FUN_000002ee */ (byte *s1 /* param_1 */,byte *s2 /* param_2 */)
 
 {
-  byte bVar1;
-  int iVar2;
+  byte ch; /* bVar1: byte of s1 */
+  int sign; /* iVar2: 0, or -2 when s1 < s2 (result sign - 1) */
   
-  iVar2 = 0;
+  sign = 0;
   do {
-    bVar1 = *param_1;
-    if (bVar1 != *param_2) {
-      if (bVar1 < *param_2) {
-        iVar2 = -2;
+    ch = *s1;
+    if (ch != *s2) {
+      if (ch < *s2) {
+        sign = -2;
       }
-      return iVar2 + 1;
+      return sign + 1;
     }
-    param_1 = param_1 + 1;
-    param_2 = param_2 + 1;
-  } while (bVar1 != 0);
+    s1 = s1 + 1;
+    s2 = s2 + 1;
+  } while (ch != 0);
   return 0;
 }
 
@@ -477,18 +477,18 @@ int ansi_strcmp /* Original: FUN_000002ee */ (byte *param_1,byte *param_2)
  * Decoded from ID02.bin bytes at file 0x30c.
  * strchr(s, c): first occurrence of the character (low byte of the 16-bit int at 8(A7), i.e. byte 9, which the C reaches as the low byte of the long's high word) including the terminating NUL, else NULL. Complete Ghidra C.
  */
-char * ansi_strchr /* Original: FUN_0000030c */ (char *param_1,undefined4 param_2)
+char * ansi_strchr /* Original: FUN_0000030c */ (char *s /* param_1 */,undefined4 c /* param_2: character in the high byte of the word (int promoted, big-endian) */)
 
 {
-  char cVar1;
+  char ch; /* cVar1 */
   
   do {
-    if ((char)((uint)param_2 >> 0x10) == *param_1) {
-      return param_1;
+    if ((char)((uint)c >> 0x10) == *s) {
+      return s;
     }
-    cVar1 = *param_1;
-    param_1 = param_1 + 1;
-  } while (cVar1 != '\0');
+    ch = *s;
+    s = s + 1;
+  } while (ch != '\0');
   return (char *)0x0;
 }
 
@@ -501,31 +501,31 @@ char * ansi_strchr /* Original: FUN_0000030c */ (char *param_1,undefined4 param_
  * Decoded from ID02.bin bytes at file 0x324.
  * strcspn(s, reject): length of the initial segment of s containing no character of reject. Complete Ghidra C.
  */
-int ansi_strcspn /* Original: FUN_00000324 */ (char *param_1,char *param_2)
+int ansi_strcspn /* Original: FUN_00000324 */ (char *s /* param_1 */,char *reject /* param_2 */)
 
 {
-  char cVar1;
-  char cVar2;
-  int iVar3;
-  char *pcVar4;
-  char *pcVar5;
+  char ch; /* cVar1: byte of s */
+  char rc; /* cVar2: byte of reject */
+  int len; /* iVar3 */
+  char *next; /* pcVar4 */
+  char *r; /* pcVar5: reject cursor */
   
-  iVar3 = -1;
+  len = -1;
   do {
-    iVar3 = iVar3 + 1;
-    pcVar4 = param_1 + 1;
-    cVar1 = *param_1;
-    pcVar5 = param_2;
-    if (cVar1 == '\0') {
-      return iVar3;
+    len = len + 1;
+    next = s + 1;
+    ch = *s;
+    r = reject;
+    if (ch == '\0') {
+      return len;
     }
     while( true ) {
-      cVar2 = *pcVar5;
-      param_1 = pcVar4;
-      if (cVar2 == '\0') break;
-      pcVar5 = pcVar5 + 1;
-      if (cVar2 == cVar1) {
-        return iVar3;
+      rc = *r;
+      s = next;
+      if (rc == '\0') break;
+      r = r + 1;
+      if (rc == ch) {
+        return len;
       }
     }
   } while( true );
@@ -540,26 +540,26 @@ int ansi_strcspn /* Original: FUN_00000324 */ (char *param_1,char *param_2)
  * Decoded from ID02.bin bytes at file 0x33e.
  * strpbrk(s, accept): first character of s that is in accept, else NULL. Complete Ghidra C.
  */
-char * ansi_strpbrk /* Original: FUN_0000033e */ (char *param_1,char *param_2)
+char * ansi_strpbrk /* Original: FUN_0000033e */ (char *s /* param_1 */,char *accept /* param_2 */)
 
 {
-  char cVar1;
-  char *pcVar2;
-  char *pcVar3;
+  char ac; /* cVar1: byte of accept */
+  char *cur; /* pcVar2: current byte of s */
+  char *a; /* pcVar3: accept cursor */
   
   do {
-    pcVar2 = param_1;
-    pcVar3 = param_2;
-    if (*pcVar2 == '\0') {
+    cur = s;
+    a = accept;
+    if (*cur == '\0') {
       return (char *)0x0;
     }
     while( true ) {
-      cVar1 = *pcVar3;
-      param_1 = pcVar2 + 1;
-      if (cVar1 == '\0') break;
-      pcVar3 = pcVar3 + 1;
-      if (cVar1 == *pcVar2) {
-        return pcVar2;
+      ac = *a;
+      s = cur + 1;
+      if (ac == '\0') break;
+      a = a + 1;
+      if (ac == *cur) {
+        return cur;
       }
     }
   } while( true );
@@ -574,21 +574,21 @@ char * ansi_strpbrk /* Original: FUN_0000033e */ (char *param_1,char *param_2)
  * Decoded from ID02.bin bytes at file 0x35a.
  * strrchr(s, c): last occurrence of the character (NUL included), else NULL. Complete Ghidra C.
  */
-char * ansi_strrchr /* Original: FUN_0000035a */ (char *param_1,undefined4 param_2)
+char * ansi_strrchr /* Original: FUN_0000035a */ (char *s /* param_1 */,undefined4 c /* param_2: character in the high byte of the word */)
 
 {
-  char cVar1;
-  char *pcVar2;
+  char ch; /* cVar1 */
+  char *last; /* pcVar2: last match so far */
   
-  pcVar2 = (char *)0x0;
+  last = (char *)0x0;
   do {
-    if ((char)((uint)param_2 >> 0x10) == *param_1) {
-      pcVar2 = param_1;
+    if ((char)((uint)c >> 0x10) == *s) {
+      last = s;
     }
-    cVar1 = *param_1;
-    param_1 = param_1 + 1;
-  } while (cVar1 != '\0');
-  return pcVar2;
+    ch = *s;
+    s = s + 1;
+  } while (ch != '\0');
+  return last;
 }
 
 
@@ -600,28 +600,28 @@ char * ansi_strrchr /* Original: FUN_0000035a */ (char *param_1,undefined4 param
  * Decoded from ID02.bin bytes at file 0x370.
  * strspn(s, accept): length of the initial segment of s made only of characters of accept. Complete Ghidra C.
  */
-int ansi_strspn /* Original: FUN_00000370 */ (char *param_1,char *param_2)
+int ansi_strspn /* Original: FUN_00000370 */ (char *s /* param_1 */,char *accept /* param_2 */)
 
 {
-  char cVar1;
-  int iVar2;
-  char *pcVar3;
+  char ac; /* cVar1: byte of accept */
+  int len; /* iVar2 */
+  char *a; /* pcVar3: accept cursor */
   
-  iVar2 = 0;
+  len = 0;
   do {
-    pcVar3 = param_2;
-    if (*param_1 == '\0') {
-      return iVar2;
+    a = accept;
+    if (*s == '\0') {
+      return len;
     }
     do {
-      cVar1 = *pcVar3;
-      if (cVar1 == '\0') {
-        return iVar2;
+      ac = *a;
+      if (ac == '\0') {
+        return len;
       }
-      pcVar3 = pcVar3 + 1;
-    } while (cVar1 != *param_1);
-    iVar2 = iVar2 + 1;
-    param_1 = param_1 + 1;
+      a = a + 1;
+    } while (ac != *s);
+    len = len + 1;
+    s = s + 1;
   } while( true );
 }
 
@@ -634,29 +634,29 @@ int ansi_strspn /* Original: FUN_00000370 */ (char *param_1,char *param_2)
  * Decoded from ID02.bin bytes at file 0x38c.
  * strstr(s, sub): first occurrence of sub in s (s itself when sub is empty), else NULL; restarts one past the previous start on a mismatch. Complete Ghidra C.
  */
-char * ansi_strstr /* Original: FUN_0000038c */ (char *param_1,char *param_2)
+char * ansi_strstr /* Original: FUN_0000038c */ (char *s /* param_1: haystack cursor */,char *needle /* param_2 */)
 
 {
-  char cVar1;
-  char cVar2;
-  char *pcVar3;
-  char *pcVar4;
+  char nc; /* cVar1: byte of needle */
+  char hc; /* cVar2: byte of the haystack */
+  char *start; /* pcVar3: candidate match start */
+  char *n; /* pcVar4: needle cursor */
   
-  pcVar4 = param_2;
-  pcVar3 = param_1;
+  n = needle;
+  start = s;
   while( true ) {
-    cVar1 = *pcVar4;
-    if (cVar1 == '\0') {
-      return pcVar3;
+    nc = *n;
+    if (nc == '\0') {
+      return start;
     }
-    cVar2 = *param_1;
-    if (cVar2 == '\0') break;
-    param_1 = param_1 + 1;
-    pcVar4 = pcVar4 + 1;
-    if (cVar2 != cVar1) {
-      param_1 = pcVar3 + 1;
-      pcVar4 = param_2;
-      pcVar3 = param_1;
+    hc = *s;
+    if (hc == '\0') break;
+    s = s + 1;
+    n = n + 1;
+    if (hc != nc) {
+      s = start + 1;
+      n = needle;
+      start = s;
     }
   }
   return (char *)0x0;
