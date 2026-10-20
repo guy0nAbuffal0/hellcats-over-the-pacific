@@ -84,4 +84,4 @@ func rt_udivmod32_core(dividend: uint, divisor: uint) -> ulonglong:
         quot = int(ushort(int(quot) - 1))
 
     return (ulonglong)quot << 32 | dividend - sum
-    
+        
