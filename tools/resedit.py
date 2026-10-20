@@ -822,6 +822,7 @@ def decode_code(b: bytes, rid: int) -> dict[str, Any]:
             entries.append({"kind": "loadseg_jump_table_entry", "index": i,
                             "a5_offset": u32(b, 12) + i * 8,
                             "record_file_offset": o, "stored_tail": u16(b, o),
+                            "target_file_offset": u16(b, o) + 4,
                             "segment_id": u16(b, o + 4),
                             "loader_stub_hex": b[o + 2:o + 8].hex()})
         d["properties"].update({"above_a5_size": u32(b, 0), "below_a5_size": u32(b, 4),

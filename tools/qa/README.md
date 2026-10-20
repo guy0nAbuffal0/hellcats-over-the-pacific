@@ -72,6 +72,6 @@ python3 tools/qa/test_regression.py
   - `godot/tests/integration/test_sim_loader_bridge.gd`
 - Fixture drift protection is owned by `tools/qa/test_regression.py`:
   - exact loader target tuple set for proven entries
-  - `entrypoint_offset == stored_tail + delta` invariant (`delta` in `{4, 6}`)
+  - `entrypoint_offset == stored_tail + delta` invariant (`delta == 4`)
   - replay input packet shape and frame count
   - byte-equality between legacy and migrated fixture copies (while both exist)

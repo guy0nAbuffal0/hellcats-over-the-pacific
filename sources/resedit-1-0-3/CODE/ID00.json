@@ -22,7 +22,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 16,
         "segment_id": 1,
-        "stored_tail": 4
+        "stored_tail": 4,
+        "target_file_offset": 8
       },
       {
         "a5_offset": 40,
@@ -31,7 +32,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 24,
         "segment_id": 1,
-        "stored_tail": 146
+        "stored_tail": 146,
+        "target_file_offset": 150
       },
       {
         "a5_offset": 48,
@@ -40,7 +42,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 32,
         "segment_id": 1,
-        "stored_tail": 166
+        "stored_tail": 166,
+        "target_file_offset": 170
       },
       {
         "a5_offset": 56,
@@ -49,7 +52,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 40,
         "segment_id": 1,
-        "stored_tail": 186
+        "stored_tail": 186,
+        "target_file_offset": 190
       },
       {
         "a5_offset": 64,
@@ -58,7 +62,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 48,
         "segment_id": 1,
-        "stored_tail": 214
+        "stored_tail": 214,
+        "target_file_offset": 218
       },
       {
         "a5_offset": 72,
@@ -67,7 +72,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 56,
         "segment_id": 1,
-        "stored_tail": 268
+        "stored_tail": 268,
+        "target_file_offset": 272
       },
       {
         "a5_offset": 80,
@@ -76,7 +82,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 64,
         "segment_id": 1,
-        "stored_tail": 300
+        "stored_tail": 300,
+        "target_file_offset": 304
       },
       {
         "a5_offset": 88,
@@ -85,7 +92,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 72,
         "segment_id": 1,
-        "stored_tail": 334
+        "stored_tail": 334,
+        "target_file_offset": 338
       },
       {
         "a5_offset": 96,
@@ -94,7 +102,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 80,
         "segment_id": 1,
-        "stored_tail": 366
+        "stored_tail": 366,
+        "target_file_offset": 370
       },
       {
         "a5_offset": 104,
@@ -103,7 +112,8 @@
         "loader_stub_hex": "3f3c0001a9f0",
         "record_file_offset": 88,
         "segment_id": 1,
-        "stored_tail": 552
+        "stored_tail": 552,
+        "target_file_offset": 556
       },
       {
         "a5_offset": 112,
@@ -112,7 +122,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 96,
         "segment_id": 4,
-        "stored_tail": 13134
+        "stored_tail": 13134,
+        "target_file_offset": 13138
       },
       {
         "a5_offset": 120,
@@ -121,7 +132,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 104,
         "segment_id": 4,
-        "stored_tail": 6666
+        "stored_tail": 6666,
+        "target_file_offset": 6670
       },
       {
         "a5_offset": 128,
@@ -130,7 +142,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 112,
         "segment_id": 4,
-        "stored_tail": 3070
+        "stored_tail": 3070,
+        "target_file_offset": 3074
       },
       {
         "a5_offset": 136,
@@ -139,7 +152,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 120,
         "segment_id": 4,
-        "stored_tail": 700
+        "stored_tail": 700,
+        "target_file_offset": 704
       },
       {
         "a5_offset": 144,
@@ -148,7 +162,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 128,
         "segment_id": 4,
-        "stored_tail": 5358
+        "stored_tail": 5358,
+        "target_file_offset": 5362
       },
       {
         "a5_offset": 152,
@@ -157,7 +172,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 136,
         "segment_id": 4,
-        "stored_tail": 3692
+        "stored_tail": 3692,
+        "target_file_offset": 3696
       },
       {
         "a5_offset": 160,
@@ -166,7 +182,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 144,
         "segment_id": 4,
-        "stored_tail": 0
+        "stored_tail": 0,
+        "target_file_offset": 4
       },
       {
         "a5_offset": 168,
@@ -175,7 +192,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 152,
         "segment_id": 4,
-        "stored_tail": 7578
+        "stored_tail": 7578,
+        "target_file_offset": 7582
       },
       {
         "a5_offset": 176,
@@ -184,7 +202,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 160,
         "segment_id": 4,
-        "stored_tail": 13812
+        "stored_tail": 13812,
+        "target_file_offset": 13816
       },
       {
         "a5_offset": 184,
@@ -193,7 +212,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 168,
         "segment_id": 4,
-        "stored_tail": 1260
+        "stored_tail": 1260,
+        "target_file_offset": 1264
       },
       {
         "a5_offset": 192,
@@ -202,7 +222,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 176,
         "segment_id": 4,
-        "stored_tail": 1504
+        "stored_tail": 1504,
+        "target_file_offset": 1508
       },
       {
         "a5_offset": 200,
@@ -211,7 +232,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 184,
         "segment_id": 4,
-        "stored_tail": 8448
+        "stored_tail": 8448,
+        "target_file_offset": 8452
       },
       {
         "a5_offset": 208,
@@ -220,7 +242,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 192,
         "segment_id": 4,
-        "stored_tail": 14590
+        "stored_tail": 14590,
+        "target_file_offset": 14594
       },
       {
         "a5_offset": 216,
@@ -229,7 +252,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 200,
         "segment_id": 4,
-        "stored_tail": 12710
+        "stored_tail": 12710,
+        "target_file_offset": 12714
       },
       {
         "a5_offset": 224,
@@ -238,7 +262,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 208,
         "segment_id": 4,
-        "stored_tail": 4604
+        "stored_tail": 4604,
+        "target_file_offset": 4608
       },
       {
         "a5_offset": 232,
@@ -247,7 +272,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 216,
         "segment_id": 4,
-        "stored_tail": 8420
+        "stored_tail": 8420,
+        "target_file_offset": 8424
       },
       {
         "a5_offset": 240,
@@ -256,7 +282,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 224,
         "segment_id": 4,
-        "stored_tail": 15678
+        "stored_tail": 15678,
+        "target_file_offset": 15682
       },
       {
         "a5_offset": 248,
@@ -265,7 +292,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 232,
         "segment_id": 4,
-        "stored_tail": 1098
+        "stored_tail": 1098,
+        "target_file_offset": 1102
       },
       {
         "a5_offset": 256,
@@ -274,7 +302,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 240,
         "segment_id": 4,
-        "stored_tail": 4982
+        "stored_tail": 4982,
+        "target_file_offset": 4986
       },
       {
         "a5_offset": 264,
@@ -283,7 +312,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 248,
         "segment_id": 4,
-        "stored_tail": 14706
+        "stored_tail": 14706,
+        "target_file_offset": 14710
       },
       {
         "a5_offset": 272,
@@ -292,7 +322,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 256,
         "segment_id": 4,
-        "stored_tail": 3030
+        "stored_tail": 3030,
+        "target_file_offset": 3034
       },
       {
         "a5_offset": 280,
@@ -301,7 +332,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 264,
         "segment_id": 4,
-        "stored_tail": 2538
+        "stored_tail": 2538,
+        "target_file_offset": 2542
       },
       {
         "a5_offset": 288,
@@ -310,7 +342,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 272,
         "segment_id": 4,
-        "stored_tail": 1140
+        "stored_tail": 1140,
+        "target_file_offset": 1144
       },
       {
         "a5_offset": 296,
@@ -319,7 +352,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 280,
         "segment_id": 4,
-        "stored_tail": 362
+        "stored_tail": 362,
+        "target_file_offset": 366
       },
       {
         "a5_offset": 304,
@@ -328,7 +362,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 288,
         "segment_id": 4,
-        "stored_tail": 1600
+        "stored_tail": 1600,
+        "target_file_offset": 1604
       },
       {
         "a5_offset": 312,
@@ -337,7 +372,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 296,
         "segment_id": 4,
-        "stored_tail": 1298
+        "stored_tail": 1298,
+        "target_file_offset": 1302
       },
       {
         "a5_offset": 320,
@@ -346,7 +382,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 304,
         "segment_id": 4,
-        "stored_tail": 494
+        "stored_tail": 494,
+        "target_file_offset": 498
       },
       {
         "a5_offset": 328,
@@ -355,7 +392,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 312,
         "segment_id": 4,
-        "stored_tail": 3652
+        "stored_tail": 3652,
+        "target_file_offset": 3656
       },
       {
         "a5_offset": 336,
@@ -364,7 +402,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 320,
         "segment_id": 4,
-        "stored_tail": 7642
+        "stored_tail": 7642,
+        "target_file_offset": 7646
       },
       {
         "a5_offset": 344,
@@ -373,7 +412,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 328,
         "segment_id": 4,
-        "stored_tail": 6970
+        "stored_tail": 6970,
+        "target_file_offset": 6974
       },
       {
         "a5_offset": 352,
@@ -382,7 +422,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 336,
         "segment_id": 4,
-        "stored_tail": 14984
+        "stored_tail": 14984,
+        "target_file_offset": 14988
       },
       {
         "a5_offset": 360,
@@ -391,7 +432,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 344,
         "segment_id": 4,
-        "stored_tail": 5824
+        "stored_tail": 5824,
+        "target_file_offset": 5828
       },
       {
         "a5_offset": 368,
@@ -400,7 +442,8 @@
         "loader_stub_hex": "3f3c0004a9f0",
         "record_file_offset": 352,
         "segment_id": 4,
-        "stored_tail": 1070
+        "stored_tail": 1070,
+        "target_file_offset": 1074
       },
       {
         "a5_offset": 376,
@@ -409,7 +452,8 @@
         "loader_stub_hex": "3f3c0003a9f0",
         "record_file_offset": 360,
         "segment_id": 3,
-        "stored_tail": 23744
+        "stored_tail": 23744,
+        "target_file_offset": 23748
       },
       {
         "a5_offset": 384,
@@ -418,7 +462,8 @@
         "loader_stub_hex": "3f3c0003a9f0",
         "record_file_offset": 368,
         "segment_id": 3,
-        "stored_tail": 27672
+        "stored_tail": 27672,
+        "target_file_offset": 27676
       },
       {
         "a5_offset": 392,
@@ -427,7 +472,8 @@
         "loader_stub_hex": "3f3c0003a9f0",
         "record_file_offset": 376,
         "segment_id": 3,
-        "stored_tail": 0
+        "stored_tail": 0,
+        "target_file_offset": 4
       },
       {
         "a5_offset": 400,
@@ -436,7 +482,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 384,
         "segment_id": 6,
-        "stored_tail": 788
+        "stored_tail": 788,
+        "target_file_offset": 792
       },
       {
         "a5_offset": 408,
@@ -445,7 +492,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 392,
         "segment_id": 6,
-        "stored_tail": 3596
+        "stored_tail": 3596,
+        "target_file_offset": 3600
       },
       {
         "a5_offset": 416,
@@ -454,7 +502,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 400,
         "segment_id": 6,
-        "stored_tail": 2206
+        "stored_tail": 2206,
+        "target_file_offset": 2210
       },
       {
         "a5_offset": 424,
@@ -463,7 +512,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 408,
         "segment_id": 6,
-        "stored_tail": 1964
+        "stored_tail": 1964,
+        "target_file_offset": 1968
       },
       {
         "a5_offset": 432,
@@ -472,7 +522,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 416,
         "segment_id": 6,
-        "stored_tail": 2132
+        "stored_tail": 2132,
+        "target_file_offset": 2136
       },
       {
         "a5_offset": 440,
@@ -481,7 +532,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 424,
         "segment_id": 6,
-        "stored_tail": 2410
+        "stored_tail": 2410,
+        "target_file_offset": 2414
       },
       {
         "a5_offset": 448,
@@ -490,7 +542,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 432,
         "segment_id": 6,
-        "stored_tail": 2516
+        "stored_tail": 2516,
+        "target_file_offset": 2520
       },
       {
         "a5_offset": 456,
@@ -499,7 +552,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 440,
         "segment_id": 6,
-        "stored_tail": 274
+        "stored_tail": 274,
+        "target_file_offset": 278
       },
       {
         "a5_offset": 464,
@@ -508,7 +562,8 @@
         "loader_stub_hex": "3f3c0006a9f0",
         "record_file_offset": 448,
         "segment_id": 6,
-        "stored_tail": 234
+        "stored_tail": 234,
+        "target_file_offset": 238
       },
       {
         "a5_offset": 472,
@@ -517,7 +572,8 @@
         "loader_stub_hex": "3f3c0008a9f0",
         "record_file_offset": 456,
         "segment_id": 8,
-        "stored_tail": 920
+        "stored_tail": 920,
+        "target_file_offset": 924
       },
       {
         "a5_offset": 480,
@@ -526,7 +582,8 @@
         "loader_stub_hex": "3f3c0008a9f0",
         "record_file_offset": 464,
         "segment_id": 8,
-        "stored_tail": 2
+        "stored_tail": 2,
+        "target_file_offset": 6
       },
       {
         "a5_offset": 488,
@@ -535,7 +592,8 @@
         "loader_stub_hex": "3f3c0008a9f0",
         "record_file_offset": 472,
         "segment_id": 8,
-        "stored_tail": 0
+        "stored_tail": 0,
+        "target_file_offset": 4
       },
       {
         "a5_offset": 496,
@@ -544,7 +602,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 480,
         "segment_id": 9,
-        "stored_tail": 28
+        "stored_tail": 28,
+        "target_file_offset": 32
       },
       {
         "a5_offset": 504,
@@ -553,7 +612,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 488,
         "segment_id": 9,
-        "stored_tail": 390
+        "stored_tail": 390,
+        "target_file_offset": 394
       },
       {
         "a5_offset": 512,
@@ -562,7 +622,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 496,
         "segment_id": 9,
-        "stored_tail": 398
+        "stored_tail": 398,
+        "target_file_offset": 402
       },
       {
         "a5_offset": 520,
@@ -571,7 +632,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 504,
         "segment_id": 9,
-        "stored_tail": 408
+        "stored_tail": 408,
+        "target_file_offset": 412
       },
       {
         "a5_offset": 528,
@@ -580,7 +642,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 512,
         "segment_id": 9,
-        "stored_tail": 430
+        "stored_tail": 430,
+        "target_file_offset": 434
       },
       {
         "a5_offset": 536,
@@ -589,7 +652,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 520,
         "segment_id": 9,
-        "stored_tail": 440
+        "stored_tail": 440,
+        "target_file_offset": 444
       },
       {
         "a5_offset": 544,
@@ -598,7 +662,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 528,
         "segment_id": 9,
-        "stored_tail": 456
+        "stored_tail": 456,
+        "target_file_offset": 460
       },
       {
         "a5_offset": 552,
@@ -607,7 +672,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 536,
         "segment_id": 9,
-        "stored_tail": 508
+        "stored_tail": 508,
+        "target_file_offset": 512
       },
       {
         "a5_offset": 560,
@@ -616,7 +682,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 544,
         "segment_id": 9,
-        "stored_tail": 520
+        "stored_tail": 520,
+        "target_file_offset": 524
       },
       {
         "a5_offset": 568,
@@ -625,7 +692,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 552,
         "segment_id": 9,
-        "stored_tail": 532
+        "stored_tail": 532,
+        "target_file_offset": 536
       },
       {
         "a5_offset": 576,
@@ -634,7 +702,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 560,
         "segment_id": 9,
-        "stored_tail": 542
+        "stored_tail": 542,
+        "target_file_offset": 546
       },
       {
         "a5_offset": 584,
@@ -643,7 +712,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 568,
         "segment_id": 9,
-        "stored_tail": 562
+        "stored_tail": 562,
+        "target_file_offset": 566
       },
       {
         "a5_offset": 592,
@@ -652,7 +722,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 576,
         "segment_id": 9,
-        "stored_tail": 574
+        "stored_tail": 574,
+        "target_file_offset": 578
       },
       {
         "a5_offset": 600,
@@ -661,7 +732,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 584,
         "segment_id": 9,
-        "stored_tail": 586
+        "stored_tail": 586,
+        "target_file_offset": 590
       },
       {
         "a5_offset": 608,
@@ -670,7 +742,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 592,
         "segment_id": 9,
-        "stored_tail": 596
+        "stored_tail": 596,
+        "target_file_offset": 600
       },
       {
         "a5_offset": 616,
@@ -679,7 +752,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 600,
         "segment_id": 9,
-        "stored_tail": 608
+        "stored_tail": 608,
+        "target_file_offset": 612
       },
       {
         "a5_offset": 624,
@@ -688,7 +762,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 608,
         "segment_id": 9,
-        "stored_tail": 620
+        "stored_tail": 620,
+        "target_file_offset": 624
       },
       {
         "a5_offset": 632,
@@ -697,7 +772,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 616,
         "segment_id": 9,
-        "stored_tail": 630
+        "stored_tail": 630,
+        "target_file_offset": 634
       },
       {
         "a5_offset": 640,
@@ -706,7 +782,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 624,
         "segment_id": 9,
-        "stored_tail": 640
+        "stored_tail": 640,
+        "target_file_offset": 644
       },
       {
         "a5_offset": 648,
@@ -715,7 +792,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 632,
         "segment_id": 9,
-        "stored_tail": 650
+        "stored_tail": 650,
+        "target_file_offset": 654
       },
       {
         "a5_offset": 656,
@@ -724,7 +802,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 640,
         "segment_id": 9,
-        "stored_tail": 660
+        "stored_tail": 660,
+        "target_file_offset": 664
       },
       {
         "a5_offset": 664,
@@ -733,7 +812,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 648,
         "segment_id": 9,
-        "stored_tail": 666
+        "stored_tail": 666,
+        "target_file_offset": 670
       },
       {
         "a5_offset": 672,
@@ -742,7 +822,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 656,
         "segment_id": 9,
-        "stored_tail": 674
+        "stored_tail": 674,
+        "target_file_offset": 678
       },
       {
         "a5_offset": 680,
@@ -751,7 +832,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 664,
         "segment_id": 9,
-        "stored_tail": 730
+        "stored_tail": 730,
+        "target_file_offset": 734
       },
       {
         "a5_offset": 688,
@@ -760,7 +842,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 672,
         "segment_id": 9,
-        "stored_tail": 758
+        "stored_tail": 758,
+        "target_file_offset": 762
       },
       {
         "a5_offset": 696,
@@ -769,7 +852,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 680,
         "segment_id": 9,
-        "stored_tail": 832
+        "stored_tail": 832,
+        "target_file_offset": 836
       },
       {
         "a5_offset": 704,
@@ -778,7 +862,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 688,
         "segment_id": 9,
-        "stored_tail": 868
+        "stored_tail": 868,
+        "target_file_offset": 872
       },
       {
         "a5_offset": 712,
@@ -787,7 +872,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 696,
         "segment_id": 9,
-        "stored_tail": 904
+        "stored_tail": 904,
+        "target_file_offset": 908
       },
       {
         "a5_offset": 720,
@@ -796,7 +882,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 704,
         "segment_id": 9,
-        "stored_tail": 940
+        "stored_tail": 940,
+        "target_file_offset": 944
       },
       {
         "a5_offset": 728,
@@ -805,7 +892,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 712,
         "segment_id": 9,
-        "stored_tail": 950
+        "stored_tail": 950,
+        "target_file_offset": 954
       },
       {
         "a5_offset": 736,
@@ -814,7 +902,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 720,
         "segment_id": 9,
-        "stored_tail": 958
+        "stored_tail": 958,
+        "target_file_offset": 962
       },
       {
         "a5_offset": 744,
@@ -823,7 +912,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 728,
         "segment_id": 9,
-        "stored_tail": 978
+        "stored_tail": 978,
+        "target_file_offset": 982
       },
       {
         "a5_offset": 752,
@@ -832,7 +922,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 736,
         "segment_id": 9,
-        "stored_tail": 1024
+        "stored_tail": 1024,
+        "target_file_offset": 1028
       },
       {
         "a5_offset": 760,
@@ -841,7 +932,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 744,
         "segment_id": 9,
-        "stored_tail": 1070
+        "stored_tail": 1070,
+        "target_file_offset": 1074
       },
       {
         "a5_offset": 768,
@@ -850,7 +942,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 752,
         "segment_id": 9,
-        "stored_tail": 1042
+        "stored_tail": 1042,
+        "target_file_offset": 1046
       },
       {
         "a5_offset": 776,
@@ -859,7 +952,8 @@
         "loader_stub_hex": "3f3c0009a9f0",
         "record_file_offset": 760,
         "segment_id": 9,
-        "stored_tail": 22
+        "stored_tail": 22,
+        "target_file_offset": 26
       },
       {
         "a5_offset": 784,
@@ -868,7 +962,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 768,
         "segment_id": 2,
-        "stored_tail": 3918
+        "stored_tail": 3918,
+        "target_file_offset": 3922
       },
       {
         "a5_offset": 792,
@@ -877,7 +972,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 776,
         "segment_id": 2,
-        "stored_tail": 6558
+        "stored_tail": 6558,
+        "target_file_offset": 6562
       },
       {
         "a5_offset": 800,
@@ -886,7 +982,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 784,
         "segment_id": 2,
-        "stored_tail": 3382
+        "stored_tail": 3382,
+        "target_file_offset": 3386
       },
       {
         "a5_offset": 808,
@@ -895,7 +992,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 792,
         "segment_id": 2,
-        "stored_tail": 2690
+        "stored_tail": 2690,
+        "target_file_offset": 2694
       },
       {
         "a5_offset": 816,
@@ -904,7 +1002,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 800,
         "segment_id": 2,
-        "stored_tail": 6656
+        "stored_tail": 6656,
+        "target_file_offset": 6660
       },
       {
         "a5_offset": 824,
@@ -913,7 +1012,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 808,
         "segment_id": 2,
-        "stored_tail": 3172
+        "stored_tail": 3172,
+        "target_file_offset": 3176
       },
       {
         "a5_offset": 832,
@@ -922,7 +1022,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 816,
         "segment_id": 2,
-        "stored_tail": 6784
+        "stored_tail": 6784,
+        "target_file_offset": 6788
       },
       {
         "a5_offset": 840,
@@ -931,7 +1032,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 824,
         "segment_id": 2,
-        "stored_tail": 3642
+        "stored_tail": 3642,
+        "target_file_offset": 3646
       },
       {
         "a5_offset": 848,
@@ -940,7 +1042,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 832,
         "segment_id": 2,
-        "stored_tail": 3952
+        "stored_tail": 3952,
+        "target_file_offset": 3956
       },
       {
         "a5_offset": 856,
@@ -949,7 +1052,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 840,
         "segment_id": 2,
-        "stored_tail": 5346
+        "stored_tail": 5346,
+        "target_file_offset": 5350
       },
       {
         "a5_offset": 864,
@@ -958,7 +1062,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 848,
         "segment_id": 2,
-        "stored_tail": 4868
+        "stored_tail": 4868,
+        "target_file_offset": 4872
       },
       {
         "a5_offset": 872,
@@ -967,7 +1072,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 856,
         "segment_id": 2,
-        "stored_tail": 5576
+        "stored_tail": 5576,
+        "target_file_offset": 5580
       },
       {
         "a5_offset": 880,
@@ -976,7 +1082,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 864,
         "segment_id": 2,
-        "stored_tail": 6520
+        "stored_tail": 6520,
+        "target_file_offset": 6524
       },
       {
         "a5_offset": 888,
@@ -985,7 +1092,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 872,
         "segment_id": 2,
-        "stored_tail": 6820
+        "stored_tail": 6820,
+        "target_file_offset": 6824
       },
       {
         "a5_offset": 896,
@@ -994,7 +1102,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 880,
         "segment_id": 2,
-        "stored_tail": 5756
+        "stored_tail": 5756,
+        "target_file_offset": 5760
       },
       {
         "a5_offset": 904,
@@ -1003,7 +1112,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 888,
         "segment_id": 2,
-        "stored_tail": 6928
+        "stored_tail": 6928,
+        "target_file_offset": 6932
       },
       {
         "a5_offset": 912,
@@ -1012,7 +1122,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 896,
         "segment_id": 2,
-        "stored_tail": 3360
+        "stored_tail": 3360,
+        "target_file_offset": 3364
       },
       {
         "a5_offset": 920,
@@ -1021,7 +1132,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 904,
         "segment_id": 2,
-        "stored_tail": 3996
+        "stored_tail": 3996,
+        "target_file_offset": 4000
       },
       {
         "a5_offset": 928,
@@ -1030,7 +1142,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 912,
         "segment_id": 2,
-        "stored_tail": 5678
+        "stored_tail": 5678,
+        "target_file_offset": 5682
       },
       {
         "a5_offset": 936,
@@ -1039,7 +1152,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 920,
         "segment_id": 2,
-        "stored_tail": 6488
+        "stored_tail": 6488,
+        "target_file_offset": 6492
       },
       {
         "a5_offset": 944,
@@ -1048,7 +1162,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 928,
         "segment_id": 2,
-        "stored_tail": 6892
+        "stored_tail": 6892,
+        "target_file_offset": 6896
       },
       {
         "a5_offset": 952,
@@ -1057,7 +1172,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 936,
         "segment_id": 2,
-        "stored_tail": 5798
+        "stored_tail": 5798,
+        "target_file_offset": 5802
       },
       {
         "a5_offset": 960,
@@ -1066,7 +1182,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 944,
         "segment_id": 2,
-        "stored_tail": 4584
+        "stored_tail": 4584,
+        "target_file_offset": 4588
       },
       {
         "a5_offset": 968,
@@ -1075,7 +1192,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 952,
         "segment_id": 2,
-        "stored_tail": 5714
+        "stored_tail": 5714,
+        "target_file_offset": 5718
       },
       {
         "a5_offset": 976,
@@ -1084,7 +1202,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 960,
         "segment_id": 2,
-        "stored_tail": 3738
+        "stored_tail": 3738,
+        "target_file_offset": 3742
       },
       {
         "a5_offset": 984,
@@ -1093,7 +1212,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 968,
         "segment_id": 2,
-        "stored_tail": 6856
+        "stored_tail": 6856,
+        "target_file_offset": 6860
       },
       {
         "a5_offset": 992,
@@ -1102,7 +1222,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 976,
         "segment_id": 2,
-        "stored_tail": 5382
+        "stored_tail": 5382,
+        "target_file_offset": 5386
       },
       {
         "a5_offset": 1000,
@@ -1111,7 +1232,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 984,
         "segment_id": 2,
-        "stored_tail": 2764
+        "stored_tail": 2764,
+        "target_file_offset": 2768
       },
       {
         "a5_offset": 1008,
@@ -1120,7 +1242,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 992,
         "segment_id": 2,
-        "stored_tail": 4046
+        "stored_tail": 4046,
+        "target_file_offset": 4050
       },
       {
         "a5_offset": 1016,
@@ -1129,7 +1252,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1000,
         "segment_id": 2,
-        "stored_tail": 2622
+        "stored_tail": 2622,
+        "target_file_offset": 2626
       },
       {
         "a5_offset": 1024,
@@ -1138,7 +1262,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1008,
         "segment_id": 2,
-        "stored_tail": 3234
+        "stored_tail": 3234,
+        "target_file_offset": 3238
       },
       {
         "a5_offset": 1032,
@@ -1147,7 +1272,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1016,
         "segment_id": 2,
-        "stored_tail": 6692
+        "stored_tail": 6692,
+        "target_file_offset": 6696
       },
       {
         "a5_offset": 1040,
@@ -1156,7 +1282,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1024,
         "segment_id": 2,
-        "stored_tail": 15018
+        "stored_tail": 15018,
+        "target_file_offset": 15022
       },
       {
         "a5_offset": 1048,
@@ -1165,7 +1292,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1032,
         "segment_id": 2,
-        "stored_tail": 14756
+        "stored_tail": 14756,
+        "target_file_offset": 14760
       },
       {
         "a5_offset": 1056,
@@ -1174,7 +1302,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1040,
         "segment_id": 2,
-        "stored_tail": 15296
+        "stored_tail": 15296,
+        "target_file_offset": 15300
       },
       {
         "a5_offset": 1064,
@@ -1183,7 +1312,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1048,
         "segment_id": 2,
-        "stored_tail": 16460
+        "stored_tail": 16460,
+        "target_file_offset": 16464
       },
       {
         "a5_offset": 1072,
@@ -1192,7 +1322,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1056,
         "segment_id": 2,
-        "stored_tail": 16958
+        "stored_tail": 16958,
+        "target_file_offset": 16962
       },
       {
         "a5_offset": 1080,
@@ -1201,7 +1332,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1064,
         "segment_id": 2,
-        "stored_tail": 17068
+        "stored_tail": 17068,
+        "target_file_offset": 17072
       },
       {
         "a5_offset": 1088,
@@ -1210,7 +1342,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1072,
         "segment_id": 2,
-        "stored_tail": 16208
+        "stored_tail": 16208,
+        "target_file_offset": 16212
       },
       {
         "a5_offset": 1096,
@@ -1219,7 +1352,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1080,
         "segment_id": 2,
-        "stored_tail": 16802
+        "stored_tail": 16802,
+        "target_file_offset": 16806
       },
       {
         "a5_offset": 1104,
@@ -1228,7 +1362,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1088,
         "segment_id": 2,
-        "stored_tail": 16682
+        "stored_tail": 16682,
+        "target_file_offset": 16686
       },
       {
         "a5_offset": 1112,
@@ -1237,7 +1372,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1096,
         "segment_id": 2,
-        "stored_tail": 18938
+        "stored_tail": 18938,
+        "target_file_offset": 18942
       },
       {
         "a5_offset": 1120,
@@ -1246,7 +1382,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1104,
         "segment_id": 2,
-        "stored_tail": 19760
+        "stored_tail": 19760,
+        "target_file_offset": 19764
       },
       {
         "a5_offset": 1128,
@@ -1255,7 +1392,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1112,
         "segment_id": 2,
-        "stored_tail": 18566
+        "stored_tail": 18566,
+        "target_file_offset": 18570
       },
       {
         "a5_offset": 1136,
@@ -1264,7 +1402,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1120,
         "segment_id": 2,
-        "stored_tail": 17790
+        "stored_tail": 17790,
+        "target_file_offset": 17794
       },
       {
         "a5_offset": 1144,
@@ -1273,7 +1412,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1128,
         "segment_id": 2,
-        "stored_tail": 17450
+        "stored_tail": 17450,
+        "target_file_offset": 17454
       },
       {
         "a5_offset": 1152,
@@ -1282,7 +1422,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1136,
         "segment_id": 2,
-        "stored_tail": 19294
+        "stored_tail": 19294,
+        "target_file_offset": 19298
       },
       {
         "a5_offset": 1160,
@@ -1291,7 +1432,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1144,
         "segment_id": 2,
-        "stored_tail": 17242
+        "stored_tail": 17242,
+        "target_file_offset": 17246
       },
       {
         "a5_offset": 1168,
@@ -1300,7 +1442,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1152,
         "segment_id": 2,
-        "stored_tail": 19814
+        "stored_tail": 19814,
+        "target_file_offset": 19818
       },
       {
         "a5_offset": 1176,
@@ -1309,7 +1452,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1160,
         "segment_id": 2,
-        "stored_tail": 7726
+        "stored_tail": 7726,
+        "target_file_offset": 7730
       },
       {
         "a5_offset": 1184,
@@ -1318,7 +1462,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1168,
         "segment_id": 2,
-        "stored_tail": 7302
+        "stored_tail": 7302,
+        "target_file_offset": 7306
       },
       {
         "a5_offset": 1192,
@@ -1327,7 +1472,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1176,
         "segment_id": 2,
-        "stored_tail": 11700
+        "stored_tail": 11700,
+        "target_file_offset": 11704
       },
       {
         "a5_offset": 1200,
@@ -1336,7 +1482,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1184,
         "segment_id": 2,
-        "stored_tail": 12438
+        "stored_tail": 12438,
+        "target_file_offset": 12442
       },
       {
         "a5_offset": 1208,
@@ -1345,7 +1492,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1192,
         "segment_id": 2,
-        "stored_tail": 7492
+        "stored_tail": 7492,
+        "target_file_offset": 7496
       },
       {
         "a5_offset": 1216,
@@ -1354,7 +1502,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1200,
         "segment_id": 2,
-        "stored_tail": 8486
+        "stored_tail": 8486,
+        "target_file_offset": 8490
       },
       {
         "a5_offset": 1224,
@@ -1363,7 +1512,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1208,
         "segment_id": 2,
-        "stored_tail": 10816
+        "stored_tail": 10816,
+        "target_file_offset": 10820
       },
       {
         "a5_offset": 1232,
@@ -1372,7 +1522,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1216,
         "segment_id": 2,
-        "stored_tail": 12000
+        "stored_tail": 12000,
+        "target_file_offset": 12004
       },
       {
         "a5_offset": 1240,
@@ -1381,7 +1532,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1224,
         "segment_id": 2,
-        "stored_tail": 26
+        "stored_tail": 26,
+        "target_file_offset": 30
       },
       {
         "a5_offset": 1248,
@@ -1390,7 +1542,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1232,
         "segment_id": 2,
-        "stored_tail": 458
+        "stored_tail": 458,
+        "target_file_offset": 462
       },
       {
         "a5_offset": 1256,
@@ -1399,7 +1552,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1240,
         "segment_id": 2,
-        "stored_tail": 558
+        "stored_tail": 558,
+        "target_file_offset": 562
       },
       {
         "a5_offset": 1264,
@@ -1408,7 +1562,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1248,
         "segment_id": 2,
-        "stored_tail": 684
+        "stored_tail": 684,
+        "target_file_offset": 688
       },
       {
         "a5_offset": 1272,
@@ -1417,7 +1572,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1256,
         "segment_id": 2,
-        "stored_tail": 582
+        "stored_tail": 582,
+        "target_file_offset": 586
       },
       {
         "a5_offset": 1280,
@@ -1426,7 +1582,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1264,
         "segment_id": 2,
-        "stored_tail": 1072
+        "stored_tail": 1072,
+        "target_file_offset": 1076
       },
       {
         "a5_offset": 1288,
@@ -1435,7 +1592,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1272,
         "segment_id": 2,
-        "stored_tail": 1010
+        "stored_tail": 1010,
+        "target_file_offset": 1014
       },
       {
         "a5_offset": 1296,
@@ -1444,7 +1602,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1280,
         "segment_id": 2,
-        "stored_tail": 724
+        "stored_tail": 724,
+        "target_file_offset": 728
       },
       {
         "a5_offset": 1304,
@@ -1453,7 +1612,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1288,
         "segment_id": 2,
-        "stored_tail": 746
+        "stored_tail": 746,
+        "target_file_offset": 750
       },
       {
         "a5_offset": 1312,
@@ -1462,7 +1622,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1296,
         "segment_id": 2,
-        "stored_tail": 996
+        "stored_tail": 996,
+        "target_file_offset": 1000
       },
       {
         "a5_offset": 1320,
@@ -1471,7 +1632,8 @@
         "loader_stub_hex": "3f3c0002a9f0",
         "record_file_offset": 1304,
         "segment_id": 2,
-        "stored_tail": 708
+        "stored_tail": 708,
+        "target_file_offset": 712
       },
       {
         "a5_offset": 1328,
@@ -1480,7 +1642,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1312,
         "segment_id": 5,
-        "stored_tail": 2222
+        "stored_tail": 2222,
+        "target_file_offset": 2226
       },
       {
         "a5_offset": 1336,
@@ -1489,7 +1652,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1320,
         "segment_id": 5,
-        "stored_tail": 2034
+        "stored_tail": 2034,
+        "target_file_offset": 2038
       },
       {
         "a5_offset": 1344,
@@ -1498,7 +1662,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1328,
         "segment_id": 5,
-        "stored_tail": 2228
+        "stored_tail": 2228,
+        "target_file_offset": 2232
       },
       {
         "a5_offset": 1352,
@@ -1507,7 +1672,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1336,
         "segment_id": 5,
-        "stored_tail": 2352
+        "stored_tail": 2352,
+        "target_file_offset": 2356
       },
       {
         "a5_offset": 1360,
@@ -1516,7 +1682,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1344,
         "segment_id": 5,
-        "stored_tail": 2944
+        "stored_tail": 2944,
+        "target_file_offset": 2948
       },
       {
         "a5_offset": 1368,
@@ -1525,7 +1692,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1352,
         "segment_id": 5,
-        "stored_tail": 2138
+        "stored_tail": 2138,
+        "target_file_offset": 2142
       },
       {
         "a5_offset": 1376,
@@ -1534,7 +1702,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1360,
         "segment_id": 5,
-        "stored_tail": 708
+        "stored_tail": 708,
+        "target_file_offset": 712
       },
       {
         "a5_offset": 1384,
@@ -1543,7 +1712,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1368,
         "segment_id": 5,
-        "stored_tail": 0
+        "stored_tail": 0,
+        "target_file_offset": 4
       },
       {
         "a5_offset": 1392,
@@ -1552,7 +1722,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1376,
         "segment_id": 5,
-        "stored_tail": 1372
+        "stored_tail": 1372,
+        "target_file_offset": 1376
       },
       {
         "a5_offset": 1400,
@@ -1561,7 +1732,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1384,
         "segment_id": 5,
-        "stored_tail": 440
+        "stored_tail": 440,
+        "target_file_offset": 444
       },
       {
         "a5_offset": 1408,
@@ -1570,7 +1742,8 @@
         "loader_stub_hex": "3f3c0005a9f0",
         "record_file_offset": 1392,
         "segment_id": 5,
-        "stored_tail": 348
+        "stored_tail": 348,
+        "target_file_offset": 352
       },
       {
         "a5_offset": 1416,
@@ -1579,7 +1752,8 @@
         "loader_stub_hex": "3f3c0007a9f0",
         "record_file_offset": 1400,
         "segment_id": 7,
-        "stored_tail": 0
+        "stored_tail": 0,
+        "target_file_offset": 4
       },
       {
         "a5_offset": 1424,
@@ -1588,7 +1762,8 @@
         "loader_stub_hex": "3f3c0007a9f0",
         "record_file_offset": 1408,
         "segment_id": 7,
-        "stored_tail": 396
+        "stored_tail": 396,
+        "target_file_offset": 400
       }
     ],
     "format": "Motorola 68000 CODE Segment",
@@ -1598,14 +1773,14 @@
       "below_a5_size": 8798,
       "decompilation_status": "see sibling .c and .decomp.c files",
       "first_u16_be": 0,
-      "ghidra_export_path": null,
+      "ghidra_export_path": "sources/resedit-1-0-3/CODE/ID00.c",
       "jump_table_a5_offset": 32,
       "jump_table_entry_count": 175,
       "jump_table_size_bytes": 1400,
       "known_function_count": 0,
       "second_u16_be": 1432,
       "segment_size_bytes": 1416,
-      "semantic_decompilation_path": null
+      "semantic_decompilation_path": "sources/resedit-1-0-3/CODE/ID00.decomp.c"
     },
     "trailing_bytes": 0
   },
@@ -1631,6 +1806,18 @@
         "path": "sources/resedit-1-0-3/CODE/ID00.bin",
         "sha256": "ea86246f42ddffb74f8270d3e87109b2dd42c45a7c0756402b79e27739cb9430",
         "size": 1416
+      },
+      {
+        "kind": "C/decompilation export",
+        "path": "sources/resedit-1-0-3/CODE/ID00.c",
+        "sha256": "db4eb71e00623afffb848ff604e9dad7005a57e9dec8f1245bd19b735371ca33",
+        "size": 12638
+      },
+      {
+        "kind": "C/decompilation export",
+        "path": "sources/resedit-1-0-3/CODE/ID00.decomp.c",
+        "sha256": "ed942b849c3d315b65e46d5c73663dc5db3e7ae5e7096bde804735dd16be5360",
+        "size": 13553
       }
     ],
     "resource_attributes": "0x28",
@@ -1640,7 +1827,9 @@
     "sha256": "ea86246f42ddffb74f8270d3e87109b2dd42c45a7c0756402b79e27739cb9430",
     "source_exports": [
       "sources/resedit-1-0-3/CODE/ID00",
-      "sources/resedit-1-0-3/CODE/ID00.bin"
+      "sources/resedit-1-0-3/CODE/ID00.bin",
+      "sources/resedit-1-0-3/CODE/ID00.c",
+      "sources/resedit-1-0-3/CODE/ID00.decomp.c"
     ]
   },
   "relationships": {

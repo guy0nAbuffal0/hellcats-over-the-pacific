@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import struct
 import sys
 import unittest
 from pathlib import Path
@@ -65,10 +67,46 @@ class ResEditMetadataTests(unittest.TestCase):
         code0 = self.by_key["CODE:0"]["decoded"]
         self.assertEqual(175, code0["properties"]["jump_table_entry_count"])
         self.assertEqual(0x20, code0["elements"][0]["a5_offset"])
+        self.assertTrue(all(
+            entry["target_file_offset"] == entry["stored_tail"] + 4
+            for entry in code0["elements"]
+            if entry["kind"] == "loadseg_jump_table_entry"
+        ))
         file_menu = self.by_key["MENU:2"]["decoded"]["elements"]
         self.assertEqual("VERIFIED", file_menu[5]["command_handler_status"])
         self.assertIn("mission map", file_menu[5]["command_handler"])
         self.assertEqual("VERIFIED", file_menu[8]["command_handler_status"])
+
+    def test_code_0_recreated_c_is_byte_exact(self) -> None:
+        source = (resedit.RESEDIT / "CODE" / "ID00.c").read_text(encoding="utf-8")
+        header = [int(value, 16) for value in re.findall(
+            r"DAT_000000(?:00_above_a5_size|04_below_a5_size|08_jump_table_size|0c_jump_table_a5_offset) = 0x([0-9a-f]+)",
+            source,
+        )]
+        rows = [tuple(int(value, 16) for value in match) for match in re.findall(
+            r"\{0x([0-9a-f]{4}),0x([0-9a-f]{4}),0x([0-9a-f]{4}),0x([0-9a-f]{4})\}",
+            source,
+        )]
+        rebuilt = b"".join(struct.pack(">I", value) for value in header)
+        rebuilt += b"".join(struct.pack(">4H", *row) for row in rows)
+        self.assertEqual((resedit.RESEDIT / "CODE" / "ID00.bin").read_bytes(), rebuilt)
+
+        semantic = (resedit.RESEDIT / "CODE" / "ID00.decomp.c").read_text(encoding="utf-8")
+        decoded_rows = [
+            (int(match[0]), int(match[1], 16), int(match[2], 16), int(match[3]),
+             int(match[4], 16), int(match[5], 16))
+            for match in re.findall(
+                r"\{\s*(\d+),0x([0-9a-f]+),0x([0-9a-f]+),(\d+),0x([0-9a-f]+),0x([0-9a-f]+),",
+                semantic,
+            )
+        ]
+        expected_rows = [
+            (entry["index"], entry["record_file_offset"], entry["a5_offset"],
+             entry["segment_id"], entry["stored_tail"], entry["target_file_offset"])
+            for entry in self.by_key["CODE:0"]["decoded"]["elements"]
+            if entry["kind"] == "loadseg_jump_table_entry"
+        ]
+        self.assertEqual(expected_rows, decoded_rows)
 
     def test_sound_and_color_icons_are_structural_not_heuristic(self) -> None:
         sound = self.by_key["snds:19330"]["decoded"]["properties"]

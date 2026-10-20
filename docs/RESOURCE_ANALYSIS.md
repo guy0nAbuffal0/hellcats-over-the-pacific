@@ -95,8 +95,9 @@ Important details:
 - `PICT` headers and bounds are decoded and rendered exports are indexed, but
   the full QuickDraw opcode streams are not yet enumerated.
 - CODE records link the protected binary, Ghidra export, semantic decompilation,
-  and function annotations found in that decompilation. CODE 0 additionally
-  exposes all 175 validated LoadSeg jump-table entries.
+  and function annotations found in that decompilation. CODE 0 has no function
+  bodies: its `ID00.c` is an explicitly reconstructed structural export, and
+  `ID00.decomp.c` exposes all 175 validated LoadSeg jump-table entries.
 
 ## Relationships
 

@@ -3,6 +3,10 @@
 This is the concise entry point for focused semantic reconstruction.
 
 **Next target:** none - every function is VERIFIED (Pacific Conflict 443/443, ID01..ID09 complete).
+CODE 0 is also structurally complete: `ID00.c` is a byte-exact reconstructed
+data export and `ID00.decomp.c` decodes its header plus all 175 Segment Manager
+jump-table entries. It has no application function bodies and is therefore not
+part of the function-count inventory.
 The four computed-jump span blitters `fill_span_rows_4bit_a` / `_4bit_b` / `_4bit_c` / `fill_span_rows_8bit`
 (FUN_000032ba / FUN_00003466 / FUN_00003608 / FUN_000037b4) were the last: delta span renderers that redraw only
 changed spans through self-patched tail tables (c is a byte copy of b; the 8-bit one swaps two 2048-entry tables by

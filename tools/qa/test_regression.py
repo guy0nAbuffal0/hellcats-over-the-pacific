@@ -44,12 +44,12 @@ EXPECTED_RUNNER_PATHS = [
 ]
 
 EXPECTED_LOADER_TARGETS = [
-    {"segment_id": 2, "stored_tail": 0x199E, "entrypoint_offset": 0x19A2, "id00_entry_offset": 770},
-    {"segment_id": 5, "stored_tail": 0x0000, "entrypoint_offset": 0x0006, "id00_entry_offset": 1362},
-    {"segment_id": 6, "stored_tail": 0x0E0C, "entrypoint_offset": 0x0E10, "id00_entry_offset": 386},
-    {"segment_id": 6, "stored_tail": 0x096A, "entrypoint_offset": 0x096E, "id00_entry_offset": 418},
-    {"segment_id": 6, "stored_tail": 0x09D4, "entrypoint_offset": 0x09D8, "id00_entry_offset": 426},
-    {"segment_id": 7, "stored_tail": 0x018C, "entrypoint_offset": 0x0190, "id00_entry_offset": 1402},
+    {"segment_id": 2, "stored_tail": 0x199E, "entrypoint_offset": 0x19A2, "id00_entry_offset": 776},
+    {"segment_id": 5, "stored_tail": 0x0000, "entrypoint_offset": 0x0004, "id00_entry_offset": 1368},
+    {"segment_id": 6, "stored_tail": 0x0E0C, "entrypoint_offset": 0x0E10, "id00_entry_offset": 392},
+    {"segment_id": 6, "stored_tail": 0x096A, "entrypoint_offset": 0x096E, "id00_entry_offset": 424},
+    {"segment_id": 6, "stored_tail": 0x09D4, "entrypoint_offset": 0x09D8, "id00_entry_offset": 432},
+    {"segment_id": 7, "stored_tail": 0x018C, "entrypoint_offset": 0x0190, "id00_entry_offset": 1408},
 ]
 
 ALLOWED_REPLAY_KEYS = {"key_32", "key_61"}
@@ -142,8 +142,8 @@ def check_loader_fixture() -> None:
                 fail(f"targets[{idx}].{key} must be int")
 
         delta = entry["delta"]
-        if delta not in (4, 6):
-            fail(f"targets[{idx}].delta must be 4 or 6")
+        if delta != 4:
+            fail(f"targets[{idx}].delta must be 4")
         if entry["entrypoint_offset"] != entry["stored_tail"] + delta:
             fail(
                 f"targets[{idx}] invariant failed: "

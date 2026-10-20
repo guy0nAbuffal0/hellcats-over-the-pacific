@@ -4,12 +4,12 @@ const Assertions := preload("res://tests/helpers/assertions.gd")
 const LoaderMetadataScript := preload("res://hellcats/core/loader_metadata.gd")
 const FIXTURE_PATH := "res://tests/fixtures/proven_loader_targets.json"
 const EXPECTED_TARGETS := [
-	{"segment_id": 2, "stored_tail": 0x199e, "entrypoint_offset": 0x19a2, "id00_entry_offset": 770, "label": "ID02"},
-	{"segment_id": 5, "stored_tail": 0x0000, "entrypoint_offset": 0x0006, "id00_entry_offset": 1362, "label": "ID05"},
-	{"segment_id": 6, "stored_tail": 0x0e0c, "entrypoint_offset": 0x0e10, "id00_entry_offset": 386, "label": "ID06/0e10"},
-	{"segment_id": 6, "stored_tail": 0x096a, "entrypoint_offset": 0x096e, "id00_entry_offset": 418, "label": "ID06/096e"},
-	{"segment_id": 6, "stored_tail": 0x09d4, "entrypoint_offset": 0x09d8, "id00_entry_offset": 426, "label": "ID06/09d8"},
-	{"segment_id": 7, "stored_tail": 0x018c, "entrypoint_offset": 0x0190, "id00_entry_offset": 1402, "label": "ID07"},
+	{"segment_id": 2, "stored_tail": 0x199e, "entrypoint_offset": 0x19a2, "id00_entry_offset": 776, "label": "ID02"},
+	{"segment_id": 5, "stored_tail": 0x0000, "entrypoint_offset": 0x0004, "id00_entry_offset": 1368, "label": "ID05"},
+	{"segment_id": 6, "stored_tail": 0x0e0c, "entrypoint_offset": 0x0e10, "id00_entry_offset": 392, "label": "ID06/0e10"},
+	{"segment_id": 6, "stored_tail": 0x096a, "entrypoint_offset": 0x096e, "id00_entry_offset": 424, "label": "ID06/096e"},
+	{"segment_id": 6, "stored_tail": 0x09d4, "entrypoint_offset": 0x09d8, "id00_entry_offset": 432, "label": "ID06/09d8"},
+	{"segment_id": 7, "stored_tail": 0x018c, "entrypoint_offset": 0x0190, "id00_entry_offset": 1408, "label": "ID07"},
 ]
 
 func run() -> bool:
