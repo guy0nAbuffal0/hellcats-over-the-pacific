@@ -16,145 +16,145 @@
     "consumed_bytes": 3942,
     "elements": [
       {
-        "annotation_line": 32,
+        "annotation_line": 50,
         "kind": "known_function",
         "original_symbol": "FUN_00000004",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 84,
+        "annotation_line": 102,
         "kind": "known_function",
         "original_symbol": "FUN_000000b0",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 121,
+        "annotation_line": 139,
         "kind": "known_function",
         "original_symbol": "FUN_000000f4",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 149,
+        "annotation_line": 167,
         "kind": "known_function",
         "original_symbol": "FUN_00000116",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 177,
+        "annotation_line": 195,
         "kind": "known_function",
         "original_symbol": "FUN_0000017c",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 202,
+        "annotation_line": 220,
         "kind": "known_function",
         "original_symbol": "FUN_000001a2",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 231,
+        "annotation_line": 249,
         "kind": "known_function",
         "original_symbol": "FUN_000001dc",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 273,
+        "annotation_line": 291,
         "kind": "known_function",
         "original_symbol": "FUN_0000024c",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 297,
+        "annotation_line": 315,
         "kind": "known_function",
         "original_symbol": "FUN_0000026c",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 349,
+        "annotation_line": 367,
         "kind": "known_function",
         "original_symbol": "FUN_00000318",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 522,
+        "annotation_line": 540,
         "kind": "known_function",
         "original_symbol": "FUN_00000512",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 557,
+        "annotation_line": 575,
         "kind": "known_function",
         "original_symbol": "FUN_00000598",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 611,
+        "annotation_line": 629,
         "kind": "known_function",
         "original_symbol": "FUN_00000666",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 679,
+        "annotation_line": 697,
         "kind": "known_function",
         "original_symbol": "FUN_000007b0",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 738,
+        "annotation_line": 756,
         "kind": "known_function",
         "original_symbol": "FUN_0000087a",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 762,
+        "annotation_line": 780,
         "kind": "known_function",
         "original_symbol": "FUN_000008a2",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 791,
+        "annotation_line": 809,
         "kind": "known_function",
         "original_symbol": "FUN_00000916",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 817,
+        "annotation_line": 835,
         "kind": "known_function",
         "original_symbol": "FUN_00000942",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 850,
+        "annotation_line": 868,
         "kind": "known_function",
         "original_symbol": "FUN_0000096e",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 897,
+        "annotation_line": 915,
         "kind": "known_function",
         "original_symbol": "FUN_000009d8",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 1062,
+        "annotation_line": 1080,
         "kind": "known_function",
         "original_symbol": "FUN_00000d02",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 1103,
+        "annotation_line": 1121,
         "kind": "known_function",
         "original_symbol": "FUN_00000d84",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 1130,
+        "annotation_line": 1148,
         "kind": "known_function",
         "original_symbol": "FUN_00000dca",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
       },
       {
-        "annotation_line": 1162,
+        "annotation_line": 1180,
         "kind": "known_function",
         "original_symbol": "FUN_00000e10",
         "source_path": "sources/resedit-1-0-3/CODE/ID06.decomp.c"
@@ -205,8 +205,8 @@
       {
         "kind": "C/decompilation export",
         "path": "sources/resedit-1-0-3/CODE/ID06.decomp.c",
-        "sha256": "4957288f5aab9d0a78fa7498a95deb70ae8dd2b225b9f2700268e8a97da4f0e0",
-        "size": 50259
+        "sha256": "a9aeb9606a63fa85b150963016995b9a4473eddc200dcd872b15029c83ec0d26",
+        "size": 57546
       }
     ],
     "resource_attributes": "0x38",

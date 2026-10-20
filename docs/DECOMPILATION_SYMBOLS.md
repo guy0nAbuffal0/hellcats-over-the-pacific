@@ -1113,3 +1113,412 @@ inventory yet.
 |---|---|---|---|
 | ID02 | `CurrentA5` | `DAT_00000904` | low-memory global $0904, read by every A5-safe routine to load the application A5 |
 | ID02 | `vbl_ch0_a5_cache` | `DAT_000039c4` | PC-relative long at entry + 0x1c of the VBL handler 0x39a8; 0 until the priming call stores CurrentA5 there |
+| ID02 | `vbl_ch0_variant_a5_cache` | `DAT_00003aca` | PC-relative long at entry + 0x1c of the VBL handler 0x3aae; 0 until the priming call stores CurrentA5 there |
+| ID02 | `vbl_two_channel_a5_cache` | `DAT_00003be0` | PC-relative long at entry + 0x1c of the VBL handler 0x3bc4; 0 until the priming call stores CurrentA5 there |
+| ID06 | `spans_active_base` | `DAT_0000039e` | render_scanline_spans PC-relative cell 0x39e: active edge array base (row table +4 of the edge pool) |
+| ID06 | `spans_band_stride` | `DAT_000003a2` | render_scanline_spans PC-relative cell 0x3a2: dest stride added after each row (param 3) |
+| ID06 | `spans_list_head` | `DAT_000003a6` | render_scanline_spans PC-relative cell 0x3a6: priority list head sentinel (edge pool +0x898) |
+| ID06 | `spans_list_tail` | `DAT_000003aa` | render_scanline_spans PC-relative cell 0x3aa: tail sentinel (edge pool +0x89c), stored after the last active edge |
+| ID06 | `spans_saved_d3_prev_x` | `DAT_000003ae` | render_scanline_spans PC-relative cell 0x3ae saved D3: previous edge x (fixed point) for the re-sort test |
+| ID06 | `spans_saved_d4_mask_x` | `DAT_000003b2` | render_scanline_spans PC-relative cell 0x3b2 saved D4: x >> 6, masked with 0x3e0 to index the left-mask table |
+| ID06 | `spans_saved_d5_edge_x` | `DAT_000003b6` | render_scanline_spans PC-relative cell 0x3b6 saved D5: edge x advanced by its slope |
+| ID06 | `spans_saved_d6_out_long` | `DAT_000003ba` | render_scanline_spans PC-relative cell 0x3ba saved D6: pending output long (mask-merged span) |
+| ID06 | `spans_saved_d7_active_end` | `DAT_000003be` | render_scanline_spans PC-relative cell 0x3be saved D7: end of the active edge array |
+| ID06 | `spans_saved_a2_row_entry` | `DAT_000003c2` | render_scanline_spans PC-relative cell 0x3c2 saved A2: current 12-byte row entry (+0 bucket, +4 drop flag, +8 pattern table) |
+| ID06 | `spans_saved_a3_scan` | `DAT_000003c6` | render_scanline_spans PC-relative cell 0x3c6 saved A3: insertion / compaction scan pointer, nonzero = list dirty |
+| ID06 | `spans_saved_a4_edge` | `DAT_000003ca` | render_scanline_spans PC-relative cell 0x3ca saved A4: current edge node |
+| ID06 | `spans_saved_a5_next_slot` | `DAT_000003ce` | render_scanline_spans PC-relative cell 0x3ce saved A5: next active edge slot |
+| ID06 | `spans_saved_a6_temp` | `DAT_000003d2` | render_scanline_spans PC-relative cell 0x3d2 saved A6: frame pointer on entry, then a scratch pointer |
+| ID06 | `CurrentA5` | `DAT_00000904` | same low-memory global as in ID02; read by set_active_row_count (CurrentA5 routine) |
+| ID09 | `kbd_type_table_end` | `DAT_00000059` | LEA $59(PC) in sysenvirons_glue_fallback: one past the in-segment KbdType byte table 0x54..0x58, scanned backwards with DBEQ |
+| Pacific Conflict | `host_world` | `DAT_0001b5a0` | pointer to the host A5 world at A5-0x1388 (see the DAT_0001b5a0 rows above); mission fuel % +0xb6, bombs +0xb8/+0xb9, kill counters +0xba.., friendly kills +0xd2 |
+| Pacific Conflict | `object_pool` | `DAT_0001b5a4` | world object pointer array (entity array 2) walked by probe_nearest_facility_kind |
+| Pacific Conflict | `object_count` | `DAT_0001b734` | low word = entry count of object_pool (16-bit dbra in probe_nearest_facility_kind) |
+| Pacific Conflict | `player_object` | `DAT_0001b738` | the player's aircraft object (IMPORT_STATUS "player entity ptr"); controller fields +0x634..+0x684 |
+| Pacific Conflict | `loadout_synced` | `_DAT_0001b73c` | set to 1 by load_player_fuel_and_bombs and when landing writes fuel/bombs back to host_world, cleared on takeoff; gates the write-back [STRONG INFERENCE] |
+| Pacific Conflict | `clip_y_max` | `DAT_0001b73e` | polygon clip rectangle y-max (row above: DAT_00020aee / aec / aea / b73e), read by clip_polygon_y_max |
+| Pacific Conflict | `clip_y_max_alt` | `DAT_0001b740` | word swapped into clip_y_max by collect_map_features for its last clip, then restored |
+| Pacific Conflict | `session_entry_handle` | `DAT_0001b744` | handle sized entries (550 / 800) * 0x1c by allocate_session_buffers when host byte +0 is set [role UNKNOWN] |
+| Pacific Conflict | `session_handles_a` | `DAT_0001b74c` | handle slots 1..3 sized rows (20 / 30) * host +0xc * 4 by allocate_session_buffers [role UNKNOWN] |
+| Pacific Conflict | `session_handles_b` | `DAT_0001b75c` | second handle group of the same size (C indexes + 2 * slot) [role UNKNOWN] |
+| Pacific Conflict | `session_buffers_rebuilt` | `_DAT_00020c4c` | cleared then set to 1 by allocate_session_buffers when any block was (re)allocated |
+| Pacific Conflict | `session_entry_ptr` | `DAT_0001b76c` | data pointer of session_entry_handle stored by lock_session_buffers (& 0xffffff when host word +0x76), cleared by unlock_session_buffers |
+| Pacific Conflict | `session_ptrs_a` | `DAT_0001b774` | data pointers of session_handles_a, slot i at + 4i (i = 1..3) |
+| Pacific Conflict | `session_ptr_a_slot1` | `DAT_0001b778` | session_ptrs_a slot 1 |
+| Pacific Conflict | `session_ptrs_b` | `DAT_0001b784` | data pointers of session_handles_b, slot i at + 4i |
+| Pacific Conflict | `session_ptr_b_slot1` | `DAT_0001b788` | session_ptrs_b slot 1 |
+| Pacific Conflict | `session_cur_b` | `DAT_0001b794` | = session_ptr_b_slot1 after lock_session_buffers, 0 after unlock |
+| Pacific Conflict | `session_cur_a` | `DAT_0001b798` | = session_ptr_a_slot1 after lock_session_buffers, 0 after unlock |
+| Pacific Conflict | `widened_format_buf` | `DAT_00020b4c` | static buffer written and returned by widen_printf_format (%d -> %ld, %x -> %lx) |
+| Pacific Conflict | `palette_owner_slots` | `DAT_0001da6c` | slot-indexed base: + 4 * slot (1..3) addresses palette_owner_tables[slot - 1] (init_depth4_colour_state) |
+| Pacific Conflict | `palette_owner_tables` | `DAT_0001da70` | three 256-long palette-slot owner tables at 0x1da70 / 74 / 78, (re)allocated by reset_palette_owner_tables |
+| Pacific Conflict | `palette_owner_current` | `DAT_0001da7c` | owner table in use, reset to the first table |
+| Pacific Conflict | `colour_tally_index` | `DAT_0001da8a` | cleared by the depth set-ups; indexes the byte counters at DAT_0001d864 [HYPOTHESIS role] |
+| Pacific Conflict | `fill_colour` | `DAT_0001daa0` | host colour table word +0x1a0 (depth 8) / +0x10 (depth 4); used as a row colour by reset_background_rows [STRONG INFERENCE] |
+| Pacific Conflict | `palette_direct_mode` | `_DAT_0001d85a` | nonzero: queue_face_palette_entry sets face +4 from r + g + b / 3 and queues no ColorSpec [role name STRONG INFERENCE] |
+| Pacific Conflict | `slot_to_index_map` | `DAT_0001d85c` | word map palette slot -> pixel index, copied from host +0x34 |
+| Pacific Conflict | `view_depth` | `DAT_0001b826` | current pixel depth tested by assign_face_colour: 1 dither patterns, 4 colour cube, otherwise palette slots |
+| Pacific Conflict | `palette_search_cursor` | `DAT_0001bd80` | round-robin palette slot cursor (wraps at 200) in assign_face_colour |
+| Pacific Conflict | `slot_usage_prev` | `DAT_0001d860` | one of the per-frame palette-slot usage maps swapped by overlay_frame_step (row above) |
+| Pacific Conflict | `slot_usage_cur` | `DAT_0001d864` | the other usage map; which one is current is STRONG INFERENCE |
+| Pacific Conflict | `palette_changed` | `_DAT_0001daa2` | set to 1 when a face claims a palette slot (assign_face_colour) and by build_object_poly_buffers |
+| Pacific Conflict | `template_ptr_table_base` | `DAT_0001b524` | ID-keyed definition record pointer table: entry key at + 4 * key (docs/DECOMPILATION_SYMBOLS.md) |
+| Pacific Conflict | `template_rec_a_field_u16` | `DAT_0001a7d2` | name from its declaration comment: field +0xc of a 0x4A template record |
+| Pacific Conflict | `template_rec_b_field_u16` | `DAT_0001a81c` | name from its declaration comment: same field of the next 0x4A record |
+| Pacific Conflict | `template_keyed_1c_src` | `DAT_0001aa5e` | source of the five keyed 0x1C template records (keys 0x15..0x19) |
+| Pacific Conflict | `def_key05` | `DAT_0001b538` | template_ptr_table_base slot +0x14 (key 5): clone of template_key05 |
+| Pacific Conflict | `template_key05` | `DAT_0001a8b8` | static template record copied into def_key05 |
+| Pacific Conflict | `def_key06` | `PTR_DAT_0001b53c` | template_ptr_table_base slot +0x18 (key 6): clone of template_key06 |
+| Pacific Conflict | `template_key06` | `DAT_0001a8d2` | static template record copied into def_key06 |
+| Pacific Conflict | `def_key07` | `PTR_DAT_0001b540` | template_ptr_table_base slot +0x1c (key 7): clone of template_key07 |
+| Pacific Conflict | `template_key07` | `DAT_0001a8ec` | static template record copied into def_key07 |
+| Pacific Conflict | `def_key10` | `DAT_0001b54c` | template_ptr_table_base slot +0x28 (key 10): clone of template_key10 |
+| Pacific Conflict | `template_key10` | `DAT_0001a906` | static template record copied into def_key10 |
+| Pacific Conflict | `def_key11` | `DAT_0001b550` | template_ptr_table_base slot +0x2c (key 11): clone of template_key11 |
+| Pacific Conflict | `template_key11` | `DAT_0001a920` | static template record copied into def_key11 |
+| Pacific Conflict | `def_key08` | `DAT_0001b544` | template_ptr_table_base slot +0x20 (key 8): clone of template_key08 |
+| Pacific Conflict | `template_key08` | `DAT_0001a93a` | static template record copied into def_key08 |
+| Pacific Conflict | `def_key09` | `DAT_0001b548` | template_ptr_table_base slot +0x24 (key 9): clone of template_key09 |
+| Pacific Conflict | `template_key09` | `DAT_0001a954` | static template record copied into def_key09 |
+| Pacific Conflict | `def_key17` | `DAT_0001b568` | template_ptr_table_base slot +0x44 (key 17): clone of template_key17 |
+| Pacific Conflict | `template_key17` | `DAT_0001a96e` | static template record copied into def_key17 |
+| Pacific Conflict | `def_key12` | `DAT_0001b554` | template_ptr_table_base slot +0x30 (key 12): clone of template_key12 |
+| Pacific Conflict | `template_key12` | `DAT_0001a988` | static template record copied into def_key12 |
+| Pacific Conflict | `def_key13` | `DAT_0001b558` | template_ptr_table_base slot +0x34 (key 13): clone of template_key13 |
+| Pacific Conflict | `template_key13` | `DAT_0001a9a8` | static template record copied into def_key13 |
+| Pacific Conflict | `def_key14` | `DAT_0001b55c` | template_ptr_table_base slot +0x38 (key 14): clone of template_key14 |
+| Pacific Conflict | `template_key14` | `DAT_0001a9c2` | static template record copied into def_key14 |
+| Pacific Conflict | `def_key15` | `DAT_0001b560` | template_ptr_table_base slot +0x3c (key 15): clone of template_key15 |
+| Pacific Conflict | `template_key15` | `DAT_0001a9dc` | static template record copied into def_key15 |
+| Pacific Conflict | `def_key16` | `DAT_0001b564` | template_ptr_table_base slot +0x40 (key 16): clone of template_key16 |
+| Pacific Conflict | `template_key16` | `DAT_0001a9f6` | static template record copied into def_key16 |
+| Pacific Conflict | `def_key18` | `DAT_0001b56c` | template_ptr_table_base slot +0x48 (key 18): clone of template_key18 |
+| Pacific Conflict | `template_key18` | `DAT_0001aa10` | static template record copied into def_key18 |
+| Pacific Conflict | `def_key19` | `DAT_0001b570` | template_ptr_table_base slot +0x4c (key 19): clone of template_key19 |
+| Pacific Conflict | `template_key19` | `DAT_0001aa2a` | static template record copied into def_key19 |
+| Pacific Conflict | `def_key20` | `DAT_0001b574` | template_ptr_table_base slot +0x50 (key 20): clone of template_key20 |
+| Pacific Conflict | `template_key20` | `DAT_0001aa44` | static template record copied into def_key20 |
+| Pacific Conflict | `def_key26` | `DAT_0001b58c` | template_ptr_table_base slot +0x68 (key 26): clone of template_key26 |
+| Pacific Conflict | `template_key26` | `DAT_0001aaea` | static template record copied into def_key26 |
+| Pacific Conflict | `def_key27` | `DAT_0001b590` | template_ptr_table_base slot +0x6c (key 27): clone of template_key27 |
+| Pacific Conflict | `template_key27` | `DAT_0001ab04` | static template record copied into def_key27 |
+| Pacific Conflict | `def_key28` | `DAT_0001b594` | template_ptr_table_base slot +0x70 (key 28): clone of template_key28 |
+| Pacific Conflict | `template_key28` | `DAT_0001ab1e` | static template record copied into def_key28 |
+| Pacific Conflict | `def_key29` | `DAT_0001b598` | template_ptr_table_base slot +0x74 (key 29): clone of template_key29 |
+| Pacific Conflict | `template_key29` | `DAT_0001ab38` | static template record copied into def_key29 |
+| Pacific Conflict | `def_key30` | `DAT_0001b59c` | template_ptr_table_base slot +0x78 (key 30): clone of template_key30 |
+| Pacific Conflict | `template_key30` | `DAT_0001ab52` | static template record copied into def_key30 |
+| Pacific Conflict | `scene_root` | `DAT_0001d6fc` | root object instantiated from host +0x8c by init_mission_object_tables; child table at +0x30, 0x18-byte records |
+| Pacific Conflict | `mission_child0` | `DAT_0001bdb4` | child[0] object published by init_mission_object_tables [role UNKNOWN] |
+| Pacific Conflict | `mission_child1` | `DAT_0001bdb0` | child[1] object published by init_mission_object_tables [role UNKNOWN] |
+| Pacific Conflict | `mission_child2or3` | `DAT_0001bdac` | child[3] in mission 2, else child[2] [role UNKNOWN] |
+| Pacific Conflict | `default_surface_face` | `DAT_0001bda8` | mission_child2or3 +0x48; surface_type_at_point falls back to its +0x16 code [STRONG INFERENCE] |
+| Pacific Conflict | `mission_child4` | `DAT_0001bda4` | child[4] object published by init_mission_object_tables [role UNKNOWN] |
+| Pacific Conflict | `child_window_lo` | `DAT_0001b88e` | root word +0x2c - 1: first index of the published child window |
+| Pacific Conflict | `child_window_hi` | `DAT_0001b88c` | child_window_lo + 2 |
+| Pacific Conflict | `child_window_prev` | `DAT_0001bc28` | child object at index root +0x2c - 1 |
+| Pacific Conflict | `child_window_cur` | `DAT_0001bc34` | child object at index root +0x2c |
+| Pacific Conflict | `child_window_next` | `DAT_0001bc38` | child object at index root +0x2c + 1 |
+| Pacific Conflict | `slot_usage_buf_a` | `DAT_0001d86c` | first per-frame palette usage buffer, assigned to slot_usage_prev by overlay_initialise |
+| Pacific Conflict | `slot_usage_buf_b` | `DAT_0001d96c` | second per-frame palette usage buffer, assigned to slot_usage_cur by overlay_initialise |
+| Pacific Conflict | `light_x` | `DAT_0001bd8c` | light direction x component, 0xd983 at start (shade_object_faces) |
+| Pacific Conflict | `light_y` | `DAT_0001bd8a` | light direction y component, 0x69d8 at start |
+| Pacific Conflict | `light_z` | `DAT_0001bd88` | light direction z component, 0xc330 at start |
+| Pacific Conflict | `init_flag_bd84` | `_DAT_0001bd84` | set to 1 by overlay_initialise, no reader in the exported C [role UNKNOWN] |
+| Pacific Conflict | `frame_counter` | `DAT_0001b838` | current frame number, incremented by advance_frame_and_tick_controllers; 0x4c at start |
+| Pacific Conflict | `heap_break` | `DAT_00020c50` | heap_sbrk break: byte offset into the arena at host +0x348 |
+| Pacific Conflict | `heap_roving_cursor` | `DAT_00020c60` | large-block free-list cursor (docs/DECOMPILATION_SYMBOLS.md) |
+| Pacific Conflict | `heap_class_lists` | `DAT_00020c64` | size-class free-list heads, class c at + 4 * c (heap_free_coalesce small path) |
+| Pacific Conflict | `heap_ring_sentinel` | `DAT_00020c58` | size-0 sentinel of the large-block ring; heap_alloc links it to itself when heap_roving_cursor is still 0 |
+| Pacific Conflict | `heap_ring_sentinel_next` | `DAT_00020c5c` | the sentinel next link (+4) |
+| Pacific Conflict | `sin_table` | `DAT_0001ab6c` | 256 words round(4096 sin(i pi / 128)), read by sin_fixed14 (row for FUN_00001d76 above) |
+| Pacific Conflict | `cos_table` | `DAT_0001ad6c` | 256 words round(4096 cos(i pi / 128)), read by cos_fixed14 |
+| Pacific Conflict | `tan_table` | `DAT_0001af6c` | 128 longs 4096 tan((i - 0x3f) pi / 128) searched by atan_fixed14; entry 127 (110980) breaks the order |
+| Pacific Conflict | `angle1_cos` | `DAT_0001d7fa` | cos_fixed14 of argument 1 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle1_sin` | `DAT_0001d7fc` | sin_fixed14 of argument 1 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle2_cos` | `DAT_0001d7f6` | cos_fixed14 of argument 2 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle2_sin` | `DAT_0001d7f8` | sin_fixed14 of argument 2 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle3_cos` | `DAT_0001d7f2` | cos_fixed14 of argument 3 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle3_sin` | `DAT_0001d7f4` | sin_fixed14 of argument 3 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle4_cos` | `DAT_0001d7ee` | cos_fixed14 of argument 4 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle4_sin` | `DAT_0001d7f0` | sin_fixed14 of argument 4 of load_attitude_angle_sincos (4.12 word) |
+| Pacific Conflict | `angle5_cos` | `DAT_0001d7ea` | cos_fixed14 of argument 1 of load_attitude_angle_sincos_5_6 |
+| Pacific Conflict | `angle5_sin` | `DAT_0001d7ec` | sin_fixed14 of argument 1 of load_attitude_angle_sincos_5_6 |
+| Pacific Conflict | `angle6_cos` | `DAT_0001d7e6` | cos_fixed14 of argument 2 of load_attitude_angle_sincos_5_6 |
+| Pacific Conflict | `angle6_sin` | `DAT_0001d7e8` | sin_fixed14 of argument 2 of load_attitude_angle_sincos_5_6 |
+| Pacific Conflict | `basis1_m00` | `DAT_0001d7d4` | 3x3 s16 matrix at 0x1d7d4, element [0][0]; ~Rx from angle 1 (fill_attitude_rotation_bases) |
+| Pacific Conflict | `basis1_m01` | `DAT_0001d7d6` | basis1 element [0][1] |
+| Pacific Conflict | `basis1_m02` | `DAT_0001d7d8` | basis1 element [0][2] |
+| Pacific Conflict | `basis1_m10` | `DAT_0001d7da` | basis1 element [1][0] |
+| Pacific Conflict | `basis1_m11` | `DAT_0001d7dc` | basis1 element [1][1] |
+| Pacific Conflict | `basis1_m12` | `DAT_0001d7de` | basis1 element [1][2] |
+| Pacific Conflict | `basis1_m20` | `DAT_0001d7e0` | basis1 element [2][0] |
+| Pacific Conflict | `basis1_m21` | `DAT_0001d7e2` | basis1 element [2][1] |
+| Pacific Conflict | `basis1_m22` | `DAT_0001d7e4` | basis1 element [2][2] |
+| Pacific Conflict | `basis2_m00` | `DAT_0001d7bc` | 3x3 s16 matrix at 0x1d7bc, element [0][0]; ~Ry from angle 2 |
+| Pacific Conflict | `basis2_m01` | `DAT_0001d7be` | basis2 element [0][1] |
+| Pacific Conflict | `basis2_m02` | `DAT_0001d7c0` | basis2 element [0][2] |
+| Pacific Conflict | `basis2_m10` | `DAT_0001d7c2` | basis2 element [1][0] |
+| Pacific Conflict | `basis2_m11` | `DAT_0001d7c4` | basis2 element [1][1] |
+| Pacific Conflict | `basis2_m12` | `DAT_0001d7c6` | basis2 element [1][2] |
+| Pacific Conflict | `basis2_m20` | `DAT_0001d7c8` | basis2 element [2][0] |
+| Pacific Conflict | `basis2_m21` | `DAT_0001d7ca` | basis2 element [2][1] |
+| Pacific Conflict | `basis2_m22` | `DAT_0001d7cc` | basis2 element [2][2] |
+| Pacific Conflict | `basis3_m00` | `DAT_0001d7a4` | 3x3 s16 matrix at 0x1d7a4, element [0][0]; ~Rz from angle 3 |
+| Pacific Conflict | `basis3_m01` | `DAT_0001d7a6` | basis3 element [0][1] |
+| Pacific Conflict | `basis3_m02` | `DAT_0001d7a8` | basis3 element [0][2] |
+| Pacific Conflict | `basis3_m10` | `DAT_0001d7aa` | basis3 element [1][0] |
+| Pacific Conflict | `basis3_m11` | `DAT_0001d7ac` | basis3 element [1][1] |
+| Pacific Conflict | `basis3_m12` | `DAT_0001d7ae` | basis3 element [1][2] |
+| Pacific Conflict | `basis3_m20` | `DAT_0001d7b0` | basis3 element [2][0] |
+| Pacific Conflict | `basis3_m21` | `DAT_0001d7b2` | basis3 element [2][1] |
+| Pacific Conflict | `basis3_m22` | `DAT_0001d7b4` | basis3 element [2][2] |
+| Pacific Conflict | `basis4_m00` | `DAT_0001d78c` | 3x3 s16 matrix at 0x1d78c, element [0][0]; ~Ry (or ~Rx) from angle 4 (fill_attitude_rotation_basis_4 / _rx) |
+| Pacific Conflict | `basis4_m01` | `DAT_0001d78e` | basis4 element [0][1] |
+| Pacific Conflict | `basis4_m02` | `DAT_0001d790` | basis4 element [0][2] |
+| Pacific Conflict | `basis4_m10` | `DAT_0001d792` | basis4 element [1][0] |
+| Pacific Conflict | `basis4_m11` | `DAT_0001d794` | basis4 element [1][1] |
+| Pacific Conflict | `basis4_m12` | `DAT_0001d796` | basis4 element [1][2] |
+| Pacific Conflict | `basis4_m20` | `DAT_0001d798` | basis4 element [2][0] |
+| Pacific Conflict | `basis4_m21` | `DAT_0001d79a` | basis4 element [2][1] |
+| Pacific Conflict | `basis4_m22` | `DAT_0001d79c` | basis4 element [2][2] |
+| Pacific Conflict | `basis5_m00` | `DAT_0001d774` | 3x3 s16 matrix at 0x1d774, element [0][0]; ~Rx from angle 5 (fill_attitude_rotation_bases_5_6) |
+| Pacific Conflict | `basis5_m01` | `DAT_0001d776` | basis5 element [0][1] |
+| Pacific Conflict | `basis5_m02` | `DAT_0001d778` | basis5 element [0][2] |
+| Pacific Conflict | `basis5_m10` | `DAT_0001d77a` | basis5 element [1][0] |
+| Pacific Conflict | `basis5_m11` | `DAT_0001d77c` | basis5 element [1][1] |
+| Pacific Conflict | `basis5_m12` | `DAT_0001d77e` | basis5 element [1][2] |
+| Pacific Conflict | `basis5_m20` | `DAT_0001d780` | basis5 element [2][0] |
+| Pacific Conflict | `basis5_m21` | `DAT_0001d782` | basis5 element [2][1] |
+| Pacific Conflict | `basis5_m22` | `DAT_0001d784` | basis5 element [2][2] |
+| Pacific Conflict | `basis6_m00` | `DAT_0001d75c` | 3x3 s16 matrix at 0x1d75c, element [0][0]; ~Ry from angle 6 (fill_attitude_rotation_bases_5_6) |
+| Pacific Conflict | `basis6_m01` | `DAT_0001d75e` | basis6 element [0][1] |
+| Pacific Conflict | `basis6_m02` | `DAT_0001d760` | basis6 element [0][2] |
+| Pacific Conflict | `basis6_m10` | `DAT_0001d762` | basis6 element [1][0] |
+| Pacific Conflict | `basis6_m11` | `DAT_0001d764` | basis6 element [1][1] |
+| Pacific Conflict | `basis6_m12` | `DAT_0001d766` | basis6 element [1][2] |
+| Pacific Conflict | `basis6_m20` | `DAT_0001d768` | basis6 element [2][0] |
+| Pacific Conflict | `basis6_m21` | `DAT_0001d76a` | basis6 element [2][1] |
+| Pacific Conflict | `basis6_m22` | `DAT_0001d76c` | basis6 element [2][2] |
+| Pacific Conflict | `attitude_compose_tag` | `DAT_00020ce4` | composer tag ($2408 / $2468 / $26e0) set by finalize_attitude_matrix_3ang / compose_attitude_matrix_x / 6ang and jumped through by invoke_tagged_attitude_compose_neg_sins4 / 6 |
+| Pacific Conflict | `camera_m00` | `DAT_0001d744` | 3x3 s16 camera attitude matrix at 0x1d744, element [0][0]: overlay_frame_step builds the inverse (view) form from the negated camera angles, then the forward form [STRONG INFERENCE role] |
+| Pacific Conflict | `camera_m01` | `DAT_0001d746` | camera matrix element [0][1] |
+| Pacific Conflict | `camera_m02` | `DAT_0001d748` | camera matrix element [0][2] |
+| Pacific Conflict | `camera_m10` | `DAT_0001d74a` | camera matrix element [1][0] |
+| Pacific Conflict | `camera_m11` | `DAT_0001d74c` | camera matrix element [1][1] |
+| Pacific Conflict | `camera_m12` | `DAT_0001d74e` | camera matrix element [1][2] |
+| Pacific Conflict | `camera_m20` | `DAT_0001d750` | camera matrix element [2][0] |
+| Pacific Conflict | `camera_m21` | `DAT_0001d752` | camera matrix element [2][1] |
+| Pacific Conflict | `camera_m22` | `DAT_0001d754` | camera matrix element [2][2] |
+| Pacific Conflict | `visible_list` | `DAT_0001c9dc` | visible object pointer list (build_visible_object_list) |
+| Pacific Conflict | `visible_count` | `DAT_0001c1d4` | visible object list count (low word) |
+| Pacific Conflict | `visible_list_split` | `DAT_0001bdb8` | visible_count saved after update_ground_scatter_objects; transform_listed_object_vecs12_by_1d744 handles the entries from here on |
+| Pacific Conflict | `edge_sentinel` | `DAT_0001b174` | sentinel edge record in scan_convert_edge_rows: view_right_x << 16 | 0x8000 |
+| Pacific Conflict | `edge_sentinel_colour` | `PTR_PTR_0001b188` | sentinel record colour long: fill_colour | 0xffff0000 |
+| Pacific Conflict | `view_width` | `DAT_0001b82a` | view width in pixels (host +0x16 = A5-0x1372, configure_renderer_for_display); also the span-row end / sentinel x |
+| Pacific Conflict | `half_rows_mode` | `DAT_0001b834` | nonzero halves the last scan row in scan_convert_edge_rows [role UNKNOWN] |
+| Pacific Conflict | `row_has_edges` | `DAT_0001daa4` | word flag per row: the row's edge bucket is non-empty |
+| Pacific Conflict | `row_edge_buckets` | `DAT_0001eaac` | per-row edge bucket heads filled by add_face_edges_to_rows |
+| Pacific Conflict | `edge_pool_count` | `DAT_00020ab0` | edge pool count, reset to 0 at the end of scan_convert_edge_rows |
+| Pacific Conflict | `scan_last_row` | `DAT_00020ae6` | last scan row (clip_y_max + rows / 2 per update_view_clip_bounds) |
+| Pacific Conflict | `spans32ba_slot0` | `DAT_00003242` | entry 0 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot1` | `DAT_00003246` | entry 1 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot2` | `DAT_0000324a` | entry 2 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot3` | `DAT_0000324e` | entry 3 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot4` | `DAT_00003252` | entry 4 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot5` | `DAT_00003256` | entry 5 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot6` | `DAT_0000325a` | entry 6 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot7` | `DAT_0000325e` | entry 7 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_slot8` | `DAT_00003262` | entry 8 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) |
+| Pacific Conflict | `spans32ba_code_335a` | `DAT_0000335a` | code address 0x335a stored into the span routine 0x32ba table |
+| Pacific Conflict | `spans32ba_code_336c` | `DAT_0000336c` | code address 0x336c stored into the span routine 0x32ba table |
+| Pacific Conflict | `spans32ba_code_3374` | `DAT_00003374` | code address 0x3374 stored into the span routine 0x32ba table |
+| Pacific Conflict | `spans32ba_code_3378` | `DAT_00003378` | code address 0x3378 stored into the span routine 0x32ba table |
+| Pacific Conflict | `spans32ba_code_33a4` | `DAT_000033a4` | code address 0x33a4 stored into the span routine 0x32ba table |
+| Pacific Conflict | `spans3466_slot0` | `DAT_000033ee` | entry 0 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot1` | `DAT_000033f2` | entry 1 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot2` | `DAT_000033f6` | entry 2 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot3` | `DAT_000033fa` | entry 3 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot4` | `DAT_000033fe` | entry 4 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot5` | `DAT_00003402` | entry 5 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot6` | `DAT_00003406` | entry 6 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot7` | `DAT_0000340a` | entry 7 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_slot8` | `DAT_0000340e` | entry 8 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) |
+| Pacific Conflict | `spans3466_code_34fc` | `DAT_000034fc` | code address 0x34fc stored into the span routine 0x3466 table |
+| Pacific Conflict | `spans3466_code_350e` | `DAT_0000350e` | code address 0x350e stored into the span routine 0x3466 table |
+| Pacific Conflict | `spans3466_code_3516` | `DAT_00003516` | code address 0x3516 stored into the span routine 0x3466 table |
+| Pacific Conflict | `spans3466_code_351a` | `DAT_0000351a` | code address 0x351a stored into the span routine 0x3466 table |
+| Pacific Conflict | `spans3466_code_3546` | `DAT_00003546` | code address 0x3546 stored into the span routine 0x3466 table |
+| Pacific Conflict | `spans3608_slot0` | `DAT_00003590` | entry 0 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot1` | `DAT_00003594` | entry 1 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot2` | `DAT_00003598` | entry 2 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot3` | `DAT_0000359c` | entry 3 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot4` | `DAT_000035a0` | entry 4 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot5` | `DAT_000035a4` | entry 5 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot6` | `DAT_000035a8` | entry 6 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot7` | `DAT_000035ac` | entry 7 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_slot8` | `DAT_000035b0` | entry 8 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) |
+| Pacific Conflict | `spans3608_code_369e` | `DAT_0000369e` | code address 0x369e stored into the span routine 0x3608 table |
+| Pacific Conflict | `spans3608_code_36b0` | `DAT_000036b0` | code address 0x36b0 stored into the span routine 0x3608 table |
+| Pacific Conflict | `spans3608_code_36b8` | `DAT_000036b8` | code address 0x36b8 stored into the span routine 0x3608 table |
+| Pacific Conflict | `spans3608_code_36bc` | `DAT_000036bc` | code address 0x36bc stored into the span routine 0x3608 table |
+| Pacific Conflict | `spans3608_code_36e8` | `DAT_000036e8` | code address 0x36e8 stored into the span routine 0x3608 table |
+| Pacific Conflict | `span8_entries_a` | `DAT_00020cec` | 0x800-long code-pointer table at 0x20cec indexed by run length in fill_span_rows_8bit [STRONG INFERENCE]; entry 0 |
+| Pacific Conflict | `span8_entries_a_1` | `DAT_00020cf0` | span8_entries_a entry 1 |
+| Pacific Conflict | `span8_entries_a_2` | `DAT_00020cf4` | span8_entries_a entry 2 |
+| Pacific Conflict | `span8_entries_a_3` | `DAT_00020cf8` | span8_entries_a entry 3 |
+| Pacific Conflict | `span8_entries_a_4` | `DAT_00020cfc` | span8_entries_a entry 4 |
+| Pacific Conflict | `span8_entries_a_5` | `DAT_00020d00` | span8_entries_a entry 5 |
+| Pacific Conflict | `span8_entries_a_rest` | `DAT_00020d04` | span8_entries_a entries 6.. (default handler copies) |
+| Pacific Conflict | `span8_entries_b` | `DAT_00022cec` | 0x800-long code-pointer table at 0x22cec indexed by run length in fill_span_rows_8bit [STRONG INFERENCE]; entry 0 |
+| Pacific Conflict | `span8_entries_b_1` | `DAT_00022cf0` | span8_entries_b entry 1 |
+| Pacific Conflict | `span8_entries_b_2` | `DAT_00022cf4` | span8_entries_b entry 2 |
+| Pacific Conflict | `span8_entries_b_3` | `DAT_00022cf8` | span8_entries_b entry 3 |
+| Pacific Conflict | `span8_entries_b_4` | `DAT_00022cfc` | span8_entries_b entry 4 |
+| Pacific Conflict | `span8_entries_b_5` | `DAT_00022d00` | span8_entries_b entry 5 |
+| Pacific Conflict | `span8_entries_b_6` | `DAT_00022d04` | span8_entries_b entry 6 |
+| Pacific Conflict | `span8_entries_b_rest` | `DAT_00022d08` | span8_entries_b entries 7.. (default handler copies) |
+| Pacific Conflict | `span8_code_3836` | `DAT_00003836` | code address 0x3836 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_383e` | `DAT_0000383e` | code address 0x383e stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_3840` | `DAT_00003840` | code address 0x3840 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_3842` | `DAT_00003842` | code address 0x3842 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_384e` | `DAT_0000384e` | code address 0x384e stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_3850` | `DAT_00003850` | code address 0x3850 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_3858` | `DAT_00003858` | code address 0x3858 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_3882` | `DAT_00003882` | code address 0x3882 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_388c` | `DAT_0000388c` | code address 0x388c stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_3898` | `DAT_00003898` | code address 0x3898 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_389c` | `DAT_0000389c` | code address 0x389c stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_38a8` | `DAT_000038a8` | code address 0x38a8 stored by init_code_pointer_tables |
+| Pacific Conflict | `span8_code_38b6` | `DAT_000038b6` | code address 0x38b6 stored by init_code_pointer_tables |
+| Pacific Conflict | `anchor_x` | `DAT_0001d83c` | anchor record (find_anchor_point result) +0: x; the record pointer is &anchor_x |
+| Pacific Conflict | `anchor_y` | `DAT_0001d840` | anchor record +4: y |
+| Pacific Conflict | `anchor_z` | `DAT_0001d844` | anchor record +8: z |
+| Pacific Conflict | `anchor_angle1` | `DAT_0001d84a` | low word of anchor record +0xc, first angle |
+| Pacific Conflict | `anchor_angle2` | `DAT_0001d84e` | low word of anchor record +0x10, second angle |
+| Pacific Conflict | `anchor_angle3` | `DAT_0001d852` | low word of anchor record +0x14, third angle |
+| Pacific Conflict | `anchor_found` | `DAT_0001d854` | anchor record word +0x18, set when find_anchor_point found a point; nonzero skips the search here |
+| Pacific Conflict | `view_mode` | `DAT_0001d858` | camera view mode word (set to 1 on respawn; < 6 / == 2 tests in overlay_frame_step) [STRONG INFERENCE] |
+| Pacific Conflict | `player_landing_state` | `DAT_0001b868` | 0 airborne/reset, 1 touchdown, 2 stopped (docs/DECOMPILATION_SYMBOLS.md) |
+| Pacific Conflict | `replay_request` | `DAT_0001b86c` | pending instant-replay request: 0 none, 1 airborne, 2 on the ground (request_instant_replay) |
+| Pacific Conflict | `state_flag_b872` | `_DAT_0001b872` | word cleared on respawn, set 0 / 1 in process_flight_input_and_outcome [role UNKNOWN] |
+| Pacific Conflict | `state_flag_b874` | `_DAT_0001b874` | word cleared on respawn; must be 0 for bail-out and view changes [role UNKNOWN] |
+| Pacific Conflict | `parachute_object` | `DAT_0001b87c` | pointer to the bail-out parachute object slot (view 8 -> 9 when it exists) [STRONG INFERENCE] |
+| Pacific Conflict | `mission_scene_object` | `DAT_0001d700` | current mission scene object: scene_root child table +0x74 + mission * 0x18, released by start_mission_scene |
+| Pacific Conflict | `camera_x` | `DAT_0001d838` | camera position x, set from the anchor by start_mission_scene |
+| Pacific Conflict | `camera_y` | `DAT_0001d834` | camera position y |
+| Pacific Conflict | `camera_z` | `DAT_0001d830` | camera position z |
+| Pacific Conflict | `ext_camera_point` | `DAT_0001d824` | stored external-camera point record (x first); 1000000000 = none (point_near_camera_or_type80_object) |
+| Pacific Conflict | `view_flag_d856` | `_DAT_0001d856` | word set to 1 with view_mode by start_mission_scene; tested in overlay_frame_step [role UNKNOWN] |
+| Pacific Conflict | `band_limits_lo` | `DAT_0001b18c` | distance band thresholds T[-1] (= 0): band i starts at band_limits_lo[i] = band_limits[i - 1] |
+| Pacific Conflict | `band_limits` | `DAT_0001b190` | ascending distance band thresholds T[0..] (40041, 81395, ...): band i ends below band_limits[i] |
+| Pacific Conflict | `entity_array_1` | `DAT_0001d4a4` | first entity pointer array (docs/STRUCTS.md entity_array_1; ticked by run_simulation_tick) |
+| Pacific Conflict | `entity_array_1_count` | `DAT_0001c1e0` | entry count of entity_array_1 (docs/STRUCTS.md) |
+| Pacific Conflict | `entity_array_3` | `DAT_0001d0e4` | third entity pointer array (docs/STRUCTS.md entity_array_3), ticked with path 1 |
+| Pacific Conflict | `entity_array_3_count` | `DAT_0001c1dc` | entry count of entity_array_3 |
+| Pacific Conflict | `entity_array_4` | `DAT_0001cbe4` | fourth entity pointer array (docs/STRUCTS.md entity_array_4), ticked with path 1 |
+| Pacific Conflict | `entity_array_4_count` | `DAT_0001c1d8` | entry count of entity_array_4 |
+| Pacific Conflict | `clip_x_min` | `DAT_00020aee` | polygon clip rectangle x-min, read by clip_polygon_x_min |
+| Pacific Conflict | `clip_x_max` | `DAT_00020aec` | polygon clip rectangle x-max, read by clip_polygon_x_max |
+| Pacific Conflict | `clip_y_min` | `DAT_00020aea` | polygon clip rectangle y-min, read by clip_polygon_y_min |
+| Pacific Conflict | `detail_ref_x` | `DAT_0001d724` | x of the detail reference point (update_altitude_detail_bands triple d724 / d720 / d71c); stored at obj +0x18 by build_land_outline_at_detail [STRONG INFERENCE] |
+| Pacific Conflict | `detail_ref_z` | `DAT_0001d71c` | z of the detail reference point; stored at obj +0x20 [STRONG INFERENCE] |
+| Pacific Conflict | `controller_list` | `DAT_0001c25c` | active controller pointer list, ticked by advance_frame_and_tick_controllers through definition +2 |
+| Pacific Conflict | `controller_count` | `DAT_0001c1cc` | entry count of controller_list |
+| Pacific Conflict | `player_shot_ctl` | `DAT_0001b880` | controller of the player's latest gun / missile entity (latched in process_flight_input_and_outcome) [STRONG INFERENCE] |
+| Pacific Conflict | `scatter_slots` | `DAT_0001bc64` | 7 ground-scatter object slots (update_ground_scatter_objects, clear_pending_entity_slots) |
+| Pacific Conflict | `retire_count` | `DAT_00024cf0` | entities retired since the last reset; above 0x13 overlay_frame_step calls reset_distance_base_globals and clears it |
+| Pacific Conflict | `view_points` | `DAT_0001c43c` | camera-relative object points (3 longs, shifted by the object's detail level) appended by collect_near_objects |
+| Pacific Conflict | `view_point_count` | `DAT_0001c1d0` | entry count of view_points |
+| Pacific Conflict | `overlap_list` | `DAT_0001c1e4` | objects with flag-long bit 15, collected each frame; dispatch_overlap_collisions walks it |
+| Pacific Conflict | `overlap_count` | `DAT_0001c1c4` | entry count of overlap_list |
+| Pacific Conflict | `replay_state` | `DAT_0001b870` | instant-replay state: 0 live, 1 rewind, other non-zero replaying, 3 controller tick restricted (docs/DECOMPILATION_SYMBOLS.md) |
+| Pacific Conflict | `designated_entity_2` | `DAT_0001b888` | second designated entity pointer (docs/IMPORT_STATUS.md), cleared each frame by dispatch_overlap_collisions unless replay_state == 3 [role UNKNOWN] |
+| Pacific Conflict | `visible_first_pass` | `DAT_0001c1c0` | visible-list count before world objects (word): first-pass count of build_visible_object_list |
+| Pacific Conflict | `alt_band` | `DAT_0001d70c` | altitude band: power of two at or below camera_y |
+| Pacific Conflict | `alt_band_log2` | `DAT_0001d704` | log2 of alt_band (word) |
+| Pacific Conflict | `alt_value_table` | `DAT_0001b214` | longs per altitude band, interpolated into the y of the reference shapes [STRONG INFERENCE] |
+| Pacific Conflict | `alt_tolerance_table` | `DAT_0001b264` | longs per altitude band: outline tolerance for build_land_outline_at_detail |
+| Pacific Conflict | `detail_ref_y` | `DAT_0001d720` | y of the near rebuild reference point (with detail_ref_x / detail_ref_z) |
+| Pacific Conflict | `far_ref_x` | `DAT_0001d718` | x of the far rebuild reference point |
+| Pacific Conflict | `far_ref_y` | `DAT_0001d714` | y of the far rebuild reference point |
+| Pacific Conflict | `far_ref_z` | `DAT_0001d710` | z of the far rebuild reference point |
+| Pacific Conflict | `scatter_point_x` | `DAT_0001b924` | 64 ground scatter points of 3 longs (x, y, z): x; the array base |
+| Pacific Conflict | `scatter_point_y` | `DAT_0001b928` | scatter point y (always 0) |
+| Pacific Conflict | `scatter_point_z` | `DAT_0001b92c` | scatter point z |
+| Pacific Conflict | `scatter_state` | `DAT_0001b8e4` | 64 point state bytes: 0x80 visible, 0x40 surface cached, low 6 bits = slot or 0x3f |
+| Pacific Conflict | `scatter_surface` | `DAT_0001b8a4` | 64 cached surface-type bytes (surface_type_at_point) |
+| Pacific Conflict | `scatter_slot_point` | `DAT_0001b894` | word per scatter slot: index of its point |
+| Pacific Conflict | `scatter_templates` | `DAT_0001bc24` | template object per surface type >> 4 (0 = none) |
+| Pacific Conflict | `proj_scale_x` | `DAT_00020b28` | projection scale word for screen x |
+| Pacific Conflict | `proj_scale_y` | `DAT_00020b26` | projection scale word for screen y |
+| Pacific Conflict | `scatter_started` | `_DAT_00024cec` | set on the first scatter update, cleared when ground detail is off or too high |
+| Pacific Conflict | `neg_camera_pitch` | `DAT_0001d810` | negated camera pitch word (docs/DECOMPILATION_SYMBOLS.md: camera pitch DAT_00024d1a) |
+| Pacific Conflict | `neg_camera_heading` | `DAT_0001d80e` | negated camera heading word (camera heading DAT_00024d18) |
+| Pacific Conflict | `camera_angle3` | `DAT_0001d80c` | third camera angle word passed to the camera matrix builders [role UNKNOWN] |
+| Pacific Conflict | `camera_angle4` | `DAT_0001d808` | fourth camera angle long passed to the camera matrix builders [role UNKNOWN] |
+| Pacific Conflict | `camera_angle5` | `DAT_0001d804` | fifth camera angle (view mode 2 only) [role UNKNOWN] |
+| Pacific Conflict | `camera_angle6` | `DAT_0001d800` | sixth camera angle (view mode 2 only) [role UNKNOWN] |
+| Pacific Conflict | `object_pool_next` | `DAT_0001b5a8` | object_pool + 1 entry: target of the insertion sort by camera metric |
+| Pacific Conflict | `carried_pair_count` | `DAT_0001b85c` | carried-pair count (docs/DECOMPILATION_SYMBOLS.md), cleared every frame |
+| Pacific Conflict | `carried_pairs` | `DAT_0001b860` | carried-pair array of {carrier, rider} objects |
+| Pacific Conflict | `span_filler` | `DAT_00020ac0` | selected span-filler routine (docs/DECOMPILATION_SYMBOLS.md) |
+| Pacific Conflict | `panels_drawn` | `_DAT_00020ae4` | 0 until the cockpit panels are redrawn by overlay_frame_step (cleared by clear_flag_00020ae4) [STRONG INFERENCE] |
+| Pacific Conflict | `view_half_height` | `DAT_00020ae8` | half view height (view_rows / 2, - 20 with panels; update_view_clip_bounds), or proj_scale_y * 0x43 / 0x1e0 after a panel redraw; used instead of clip_y_max once panels_drawn is set |
+| Pacific Conflict | `view_rows` | `DAT_0001b828` | view height in rows (one span run per row in reset_span_row_lists); scan_last_row = clip_y_max + view_rows / 2 |
+| Pacific Conflict | `deferred_free_flag` | `_DAT_0001c1bc` | shared-block deferred-free flag (docs/DECOMPILATION_SYMBOLS.md), cleared each frame |
+| Pacific Conflict | `flag_da8c` | `DAT_0001da8c` | word cleared by update_view_clip_bounds [role UNKNOWN] |
+| Pacific Conflict | `view_inset` | `DAT_00020ae2` | 4 when update_view_clip_bounds reserves 20 rows for the panels, else 0 [STRONG INFERENCE] |
+| Pacific Conflict | `flag_20ae0` | `_DAT_00020ae0` | word cleared with panels_drawn by update_view_clip_bounds [role UNKNOWN] |
+| Pacific Conflict | `scale_table_index` | `DAT_00020af4` | index into the projection scale tables, used in view mode 6 |
+| Pacific Conflict | `proj_scale_y_table` | `DAT_00020afc` | projection scale word table for proj_scale_y |
+| Pacific Conflict | `proj_scale_x_table` | `DAT_00020b14` | projection scale word table for proj_scale_x |
+| Pacific Conflict | `view_param_12` | `_DAT_0001b82e` | host +0x12 (A5-0x1376) copied by configure_renderer_for_display [role UNKNOWN] |
+| Pacific Conflict | `view_param_14` | `_DAT_0001b82c` | host +0x14 (A5-0x1374) [role UNKNOWN] |
+| Pacific Conflict | `view_half_rows` | `DAT_00020b2c` | view_rows / 2 |
+| Pacific Conflict | `view_half_width` | `DAT_00020b2a` | view_width / 2 |
+| Pacific Conflict | `view_centre_fixed` | `DAT_00020af0` | (2 * view_half_width - 1) << 16 | 0x8000: centre column in 16.16 |
+| Pacific Conflict | `view_multi_flag` | `DAT_0001b824` | host +0xb4 multi-monitor flag the renderer was configured for |
+| Pacific Conflict | `span_filler_2` | `_DAT_00020abc` | second selected span-filler routine (address - 0x20) |
+| Pacific Conflict | `span_filler_3` | `_DAT_00020ab8` | third selected span-filler routine (address - 0x20) |
+| Pacific Conflict | `depth_routine_ab4` | `DAT_00020ab4` | depth-specific code address (0xa14e / 0xa200) [role UNKNOWN] |
+| Pacific Conflict | `depth_routine_da80` | `DAT_0001da80` | depth-specific code address [role UNKNOWN] |
+| Pacific Conflict | `depth_routine_da84` | `DAT_0001da84` | depth-specific code address [role UNKNOWN] |
+| Pacific Conflict | `depth_routine_da90` | `DAT_0001da90` | depth-specific code address [role UNKNOWN] |
+| Pacific Conflict | `depth_routine_da94` | `DAT_0001da94` | depth-specific code address [role UNKNOWN] |
+| Pacific Conflict | `depth_routine_da98` | `DAT_0001da98` | depth-specific code address (host +0x276 at depth 1) [role UNKNOWN] |
+| Pacific Conflict | `depth_routine_da9c` | `DAT_0001da9c` | depth-specific code address (host +0x276 at depth 1) [role UNKNOWN] |
+| Pacific Conflict | `rank_aim_lag_table` | `DAT_0001b2b4` | word per pilot rank: AI aim lag in frames |
+| Pacific Conflict | `ai_aim_lag_key1` | `DAT_0001b876` | AI aim lag in frames for definition key 1 (docs/DECOMPILATION_SYMBOLS.md) |
+| Pacific Conflict | `ai_aim_lag` | `DAT_0001b878` | AI aim lag in frames for the other aircraft |
+| Pacific Conflict | `rudder_key` | `DAT_0001b858` | rudder key input word: +0x40 Z, -0x40 X, 0 |
+| Pacific Conflict | `bw_pattern_first` | `DAT_0001da88` | first word of the host pattern table (+0x88), read at depth 1 |
+| Pacific Conflict | `flight_word_24d2c` | `_DAT_00024d2c` | word cleared when a flight starts [role UNKNOWN] |
+| Pacific Conflict | `flight_word_24d2e` | `_DAT_00024d2e` | word cleared when a flight starts [role UNKNOWN] |
+| Pacific Conflict | `host_words_valid` | `_DAT_00024d34` | nonzero: begin_flight_for_rank copies host words +0x33e / +0x340 [role UNKNOWN] |
+| Pacific Conflict | `host_word_33e` | `DAT_00024d32` | copy of host word +0x33e [role UNKNOWN] |
+| Pacific Conflict | `host_word_340` | `DAT_00024d30` | copy of host word +0x340 [role UNKNOWN] |
+| Pacific Conflict | `replay_frames_left` | `DAT_0001b86e` | instant-replay / end-sequence frame countdown (docs/DECOMPILATION_SYMBOLS.md comment-only name) |
+| Pacific Conflict | `snd_gun` | `_DAT_0001b852` | sound event slot Gun (docs/DECOMPILATION_SYMBOLS.md, slot names from DATA 0) |
+| Pacific Conflict | `view_key_angle_a` | `DAT_00024cfc` | view angle stepped by 0x800 with arrow keys 0x1c / 0x1d |
+| Pacific Conflict | `view_key_angle_b` | `DAT_00024cf8` | view angle stepped by 0x540 with arrow keys 0x1e / 0x1f |
+| Pacific Conflict | `track_pitch` | `DAT_00024d00` | view mode 6 tracking-camera pitch (eased toward attitude_from_velocity's pitch); its low word feeds neg_camera_pitch |
+| Pacific Conflict | `track_heading` | `DAT_00024d04` | view mode 6 tracking-camera heading; its low word feeds neg_camera_heading |
+| Pacific Conflict | `ext_camera_point_y` | `DAT_0001d828` | ext_camera_point record +4: y |
+| Pacific Conflict | `ext_camera_point_z` | `DAT_0001d82c` | ext_camera_point record +8: z |
+| Pacific Conflict | `throttle_step` | `DAT_00024cf6` | throttle step input (+1 / -1 / 0) from the + / = and - / _ keys (docs/STRUCTS.md) |
+| Pacific Conflict | `snd_approach_ok` | `_DAT_0001b83c` | sound event slot 3 (no sample): landing approach accepted (try_begin_landing_approach != 0) |
+| Pacific Conflict | `snd_approach_refused` | `_DAT_0001b83e` | sound event slot 4 (no sample): landing approach refused |
+| Pacific Conflict | `friendly_landing_scored` | `_DAT_0001b86a` | set once per flight when the friendly-base landing outcome (0x201) is taken |
+| Pacific Conflict | `fire_button` | `_DAT_00024cf4` | space key held (1 on keyDown, 0 on keyUp), also restored from host +0x342; gates gun fire [STRONG INFERENCE] |
+| Pacific Conflict | `view_follow_target` | `DAT_0001b884` | object the view follows, taken from designated_entity_2 for 0x14 frames [STRONG INFERENCE] |
+| Pacific Conflict | `abandoned_intact_aircraft` | `_DAT_0001b87a` | set in update_aircraft_entity when the player bails out of an undamaged aircraft with fuel; a surviving pilot is then Discharged (resolve_bailout_outcome header) |
+| Pacific Conflict | `camera_pitch` | `DAT_00024d1a` | camera pitch word 0..0x3fff (docs/DECOMPILATION_SYMBOLS.md, PROVEN); neg_camera_pitch is its negative |
+| Pacific Conflict | `camera_heading` | `DAT_00024d18` | camera heading word 0..0x3fff (PROVEN); neg_camera_heading is its negative |
+| Pacific Conflict | `camera_step_x` | `DAT_0001d81c` | camera x step per frame: (camera_goal_x - camera_x) / (replay_frames_left - 0x1e) |
+| Pacific Conflict | `camera_step_y` | `DAT_0001d818` | camera y step per frame |
+| Pacific Conflict | `camera_step_z` | `DAT_0001d814` | camera z step per frame |
+| Pacific Conflict | `camera_goal_x` | `DAT_00024d28` | camera destination x the replay camera glides to |
+| Pacific Conflict | `camera_goal_y` | `DAT_00024d24` | camera destination y |
+| Pacific Conflict | `camera_goal_z` | `DAT_00024d20` | camera destination z |
+| Pacific Conflict | `target_hold_frames` | `DAT_00024d1c` | frames the view keeps following view_follow_target (0x14 when taken) |

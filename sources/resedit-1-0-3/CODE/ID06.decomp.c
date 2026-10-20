@@ -23,6 +23,24 @@ uint *DAT_000003ca;
 int *DAT_000003ce;
 int DAT_00000904;
 
+/* Readable global names (readability pass; the Ghidra name stays the real symbol).
+ * render_scanline_spans PC-relative state block 0x39e..0x3d6 (see its VERIFIED note). */
+#define CurrentA5 DAT_00000904 /* low-memory global $0904: the application's A5 world */
+#define spans_active_base DAT_0000039e /* 0x39e: active edge array base (row table +4 of the edge pool) */
+#define spans_band_stride DAT_000003a2 /* 0x3a2: dest stride added after each row (param 3) */
+#define spans_list_head DAT_000003a6 /* 0x3a6: priority list head sentinel (edge pool +0x898) */
+#define spans_list_tail DAT_000003aa /* 0x3aa: tail sentinel (edge pool +0x89c), stored after the last active edge */
+#define spans_saved_d3_prev_x DAT_000003ae /* 0x3ae saved D3: previous edge x (fixed point) for the re-sort test */
+#define spans_saved_d4_mask_x DAT_000003b2 /* 0x3b2 saved D4: x >> 6, masked with 0x3e0 to index the left-mask table */
+#define spans_saved_d5_edge_x DAT_000003b6 /* 0x3b6 saved D5: edge x advanced by its slope */
+#define spans_saved_d6_out_long DAT_000003ba /* 0x3ba saved D6: pending output long (mask-merged span) */
+#define spans_saved_d7_active_end DAT_000003be /* 0x3be saved D7: end of the active edge array */
+#define spans_saved_a2_row_entry DAT_000003c2 /* 0x3c2 saved A2: current 12-byte row entry (+0 bucket, +4 drop flag, +8 pattern table) */
+#define spans_saved_a3_scan DAT_000003c6 /* 0x3c6 saved A3: insertion / compaction scan pointer, nonzero = list dirty */
+#define spans_saved_a4_edge DAT_000003ca /* 0x3ca saved A4: current edge node */
+#define spans_saved_a5_next_slot DAT_000003ce /* 0x3ce saved A5: next active edge slot */
+#define spans_saved_a6_temp DAT_000003d2 /* 0x3d2 saved A6: frame pointer on entry, then a scratch pointer */
+
 /* VERIFIED (ID06::FUN_00000004): ID06.bin 0x4..0xaa checked against an independent capstone disassembly:
  * 32 fill masks x 8 longs into *(A5-0x1eda) (m = m >> 1 | 0x80000000, from 0), then 64 B/W patterns x 8
  * longs, each the byte A5-0x1ed6[i * 8 + j] replicated four times (LSL.L #8 / #16 with OR), then the
@@ -43,33 +61,33 @@ int DAT_00000904;
 undefined4 init_pattern_tables /* Original: FUN_00000004 */ (void)
 
 {
-  undefined1 uVar1;
-  undefined2 uVar2;
-  uint uVar3;
-  short sVar4;
-  short sVar5;
-  uint *puVar6;
+  undefined1 pat_byte; /* uVar1: byte j of 8-byte pattern i at A5-0x1ed6 */
+  undefined2 pat_word; /* uVar2: pat_byte doubled into a word */
+  uint mask; /* uVar3: left mask, m >> 1 | 0x80000000 */
+  short row; /* sVar4: long within an 8-long block */
+  short i; /* sVar5: mask 0..31, pattern 0..63, then map entry 0..255 */
+  uint *out; /* puVar6: write cursor in the 0xc00-byte table *(A5-0x1eda) */
   int unaff_A5;
   
-  puVar6 = *(uint **)(unaff_A5 + -0x1eda);
-  uVar3 = 0;
-  for (sVar5 = 0; sVar5 < 0x20; sVar5 = sVar5 + 1) {
-    for (sVar4 = 0; sVar4 < 8; sVar4 = sVar4 + 1) {
-      *puVar6 = uVar3;
-      puVar6 = puVar6 + 1;
+  out = *(uint **)(unaff_A5 + -0x1eda);
+  mask = 0;
+  for (i = 0; i < 0x20; i = i + 1) {
+    for (row = 0; row < 8; row = row + 1) {
+      *out = mask;
+      out = out + 1;
     }
-    uVar3 = uVar3 >> 1 | 0x80000000;
+    mask = mask >> 1 | 0x80000000;
   }
-  for (sVar5 = 0; sVar5 < 0x40; sVar5 = sVar5 + 1) {
-    for (sVar4 = 0; sVar4 < 8; sVar4 = sVar4 + 1) {
-      uVar1 = *(undefined1 *)(unaff_A5 + -0x1ed6 + (int)(short)(sVar4 + sVar5 * 8));
-      uVar2 = CONCAT11(uVar1,uVar1);
-      *puVar6 = CONCAT22(uVar2,uVar2);
-      puVar6 = puVar6 + 1;
+  for (i = 0; i < 0x40; i = i + 1) {
+    for (row = 0; row < 8; row = row + 1) {
+      pat_byte = *(undefined1 *)(unaff_A5 + -0x1ed6 + (int)(short)(row + i * 8));
+      pat_word = CONCAT11(pat_byte,pat_byte);
+      *out = CONCAT22(pat_word,pat_word);
+      out = out + 1;
     }
   }
-  for (sVar5 = 0; sVar5 < 0x100; sVar5 = sVar5 + 1) {
-    *(short *)(*(int *)(unaff_A5 + -0x1ede) + sVar5 * 2) = ((sVar5 >> 4) * -4 + 0x3f) * 0x20 + 0x400
+  for (i = 0; i < 0x100; i = i + 1) {
+    *(short *)(*(int *)(unaff_A5 + -0x1ede) + i * 2) = ((i >> 4) * -4 + 0x3f) * 0x20 + 0x400
     ;
   }
   return 1;
@@ -90,26 +108,26 @@ undefined4 init_pattern_tables /* Original: FUN_00000004 */ (void)
 undefined4 alloc_pattern_tables /* Original: FUN_000000b0 */ (void)
 
 {
-  uint uVar1;
-  undefined4 uVar2;
+  uint block; /* uVar1: alloc_aligned_clear result */
+  undefined4 result; /* uVar2: init_pattern_tables result */
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1eda) == 0) {
-    uVar1 = alloc_aligned_clear(0xc00);
-    *(uint *)(unaff_A5 + -0x1eda) = uVar1;
-    if (uVar1 == 0) {
+    block = alloc_aligned_clear(0xc00);
+    *(uint *)(unaff_A5 + -0x1eda) = block;
+    if (block == 0) {
       return 0;
     }
   }
   if (*(int *)(unaff_A5 + -0x1ede) == 0) {
-    uVar1 = alloc_aligned_clear(0x200);
-    *(uint *)(unaff_A5 + -0x1ede) = uVar1;
-    if (uVar1 == 0) {
+    block = alloc_aligned_clear(0x200);
+    *(uint *)(unaff_A5 + -0x1ede) = block;
+    if (block == 0) {
       return 0;
     }
   }
-  uVar2 = init_pattern_tables();
-  return uVar2;
+  result = init_pattern_tables();
+  return result;
 }
 
 
@@ -126,13 +144,13 @@ undefined4 alloc_pattern_tables /* Original: FUN_000000b0 */ (void)
 undefined4 get_pattern_table /* Original: FUN_000000f4 */ (void)
 
 {
-  uint uVar1;
+  uint block; /* uVar1: alloc_aligned_clear(0xc00) result */
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1eda) == 0) {
-    uVar1 = alloc_aligned_clear(0xc00);
-    *(uint *)(unaff_A5 + -0x1eda) = uVar1;
-    if (uVar1 == 0) {
+    block = alloc_aligned_clear(0xc00);
+    *(uint *)(unaff_A5 + -0x1eda) = block;
+    if (block == 0) {
       return 0;
     }
   }
@@ -155,14 +173,14 @@ undefined4 get_pattern_table /* Original: FUN_000000f4 */ (void)
  * i.e. an 8-byte pattern chosen by inverse brightness (64 levels) for 1-bit
  * output [STRONG INFERENCE].
  */
-int rgb_to_bw_pattern /* Original: FUN_00000116 */ (undefined4 param_1,undefined4 param_2)
+int rgb_to_bw_pattern /* Original: FUN_00000116 */ (undefined4 red_green /* param_1: high word red, low word green */,undefined4 blue /* param_2: high word blue */)
 
 {
   int unaff_A5;
   
-  return (int)(short)((0x3f - ((short)((ushort)((param_2._0_2_ >> 8) * 7 +
-                                               (param_1._2_2_ >> 8) * 0x26 +
-                                               (param_1._0_2_ >> 8) * 0x13) >> 6) >> 2)) * 8) +
+  return (int)(short)((0x3f - ((short)((ushort)((blue._0_2_ >> 8) * 7 +
+                                               (red_green._2_2_ >> 8) * 0x26 +
+                                               (red_green._0_2_ >> 8) * 0x13) >> 6) >> 2)) * 8) +
          unaff_A5 + -0x1ed6;
 }
 
@@ -180,17 +198,17 @@ int rgb_to_bw_pattern /* Original: FUN_00000116 */ (undefined4 param_1,undefined
  * (*(long A5-0x1ede))[i] (low word of result; high word is pointer residue).
  * Used by init_row_table_fields for row table +8.
  */
-undefined4 lookup_colour_map /* Original: FUN_0000017c */ (undefined4 param_1)
+undefined4 lookup_colour_map /* Original: FUN_0000017c */ (undefined4 level /* param_1: high word = map index, clamped to 0xff */)
 
 {
-  undefined2 *puVar1;
+  undefined2 *entry; /* puVar1: word entry in *(A5-0x1ede) */
   int unaff_A5;
   
-  if (0xff < (short)param_1._0_2_) { /* CORRECTED [PROVEN]: CMPI.W #$100 / BLT is a signed word compare */
-    param_1._0_2_ = 0xff;
+  if (0xff < (short)level._0_2_) { /* CORRECTED [PROVEN]: CMPI.W #$100 / BLT is a signed word compare */
+    level._0_2_ = 0xff;
   }
-  puVar1 = (undefined2 *)(*(int *)(unaff_A5 + -0x1ede) + (short)param_1._0_2_ * 2); /* EXT.L: signed index */
-  return CONCAT22((short)((uint)puVar1 >> 0x10),*puVar1);
+  entry = (undefined2 *)(*(int *)(unaff_A5 + -0x1ede) + (short)level._0_2_ * 2); /* EXT.L: signed index */
+  return CONCAT22((short)((uint)entry >> 0x10),*entry);
 }
 
 
@@ -204,23 +222,23 @@ undefined4 lookup_colour_map /* Original: FUN_0000017c */ (undefined4 param_1)
  * Exported C complete: first i in 0..255 with table[i] == word param, else 0.
  * Inverse of lookup_colour_map.
  */
-undefined4 reverse_lookup_colour_map /* Original: FUN_000001a2 */ (undefined4 param_1)
+undefined4 reverse_lookup_colour_map /* Original: FUN_000001a2 */ (undefined4 value /* param_1: high word = map value to find */)
 
 {
-  short *psVar1;
-  short sVar2;
+  short *entry; /* psVar1: word entry in *(A5-0x1ede) */
+  short i; /* sVar2: map index 0..255 */
   int unaff_A5;
   
-  sVar2 = 0;
+  i = 0;
   while( true ) {
-    if (0xff < sVar2) {
+    if (0xff < i) {
       return 0;
     }
-    psVar1 = (short *)(*(int *)(unaff_A5 + -0x1ede) + sVar2 * 2);
-    if (param_1._0_2_ == *psVar1) break;
-    sVar2 = sVar2 + 1;
+    entry = (short *)(*(int *)(unaff_A5 + -0x1ede) + i * 2);
+    if (value._0_2_ == *entry) break;
+    i = i + 1;
   }
-  return CONCAT22((short)((uint)psVar1 >> 0x10),sVar2);
+  return CONCAT22((short)((uint)entry >> 0x10),i);
 }
 
 
@@ -275,15 +293,15 @@ uint alloc_aligned_clear /* Original: FUN_000001dc */ (int size)
  * Exported C complete: if p != 0, DisposPtr(*(p - 8)) (JT $23a); returns p != 0.
  * Frees a block from alloc_aligned_clear.
  */
-bool free_aligned /* Original: FUN_0000024c */ (int param_1)
+bool free_aligned /* Original: FUN_0000024c */ (int block /* param_1: block from alloc_aligned_clear */)
 
 {
   int unaff_A5;
   
-  if (param_1 != 0) {
-    (**(code **)(unaff_A5 + 0x23a))(*(undefined4 *)(param_1 + -8));
+  if (block != 0) {
+    (**(code **)(unaff_A5 + 0x23a))(*(undefined4 *)(block + -8));
   }
-  return param_1 != 0;
+  return block != 0;
 }
 
 
@@ -303,27 +321,27 @@ bool free_aligned /* Original: FUN_0000024c */ (int param_1)
  * (row % 8) * 4 (8-row repeating table: dither pattern [HYPOTHESIS]);
  * +0xe = rows; +0x10 = +0x14 = 0. Returns 1. Caller: alloc_row_table.
  */
-undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 param_1)
+undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 level_rows /* param_1: high word = colour level, low word = row count */)
 
 {
-  undefined4 uVar1;
+  undefined4 map_word; /* uVar1: lookup_colour_map result */
   undefined4 unaff_D7;
-  short sVar2;
+  short row; /* sVar2: row index */
   int unaff_A5;
   
   **(int **)(unaff_A5 + -0x1cd2) = unaff_A5 + 0x192;
-  uVar1 = lookup_colour_map(CONCAT22(param_1._0_2_,(short)((uint)unaff_D7 >> 0x10)));
-  *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 8) = (short)uVar1;
+  map_word = lookup_colour_map(CONCAT22(level_rows._0_2_,(short)((uint)unaff_D7 >> 0x10)));
+  *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 8) = (short)map_word;
   *(undefined2 *)(*(int *)(unaff_A5 + -0x1cd2) + 10) = 0xb;
   *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xc) =
        *(short *)(*(int *)(unaff_A5 + -0x1cce) + 4) -
        (short)(*(short *)(*(int *)(unaff_A5 + -0x1cce) + 8) *
               *(short *)(*(int *)(unaff_A5 + -0x1cce) + 6)) / 8;
-  for (sVar2 = 0; sVar2 < param_1._2_2_; sVar2 = sVar2 + 1) {
-    *(int *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + sVar2 * 0xc + 8) =
-         *(int *)(*(int *)(unaff_A5 + -0x1cce) + 0xc) + (sVar2 % 8) * 4;
+  for (row = 0; row < level_rows._2_2_; row = row + 1) {
+    *(int *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + row * 0xc + 8) =
+         *(int *)(*(int *)(unaff_A5 + -0x1cce) + 0xc) + (row % 8) * 4;
   }
-  *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe) = param_1._2_2_;
+  *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe) = level_rows._2_2_;
   *(undefined4 *)(*(int *)(unaff_A5 + -0x1cd2) + 0x10) = 0;
   *(undefined4 *)(*(int *)(unaff_A5 + -0x1cd2) + 0x14) = 0;
   return 1;
@@ -369,147 +387,147 @@ undefined4 init_row_table_fields /* Original: FUN_0000026c */ (undefined4 param_
  *   4. advance each edge x by its slope (+4) and re-sort.
  * Painter-style priority span fill of the polygons from add_polygon_edges.
  */
-void render_scanline_spans /* Original: FUN_00000318 */ (undefined4 param_1,uint *param_2,int param_3)
+void render_scanline_spans /* Original: FUN_00000318 */ (undefined4 band /* param_1: high word = continue flag (0 = first band), low word = rows */,uint *dest /* param_2: output long cursor */,int stride /* param_3: bytes added to dest after each row */)
 
 {
-  uint uVar1;
-  int iVar2;
-  uint uVar3;
-  ushort uVar4;
-  int iVar5;
-  short sVar6;
-  uint uVar7;
-  short sVar8;
+  uint edge_x; /* uVar1: edge node x long (high word = pixel x) */
+  int work; /* iVar2: scratch: tail sentinel, new edge x, drop flag, polygon, then the row's pattern table */
+  uint left_mask; /* uVar3: left mask from the pattern table, (x >> 6) & 0x3e0 */
+  ushort parity; /* uVar4: complemented polygon parity word +0x20 */
+  int head; /* iVar5: priority list head sentinel */
+  short rows_left; /* sVar6: row countdown */
+  uint x_or_colour; /* uVar7: previous edge x word, then the colour pattern long */
+  short run_len; /* sVar8: whole longs to store before the next crossing */
   uint unaff_D6;
-  int *piVar9;
-  int *piVar10;
-  int iVar11;
+  int *edges; /* piVar9: active edge array, new-edge cursor, then compacted end */
+  int *cursor; /* piVar10: insert / compaction write / walk cursor, then next row entry */
+  int node; /* iVar11: priority list node */
   int unaff_A5;
-  int *piVar12;
-  int *piVar14;
-  int *piVar13;
+  int *scan; /* piVar12: active array read pointer */
+  int *walk; /* piVar14: row entries, new-edge bucket, then the span walk pointer */
+  int *scan_next; /* piVar13: scan + 1 */
   
-  piVar9 = (int *)(*(int *)(unaff_A5 + -0x1cd6) + 4);
-  iVar2 = *(int *)(*(int *)(unaff_A5 + -0x1cd6) + 0x89c);
-  piVar14 = *(int **)(*(int *)(unaff_A5 + -0x1cd2) + 4);
-  sVar6 = param_1._2_2_ + -1;
-  if (param_1._0_2_ == 0) {
-    DAT_000003a2 = param_3;
-    DAT_000003c6 = (int *)0x0;
-    DAT_0000039e = piVar9;
-    DAT_000003a6 = *(int *)(*(int *)(unaff_A5 + -0x1cd6) + 0x898);
-    DAT_000003aa = iVar2;
-    *piVar9 = iVar2;
-    DAT_000003ba = unaff_D6;
-    DAT_000003be = piVar9;
-    DAT_000003c2 = piVar14;
-    DAT_000003d2 = (int *)&stack0xfffffffc;
+  edges = (int *)(*(int *)(unaff_A5 + -0x1cd6) + 4);
+  work = *(int *)(*(int *)(unaff_A5 + -0x1cd6) + 0x89c);
+  walk = *(int **)(*(int *)(unaff_A5 + -0x1cd2) + 4);
+  rows_left = band._2_2_ + -1;
+  if (band._0_2_ == 0) {
+    spans_band_stride = stride;
+    spans_saved_a3_scan = (int *)0x0;
+    spans_active_base = edges;
+    spans_list_head = *(int *)(*(int *)(unaff_A5 + -0x1cd6) + 0x898);
+    spans_list_tail = work;
+    *edges = work;
+    spans_saved_d6_out_long = unaff_D6;
+    spans_saved_d7_active_end = edges;
+    spans_saved_a2_row_entry = walk;
+    spans_saved_a6_temp = (int *)&stack0xfffffffc;
   }
   do {
-    piVar14 = (int *)*DAT_000003c2;
-    for (piVar9 = piVar14; piVar9 != (int *)0x0; piVar9 = (int *)piVar9[3]) {
-      iVar2 = piVar9[2];
-      *piVar9 = iVar2;
-      DAT_000003c6 = DAT_000003be;
+    walk = (int *)*spans_saved_a2_row_entry;
+    for (edges = walk; edges != (int *)0x0; edges = (int *)edges[3]) {
+      work = edges[2];
+      *edges = work;
+      spans_saved_a3_scan = spans_saved_d7_active_end;
       do {
-        piVar10 = DAT_000003c6;
-        DAT_000003c6 = piVar10 + -1;
-        *piVar10 = *DAT_000003c6;
-      } while (iVar2 < *(int *)*DAT_000003c6);
-      *piVar10 = (int)piVar9;
-      DAT_000003be = DAT_000003be + 1;
+        cursor = spans_saved_a3_scan;
+        spans_saved_a3_scan = cursor + -1;
+        *cursor = *spans_saved_a3_scan;
+      } while (work < *(int *)*spans_saved_a3_scan);
+      *cursor = (int)edges;
+      spans_saved_d7_active_end = spans_saved_d7_active_end + 1;
     }
-    iVar2 = DAT_000003c2[1];
-    piVar9 = DAT_000003be;
-    piVar10 = DAT_0000039e;
-    piVar12 = DAT_0000039e;
-    if (iVar2 != 0) {
+    work = spans_saved_a2_row_entry[1];
+    edges = spans_saved_d7_active_end;
+    cursor = spans_active_base;
+    scan = spans_active_base;
+    if (work != 0) {
       do {
-        piVar13 = piVar12 + 1;
-        piVar9 = piVar10;
-        if (sVar6 != *(short *)(*piVar12 + 0x22)) {
-          piVar9 = piVar10 + 1;
-          *piVar10 = *piVar12;
+        scan_next = scan + 1;
+        edges = cursor;
+        if (rows_left != *(short *)(*scan + 0x22)) {
+          edges = cursor + 1;
+          *cursor = *scan;
         }
-        piVar10 = piVar9;
-        DAT_000003c6 = piVar9;
-        piVar12 = piVar13;
-      } while (piVar13 < DAT_000003be);
+        cursor = edges;
+        spans_saved_a3_scan = edges;
+        scan = scan_next;
+      } while (scan_next < spans_saved_d7_active_end);
     }
-    iVar5 = DAT_000003a6;
-    piVar10 = DAT_0000039e;
-    if (piVar14 != (int *)0x0 || (iVar2 != 0 || DAT_000003c6 != (int *)0x0)) {
-      while (piVar10 < piVar9) {
-        iVar2 = *piVar10;
-        *(undefined2 *)(iVar2 + 0x1e) = *(undefined2 *)(*(int *)(iVar5 + 0x10) + 0x1c);
-        iVar2 = *(int *)(iVar2 + 0x18);
-        uVar4 = ~*(ushort *)(iVar2 + 0x20);
-        *(ushort *)(iVar2 + 0x20) = uVar4;
-        iVar11 = iVar5;
-        if (uVar4 == 0) {
-          iVar11 = *(int *)(iVar2 + 0x14);
-          iVar2 = *(int *)(iVar2 + 0x10);
-          *(int *)(iVar11 + 0x10) = iVar2;
-          *(int *)(iVar2 + 0x14) = iVar11;
-          piVar10 = piVar10 + 1;
+    head = spans_list_head;
+    cursor = spans_active_base;
+    if (walk != (int *)0x0 || (work != 0 || spans_saved_a3_scan != (int *)0x0)) {
+      while (cursor < edges) {
+        work = *cursor;
+        *(undefined2 *)(work + 0x1e) = *(undefined2 *)(*(int *)(head + 0x10) + 0x1c);
+        work = *(int *)(work + 0x18);
+        parity = ~*(ushort *)(work + 0x20);
+        *(ushort *)(work + 0x20) = parity;
+        node = head;
+        if (parity == 0) {
+          node = *(int *)(work + 0x14);
+          work = *(int *)(work + 0x10);
+          *(int *)(node + 0x10) = work;
+          *(int *)(work + 0x14) = node;
+          cursor = cursor + 1;
         }
         else {
           do {
-            iVar11 = *(int *)(iVar11 + 0x10);
-          } while (*(short *)(iVar2 + 0x24) < *(short *)(iVar11 + 0x24));
-          *(int *)(iVar2 + 0x10) = iVar11;
-          DAT_000003d2 = *(int **)(iVar11 + 0x14);
-          *(int **)(iVar2 + 0x14) = DAT_000003d2;
-          *(int *)(iVar11 + 0x14) = iVar2;
-          DAT_000003d2[4] = iVar2;
-          piVar10 = piVar10 + 1;
+            node = *(int *)(node + 0x10);
+          } while (*(short *)(work + 0x24) < *(short *)(node + 0x24));
+          *(int *)(work + 0x10) = node;
+          spans_saved_a6_temp = *(int **)(node + 0x14);
+          *(int **)(work + 0x14) = spans_saved_a6_temp;
+          *(int *)(node + 0x14) = work;
+          spans_saved_a6_temp[4] = work;
+          cursor = cursor + 1;
         }
       }
-      DAT_000003c6 = (int *)0x0;
-      *piVar10 = DAT_000003aa;
+      spans_saved_a3_scan = (int *)0x0;
+      *cursor = spans_list_tail;
     }
-    piVar10 = DAT_000003c2 + 3;
-    iVar2 = DAT_000003c2[2];
-    DAT_000003b2 = 0;
-    uVar7 = 0;
-    DAT_000003b6 = 0;
-    piVar14 = DAT_0000039e;
+    cursor = spans_saved_a2_row_entry + 3;
+    work = spans_saved_a2_row_entry[2];
+    spans_saved_d4_mask_x = 0;
+    x_or_colour = 0;
+    spans_saved_d5_edge_x = 0;
+    walk = spans_active_base;
     do {
-      DAT_000003ae = DAT_000003b6;
-      DAT_000003ce = piVar14 + 1;
-      DAT_000003ca = (uint *)*piVar14;
-      uVar1 = *DAT_000003ca;
-      uVar3 = *(uint *)(iVar2 + (short)((ushort)DAT_000003b2 & 0x3e0));
-      sVar8 = (short)(uVar1 >> 0x10) - (short)uVar7;
-      uVar7 = *(uint *)(iVar2 + *(short *)((int)DAT_000003ca + 0x1e));
-      DAT_000003ba = uVar7 & ~uVar3 | uVar3 & DAT_000003ba;
-      while (sVar8 = sVar8 + -1, sVar8 != -1) {
-        *param_2 = DAT_000003ba;
-        DAT_000003ba = uVar7;
-        param_2 = param_2 + 1;
+      spans_saved_d3_prev_x = spans_saved_d5_edge_x;
+      spans_saved_a5_next_slot = walk + 1;
+      spans_saved_a4_edge = (uint *)*walk;
+      edge_x = *spans_saved_a4_edge;
+      left_mask = *(uint *)(work + (short)((ushort)spans_saved_d4_mask_x & 0x3e0));
+      run_len = (short)(edge_x >> 0x10) - (short)x_or_colour;
+      x_or_colour = *(uint *)(work + *(short *)((int)spans_saved_a4_edge + 0x1e));
+      spans_saved_d6_out_long = x_or_colour & ~left_mask | left_mask & spans_saved_d6_out_long;
+      while (run_len = run_len + -1, run_len != -1) {
+        *dest = spans_saved_d6_out_long;
+        spans_saved_d6_out_long = x_or_colour;
+        dest = dest + 1;
       }
-      DAT_000003b6 = DAT_000003ca[1] + uVar1;
-      uVar7 = uVar1 >> 0x10;
-      DAT_000003b2 = uVar1 >> 6;
-      *DAT_000003ca = DAT_000003b6;
-      if ((int)DAT_000003b6 < (int)DAT_000003ae) {
+      spans_saved_d5_edge_x = spans_saved_a4_edge[1] + edge_x;
+      x_or_colour = edge_x >> 0x10;
+      spans_saved_d4_mask_x = edge_x >> 6;
+      *spans_saved_a4_edge = spans_saved_d5_edge_x;
+      if ((int)spans_saved_d5_edge_x < (int)spans_saved_d3_prev_x) {
         do {
-          piVar12 = piVar14;
-          DAT_000003c6 = piVar12 + -1;
-          DAT_000003d2 = (int *)*DAT_000003c6;
-          *piVar12 = (int)DAT_000003d2;
-          piVar14 = DAT_000003c6;
-        } while ((int)DAT_000003b6 < *DAT_000003d2);
-        *piVar12 = (int)DAT_000003ca;
-        DAT_000003b6 = DAT_000003ae;
+          scan = walk;
+          spans_saved_a3_scan = scan + -1;
+          spans_saved_a6_temp = (int *)*spans_saved_a3_scan;
+          *scan = (int)spans_saved_a6_temp;
+          walk = spans_saved_a3_scan;
+        } while ((int)spans_saved_d5_edge_x < *spans_saved_a6_temp);
+        *scan = (int)spans_saved_a4_edge;
+        spans_saved_d5_edge_x = spans_saved_d3_prev_x;
       }
-      piVar14 = DAT_000003ce;
-    } while (DAT_000003ce <= piVar9);
-    param_2 = (uint *)(DAT_000003a2 + (int)param_2);
-    sVar6 = sVar6 + -1;
-    DAT_000003be = piVar9;
-    DAT_000003c2 = piVar10;
-  } while (sVar6 != -1);
+      walk = spans_saved_a5_next_slot;
+    } while (spans_saved_a5_next_slot <= edges);
+    dest = (uint *)(spans_band_stride + (int)dest);
+    rows_left = rows_left + -1;
+    spans_saved_d7_active_end = edges;
+    spans_saved_a2_row_entry = cursor;
+  } while (rows_left != -1);
   return;
 }
 
@@ -563,40 +581,40 @@ void free_row_table /* Original: FUN_00000512 */ (void)
  * n * 12 bytes of entries -> record+4, clears every entry, then returns
  * FUN_0000026c(param_1). One 12-byte entry per raster row [STRONG INFERENCE].
  */
-undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
+undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 level_rows /* param_1: high word = colour level, low word = row count */)
 
 {
-  uint uVar1;
-  undefined4 uVar2;
-  short sVar3;
+  uint block; /* uVar1: alloc_aligned_clear result */
+  undefined4 result; /* uVar2: init_row_table_fields result */
+  short row; /* sVar3: row entry index */
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1cce) == 0) {
     return 0;
   }
   if ((*(int *)(unaff_A5 + -0x1cd2) != 0) &&
-     (*(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe) < param_1._2_2_)) {
+     (*(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe) < level_rows._2_2_)) {
     free_row_table();
   }
   if (*(int *)(unaff_A5 + -0x1cd2) == 0) {
-    uVar1 = alloc_aligned_clear(0x24);
-    *(uint *)(unaff_A5 + -0x1cd2) = uVar1;
-    if (uVar1 == 0) {
+    block = alloc_aligned_clear(0x24);
+    *(uint *)(unaff_A5 + -0x1cd2) = block;
+    if (block == 0) {
       return 0;
     }
-    uVar1 = alloc_aligned_clear(param_1._2_2_ * 0xc);
-    *(uint *)(*(int *)(unaff_A5 + -0x1cd2) + 4) = uVar1;
-    if (uVar1 == 0) {
+    block = alloc_aligned_clear(level_rows._2_2_ * 0xc);
+    *(uint *)(*(int *)(unaff_A5 + -0x1cd2) + 4) = block;
+    if (block == 0) {
       return 0;
     }
   }
-  for (sVar3 = 0; sVar3 < param_1._2_2_; sVar3 = sVar3 + 1) {
-    *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + sVar3 * 0xc) = 0;
-    *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + sVar3 * 0xc + 4) = 0;
-    *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + sVar3 * 0xc + 8) = 0;
+  for (row = 0; row < level_rows._2_2_; row = row + 1) {
+    *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + row * 0xc) = 0;
+    *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + row * 0xc + 4) = 0;
+    *(undefined4 *)(*(int *)(*(int *)(unaff_A5 + -0x1cd2) + 4) + row * 0xc + 8) = 0;
   }
-  uVar2 = init_row_table_fields(param_1);
-  return uVar2;
+  result = init_row_table_fields(level_rows);
+  return result;
 }
 
 
@@ -621,18 +639,18 @@ undefined4 alloc_row_table /* Original: FUN_00000598 */ (undefined4 param_1)
 undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
 
 {
-  undefined4 uVar1;
-  uint uVar2;
+  undefined4 result; /* uVar1: 0 without a row table, else 1 */
+  uint block; /* uVar2: alloc_aligned_clear(0x5e9c) result */
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1cd2) == 0) {
-    uVar1 = 0;
+    result = 0;
   }
   else {
     if (*(int *)(unaff_A5 + -0x1cd6) == 0) {
-      uVar2 = alloc_aligned_clear(0x5e9c);
-      *(uint *)(unaff_A5 + -0x1cd6) = uVar2;
-      if (uVar2 == 0) {
+      block = alloc_aligned_clear(0x5e9c);
+      *(uint *)(unaff_A5 + -0x1cd6) = block;
+      if (block == 0) {
         return 0;
       }
     }
@@ -662,9 +680,9 @@ undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
     *(undefined4 *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a4) =
          *(undefined4 *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a0);
     *(int *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a8) = *(int *)(unaff_A5 + -0x1cd6) + 0x5b7c;
-    uVar1 = 1;
+    result = 1;
   }
-  return uVar1;
+  return result;
 }
 
 
@@ -685,49 +703,49 @@ undefined4 init_edge_pool /* Original: FUN_00000666 */ (void)
  * init_edge_pool; A5-0x1cca = width >> 1, A5-0x1cc8 = height >> 1 (centre).
  * Returns 1 on success, 0 on any failure.
  */
-undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 pixel_base /* param_1: target +0, pixel base */,undefined4 rowbytes_level /* param_2: high word -> target +4 (row bytes [STRONG INFERENCE]), low word = colour level */,undefined4 width_height /* param_3: high word = width, low word = height */)
 
 {
-  undefined4 uVar1;
-  uint uVar2;
+  undefined4 result; /* uVar1: callee result / return value */
+  uint block; /* uVar2: alloc_aligned_clear(0x10) result */
   int unaff_A5;
   
-  uVar1 = alloc_pattern_tables();
-  if ((short)uVar1 == 0) {
-    uVar1 = 0;
+  result = alloc_pattern_tables();
+  if ((short)result == 0) {
+    result = 0;
   }
   else {
     if (*(int *)(unaff_A5 + -0x1cce) == 0) {
-      uVar2 = alloc_aligned_clear(0x10);
-      *(uint *)(unaff_A5 + -0x1cce) = uVar2;
-      if (uVar2 == 0) {
+      block = alloc_aligned_clear(0x10);
+      *(uint *)(unaff_A5 + -0x1cce) = block;
+      if (block == 0) {
         return 0;
       }
     }
-    **(undefined4 **)(unaff_A5 + -0x1cce) = param_1;
-    *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 4) = param_2._0_2_;
+    **(undefined4 **)(unaff_A5 + -0x1cce) = pixel_base;
+    *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 4) = rowbytes_level._0_2_;
     *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 6) = 1;
-    *(short *)(*(int *)(unaff_A5 + -0x1cce) + 8) = param_3._0_2_;
-    *(short *)(*(int *)(unaff_A5 + -0x1cce) + 10) = param_3._2_2_;
-    uVar1 = get_pattern_table();
-    *(undefined4 *)(*(int *)(unaff_A5 + -0x1cce) + 0xc) = uVar1;
-    uVar1 = alloc_row_table(CONCAT22(param_2._2_2_,param_3._2_2_));
-    if ((short)uVar1 == 0) {
-      uVar1 = 0;
+    *(short *)(*(int *)(unaff_A5 + -0x1cce) + 8) = width_height._0_2_;
+    *(short *)(*(int *)(unaff_A5 + -0x1cce) + 10) = width_height._2_2_;
+    result = get_pattern_table();
+    *(undefined4 *)(*(int *)(unaff_A5 + -0x1cce) + 0xc) = result;
+    result = alloc_row_table(CONCAT22(rowbytes_level._2_2_,width_height._2_2_));
+    if ((short)result == 0) {
+      result = 0;
     }
     else {
-      uVar1 = init_edge_pool();
-      if ((short)uVar1 == 0) {
-        uVar1 = 0;
+      result = init_edge_pool();
+      if ((short)result == 0) {
+        result = 0;
       }
       else {
-        *(short *)(unaff_A5 + -0x1cca) = (short)param_3._0_2_ >> 1; /* CORRECTED [PROVEN]: ASR.W #1, arithmetic */
-        *(short *)(unaff_A5 + -0x1cc8) = (short)param_3._2_2_ >> 1; /* CORRECTED [PROVEN]: ASR.W #1, arithmetic */
-        uVar1 = 1;
+        *(short *)(unaff_A5 + -0x1cca) = (short)width_height._0_2_ >> 1; /* CORRECTED [PROVEN]: ASR.W #1, arithmetic */
+        *(short *)(unaff_A5 + -0x1cc8) = (short)width_height._2_2_ >> 1; /* CORRECTED [PROVEN]: ASR.W #1, arithmetic */
+        result = 1;
       }
     }
   }
-  return uVar1;
+  return result;
 }
 
 
@@ -740,13 +758,13 @@ undefined4 init_raster_target /* Original: FUN_000007b0 */ (undefined4 param_1,u
  * Exported C complete: if target record exists, its +0 (pixel base) =
  * param_1. Used to retarget rendering to another buffer [STRONG INFERENCE].
  */
-void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 param_1)
+void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 pixel_base /* param_1: new target +0 pixel base */)
 
 {
   int unaff_A5;
   
   if (*(int *)(unaff_A5 + -0x1cce) != 0) {
-    **(undefined4 **)(unaff_A5 + -0x1cce) = param_1;
+    **(undefined4 **)(unaff_A5 + -0x1cce) = pixel_base;
   }
   return;
 }
@@ -766,19 +784,19 @@ void set_raster_target_base /* Original: FUN_0000087a */ (undefined4 param_1)
  * n = param_1 clamped to [1, target height (+0xa)] (out-of-range -> height);
  * row table +0xe = n (rows processed). A5-0x1cc6 = row table +0xe.
  */
-void set_active_row_count /* Original: FUN_000008a2 */ (int param_1)
+void set_active_row_count /* Original: FUN_000008a2 */ (int rows /* param_1: requested row count, clamped to [1, height] */)
 
 {
-  int iVar1;
+  int a5; /* iVar1: CurrentA5 copy */
   
-  iVar1 = DAT_00000904;
-  if ((*(int *)(DAT_00000904 + -0x1cce) != 0) && (*(int *)(DAT_00000904 + -0x1cd2) != 0)) {
-    if ((*(short *)(*(int *)(DAT_00000904 + -0x1cce) + 10) < param_1) || (param_1 < 1)) {
-      param_1 = (int)*(short *)(*(int *)(DAT_00000904 + -0x1cce) + 10);
+  a5 = CurrentA5;
+  if ((*(int *)(CurrentA5 + -0x1cce) != 0) && (*(int *)(CurrentA5 + -0x1cd2) != 0)) {
+    if ((*(short *)(*(int *)(CurrentA5 + -0x1cce) + 10) < rows) || (rows < 1)) {
+      rows = (int)*(short *)(*(int *)(CurrentA5 + -0x1cce) + 10);
     }
-    *(undefined2 *)(*(int *)(DAT_00000904 + -0x1cd2) + 0xe) = param_1._2_2_;
+    *(undefined2 *)(*(int *)(CurrentA5 + -0x1cd2) + 0xe) = rows._2_2_;
   }
-  *(undefined2 *)(iVar1 + -0x1cc6) = *(undefined2 *)(*(int *)(iVar1 + -0x1cd2) + 0xe);
+  *(undefined2 *)(a5 + -0x1cc6) = *(undefined2 *)(*(int *)(a5 + -0x1cd2) + 0xe);
   return;
 }
 
@@ -793,18 +811,18 @@ void set_active_row_count /* Original: FUN_000008a2 */ (int param_1)
  * Exported C complete: if the target exists, *param_1 = width (+8),
  * *param_2 = height (+0xa); returns whether it exists.
  */
-bool get_raster_target_size /* Original: FUN_00000916 */ (undefined2 *param_1,undefined2 *param_2)
+bool get_raster_target_size /* Original: FUN_00000916 */ (undefined2 *width /* param_1: out, target width (+8) */,undefined2 *height /* param_2: out, target height (+0xa) */)
 
 {
   int unaff_A5;
-  bool bVar1;
+  bool has_target; /* bVar1: target record A5-0x1cce exists */
   
-  bVar1 = *(int *)(unaff_A5 + -0x1cce) != 0;
-  if (bVar1) {
-    *param_1 = *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 8);
-    *param_2 = *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 10);
+  has_target = *(int *)(unaff_A5 + -0x1cce) != 0;
+  if (has_target) {
+    *width = *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 8);
+    *height = *(undefined2 *)(*(int *)(unaff_A5 + -0x1cce) + 10);
   }
-  return bVar1;
+  return has_target;
 }
 
 
@@ -820,23 +838,23 @@ bool get_raster_target_size /* Original: FUN_00000916 */ (undefined2 *param_1,un
  * then init_edge_pool; returns 0 on failure. Rebuilds the row table and node
  * pool [STRONG INFERENCE: param word is passed as row-table word +8 source].
  */
-undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 param_1)
+undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 level /* param_1: high word = colour level for alloc_row_table */)
 
 {
-  undefined4 uVar1;
+  undefined4 result; /* uVar1: callee result / return value */
   int unaff_A5;
   
-  uVar1 = alloc_row_table(CONCAT22(param_1._0_2_,*(undefined2 *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe)));
-  if ((short)uVar1 == 0) {
-    uVar1 = 0;
+  result = alloc_row_table(CONCAT22(level._0_2_,*(undefined2 *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe)));
+  if ((short)result == 0) {
+    result = 0;
   }
   else {
-    uVar1 = init_edge_pool();
-    if ((short)uVar1 == 0) {
-      uVar1 = 0;
+    result = init_edge_pool();
+    if ((short)result == 0) {
+      result = 0;
     }
   }
-  return uVar1;
+  return result;
 }
 
 
@@ -858,24 +876,24 @@ undefined4 realloc_row_table /* Original: FUN_00000942 */ (undefined4 param_1)
 void reset_edge_table /* Original: FUN_0000096e */ (void)
 
 {
-  int iVar1;
-  short sVar2;
-  undefined4 *puVar3;
+  int a5; /* iVar1: CurrentA5 copy */
+  short rows_left; /* sVar2: row countdown (DBRA) */
+  undefined4 *entry; /* puVar3: 12-byte row entry cursor in row table +4 */
   
-  iVar1 = DAT_00000904;
-  puVar3 = *(undefined4 **)(*(int *)(DAT_00000904 + -0x1cd2) + 4);
-  sVar2 = *(short *)(*(int *)(DAT_00000904 + -0x1cd2) + 0xe) + -1;
+  a5 = CurrentA5;
+  entry = *(undefined4 **)(*(int *)(CurrentA5 + -0x1cd2) + 4);
+  rows_left = *(short *)(*(int *)(CurrentA5 + -0x1cd2) + 0xe) + -1;
   do {
-    *puVar3 = 0;
-    puVar3[1] = 0;
-    puVar3 = puVar3 + 3;
-    sVar2 = sVar2 + -1;
-  } while (sVar2 != -1);
-  *(undefined4 *)(*(int *)(iVar1 + -0x1cd6) + 0x8a4) =
-       *(undefined4 *)(*(int *)(iVar1 + -0x1cd6) + 0x8a0);
-  *(int *)(*(int *)(iVar1 + -0x1cd2) + 0x14) =
-       (int)(short)(*(int *)(*(int *)(iVar1 + -0x1cd2) + 0x14) == 0);
-  *(undefined2 *)(iVar1 + -0x1cc6) = 0;
+    *entry = 0;
+    entry[1] = 0;
+    entry = entry + 3;
+    rows_left = rows_left + -1;
+  } while (rows_left != -1);
+  *(undefined4 *)(*(int *)(a5 + -0x1cd6) + 0x8a4) =
+       *(undefined4 *)(*(int *)(a5 + -0x1cd6) + 0x8a0);
+  *(int *)(*(int *)(a5 + -0x1cd2) + 0x14) =
+       (int)(short)(*(int *)(*(int *)(a5 + -0x1cd2) + 0x14) == 0);
+  *(undefined2 *)(a5 + -0x1cc6) = 0;
   return;
 }
 
@@ -910,146 +928,146 @@ void reset_edge_table /* Original: FUN_0000096e */ (void)
  * Returns true if any node was added. Scanline polygon edge-table insertion
  * [STRONG INFERENCE].
  */
-bool add_polygon_edges /* Original: FUN_000009d8 */ (int param_1,undefined2 param_2,undefined2 param_3,int *param_4)
+bool add_polygon_edges /* Original: FUN_000009d8 */ (int n_points /* param_1: point count */,undefined2 colour /* param_2: first node +0x1c, the polygon colour read by render_scanline_spans */,undefined2 priority /* param_3: first node +0x24, the priority-list key */,int *pts /* param_4: n {x, y} int pairs relative to the centre */)
 
 {
-  uint uVar1;
-  ushort uVar2;
-  ushort uVar3;
-  longlong lVar4;
-  int iVar5;
-  int iVar6;
-  int iVar7;
-  int iVar8;
-  int iVar9;
-  int iVar10;
-  int iVar11;
-  int iVar12;
-  int *piVar13;
-  uint uVar14;
-  bool bVar15;
-  int local_10;
-  int local_c;
+  uint first_node; /* uVar1: pool cursor +0x8a4 on entry = the polygon's first node */
+  ushort frac_shift; /* uVar2: row table word +0xa (11) */
+  ushort slope_shift; /* uVar3: row table word +0x12 */
+  longlong prod; /* lVar4: 64-bit product for the clip / slope divides */
+  int a5; /* iVar5: CurrentA5 copy */
+  int y_bot; /* iVar6: bottom y of the edge */
+  int row_start; /* iVar7: x max in the range scan, previous point y, then the segment start row */
+  int x_bot; /* iVar8: x at the bottom of the edge */
+  int x_top; /* iVar9: x at the segment start */
+  int y_top; /* iVar10: x min in the range scan, then current point y / top y */
+  int row_end; /* iVar11: scan countdown, previous point x, then the segment end row */
+  int x_cur; /* iVar12: current point x */
+  int *pt; /* piVar13: point cursor for the x range scan */
+  uint node; /* uVar14: 0x28-byte node cursor */
+  bool added; /* bVar15: any node added */
+  int x_next; /* local_10: x for the next split segment (also the swap temporary) */
+  int slope; /* local_c: node +4 x step per row */
   
-  iVar5 = DAT_00000904;
-  uVar2 = *(ushort *)(*(int *)(DAT_00000904 + -0x1cd2) + 10);
-  uVar3 = *(ushort *)(*(int *)(DAT_00000904 + -0x1cd2) + 0x12);
-  uVar1 = *(uint *)(*(int *)(DAT_00000904 + -0x1cd6) + 0x8a4);
-  iVar10 = (int)*(short *)(*(int *)(DAT_00000904 + -0x1cce) + 8);
-  iVar7 = 0;
-  iVar11 = param_1;
-  piVar13 = param_4;
-  while (0 < iVar11) {
-    iVar12 = *piVar13 + (int)*(short *)(DAT_00000904 + -0x1cca);
-    if (iVar12 < iVar10) {
-      iVar10 = iVar12;
+  a5 = CurrentA5;
+  frac_shift = *(ushort *)(*(int *)(CurrentA5 + -0x1cd2) + 10);
+  slope_shift = *(ushort *)(*(int *)(CurrentA5 + -0x1cd2) + 0x12);
+  first_node = *(uint *)(*(int *)(CurrentA5 + -0x1cd6) + 0x8a4);
+  y_top = (int)*(short *)(*(int *)(CurrentA5 + -0x1cce) + 8);
+  row_start = 0;
+  row_end = n_points;
+  pt = pts;
+  while (0 < row_end) {
+    x_cur = *pt + (int)*(short *)(CurrentA5 + -0x1cca);
+    if (x_cur < y_top) {
+      y_top = x_cur;
     }
-    if (iVar7 < iVar12) {
-      iVar7 = iVar12;
+    if (row_start < x_cur) {
+      row_start = x_cur;
     }
-    piVar13 = piVar13 + 2;
-    iVar11 = iVar11 + -1;
+    pt = pt + 2;
+    row_end = row_end + -1;
   }
-  if ((iVar7 == 0) || (*(short *)(*(int *)(DAT_00000904 + -0x1cce) + 8) == iVar10)) {
-    bVar15 = false;
+  if ((row_start == 0) || (*(short *)(*(int *)(CurrentA5 + -0x1cce) + 8) == y_top)) {
+    added = false;
   }
-  else if (uVar1 < *(uint *)(*(int *)(DAT_00000904 + -0x1cd6) + 0x8a8)) {
-    *(undefined2 *)(uVar1 + 0x1c) = param_2;
-    *(undefined2 *)(uVar1 + 0x24) = param_3;
-    iVar11 = param_4[param_1 * 2 + -2] + (int)*(short *)(iVar5 + -0x1cca);
-    iVar7 = param_4[param_1 * 2 + -1] + (int)*(short *)(iVar5 + -0x1cc8);
-    uVar14 = uVar1;
-    while (param_1 != 0) {
-      iVar12 = *param_4 + (int)*(short *)(iVar5 + -0x1cca);
-      iVar10 = param_4[1] + (int)*(short *)(iVar5 + -0x1cc8);
-      if (iVar10 != iVar7) {
-        iVar6 = iVar7;
-        iVar8 = iVar11;
-        iVar9 = iVar12;
-        if (iVar7 < iVar10) {
-          iVar6 = iVar10;
-          iVar8 = iVar12;
-          iVar10 = iVar7;
-          iVar9 = iVar11;
-          local_10 = iVar12;
+  else if (first_node < *(uint *)(*(int *)(CurrentA5 + -0x1cd6) + 0x8a8)) {
+    *(undefined2 *)(first_node + 0x1c) = colour;
+    *(undefined2 *)(first_node + 0x24) = priority;
+    row_end = pts[n_points * 2 + -2] + (int)*(short *)(a5 + -0x1cca);
+    row_start = pts[n_points * 2 + -1] + (int)*(short *)(a5 + -0x1cc8);
+    node = first_node;
+    while (n_points != 0) {
+      x_cur = *pts + (int)*(short *)(a5 + -0x1cca);
+      y_top = pts[1] + (int)*(short *)(a5 + -0x1cc8);
+      if (y_top != row_start) {
+        y_bot = row_start;
+        x_bot = row_end;
+        x_top = x_cur;
+        if (row_start < y_top) {
+          y_bot = y_top;
+          x_bot = x_cur;
+          y_top = row_start;
+          x_top = row_end;
+          x_next = x_cur;
         }
-        if ((0 < iVar6) && (iVar10 < *(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe))) {
-          iVar7 = iVar10;
-          if (iVar10 < 0) {
-            lVar4 = (longlong)iVar10 * (longlong)(iVar8 - iVar9);
-            iVar7 = 0;
-            iVar9 = iVar9 - (int)(((longlong)(int)((ulonglong)lVar4 >> 0x20) << 0x20 |
-                                  (longlong)(int)lVar4) / (longlong)(iVar6 - iVar10));
+        if ((0 < y_bot) && (y_top < *(short *)(*(int *)(a5 + -0x1cd2) + 0xe))) {
+          row_start = y_top;
+          if (y_top < 0) {
+            prod = (longlong)y_top * (longlong)(x_bot - x_top);
+            row_start = 0;
+            x_top = x_top - (int)(((longlong)(int)((ulonglong)prod >> 0x20) << 0x20 |
+                                  (longlong)(int)prod) / (longlong)(y_bot - y_top));
           }
           do {
-            iVar11 = iVar6;
-            if (iVar9 < 1) {
-              if (0 < iVar8) {
-                lVar4 = (longlong)iVar9 * (longlong)(iVar6 - iVar7);
-                iVar11 = iVar7 - (int)(((longlong)(int)((ulonglong)lVar4 >> 0x20) << 0x20 |
-                                       (longlong)(int)lVar4) / (longlong)(iVar8 - iVar9));
+            row_end = y_bot;
+            if (x_top < 1) {
+              if (0 < x_bot) {
+                prod = (longlong)x_top * (longlong)(y_bot - row_start);
+                row_end = row_start - (int)(((longlong)(int)((ulonglong)prod >> 0x20) << 0x20 |
+                                       (longlong)(int)prod) / (longlong)(x_bot - x_top));
               }
-              iVar9 = 0;
-              local_10 = 1;
-              local_c = 0;
+              x_top = 0;
+              x_next = 1;
+              slope = 0;
             }
-            else if (iVar9 < *(short *)(*(int *)(iVar5 + -0x1cce) + 8)) {
-              if (iVar8 < 1) {
-                lVar4 = (longlong)(iVar9 + -1) * (longlong)(iVar6 - iVar7);
-                local_10 = 0;
-                iVar11 = iVar7 - (int)(((longlong)(int)((ulonglong)lVar4 >> 0x20) << 0x20 |
-                                       (longlong)(int)lVar4) / (longlong)(iVar8 - iVar9));
+            else if (x_top < *(short *)(*(int *)(a5 + -0x1cce) + 8)) {
+              if (x_bot < 1) {
+                prod = (longlong)(x_top + -1) * (longlong)(y_bot - row_start);
+                x_next = 0;
+                row_end = row_start - (int)(((longlong)(int)((ulonglong)prod >> 0x20) << 0x20 |
+                                       (longlong)(int)prod) / (longlong)(x_bot - x_top));
               }
-              else if (*(short *)(*(int *)(iVar5 + -0x1cce) + 8) <= iVar8) {
-                local_10 = (int)*(short *)(*(int *)(iVar5 + -0x1cce) + 8);
-                lVar4 = (longlong)(iVar9 + (1 - local_10)) * (longlong)(iVar6 - iVar7);
-                iVar11 = iVar7 - (int)(((longlong)(int)((ulonglong)lVar4 >> 0x20) << 0x20 |
-                                       (longlong)(int)lVar4) / (longlong)(iVar8 - iVar9));
+              else if (*(short *)(*(int *)(a5 + -0x1cce) + 8) <= x_bot) {
+                x_next = (int)*(short *)(*(int *)(a5 + -0x1cce) + 8);
+                prod = (longlong)(x_top + (1 - x_next)) * (longlong)(y_bot - row_start);
+                row_end = row_start - (int)(((longlong)(int)((ulonglong)prod >> 0x20) << 0x20 |
+                                       (longlong)(int)prod) / (longlong)(x_bot - x_top));
               }
-              lVar4 = (longlong)(1 << (uVar2 & 0x3f)) * (longlong)(iVar8 - iVar9);
-              local_c = (int)(((longlong)(int)((ulonglong)lVar4 >> 0x20) << 0x20 |
-                              (longlong)(int)lVar4) / (longlong)(iVar6 - iVar7)) << (uVar3 & 0x3f);
+              prod = (longlong)(1 << (frac_shift & 0x3f)) * (longlong)(x_bot - x_top);
+              slope = (int)(((longlong)(int)((ulonglong)prod >> 0x20) << 0x20 |
+                              (longlong)(int)prod) / (longlong)(y_bot - row_start)) << (slope_shift & 0x3f);
             }
             else {
-              if (iVar8 < *(short *)(*(int *)(iVar5 + -0x1cce) + 8)) {
-                lVar4 = (longlong)(*(short *)(*(int *)(iVar5 + -0x1cce) + 8) - iVar9) *
-                        (longlong)(iVar6 - iVar7);
-                iVar11 = (int)(((longlong)(int)((ulonglong)lVar4 >> 0x20) << 0x20 |
-                               (longlong)(int)lVar4) / (longlong)(iVar8 - iVar9)) + iVar7;
+              if (x_bot < *(short *)(*(int *)(a5 + -0x1cce) + 8)) {
+                prod = (longlong)(*(short *)(*(int *)(a5 + -0x1cce) + 8) - x_top) *
+                        (longlong)(y_bot - row_start);
+                row_end = (int)(((longlong)(int)((ulonglong)prod >> 0x20) << 0x20 |
+                               (longlong)(int)prod) / (longlong)(x_bot - x_top)) + row_start;
               }
-              iVar9 = (int)*(short *)(*(int *)(iVar5 + -0x1cce) + 8);
-              local_10 = iVar9 + -1;
-              local_c = 0;
+              x_top = (int)*(short *)(*(int *)(a5 + -0x1cce) + 8);
+              x_next = x_top + -1;
+              slope = 0;
             }
-            *(int *)(uVar14 + 4) = local_c;
-            *(uint *)(uVar14 + 0x18) = uVar1;
-            *(int *)(uVar14 + 8) = iVar9 << (uVar3 + uVar2 & 0x3f);
-            *(undefined4 *)(uVar14 + 0xc) =
-                 *(undefined4 *)(*(int *)(*(int *)(iVar5 + -0x1cd2) + 4) + iVar7 * 0xc);
-            *(uint *)(*(int *)(*(int *)(iVar5 + -0x1cd2) + 4) + iVar7 * 0xc) = uVar14;
-            *(short *)(uVar14 + 0x22) =
-                 (*(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe) - (short)iVar11) + -1;
-            if (iVar11 < *(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe)) {
-              *(undefined4 *)(*(int *)(*(int *)(iVar5 + -0x1cd2) + 4) + iVar11 * 0xc + 4) = 1;
+            *(int *)(node + 4) = slope;
+            *(uint *)(node + 0x18) = first_node;
+            *(int *)(node + 8) = x_top << (slope_shift + frac_shift & 0x3f);
+            *(undefined4 *)(node + 0xc) =
+                 *(undefined4 *)(*(int *)(*(int *)(a5 + -0x1cd2) + 4) + row_start * 0xc);
+            *(uint *)(*(int *)(*(int *)(a5 + -0x1cd2) + 4) + row_start * 0xc) = node;
+            *(short *)(node + 0x22) =
+                 (*(short *)(*(int *)(a5 + -0x1cd2) + 0xe) - (short)row_end) + -1;
+            if (row_end < *(short *)(*(int *)(a5 + -0x1cd2) + 0xe)) {
+              *(undefined4 *)(*(int *)(*(int *)(a5 + -0x1cd2) + 4) + row_end * 0xc + 4) = 1;
             }
-            uVar14 = uVar14 + 0x28;
-          } while ((iVar11 < iVar6) &&
-                  (iVar7 = iVar11, iVar9 = local_10,
-                  iVar11 < *(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe)));
+            node = node + 0x28;
+          } while ((row_end < y_bot) &&
+                  (row_start = row_end, x_top = x_next,
+                  row_end < *(short *)(*(int *)(a5 + -0x1cd2) + 0xe)));
         }
       }
-      iVar11 = *param_4 + (int)*(short *)(iVar5 + -0x1cca);
-      iVar7 = param_4[1] + (int)*(short *)(iVar5 + -0x1cc8);
-      param_4 = param_4 + 2;
-      param_1 = param_1 + -1;
+      row_end = *pts + (int)*(short *)(a5 + -0x1cca);
+      row_start = pts[1] + (int)*(short *)(a5 + -0x1cc8);
+      pts = pts + 2;
+      n_points = n_points + -1;
     }
-    *(uint *)(*(int *)(iVar5 + -0x1cd6) + 0x8a4) = uVar14;
-    bVar15 = uVar14 != uVar1;
+    *(uint *)(*(int *)(a5 + -0x1cd6) + 0x8a4) = node;
+    added = node != first_node;
   }
   else {
-    bVar15 = false;
+    added = false;
   }
-  return bVar15;
+  return added;
 }
 
 
@@ -1067,30 +1085,30 @@ bool add_polygon_edges /* Original: FUN_000009d8 */ (int param_1,undefined2 para
  * add_polygon_edges(4, lookup_colour_map(colour), 0, pts). Ghidra's unaff_A4
  * half is register residue.
  */
-void add_rect_polygon /* Original: FUN_00000d02 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+void add_rect_polygon /* Original: FUN_00000d02 */ (undefined4 colour_x0 /* param_1: high word = colour, low word = x0 */,undefined4 y0_x1 /* param_2: high word = y0, low word = x1 */,undefined4 y1 /* param_3: high word = y1 */)
 
 {
-  undefined4 uVar1;
+  undefined4 map_word; /* uVar1: lookup_colour_map result */
   undefined4 unaff_A4;
-  int local_34;
-  int local_30;
-  int local_2c;
-  int local_28;
-  int local_24;
-  int local_20;
-  int local_1c;
-  int local_18;
+  int pt0_x; /* local_34, -$34(A6): pts[0] = (x0, y0); &pt0_x is the 4-point array */
+  int pt0_y; /* local_30, -$30(A6) */
+  int pt1_x; /* local_2c, -$2c(A6): pts[1] = (x1, y0) */
+  int pt1_y; /* local_28, -$28(A6) */
+  int pt2_x; /* local_24, -$24(A6): pts[2] = (x1, y1) */
+  int pt2_y; /* local_20, -$20(A6) */
+  int pt3_x; /* local_1c, -$1c(A6): pts[3] = (x0, y1) */
+  int pt3_y; /* local_18, -$18(A6) */
   
-  local_34 = (int)param_1._2_2_;
-  local_30 = (int)param_2._0_2_;
-  local_2c = (int)param_2._2_2_;
-  local_28 = (int)param_2._0_2_;
-  local_24 = (int)param_2._2_2_;
-  local_20 = (int)param_3._0_2_;
-  local_1c = (int)param_1._2_2_;
-  local_18 = (int)param_3._0_2_;
-  uVar1 = lookup_colour_map(CONCAT22(param_1._0_2_,(short)((uint)unaff_A4 >> 0x10)));
-  add_polygon_edges(4,(short)uVar1,0,&local_34);
+  pt0_x = (int)colour_x0._2_2_;
+  pt0_y = (int)y0_x1._0_2_;
+  pt1_x = (int)y0_x1._2_2_;
+  pt1_y = (int)y0_x1._0_2_;
+  pt2_x = (int)y0_x1._2_2_;
+  pt2_y = (int)y1._0_2_;
+  pt3_x = (int)colour_x0._2_2_;
+  pt3_y = (int)y1._0_2_;
+  map_word = lookup_colour_map(CONCAT22(colour_x0._0_2_,(short)((uint)unaff_A4 >> 0x10)));
+  add_polygon_edges(4,(short)map_word,0,&pt0_x);
   return;
 }
 
@@ -1106,16 +1124,16 @@ void add_rect_polygon /* Original: FUN_00000d02 */ (undefined4 param_1,undefined
  * stride 0x28): +0x22 += band_offset - active rows (row table +0xe). Called by
  * rasterize_and_present before each band.
  */
-void rebase_edge_rows_for_band /* Original: FUN_00000d84 */ (undefined4 param_1)
+void rebase_edge_rows_for_band /* Original: FUN_00000d84 */ (undefined4 band_offset /* param_1: high word = band offset */)
 
 {
   int unaff_A5;
-  undefined4 local_8;
+  undefined4 node; /* local_8, -8(A6): 0x28-byte node cursor, pool +0x8a0 .. +0x8a4 */
   
-  for (local_8 = *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a0);
-      local_8 < *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a4); local_8 = local_8 + 0x28) {
-    *(short *)(local_8 + 0x22) =
-         (param_1._0_2_ + *(short *)(local_8 + 0x22)) -
+  for (node = *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a0);
+      node < *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a4); node = node + 0x28) {
+    *(short *)(node + 0x22) =
+         (band_offset._0_2_ + *(short *)(node + 0x22)) -
          *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe);
   }
   return;
@@ -1132,17 +1150,17 @@ void rebase_edge_rows_for_band /* Original: FUN_00000d84 */ (undefined4 param_1)
  * Exported C complete: inverse of rebase_edge_rows_for_band
  * (+0x22 += active rows - band_offset) after each band.
  */
-void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 param_1)
+void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 band_offset /* param_1: high word = band offset */)
 
 {
   int unaff_A5;
-  undefined4 local_8;
+  undefined4 node; /* local_8, -8(A6): 0x28-byte node cursor, pool +0x8a0 .. +0x8a4 */
   
-  for (local_8 = *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a0);
-      local_8 < *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a4); local_8 = local_8 + 0x28) {
-    *(short *)(local_8 + 0x22) =
+  for (node = *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a0);
+      node < *(uint *)(*(int *)(unaff_A5 + -0x1cd6) + 0x8a4); node = node + 0x28) {
+    *(short *)(node + 0x22) =
          *(short *)(*(int *)(unaff_A5 + -0x1cd2) + 0xe) +
-         (*(short *)(local_8 + 0x22) - param_1._0_2_);
+         (*(short *)(node + 0x22) - band_offset._0_2_);
   }
   return;
 }
@@ -1170,61 +1188,61 @@ void restore_edge_rows_after_band /* Original: FUN_00000dca */ (undefined4 param
  * mode). Rasterises the edge table and presents it in bands [STRONG INFERENCE].
  * The renderer callback is JT A5+0x192 (installed by init_row_table_fields).
  */
-void rasterize_and_present /* Original: FUN_00000e10 */ (int param_1,int param_2,int param_3)
+void rasterize_and_present /* Original: FUN_00000e10 */ (int dest /* param_1: offscreen destination, 0 = render into the target only */,int band_rows /* param_2: maximum rows per band */,int mode /* param_3: long forwarded to blit_offscreen_frame_to_window (JT $322) */)
 
 {
-  short sVar1;
-  short sVar2;
-  short sVar3;
-  short sVar4;
-  int iVar5;
-  short sVar6;
+  short view_width; /* sVar1: A5-0x1372 view width */
+  short pixel_depth; /* sVar2: A5-0x137a screen pixel depth */
+  short view_width2; /* sVar3: A5-0x1372 re-read */
+  short pixel_depth2; /* sVar4: A5-0x137a re-read */
+  int a5; /* iVar5: CurrentA5 copy */
+  short band_offset; /* sVar6: active rows - rows still to draw after this band */
   undefined4 unaff_D2;
-  undefined2 uVar7;
-  undefined4 local_e;
-  undefined2 local_8;
-  undefined2 local_6;
+  undefined2 d2_residue; /* uVar7: unaff_D2 high word, unread low half of the pushed long */
+  undefined4 rows_left; /* local_e, -$e(A6): rows still to render */
+  undefined2 continue_flag; /* local_8, -8(A6): 0 for the first band, then 1 */
+  undefined2 band; /* local_6, -6(A6): rows in this band, min(band_rows, rows_left) */
   
-  iVar5 = DAT_00000904;
-  uVar7 = (undefined2)((uint)unaff_D2 >> 0x10);
-  if (*(int *)(DAT_00000904 + -0x1cd2) != 0) {
-    *(undefined4 *)(*(int *)(*(int *)(DAT_00000904 + -0x1cd6) + 0x898) + 0x10) =
-         *(undefined4 *)(*(int *)(DAT_00000904 + -0x1cd6) + 0x89c);
-    *(undefined4 *)(*(int *)(*(int *)(iVar5 + -0x1cd6) + 0x89c) + 0x14) =
-         *(undefined4 *)(*(int *)(iVar5 + -0x1cd6) + 0x898);
-    if (param_1 == 0) {
+  a5 = CurrentA5;
+  d2_residue = (undefined2)((uint)unaff_D2 >> 0x10);
+  if (*(int *)(CurrentA5 + -0x1cd2) != 0) {
+    *(undefined4 *)(*(int *)(*(int *)(CurrentA5 + -0x1cd6) + 0x898) + 0x10) =
+         *(undefined4 *)(*(int *)(CurrentA5 + -0x1cd6) + 0x89c);
+    *(undefined4 *)(*(int *)(*(int *)(a5 + -0x1cd6) + 0x89c) + 0x14) =
+         *(undefined4 *)(*(int *)(a5 + -0x1cd6) + 0x898);
+    if (dest == 0) {
       /* CORRECTED [PROVEN, 0xf34..0xf54]: pushes (word 0, word rows, long target base, long
        * sign-extended row table +0xc) = render_scanline_spans(0 << 16 | rows, base, stride) */
-      (*(code *)**(undefined4 **)(iVar5 + -0x1cd2))
-                (CONCAT22(0,*(undefined2 *)(*(int *)(iVar5 + -0x1cd2) + 0xe)),
-                 (uint *)**(undefined4 **)(iVar5 + -0x1cce),
-                 (int)*(short *)(*(int *)(iVar5 + -0x1cd2) + 0xc));
+      (*(code *)**(undefined4 **)(a5 + -0x1cd2))
+                (CONCAT22(0,*(undefined2 *)(*(int *)(a5 + -0x1cd2) + 0xe)),
+                 (uint *)**(undefined4 **)(a5 + -0x1cce),
+                 (int)*(short *)(*(int *)(a5 + -0x1cd2) + 0xc));
     }
     else {
-      sVar1 = *(short *)(iVar5 + -0x1372);
-      sVar2 = *(short *)(iVar5 + -0x137a);
-      sVar3 = *(short *)(iVar5 + -0x1372);
-      sVar4 = *(short *)(iVar5 + -0x137a);
-      local_e = (int)*(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe);
-      local_8 = 0;
+      view_width = *(short *)(a5 + -0x1372);
+      pixel_depth = *(short *)(a5 + -0x137a);
+      view_width2 = *(short *)(a5 + -0x1372);
+      pixel_depth2 = *(short *)(a5 + -0x137a);
+      rows_left = (int)*(short *)(*(int *)(a5 + -0x1cd2) + 0xe);
+      continue_flag = 0;
       do {
-        if (param_2 < local_e) {
-          local_6 = param_2._2_2_;
+        if (band_rows < rows_left) {
+          band = band_rows._2_2_;
         }
         else {
-          local_6 = local_e._2_2_;
+          band = rows_left._2_2_;
         }
-        sVar6 = *(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe) - (local_e._2_2_ - local_6);
-        rebase_edge_rows_for_band(CONCAT22(sVar6,uVar7));
-        (*(code *)**(undefined4 **)(iVar5 + -0x1cd2))
-                  (CONCAT22(local_8,local_6),(uint *)param_1, /* CORRECTED [PROVEN]: MOVE.L 8(A6) pushes the whole dest */
-                   ((short)(sVar1 * sVar2 + 0xf) >> 4) * 2 - (short)(sVar3 * sVar4) / 8);
-        local_8 = 1;
-        restore_edge_rows_after_band(CONCAT22(sVar6,uVar7));
-        (**(code **)(iVar5 + 0x322))
-                  (param_1,*(short *)(*(int *)(iVar5 + -0x1cd2) + 0xe) - local_e,local_6,param_3);
-        local_e = local_e - local_6;
-      } while (local_e != 0);
+        band_offset = *(short *)(*(int *)(a5 + -0x1cd2) + 0xe) - (rows_left._2_2_ - band);
+        rebase_edge_rows_for_band(CONCAT22(band_offset,d2_residue));
+        (*(code *)**(undefined4 **)(a5 + -0x1cd2))
+                  (CONCAT22(continue_flag,band),(uint *)dest, /* CORRECTED [PROVEN]: MOVE.L 8(A6) pushes the whole dest */
+                   ((short)(view_width * pixel_depth + 0xf) >> 4) * 2 - (short)(view_width2 * pixel_depth2) / 8);
+        continue_flag = 1;
+        restore_edge_rows_after_band(CONCAT22(band_offset,d2_residue));
+        (**(code **)(a5 + 0x322))
+                  (dest,*(short *)(*(int *)(a5 + -0x1cd2) + 0xe) - rows_left,band,mode);
+        rows_left = rows_left - band;
+      } while (rows_left != 0);
     }
   }
   return;

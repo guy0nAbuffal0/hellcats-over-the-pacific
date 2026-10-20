@@ -14,6 +14,8 @@ int DAT_00000904;
 /* Readable global names (readability pass; the Ghidra name stays the real symbol) */
 #define CurrentA5 DAT_00000904 /* low-memory global $0904: the application's A5 world */
 #define vbl_ch0_a5_cache DAT_000039c4 /* long inside the code of vbl_sound_handler_ch0_unrolled: A5 cached on the first call */
+#define vbl_ch0_variant_a5_cache DAT_00003aca /* long inside the code of vbl_sound_handler_ch0_variant: A5 cached on the first call */
+#define vbl_two_channel_a5_cache DAT_00003be0 /* long inside the code of vbl_sound_handler_two_channel: A5 cached on the first call */
 undefined4 DAT_00000904;
 short DAT_00000baa;
 int DAT_000039c4;
@@ -4305,121 +4307,121 @@ undefined8 vbl_sound_handler_ch0_unrolled /* Original: FUN_000039a8 */ (void)
 undefined8 vbl_sound_handler_ch0_variant /* Original: FUN_00003aae */ (void)
 
 {
-  int iVar1;
-  uint uVar2;
-  int iVar3;
-  undefined4 in_D0;
-  int iVar4;
-  undefined4 in_D1;
-  uint uVar5;
-  int iVar6;
-  short sVar7;
-  uint *puVar8;
-  uint *puVar9;
-  int iVar10;
-  int *piVar11;
-  undefined1 *puVar12;
-  undefined1 *puVar13;
-  bool bVar14;
+  int step_int; /* iVar1: A5-0xc32, integer part of the sample step */
+  uint step_frac; /* uVar2: A5-0xc2e, fraction of the step */
+  int a5; /* iVar3: the cached A5 */
+  undefined4 reg_d0; /* in_D0: passed through untouched */
+  int pos; /* iVar4: sample position, integer part */
+  undefined4 reg_d1; /* in_D1 */
+  uint pos_frac; /* uVar5: sample position fraction; the long just copied on the fast path */
+  int end; /* iVar6: end of the current sample (record +0x10) */
+  short n; /* sVar7: DBRA counter */
+  uint *src; /* puVar8: source long cursor (fast path) */
+  uint *src_cur; /* puVar9: the long being copied */
+  int samples; /* iVar10: sample data base (record +8) */
+  int *chan; /* piVar11: channel record *(A5-2000): pos, frac, base, start, end, -, next */
+  undefined1 *out; /* puVar12: SoundBase output cursor (every other byte) */
+  undefined1 *out_cur; /* puVar13: output cursor of the current group (odd-source path) */
+  bool carry; /* bVar14 */
   
-  iVar3 = DAT_00003aca;                         /* in-code A5 cache at 0x3aca */
-  if (DAT_00003aca != 0) {
-    piVar11 = *(int **)(DAT_00003aca + -2000);
-    iVar4 = *piVar11;
-    uVar5 = piVar11[1];
-    iVar10 = piVar11[2];
-    iVar6 = piVar11[4];
-    puVar12 = *(undefined1 **)0x266 + 4;                      /* SoundBase + 4 (Ghidra: &DAT_66fa4e79) */
-    iVar1 = *(int *)(DAT_00003aca + -0xc32);
-    uVar2 = *(uint *)(DAT_00003aca + -0xc2e);
-    if (*(int *)(DAT_00003aca + -0xc2a) < iVar6 - iVar4) {
-      sVar7 = 0x5b;
-      puVar8 = (uint *)(iVar4 + iVar10);
-      iVar4 = iVar4 + 0x172;
-      if (((uint)puVar8 & 1) == 0) {
+  a5 = vbl_ch0_variant_a5_cache;                         /* in-code A5 cache at 0x3aca */
+  if (vbl_ch0_variant_a5_cache != 0) {
+    chan = *(int **)(vbl_ch0_variant_a5_cache + -2000);
+    pos = *chan;
+    pos_frac = chan[1];
+    samples = chan[2];
+    end = chan[4];
+    out = *(undefined1 **)0x266 + 4;                      /* SoundBase + 4 (Ghidra: &DAT_66fa4e79) */
+    step_int = *(int *)(vbl_ch0_variant_a5_cache + -0xc32);
+    step_frac = *(uint *)(vbl_ch0_variant_a5_cache + -0xc2e);
+    if (*(int *)(vbl_ch0_variant_a5_cache + -0xc2a) < end - pos) {
+      n = 0x5b;
+      src = (uint *)(pos + samples);
+      pos = pos + 0x172;
+      if (((uint)src & 1) == 0) {
         do {
-          puVar9 = puVar8;
-          uVar5 = *puVar9;
-          *puVar12 = (char)(uVar5 >> 0x18);
-          puVar12[2] = (char)(uVar5 >> 0x10);
-          puVar12[4] = (char)(uVar5 >> 8);
-          puVar12[6] = (char)uVar5;
-          puVar12 = puVar12 + 8;
-          sVar7 = sVar7 + -1;
-          puVar8 = puVar9 + 1;
-        } while (sVar7 != -1);
-        **(undefined1 **)0x266 = *(undefined1 *)(puVar9 + 1);          /* SoundBase + 0 */
-        *(*(undefined1 **)0x266 + 2) = *(undefined1 *)((int)puVar9 + 5); /* SoundBase + 2 */
+          src_cur = src;
+          pos_frac = *src_cur;
+          *out = (char)(pos_frac >> 0x18);
+          out[2] = (char)(pos_frac >> 0x10);
+          out[4] = (char)(pos_frac >> 8);
+          out[6] = (char)pos_frac;
+          out = out + 8;
+          n = n + -1;
+          src = src_cur + 1;
+        } while (n != -1);
+        **(undefined1 **)0x266 = *(undefined1 *)(src_cur + 1);          /* SoundBase + 0 */
+        *(*(undefined1 **)0x266 + 2) = *(undefined1 *)((int)src_cur + 5); /* SoundBase + 2 */
       }
       else {
-        *(*(undefined1 **)0x266 + 4) = *(undefined1 *)puVar8;        /* odd source: one leading byte */
-        sVar7 = 0x5a;
-        puVar8 = (uint *)((int)puVar8 + 1);
-        puVar12 = *(undefined1 **)0x266 + 6;                    /* SoundBase + 6 */
+        *(*(undefined1 **)0x266 + 4) = *(undefined1 *)src;        /* odd source: one leading byte */
+        n = 0x5a;
+        src = (uint *)((int)src + 1);
+        out = *(undefined1 **)0x266 + 6;                    /* SoundBase + 6 */
         do {
-          puVar13 = puVar12;
-          puVar9 = puVar8;
-          uVar5 = *puVar9;
-          *puVar13 = (char)(uVar5 >> 0x18);
-          puVar13[2] = (char)(uVar5 >> 0x10);
-          puVar13[4] = (char)(uVar5 >> 8);
-          puVar13[6] = (char)uVar5;
-          sVar7 = sVar7 + -1;
-          puVar8 = puVar9 + 1;
-          puVar12 = puVar13 + 8;
-        } while (sVar7 != -1);
-        puVar13[8] = *(undefined1 *)(puVar9 + 1);
-        puVar13[10] = *(undefined1 *)((int)puVar9 + 5);
-        puVar13[0xc] = *(undefined1 *)((int)puVar9 + 6);
-        **(undefined1 **)0x266 = *(undefined1 *)((int)puVar9 + 7);
-        *(*(undefined1 **)0x266 + 2) = *(undefined1 *)(puVar9 + 2);
+          out_cur = out;
+          src_cur = src;
+          pos_frac = *src_cur;
+          *out_cur = (char)(pos_frac >> 0x18);
+          out_cur[2] = (char)(pos_frac >> 0x10);
+          out_cur[4] = (char)(pos_frac >> 8);
+          out_cur[6] = (char)pos_frac;
+          n = n + -1;
+          src = src_cur + 1;
+          out = out_cur + 8;
+        } while (n != -1);
+        out_cur[8] = *(undefined1 *)(src_cur + 1);
+        out_cur[10] = *(undefined1 *)((int)src_cur + 5);
+        out_cur[0xc] = *(undefined1 *)((int)src_cur + 6);
+        **(undefined1 **)0x266 = *(undefined1 *)((int)src_cur + 7);
+        *(*(undefined1 **)0x266 + 2) = *(undefined1 *)(src_cur + 2);
       }
     }
     else {
-      sVar7 = 0x16f;
+      n = 0x16f;
       do {
-        if (iVar6 <= iVar4) {
-          piVar11 = (int *)piVar11[6];
-          iVar10 = piVar11[2];
-          iVar4 = piVar11[3];
-          uVar5 = 0;
-          iVar6 = piVar11[4];
-          *(int **)(iVar3 + -2000) = piVar11;
+        if (end <= pos) {
+          chan = (int *)chan[6];
+          samples = chan[2];
+          pos = chan[3];
+          pos_frac = 0;
+          end = chan[4];
+          *(int **)(a5 + -2000) = chan;
         }
-        *puVar12 = *(undefined1 *)(iVar10 + iVar4);
-        puVar12 = puVar12 + 2;
-        bVar14 = CARRY4(uVar2,uVar5);
-        uVar5 = uVar2 + uVar5;
-        iVar4 = iVar1 + iVar4 + (uint)bVar14;
-        sVar7 = sVar7 + -1;
-      } while (sVar7 != -1);
-      puVar12 = *(undefined1 **)0x266;                          /* SoundBase */
-      sVar7 = 1;
+        *out = *(undefined1 *)(samples + pos);
+        out = out + 2;
+        carry = CARRY4(step_frac,pos_frac);
+        pos_frac = step_frac + pos_frac;
+        pos = step_int + pos + (uint)carry;
+        n = n + -1;
+      } while (n != -1);
+      out = *(undefined1 **)0x266;                          /* SoundBase */
+      n = 1;
       do {
-        if (iVar6 <= iVar4) {
-          piVar11 = (int *)piVar11[6];
-          iVar10 = piVar11[2];
-          iVar4 = piVar11[3];
-          uVar5 = 0;
-          iVar6 = piVar11[4];
-          *(int **)(iVar3 + -2000) = piVar11;
+        if (end <= pos) {
+          chan = (int *)chan[6];
+          samples = chan[2];
+          pos = chan[3];
+          pos_frac = 0;
+          end = chan[4];
+          *(int **)(a5 + -2000) = chan;
         }
-        *puVar12 = *(undefined1 *)(iVar10 + iVar4);
-        puVar12 = puVar12 + 2;
-        bVar14 = CARRY4(uVar2,uVar5);
-        uVar5 = uVar2 + uVar5;
-        iVar4 = iVar1 + iVar4 + (uint)bVar14;
-        sVar7 = sVar7 + -1;
-      } while (sVar7 != -1);
+        *out = *(undefined1 *)(samples + pos);
+        out = out + 2;
+        carry = CARRY4(step_frac,pos_frac);
+        pos_frac = step_frac + pos_frac;
+        pos = step_int + pos + (uint)carry;
+        n = n + -1;
+      } while (n != -1);
     }
-    *piVar11 = iVar4;
-    piVar11[1] = uVar5;                         /* fast path: the last long copied (D1 reused) */
-    (**(code **)(iVar3 + -0xc36))();          /* reserved slot = A5-0xc36: RTS tail-chains to the previous
+    *chan = pos;
+    chan[1] = pos_frac;                         /* fast path: the last long copied (D1 reused) */
+    (**(code **)(a5 + -0xc36))();          /* reserved slot = A5-0xc36: RTS tail-chains to the previous
                                                  Lvl1DT[1] handler with all registers restored */
-    return CONCAT44(in_D0,in_D1);
+    return CONCAT44(reg_d0,reg_d1);
   }
-  DAT_00003aca = DAT_00000904;                  /* first call: cache CurrentA5 in the code; plain return */
-  return CONCAT44(in_D0,in_D1);
+  vbl_ch0_variant_a5_cache = CurrentA5;                  /* first call: cache CurrentA5 in the code; plain return */
+  return CONCAT44(reg_d0,reg_d1);
 }
 
 
@@ -4458,120 +4460,120 @@ undefined8 vbl_sound_handler_ch0_variant /* Original: FUN_00003aae */ (void)
 undefined8 vbl_sound_handler_two_channel /* Original: FUN_00003bc4 */ (void)
 
 {
-  int iVar1;
-  uint uVar2;
-  uint uVar3;
-  int iVar4;
-  undefined4 in_D0;
-  int iVar5;
-  int iVar6;
-  undefined4 in_D1;
-  uint uVar7;
-  short sVar8;
-  int iVar9;
-  char *pcVar10;
-  char *pcVar11;
-  char *pcVar12;
-  int *piVar13;
-  int iVar14;
-  int *piVar15;
-  char *pcVar16;
-  bool bVar17;
+  int step_int; /* iVar1: A5-0xc32, integer part of the channel 0 step */
+  uint step_frac; /* uVar2: A5-0xc2e, fraction of the step */
+  uint frac_b; /* uVar3: running fraction (second sample) */
+  int a5; /* iVar4: the cached A5 */
+  undefined4 reg_d0; /* in_D0: passed through untouched */
+  int end; /* iVar5: end of the channel 0 sample; scratch position on the fast path */
+  int pos; /* iVar6: channel 0 position, integer part */
+  undefined4 reg_d1; /* in_D1 */
+  uint pos_frac; /* uVar7: channel 0 position, fraction */
+  short n; /* sVar8: DBRA counter */
+  int samples; /* iVar9: channel 0 sample data base (record +8) */
+  char *p1; /* pcVar10: channel 1 byte cursor (1:1); the output cursor for the last two samples */
+  char *p1_cur; /* pcVar11: channel 1 bytes being mixed */
+  char *p1_next; /* pcVar12: channel 1 cursor for the last two samples */
+  int *chan1; /* piVar13: channel 1 record *(A5-0x598): pos, -, base, start, end, -, next */
+  int pos1_next; /* iVar14: channel 1 position after this buffer (+370) */
+  int *chan0; /* piVar15: channel 0 record *(A5-2000): pos, frac, base, start, end, -, next */
+  char *out; /* pcVar16: SoundBase output cursor (every other byte); the channel 0 sample pointer for the last two samples */
+  bool carry; /* bVar17 */
   
-  iVar4 = DAT_00003be0;                         /* in-code A5 cache at 0x3be0 */
-  if (DAT_00003be0 != 0) {
-    piVar13 = *(int **)(DAT_00003be0 + -0x598);
-    pcVar10 = (char *)(*piVar13 + piVar13[2]);
-    iVar14 = *piVar13 + 0x172;
-    piVar15 = *(int **)(DAT_00003be0 + -2000);
-    iVar6 = *piVar15;
-    uVar7 = piVar15[1];
-    iVar9 = piVar15[2];
-    iVar5 = piVar15[4];
-    iVar1 = *(int *)(DAT_00003be0 + -0xc32);
-    uVar2 = *(uint *)(DAT_00003be0 + -0xc2e);
-    pcVar16 = *(char **)0x266 + 4;                         /* SoundBase + 4 (Ghidra: &DAT_66fa4e79) */
-    if (*(int *)(DAT_00003be0 + -0xc2a) < iVar5 - iVar6) {
-      sVar8 = 0xb7;
+  a5 = vbl_two_channel_a5_cache;                         /* in-code A5 cache at 0x3be0 */
+  if (vbl_two_channel_a5_cache != 0) {
+    chan1 = *(int **)(vbl_two_channel_a5_cache + -0x598);
+    p1 = (char *)(*chan1 + chan1[2]);
+    pos1_next = *chan1 + 0x172;
+    chan0 = *(int **)(vbl_two_channel_a5_cache + -2000);
+    pos = *chan0;
+    pos_frac = chan0[1];
+    samples = chan0[2];
+    end = chan0[4];
+    step_int = *(int *)(vbl_two_channel_a5_cache + -0xc32);
+    step_frac = *(uint *)(vbl_two_channel_a5_cache + -0xc2e);
+    out = *(char **)0x266 + 4;                         /* SoundBase + 4 (Ghidra: &DAT_66fa4e79) */
+    if (*(int *)(vbl_two_channel_a5_cache + -0xc2a) < end - pos) {
+      n = 0xb7;
       do {
-        pcVar11 = pcVar10;
-        uVar3 = uVar2 + uVar7;
-        iVar5 = iVar1 + iVar6 + (uint)CARRY4(uVar2,uVar7);
-        *pcVar16 = *pcVar11 + *(char *)(iVar9 + iVar6) + -0x80;
-        uVar7 = uVar2 + uVar3;
-        iVar6 = iVar1 + iVar5 + (uint)CARRY4(uVar2,uVar3);
-        pcVar16[2] = pcVar11[1] + *(char *)(iVar9 + iVar5) + -0x80;
-        pcVar16 = pcVar16 + 4;
-        sVar8 = sVar8 + -1;
-        pcVar10 = pcVar11 + 2;
-      } while (sVar8 != -1);
-      uVar3 = uVar2 + uVar7;
-      iVar5 = iVar1 + iVar6 + (uint)CARRY4(uVar2,uVar7);
-      **(char **)0x266 = pcVar11[2] + *(char *)(iVar9 + iVar6) + -0x80; /* SoundBase + 0 */
-      uVar7 = uVar2 + uVar3;
-      iVar6 = iVar1 + iVar5 + (uint)CARRY4(uVar2,uVar3);
-      *(*(char **)0x266 + 2) = pcVar11[3] + *(char *)(iVar9 + iVar5) + -0x80; /* SoundBase + 2 */
+        p1_cur = p1;
+        frac_b = step_frac + pos_frac;
+        end = step_int + pos + (uint)CARRY4(step_frac,pos_frac);
+        *out = *p1_cur + *(char *)(samples + pos) + -0x80;
+        pos_frac = step_frac + frac_b;
+        pos = step_int + end + (uint)CARRY4(step_frac,frac_b);
+        out[2] = p1_cur[1] + *(char *)(samples + end) + -0x80;
+        out = out + 4;
+        n = n + -1;
+        p1 = p1_cur + 2;
+      } while (n != -1);
+      frac_b = step_frac + pos_frac;
+      end = step_int + pos + (uint)CARRY4(step_frac,pos_frac);
+      **(char **)0x266 = p1_cur[2] + *(char *)(samples + pos) + -0x80; /* SoundBase + 0 */
+      pos_frac = step_frac + frac_b;
+      pos = step_int + end + (uint)CARRY4(step_frac,frac_b);
+      *(*(char **)0x266 + 2) = p1_cur[3] + *(char *)(samples + end) + -0x80; /* SoundBase + 2 */
     }
     else {
-      sVar8 = 0x16f;
+      n = 0x16f;
       do {
-        if (iVar5 <= iVar6) {
-          piVar15 = (int *)piVar15[6];
-          iVar9 = piVar15[2];
-          iVar6 = piVar15[3];
-          uVar7 = 0;
-          iVar5 = piVar15[4];
-          *(int **)(iVar4 + -2000) = piVar15;
+        if (end <= pos) {
+          chan0 = (int *)chan0[6];
+          samples = chan0[2];
+          pos = chan0[3];
+          pos_frac = 0;
+          end = chan0[4];
+          *(int **)(a5 + -2000) = chan0;
         }
-        pcVar11 = (char *)(iVar9 + iVar6);
-        bVar17 = CARRY4(uVar2,uVar7);
-        uVar7 = uVar2 + uVar7;
-        iVar6 = iVar1 + iVar6 + (uint)bVar17;
-        pcVar12 = pcVar10 + 1;
-        *pcVar16 = *pcVar10 + *pcVar11 + -0x80;
-        pcVar16 = pcVar16 + 2;
-        sVar8 = sVar8 + -1;
-        pcVar10 = pcVar12;
-      } while (sVar8 != -1);
-      pcVar10 = *(char **)0x266;                             /* SoundBase */
-      sVar8 = 1;
+        p1_cur = (char *)(samples + pos);
+        carry = CARRY4(step_frac,pos_frac);
+        pos_frac = step_frac + pos_frac;
+        pos = step_int + pos + (uint)carry;
+        p1_next = p1 + 1;
+        *out = *p1 + *p1_cur + -0x80;
+        out = out + 2;
+        n = n + -1;
+        p1 = p1_next;
+      } while (n != -1);
+      p1 = *(char **)0x266;                             /* SoundBase */
+      n = 1;
       do {
-        if (iVar5 <= iVar6) {
-          piVar15 = (int *)piVar15[6];
-          iVar9 = piVar15[2];
-          iVar6 = piVar15[3];
-          uVar7 = 0;
-          iVar5 = piVar15[4];
-          *(int **)(iVar4 + -2000) = piVar15;
+        if (end <= pos) {
+          chan0 = (int *)chan0[6];
+          samples = chan0[2];
+          pos = chan0[3];
+          pos_frac = 0;
+          end = chan0[4];
+          *(int **)(a5 + -2000) = chan0;
         }
-        pcVar16 = (char *)(iVar9 + iVar6);
-        bVar17 = CARRY4(uVar2,uVar7);
-        uVar7 = uVar2 + uVar7;
-        iVar6 = iVar1 + iVar6 + (uint)bVar17;
-        *pcVar10 = *pcVar12 + *pcVar16 + -0x80;
-        pcVar10 = pcVar10 + 2;
-        sVar8 = sVar8 + -1;
-        pcVar12 = pcVar12 + 1;
-      } while (sVar8 != -1);
+        out = (char *)(samples + pos);
+        carry = CARRY4(step_frac,pos_frac);
+        pos_frac = step_frac + pos_frac;
+        pos = step_int + pos + (uint)carry;
+        *p1 = *p1_next + *out + -0x80;
+        p1 = p1 + 2;
+        n = n + -1;
+        p1_next = p1_next + 1;
+      } while (n != -1);
     }
-    *piVar15 = iVar6;
-    piVar15[1] = uVar7;
-    if (piVar13[4] <= iVar14) {
-      piVar13 = (int *)piVar13[6];
-      iVar14 = piVar13[3];
-      *(int **)(iVar4 + -0x598) = piVar13;
-      if (iVar4 + -0xc26 == piVar13[2]) {
-        *(undefined4 *)0x196 = *(undefined4 *)(iVar4 + -0x360); /* channel 1 back on silence: restore the
+    *chan0 = pos;
+    chan0[1] = pos_frac;
+    if (chan1[4] <= pos1_next) {
+      chan1 = (int *)chan1[6];
+      pos1_next = chan1[3];
+      *(int **)(a5 + -0x598) = chan1;
+      if (a5 + -0xc26 == chan1[2]) {
+        *(undefined4 *)0x196 = *(undefined4 *)(a5 + -0x360); /* channel 1 back on silence: restore the
                                                      single-channel handler in Lvl1DT[1] */
       }
     }
-    *piVar13 = iVar14;
-    (**(code **)(iVar4 + -0xc36))();          /* reserved slot = A5-0xc36: RTS tail-chains to the previous
+    *chan1 = pos1_next;
+    (**(code **)(a5 + -0xc36))();          /* reserved slot = A5-0xc36: RTS tail-chains to the previous
                                                  Lvl1DT[1] handler with all registers restored */
-    return CONCAT44(in_D0,in_D1);
+    return CONCAT44(reg_d0,reg_d1);
   }
-  DAT_00003be0 = DAT_00000904;                  /* first call: cache CurrentA5 in the code; plain return */
-  return CONCAT44(in_D0,in_D1);
+  vbl_two_channel_a5_cache = CurrentA5;                  /* first call: cache CurrentA5 in the code; plain return */
+  return CONCAT44(reg_d0,reg_d1);
 }
 
 
@@ -4594,16 +4596,16 @@ undefined8 vbl_sound_handler_two_channel /* Original: FUN_00003bc4 */ (void)
 void clear_sound_buffer_to_silence /* Original: FUN_00003d36 */ (void)
 
 {
-  short sVar1;
-  undefined1 *puVar2;
+  short n; /* sVar1: DBRA counter, 370 samples */
+  undefined1 *out; /* puVar2: SoundBase cursor (every other byte) */
   
-  puVar2 = *(undefined1 **)0x266;               /* MOVEA.L $0266.w: SoundBase */
-  sVar1 = 0x171;
+  out = *(undefined1 **)0x266;               /* MOVEA.L $0266.w: SoundBase */
+  n = 0x171;
   do {
-    *puVar2 = 0x80;
-    puVar2 = puVar2 + 2;
-    sVar1 = sVar1 + -1;
-  } while (sVar1 != -1);
+    *out = 0x80;
+    out = out + 2;
+    n = n + -1;
+  } while (n != -1);
   return;
 }
 
@@ -4626,27 +4628,27 @@ void clear_sound_buffer_to_silence /* Original: FUN_00003d36 */ (void)
  * (14 call sites renamed in total).
  */
 undefined4 *
-alloc_sound_buffer_node /* Original: FUN_00003d50 */ (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5
+alloc_sound_buffer_node /* Original: FUN_00003d50 */ (int channel /* param_1 */,undefined4 samples /* param_2: sample data base (node +8) */,undefined4 start /* param_3: node +0 position and +0xc start */,undefined4 end /* param_4: node +0x10 */,undefined4 advance /* param_5: word flag, 1 = continue to the next node, 0 = loop on itself */
             )
 
 {
-  undefined4 *puVar1;
-  undefined4 *puVar2;
+  undefined4 *node; /* puVar1: node taken from the channel's free list A5-0x7cc */
+  undefined4 *next; /* puVar2: node +0x18 successor */
   int unaff_A5;
   
-  puVar1 = *(undefined4 **)(param_1 * 0x238 + unaff_A5 + -0x7cc);
-  *(undefined4 *)(param_1 * 0x238 + unaff_A5 + -0x7cc) = puVar1[5];
-  *puVar1 = param_3;
-  puVar1[1] = 0;
-  puVar1[2] = param_2;
-  puVar1[3] = param_3;
-  puVar1[4] = param_4;
-  puVar2 = puVar1;
-  if (param_5._0_2_ != 0) {
-    puVar2 = (undefined4 *)puVar1[5];
+  node = *(undefined4 **)(channel * 0x238 + unaff_A5 + -0x7cc);
+  *(undefined4 *)(channel * 0x238 + unaff_A5 + -0x7cc) = node[5];
+  *node = start;
+  node[1] = 0;
+  node[2] = samples;
+  node[3] = start;
+  node[4] = end;
+  next = node;
+  if (advance._0_2_ != 0) {
+    next = (undefined4 *)node[5];
   }
-  puVar1[6] = puVar2;
-  return puVar1;
+  node[6] = next;
+  return node;
 }
 
 
@@ -4662,12 +4664,12 @@ alloc_sound_buffer_node /* Original: FUN_00003d50 */ (int param_1,undefined4 par
  * (vbl_sound_handler_two_channel). Otherwise no change. Bytes 0x3db8..0x3dce
  * match the C.
  */
-void select_two_channel_sound_handler /* Original: FUN_00003db8 */ (int param_1)
+void select_two_channel_sound_handler /* Original: FUN_00003db8 */ (int channel /* param_1: 1 = install the two-channel handler A5-0x35c */)
 
 {
   int unaff_A5;
   
-  if (param_1 == 1) {
+  if (channel == 1) {
     *(undefined4 *)0x196 = *(undefined4 *)(unaff_A5 + -0x35c); /* Lvl1DT[1]; Ghidra's _FUN_00000196 label */
   }
   return;
@@ -4707,34 +4709,34 @@ void select_two_channel_sound_handler /* Original: FUN_00003db8 */ (int param_1)
  *   err ? return 0 : (A5-0xc38 = 1, return 1).
  * Caller: ID02.c:606 (via a computed stack argument).
  */
-short init_sound_system /* Original: FUN_00003dd0 */ (int param_1)
+short init_sound_system /* Original: FUN_00003dd0 */ (int use_variant /* param_1: nonzero = JT $412 (vbl_sound_handler_ch0_variant, 0x3aae), 0 = JT $41a (_unrolled, 0x39a8) */)
 
 {
-  short sVar1;
-  int iVar2;
-  int iVar3;
-  undefined1 *puVar4;
+  short k; /* sVar1: node index, then the silence-buffer byte count */
+  int ch; /* iVar2: channel 0..1, then the chosen handler address */
+  int node0; /* iVar3: first of the channel's 20 buffer nodes (0x1c bytes each) */
+  undefined1 *p; /* puVar4: silence buffer cursor (A5-0xc26) */
   int unaff_A5;
   
   if (*(short *)(unaff_A5 + -0xc38) != 0) {
     shutdown_sound(); /* Original: FUN_00004318 */
   }
-  for (iVar2 = 0; iVar2 < 2; iVar2 = iVar2 + 1) {
-    iVar3 = iVar2 * 0x238 + unaff_A5 + -0x7c8;
-    *(int *)(iVar2 * 0x238 + unaff_A5 + -0x5a0) = iVar3;
-    *(int *)(iVar2 * 0x238 + unaff_A5 + -0x7cc) = iVar3;
-    *(int *)(iVar2 * 0x238 + unaff_A5 + -2000) = iVar3;
-    for (sVar1 = 0; sVar1 < 0x13; sVar1 = sVar1 + 1) {
-      *(int *)(sVar1 * 0x1c + iVar2 * 0x238 + unaff_A5 + -0x7b4) =
-           (short)(sVar1 + 1) * 0x1c + iVar2 * 0x238 + unaff_A5 + -0x7c8;
+  for (ch = 0; ch < 2; ch = ch + 1) {
+    node0 = ch * 0x238 + unaff_A5 + -0x7c8;
+    *(int *)(ch * 0x238 + unaff_A5 + -0x5a0) = node0;
+    *(int *)(ch * 0x238 + unaff_A5 + -0x7cc) = node0;
+    *(int *)(ch * 0x238 + unaff_A5 + -2000) = node0;
+    for (k = 0; k < 0x13; k = k + 1) {
+      *(int *)(k * 0x1c + ch * 0x238 + unaff_A5 + -0x7b4) =
+           (short)(k + 1) * 0x1c + ch * 0x238 + unaff_A5 + -0x7c8;
     }
   }
-  puVar4 = (undefined1 *)(unaff_A5 + -0xc26);
-  sVar1 = 0x456;
-  while (0 < sVar1) {
-    *puVar4 = 0x80;
-    puVar4 = puVar4 + 1;
-    sVar1 = sVar1 + -1;
+  p = (undefined1 *)(unaff_A5 + -0xc26);
+  k = 0x456;
+  while (0 < k) {
+    *p = 0x80;
+    p = p + 1;
+    k = k + -1;
   }
   clear_sound_buffer_to_silence(); /* Original: FUN_00003d36 */
   *(undefined4 *)(unaff_A5 + -0xc32) = 1;
@@ -4742,13 +4744,13 @@ short init_sound_system /* Original: FUN_00003dd0 */ (int param_1)
   *(undefined4 *)(unaff_A5 + -0xc2a) = 0x172;
   alloc_sound_buffer_node(0,unaff_A5 + -0xc26,0,0x172,0); /* flag 0 (CLR.W): looping silence */
   alloc_sound_buffer_node(1,unaff_A5 + -0xc26,0,0x172,0);
-  if (param_1 == 0) {
-    iVar2 = unaff_A5 + 0x41a;
+  if (use_variant == 0) {
+    ch = unaff_A5 + 0x41a;
   }
   else {
-    iVar2 = unaff_A5 + 0x412;
+    ch = unaff_A5 + 0x412;
   }
-  *(int *)(unaff_A5 + -0x360) = iVar2;
+  *(int *)(unaff_A5 + -0x360) = ch;
   *(int *)(unaff_A5 + -0x35c) = unaff_A5 + 0x422;
   if (*(short *)(unaff_A5 + -0x352) == 0) {
     *(undefined2 *)(unaff_A5 + -0x352) = 1;
@@ -4790,34 +4792,34 @@ short init_sound_system /* Original: FUN_00003dd0 */ (int param_1)
  * re-linked [HYPOTHESIS: sustain loop with release tail].
  */
 undefined4
-play_sample_on_channel /* Original: FUN_00003f54 */ (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,uint param_5,
-            uint param_6)
+play_sample_on_channel /* Original: FUN_00003f54 */ (int channel /* param_1: 0 or 1 */,undefined4 samples /* param_2: sample data */,undefined4 start /* param_3 */,undefined4 end /* param_4 */,uint loop_start /* param_5: loop section when loop_start < loop_end */,
+            uint loop_end /* param_6 */)
 
 {
-  int iVar1;
-  undefined4 uVar2;
-  undefined4 local_8;
+  int a5; /* iVar1: copy of CurrentA5 */
+  undefined4 ok; /* uVar2: 1 = queued, 0 = sound off or bad channel */
+  undefined4 first_node; /* local_8, -8(A6): the node the channel starts on */
   
-  iVar1 = DAT_00000904;
+  a5 = CurrentA5;
   /* A5 = CurrentA5 ($904) inside; flag words: 1 = continue to the next node, 0 = loop on itself */
-  if (((*(short *)(DAT_00000904 + -0xc38) == 0) || (param_1 < 0)) || (1 < param_1)) {
-    uVar2 = 0;
+  if (((*(short *)(CurrentA5 + -0xc38) == 0) || (channel < 0)) || (1 < channel)) {
+    ok = 0;
   }
   else {
-    if (param_5 < param_6) {
-      local_8 = alloc_sound_buffer_node(param_1,param_2,param_3,param_5,1);
-      alloc_sound_buffer_node(param_1,param_2,param_5,param_6,0);
-      alloc_sound_buffer_node(param_1,param_2,param_6,param_4,1);
+    if (loop_start < loop_end) {
+      first_node = alloc_sound_buffer_node(channel,samples,start,loop_start,1);
+      alloc_sound_buffer_node(channel,samples,loop_start,loop_end,0);
+      alloc_sound_buffer_node(channel,samples,loop_end,end,1);
     }
     else {
-      local_8 = alloc_sound_buffer_node(param_1,param_2,param_3,param_4,1);
-      alloc_sound_buffer_node(param_1,iVar1 + -0xc26,0,0x172,0);
+      first_node = alloc_sound_buffer_node(channel,samples,start,end,1);
+      alloc_sound_buffer_node(channel,a5 + -0xc26,0,0x172,0);
     }
-    select_two_channel_sound_handler(param_1);
-    *(undefined4 **)(param_1 * 0x238 + iVar1 + -2000) = local_8;
-    uVar2 = 1;
+    select_two_channel_sound_handler(channel);
+    *(undefined4 **)(channel * 0x238 + a5 + -2000) = first_node;
+    ok = 1;
   }
-  return uVar2;
+  return ok;
 }
 
 
@@ -4838,32 +4840,32 @@ play_sample_on_channel /* Original: FUN_00003f54 */ (int param_1,undefined4 para
  * select_two_channel_sound_handler(ch)). Overlay service slot A5-0x10da (JT $42a).
  */
 undefined4
-enqueue_sample_on_channel /* Original: FUN_00004050 */ (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,uint param_5,
-            uint param_6)
+enqueue_sample_on_channel /* Original: FUN_00004050 */ (int channel /* param_1: 0 or 1 */,undefined4 samples /* param_2: sample data */,undefined4 start /* param_3 */,undefined4 end /* param_4 */,uint loop_start /* param_5: loop section when loop_start < loop_end */,
+            uint loop_end /* param_6 */)
 
 {
-  int iVar1;
-  undefined4 uVar2;
+  int a5; /* iVar1: copy of CurrentA5 */
+  undefined4 ok; /* uVar2: 1 = queued, 0 = sound off or bad channel */
   
-  iVar1 = DAT_00000904;
+  a5 = CurrentA5;
   /* A5 = CurrentA5 ($904) inside; flag words: 1 = continue to the next node, 0 = loop on itself */
-  if (((*(short *)(DAT_00000904 + -0xc38) == 0) || (param_1 < 0)) || (1 < param_1)) {
-    uVar2 = 0;
+  if (((*(short *)(CurrentA5 + -0xc38) == 0) || (channel < 0)) || (1 < channel)) {
+    ok = 0;
   }
   else {
-    if (param_5 < param_6) {
-      alloc_sound_buffer_node(param_1,param_2,param_3,param_5,1);
-      alloc_sound_buffer_node(param_1,param_2,param_5,param_6,0);
-      alloc_sound_buffer_node(param_1,param_2,param_6,param_4,1);
+    if (loop_start < loop_end) {
+      alloc_sound_buffer_node(channel,samples,start,loop_start,1);
+      alloc_sound_buffer_node(channel,samples,loop_start,loop_end,0);
+      alloc_sound_buffer_node(channel,samples,loop_end,end,1);
     }
     else {
-      alloc_sound_buffer_node(param_1,param_2,param_3,param_4,1);
-      alloc_sound_buffer_node(param_1,iVar1 + -0xc26,0,0x172,0);
+      alloc_sound_buffer_node(channel,samples,start,end,1);
+      alloc_sound_buffer_node(channel,a5 + -0xc26,0,0x172,0);
     }
-    select_two_channel_sound_handler(param_1);
-    uVar2 = 1;
+    select_two_channel_sound_handler(channel);
+    ok = 1;
   }
-  return uVar2;
+  return ok;
 }
 
 
@@ -4884,22 +4886,22 @@ enqueue_sample_on_channel /* Original: FUN_00004050 */ (int param_1,undefined4 p
  * These are the 32.32 step and length read by the VBL handlers. Unsigned
  * arithmetic; rate * 0x172 cannot overflow for the clamped range.
  */
-void set_sound_playback_rate /* Original: FUN_0000412e */ (uint param_1)
+void set_sound_playback_rate /* Original: FUN_0000412e */ (uint rate /* param_1: 16.16 playback rate, clamped to 0.5 .. 3.0 */)
 
 {
-  int iVar1;
+  int a5; /* iVar1: copy of CurrentA5 */
   
-  iVar1 = DAT_00000904;
-  if (*(short *)(DAT_00000904 + -0xc38) != 0) {
-    if (param_1 < 0x8000) {
-      param_1 = 0x8000;
+  a5 = CurrentA5;
+  if (*(short *)(CurrentA5 + -0xc38) != 0) {
+    if (rate < 0x8000) {
+      rate = 0x8000;
     }
-    else if (0x30000 < param_1) {
-      param_1 = 0x30000;
+    else if (0x30000 < rate) {
+      rate = 0x30000;
     }
-    *(uint *)(DAT_00000904 + -0xc2a) = param_1 * 0x172 >> 0x10;
-    *(uint *)(iVar1 + -0xc2e) = param_1 << 0x10;
-    *(uint *)(iVar1 + -0xc32) = param_1 >> 0x10;
+    *(uint *)(CurrentA5 + -0xc2a) = rate * 0x172 >> 0x10;
+    *(uint *)(a5 + -0xc2e) = rate << 0x10;
+    *(uint *)(a5 + -0xc32) = rate >> 0x10;
   }
   return;
 }
@@ -4922,20 +4924,20 @@ void set_sound_playback_rate /* Original: FUN_0000412e */ (uint param_1)
  * sustain-release question in docs/SOUND_SYSTEM.md. Ghidra's unaff_A3 is the
  * pushed word 0 (artifact; now written as 0).
  */
-void release_channel_loop /* Original: FUN_000041a6 */ (int param_1)
+void release_channel_loop /* Original: FUN_000041a6 */ (int channel /* param_1 */)
 
 {
-  int iVar1;
-  undefined4 *puVar2;
-  undefined4 *puVar3;
+  int a5; /* iVar1: copy of CurrentA5 */
+  undefined4 *silence; /* puVar2: looping silence node appended */
+  undefined4 *node; /* puVar3: walks the queue from the playing node */
   
-  iVar1 = DAT_00000904;
-  if (((*(short *)(DAT_00000904 + -0xc38) != 0) && (-1 < param_1)) && (param_1 < 2)) {
-    puVar2 = alloc_sound_buffer_node(param_1,DAT_00000904 + -0xc26,0,0x172,0); /* flag CLR.W 0 */
-    *(undefined4 *)(param_1 * 0x238 + iVar1 + -0x7cc) = puVar2[5];
-    for (puVar3 = *(undefined4 **)(param_1 * 0x238 + iVar1 + -2000); puVar3 != puVar2;
-        puVar3 = (undefined4 *)puVar3[5]) {
-      puVar3[6] = puVar3[5];
+  a5 = CurrentA5;
+  if (((*(short *)(CurrentA5 + -0xc38) != 0) && (-1 < channel)) && (channel < 2)) {
+    silence = alloc_sound_buffer_node(channel,CurrentA5 + -0xc26,0,0x172,0); /* flag CLR.W 0 */
+    *(undefined4 *)(channel * 0x238 + a5 + -0x7cc) = silence[5];
+    for (node = *(undefined4 **)(channel * 0x238 + a5 + -2000); node != silence;
+        node = (undefined4 *)node[5]) {
+      node[6] = node[5];
     }
   }
   return;
@@ -4956,16 +4958,16 @@ void release_channel_loop /* Original: FUN_000041a6 */ (int param_1)
  * the word 0 pushed by CLR.W (artifact; now written as 0). shutdown_sound also passes ch = 2,
  * which the bounds check ignores. Service slot A5-0x10ca (JT $432).
  */
-void silence_sound_channel /* Original: FUN_00004242 */ (int param_1)
+void silence_sound_channel /* Original: FUN_00004242 */ (int channel /* param_1 */)
 
 {
-  int iVar1;
-  undefined4 *puVar2;
+  int a5; /* iVar1: copy of CurrentA5 */
+  undefined4 *silence; /* puVar2: looping silence node, made current */
   
-  iVar1 = DAT_00000904;
-  if (((*(short *)(DAT_00000904 + -0xc38) != 0) && (-1 < param_1)) && (param_1 < 2)) {
-    puVar2 = alloc_sound_buffer_node(param_1,DAT_00000904 + -0xc26,0,0x172,0); /* flag CLR.W 0 */
-    *(undefined4 **)(param_1 * 0x238 + iVar1 + -2000) = puVar2;
+  a5 = CurrentA5;
+  if (((*(short *)(CurrentA5 + -0xc38) != 0) && (-1 < channel)) && (channel < 2)) {
+    silence = alloc_sound_buffer_node(channel,CurrentA5 + -0xc26,0,0x172,0); /* flag CLR.W 0 */
+    *(undefined4 **)(channel * 0x238 + a5 + -2000) = silence;
   }
   return;
 }
@@ -4983,14 +4985,14 @@ void silence_sound_channel /* Original: FUN_00004242 */ (int param_1)
  * else (word) current node's buffer (+8) != silence buffer A5-0xc26. The upper
  * word in Ghidra's CONCAT22 is register residue, not meaningful (the C now returns short).
  */
-short is_channel_playing /* Original: FUN_000042b0 */ (int param_1)
+short is_channel_playing /* Original: FUN_000042b0 */ (int channel /* param_1 */)
 
 {
-  if (((*(short *)(DAT_00000904 + -0xc38) == 0) || (param_1 < 0)) || (1 < param_1)) {
+  if (((*(short *)(CurrentA5 + -0xc38) == 0) || (channel < 0)) || (1 < channel)) {
     return 0;
   }
-  return (short)(DAT_00000904 + -0xc26 !=      /* SNE / NEG.B / EXT.W: only D0's low word is set */
-                 *(int *)(*(int *)(param_1 * 0x238 + DAT_00000904 + -2000) + 8));
+  return (short)(CurrentA5 + -0xc26 !=      /* SNE / NEG.B / EXT.W: only D0's low word is set */
+                 *(int *)(*(int *)(channel * 0x238 + CurrentA5 + -2000) + 8));
 }
 
 
@@ -5041,7 +5043,7 @@ void shutdown_sound /* Original: FUN_00004318 */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void position_window_on_screen /* Original: FUN_0000435e */ (int param_1)
+void position_window_on_screen /* Original: FUN_0000435e */ (int win /* param_1: WindowPtr */)
 
 {
   int unaff_A5;
@@ -5050,16 +5052,16 @@ void position_window_on_screen /* Original: FUN_0000435e */ (int param_1)
   short sw;                                     /* -6(A6) */
   short sh;                                     /* -8(A6) */
 
-  w = *(short *)(param_1 + 0x16) - *(short *)(param_1 + 0x12); /* portRect */
-  h = *(short *)(param_1 + 0x14) - *(short *)(param_1 + 0x10);
+  w = *(short *)(win + 0x16) - *(short *)(win + 0x12); /* portRect */
+  h = *(short *)(win + 0x14) - *(short *)(win + 0x10);
   sw = *(short *)(unaff_A5 + -0x167a) - *(short *)(unaff_A5 + -0x167e);                                    /* screenBits.bounds */
   sh = *(short *)(unaff_A5 + -0x167c) - *(short *)(unaff_A5 + -0x1680);
   sh = sh - *(short *)0xbaa;                    /* MBarHeight */
   if (sh < h) {                                 /* centred (each term divided separately) */
-    MoveWindow(param_1,(short)((int)sw / 2) - (short)((int)w / 2),(short)((int)sh / 2) - (short)((int)h / 2),1); /* $A91B */
+    MoveWindow(win,(short)((int)sw / 2) - (short)((int)w / 2),(short)((int)sh / 2) - (short)((int)h / 2),1); /* $A91B */
   }
   else {                                        /* one third down */
-    MoveWindow(param_1,(short)((int)sw / 2) - (short)((int)w / 2),(short)((int)sh / 3) - (short)((int)h / 3),1);
+    MoveWindow(win,(short)((int)sw / 2) - (short)((int)w / 2),(short)((int)sh / 3) - (short)((int)h / 3),1);
   }
   return;
 }
@@ -5075,7 +5077,7 @@ void position_window_on_screen /* Original: FUN_0000435e */ (int param_1)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void position_alert_template /* Original: FUN_0000442e */ (short param_1)
+void position_alert_template /* Original: FUN_0000442e */ (short alrt_id /* param_1: ALRT resource id */)
 
 {
   int unaff_A5;
@@ -5085,7 +5087,7 @@ void position_alert_template /* Original: FUN_0000442e */ (short param_1)
   short sw;                                     /* -6(A6) */
   short sh;                                     /* -8(A6) */
 
-  h_ = (int **)GetResource(0x414c5254,param_1); /* $A9A0, 'ALRT' */
+  h_ = (int **)GetResource(0x414c5254,alrt_id); /* $A9A0, 'ALRT' */
   w = *(short *)((int)*h_ + 6) - *(short *)((int)*h_ + 2); /* boundsRect */
   h = *(short *)((int)*h_ + 4) - *(short *)*h_;
   sw = *(short *)(unaff_A5 + -0x167a) - *(short *)(unaff_A5 + -0x167e);
@@ -5111,7 +5113,7 @@ void position_alert_template /* Original: FUN_0000442e */ (short param_1)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void centre_window_on_screen /* Original: FUN_00004582 */ (int param_1)
+void centre_window_on_screen /* Original: FUN_00004582 */ (int win /* param_1: WindowPtr */)
 
 {
   int unaff_A5;
@@ -5120,11 +5122,11 @@ void centre_window_on_screen /* Original: FUN_00004582 */ (int param_1)
   short sw;                                     /* -6(A6) */
   short sh;                                     /* -8(A6) */
 
-  w = *(short *)(param_1 + 0x16) - *(short *)(param_1 + 0x12);
-  h = *(short *)(param_1 + 0x14) - *(short *)(param_1 + 0x10);
+  w = *(short *)(win + 0x16) - *(short *)(win + 0x12);
+  h = *(short *)(win + 0x14) - *(short *)(win + 0x10);
   sw = *(short *)(unaff_A5 + -0x167a) - *(short *)(unaff_A5 + -0x167e);
   sh = *(short *)(unaff_A5 + -0x167c) - *(short *)(unaff_A5 + -0x1680);
-  MoveWindow(param_1,(short)((int)sw / 2) - (short)((int)w / 2),
+  MoveWindow(win,(short)((int)sw / 2) - (short)((int)w / 2),
              ((short)((int)sh / 2) - (short)((int)h / 2)) + (short)((int)*(short *)0xbaa / 2),1); /* $A91B */
   return;
 }
@@ -5213,7 +5215,7 @@ void rebuild_all_palette_index_maps /* Original: FUN_000046b4 */ (void)
   int unaff_A5;
   undefined1 scratch[0x200];                    /* -$204(A6) */
   int start;                                    /* -4(A6) */
-  short local_6;                                /* -2(A6) */
+  short slot; /* local_6: display device slot 1..3 (0x16-byte records at A5-0x136e) */                                /* -2(A6) */
   
   *(undefined2 *)(unaff_A5 + -0x102a) = 0;
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
@@ -5224,9 +5226,9 @@ void rebuild_all_palette_index_maps /* Original: FUN_000046b4 */ (void)
       close_and_dispose_port(*(int *)(unaff_A5 + -0x103a)); /* Original: FUN_00000d24 */
       *(undefined4 *)(unaff_A5 + -0x103a) = 0;
     }
-    for (local_6 = 1; local_6 < 4; local_6 = local_6 + 1) {
-      if (*(int *)(local_6 * 0x16 + unaff_A5 + -0x136e) != 0) {
-        build_palette_index_map(local_6,&start,*(int *)(local_6 * 0x16 + unaff_A5 + -0x136e + 4),scratch);
+    for (slot = 1; slot < 4; slot = slot + 1) {
+      if (*(int *)(slot * 0x16 + unaff_A5 + -0x136e) != 0) {
+        build_palette_index_map(slot,&start,*(int *)(slot * 0x16 + unaff_A5 + -0x136e + 4),scratch);
                                                 /* BSR 0x48ae: word slot, &-4, record +4, &-$204 */
       }
     }
@@ -5264,13 +5266,13 @@ void rebuild_all_palette_index_maps /* Original: FUN_000046b4 */ (void)
  *     entries 0..0xc7: SetEntryUsage(pal, e, 4 pmAnimated, 0)
  *   RGBColor entries are 6 bytes. Callers: layout_game_window_and_view (4, 8). Body rebuilt as C below.
  */
-void configure_palette_entries /* Original: FUN_00004738 */ (short param_1)
+void configure_palette_entries /* Original: FUN_00004738 */ (short depth /* param_1: pixel depth, 4 or 8 */)
 
 {
   int unaff_A5;
   short e;                                      /* -2(A6) */
 
-  if (param_1 == 4) {
+  if (depth == 4) {
     for (e = 0; e < 5; e = e + 1) {
       SetEntryUsage(*(int *)(unaff_A5 + -0x14ae),e + 8,2,0);            /* $AA9E, pmTolerant */
       SetEntryColor(*(int *)(unaff_A5 + -0x14ae),e + 8,(void *)(unaff_A5 + -0x320 + e * 6)); /* $AA9C */
@@ -5280,7 +5282,7 @@ void configure_palette_entries /* Original: FUN_00004738 */ (short param_1)
       SetEntryColor(*(int *)(unaff_A5 + -0x14ae),e,(void *)(unaff_A5 + -0x350 + e * 6));
     }
   }
-  else if (param_1 == 8) {
+  else if (depth == 8) {
     for (e = 0; e < 9; e = e + 1) {
       SetEntryUsage(*(int *)(unaff_A5 + -0x14aa),e + 0xd0,2,0);
       SetEntryColor(*(int *)(unaff_A5 + -0x14aa),e + 0xd0,(void *)(unaff_A5 + -0x302 + e * 6));
@@ -5315,7 +5317,7 @@ void configure_palette_entries /* Original: FUN_00004738 */ (short param_1)
 void clear_ctab_size_callback /* Original: FUN_0000488a */ (void)
 
 {
-  *(undefined2 *)(*(int *)(DAT_00000904 + -0x14b2) + 6) = 0;
+  *(undefined2 *)(*(int *)(CurrentA5 + -0x14b2) + 6) = 0;
   return;
 }
 
@@ -5356,7 +5358,7 @@ void clear_ctab_size_callback /* Original: FUN_0000488a */ (void)
  * function pointer A5-0x1122. Traps per Inside Macintosh (Palette Manager).
  * Callers: check_device_color_state_changed (2x), FUN_000046b4.
  */
-short build_palette_index_map /* Original: FUN_000048ae */ (short param_1,short *param_2,short *param_3,short *param_4)
+short build_palette_index_map /* Original: FUN_000048ae */ (short slot /* param_1: display device slot */,short *start /* param_2: out, first index found (0, or 256) */,short *map /* param_3: out, colour level -> palette index */,short *inverse /* param_4: out, palette index -> colour level */)
 
 {
   int unaff_A5;
@@ -5367,15 +5369,15 @@ short build_palette_index_map /* Original: FUN_000048ae */ (short param_1,short 
   short i;                                      /* -4(A6) */
   short idx;                                    /* -2(A6) */
 
-  if (*(int *)(param_1 * 0x16 + unaff_A5 + -0x136e) == 0) {
+  if (*(int *)(slot * 0x16 + unaff_A5 + -0x136e) == 0) {
     return 0;
   }
   front_is_main = FrontWindow() == *(int *)(unaff_A5 + -0x14ca); /* $A924 */
   saved = GetGDevice();                         /* $AA32 */
-  SetGDevice(*(int *)(param_1 * 0x16 + unaff_A5 + -0x136e)); /* $AA31 */
+  SetGDevice(*(int *)(slot * 0x16 + unaff_A5 + -0x136e)); /* $AA31 */
   for (i = 0; i < 0x100; i = i + 1) {
     count[i] = 0;
-    param_4[i] = 0;
+    inverse[i] = 0;
   }
   if (*(short *)(unaff_A5 + -0x2cc) == 4) {
     limit = 0xd;
@@ -5385,12 +5387,12 @@ short build_palette_index_map /* Original: FUN_000048ae */ (short param_1,short 
     limit = 0xd9;
     i = 0;
   }
-  *param_2 = i;                                 /* 0, or 256 left over from the clear loop */
+  *start = i;                                 /* 0, or 256 left over from the clear loop */
   for (; i < limit; i = i + 1) {
     PmForeColor(i);                             /* $AA97 */
     idx = *(short *)(*(int *)(unaff_A5 + -0x160c) + 0x52); /* low word of thePort->fgColor */
-    param_3[i] = idx;
-    param_4[idx] = i;
+    map[i] = idx;
+    inverse[idx] = i;
     if (((count[idx] != 0) && (*(short *)(unaff_A5 + -0x2cc) == 8)) && (i < 200)) {
       *(short *)(unaff_A5 + -0x102a) = 1;       /* collision */
     }
@@ -5428,78 +5430,78 @@ short build_palette_index_map /* Original: FUN_000048ae */ (short param_1,short 
  * other modes return the leftover register value (preserved, UNKNOWN).
  * Callers: FUN_00004b62 (9 calls; not decompiled by Ghidra, see note below it).
  */
-undefined4 lookup_palette_index_for_rgb_level /* Original: FUN_000049fe */ (undefined4 param_1,undefined4 param_2)
+undefined4 lookup_palette_index_for_rgb_level /* Original: FUN_000049fe */ (undefined4 rg /* param_1: red level in ._0_2_, green level in ._2_2_ (0..4) */,undefined4 b_word /* param_2: blue level in ._0_2_ */)
 
 {
-  short sVar1;
-  short *psVar2;
-  int iVar3;
-  undefined2 uVar4;
-  short sVar6;
-  undefined4 uVar5;
+  short comp; /* sVar1: colour component being compared */
+  short *entry; /* psVar2: extended table entry (6 bytes) */
+  int entry_addr; /* iVar3 */
+  undefined2 d0_hi; /* uVar4: high word of D0 (left over) */
+  short b; /* sVar6: blue component (level << 6, 0x100 -> 0xff) */
+  undefined4 result; /* uVar5: D0 */
   int unaff_A5;
-  undefined2 local_8;
-  undefined2 local_6;
+  undefined2 index; /* local_8: index found, -1 = none */
+  undefined2 i; /* local_6 */
   
-  sVar6 = param_1._0_2_ << 6;
-  param_1._0_2_ = sVar6;
-  if (sVar6 == 0x100) {
-    param_1._0_2_ = 0xff;
+  b = rg._0_2_ << 6;
+  rg._0_2_ = b;
+  if (b == 0x100) {
+    rg._0_2_ = 0xff;
   }
-  param_1._2_2_ = param_1._2_2_ << 6;
-  if (param_1._2_2_ == 0x100) {
-    param_1._2_2_ = 0xff;
+  rg._2_2_ = rg._2_2_ << 6;
+  if (rg._2_2_ == 0x100) {
+    rg._2_2_ = 0xff;
   }
-  sVar6 = param_2._0_2_ << 6;
-  if (sVar6 == 0x100) {
-    sVar6 = 0xff;
+  b = b_word._0_2_ << 6;
+  if (b == 0x100) {
+    b = 0xff;
   }
-  uVar5 = 0xffffffff;
-  local_8 = -1;
-  for (local_6 = 0; local_6 < 8; local_6 = local_6 + 1) {
-    sVar1 = *(short *)(local_6 * 6 + unaff_A5 + -0x350);
-    uVar5 = CONCAT22((short)((uint)(local_6 * 6) >> 0x10),sVar1);
-    if (((sVar1 == (short)(param_1._0_2_ << 8)) &&
-        (sVar1 = *(short *)(local_6 * 6 + unaff_A5 + -0x34e),
-        uVar5 = CONCAT22((short)((uint)(local_6 * 6) >> 0x10),sVar1),
-        sVar1 == (short)(param_1._2_2_ << 8))) &&
-       (sVar1 = *(short *)(local_6 * 6 + unaff_A5 + -0x34c),
-       uVar5 = CONCAT22((short)((uint)(local_6 * 6) >> 0x10),sVar1), sVar1 == (short)(sVar6 << 8)))
+  result = 0xffffffff;
+  index = -1;
+  for (i = 0; i < 8; i = i + 1) {
+    comp = *(short *)(i * 6 + unaff_A5 + -0x350);
+    result = CONCAT22((short)((uint)(i * 6) >> 0x10),comp);
+    if (((comp == (short)(rg._0_2_ << 8)) &&
+        (comp = *(short *)(i * 6 + unaff_A5 + -0x34e),
+        result = CONCAT22((short)((uint)(i * 6) >> 0x10),comp),
+        comp == (short)(rg._2_2_ << 8))) &&
+       (comp = *(short *)(i * 6 + unaff_A5 + -0x34c),
+       result = CONCAT22((short)((uint)(i * 6) >> 0x10),comp), comp == (short)(b << 8)))
     {
-      local_8 = local_6;
+      index = i;
       break;
     }
   }
-  if (local_8 == -1) {
-    for (local_6 = 0; uVar5 = CONCAT22((short)((uint)uVar5 >> 0x10),local_6),
-        local_6 < *(short *)(unaff_A5 + -0x14a2); local_6 = local_6 + 1) {
-      psVar2 = (short *)(*(int *)(unaff_A5 + -0x14a6) + local_6 * 6);
-      sVar1 = *psVar2;
-      uVar5 = CONCAT22((short)((uint)psVar2 >> 0x10),sVar1);
-      if ((sVar1 == (short)(param_1._0_2_ << 8)) &&
-         (iVar3 = *(int *)(unaff_A5 + -0x14a6) + local_6 * 6, sVar1 = *(short *)(iVar3 + 2),
-         uVar5 = CONCAT22((short)((uint)iVar3 >> 0x10),sVar1), sVar1 == (short)(param_1._2_2_ << 8))
+  if (index == -1) {
+    for (i = 0; result = CONCAT22((short)((uint)result >> 0x10),i),
+        i < *(short *)(unaff_A5 + -0x14a2); i = i + 1) {
+      entry = (short *)(*(int *)(unaff_A5 + -0x14a6) + i * 6);
+      comp = *entry;
+      result = CONCAT22((short)((uint)entry >> 0x10),comp);
+      if ((comp == (short)(rg._0_2_ << 8)) &&
+         (entry_addr = *(int *)(unaff_A5 + -0x14a6) + i * 6, comp = *(short *)(entry_addr + 2),
+         result = CONCAT22((short)((uint)entry_addr >> 0x10),comp), comp == (short)(rg._2_2_ << 8))
          ) {
-        iVar3 = *(int *)(unaff_A5 + -0x14a6) + local_6 * 6;
-        sVar1 = *(short *)(iVar3 + 4);
-        uVar4 = (undefined2)((uint)iVar3 >> 0x10);
-        uVar5 = CONCAT22(uVar4,sVar1);
-        if (sVar1 == (short)(sVar6 << 8)) {
-          local_8 = local_6 + 8;
-          uVar5 = CONCAT22(uVar4,local_8);
+        entry_addr = *(int *)(unaff_A5 + -0x14a6) + i * 6;
+        comp = *(short *)(entry_addr + 4);
+        d0_hi = (undefined2)((uint)entry_addr >> 0x10);
+        result = CONCAT22(d0_hi,comp);
+        if (comp == (short)(b << 8)) {
+          index = i + 8;
+          result = CONCAT22(d0_hi,index);
           break;
         }
       }
     }
   }
-  uVar4 = (undefined2)((uint)uVar5 >> 0x10);
+  d0_hi = (undefined2)((uint)result >> 0x10);
   if ((*(short *)(unaff_A5 + -0x137a) == 4) || (*(short *)(unaff_A5 + -0x137a) == 1)) {
-    uVar5 = CONCAT22(uVar4,local_8);
+    result = CONCAT22(d0_hi,index);
   }
   else if (*(short *)(unaff_A5 + -0x137a) == 8) {
-    uVar5 = CONCAT22(uVar4,local_8 + 200);
+    result = CONCAT22(d0_hi,index + 200);
   }
-  return uVar5;
+  return result;
 }
 
 
@@ -5556,45 +5558,45 @@ Low-level Error: Symbol $$undef00000003 extends beyond the end of the address sp
 void check_device_color_state_changed /* Original: FUN_00004c18 */ (void)
 
 {
-  undefined4 uVar1;
+  undefined4 count; /* uVar1: build_palette_index_map result (entries in the map) */
   int unaff_A5;
-  short asStack_40e [256];                      /* -$40a(A6): scratch (inverse map) */
-  short asStack_20e [256];                      /* -$20a(A6): fresh map */
-  short local_e;
-  short local_c;
-  short local_a;
-  short local_8;
-  short local_6;
+  short inverse [256]; /* asStack_40e */                      /* -$40a(A6): scratch (inverse map) */
+  short fresh_map [256]; /* asStack_20e */                      /* -$20a(A6): fresh map */
+  short any_changed; /* local_e: some device map changed */
+  short changed; /* local_c: this device's map changed */
+  short n_entries; /* local_a: stored, never read */
+  short i; /* local_8: start index from build_palette_index_map, then the compare cursor */
+  short slot; /* local_6: display device slot 1..3 */
   
-  local_e = 0;
+  any_changed = 0;
   *(undefined2 *)(unaff_A5 + -0x102a) = 0;
   if (*(short *)(unaff_A5 + -0x137a) == 1) {
     FUN_00004b62();
   }
   else {
-    for (local_6 = 1; local_6 < 4; local_6 = local_6 + 1) {
-      if (*(int *)(local_6 * 0x16 + unaff_A5 + -0x136e) != 0) {
-        uVar1 = build_palette_index_map(local_6,&local_8,asStack_20e,asStack_40e); /* BSR 0x48ae */
-        local_a = (short)uVar1;
-        local_c = 0;
-        for (; local_8 < (short)uVar1; local_8 = local_8 + 1) {
-          if (asStack_20e[local_8] !=
-              *(short *)(*(int *)(local_6 * 0x16 + unaff_A5 + -0x136a) + local_8 * 2)) {
-            local_e = 1;
-            local_c = 1;
+    for (slot = 1; slot < 4; slot = slot + 1) {
+      if (*(int *)(slot * 0x16 + unaff_A5 + -0x136e) != 0) {
+        count = build_palette_index_map(slot,&i,fresh_map,inverse); /* BSR 0x48ae */
+        n_entries = (short)count;
+        changed = 0;
+        for (; i < (short)count; i = i + 1) {
+          if (fresh_map[i] !=
+              *(short *)(*(int *)(slot * 0x16 + unaff_A5 + -0x136a) + i * 2)) {
+            any_changed = 1;
+            changed = 1;
             break;
           }
         }
-        if (local_c != 0) {
-          if (local_6 == 1) {
-            remap_cached_panel_colours(*(undefined4 *)(unaff_A5 + -0x1354),asStack_20e); /* JT $182 -> ID03 0x6c1c */
+        if (changed != 0) {
+          if (slot == 1) {
+            remap_cached_panel_colours(*(undefined4 *)(unaff_A5 + -0x1354),fresh_map); /* JT $182 -> ID03 0x6c1c */
           }
-          build_palette_index_map(local_6,&local_8,*(short **)(local_6 * 0x16 + unaff_A5 + -0x136a),asStack_40e);
+          build_palette_index_map(slot,&i,*(short **)(slot * 0x16 + unaff_A5 + -0x136a),inverse);
                                                 /* refresh the stored map (record +4) */
         }
       }
     }
-    if ((local_e != 0) && (*(int *)(unaff_A5 + -0x1006) != 0)) {
+    if ((any_changed != 0) && (*(int *)(unaff_A5 + -0x1006) != 0)) {
       (**(code **)(unaff_A5 + -0x1096))();
     }
   }
@@ -5644,13 +5646,13 @@ void process_pending_update_events /* Original: FUN_00004d34 */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void handle_update_event /* Original: FUN_00004d6a */ (int param_1)
+void handle_update_event /* Original: FUN_00004d6a */ (int evt /* param_1: EventRecord (message +2 = the window) */)
 
 {
   int unaff_A5;
   
   if ((*(short *)(unaff_A5 + -0x14c6) != 0) &&
-     (*(int *)(param_1 + 2) == *(int *)(unaff_A5 + -0x14ca))) {
+     (*(int *)(evt + 2) == *(int *)(unaff_A5 + -0x14ca))) {
     BeginUpdate(*(int *)(unaff_A5 + -0x14ca)); /* $A922 */
     redraw_main_window();                       /* BSR 0x4db0 */
     EndUpdate(*(int *)(unaff_A5 + -0x14ca));   /* $A923 */

@@ -19,6 +19,9 @@ char DAT_216e0017;
 char DAT_216e0016;
 undefined DAT_00000059;
 
+/* Readable global names (readability pass; the Ghidra name stays the real symbol) */
+#define kbd_type_table_end DAT_00000059 /* LEA $59(PC): one past the in-segment KbdType table 0x54..0x58 (03 13 0b 02 01), scanned backwards */
+
 // WARNING: Control flow encountered bad instruction data
 // WARNING: Removing unreachable block (ram,0x000000cc)
 // WARNING: Globals starting with '_' overlap smaller symbols at the same address
@@ -81,73 +84,73 @@ undefined DAT_00000059;
  * theWorld at 4(A7), versionRequested at 8(A7) (never read), result word at $a(A7); entered by branch
  * from the dispatcher at 0x20 with the caller's frame untouched. Low-memory names per Inside Macintosh
  * [STRONG INFERENCE]; addresses and widths [PROVEN, bytes]. */
-short sysenvirons_glue_fallback /* Original: FUN_00000048 */ (short versionRequested,undefined2 *param_1)
+short sysenvirons_glue_fallback /* Original: FUN_00000048 */ (short versionRequested,undefined2 *theWorld /* param_1: VAR SysEnvRec, 8 words */)
 
 {
-  short sVar2;
-  undefined2 *puVar3;
+  short count; /* sVar2: DBRA counter (clear loop, keyboard scan = keyBoardType - 1, pb clear) */
+  undefined2 *word; /* puVar3: clear-loop cursor over theWorld */
   char *rom;
-  char *pcVar4;
+  char *kbd_entry; /* pcVar4: KbdType table cursor */
   undefined1 pb[0x7a];                          /* 61 words cleared on the stack (CLR.W -(A7) / DBRA) */
 
-  sVar2 = 7;                                    /* MOVE.W #$10,D0; ASR.W #1; SUBQ.W #1 */
-  puVar3 = param_1;
+  count = 7;                                    /* MOVE.W #$10,D0; ASR.W #1; SUBQ.W #1 */
+  word = theWorld;
   do {
-    *puVar3 = 0;
-    sVar2 = sVar2 + -1;
-    puVar3 = puVar3 + 1;
-  } while (sVar2 != -1);
-  *param_1 = 1;                                 /* environsVersion */
+    *word = 0;
+    count = count + -1;
+    word = word + 1;
+  } while (count != -1);
+  *theWorld = 1;                                 /* environsVersion */
   rom = *(char **)0x2ae;                        /* ROMBase; Ghidra's DAT_216e0016/17 were rom[8] / rom[9] */
-  param_1[1] = 0xfffe;                          /* machineType: envXL */
+  theWorld[1] = 0xfffe;                          /* machineType: envXL */
   if (rom[9] != -1) {
     if (rom[8] < 1) {
-      param_1[1] = 0xffff;                      /* envMac */
+      theWorld[1] = 0xffff;                      /* envMac */
       if (-1 < *(short *)0x28e) {               /* ROM85 */
-        param_1[1] = 1;                         /* env512KE */
+        theWorld[1] = 1;                         /* env512KE */
         if (*(short *)0xb22 < 0) {              /* HWCfgFlags bit 15 */
-          param_1[1] = 2;                       /* envMacPlus */
+          theWorld[1] = 2;                       /* envMacPlus */
         }
       }
     }
     else {
-      param_1[1] = 0;
+      theWorld[1] = 0;
       if (rom[8] < 3) {
         if (rom[8] == 2) {
-          param_1[1] = 3;                       /* envSE */
+          theWorld[1] = 3;                       /* envSE */
         }
         else {
-          param_1[1] = 4;                       /* envMacII */
+          theWorld[1] = 4;                       /* envMacII */
         }
       }
     }
   }
-  param_1[2] = 0;                               /* systemVersion (second clear kept) */
+  theWorld[2] = 0;                               /* systemVersion (second clear kept) */
   if (*(char *)0x12f < 3) {                     /* CPUFlag, signed byte; path Ghidra dropped */
-    *(char *)((int)param_1 + 7) = *(char *)0x12f + 1; /* processor low byte (ADDQ.W, MOVE.B) */
+    *(char *)((int)theWorld + 7) = *(char *)0x12f + 1; /* processor low byte (ADDQ.W, MOVE.B) */
   }
   if ((-1 < *(short *)0x28e) && ((*(byte *)0xb22 & 0x10) != 0)) { /* BTST #4 of byte $b22 = word bit 12 */
-    *(undefined1 *)(param_1 + 4) = 1;           /* hasFPU byte */
+    *(undefined1 *)(theWorld + 4) = 1;           /* hasFPU byte */
   }
   if (*(ushort *)0x28e < 0x4000) {              /* CMPI.W #$3fff / BHI: unsigned */
-    *(undefined1 *)((int)param_1 + 9) = 1;      /* hasColorQD byte */
+    *(undefined1 *)((int)theWorld + 9) = 1;      /* hasColorQD byte */
   }
-  pcVar4 = &DAT_00000059;                       /* LEA $59(PC): in-segment table 0x54..0x58 = 03 13 0b 02 01 */
-  sVar2 = 4;
+  kbd_entry = &kbd_type_table_end;                       /* LEA $59(PC): in-segment table 0x54..0x58 = 03 13 0b 02 01 */
+  count = 4;
   do {
-    pcVar4 = pcVar4 + -1;
-    if (*(char *)0x21e == *pcVar4) break;       /* KbdType; CMP.B -(A0) / DBEQ */
-    sVar2 = sVar2 + -1;
-  } while (sVar2 != -1);
-  param_1[5] = sVar2 + 1;                       /* keyBoardType */
+    kbd_entry = kbd_entry + -1;
+    if (*(char *)0x21e == *kbd_entry) break;       /* KbdType; CMP.B -(A0) / DBEQ */
+    count = count + -1;
+  } while (count != -1);
+  theWorld[5] = count + 1;                       /* keyBoardType */
   if ((-1 < *(char *)0x291) && ((*(byte *)0x1fb & 0xf) == 1)) { /* PortBUse, SPConfig */
-    *(undefined1 *)((int)param_1 + 0xd) = *(undefined1 *)(*(int *)0x2dc + 7); /* ABusVars+7 -> atDrvrVersNum */
+    *(undefined1 *)((int)theWorld + 0xd) = *(undefined1 *)(*(int *)0x2dc + 7); /* ABusVars+7 -> atDrvrVersNum */
   }
-  param_1[7] = *(undefined2 *)0x210;            /* BootDrive -> sysVRefNum */
+  theWorld[7] = *(undefined2 *)0x210;            /* BootDrive -> sysVRefNum */
   if (-1 < *(short *)0x3f6) {                   /* FSFCBLen >= 0: HFS present */
-    param_1[7] = 0;
-    for (sVar2 = 0x3c; sVar2 != -1; sVar2 = sVar2 + -1) {
-      *(undefined2 *)(pb + sVar2 * 2) = 0;
+    theWorld[7] = 0;
+    for (count = 0x3c; count != -1; count = count + -1) {
+      *(undefined2 *)(pb + count * 2) = 0;
     }
     *(undefined2 *)(pb + 0x18) = *(undefined2 *)0xa58;         /* ioRefNum = SysMap */
     if (HFSDispatch(pb,8) == 0) {                              /* MOVEQ #8, $A260: PBGetFCBInfo */
@@ -156,7 +159,7 @@ short sysenvirons_glue_fallback /* Original: FUN_00000048 */ (short versionReque
         *(undefined4 *)(pb + 0x30) = *(undefined4 *)(pb + 0x5a); /* ioWDDirID = ioVFndrInfo[0] */
         *(undefined4 *)(pb + 0x1c) = 0x4552494b;               /* ioWDProcID = 'ERIK' */
         if (HFSDispatch(pb,1) == 0) {                          /* MOVEQ #1, $A260: PBOpenWD */
-          param_1[7] = *(undefined2 *)(pb + 0x16);             /* sysVRefNum = working directory */
+          theWorld[7] = *(undefined2 *)(pb + 0x16);             /* sysVRefNum = working directory */
         }
       }
     }

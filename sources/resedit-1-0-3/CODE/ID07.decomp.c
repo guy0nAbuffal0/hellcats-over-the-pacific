@@ -155,24 +155,24 @@ void init_string_pointer_groups /* Original: FUN_00000190 */ (void)
 
 {
   int unaff_A5;
-  undefined2 local_6;
+  undefined2 i; /* local_6, -6(A6): copy index within each group */
 
   load_str129_string_table(); /* Original: FUN_00000006; binary JSR $6(PC) at file 0x194 */
-  for (local_6 = 0; local_6 < 0x15; local_6 = local_6 + 1) {
-    *(undefined4 *)(local_6 * 4 + unaff_A5 + -0x221e) =
-         *(undefined4 *)((short)(local_6 + 2) * 4 + unaff_A5 + -0xf46);
+  for (i = 0; i < 0x15; i = i + 1) {
+    *(undefined4 *)(i * 4 + unaff_A5 + -0x221e) =
+         *(undefined4 *)((short)(i + 2) * 4 + unaff_A5 + -0xf46);
   }
-  for (local_6 = 0; local_6 < 6; local_6 = local_6 + 1) {
-    *(undefined4 *)(local_6 * 4 + unaff_A5 + -0xffe) =
-         *(undefined4 *)((short)(local_6 + 0x5e) * 4 + unaff_A5 + -0xf46);
+  for (i = 0; i < 6; i = i + 1) {
+    *(undefined4 *)(i * 4 + unaff_A5 + -0xffe) =
+         *(undefined4 *)((short)(i + 0x5e) * 4 + unaff_A5 + -0xf46);
   }
-  for (local_6 = 0; local_6 < 6; local_6 = local_6 + 1) {
-    *(undefined4 *)(local_6 * 4 + unaff_A5 + -0xfae) =
-         *(undefined4 *)((short)(local_6 + 100) * 4 + unaff_A5 + -0xf46);
+  for (i = 0; i < 6; i = i + 1) {
+    *(undefined4 *)(i * 4 + unaff_A5 + -0xfae) =
+         *(undefined4 *)((short)(i + 100) * 4 + unaff_A5 + -0xf46);
   }
-  for (local_6 = 0; local_6 < 10; local_6 = local_6 + 1) {
-    *(undefined4 *)(local_6 * 4 + unaff_A5 + -0xf86) =
-         *(undefined4 *)((short)(local_6 + 0x6a) * 4 + unaff_A5 + -0xf46);
+  for (i = 0; i < 10; i = i + 1) {
+    *(undefined4 *)(i * 4 + unaff_A5 + -0xf86) =
+         *(undefined4 *)((short)(i + 0x6a) * 4 + unaff_A5 + -0xf46);
   }
   return;
 }

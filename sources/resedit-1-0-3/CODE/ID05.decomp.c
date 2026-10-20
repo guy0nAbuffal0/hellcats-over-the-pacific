@@ -34,7 +34,7 @@ typedef unsigned char    byte;
  * Rect fields per Inside Macintosh; DLOG/ALRT/WIND template use is
  * [HYPOTHESIS]. GetMBarHeight is called three times (re-read each time).
  */
-void center_template_rect_on_screen /* Original: FUN_00000006 */ (undefined4 param_1,short param_2)
+void center_template_rect_on_screen /* Original: FUN_00000006 */ (undefined4 res_type /* param_1: OSType */,short res_id /* param_2 */)
 
 {
   int unaff_A5;
@@ -43,7 +43,7 @@ void center_template_rect_on_screen /* Original: FUN_00000006 */ (undefined4 par
   short v;                                      /* -$a(A6) */
   short d;                                      /* -$c(A6) */
 
-  h = GetResource(param_1,param_2);             /* $A9A0; type 8(A6), id $c(A6) */
+  h = GetResource(res_type,res_id);             /* $A9A0; type 8(A6), id $c(A6) */
   if (h != (Handle)0) {
     r = (short *)*h;
     v = (short)((int)(short)(*(short *)(unaff_A5 + -0x167a) - (r[3] - r[1])) / 2); /* EXT.L, DIVS.W #2 */
@@ -90,8 +90,8 @@ void center_template_rect_on_screen /* Original: FUN_00000006 */ (undefined4 par
  * builder), whose five words go to pack_fields_to_code_buf68: machine type,
  * width/128, height/128, depth/4, 0 -> a machine-dependent code [STRONG INFERENCE].
  */
-void get_machine_screen_fingerprint /* Original: FUN_000000c8 */ (undefined2 *param_1,short *param_2,short *param_3,undefined2 *param_4,
-                 undefined2 *param_5)
+void get_machine_screen_fingerprint /* Original: FUN_000000c8 */ (undefined2 *machine /* param_1: out, SysEnvRec machineType */,short *width /* param_2: out, main screen width */,short *height /* param_3: out, main screen height */,undefined2 *depth /* param_4: out, pixel size (1 without Color QuickDraw) */,
+                 undefined2 *zero /* param_5: out, always 0 */)
 
 {
   int unaff_A5;
@@ -100,20 +100,20 @@ void get_machine_screen_fingerprint /* Original: FUN_000000c8 */ (undefined2 *pa
   int pm;
 
   SysEnvirons(1,env);                           /* JT $1f2 -> ID09 0x20 ($A090 glue); OSErr discarded */
-  *param_1 = *(undefined2 *)(env + 2);          /* machineType */
+  *machine = *(undefined2 *)(env + 2);          /* machineType */
   if (env[9] != 0) {                            /* hasColorQD */
     gd = (int *)GetGDevice();                   /* $AA32 */
     pm = **(int **)(*gd + 0x16);                /* *(*gd)->gdPMap (byte offset); re-read before each store */
-    *param_2 = *(short *)(pm + 0xc);            /* pmBounds.right */
-    *param_3 = *(short *)(pm + 0xa);            /* pmBounds.bottom */
-    *param_4 = *(undefined2 *)(pm + 0x20);      /* pixelSize */
+    *width = *(short *)(pm + 0xc);            /* pmBounds.right */
+    *height = *(short *)(pm + 0xa);            /* pmBounds.bottom */
+    *depth = *(undefined2 *)(pm + 0x20);      /* pixelSize */
   }
   else {
-    *param_2 = *(short *)(unaff_A5 + -0x167a) - *(short *)(unaff_A5 + -0x167e);
-    *param_3 = *(short *)(unaff_A5 + -0x167c) - *(short *)(unaff_A5 + -0x1680);
-    *param_4 = 1;
+    *width = *(short *)(unaff_A5 + -0x167a) - *(short *)(unaff_A5 + -0x167e);
+    *height = *(short *)(unaff_A5 + -0x167c) - *(short *)(unaff_A5 + -0x1680);
+    *depth = 1;
   }
-  *param_5 = 0;
+  *zero = 0;
   return;
 }
 
@@ -136,18 +136,18 @@ void get_machine_screen_fingerprint /* Original: FUN_000000c8 */ (undefined2 *pa
  * [HYPOTHESIS] Persistent protection/registration state hidden in generic
  * resource types; meaning of the two longs UNKNOWN. Body reconstructed from the bytes.
  */
-void read_DATA128_pair /* Original: FUN_00000160 */ (undefined4 *param_1,undefined4 *param_2)
+void read_DATA128_pair /* Original: FUN_00000160 */ (undefined4 *first /* param_1: out, first long of DATA 128 */,undefined4 *second /* param_2: out, second long */)
 
 {
   Handle h;
 
-  *param_1 = 0;
-  *param_2 = 0;
+  *first = 0;
+  *second = 0;
   h = GetResource('DATA',0x80);             /* PEA $44415441.L, MOVE.W #$80, _GetResource $A9A0 */
   if (h != (Handle)0) {
     HNoPurge(h);                               /* JT $28a -> ID09 0x28e _HNoPurge $A04A */
-    *param_1 = *(undefined4 *)*h;
-    *param_2 = *(undefined4 *)(*h + 4);
+    *first = *(undefined4 *)*h;
+    *second = *(undefined4 *)(*h + 4);
     HPurge(h);                                 /* JT $282 -> ID09 0x284 _HPurge $A049 */
     ReleaseResource(h);                        /* $A9A3 */
   }
@@ -174,7 +174,7 @@ void read_DATA128_pair /* Original: FUN_00000160 */ (undefined4 *param_1,undefin
  * [HYPOTHESIS] Persistent protection/registration state hidden in generic
  * resource types; meaning of the two longs UNKNOWN. Body reconstructed from the bytes.
  */
-void write_DATA128_pair /* Original: FUN_000001bc */ (undefined4 param_1,undefined4 param_2)
+void write_DATA128_pair /* Original: FUN_000001bc */ (undefined4 first /* param_1 */,undefined4 second /* param_2 */)
 
 {
   Handle h;
@@ -182,8 +182,8 @@ void write_DATA128_pair /* Original: FUN_000001bc */ (undefined4 param_1,undefin
   h = GetResource('DATA',0x80);             /* PEA $44415441.L, MOVE.W #$80, _GetResource $A9A0 */
   if (h != (Handle)0) {
     HNoPurge(h);                               /* JT $28a -> ID09 0x28e _HNoPurge $A04A */
-    *(undefined4 *)*h = param_1;               /* 8(A6) */
-    *(undefined4 *)(*h + 4) = param_2;         /* $c(A6) */
+    *(undefined4 *)*h = first;               /* 8(A6) */
+    *(undefined4 *)(*h + 4) = second;         /* $c(A6) */
     ChangedResource(h);                        /* $A9AA */
     WriteResource(h);                          /* $A9B0 */
     HPurge(h);                                 /* JT $282 -> ID09 0x284 _HPurge $A049 */
@@ -211,18 +211,18 @@ void write_DATA128_pair /* Original: FUN_000001bc */ (undefined4 param_1,undefin
  * [HYPOTHESIS] Persistent protection/registration state hidden in generic
  * resource types; meaning of the two longs UNKNOWN. Body reconstructed from the bytes.
  */
-void read_TEXT128_pair /* Original: FUN_00000214 */ (undefined4 *param_1,undefined4 *param_2)
+void read_TEXT128_pair /* Original: FUN_00000214 */ (undefined4 *first /* param_1: out, first long of TEXT 128 */,undefined4 *second /* param_2: out, second long */)
 
 {
   Handle h;
 
-  *param_1 = 0;
-  *param_2 = 0;
+  *first = 0;
+  *second = 0;
   h = GetResource('TEXT',0x80);             /* PEA $54455854.L, MOVE.W #$80, _GetResource $A9A0 */
   if (h != (Handle)0) {
     HNoPurge(h);                               /* JT $28a -> ID09 0x28e _HNoPurge $A04A */
-    *param_1 = *(undefined4 *)*h;
-    *param_2 = *(undefined4 *)(*h + 4);
+    *first = *(undefined4 *)*h;
+    *second = *(undefined4 *)(*h + 4);
     HPurge(h);                                 /* JT $282 -> ID09 0x284 _HPurge $A049 */
     ReleaseResource(h);                        /* $A9A3 */
   }
@@ -250,7 +250,7 @@ void read_TEXT128_pair /* Original: FUN_00000214 */ (undefined4 *param_1,undefin
  * [HYPOTHESIS] Persistent protection/registration state hidden in generic
  * resource types; meaning of the two longs UNKNOWN. Body reconstructed from the bytes.
  */
-void write_TEXT128_pair /* Original: FUN_00000270 */ (undefined4 param_1,undefined4 param_2)
+void write_TEXT128_pair /* Original: FUN_00000270 */ (undefined4 first /* param_1 */,undefined4 second /* param_2 */)
 
 {
   Handle h;
@@ -258,8 +258,8 @@ void write_TEXT128_pair /* Original: FUN_00000270 */ (undefined4 param_1,undefin
   h = GetResource('TEXT',0x80);             /* PEA $54455854.L, MOVE.W #$80, _GetResource $A9A0 */
   if (h != (Handle)0) {
     HNoPurge(h);                               /* JT $28a -> ID09 0x28e _HNoPurge $A04A */
-    *(undefined4 *)*h = param_1;               /* 8(A6) */
-    *(undefined4 *)(*h + 4) = param_2;         /* $c(A6) */
+    *(undefined4 *)*h = first;               /* 8(A6) */
+    *(undefined4 *)(*h + 4) = second;         /* $c(A6) */
     ChangedResource(h);                        /* $A9AA */
     WriteResource(h);                          /* $A9B0 */
     HPurge(h);                                 /* JT $282 -> ID09 0x284 _HPurge $A049 */
@@ -332,7 +332,7 @@ char code_dialog_filter /* Original: FUN_000002c8 */ (int dlg,short *evt,short *
 
 {
   int unaff_A5;
-  short sVar1;
+  short calls; /* sVar1: previous value of the call counter A5-0x2ca */
   byte text[256];                               /* -$10e(A6): Str255 */
   undefined1 box[8];                            /* -$e(A6): Rect */
   Handle h;                                     /* -6(A6) */
@@ -340,9 +340,9 @@ char code_dialog_filter /* Original: FUN_000002c8 */ (int dlg,short *evt,short *
   char result;
 
   SetPort(dlg);                                 /* $A873 */
-  sVar1 = *(short *)(unaff_A5 + -0x2ca);
-  *(short *)(unaff_A5 + -0x2ca) = sVar1 + 1;
-  if (sVar1 == 0) {
+  calls = *(short *)(unaff_A5 + -0x2ca);
+  *(short *)(unaff_A5 + -0x2ca) = calls + 1;
+  if (calls == 0) {
     GetDItem(dlg,3,&itemType,&h,box);           /* $A98D */
     GetIText(h,text);                           /* $A990 */
     GetDItem(dlg,1,&itemType,&h,box);
@@ -388,7 +388,7 @@ char code_dialog_filter /* Original: FUN_000002c8 */ (int dlg,short *evt,short *
  *   return A5-0x1c9 (static buffer, overwritten on each call).
  * Callers [PROVEN]: run_protection_dialog file 0x66c, 0x688, 0x6b6.
  */
-char * get_dialog_item_text_upper /* Original: FUN_000004e4 */ (int param_1,short param_2)
+char * get_dialog_item_text_upper /* Original: FUN_000004e4 */ (int dlg /* param_1: DialogPtr */,short item_no /* param_2 */)
 
 {
   int unaff_A5;
@@ -397,7 +397,7 @@ char * get_dialog_item_text_upper /* Original: FUN_000004e4 */ (int param_1,shor
   Handle item;                                  /* -4(A6) */
   byte *p;                                      /* -$12(A6) */
 
-  GetDItem(param_1,param_2,&itemType,&item,box); /* $A98D */
+  GetDItem(dlg,item_no,&itemType,&item,box); /* $A98D */
   GetIText(item,(byte *)(unaff_A5 + -0x1c9));   /* $A990 */
   length_prefixed_bytes_to_c_string_in_place((byte *)(unaff_A5 + -0x1c9));
                                                 /* JT $2fa -> ID09 0x432 (FUN_00000432), caller pops */
@@ -461,7 +461,7 @@ char * get_dialog_item_text_upper /* Original: FUN_000004e4 */ (int param_1,shor
  * and an unlock code in item 4; success sets the 0x964 gate A5-0xc0 used by
  * restore_poisoned_overlay_bytes. Exact UI meaning of fields is HYPOTHESIS.
  */
-void run_protection_dialog /* Original: FUN_00000560 */ (int *param_1,int *param_2)
+void run_protection_dialog /* Original: FUN_00000560 */ (int *code_a /* param_1: in/out, first code long */,int *code_b /* param_2: in/out, second code long */)
 
 {
   int unaff_A5;
@@ -480,8 +480,8 @@ void run_protection_dialog /* Original: FUN_00000560 */ (int *param_1,int *param
 
   GetPort(&savePort);                           /* $A874 */
   InitCursor();                                 /* $A850 */
-  FUN_000003ba(param_1,outA,param_2,outB);      /* routine B, code-string builder (no inventory entry) */
-  if (record_code_index_equals(*param_1,(int)(outB + 6)) != 0) {
+  FUN_000003ba(code_a,outA,code_b,outB);      /* routine B, code-string builder (no inventory entry) */
+  if (record_code_index_equals(*code_a,(int)(outB + 6)) != 0) {
     return;                                     /* BNE.W to UNLK: the saved port is NOT restored */
   }
   pick_random_protection_challenge(&w1,&w2,&w3);
@@ -505,7 +505,7 @@ void run_protection_dialog /* Original: FUN_00000560 */ (int *param_1,int *param
       }
     }
     length_prefixed_bytes_to_c_string_in_place(outB); /* JT $2fa -> ID09 0x432 */
-    *param_1 = decode_code_to_long_b(get_dialog_item_text_upper(dlg,4));
+    *code_a = decode_code_to_long_b(get_dialog_item_text_upper(dlg,4));
     ok = FUN_00000964(w1,w2,w3,get_dialog_item_text_upper(dlg,3)); /* matcher; Ghidra could not decompile it */
     if (ok == 0) {
       ParamText(c2pstr_in_place(get_dialog_item_text_upper(dlg,3)),0,0,0);
@@ -514,8 +514,8 @@ void run_protection_dialog /* Original: FUN_00000560 */ (int *param_1,int *param
     }
   }
   DisposDialog(dlg);                            /* $A983 */
-  if (record_code_index_equals(*param_1,(int)(outB + 6)) != 0) {
-    write_TEXT128_pair(*param_1,*param_2);
+  if (record_code_index_equals(*code_a,(int)(outB + 6)) != 0) {
+    write_TEXT128_pair(*code_a,*code_b);
   }
   SetPort(savePort);                            /* $A873 */
   return;
@@ -552,12 +552,12 @@ uint ansi_rand /* Original: FUN_00000728 */ (void)
  * Recovered name: ansi_srand [STRONG INFERENCE].
  * Stores param_1 into the ansi_rand seed (long A5-0x6c). No callers found yet.
  */
-void ansi_srand /* Original: FUN_00000746 */ (undefined4 param_1)
+void ansi_srand /* Original: FUN_00000746 */ (undefined4 seed /* param_1 */)
 
 {
   int unaff_A5;
   
-  *(undefined4 *)(unaff_A5 + -0x6c) = param_1;
+  *(undefined4 *)(unaff_A5 + -0x6c) = seed;
   return;
 }
 
@@ -581,22 +581,22 @@ void ansi_srand /* Original: FUN_00000746 */ (undefined4 param_1)
  * Callers [PROVEN, bytes]: ID05 file 0xb00, 0xb98, 0xbce (ID05.c:300, 332, 354)
  * writing to A5-0x68, A5-0x54, A5-0x40 respectively.
  */
-int encode_base26_6chars /* Original: FUN_00000754 */ (char *param_1,int param_2)
+int encode_base26_6chars /* Original: FUN_00000754 */ (char *dst /* param_1: out, 7-byte buffer (6 letters + NUL) */,int value /* param_2: value to encode */)
 
 {
-  int iVar1;
-  short local_a;
+  int quotient; /* iVar1: value / 26, returned */
+  short i; /* local_a, -$a(A6): letter counter 0..5 */
   
-  param_1 = param_1 + 6;
-  iVar1 = 0;
-  for (local_a = 0; local_a < 6; local_a = local_a + 1) {
-    param_1 = param_1 + -1;
-    *param_1 = (char)(param_2 % 0x1a) + 'A';
-    iVar1 = param_2 / 0x1a;
-    param_2 = iVar1;
+  dst = dst + 6;
+  quotient = 0;
+  for (i = 0; i < 6; i = i + 1) {
+    dst = dst + -1;
+    *dst = (char)(value % 0x1a) + 'A';
+    quotient = value / 0x1a;
+    value = quotient;
   }
-  param_1[6] = '\0';
-  return iVar1;
+  dst[6] = '\0';
+  return quotient;
 }
 
 
@@ -614,21 +614,21 @@ int encode_base26_6chars /* Original: FUN_00000754 */ (char *param_1,int param_2
  * equal the signed product), EXTB.L, ADDI.W #$ffbf, EXT.L (file 0x7bc..0x7d8).
  * Callers [PROVEN, bytes]: ID05 file 0xb1c, 0xbb4, 0xbea (ID05.c:316, 343, 365).
  */
-int decode_base26_6chars /* Original: FUN_000007a8 */ (int param_1,int *param_2)
+int decode_base26_6chars /* Original: FUN_000007a8 */ (int src /* param_1: 6-letter code */,int *out_value /* param_2: out, decoded value */)
 
 {
-  int iVar1;
-  undefined2 local_a;
-  undefined4 local_8;
+  int digit; /* iVar1: (short)(c - 'A'), returned */
+  undefined2 i; /* local_a, -$a(A6): letter index 0..5 */
+  undefined4 acc; /* local_8, -8(A6): base-26 accumulator */
   
-  local_8 = 0;
-  iVar1 = 0;
-  for (local_a = 0; local_a < 6; local_a = local_a + 1) {
-    iVar1 = (int)(short)(*(char *)(param_1 + local_a) + -0x41);
-    local_8 = iVar1 + local_8 * 0x1a;
+  acc = 0;
+  digit = 0;
+  for (i = 0; i < 6; i = i + 1) {
+    digit = (int)(short)(*(char *)(src + i) + -0x41);
+    acc = digit + acc * 0x1a;
   }
-  *param_2 = local_8;
-  return iVar1;
+  *out_value = acc;
+  return digit;
 }
 
 
@@ -653,20 +653,20 @@ int decode_base26_6chars /* Original: FUN_000007a8 */ (int param_1,int *param_2)
  * restore_poisoned_overlay_bytes finds its gate set. Duplicate offsets are
  * possible; reverse-order restore keeps the original byte in that case.
  */
-void poison_overlay_bytes /* Original: FUN_000007f6 */ (int param_1,uint param_2)
+void poison_overlay_bytes /* Original: FUN_000007f6 */ (int base /* param_1: overlay base */,uint size /* param_2: overlay byte count */)
 
 {
-  undefined1 *puVar1;
-  uint uVar2;
+  undefined1 *target; /* puVar1: byte chosen for poisoning */
+  uint rnd; /* uVar2: ansi_rand result */
   int unaff_A5;
-  undefined2 local_6;
+  undefined2 i; /* local_6, -6(A6): table entry 0..11 */
   
-  for (local_6 = 0; (param_1 != 0 && (local_6 < 0xc)); local_6 = local_6 + 1) {
-    uVar2 = ansi_rand(); /* Original: FUN_00000728 */
-    puVar1 = (undefined1 *)(param_1 + (uVar2 & 0xffff) % param_2);
-    *(undefined1 **)(local_6 * 6 + unaff_A5 + -0xb4) = puVar1;
-    *(undefined1 *)(local_6 * 6 + unaff_A5 + -0xb0) = *puVar1;
-    *puVar1 = 0xff;
+  for (i = 0; (base != 0 && (i < 0xc)); i = i + 1) {
+    rnd = ansi_rand(); /* Original: FUN_00000728 */
+    target = (undefined1 *)(base + (rnd & 0xffff) % size);
+    *(undefined1 **)(i * 6 + unaff_A5 + -0xb4) = target;
+    *(undefined1 *)(i * 6 + unaff_A5 + -0xb0) = *target;
+    *target = 0xff;
   }
   return;
 }
@@ -691,23 +691,23 @@ void poison_overlay_bytes /* Original: FUN_000007f6 */ (int param_1,uint param_2
 void restore_poisoned_overlay_bytes /* Original: FUN_0000085e */ (void)
 
 {
-  short sVar1;
-  bool bVar2;
+  short entry; /* sVar1: decremented counter = table entry 11..0 */
+  bool armed; /* bVar2: A5-0xbc word or A5-0xc0 long nonzero (restore gate) */
   int unaff_A5;
-  undefined2 local_6;
+  undefined2 count; /* local_6, -6(A6): entries left, starts at 12 */
   
   if ((*(short *)(unaff_A5 + -0xbc) == 0) && (*(int *)(unaff_A5 + -0xc0) == 0)) {
-    bVar2 = false;
+    armed = false;
   }
   else {
-    bVar2 = true;
+    armed = true;
   }
-  if (bVar2) {
-    local_6 = 0xc;
-    while (sVar1 = local_6 + -1, 0 < local_6) {
-      **(undefined1 **)(sVar1 * 6 + unaff_A5 + -0xb4) =
-           *(undefined1 *)(sVar1 * 6 + unaff_A5 + -0xb0);
-      local_6 = sVar1;
+  if (armed) {
+    count = 0xc;
+    while (entry = count + -1, 0 < count) {
+      **(undefined1 **)(entry * 6 + unaff_A5 + -0xb4) =
+           *(undefined1 *)(entry * 6 + unaff_A5 + -0xb0);
+      count = entry;
     }
   }
   return;
@@ -744,18 +744,18 @@ Low-level Error: Cannot properly adjust input varnodes
  * Caller [PROVEN]: run_protection_dialog file 0x5a6. The same entry words are
  * later checked by the 0x964 matcher.
  */
-void pick_random_protection_challenge /* Original: FUN_000008d6 */ (undefined2 *param_1,undefined2 *param_2,undefined2 *param_3)
+void pick_random_protection_challenge /* Original: FUN_000008d6 */ (undefined2 *word6 /* param_1: out, entry word +6 [meaning UNKNOWN] */,undefined2 *word8 /* param_2: out, entry word +8 */,undefined2 *word10 /* param_3: out, entry word +0xa */)
 
 {
-  uint uVar1;
-  short sVar2;
+  uint rnd; /* uVar1: ansi_rand result */
+  short index; /* sVar2: entry index, rnd % count word A5-0xb6 */
   int unaff_A5;
   
-  uVar1 = ansi_rand(); /* Original: FUN_00000728 */
-  sVar2 = (short)((uVar1 & 0xffff) % (uint)*(ushort *)(unaff_A5 + -0xb6));
-  *param_1 = *(undefined2 *)(*(int *)(unaff_A5 + -0xba) + sVar2 * 0xc + 6);
-  *param_2 = *(undefined2 *)(*(int *)(unaff_A5 + -0xba) + sVar2 * 0xc + 8);
-  *param_3 = *(undefined2 *)(*(int *)(unaff_A5 + -0xba) + sVar2 * 0xc + 10);
+  rnd = ansi_rand(); /* Original: FUN_00000728 */
+  index = (short)((rnd & 0xffff) % (uint)*(ushort *)(unaff_A5 + -0xb6));
+  *word6 = *(undefined2 *)(*(int *)(unaff_A5 + -0xba) + index * 0xc + 6);
+  *word8 = *(undefined2 *)(*(int *)(unaff_A5 + -0xba) + index * 0xc + 8);
+  *word10 = *(undefined2 *)(*(int *)(unaff_A5 + -0xba) + index * 0xc + 10);
   return;
 }
 
@@ -792,13 +792,13 @@ void pick_random_protection_challenge /* Original: FUN_000008d6 */ (undefined2 *
  * A5-0xc0 is the second restore gate. Semantics as a code-entry check is
  * [HYPOTHESIS]; table contents not yet located.
  */
-undefined4 record_code_index_equals /* Original: FUN_00000934 */ (int param_1,int param_2)
+undefined4 record_code_index_equals /* Original: FUN_00000934 */ (int n /* param_1: index to compare */,int rec /* param_2: record pointer */)
 
 {
-  int iVar1;
+  int rec_index; /* iVar1: rec[4] * 20 + rec[5] */
   
-  iVar1 = (int)*(char *)(param_2 + 5) + *(char *)(param_2 + 4) * 0x14;
-  return CONCAT22((short)((uint)iVar1 >> 0x10),(short)(iVar1 == param_1));
+  rec_index = (int)*(char *)(rec + 5) + *(char *)(rec + 4) * 0x14;
+  return CONCAT22((short)((uint)rec_index >> 0x10),(short)(rec_index == n));
 }
 
 
@@ -823,12 +823,12 @@ Low-level Error: Cannot properly adjust input varnodes
 uint random_28bit_value /* Original: FUN_00000a62 */ (void)
 
 {
-  uint uVar1;
-  uint uVar2;
+  uint rnd_hi; /* uVar1: first ansi_rand, low 12 bits -> bits 16..27 */
+  uint rnd_lo; /* uVar2: second ansi_rand, low 16 bits */
   
-  uVar1 = ansi_rand(); /* Original: FUN_00000728 */
-  uVar2 = ansi_rand(); /* Original: FUN_00000728 */
-  return (uVar1 & 0xfff) << 0x10 | uVar2 & 0xffff;
+  rnd_hi = ansi_rand(); /* Original: FUN_00000728 */
+  rnd_lo = ansi_rand(); /* Original: FUN_00000728 */
+  return (rnd_hi & 0xfff) << 0x10 | rnd_lo & 0xffff;
 }
 
 
@@ -850,20 +850,20 @@ uint random_28bit_value /* Original: FUN_00000a62 */ (void)
  * OR (e.g. 0x20 sets bit 5) preserved as exported.
  * Inverse (with rescaling): unpack_fields_from_code. Caller: ID05 file 0x498.
  */
-int pack_fields_to_code_buf68 /* Original: FUN_00000a90 */ (undefined4 param_1,undefined4 param_2,undefined4 param_3)
+int pack_fields_to_code_buf68 /* Original: FUN_00000a90 */ (undefined4 slot1 /* param_1: high word -> bits 16..27, low word / 0x80 -> bits 12..15 [field meanings UNKNOWN] */,undefined4 slot2 /* param_2: high word / 0x80 -> bits 8..11, low word / 4 -> bits 5..7 */,undefined4 slot3 /* param_3: high word / 0x200 (max 0x20) -> bits 0..4 */)
 
 {
   int unaff_A5;
   
-  param_3._0_2_ = param_3._0_2_ / 0x200;
-  if (0x20 < param_3._0_2_) {
-    param_3._0_2_ = 0x20;
+  slot3._0_2_ = slot3._0_2_ / 0x200;
+  if (0x20 < slot3._0_2_) {
+    slot3._0_2_ = 0x20;
   }
   encode_base26_6chars( /* Original: FUN_00000754 */ (char *)(unaff_A5 + -0x68),
-               ((int)param_3._0_2_ |
-               (int)(short)(param_2._2_2_ / 4 << 5 |
-                           param_2._0_2_ / 0x80 << 8 | param_1._2_2_ / 0x80 << 0xc) |
-               (int)param_1._0_2_ << 0x10) & 0xfffffff);
+               ((int)slot3._0_2_ |
+               (int)(short)(slot2._2_2_ / 4 << 5 |
+                           slot2._0_2_ / 0x80 << 8 | slot1._2_2_ / 0x80 << 0xc) |
+               (int)slot1._0_2_ << 0x10) & 0xfffffff);
   return unaff_A5 + -0x68;
 }
 
@@ -880,18 +880,18 @@ int pack_fields_to_code_buf68 /* Original: FUN_00000a90 */ (undefined4 param_1,u
  * *p4 = bits 8..11 << 7, *p5 = bits 5..7 << 2, *p6 = bits 0..4. Mirrors
  * pack_fields_to_code_buf68 (last field not rescaled by 0x200). No caller found yet.
  */
-void unpack_fields_from_code /* Original: FUN_00000b10 */ (int param_1,undefined2 *param_2,undefined2 *param_3,undefined2 *param_4,
-                 undefined2 *param_5,ushort *param_6)
+void unpack_fields_from_code /* Original: FUN_00000b10 */ (int code /* param_1: 6-letter code */,undefined2 *bits16_31 /* param_2: out, bits 16..31 */,undefined2 *bits12_15 /* param_3: out, bits 12..15 << 7 */,undefined2 *bits8_11 /* param_4: out, bits 8..11 << 7 */,
+                 undefined2 *bits5_7 /* param_5: out, bits 5..7 << 2 */,ushort *bits0_4 /* param_6: out, bits 0..4 */)
 
 {
-  int local_8;
+  int value; /* local_8, -8(A6): decoded 28-bit value */
   
-  decode_base26_6chars( /* Original: FUN_000007a8 */ param_1,&local_8);
-  *param_2 = (short)((uint)local_8 >> 0x10);
-  *param_3 = (short)((local_8 >> 0xc & 0xfU) << 7);
-  *param_4 = (short)((local_8 >> 8 & 0xfU) << 7);
-  *param_5 = (short)((local_8 >> 5 & 7U) << 2);
-  *param_6 = (ushort)local_8 & 0x1f;
+  decode_base26_6chars( /* Original: FUN_000007a8 */ code,&value);
+  *bits16_31 = (short)((uint)value >> 0x10);
+  *bits12_15 = (short)((value >> 0xc & 0xfU) << 7);
+  *bits8_11 = (short)((value >> 8 & 0xfU) << 7);
+  *bits5_7 = (short)((value >> 5 & 7U) << 2);
+  *bits0_4 = (ushort)value & 0x1f;
   return;
 }
 
@@ -908,12 +908,12 @@ void unpack_fields_from_code /* Original: FUN_00000b10 */ (int param_1,undefined
  * $552. At ID08 0x276 the returned string is passed as `rec` to
  * record_code_index_equals(n, str): letters 5 and 6 (offsets 4, 5) are tested.
  */
-int encode_code28_to_buf54 /* Original: FUN_00000b84 */ (uint param_1)
+int encode_code28_to_buf54 /* Original: FUN_00000b84 */ (uint value /* param_1: masked to 28 bits */)
 
 {
   int unaff_A5;
   
-  encode_base26_6chars( /* Original: FUN_00000754 */ (char *)(unaff_A5 + -0x54),param_1 & 0xfffffff);
+  encode_base26_6chars( /* Original: FUN_00000754 */ (char *)(unaff_A5 + -0x54),value & 0xfffffff);
   return unaff_A5 + -0x54;
 }
 
@@ -926,13 +926,13 @@ int encode_code28_to_buf54 /* Original: FUN_00000b84 */ (uint param_1)
  * Recovered name: decode_code_to_long_a [STRONG INFERENCE].
  * Returns decode_base26_6chars(param_1). No caller found yet.
  */
-int decode_code_to_long_a /* Original: FUN_00000ba8 */ (int param_1)
+int decode_code_to_long_a /* Original: FUN_00000ba8 */ (int code /* param_1: 6-letter code */)
 
 {
-  int local_8;
+  int value; /* local_8, -8(A6): decoded value */
   
-  decode_base26_6chars( /* Original: FUN_000007a8 */ param_1,&local_8);
-  return local_8;
+  decode_base26_6chars( /* Original: FUN_000007a8 */ code,&value);
+  return value;
 }
 
 
@@ -945,12 +945,12 @@ int decode_code_to_long_a /* Original: FUN_00000ba8 */ (int param_1)
  * encode_base26_6chars(A5-0x40, param_1) without masking; returns A5-0x40.
  * Caller [PROVEN, bytes]: ID05 file 0x4ce.
  */
-int encode_long_to_buf40 /* Original: FUN_00000bc2 */ (int param_1)
+int encode_long_to_buf40 /* Original: FUN_00000bc2 */ (int value /* param_1: value to encode */)
 
 {
   int unaff_A5;
   
-  encode_base26_6chars( /* Original: FUN_00000754 */ (char *)(unaff_A5 + -0x40),param_1);
+  encode_base26_6chars( /* Original: FUN_00000754 */ (char *)(unaff_A5 + -0x40),value);
   return unaff_A5 + -0x40;
 }
 
@@ -965,13 +965,13 @@ int encode_long_to_buf40 /* Original: FUN_00000bc2 */ (int param_1)
  * decode_code_to_long_a (separate function kept). Caller [PROVEN, bytes]: ID05
  * file 0x674 (result stored through the caller's param at 8(A6)).
  */
-int decode_code_to_long_b /* Original: FUN_00000bde */ (int param_1)
+int decode_code_to_long_b /* Original: FUN_00000bde */ (int code /* param_1: 6-letter code */)
 
 {
-  int local_8;
+  int value; /* local_8, -8(A6): decoded value */
   
-  decode_base26_6chars( /* Original: FUN_000007a8 */ param_1,&local_8);
-  return local_8;
+  decode_base26_6chars( /* Original: FUN_000007a8 */ code,&value);
+  return value;
 }
 
 

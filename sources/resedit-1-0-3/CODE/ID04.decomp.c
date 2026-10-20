@@ -19,14 +19,14 @@ int DAT_00000904;
  */
 // WARNING: Control flow encountered bad instruction data
 
-void disable_dialog_control /* Original: FUN_00000006 */ (int param_1,short param_2)
+void disable_dialog_control /* Original: FUN_00000006 */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   HiliteControl(handle,0xff);                   /* $A95D */
   return;
 }
@@ -42,14 +42,14 @@ void disable_dialog_control /* Original: FUN_00000006 */ (int param_1,short para
  */
 // WARNING: Control flow encountered bad instruction data
 
-void enable_dialog_control /* Original: FUN_0000002e */ (int param_1,short param_2)
+void enable_dialog_control /* Original: FUN_0000002e */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   HiliteControl(handle,0);                      /* $A95D */
   return;
 }
@@ -65,14 +65,14 @@ void enable_dialog_control /* Original: FUN_0000002e */ (int param_1,short param
  */
 // WARNING: Control flow encountered bad instruction data
 
-void hide_dialog_control /* Original: FUN_00000054 */ (int param_1,short param_2)
+void hide_dialog_control /* Original: FUN_00000054 */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   HideControl(handle);                          /* $A958 */
   return;
 }
@@ -88,14 +88,14 @@ void hide_dialog_control /* Original: FUN_00000054 */ (int param_1,short param_2
  */
 // WARNING: Control flow encountered bad instruction data
 
-void show_dialog_control /* Original: FUN_00000078 */ (int param_1,short param_2)
+void show_dialog_control /* Original: FUN_00000078 */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   ShowControl(handle);                          /* $A957 */
   return;
 }
@@ -111,15 +111,15 @@ void show_dialog_control /* Original: FUN_00000078 */ (int param_1,short param_2
  */
 // WARNING: Control flow encountered bad instruction data
 
-void set_dialog_item_text /* Original: FUN_0000009c */ (int param_1,short param_2,void *param_3)
+void set_dialog_item_text /* Original: FUN_0000009c */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */,void *text /* param_3: Pascal string */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
-  SetIText(handle,param_3);                     /* $A98F */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
+  SetIText(handle,text);                     /* $A98F */
   return;
 }
 
@@ -134,15 +134,15 @@ void set_dialog_item_text /* Original: FUN_0000009c */ (int param_1,short param_
  */
 // WARNING: Control flow encountered bad instruction data
 
-void set_dialog_control_title /* Original: FUN_000000c4 */ (int param_1,short param_2,void *param_3)
+void set_dialog_control_title /* Original: FUN_000000c4 */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */,void *title /* param_3: Pascal string */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
-  SetCTitle(handle,param_3);                    /* $A95F */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
+  SetCTitle(handle,title);                    /* $A95F */
   return;
 }
 
@@ -157,15 +157,15 @@ void set_dialog_control_title /* Original: FUN_000000c4 */ (int param_1,short pa
  */
 // WARNING: Control flow encountered bad instruction data
 
-void set_dialog_user_item_proc /* Original: FUN_000000ec */ (int param_1,short param_2,void *param_3)
+void set_dialog_user_item_proc /* Original: FUN_000000ec */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */,void *proc /* param_3: user-item procedure */)
 
 {
   short itemType;                               /* -2(A6) */
   int handle;                                   /* -6(A6) */
   short box[4];                                 /* -$e(A6): Rect */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
-  SetDItem(param_1,param_2,itemType,param_3,box); /* $A98E: same type and box, new proc */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
+  SetDItem(dlg,item,itemType,proc,box); /* $A98E: same type and box, new proc */
   return;
 }
 
@@ -181,7 +181,7 @@ void set_dialog_user_item_proc /* Original: FUN_000000ec */ (int param_1,short p
  */
 // WARNING: Control flow encountered bad instruction data
 
-void frame_dialog_item_box /* Original: FUN_00000120 */ (int param_1,short param_2)
+void frame_dialog_item_box /* Original: FUN_00000120 */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */)
 
 {
   int unaff_A5;
@@ -191,8 +191,8 @@ void frame_dialog_item_box /* Original: FUN_00000120 */ (int param_1,short param
   short box[4];                                 /* -$e(A6): Rect */
 
   saved = *(int *)(unaff_A5 + -0x160c);         /* thePort */
-  SetPort(param_1);                             /* $A873 */
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  SetPort(dlg);                             /* $A873 */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   InsetRect(box,-2,-2);                         /* $A8A9 */
   PenSize(1,1);                                 /* $A89B */
   FrameRect(box);                               /* $A8A1 */
@@ -265,7 +265,7 @@ void draw_grey_user_item /* Original: FUN_000001f2 */ (int dlg,short item)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void draw_percent_bar_item /* Original: FUN_00000220 */ (int param_1,short param_2)
+void draw_percent_bar_item /* Original: FUN_00000220 */ (int dlg /* param_1: DialogPtr */,short item /* param_2: item number */)
 
 {
   int unaff_A5;
@@ -276,7 +276,7 @@ void draw_percent_bar_item /* Original: FUN_00000220 */ (int param_1,short param
   short w;                                      /* -4(A6) */
   short itemType;                               /* -2(A6) */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   *(Rect *)frame = *(Rect *)box;
   w = box[3] - box[1];
   right = box[3];
@@ -319,7 +319,7 @@ void percent_bar_user_item_proc /* Original: FUN_000002c0 */ (int dlg,short item
  */
 // WARNING: Control flow encountered bad instruction data
 
-short get_radio_group_selection /* Original: FUN_00000362 */ (int param_1,short *param_2,short param_3)
+short get_radio_group_selection /* Original: FUN_00000362 */ (int dlg /* param_1: DialogPtr */,short *items /* param_2: radio button item numbers */,short count /* param_3 */)
 
 {
   short i;                                      /* -2(A6) */
@@ -327,10 +327,10 @@ short get_radio_group_selection /* Original: FUN_00000362 */ (int param_1,short 
   short box[4];                                 /* -$10(A6) */
   short itemType;                               /* -4(A6) */
 
-  for (i = 0; i < param_3; i = i + 1) {
-    GetDItem(param_1,param_2[i],&itemType,&handle,box); /* $A98D */
+  for (i = 0; i < count; i = i + 1) {
+    GetDItem(dlg,items[i],&itemType,&handle,box); /* $A98D */
     if (GetCtlValue(handle) != 0) {             /* $A960 */
-      return param_2[i];
+      return items[i];
     }
   }
   return -1;
@@ -393,10 +393,10 @@ void run_with_temporary_window /* Original: FUN_000003c2 */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-short show_scenery_open_error_alert /* Original: FUN_0000044e */ (void *param_1)
+short show_scenery_open_error_alert /* Original: FUN_0000044e */ (void *name /* param_1: Pascal string for ^0 */)
 
 {
-  ParamText(param_1,0,0,0);                     /* $A98B */
+  ParamText(name,0,0,0);                     /* $A98B */
   position_alert_template(0x100);               /* JT $47a -> ID02 0x442e */
   return StopAlert(0x100,0);                    /* $A986 */
 }
@@ -534,20 +534,20 @@ short confirm_erase_high_scores /* Original: FUN_00000560 */ (void)
  * [HYPOTHESIS] tallies 0..9 count destroyed targets of those categories;
  * the remaining two tallies are UNKNOWN.
  */
-int compute_pilot_score /* Original: FUN_00000588 */ (short param_1)
+int compute_pilot_score /* Original: FUN_00000588 */ (short pilot /* param_1: roster index (0x40-byte records) */)
 
 {
   int unaff_A5;
-  int local_a;                                  /* -6(A6) */
-  short local_6;                                /* -2(A6) */
+  int score; /* local_a, -6(A6) */                                  /* -6(A6) */
+  short k; /* local_6, -2(A6): tally 0..11 */                                /* -2(A6) */
   
-  local_a = 0;
-  for (local_6 = 0; local_6 < 0xc; local_6 = local_6 + 1) {
-    local_a = (int)*(short *)(local_6 * 2 + **(int **)(unaff_A5 + -0x13a8) + (int)param_1 * 0x40 +
-                             0x28) * (int)*(short *)(local_6 * 2 + unaff_A5 + -0xf5e) + local_a;
+  score = 0;
+  for (k = 0; k < 0xc; k = k + 1) {
+    score = (int)*(short *)(k * 2 + **(int **)(unaff_A5 + -0x13a8) + (int)pilot * 0x40 +
+                             0x28) * (int)*(short *)(k * 2 + unaff_A5 + -0xf5e) + score;
                                                 /* EXT.L index (signed), MULU.L of sign-extended words */
   }
-  return local_a;
+  return score;
 }
 
 
@@ -635,7 +635,7 @@ void draw_select_mission_title /* Original: FUN_000009ee */ (int dlg,short item)
  * Decoded from ID04.bin bytes at file 0xa8e.
  * C args: +8 DialogPtr, +0xc EventRecord *, +0x10 short *itemHit, +0x14 short slider item; returns 1 when the event is handled. Switch on event->what through JT $2a (sparse table at 0xa9c: keyDown 3 -> 0xaac, mouseDown 1 -> 0xae8, updateEvt 6 -> 0xbca, default -> 0xbd4) [PROVEN]: keyDown Return (13) / Enter (3) -> *itemHit = 1, return 1 (the case Ghidra decoded); mouseDown -> GetDItem(slider), SetPort, GlobalToLocal(where), PtInRect ($A8AD); if inside, while StillDown ($A973): GetMouse ($A972), value = 100 * (h - left) / (right - left) clamped to 0..100, and when it changes A5-0x225c = value and draw_percent_bar_item(dialog, slider); then *itemHit = slider, return 1; updateEvt -> JT $492 (ID02 0x4d6a), return 0. The slider is the fuel bar of DLOG 129 "Scenario Selection" and DLOG 132 "Refuel" (labels "Fuel:" "E" "F" in DITL 132), so A5-0x225c = fuel load percentage [STRONG INFERENCE]. Body rebuilt as C below (Ghidra had only the keyDown case).
  */
-short fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (int param_1,short *param_2,short *param_3,short param_4)
+short fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (int dlg /* param_1: DialogPtr */,short *evt /* param_2: EventRecord */,short *itemHit /* param_3 */,short bar_item /* param_4: the percent-bar user item */)
 
 {
   int unaff_A5;
@@ -646,18 +646,18 @@ short fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (int param_1,short 
   short itemType;                               /* -4(A6) */
   short value;                                  /* -2(A6) */
 
-  switch (param_2[0]) {                         /* JSR $2a(A5) -> ID01 0x96, table 0xa9c */
+  switch (evt[0]) {                         /* JSR $2a(A5) -> ID01 0x96, table 0xa9c */
   case 3:                                       /* keyDown */
-    if (((*(uint *)(param_2 + 1) & 0xff) == 0xd) || ((*(uint *)(param_2 + 1) & 0xff) == 3)) {
-      *param_3 = 1;
+    if (((*(uint *)(evt + 1) & 0xff) == 0xd) || ((*(uint *)(evt + 1) & 0xff) == 3)) {
+      *itemHit = 1;
       return 1;
     }
     break;
   case 1:                                       /* mouseDown */
-    GetDItem(param_1,param_4,&itemType,&handle,box); /* $A98D */
+    GetDItem(dlg,bar_item,&itemType,&handle,box); /* $A98D */
     saved = *(int *)(unaff_A5 + -0x160c);       /* thePort */
-    SetPort(param_1);                           /* $A873 */
-    *(int *)pt = *(int *)(param_2 + 5);         /* evt->where */
+    SetPort(dlg);                           /* $A873 */
+    *(int *)pt = *(int *)(evt + 5);         /* evt->where */
     GlobalToLocal(pt);                          /* $A871 */
     if (PtInRect(*(int *)pt,box) == '\0') {     /* $A8AD */
       SetPort(saved);
@@ -673,15 +673,15 @@ short fuel_slider_dialog_filter /* Original: FUN_00000a8e */ (int param_1,short 
       }
       if (value != *(short *)(unaff_A5 + -0x225c)) {
         *(short *)(unaff_A5 + -0x225c) = value;
-        draw_percent_bar_item(param_1,param_4); /* BSR 0x220 */
+        draw_percent_bar_item(dlg,bar_item); /* BSR 0x220 */
       }
       GetMouse(pt);                             /* $A972 */
     }
-    *param_3 = param_4;
+    *itemHit = bar_item;
     SetPort(saved);
     return 1;
   case 6:                                       /* updateEvt */
-    handle_update_event(param_2);               /* JT $492 -> ID02 0x4d6a */
+    handle_update_event(evt);               /* JT $492 -> ID02 0x4d6a */
     break;
   }
   return 0;
@@ -791,7 +791,7 @@ char refuel_dialog_filter_proc /* Original: FUN_00000e48 */ (int dlg,short *evt,
  * selector 10) < 0 keeps the order [PROVEN]. Body rebuilt as C below (Ghidra's
  * label-and-stack version replaced). Used to build the high-score list.
  */
-void rank_pilots_by_score /* Original: FUN_00000f4e */ (int *param_1,short *param_2)
+void rank_pilots_by_score /* Original: FUN_00000f4e */ (int *scores /* param_1: out, long score per rank */,short *order /* param_2: out, pilot index per rank */)
 
 {
   int unaff_A5;
@@ -802,26 +802,26 @@ void rank_pilots_by_score /* Original: FUN_00000f4e */ (int *param_1,short *para
   short j;                                      /* -4(A6) */
 
   for (i = 0; i < 0x14; i = i + 1) {
-    param_1[i] = compute_pilot_score(i);        /* BSR 0x588 */
-    param_2[i] = i;
+    scores[i] = compute_pilot_score(i);        /* BSR 0x588 */
+    order[i] = i;
   }
   for (i = 0; i < 0x13; i = i + 1) {
     for (j = i + 1; j < 0x14; j = j + 1) {
-      pi = (char *)(**(int **)(unaff_A5 + -0x13a8) + (int)param_2[i] * 0x40);
-      pj = (char *)(**(int **)(unaff_A5 + -0x13a8) + (int)param_2[j] * 0x40);
-      if (param_1[j] <= param_1[i]) {
-        if (param_1[j] != param_1[i]) continue;
+      pi = (char *)(**(int **)(unaff_A5 + -0x13a8) + (int)order[i] * 0x40);
+      pj = (char *)(**(int **)(unaff_A5 + -0x13a8) + (int)order[j] * 0x40);
+      if (scores[j] <= scores[i]) {
+        if (scores[j] != scores[i]) continue;
         if (*pi != '\0') {                       /* tie: an empty first name always yields */
           if ((*pi == '\0') || (*pj == '\0')) continue;
           if (IUCompString(pi,pj) < 0) continue; /* JT $2ea -> ID09 0x3d6 (Pack6 selector 10) */
         }
       }
-      tmp = param_1[j];                         /* exchange */
-      param_1[j] = param_1[i];
-      param_1[i] = tmp;
-      tmp = (int)param_2[j];                    /* MOVEA.W to the long -8 ... */
-      param_2[j] = param_2[i];
-      param_2[i] = (short)tmp;                  /* ... read back as its low word -6 */
+      tmp = scores[j];                         /* exchange */
+      scores[j] = scores[i];
+      scores[i] = tmp;
+      tmp = (int)order[j];                    /* MOVEA.W to the long -8 ... */
+      order[j] = order[i];
+      order[i] = (short)tmp;                  /* ... read back as its low word -6 */
     }
   }
   return;
@@ -839,22 +839,22 @@ void rank_pilots_by_score /* Original: FUN_00000f4e */ (int *param_1,short *para
  * clears words +0x22 (rank), +0x20, +0x24, +0x26 and the 12 tallies at +0x28, then the
  * name's length byte at +0x00 (corrected: the name is emptied).
  */
-void reset_pilot_record /* Original: FUN_00001106 */ (short param_1)
+void reset_pilot_record /* Original: FUN_00001106 */ (short pilot /* param_1: roster index */)
 
 {
-  undefined1 *puVar1;                           /* -6(A6) */
+  undefined1 *rec; /* puVar1, -6(A6): the pilot's 0x40-byte roster record */                           /* -6(A6) */
   int unaff_A5;
-  short local_6;                                /* -2(A6) */
+  short k; /* local_6, -2(A6): tally 0..11 */                                /* -2(A6) */
   
-  puVar1 = (undefined1 *)(**(int **)(unaff_A5 + -0x13a8) + (int)param_1 * 0x40); /* EXT.L, ASL.L #6 */
-  *(undefined2 *)(puVar1 + 0x22) = 0;
-  *(undefined2 *)(puVar1 + 0x20) = 0;
-  *(undefined2 *)(puVar1 + 0x24) = 0;
-  *(undefined2 *)(puVar1 + 0x26) = 0;
-  for (local_6 = 0; local_6 < 0xc; local_6 = local_6 + 1) {
-    *(undefined2 *)(puVar1 + local_6 * 2 + 0x28) = 0;
+  rec = (undefined1 *)(**(int **)(unaff_A5 + -0x13a8) + (int)pilot * 0x40); /* EXT.L, ASL.L #6 */
+  *(undefined2 *)(rec + 0x22) = 0;
+  *(undefined2 *)(rec + 0x20) = 0;
+  *(undefined2 *)(rec + 0x24) = 0;
+  *(undefined2 *)(rec + 0x26) = 0;
+  for (k = 0; k < 0xc; k = k + 1) {
+    *(undefined2 *)(rec + k * 2 + 0x28) = 0;
   }
-  *puVar1 = 0;                                  /* empties the Pascal name (length byte) */
+  *rec = 0;                                  /* empties the Pascal name (length byte) */
   return;
 }
 
@@ -870,7 +870,7 @@ void reset_pilot_record /* Original: FUN_00001106 */ (short param_1)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void prune_inactive_pilots_beyond_ten /* Original: FUN_0000116a */ (short *param_1)
+void prune_inactive_pilots_beyond_ten /* Original: FUN_0000116a */ (short *order /* param_1: pilot indices sorted by rank_pilots_by_score */)
 
 {
   int unaff_A5;
@@ -883,11 +883,11 @@ void prune_inactive_pilots_beyond_ten /* Original: FUN_0000116a */ (short *param
   count = 0;
   changed = 0;
   for (i = 0; i < 0x14; i = i + 1) {
-    rec = **(int **)(unaff_A5 + -0x13a8) + (int)param_1[i] * 0x40;
+    rec = **(int **)(unaff_A5 + -0x13a8) + (int)order[i] * 0x40;
     if (*(short *)(rec + 0x20) != 0) {          /* not Active */
       count = count + 1;
       if (9 < (short)(count - 1)) {             /* old count >= 10: the 11th and later */
-        reset_pilot_record(param_1[i]);         /* BSR 0x1106 */
+        reset_pilot_record(order[i]);         /* BSR 0x1106 */
         changed = 1;
       }
     }
@@ -972,7 +972,7 @@ void draw_high_scores_table /* Original: FUN_00001200 */ (int dlg,short item)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void draw_scrolling_text_item /* Original: FUN_000014a0 */ (int param_1,short param_2)
+void draw_scrolling_text_item /* Original: FUN_000014a0 */ (int dlg /* param_1: DialogPtr */,short item /* param_2 */)
 
 {
   int unaff_A5;
@@ -980,7 +980,7 @@ void draw_scrolling_text_item /* Original: FUN_000014a0 */ (int param_1,short pa
   int handle;                                   /* -$a(A6) */
   short itemType;                               /* -2(A6) */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   EraseRect((void *)(**(int **)(unaff_A5 + -0x223a) + 8)); /* $A8A3: (*hTE)->viewRect */
   TEUpdate(box,*(int *)(unaff_A5 + -0x223a));   /* $A9D3 */
   InsetRect(box,-2,-2);                         /* $A8A9 */
@@ -1103,24 +1103,24 @@ void scroll_text_to_show_selection /* Original: FUN_0000158c */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void fit_text_view_to_box /* Original: FUN_00001638 */ (undefined4 *param_1)
+void fit_text_view_to_box /* Original: FUN_00001638 */ (undefined4 *box /* param_1: Rect (two longs) for the TextEdit view */)
 
 {
-  int iVar1;
-  int *piVar2;
+  int te_rec; /* iVar1: *te (first use) */
+  int *te; /* piVar2: TEHandle A5-0x223a */
   int unaff_A5;
   
-  piVar2 = *(int **)(unaff_A5 + -0x223a);
-  iVar1 = *piVar2;
-  *(undefined4 *)(iVar1 + 8) = *param_1;
-  *(undefined4 *)(iVar1 + 0xc) = param_1[1];
-  *(short *)(*piVar2 + 0xe) = *(short *)(*piVar2 + 0xe) + -0x10;
+  te = *(int **)(unaff_A5 + -0x223a);
+  te_rec = *te;
+  *(undefined4 *)(te_rec + 8) = *box;
+  *(undefined4 *)(te_rec + 0xc) = box[1];
+  *(short *)(*te + 0xe) = *(short *)(*te + 0xe) + -0x10;
   *(short *)(unaff_A5 + -0x2232) =
-       (short)(*(short *)(*piVar2 + 0xc) - *(short *)(*piVar2 + 8)) / *(short *)(*piVar2 + 0x18);
-  *(short *)(*piVar2 + 0xc) =
-       *(short *)(*piVar2 + 8) + *(short *)(*piVar2 + 0x18) * *(short *)(unaff_A5 + -0x2232);
-  *(undefined2 *)(*piVar2 + 6) = *(undefined2 *)(*piVar2 + 0xe);
-  TECalText((int)piVar2);                        /* $A9D0 */
+       (short)(*(short *)(*te + 0xc) - *(short *)(*te + 8)) / *(short *)(*te + 0x18);
+  *(short *)(*te + 0xc) =
+       *(short *)(*te + 8) + *(short *)(*te + 0x18) * *(short *)(unaff_A5 + -0x2232);
+  *(undefined2 *)(*te + 6) = *(undefined2 *)(*te + 0xe);
+  TECalText((int)te);                        /* $A9D0 */
   return;
 }
 
@@ -1183,7 +1183,7 @@ void scroll_bar_action_proc /* Original: FUN_000016c4 */ (int ctl,short part)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void create_scrolling_text_item /* Original: FUN_000017e6 */ (int param_1,short param_2)
+void create_scrolling_text_item /* Original: FUN_000017e6 */ (int dlg /* param_1: DialogPtr */,short item /* param_2 */)
 
 {
   int unaff_A5;
@@ -1193,18 +1193,18 @@ void create_scrolling_text_item /* Original: FUN_000017e6 */ (int param_1,short 
   int handle;                                   /* -$a(A6) */
   short itemType;                               /* -2(A6) */
 
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   *(Rect *)bar = *(Rect *)box;
   bar[1] = box[3] + -0x10;                      /* 16-pixel bar on the right edge */
   InsetRect(bar,0,-2);                          /* $A8A9 */
   OffsetRect(bar,2,0);                          /* $A8A8 */
   GetPort(&saved);                              /* $A874 */
-  SetPort(param_1);                             /* $A873 */
+  SetPort(dlg);                             /* $A873 */
   *(int *)(unaff_A5 + -0x223a) = TENew(box,box); /* $A9D2: destRect, viewRect */
   *(int *)(unaff_A5 + -0x2236) =
-       NewControl(param_1,bar,(void *)(unaff_A5 + -0x213c),1,0,0,0,0x10,0); /* $A954, scrollBarProc */
+       NewControl(dlg,bar,(void *)(unaff_A5 + -0x213c),1,0,0,0,0x10,0); /* $A954, scrollBarProc */
   fit_text_view_to_box((undefined4 *)box);      /* BSR 0x1638 */
-  set_dialog_user_item_proc(param_1,param_2,(void *)(unaff_A5 + 0x92)); /* BSR 0xec; JT $92 -> 0x14f2 */
+  set_dialog_user_item_proc(dlg,item,(void *)(unaff_A5 + 0x92)); /* BSR 0xec; JT $92 -> 0x14f2 */
   SetPort(saved);
   return;
 }
@@ -1242,12 +1242,12 @@ void dispose_scrolling_text_item /* Original: FUN_0000189c */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void append_line_to_scrolling_text /* Original: FUN_000018b0 */ (int unused_8,short unused_c,char *param_3)
+void append_line_to_scrolling_text /* Original: FUN_000018b0 */ (int unused_8,short unused_c,char *line /* param_3: C string */)
 
 {
   int unaff_A5;
 
-  TEInsert(param_3,FUN_000003e8(param_3),*(int *)(unaff_A5 + -0x223a)); /* JT $522 -> ID02 0x3e8 strlen; $A9DE */
+  TEInsert(line,FUN_000003e8(line),*(int *)(unaff_A5 + -0x223a)); /* JT $522 -> ID02 0x3e8 strlen; $A9DE */
   TEInsert((void *)(unaff_A5 + -0x213a),1,*(int *)(unaff_A5 + -0x223a)); /* one separator byte */
   scroll_text_to_show_selection();              /* BSR 0x158c */
   return;
@@ -1265,25 +1265,25 @@ void append_line_to_scrolling_text /* Original: FUN_000018b0 */ (int unused_8,sh
 undefined4 get_mission_kill_report_state /* Original: FUN_000018e0 */ (void)
 
 {
-  undefined4 uVar1;
+  undefined4 state; /* uVar1: 0, 1 or 2 */
   int unaff_A5;
-  short local_6;
+  short k; /* local_6: kill counter 0..9 */
   
   if (*(short *)(unaff_A5 + -0x12f8) == 2) {
-    uVar1 = 0;
+    state = 0;
   }
   else if ((*(short *)(unaff_A5 + -0x14c0) == 0) && (0 < *(short *)(unaff_A5 + -0x12ba))) {
-    uVar1 = 2;
+    state = 2;
   }
   else {
-    for (local_6 = 0; local_6 < 10; local_6 = local_6 + 1) {
-      if (*(short *)(local_6 * 2 + unaff_A5 + -0x12ce) != 0) {
+    for (k = 0; k < 10; k = k + 1) {
+      if (*(short *)(k * 2 + unaff_A5 + -0x12ce) != 0) {
         return 1;
       }
     }
-    uVar1 = 0;
+    state = 0;
   }
-  return uVar1;
+  return state;
 }
 
 
@@ -1299,7 +1299,7 @@ undefined4 get_mission_kill_report_state /* Original: FUN_000018e0 */ (void)
  */
 // WARNING: Control flow encountered bad instruction data
 
-void update_summary_dialog_buttons /* Original: FUN_0000192e */ (int param_1,short param_2)
+void update_summary_dialog_buttons /* Original: FUN_0000192e */ (int dlg /* param_1: DialogPtr */,short mode /* param_2: summary mode (3 = the dossier view) */)
 
 {
   int unaff_A5;
@@ -1311,20 +1311,20 @@ void update_summary_dialog_buttons /* Original: FUN_0000192e */ (int param_1,sho
   *(undefined4 *)(unaff_A5 + -0x2230) = 0;
   if (((*(short *)(unaff_A5 + -0x14c4) == 0) || (*(short *)(unaff_A5 + -0x12f0) != 0)) ||
      (*(short *)(unaff_A5 + -0x2228) != -1)) {
-    enable_dialog_control(param_1,3);           /* BSR 0x2e */
+    enable_dialog_control(dlg,3);           /* BSR 0x2e */
   }
   if (*(short *)(unaff_A5 + -0x12f0) == 0) {
-    enable_dialog_control(param_1,1);
+    enable_dialog_control(dlg,1);
   }
-  if (((param_2 != 3) && (*(short *)(unaff_A5 + -0x14c4) != 0)) &&
+  if (((mode != 3) && (*(short *)(unaff_A5 + -0x14c4) != 0)) &&
      ((*(short *)(unaff_A5 + -0x2228) == -1 && (*(short *)(unaff_A5 + -0x225e) != 1)))) {
     saved = *(int *)(unaff_A5 + -0x160c);       /* thePort */
-    SetPort(param_1);                           /* $A873 */
-    GetDItem(param_1,*(short *)(unaff_A5 + -0x225e),&itemType,&handle,box); /* old default item */
+    SetPort(dlg);                           /* $A873 */
+    GetDItem(dlg,*(short *)(unaff_A5 + -0x225e),&itemType,&handle,box); /* old default item */
     InsetRect(box,-4,-4);                       /* $A8A9 */
     EraseRect(box);                             /* $A8A3 */
     InvalRect(box);                             /* $A928 */
-    GetDItem(param_1,1,&itemType,&handle,box);  /* new default item 1 */
+    GetDItem(dlg,1,&itemType,&handle,box);  /* new default item 1 */
     InsetRect(box,-4,-4);
     EraseRect(box);
     InvalRect(box);
@@ -1423,7 +1423,7 @@ void build_rank_and_name_string /* Original: FUN_00001a0e */ (int dlg,short item
  */
 // WARNING: Control flow encountered bad instruction data
 
-void draw_targets_destroyed_row /* Original: FUN_00001bc8 */ (int param_1,short param_2,short param_3)
+void draw_targets_destroyed_row /* Original: FUN_00001bc8 */ (int dlg /* param_1: DialogPtr */,short item /* param_2 */,short target /* param_3: target type 0..9 */)
 
 {
   int unaff_A5;
@@ -1440,16 +1440,16 @@ void draw_targets_destroyed_row /* Original: FUN_00001bc8 */ (int param_1,short 
 
   savedFont = *(short *)(*(int *)(unaff_A5 + -0x160c) + 0x44); /* thePort->txFont */
   savedPort = *(int *)(unaff_A5 + -0x160c);
-  if (((param_3 == 2) || (param_3 == 4)) || (param_3 == 8)) {
+  if (((target == 2) || (target == 4)) || (target == 8)) {
     return;                                     /* Tank, Vehicle, PT Boat are not listed */
   }
-  row = param_3;
-  if (2 < param_3) row = row + -1;
-  if (4 < param_3) row = row + -1;
-  if (8 < param_3) row = row + -1;
-  SetPort(param_1);                             /* $A873 */
+  row = target;
+  if (2 < target) row = row + -1;
+  if (4 < target) row = row + -1;
+  if (8 < target) row = row + -1;
+  SetPort(dlg);                             /* $A873 */
   ClipRect((void *)(*(int *)(unaff_A5 + -0x160c) + 0x10)); /* $A87B, portRect */
-  GetDItem(param_1,param_2,&itemType,&handle,box); /* $A98D */
+  GetDItem(dlg,item,&itemType,&handle,box); /* $A98D */
   InsetRect(box,4,0);                           /* $A8A9 */
   GetFontInfo(fi);                              /* $A88B */
   y = row * 0x17 + fi[0] + box[0] + 3;          /* MULS.W #$17: baseline */
@@ -1457,19 +1457,19 @@ void draw_targets_destroyed_row /* Original: FUN_00001bc8 */ (int param_1,short 
   box[2] = box[0] + 0x10;
   EraseRect(box);                               /* $A8A3 */
   MoveTo(box[1],y);                             /* $A893 */
-  if (*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)param_3 * 2) == 0) {
-    ansi_strcpy(buf,*(char **)(unaff_A5 + -0xf86 + (int)param_3 * 4)); /* JT $52a: target name */
+  if (*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)target * 2) == 0) {
+    ansi_strcpy(buf,*(char **)(unaff_A5 + -0xf86 + (int)target * 4)); /* JT $52a: target name */
   }
   else {
-    ansi_strcpy(buf,*(char **)(unaff_A5 + -0xf86 + (int)param_3 * 4));
+    ansi_strcpy(buf,*(char **)(unaff_A5 + -0xf86 + (int)target * 4));
     ansi_strcat(buf,(char *)(unaff_A5 + -0x2136)); /* JT $512: separator */
     ansi_strcat(buf,length_prefixed_bytes_to_c_string_in_place(
-                    format_int_decimal_pstring((int)*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)param_3 * 2),tmp))); /* JT $4a2, JT $2fa */
+                    format_int_decimal_pstring((int)*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)target * 2),tmp))); /* JT $4a2, JT $2fa */
   }
   c2pstr_in_place(buf);                         /* JT $302 */
   TextFont(1);                                  /* $A887 */
   DrawString(buf);                              /* $A884 */
-  format_int_decimal_pstring((int)*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)param_3 * 2) * (int)*(short *)(unaff_A5 + -0xf5e + (int)param_3 * 2),buf);
+  format_int_decimal_pstring((int)*(short *)(*(int *)(unaff_A5 + -0x2226) + (int)target * 2) * (int)*(short *)(unaff_A5 + -0xf5e + (int)target * 2),buf);
                                                 /* points = n * weight (MULU.L of sign-extended words) */
   MoveTo(box[3] - StringWidth(buf),y);          /* right-aligned; $A88C */
   DrawString(buf);

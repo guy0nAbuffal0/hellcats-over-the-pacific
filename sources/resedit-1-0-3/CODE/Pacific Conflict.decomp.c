@@ -11,6 +11,400 @@ typedef unsigned int    undefined4;
 typedef unsigned short    ushort;
 
 
+/* Readable global names (readability pass; the Ghidra name stays the real symbol). Applied
+ * function by function in address order; see the table in docs/DECOMPILATION_SYMBOLS.md. */
+#define host_world DAT_0001b5a0 /* pointer to the host A5 world at A5-0x1388 (mission fuel/bombs/kills at +0xb6..+0xd2) */
+#define object_pool DAT_0001b5a4 /* world object pointer array scanned by probe_nearest_facility_kind (entity array 2) */
+#define object_count DAT_0001b734 /* low word = number of entries in object_pool */
+#define player_object DAT_0001b738 /* the player's aircraft object (controller fields +0x634..+0x684) */
+#define loadout_synced _DAT_0001b73c /* 1 once fuel/bombs are loaded or written back on landing, 0 after takeoff [STRONG INFERENCE] */
+#define clip_y_max DAT_0001b73e /* polygon clip rectangle y-max (with DAT_00020aee / aec / aea), read by clip_polygon_y_max */
+#define clip_y_max_alt DAT_0001b740 /* replacement y-max swapped into clip_y_max by collect_map_features for its last clip */
+#define session_entry_handle DAT_0001b744 /* handle sized entries * 0x1c by allocate_session_buffers when host byte +0 is set [role UNKNOWN] */
+#define session_handles_a DAT_0001b74c /* handle slots 1..3 sized rows * (host +0xc) * 4 by allocate_session_buffers [role UNKNOWN] */
+#define session_handles_b DAT_0001b75c /* second handle group, same size, indexed + 2 * slot in the C [role UNKNOWN] */
+#define session_buffers_rebuilt _DAT_00020c4c /* 1 when allocate_session_buffers had to (re)allocate a block, so contents must be rebuilt */
+#define session_entry_ptr DAT_0001b76c /* locked data pointer of session_entry_handle (24-bit masked when host word +0x76) */
+#define session_ptrs_a DAT_0001b774 /* locked data pointers of session_handles_a, slots 1..3 at + 4i */
+#define session_ptr_a_slot1 DAT_0001b778 /* session_ptrs_a slot 1 */
+#define session_ptrs_b DAT_0001b784 /* locked data pointers of session_handles_b, slots 1..3 at + 4i */
+#define session_ptr_b_slot1 DAT_0001b788 /* session_ptrs_b slot 1 */
+#define session_cur_b DAT_0001b794 /* copy of session_ptr_b_slot1 made by lock_session_buffers, 0 when unlocked */
+#define session_cur_a DAT_0001b798 /* copy of session_ptr_a_slot1 made by lock_session_buffers, 0 when unlocked */
+#define widened_format_buf DAT_00020b4c /* static buffer filled and returned by widen_printf_format (%d -> %ld, %x -> %lx) */
+#define palette_owner_slots DAT_0001da6c /* base for slot indexing: palette_owner_slots + 4 * slot (1..3) = palette_owner_tables[slot - 1] */
+#define palette_owner_tables DAT_0001da70 /* three 256-long palette-slot owner tables (0x1da70 / 74 / 78), slot 1 always, 2 / 3 with host +0xb4 */
+#define palette_owner_current DAT_0001da7c /* owner table in use, reset to palette_owner_tables[0] */
+#define colour_tally_index DAT_0001da8a /* cleared by the depth set-ups; indexes the byte counters at DAT_0001d864 [HYPOTHESIS role] */
+#define fill_colour DAT_0001daa0 /* host colour table word +0x1a0 (depth 8) / +0x10 (depth 4); a row colour in reset_background_rows [STRONG INFERENCE] */
+#define palette_direct_mode _DAT_0001d85a /* nonzero: faces get v = r + g + b / 3 directly and no palette entry is queued [role name STRONG INFERENCE] */
+#define slot_to_index_map DAT_0001d85c /* word map palette slot -> pixel index (copy of the host table at +0x34) */
+#define view_depth DAT_0001b826 /* current pixel depth used by assign_face_colour: 1 (dither patterns), 4 (5x5x5 cube) or 8 (palette slots) */
+#define palette_search_cursor DAT_0001bd80 /* round-robin palette slot cursor 0..199 in assign_face_colour */
+#define slot_usage_prev DAT_0001d860 /* per-frame palette-slot usage map (pair swapped by overlay_frame_step) */
+#define slot_usage_cur DAT_0001d864 /* per-frame palette-slot usage map, the other half of the pair [which is current: STRONG INFERENCE] */
+#define palette_changed _DAT_0001daa2 /* set to 1 when a face claims a new palette slot (also set by build_object_poly_buffers) */
+#define template_ptr_table_base DAT_0001b524 /* ID-keyed definition record pointer table: entry key at + 4 * key (docs/DECOMPILATION_SYMBOLS.md) */
+#define template_rec_a_field_u16 DAT_0001a7d2 /* name from its declaration comment: field +0xc of a 0x4A template record */
+#define template_rec_b_field_u16 DAT_0001a81c /* name from its declaration comment: same field of the next 0x4A record */
+#define template_keyed_1c_src DAT_0001aa5e /* source of the five keyed 0x1C template records (keys 0x15..0x19) */
+#define def_key05 DAT_0001b538 /* template_ptr_table_base slot +0x14 (key 5): clone of template_key05 */
+#define template_key05 DAT_0001a8b8 /* static template record copied into def_key05 */
+#define def_key06 PTR_DAT_0001b53c /* template_ptr_table_base slot +0x18 (key 6): clone of template_key06 */
+#define template_key06 DAT_0001a8d2 /* static template record copied into def_key06 */
+#define def_key07 PTR_DAT_0001b540 /* template_ptr_table_base slot +0x1c (key 7): clone of template_key07 */
+#define template_key07 DAT_0001a8ec /* static template record copied into def_key07 */
+#define def_key10 DAT_0001b54c /* template_ptr_table_base slot +0x28 (key 10): clone of template_key10 */
+#define template_key10 DAT_0001a906 /* static template record copied into def_key10 */
+#define def_key11 DAT_0001b550 /* template_ptr_table_base slot +0x2c (key 11): clone of template_key11 */
+#define template_key11 DAT_0001a920 /* static template record copied into def_key11 */
+#define def_key08 DAT_0001b544 /* template_ptr_table_base slot +0x20 (key 8): clone of template_key08 */
+#define template_key08 DAT_0001a93a /* static template record copied into def_key08 */
+#define def_key09 DAT_0001b548 /* template_ptr_table_base slot +0x24 (key 9): clone of template_key09 */
+#define template_key09 DAT_0001a954 /* static template record copied into def_key09 */
+#define def_key17 DAT_0001b568 /* template_ptr_table_base slot +0x44 (key 17): clone of template_key17 */
+#define template_key17 DAT_0001a96e /* static template record copied into def_key17 */
+#define def_key12 DAT_0001b554 /* template_ptr_table_base slot +0x30 (key 12): clone of template_key12 */
+#define template_key12 DAT_0001a988 /* static template record copied into def_key12 */
+#define def_key13 DAT_0001b558 /* template_ptr_table_base slot +0x34 (key 13): clone of template_key13 */
+#define template_key13 DAT_0001a9a8 /* static template record copied into def_key13 */
+#define def_key14 DAT_0001b55c /* template_ptr_table_base slot +0x38 (key 14): clone of template_key14 */
+#define template_key14 DAT_0001a9c2 /* static template record copied into def_key14 */
+#define def_key15 DAT_0001b560 /* template_ptr_table_base slot +0x3c (key 15): clone of template_key15 */
+#define template_key15 DAT_0001a9dc /* static template record copied into def_key15 */
+#define def_key16 DAT_0001b564 /* template_ptr_table_base slot +0x40 (key 16): clone of template_key16 */
+#define template_key16 DAT_0001a9f6 /* static template record copied into def_key16 */
+#define def_key18 DAT_0001b56c /* template_ptr_table_base slot +0x48 (key 18): clone of template_key18 */
+#define template_key18 DAT_0001aa10 /* static template record copied into def_key18 */
+#define def_key19 DAT_0001b570 /* template_ptr_table_base slot +0x4c (key 19): clone of template_key19 */
+#define template_key19 DAT_0001aa2a /* static template record copied into def_key19 */
+#define def_key20 DAT_0001b574 /* template_ptr_table_base slot +0x50 (key 20): clone of template_key20 */
+#define template_key20 DAT_0001aa44 /* static template record copied into def_key20 */
+#define def_key26 DAT_0001b58c /* template_ptr_table_base slot +0x68 (key 26): clone of template_key26 */
+#define template_key26 DAT_0001aaea /* static template record copied into def_key26 */
+#define def_key27 DAT_0001b590 /* template_ptr_table_base slot +0x6c (key 27): clone of template_key27 */
+#define template_key27 DAT_0001ab04 /* static template record copied into def_key27 */
+#define def_key28 DAT_0001b594 /* template_ptr_table_base slot +0x70 (key 28): clone of template_key28 */
+#define template_key28 DAT_0001ab1e /* static template record copied into def_key28 */
+#define def_key29 DAT_0001b598 /* template_ptr_table_base slot +0x74 (key 29): clone of template_key29 */
+#define template_key29 DAT_0001ab38 /* static template record copied into def_key29 */
+#define def_key30 DAT_0001b59c /* template_ptr_table_base slot +0x78 (key 30): clone of template_key30 */
+#define template_key30 DAT_0001ab52 /* static template record copied into def_key30 */
+#define scene_root DAT_0001d6fc /* root object instantiated from host +0x8c by init_mission_object_tables; child table at +0x30, 0x18-byte records */
+#define mission_child0 DAT_0001bdb4 /* child[0] object published by init_mission_object_tables [role UNKNOWN] */
+#define mission_child1 DAT_0001bdb0 /* child[1] object published by init_mission_object_tables [role UNKNOWN] */
+#define mission_child2or3 DAT_0001bdac /* child[3] in mission 2, else child[2] [role UNKNOWN] */
+#define default_surface_face DAT_0001bda8 /* mission_child2or3 +0x48; surface_type_at_point falls back to its +0x16 code [STRONG INFERENCE] */
+#define mission_child4 DAT_0001bda4 /* child[4] object published by init_mission_object_tables [role UNKNOWN] */
+#define child_window_lo DAT_0001b88e /* root word +0x2c - 1: first index of the published child window */
+#define child_window_hi DAT_0001b88c /* child_window_lo + 2 */
+#define child_window_prev DAT_0001bc28 /* child object at index root +0x2c - 1 */
+#define child_window_cur DAT_0001bc34 /* child object at index root +0x2c */
+#define child_window_next DAT_0001bc38 /* child object at index root +0x2c + 1 */
+#define slot_usage_buf_a DAT_0001d86c /* first per-frame palette usage buffer, assigned to slot_usage_prev by overlay_initialise */
+#define slot_usage_buf_b DAT_0001d96c /* second per-frame palette usage buffer, assigned to slot_usage_cur by overlay_initialise */
+#define light_x DAT_0001bd8c /* light direction x component, 0xd983 at start (shade_object_faces) */
+#define light_y DAT_0001bd8a /* light direction y component, 0x69d8 at start */
+#define light_z DAT_0001bd88 /* light direction z component, 0xc330 at start */
+#define init_flag_bd84 _DAT_0001bd84 /* set to 1 by overlay_initialise, no reader in the exported C [role UNKNOWN] */
+#define frame_counter DAT_0001b838 /* current frame number, incremented by advance_frame_and_tick_controllers; 0x4c at start */
+#define heap_break DAT_00020c50 /* heap_sbrk break: byte offset into the arena at host +0x348 */
+#define heap_roving_cursor DAT_00020c60 /* large-block free-list cursor (docs/DECOMPILATION_SYMBOLS.md) */
+#define heap_class_lists DAT_00020c64 /* size-class free-list heads, class c at + 4 * c (heap_free_coalesce) */
+#define heap_ring_sentinel DAT_00020c58 /* size-0 sentinel block of the large-block ring, linked to itself on first heap_alloc */
+#define heap_ring_sentinel_next DAT_00020c5c /* the sentinel's next link (+4) */
+#define sin_table DAT_0001ab6c /* 256 words, round(4096 * sin(i * pi / 128)) (sin_fixed14) */
+#define cos_table DAT_0001ad6c /* 256 words, round(4096 * cos(i * pi / 128)) (cos_fixed14) */
+#define tan_table DAT_0001af6c /* 128 longs, 4096 * tan((i - 0x3f) * pi / 128) (atan_fixed14); entry 127 breaks the order */
+#define angle1_cos DAT_0001d7fa /* cos_fixed14 of argument 1 of load_attitude_angle_sincos (4.12 word) */
+#define angle1_sin DAT_0001d7fc /* sin_fixed14 of argument 1 of load_attitude_angle_sincos (4.12 word) */
+#define angle2_cos DAT_0001d7f6 /* cos_fixed14 of argument 2 of load_attitude_angle_sincos (4.12 word) */
+#define angle2_sin DAT_0001d7f8 /* sin_fixed14 of argument 2 of load_attitude_angle_sincos (4.12 word) */
+#define angle3_cos DAT_0001d7f2 /* cos_fixed14 of argument 3 of load_attitude_angle_sincos (4.12 word) */
+#define angle3_sin DAT_0001d7f4 /* sin_fixed14 of argument 3 of load_attitude_angle_sincos (4.12 word) */
+#define angle4_cos DAT_0001d7ee /* cos_fixed14 of argument 4 of load_attitude_angle_sincos (4.12 word) */
+#define angle4_sin DAT_0001d7f0 /* sin_fixed14 of argument 4 of load_attitude_angle_sincos (4.12 word) */
+#define angle5_cos DAT_0001d7ea /* cos_fixed14 of argument 1 of load_attitude_angle_sincos_5_6 */
+#define angle5_sin DAT_0001d7ec /* sin_fixed14 of argument 1 of load_attitude_angle_sincos_5_6 */
+#define angle6_cos DAT_0001d7e6 /* cos_fixed14 of argument 2 of load_attitude_angle_sincos_5_6 */
+#define angle6_sin DAT_0001d7e8 /* sin_fixed14 of argument 2 of load_attitude_angle_sincos_5_6 */
+#define basis1_m00 DAT_0001d7d4 /* 3x3 s16 matrix at 0x1d7d4, element [0][0]; ~Rx from angle 1 (fill_attitude_rotation_bases) */
+#define basis1_m01 DAT_0001d7d6 /* basis1 element [0][1] */
+#define basis1_m02 DAT_0001d7d8 /* basis1 element [0][2] */
+#define basis1_m10 DAT_0001d7da /* basis1 element [1][0] */
+#define basis1_m11 DAT_0001d7dc /* basis1 element [1][1] */
+#define basis1_m12 DAT_0001d7de /* basis1 element [1][2] */
+#define basis1_m20 DAT_0001d7e0 /* basis1 element [2][0] */
+#define basis1_m21 DAT_0001d7e2 /* basis1 element [2][1] */
+#define basis1_m22 DAT_0001d7e4 /* basis1 element [2][2] */
+#define basis2_m00 DAT_0001d7bc /* 3x3 s16 matrix at 0x1d7bc, element [0][0]; ~Ry from angle 2 */
+#define basis2_m01 DAT_0001d7be /* basis2 element [0][1] */
+#define basis2_m02 DAT_0001d7c0 /* basis2 element [0][2] */
+#define basis2_m10 DAT_0001d7c2 /* basis2 element [1][0] */
+#define basis2_m11 DAT_0001d7c4 /* basis2 element [1][1] */
+#define basis2_m12 DAT_0001d7c6 /* basis2 element [1][2] */
+#define basis2_m20 DAT_0001d7c8 /* basis2 element [2][0] */
+#define basis2_m21 DAT_0001d7ca /* basis2 element [2][1] */
+#define basis2_m22 DAT_0001d7cc /* basis2 element [2][2] */
+#define basis3_m00 DAT_0001d7a4 /* 3x3 s16 matrix at 0x1d7a4, element [0][0]; ~Rz from angle 3 */
+#define basis3_m01 DAT_0001d7a6 /* basis3 element [0][1] */
+#define basis3_m02 DAT_0001d7a8 /* basis3 element [0][2] */
+#define basis3_m10 DAT_0001d7aa /* basis3 element [1][0] */
+#define basis3_m11 DAT_0001d7ac /* basis3 element [1][1] */
+#define basis3_m12 DAT_0001d7ae /* basis3 element [1][2] */
+#define basis3_m20 DAT_0001d7b0 /* basis3 element [2][0] */
+#define basis3_m21 DAT_0001d7b2 /* basis3 element [2][1] */
+#define basis3_m22 DAT_0001d7b4 /* basis3 element [2][2] */
+#define basis4_m00 DAT_0001d78c /* 3x3 s16 matrix at 0x1d78c, element [0][0]; ~Ry (or ~Rx) from angle 4 (fill_attitude_rotation_basis_4 / _rx) */
+#define basis4_m01 DAT_0001d78e /* basis4 element [0][1] */
+#define basis4_m02 DAT_0001d790 /* basis4 element [0][2] */
+#define basis4_m10 DAT_0001d792 /* basis4 element [1][0] */
+#define basis4_m11 DAT_0001d794 /* basis4 element [1][1] */
+#define basis4_m12 DAT_0001d796 /* basis4 element [1][2] */
+#define basis4_m20 DAT_0001d798 /* basis4 element [2][0] */
+#define basis4_m21 DAT_0001d79a /* basis4 element [2][1] */
+#define basis4_m22 DAT_0001d79c /* basis4 element [2][2] */
+#define basis5_m00 DAT_0001d774 /* 3x3 s16 matrix at 0x1d774, element [0][0]; ~Rx from angle 5 (fill_attitude_rotation_bases_5_6) */
+#define basis5_m01 DAT_0001d776 /* basis5 element [0][1] */
+#define basis5_m02 DAT_0001d778 /* basis5 element [0][2] */
+#define basis5_m10 DAT_0001d77a /* basis5 element [1][0] */
+#define basis5_m11 DAT_0001d77c /* basis5 element [1][1] */
+#define basis5_m12 DAT_0001d77e /* basis5 element [1][2] */
+#define basis5_m20 DAT_0001d780 /* basis5 element [2][0] */
+#define basis5_m21 DAT_0001d782 /* basis5 element [2][1] */
+#define basis5_m22 DAT_0001d784 /* basis5 element [2][2] */
+#define basis6_m00 DAT_0001d75c /* 3x3 s16 matrix at 0x1d75c, element [0][0]; ~Ry from angle 6 (fill_attitude_rotation_bases_5_6) */
+#define basis6_m01 DAT_0001d75e /* basis6 element [0][1] */
+#define basis6_m02 DAT_0001d760 /* basis6 element [0][2] */
+#define basis6_m10 DAT_0001d762 /* basis6 element [1][0] */
+#define basis6_m11 DAT_0001d764 /* basis6 element [1][1] */
+#define basis6_m12 DAT_0001d766 /* basis6 element [1][2] */
+#define basis6_m20 DAT_0001d768 /* basis6 element [2][0] */
+#define basis6_m21 DAT_0001d76a /* basis6 element [2][1] */
+#define basis6_m22 DAT_0001d76c /* basis6 element [2][2] */
+#define attitude_compose_tag DAT_00020ce4 /* last composer tag ($2408 / $2468 / $26e0) jumped through by invoke_tagged_attitude_compose_neg_sins4 / 6 */
+#define camera_m00 DAT_0001d744 /* 3x3 s16 camera attitude matrix at 0x1d744, element [0][0]: overlay_frame_step builds the inverse (view) form from the negated camera angles, then the forward form [STRONG INFERENCE role] */
+#define camera_m01 DAT_0001d746 /* camera matrix element [0][1] */
+#define camera_m02 DAT_0001d748 /* camera matrix element [0][2] */
+#define camera_m10 DAT_0001d74a /* camera matrix element [1][0] */
+#define camera_m11 DAT_0001d74c /* camera matrix element [1][1] */
+#define camera_m12 DAT_0001d74e /* camera matrix element [1][2] */
+#define camera_m20 DAT_0001d750 /* camera matrix element [2][0] */
+#define camera_m21 DAT_0001d752 /* camera matrix element [2][1] */
+#define camera_m22 DAT_0001d754 /* camera matrix element [2][2] */
+#define visible_list DAT_0001c9dc /* visible object pointer list (build_visible_object_list) */
+#define visible_count DAT_0001c1d4 /* visible object list count (low word) */
+#define visible_list_split DAT_0001bdb8 /* visible_count saved after update_ground_scatter_objects; transform_listed_object_vecs12_by_1d744 handles the entries from here on */
+#define edge_sentinel DAT_0001b174 /* sentinel edge record in scan_convert_edge_rows: view_width << 16 | 0x8000 */
+#define edge_sentinel_colour PTR_PTR_0001b188 /* sentinel record colour long: fill_colour | 0xffff0000 */
+#define view_width DAT_0001b82a /* view width in pixels (host +0x16 = A5-0x1372, configure_renderer_for_display); also the span-row end / sentinel x */
+#define half_rows_mode DAT_0001b834 /* nonzero halves the last scan row in scan_convert_edge_rows [role UNKNOWN] */
+#define row_has_edges DAT_0001daa4 /* word flag per row: the row's edge bucket is non-empty */
+#define row_edge_buckets DAT_0001eaac /* per-row edge bucket heads filled by add_face_edges_to_rows */
+#define edge_pool_count DAT_00020ab0 /* edge pool count, reset to 0 at the end of scan_convert_edge_rows */
+#define scan_last_row DAT_00020ae6 /* last scan row (clip_y_max + rows / 2 per update_view_clip_bounds) */
+#define spans32ba_slot0 DAT_00003242 /* entry 0 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot1 DAT_00003246 /* entry 1 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot2 DAT_0000324a /* entry 2 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot3 DAT_0000324e /* entry 3 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot4 DAT_00003252 /* entry 4 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot5 DAT_00003256 /* entry 5 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot6 DAT_0000325a /* entry 6 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot7 DAT_0000325e /* entry 7 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_slot8 DAT_00003262 /* entry 8 of the nine-long table inside the code before the span routine 0x32ba (init_span_table_32ba; self-modifying) */
+#define spans32ba_code_335a DAT_0000335a /* code address 0x335a stored into the span routine 0x32ba table */
+#define spans32ba_code_336c DAT_0000336c /* code address 0x336c stored into the span routine 0x32ba table */
+#define spans32ba_code_3374 DAT_00003374 /* code address 0x3374 stored into the span routine 0x32ba table */
+#define spans32ba_code_3378 DAT_00003378 /* code address 0x3378 stored into the span routine 0x32ba table */
+#define spans32ba_code_33a4 DAT_000033a4 /* code address 0x33a4 stored into the span routine 0x32ba table */
+#define spans3466_slot0 DAT_000033ee /* entry 0 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot1 DAT_000033f2 /* entry 1 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot2 DAT_000033f6 /* entry 2 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot3 DAT_000033fa /* entry 3 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot4 DAT_000033fe /* entry 4 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot5 DAT_00003402 /* entry 5 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot6 DAT_00003406 /* entry 6 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot7 DAT_0000340a /* entry 7 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_slot8 DAT_0000340e /* entry 8 of the nine-long table inside the code before the span routine 0x3466 (init_span_table_3466; self-modifying) */
+#define spans3466_code_34fc DAT_000034fc /* code address 0x34fc stored into the span routine 0x3466 table */
+#define spans3466_code_350e DAT_0000350e /* code address 0x350e stored into the span routine 0x3466 table */
+#define spans3466_code_3516 DAT_00003516 /* code address 0x3516 stored into the span routine 0x3466 table */
+#define spans3466_code_351a DAT_0000351a /* code address 0x351a stored into the span routine 0x3466 table */
+#define spans3466_code_3546 DAT_00003546 /* code address 0x3546 stored into the span routine 0x3466 table */
+#define spans3608_slot0 DAT_00003590 /* entry 0 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot1 DAT_00003594 /* entry 1 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot2 DAT_00003598 /* entry 2 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot3 DAT_0000359c /* entry 3 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot4 DAT_000035a0 /* entry 4 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot5 DAT_000035a4 /* entry 5 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot6 DAT_000035a8 /* entry 6 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot7 DAT_000035ac /* entry 7 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_slot8 DAT_000035b0 /* entry 8 of the nine-long table inside the code before the span routine 0x3608 (init_span_table_3608; self-modifying) */
+#define spans3608_code_369e DAT_0000369e /* code address 0x369e stored into the span routine 0x3608 table */
+#define spans3608_code_36b0 DAT_000036b0 /* code address 0x36b0 stored into the span routine 0x3608 table */
+#define spans3608_code_36b8 DAT_000036b8 /* code address 0x36b8 stored into the span routine 0x3608 table */
+#define spans3608_code_36bc DAT_000036bc /* code address 0x36bc stored into the span routine 0x3608 table */
+#define spans3608_code_36e8 DAT_000036e8 /* code address 0x36e8 stored into the span routine 0x3608 table */
+#define span8_entries_a DAT_00020cec /* 0x800-long code-pointer table at 0x20cec indexed by run length in fill_span_rows_8bit [STRONG INFERENCE]; entry 0 */
+#define span8_entries_a_1 DAT_00020cf0 /* span8_entries_a entry 1 */
+#define span8_entries_a_2 DAT_00020cf4 /* span8_entries_a entry 2 */
+#define span8_entries_a_3 DAT_00020cf8 /* span8_entries_a entry 3 */
+#define span8_entries_a_4 DAT_00020cfc /* span8_entries_a entry 4 */
+#define span8_entries_a_5 DAT_00020d00 /* span8_entries_a entry 5 */
+#define span8_entries_a_rest DAT_00020d04 /* span8_entries_a entries 6.. (default handler copies) */
+#define span8_entries_b DAT_00022cec /* 0x800-long code-pointer table at 0x22cec indexed by run length in fill_span_rows_8bit [STRONG INFERENCE]; entry 0 */
+#define span8_entries_b_1 DAT_00022cf0 /* span8_entries_b entry 1 */
+#define span8_entries_b_2 DAT_00022cf4 /* span8_entries_b entry 2 */
+#define span8_entries_b_3 DAT_00022cf8 /* span8_entries_b entry 3 */
+#define span8_entries_b_4 DAT_00022cfc /* span8_entries_b entry 4 */
+#define span8_entries_b_5 DAT_00022d00 /* span8_entries_b entry 5 */
+#define span8_entries_b_6 DAT_00022d04 /* span8_entries_b entry 6 */
+#define span8_entries_b_rest DAT_00022d08 /* span8_entries_b entries 7.. (default handler copies) */
+#define span8_code_3836 DAT_00003836 /* code address 0x3836 stored by init_code_pointer_tables */
+#define span8_code_383e DAT_0000383e /* code address 0x383e stored by init_code_pointer_tables */
+#define span8_code_3840 DAT_00003840 /* code address 0x3840 stored by init_code_pointer_tables */
+#define span8_code_3842 DAT_00003842 /* code address 0x3842 stored by init_code_pointer_tables */
+#define span8_code_384e DAT_0000384e /* code address 0x384e stored by init_code_pointer_tables */
+#define span8_code_3850 DAT_00003850 /* code address 0x3850 stored by init_code_pointer_tables */
+#define span8_code_3858 DAT_00003858 /* code address 0x3858 stored by init_code_pointer_tables */
+#define span8_code_3882 DAT_00003882 /* code address 0x3882 stored by init_code_pointer_tables */
+#define span8_code_388c DAT_0000388c /* code address 0x388c stored by init_code_pointer_tables */
+#define span8_code_3898 DAT_00003898 /* code address 0x3898 stored by init_code_pointer_tables */
+#define span8_code_389c DAT_0000389c /* code address 0x389c stored by init_code_pointer_tables */
+#define span8_code_38a8 DAT_000038a8 /* code address 0x38a8 stored by init_code_pointer_tables */
+#define span8_code_38b6 DAT_000038b6 /* code address 0x38b6 stored by init_code_pointer_tables */
+#define anchor_x DAT_0001d83c /* anchor record (find_anchor_point result) +0: x; the record pointer is &anchor_x */
+#define anchor_y DAT_0001d840 /* anchor record +4: y */
+#define anchor_z DAT_0001d844 /* anchor record +8: z */
+#define anchor_angle1 DAT_0001d84a /* low word of anchor record +0xc, first angle */
+#define anchor_angle2 DAT_0001d84e /* low word of anchor record +0x10, second angle */
+#define anchor_angle3 DAT_0001d852 /* low word of anchor record +0x14, third angle */
+#define anchor_found DAT_0001d854 /* anchor record word +0x18, set when find_anchor_point found a point; nonzero skips the search here */
+#define view_mode DAT_0001d858 /* camera view mode word (set to 1 on respawn; < 6 / == 2 tests in overlay_frame_step) [STRONG INFERENCE] */
+#define player_landing_state DAT_0001b868 /* 0 airborne/reset, 1 touchdown, 2 stopped (docs/DECOMPILATION_SYMBOLS.md) */
+#define replay_request DAT_0001b86c /* pending instant-replay request: 0 none, 1 airborne, 2 on the ground (request_instant_replay) */
+#define state_flag_b872 _DAT_0001b872 /* word cleared on respawn, set 0 / 1 in process_flight_input_and_outcome [role UNKNOWN] */
+#define state_flag_b874 _DAT_0001b874 /* word cleared on respawn; must be 0 for bail-out and view changes [role UNKNOWN] */
+#define parachute_object DAT_0001b87c /* pointer to the bail-out parachute object slot (view 8 -> 9 when it exists) [STRONG INFERENCE] */
+#define mission_scene_object DAT_0001d700 /* current mission scene object: scene_root child table +0x74 + mission * 0x18, released by start_mission_scene */
+#define camera_x DAT_0001d838 /* camera position x, set from the anchor by start_mission_scene */
+#define camera_y DAT_0001d834 /* camera position y */
+#define camera_z DAT_0001d830 /* camera position z */
+#define ext_camera_point DAT_0001d824 /* stored external-camera point record (x first); 1000000000 = none (point_near_camera_or_type80_object) */
+#define view_flag_d856 _DAT_0001d856 /* word set to 1 with view_mode by start_mission_scene; tested in overlay_frame_step [role UNKNOWN] */
+#define band_limits_lo DAT_0001b18c /* distance band thresholds T[-1] (= 0): band i starts at band_limits_lo[i] = band_limits[i - 1] */
+#define band_limits DAT_0001b190 /* ascending distance band thresholds T[0..] (40041, 81395, ...): band i ends below band_limits[i] */
+#define entity_array_1 DAT_0001d4a4 /* first entity pointer array (docs/STRUCTS.md entity_array_1; ticked by run_simulation_tick) */
+#define entity_array_1_count DAT_0001c1e0 /* entry count of entity_array_1 (docs/STRUCTS.md) */
+#define entity_array_3 DAT_0001d0e4 /* third entity pointer array (docs/STRUCTS.md entity_array_3), ticked with path 1 */
+#define entity_array_3_count DAT_0001c1dc /* entry count of entity_array_3 */
+#define entity_array_4 DAT_0001cbe4 /* fourth entity pointer array (docs/STRUCTS.md entity_array_4), ticked with path 1 */
+#define entity_array_4_count DAT_0001c1d8 /* entry count of entity_array_4 */
+#define clip_x_min DAT_00020aee /* polygon clip rectangle x-min, read by clip_polygon_x_min */
+#define clip_x_max DAT_00020aec /* polygon clip rectangle x-max, read by clip_polygon_x_max */
+#define clip_y_min DAT_00020aea /* polygon clip rectangle y-min, read by clip_polygon_y_min */
+#define detail_ref_x DAT_0001d724 /* x of the detail reference point (update_altitude_detail_bands triple d724 / d720 / d71c); stored at obj +0x18 by build_land_outline_at_detail [STRONG INFERENCE] */
+#define detail_ref_z DAT_0001d71c /* z of the detail reference point; stored at obj +0x20 [STRONG INFERENCE] */
+#define controller_list DAT_0001c25c /* active controller pointer list, ticked by advance_frame_and_tick_controllers through definition +2 */
+#define controller_count DAT_0001c1cc /* entry count of controller_list */
+#define player_shot_ctl DAT_0001b880 /* controller of the player's latest gun / missile entity (latched in process_flight_input_and_outcome) [STRONG INFERENCE] */
+#define scatter_slots DAT_0001bc64 /* 7 ground-scatter object slots (update_ground_scatter_objects, clear_pending_entity_slots) */
+#define retire_count DAT_00024cf0 /* entities retired since the last reset; above 0x13 overlay_frame_step calls reset_distance_base_globals and clears it */
+#define view_points DAT_0001c43c /* camera-relative object points (3 longs, shifted by the object's detail level) appended by collect_near_objects */
+#define view_point_count DAT_0001c1d0 /* entry count of view_points */
+#define overlap_list DAT_0001c1e4 /* objects with flag-long bit 15, collected each frame; dispatch_overlap_collisions walks it */
+#define overlap_count DAT_0001c1c4 /* entry count of overlap_list */
+#define replay_state DAT_0001b870 /* instant-replay state: 0 live, 1 rewind, other non-zero replaying, 3 controller tick restricted (docs/DECOMPILATION_SYMBOLS.md) */
+#define designated_entity_2 DAT_0001b888 /* second designated entity pointer (docs/IMPORT_STATUS.md), cleared each frame by dispatch_overlap_collisions unless replay_state == 3 [role UNKNOWN] */
+#define visible_first_pass DAT_0001c1c0 /* visible-list count before world objects (word): first-pass count of build_visible_object_list */
+#define alt_band DAT_0001d70c /* altitude band: power of two at or below camera_y */
+#define alt_band_log2 DAT_0001d704 /* log2 of alt_band (word) */
+#define alt_value_table DAT_0001b214 /* longs per altitude band, interpolated into the y of the reference shapes [STRONG INFERENCE] */
+#define alt_tolerance_table DAT_0001b264 /* longs per altitude band: outline tolerance for build_land_outline_at_detail */
+#define detail_ref_y DAT_0001d720 /* y of the near rebuild reference point (with detail_ref_x / detail_ref_z) */
+#define far_ref_x DAT_0001d718 /* x of the far rebuild reference point */
+#define far_ref_y DAT_0001d714 /* y of the far rebuild reference point */
+#define far_ref_z DAT_0001d710 /* z of the far rebuild reference point */
+#define scatter_point_x DAT_0001b924 /* 64 ground scatter points of 3 longs (x, y, z): x; the array base */
+#define scatter_point_y DAT_0001b928 /* scatter point y (always 0) */
+#define scatter_point_z DAT_0001b92c /* scatter point z */
+#define scatter_state DAT_0001b8e4 /* 64 point state bytes: 0x80 visible, 0x40 surface cached, low 6 bits = slot or 0x3f */
+#define scatter_surface DAT_0001b8a4 /* 64 cached surface-type bytes (surface_type_at_point) */
+#define scatter_slot_point DAT_0001b894 /* word per scatter slot: index of its point */
+#define scatter_templates DAT_0001bc24 /* template object per surface type >> 4 (0 = none) */
+#define proj_scale_x DAT_00020b28 /* projection scale word for screen x */
+#define proj_scale_y DAT_00020b26 /* projection scale word for screen y */
+#define scatter_started _DAT_00024cec /* set on the first scatter update, cleared when ground detail is off or too high */
+#define neg_camera_pitch DAT_0001d810 /* negated camera pitch word (docs/DECOMPILATION_SYMBOLS.md: camera pitch DAT_00024d1a) */
+#define neg_camera_heading DAT_0001d80e /* negated camera heading word (camera heading DAT_00024d18) */
+#define camera_angle3 DAT_0001d80c /* third camera angle word passed to the camera matrix builders [role UNKNOWN] */
+#define camera_angle4 DAT_0001d808 /* fourth camera angle long passed to the camera matrix builders [role UNKNOWN] */
+#define camera_angle5 DAT_0001d804 /* fifth camera angle (view mode 2 only) [role UNKNOWN] */
+#define camera_angle6 DAT_0001d800 /* sixth camera angle (view mode 2 only) [role UNKNOWN] */
+#define object_pool_next DAT_0001b5a8 /* object_pool + 1 entry: target of the insertion sort by camera metric */
+#define carried_pair_count DAT_0001b85c /* carried-pair count (docs/DECOMPILATION_SYMBOLS.md), cleared every frame */
+#define carried_pairs DAT_0001b860 /* carried-pair array of {carrier, rider} objects */
+#define span_filler DAT_00020ac0 /* selected span-filler routine (docs/DECOMPILATION_SYMBOLS.md) */
+#define panels_drawn _DAT_00020ae4 /* 0 until the cockpit panels are redrawn by overlay_frame_step (cleared by clear_flag_00020ae4) [STRONG INFERENCE] */
+#define view_half_height DAT_00020ae8 /* half view height (view_rows / 2, - 20 with panels; update_view_clip_bounds), or proj_scale_y * 0x43 / 0x1e0 after a panel redraw; used instead of clip_y_max once panels_drawn is set */
+#define view_rows DAT_0001b828 /* view height in rows (one span run per row in reset_span_row_lists); scan_last_row = clip_y_max + view_rows / 2 */
+#define deferred_free_flag _DAT_0001c1bc /* shared-block deferred-free flag (docs/DECOMPILATION_SYMBOLS.md), cleared each frame */
+#define flag_da8c DAT_0001da8c /* word cleared by update_view_clip_bounds [role UNKNOWN] */
+#define view_inset DAT_00020ae2 /* 4 when update_view_clip_bounds reserves 20 rows for the panels, else 0 [STRONG INFERENCE] */
+#define flag_20ae0 _DAT_00020ae0 /* word cleared with panels_drawn by update_view_clip_bounds [role UNKNOWN] */
+#define scale_table_index DAT_00020af4 /* index into the projection scale tables, used in view mode 6 */
+#define proj_scale_y_table DAT_00020afc /* projection scale word table for proj_scale_y */
+#define proj_scale_x_table DAT_00020b14 /* projection scale word table for proj_scale_x */
+#define view_param_12 _DAT_0001b82e /* host +0x12 (A5-0x1376) copied by configure_renderer_for_display [role UNKNOWN] */
+#define view_param_14 _DAT_0001b82c /* host +0x14 (A5-0x1374) [role UNKNOWN] */
+#define view_half_rows DAT_00020b2c /* view_rows / 2 */
+#define view_half_width DAT_00020b2a /* view_width / 2 */
+#define view_centre_fixed DAT_00020af0 /* (2 * view_half_width - 1) << 16 | 0x8000: centre column in 16.16 */
+#define view_multi_flag DAT_0001b824 /* host +0xb4 multi-monitor flag the renderer was configured for */
+#define span_filler_2 _DAT_00020abc /* second selected span-filler routine (address - 0x20) */
+#define span_filler_3 _DAT_00020ab8 /* third selected span-filler routine (address - 0x20) */
+#define depth_routine_ab4 DAT_00020ab4 /* depth-specific code address (0xa14e / 0xa200) [role UNKNOWN] */
+#define depth_routine_da80 DAT_0001da80 /* depth-specific code address [role UNKNOWN] */
+#define depth_routine_da84 DAT_0001da84 /* depth-specific code address [role UNKNOWN] */
+#define depth_routine_da90 DAT_0001da90 /* depth-specific code address [role UNKNOWN] */
+#define depth_routine_da94 DAT_0001da94 /* depth-specific code address [role UNKNOWN] */
+#define depth_routine_da98 DAT_0001da98 /* depth-specific code address (host +0x276 at depth 1) [role UNKNOWN] */
+#define depth_routine_da9c DAT_0001da9c /* depth-specific code address (host +0x276 at depth 1) [role UNKNOWN] */
+#define rank_aim_lag_table DAT_0001b2b4 /* word per pilot rank: AI aim lag in frames */
+#define ai_aim_lag_key1 DAT_0001b876 /* AI aim lag in frames for definition key 1 (docs/DECOMPILATION_SYMBOLS.md) */
+#define ai_aim_lag DAT_0001b878 /* AI aim lag in frames for the other aircraft */
+#define rudder_key DAT_0001b858 /* rudder key input word: +0x40 Z, -0x40 X, 0 */
+#define bw_pattern_first DAT_0001da88 /* first word of the host pattern table (+0x88), read at depth 1 */
+#define flight_word_24d2c _DAT_00024d2c /* word cleared when a flight starts [role UNKNOWN] */
+#define flight_word_24d2e _DAT_00024d2e /* word cleared when a flight starts [role UNKNOWN] */
+#define host_words_valid _DAT_00024d34 /* nonzero: begin_flight_for_rank copies host words +0x33e / +0x340 [role UNKNOWN] */
+#define host_word_33e DAT_00024d32 /* copy of host word +0x33e [role UNKNOWN] */
+#define host_word_340 DAT_00024d30 /* copy of host word +0x340 [role UNKNOWN] */
+#define replay_frames_left DAT_0001b86e /* instant-replay / end-sequence frame countdown (docs/DECOMPILATION_SYMBOLS.md comment-only name) */
+#define snd_gun _DAT_0001b852 /* sound event slot Gun (docs/DECOMPILATION_SYMBOLS.md, slot names from DATA 0) */
+#define view_key_angle_a DAT_00024cfc /* view angle stepped by 0x800 with arrow keys 0x1c / 0x1d */
+#define view_key_angle_b DAT_00024cf8 /* view angle stepped by 0x540 with arrow keys 0x1e / 0x1f */
+#define track_pitch DAT_00024d00 /* view mode 6 tracking-camera pitch (eased toward attitude_from_velocity's pitch); its low word feeds neg_camera_pitch */
+#define track_heading DAT_00024d04 /* view mode 6 tracking-camera heading; its low word feeds neg_camera_heading */
+#define ext_camera_point_y DAT_0001d828 /* ext_camera_point record +4: y */
+#define ext_camera_point_z DAT_0001d82c /* ext_camera_point record +8: z */
+#define throttle_step DAT_00024cf6 /* throttle step input (+1 / -1 / 0) from the + / = and - / _ keys (docs/STRUCTS.md) */
+#define snd_approach_ok _DAT_0001b83c /* sound event slot 3 (no sample): landing approach accepted (try_begin_landing_approach != 0) */
+#define snd_approach_refused _DAT_0001b83e /* sound event slot 4 (no sample): landing approach refused */
+#define friendly_landing_scored _DAT_0001b86a /* set once per flight when the friendly-base landing outcome (0x201) is taken */
+#define fire_button _DAT_00024cf4 /* space key held (1 on keyDown, 0 on keyUp), also restored from host +0x342; gates gun fire [STRONG INFERENCE] */
+#define view_follow_target DAT_0001b884 /* object the view follows, taken from designated_entity_2 for 0x14 frames [STRONG INFERENCE] */
+#define abandoned_intact_aircraft _DAT_0001b87a /* set in update_aircraft_entity when the player bails out of an undamaged aircraft with fuel; a surviving pilot is then Discharged (resolve_bailout_outcome header) */
+#define camera_pitch DAT_00024d1a /* camera pitch word 0..0x3fff (docs/DECOMPILATION_SYMBOLS.md, PROVEN); neg_camera_pitch is its negative */
+#define camera_heading DAT_00024d18 /* camera heading word 0..0x3fff (PROVEN); neg_camera_heading is its negative */
+#define camera_step_x DAT_0001d81c /* camera x step per frame: (camera_goal_x - camera_x) / (replay_frames_left - 0x1e) */
+#define camera_step_y DAT_0001d818 /* camera y step per frame */
+#define camera_step_z DAT_0001d814 /* camera z step per frame */
+#define camera_goal_x DAT_00024d28 /* camera destination x the replay camera glides to */
+#define camera_goal_y DAT_00024d24 /* camera destination y */
+#define camera_goal_z DAT_00024d20 /* camera destination z */
+#define target_hold_frames DAT_00024d1c /* frames the view keeps following view_follow_target (0x14 when taken) */
+
 /*
  * Original: DAT_0001a7d2
  * Proposed: template_rec_a_field_u16
@@ -803,8 +1197,8 @@ int *DAT_00020b40;
  */
 void overlay_patch_template_u16_pair(undefined2 config_u16) /* Original: FUN_00000020 */
 {
-  DAT_0001a7d2 = config_u16; /* template_rec_a_field_u16 */
-  DAT_0001a81c = config_u16; /* template_rec_b_field_u16 */
+  template_rec_a_field_u16 = config_u16; /* template_rec_a_field_u16 */
+  template_rec_b_field_u16 = config_u16; /* template_rec_b_field_u16 */
   return;
 }
 
@@ -887,15 +1281,15 @@ undefined4 * copy_block_return_dst(undefined4 *dst, undefined4 *src, undefined4 
  * The evidence comments below were corrected: the source addresses are runtime (file + 0x20). */
 void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
 {
-  undefined4 *puVar1;
-  uint uVar2;
-  char *pcVar3;
-  short *psVar4;
-  code *pcVar5;
-  char *pcVar6;
-  undefined4 *puVar7;
-  undefined4 *puVar8;
-  undefined4 *puVar9;
+  undefined4 *buf; /* puVar1: heap_alloc clone (blocks A, B, D) / Block C source walk */
+  uint n; /* uVar2: clone counter (D2) */
+  char *src_walk; /* pcVar3: Block A source address (D3) */
+  short *key_walk; /* psVar4: record key word walk (A2) */
+  code *nbytes_20; /* pcVar5: the 0x20 byte count */
+  char *src; /* pcVar6: Block A source */
+  undefined4 *src_or_clone; /* puVar7: template source, or the clone in Block C */
+  undefined4 *nbytes_or_dst; /* puVar8: byte count, or the heap_alloc block in Block C */
+  undefined4 *nbytes; /* puVar9: Block C byte count 0x1C */
   
   /*
    * ---- Block A: four 0x4A-byte template clones --------------------
@@ -941,20 +1335,20 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
    * - [WITHDRAWN] The 'XX' key hypothesis came from reading the title string at the file
    *   offset; with the runtime base the keys are ordinary small IDs.
    */
-  uVar2 = 0; /* D2 */
-  psVar4 = (short *)(s_GRAPHIC_SIMULATIONS_XXXXXXXXXXXX_0001a77c + 0x14); /* A2 = 0x1A790 */
-  pcVar3 = s_GRAPHIC_SIMULATIONS_XXXXXXXXXXXX_0001a77c + 0x14; /* D3 source walk */
+  n = 0; /* D2 */
+  key_walk = (short *)(s_GRAPHIC_SIMULATIONS_XXXXXXXXXXXX_0001a77c + 0x14); /* A2 = 0x1A790 */
+  src_walk = s_GRAPHIC_SIMULATIONS_XXXXXXXXXXXX_0001a77c + 0x14; /* D3 source walk */
   do {
-    puVar7 = (undefined4 *)0x4a; /* nbytes */
-    pcVar6 = pcVar3; /* src */
-    puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */); /*: resolved - the JSR target is heap_alloc (runtime address $1A48 = file 0x1a68) */
-    puVar1 = copy_block_return_dst(puVar1,(undefined4 *)pcVar6,puVar7);
+    src_or_clone = (undefined4 *)0x4a; /* nbytes */
+    src = src_walk; /* src */
+    buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */); /*: resolved - the JSR target is heap_alloc (runtime address $1A48 = file 0x1a68) */
+    buf = copy_block_return_dst(buf,(undefined4 *)src,src_or_clone);
     /* table[sign_extend(*psVar4)] = cloned record */
-    *(undefined4 **)(&DAT_0001b524 + *psVar4 * 4) = puVar1;
-    psVar4 = psVar4 + 0x25; /* +0x4A bytes */
-    pcVar3 = pcVar3 + 0x4a;
-    uVar2 = uVar2 + 1;
-  } while (uVar2 < 4);
+    *(undefined4 **)(&template_ptr_table_base + *key_walk * 4) = buf;
+    key_walk = key_walk + 0x25; /* +0x4A bytes */
+    src_walk = src_walk + 0x4a;
+    n = n + 1;
+  } while (n < 4);
 
   /*
    * ---- Block B: fixed-slot template clones (binary @0xA2…0x252) ----------
@@ -988,71 +1382,71 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
    * image fields); exact schema still UNKNOWN.
    * Dest buffer comes from heap_alloc (: JSR $1A48 is a runtime address = file 0x1a68).
    */
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a8b8;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b538 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a8d2;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  PTR_DAT_0001b53c = (undefined *)copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a8ec;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  PTR_DAT_0001b540 = (undefined *)copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a906;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b54c = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a920;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b550 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a93a;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b544 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a954;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b548 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a96e;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b568 = copy_block_return_dst(puVar1,puVar7,puVar8);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key05;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key05 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key06;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key06 = (undefined *)copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key07;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key07 = (undefined *)copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key10;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key10 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key11;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key11 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key08;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key08 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key09;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key09 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key17;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key17 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
   /* [PROVEN] nbytes=0x20 via PEA $20.W (not address-of overlay_patch_template_u16_pair). */
-  pcVar5 = (code *)0x20;
-  puVar7 = (undefined4 *)&DAT_0001a988;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b554 = copy_block_return_dst(puVar1,puVar7,(undefined4 *)pcVar5);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a9a8;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b558 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a9c2;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b55c = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a9dc;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b560 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001a9f6;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b564 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001aa10;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b56c = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001aa2a;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b570 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001aa44;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b574 = copy_block_return_dst(puVar1,puVar7,puVar8);
+  nbytes_20 = (code *)0x20;
+  src_or_clone = (undefined4 *)&template_key12;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key12 = copy_block_return_dst(buf,src_or_clone,(undefined4 *)nbytes_20);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key13;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key13 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key14;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key14 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key15;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key15 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key16;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key16 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key18;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key18 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key19;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key19 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key20;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key20 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
 
   /*
    * ---- Block C: five 0x1C keyed clones (binary @0x256…0x2A2) -------------
@@ -1062,44 +1456,44 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
    * All Block B / D source labels are runtime addresses as well (data at label + 0x20).
    * A5 is reloaded to $1B524 before the loop [PROVEN].
    */
-  uVar2 = 0;
-  psVar4 = &DAT_0001aa5e;
-  puVar1 = (undefined4 *)&DAT_0001aa5e;
+  n = 0;
+  key_walk = &template_keyed_1c_src;
+  buf = (undefined4 *)&template_keyed_1c_src;
   do {
-    puVar9 = (undefined4 *)0x1c;
-    puVar7 = puVar1;
-    puVar8 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-    puVar7 = copy_block_return_dst(puVar8,puVar7,puVar9);
-    *(undefined4 **)(&DAT_0001b524 + *psVar4 * 4) = puVar7;
-    psVar4 = psVar4 + 0xe; /* +0x1C bytes */
-    puVar1 = puVar1 + 7;   /* +0x1C bytes */
-    uVar2 = uVar2 + 1;
-  } while (uVar2 < 5);
+    nbytes = (undefined4 *)0x1c;
+    src_or_clone = buf;
+    nbytes_or_dst = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+    src_or_clone = copy_block_return_dst(nbytes_or_dst,src_or_clone,nbytes);
+    *(undefined4 **)(&template_ptr_table_base + *key_walk * 4) = src_or_clone;
+    key_walk = key_walk + 0xe; /* +0x1C bytes */
+    buf = buf + 7;   /* +0x1C bytes */
+    n = n + 1;
+  } while (n < 5);
 
   /*
    * ---- Block D: five more fixed 0x1A slots → DAT_0001b58c…DAT_0001b59c ----
    * Same PEA/JSR pattern as Block B; A5 offsets +0x68…+0x78 [PROVEN @0x2A4+].
    */
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001aaea;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b58c = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001ab04;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b590 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001ab1e;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b594 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001ab38;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b598 = copy_block_return_dst(puVar1,puVar7,puVar8);
-  puVar8 = (undefined4 *)0x1a;
-  puVar7 = (undefined4 *)&DAT_0001ab52;
-  puVar1 = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
-  DAT_0001b59c = copy_block_return_dst(puVar1,puVar7,puVar8);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key26;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key26 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key27;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key27 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key28;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key28 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key29;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key29 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
+  nbytes_or_dst = (undefined4 *)0x1a;
+  src_or_clone = (undefined4 *)&template_key30;
+  buf = (undefined4 *)heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */);
+  def_key30 = copy_block_return_dst(buf,src_or_clone,nbytes_or_dst);
   return;
 }
 
@@ -1115,15 +1509,15 @@ void overlay_init_template_pointer_tables(void) /* Original: FUN_00000054 */
 undefined4 any_mission_kills_recorded /* Original: FUN_00000334 */ (void)
 
 {
-  int iVar1;
+  int kill_word; /* iVar1: host_world + 2k, walks the 12 kill counters at +0xba */
   
-  iVar1 = DAT_0001b5a0;
+  kill_word = host_world;
   do {
-    if (*(short *)(iVar1 + 0xba) != 0) {
+    if (*(short *)(kill_word + 0xba) != 0) {
       return 1;
     }
-    iVar1 = iVar1 + 2;
-  } while (iVar1 <= DAT_0001b5a0 + 0x16);
+    kill_word = kill_word + 2;
+  } while (kill_word <= host_world + 0x16);
   return 0;
 }
 
@@ -1165,37 +1559,37 @@ undefined4 any_mission_kills_recorded /* Original: FUN_00000334 */ (void)
  * the low-word DAT_0001b734 count of DAT_0001b5a4 (16-bit dbra), objects whose controller type
  * word is 0x12 or 0x13 with approx_dist3_xyz(object pos, facility pos) < facility +0xc (its
  * range) and below the best so far; returns 0x100 (type 0x12), 0x200 (type 0x13) or 0. */
-undefined4 probe_nearest_facility_kind(int param_1) /* Original: FUN_00000354 */
+undefined4 probe_nearest_facility_kind(int object /* param_1: object whose position is tested */) /* Original: FUN_00000354 */
 {
-  int iVar1;
-  short *psVar2;
-  int iVar3;
-  short sVar4;
-  int iVar5;
-  int *piVar6;
-  int *piVar7;
-  int iVar8;
-  
-  iVar5 = 0x7fffffff;
-  piVar7 = &DAT_0001b5a4;
-  iVar8 = 0;
-  sVar4 = DAT_0001b734._2_2_;
-  while (sVar4 = sVar4 + -1, sVar4 != -1) {
-    piVar6 = piVar7 + 1;
-    iVar1 = *piVar7;
-    piVar7 = piVar6;
-    if (((*(int *)(iVar1 + 8) != 0) &&
-        (((psVar2 = *(short **)(*(int *)(iVar1 + 8) + 4), *psVar2 == 0x12 || (*psVar2 == 0x13)) &&
-         (iVar3 = approx_dist3_xyz( /* Original: FUN_00003c68 */), iVar3 < *(int *)(iVar1 + 0xc))))) && (iVar3 < iVar5)) {
-      iVar5 = iVar3;
-      iVar8 = iVar1;
+  int facility; /* iVar1: candidate object */
+  short *type_word; /* psVar2: controller type word (*(obj +8) +4) */
+  int dist; /* iVar3: approx_dist3_xyz result */
+  short left; /* sVar4: dbra countdown over object_count */
+  int best_dist; /* iVar5: nearest distance so far */
+  int *next; /* piVar6: next pool slot */
+  int *slot; /* piVar7: object_pool cursor */
+  int best; /* iVar8: nearest facility, 0 = none */
+
+  best_dist = 0x7fffffff;
+  slot = &object_pool;
+  best = 0;
+  left = object_count._2_2_;
+  while (left = left + -1, left != -1) {
+    next = slot + 1;
+    facility = *slot;
+    slot = next;
+    if (((*(int *)(facility + 8) != 0) &&
+        (((type_word = *(short **)(*(int *)(facility + 8) + 4), *type_word == 0x12 || (*type_word == 0x13)) &&
+         (dist = approx_dist3_xyz( /* Original: FUN_00003c68 */), dist < *(int *)(facility + 0xc))))) && (dist < best_dist)) {
+      best_dist = dist;
+      best = facility;
     }
   }
-  if (iVar8 != 0) {
-    if (**(short **)(*(int *)(iVar8 + 8) + 4) == 0x12) {
+  if (best != 0) {
+    if (**(short **)(*(int *)(best + 8) + 4) == 0x12) {
       return 0x100;
     }
-    if (**(short **)(*(int *)(iVar8 + 8) + 4) == 0x13) {
+    if (**(short **)(*(int *)(best + 8) + 4) == 0x13) {
       return 0x200;
     }
   }
@@ -1219,28 +1613,28 @@ undefined4 probe_nearest_facility_kind(int param_1) /* Original: FUN_00000354 */
 void load_player_fuel_and_bombs /* Original: FUN_000003fa */ (void)
 
 {
-  int iVar1;
+  int value; /* iVar1: fuel units, then player_object */
   
-  iVar1 = ((int)*(short *)(*(int *)(DAT_0001b738 + 4) + 0x1c) * (int)*(short *)(DAT_0001b5a0 + 0xb6)
+  value = ((int)*(short *)(*(int *)(player_object + 4) + 0x1c) * (int)*(short *)(host_world + 0xb6)
           ) / 100;
-  if (iVar1 < 0) {
-    iVar1 = iVar1 + 1;
+  if (value < 0) {
+    value = value + 1;
   }
-  *(char *)(DAT_0001b738 + 0x67d) = (char)(iVar1 >> 1);
-  iVar1 = DAT_0001b738;
-  *(undefined1 *)(DAT_0001b738 + 0x67e) = *(undefined1 *)(DAT_0001b738 + 0x67d);
-  *(undefined2 *)(iVar1 + 0x680) = 0;
-  if ((*(char *)(iVar1 + 0x67d) == '\0') && (*(char *)(iVar1 + 0x67e) == '\0')) {
-    *(undefined1 *)(iVar1 + 0x67d) = 1;
+  *(char *)(player_object + 0x67d) = (char)(value >> 1);
+  value = player_object;
+  *(undefined1 *)(player_object + 0x67e) = *(undefined1 *)(player_object + 0x67d);
+  *(undefined2 *)(value + 0x680) = 0;
+  if ((*(char *)(value + 0x67d) == '\0') && (*(char *)(value + 0x67e) == '\0')) {
+    *(undefined1 *)(value + 0x67d) = 1;
   }
-  iVar1 = DAT_0001b738;
-  *(undefined1 *)(DAT_0001b738 + 0x67c) = *(undefined1 *)(DAT_0001b5a0 + 0xb9);
-  *(short *)(iVar1 + 0x634) =
-       *(short *)(*(int *)(iVar1 + 4) + 0x1a) + *(char *)(iVar1 + 0x67c) * 0x10;
-  *(undefined2 *)(iVar1 + 0x682) = 0x2a3;
-  *(undefined1 *)(iVar1 + 0x674) = 0;
-  *(ushort *)(iVar1 + 0x684) = *(ushort *)(iVar1 + 0x684) & 0xfc01;
-  _DAT_0001b73c = 1;
+  value = player_object;
+  *(undefined1 *)(player_object + 0x67c) = *(undefined1 *)(host_world + 0xb9);
+  *(short *)(value + 0x634) =
+       *(short *)(*(int *)(value + 4) + 0x1a) + *(char *)(value + 0x67c) * 0x10;
+  *(undefined2 *)(value + 0x682) = 0x2a3;
+  *(undefined1 *)(value + 0x674) = 0;
+  *(ushort *)(value + 0x684) = *(ushort *)(value + 0x684) & 0xfc01;
+  loadout_synced = 1;
   return;
 }
 
@@ -1254,21 +1648,21 @@ void load_player_fuel_and_bombs /* Original: FUN_000003fa */ (void)
  * found identical to the C: word +0x50 < 0, or bsr.w 0x354 probe_nearest_facility_kind(entity)
  * (argument reconstructed below) == 0x200 -> word DAT_0001b5a0 +0xd2 += 1; else index 0 does
  * nothing and index k > 0 increments word DAT_0001b5a0 +0xb8 + 2k. */
-void tally_destroyed_entity /* Original: FUN_00000488 */ (int param_1)
+void tally_destroyed_entity /* Original: FUN_00000488 */ (int entity /* param_1: destroyed entity (+0x50 target type) */)
 
 {
-  short *psVar1;
-  int iVar2;
+  short *counter; /* psVar1: kill counter for the type, host_world +0xb8 + 2t */
+  int kind; /* iVar2: probe_nearest_facility_kind result */
   
-  if ((-1 < *(short *)(param_1 + 0x50)) && (iVar2 = probe_nearest_facility_kind( /* Original: FUN_00000354 */param_1), iVar2 != 0x200)) {
-    if (*(short *)(param_1 + 0x50) == 0) {
+  if ((-1 < *(short *)(entity + 0x50)) && (kind = probe_nearest_facility_kind( /* Original: FUN_00000354 */entity), kind != 0x200)) {
+    if (*(short *)(entity + 0x50) == 0) {
       return;
     }
-    psVar1 = (short *)(*(short *)(param_1 + 0x50) * 2 + DAT_0001b5a0 + 0xb8);
-    *psVar1 = *psVar1 + 1;
+    counter = (short *)(*(short *)(entity + 0x50) * 2 + host_world + 0xb8);
+    *counter = *counter + 1;
     return;
   }
-  *(short *)(DAT_0001b5a0 + 0xd2) = *(short *)(DAT_0001b5a0 + 0xd2) + 1;
+  *(short *)(host_world + 0xd2) = *(short *)(host_world + 0xd2) + 1;
   return;
 }
 
@@ -1290,32 +1684,32 @@ void tally_destroyed_entity /* Original: FUN_00000488 */ (int param_1)
  * to the C with the call reconstruction (transform_int3_vecs_by_matrix3 and
  * translate_int3_vecs themselves are not yet verified).
  */
-void transform_through_node_chain /* Original: FUN_000004f8 */ (int *param_1,short param_2,int param_3,undefined4 *param_4,undefined4 *param_5,
-                 undefined4 *param_6,int param_7)
+void transform_through_node_chain /* Original: FUN_000004f8 */ (int *path_top /* param_1: one past the top of the node-pointer stack */,short node_count /* param_2: nodes to apply (dbra) */,int object /* param_3: object (position +2/+6/+0xa, vertices +0x22) */,undefined4 *out_x /* param_4: out, world x */,undefined4 *out_y /* param_5: out, world y */,
+                 undefined4 *out_z /* param_6: out, world z */,int vertex_out /* param_7: optional vertex output buffer, 0 = none */)
 
 {
-  int iVar1;
-  uint uVar2;
-  int iVar3;
-  int iVar4;
-  int iVar5;
-  undefined1 *puVar6;
-  int *local_26;
-  undefined1 auStack_22 [18];
-  undefined4 local_10;
-  undefined4 local_c;
-  undefined4 local_8;
-  
-  local_26 = param_1;
-  local_10 = *(undefined4 *)(param_3 + 2);
-  local_c = *(undefined4 *)(param_3 + 6);
-  local_8 = *(undefined4 *)(param_3 + 10);
-  iVar3 = param_3 + 0x22;
-  while (param_2 = param_2 + -1, param_2 != -1) {
-    local_26 = local_26 + -1;
-    iVar1 = *local_26;
-    build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar1 + 2),(int)*(short *)(iVar1 + 4),(int)*(short *)(iVar1 + 6),
-                 (int)auStack_22);
+  int node; /* iVar1: node popped from the path */
+  uint shift; /* uVar2: object word +0x18 scale shift */
+  int src; /* iVar3: vertex source, object +0x22 then vertex_out */
+  int vert_count; /* iVar4: object word +0x1a vertex count */
+  int dst; /* iVar5: vertex destination */
+  undefined1 *matrix_arg; /* puVar6: matrix argument */
+  int *path; /* local_26, -$26(A6): node-pointer stack cursor */
+  undefined1 matrix [18]; /* auStack_22, -$22(A6): 3x3 attitude matrix (18 bytes) */
+  undefined4 pos_x; /* local_10, -$10(A6): running position x */
+  undefined4 pos_y; /* local_c, -$c(A6) */
+  undefined4 pos_z; /* local_8, -8(A6) */
+
+  path = path_top;
+  pos_x = *(undefined4 *)(object + 2);
+  pos_y = *(undefined4 *)(object + 6);
+  pos_z = *(undefined4 *)(object + 10);
+  src = object + 0x22;
+  while (node_count = node_count + -1, node_count != -1) {
+    path = path + -1;
+    node = *path;
+    build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(node + 2),(int)*(short *)(node + 4),(int)*(short *)(node + 6),
+                 (int)matrix);
     /* CALL RECONSTRUCTION [PROVEN, bytes 0x55c..0x5d0]: Ghidra printed FUN_00002aba() with
      * no arguments and merged the arguments of neighbouring calls into LAB_00001c3a_2.
      * lea.l $2aba.l / $1c3c.l are RUNTIME addresses = file 0x2ada transform_int3_vecs_by_matrix3
@@ -1323,24 +1717,24 @@ void transform_through_node_chain /* Original: FUN_000004f8 */ (int *param_1,sho
      *   FUN_00002aba(); (*LAB_00001c3a_2)(1,&local_10,&local_10,node+8,+0xc,+0x10);
      *   [param_7] FUN_00002aba(); (*LAB_00001c3a_2)(count,param_7,param_7,off<<s..., iVar4,
      *   iVar3,iVar5,puVar6)  - the last four are the arguments of the second matrix call. */
-    transform_int3_vecs_by_matrix3( /* Original: FUN_00002aba (runtime $2aba) */1,&local_10,(uint *)&local_10,(int)auStack_22);
-    translate_int3_vecs( /* Original: LAB_00001c3a_2 (runtime $1c3c) */1,&local_10,&local_10,*(int *)(iVar1 + 8),*(int *)(iVar1 + 0xc),
-                        *(int *)(iVar1 + 0x10));
-    if (param_7 != 0) {
-      iVar4 = (int)*(short *)(param_3 + 0x1a); /* vertex count */
-      iVar5 = param_7;                          /* destination buffer */
-      puVar6 = auStack_22;                      /* this node's matrix */
-      transform_int3_vecs_by_matrix3( /* Original: FUN_00002aba */iVar4,(int *)iVar3,(uint *)iVar5,(int)puVar6);
-      uVar2 = (uint)*(short *)(param_3 + 0x18); /* scale shift */
-      translate_int3_vecs( /* Original: LAB_00001c3a_2 */(int)*(short *)(param_3 + 0x1a),(int *)param_7,(int *)param_7,
-                          *(int *)(iVar1 + 8) << (uVar2 & 0x3f),*(int *)(iVar1 + 0xc) << (uVar2 & 0x3f),
-                          *(int *)(iVar1 + 0x10) << (uVar2 & 0x3f));
-      iVar3 = param_7;                          /* later nodes transform the output in place */
+    transform_int3_vecs_by_matrix3( /* Original: FUN_00002aba (runtime $2aba) */1,&pos_x,(uint *)&pos_x,(int)matrix);
+    translate_int3_vecs( /* Original: LAB_00001c3a_2 (runtime $1c3c) */1,&pos_x,&pos_x,*(int *)(node + 8),*(int *)(node + 0xc),
+                        *(int *)(node + 0x10));
+    if (vertex_out != 0) {
+      vert_count = (int)*(short *)(object + 0x1a); /* vertex count */
+      dst = vertex_out;                          /* destination buffer */
+      matrix_arg = matrix;                      /* this node's matrix */
+      transform_int3_vecs_by_matrix3( /* Original: FUN_00002aba */vert_count,(int *)src,(uint *)dst,(int)matrix_arg);
+      shift = (uint)*(short *)(object + 0x18); /* scale shift */
+      translate_int3_vecs( /* Original: LAB_00001c3a_2 */(int)*(short *)(object + 0x1a),(int *)vertex_out,(int *)vertex_out,
+                          *(int *)(node + 8) << (shift & 0x3f),*(int *)(node + 0xc) << (shift & 0x3f),
+                          *(int *)(node + 0x10) << (shift & 0x3f));
+      src = vertex_out;                          /* later nodes transform the output in place */
     }
   }
-  *param_4 = local_10;
-  *param_5 = local_c;
-  *param_6 = local_8;
+  *out_x = pos_x;
+  *out_y = pos_y;
+  *out_z = pos_z;
   return;
 }
 
@@ -1357,37 +1751,37 @@ void transform_through_node_chain /* Original: FUN_000004f8 */ (int *param_1,sho
  * DAT_0001b5a0 +0x8c + record +0x14; type byte 3 recurses, otherwise the visitor (jsr (a6)) gets
  * (ctx, node, face, path + 1, depth + 1) for each of the sext word +0x1e faces, starting at node
  * + 0x22 + 12 * word +0x1a + 12 * word +0x1e and stepping 0xe + 2 * byte face +8. */
-void traverse_scene_tree /* Original: FUN_000005fa */ (undefined *param_1,undefined4 param_2,int *param_3,int param_4,int param_5)
+void traverse_scene_tree /* Original: FUN_000005fa */ (undefined *visitor /* param_1: callback(ctx, node, face, path, depth) */,undefined4 ctx /* param_2: context passed to the visitor */,int *path /* param_3: node path stack slot for this level */,int depth /* param_4: tree depth */,int group /* param_5: group node (child count +0x18, 0x18-byte records at +0x1a) */)
 
 {
-  int iVar1;
-  short sVar2;
-  short sVar3;
-  char *pcVar4;
-  char *pcVar5;
+  int record; /* iVar1: child record, pushed on the path */
+  short face_index; /* sVar2: face index 0 .. node +0x1e */
+  short child_index; /* sVar3: child index 0 .. group +0x18 */
+  char *child; /* pcVar4: child node = host_world +0x8c data + record +0x14 (type byte 3 = sub-group) */
+  char *face; /* pcVar5: face record, next at + byte +8 * 2 + 0xe */
   
-  sVar3 = 0;
-  if (0 < *(short *)(param_5 + 0x18)) {
+  child_index = 0;
+  if (0 < *(short *)(group + 0x18)) {
     do {
-      iVar1 = param_5 + 0x1a + sVar3 * 0x18;
-      *param_3 = iVar1;
-      pcVar4 = (char *)(*(int *)(DAT_0001b5a0 + 0x8c) + *(int *)(iVar1 + 0x14));
-      if (*pcVar4 == '\x03') {
-        traverse_scene_tree(param_1,param_2,param_3 + 1,param_4 + 1,(int)pcVar4);
+      record = group + 0x1a + child_index * 0x18;
+      *path = record;
+      child = (char *)(*(int *)(host_world + 0x8c) + *(int *)(record + 0x14));
+      if (*child == '\x03') {
+        traverse_scene_tree(visitor,ctx,path + 1,depth + 1,(int)child);
       }
       else {
-        pcVar5 = pcVar4 + *(short *)(pcVar4 + 0x1e) * 0xc + *(short *)(pcVar4 + 0x1a) * 0xc + 0x22;
-        sVar2 = 0;
-        if (0 < *(short *)(pcVar4 + 0x1e)) {
+        face = child + *(short *)(child + 0x1e) * 0xc + *(short *)(child + 0x1a) * 0xc + 0x22;
+        face_index = 0;
+        if (0 < *(short *)(child + 0x1e)) {
           do {
-            (*(code *)param_1)(param_2,pcVar4,pcVar5,param_3 + 1,param_4 + 1);
-            pcVar5 = pcVar5 + (uint)(byte)pcVar5[8] * 2 + 0xe;
-            sVar2 = sVar2 + 1;
-          } while (sVar2 < *(short *)(pcVar4 + 0x1e));
+            (*(code *)visitor)(ctx,child,face,path + 1,depth + 1);
+            face = face + (uint)(byte)face[8] * 2 + 0xe;
+            face_index = face_index + 1;
+          } while (face_index < *(short *)(child + 0x1e));
         }
       }
-      sVar3 = sVar3 + 1;
-    } while (sVar3 < *(short *)(param_5 + 0x18));
+      child_index = child_index + 1;
+    } while (child_index < *(short *)(group + 0x18));
   }
   return;
 }
@@ -1402,14 +1796,14 @@ void traverse_scene_tree /* Original: FUN_000005fa */ (undefined *param_1,undefi
  * found identical to the C: root = long DAT_0001b5a0 +0x8c + long (+0x8c + 24 * sext word +0x90 +
  * 0x8e) (0x7a + $14, scale *2 decoded by hand); bsr.w 0x5fa traverse_scene_tree(param_1,
  * param_2, a6 - 0x28, 0, root). */
-void for_each_mission_scene_object /* Original: FUN_000006a6 */ (undefined *param_1,undefined4 param_2)
+void for_each_mission_scene_object /* Original: FUN_000006a6 */ (undefined *visitor /* param_1: callback for traverse_scene_tree */,undefined4 ctx /* param_2: visitor context */)
 
 {
-  int aiStack_2c [10];
+  int path_stack [10]; /* aiStack_2c: 10-slot node path stack */
   
-  traverse_scene_tree(param_1,param_2,aiStack_2c,0,
-               *(int *)(DAT_0001b5a0 + 0x8c) +
-               *(int *)(*(int *)(DAT_0001b5a0 + 0x8c) + *(short *)(DAT_0001b5a0 + 0x90) * 0x18 +
+  traverse_scene_tree(visitor,ctx,path_stack,0,
+               *(int *)(host_world + 0x8c) +
+               *(int *)(*(int *)(host_world + 0x8c) + *(short *)(host_world + 0x90) * 0x18 +
                        0x8e));
   return;
 }
@@ -1427,81 +1821,81 @@ void for_each_mission_scene_object /* Original: FUN_000006a6 */ (undefined *para
  * Ghidra C reviewed (function at overlay offset 0x6ec).
  * Scene visitor used by plot_mission_map_symbols (through for_each_mission_scene_object); arg 1 is the plotter context (int[0] = map scale). For land objects (flag 0x10 set and 0x240 clear in the node word +0x16): transforms the vertices with transform_through_node_chain, makes them relative to the player position (translate_int3_vecs with -(player +0x18), -(player +0x20)), divides x / z by the scale, clips the outline through FUN_0000b190 / b242 / b2f4 / b3aa (four Sutherland-Hodgman edge clippers; the y-max bound DAT_0001b73e is temporarily replaced by DAT_0001b740 for the last one, FUN_0000b3aa; correction ) and hands the polygon to the hook DAT_0001b5a0 + 0x292 (map outline drawing). Objects whose type nibble (+9 & 0xf0) is 0x70 append a position triple to the first list (count word at context + 0xb58, entries from context + 4). Kinds 0x12 / 0x13 (node byte +1) append position, radius (+0xe) and kind to the second list (count at context + 0xb5a) [PROVEN data flow, STRONG INFERENCE roles].
  */
-void collect_map_features /* Original: FUN_000006ec */ (int *param_1,int param_2,undefined4 *param_3,int *param_4,short param_5)
+void collect_map_features /* Original: FUN_000006ec */ (int *plot_ctx /* param_1: plotter context, int[0] = map scale */,int node /* param_2: scene node (+0x16 flags, +0x1a vertex count) */,undefined4 *face /* param_3: face record (+2 vertex count, +9 type nibble, +0xe indices) */,int *path /* param_4: node path for transform_through_node_chain */,short depth /* param_5: path depth */)
 
 {
-  int *piVar1;
-  short *psVar2;
-  undefined2 uVar3;
-  short sVar4;
-  int iVar5;
-  int *piVar6;
+  int *zone_count; /* piVar1: context word +0xb58, zone list count */
+  short *site_count; /* psVar2: context word +0xb5a, kind 0x12 / 0x13 list count */
+  undefined2 saved_y_max; /* uVar3: clip_y_max saved around the last clip */
+  short i; /* sVar4: vertex index */
+  int work; /* iVar5: player object, then index, then clipped vertex count */
+  int *entry; /* piVar6: list entry (x, y, z) */
   int aiStackY_60694 [32488];
   int aiStackY_40af4 [65231];
-  int local_f60;
-  int local_f5c;
-  int local_f58;
-  int aiStack_f54 [280];
-  int local_af4 [280];
-  int local_694 [420];
-  
-  iVar5 = *DAT_0001b738;
-  if (((*(byte *)(param_2 + 0x16) & 0x10) == 0) || ((*(ushort *)(param_2 + 0x16) & 0x240) != 0)) {
-    if ((*(byte *)((int)param_3 + 9) & 0xf0) == 0x70) {
-      transform_through_node_chain(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
-      piVar1 = param_1 + 0x2d6;
-      piVar6 = param_1 + *(short *)piVar1 * 3 + 1;
-      *(short *)piVar1 = *(short *)piVar1 + 1;
-      *piVar6 = local_f58;
-      piVar6[1] = local_694[*(short *)((int)param_3 + 0xe) * 3 + 1];
+  int pos_z; /* local_f60: node origin z */
+  int pos_y; /* local_f5c: node origin y */
+  int pos_x; /* local_f58: node origin x */
+  int clip_buf [280]; /* aiStack_f54: clipper scratch (x, z) pairs */
+  int outline [280]; /* local_af4: (x, z) outline pairs */
+  int verts [420]; /* local_694: transformed vertices (x, y, z) */
+
+  work = *player_object;
+  if (((*(byte *)(node + 0x16) & 0x10) == 0) || ((*(ushort *)(node + 0x16) & 0x240) != 0)) {
+    if ((*(byte *)((int)face + 9) & 0xf0) == 0x70) {
+      transform_through_node_chain(path,depth,node,&pos_x,&pos_y,&pos_z,(int)verts);
+      zone_count = plot_ctx + 0x2d6;
+      entry = plot_ctx + *(short *)zone_count * 3 + 1;
+      *(short *)zone_count = *(short *)zone_count + 1;
+      *entry = pos_x;
+      entry[1] = verts[*(short *)((int)face + 0xe) * 3 + 1];
     }
     else {
-      if ((*(char *)(param_2 + 1) != '\x13') && (*(char *)(param_2 + 1) != '\x12')) {
+      if ((*(char *)(node + 1) != '\x13') && (*(char *)(node + 1) != '\x12')) {
         return;
       }
-      transform_through_node_chain(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,0);
-      param_1[*(short *)((int)param_1 + 0xb5a) + 0x272] = *(int *)(param_2 + 0xe);
-      *(undefined1 *)((int)param_1 + *(short *)((int)param_1 + 0xb5a) + 0x964) =
-           *(undefined1 *)(param_2 + 1);
-      psVar2 = (short *)((int)param_1 + 0xb5a);
-      piVar6 = param_1 + *psVar2 * 3 + 0x12d;
-      *psVar2 = *psVar2 + 1;
-      *piVar6 = local_f58;
-      piVar6[1] = local_f5c;
+      transform_through_node_chain(path,depth,node,&pos_x,&pos_y,&pos_z,0);
+      plot_ctx[*(short *)((int)plot_ctx + 0xb5a) + 0x272] = *(int *)(node + 0xe);
+      *(undefined1 *)((int)plot_ctx + *(short *)((int)plot_ctx + 0xb5a) + 0x964) =
+           *(undefined1 *)(node + 1);
+      site_count = (short *)((int)plot_ctx + 0xb5a);
+      entry = plot_ctx + *site_count * 3 + 0x12d;
+      *site_count = *site_count + 1;
+      *entry = pos_x;
+      entry[1] = pos_y;
     }
-    piVar6[2] = local_f60;
+    entry[2] = pos_z;
   }
   else {
-    transform_through_node_chain(param_4,param_5,param_2,&local_f58,&local_f5c,&local_f60,(int)local_694);
-    translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(param_2 + 0x1a),local_694,local_694,-*(int *)(iVar5 + 0x18),0,
-                 -*(int *)(iVar5 + 0x20));
-    sVar4 = 0;
-    if (0 < *(short *)(param_2 + 0x1a)) {
+    transform_through_node_chain(path,depth,node,&pos_x,&pos_y,&pos_z,(int)verts);
+    translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(node + 0x1a),verts,verts,-*(int *)(work + 0x18),0,
+                 -*(int *)(work + 0x20));
+    i = 0;
+    if (0 < *(short *)(node + 0x1a)) {
       do {
-        iVar5 = (int)sVar4;
-        local_694[iVar5 * 3] = local_694[iVar5 * 3] / *param_1;
-        local_694[iVar5 * 3 + 2] = local_694[iVar5 * 3 + 2] / *param_1;
-        sVar4 = sVar4 + 1;
-      } while (sVar4 < *(short *)(param_2 + 0x1a));
+        work = (int)i;
+        verts[work * 3] = verts[work * 3] / *plot_ctx;
+        verts[work * 3 + 2] = verts[work * 3 + 2] / *plot_ctx;
+        i = i + 1;
+      } while (i < *(short *)(node + 0x1a));
     }
-    for (sVar4 = 0; sVar4 < (short)(ushort)*(byte *)(param_3 + 2); sVar4 = sVar4 + 1) {
-      iVar5 = (int)sVar4;
-      local_af4[iVar5 * 2] = local_694[*(short *)((int)param_3 + iVar5 * 2 + 0xe) * 3];
-      local_af4[iVar5 * 2 + 1] = local_694[*(short *)((int)param_3 + iVar5 * 2 + 0xe) * 3 + 2];
+    for (i = 0; i < (short)(ushort)*(byte *)(face + 2); i = i + 1) {
+      work = (int)i;
+      outline[work * 2] = verts[*(short *)((int)face + work * 2 + 0xe) * 3];
+      outline[work * 2 + 1] = verts[*(short *)((int)face + work * 2 + 0xe) * 3 + 2];
     }
-    iVar5 = clip_polygon_x_min(local_af4,(int)(short)(ushort)*(byte *)(param_3 + 2),aiStack_f54);
-    if ((short)iVar5 != 0) {
-      iVar5 = clip_polygon_x_max(aiStack_f54,(int)(short)iVar5,local_af4);
-      if ((short)iVar5 != 0) {
-        iVar5 = clip_polygon_y_min(local_af4,(int)(short)iVar5,aiStack_f54);
-        uVar3 = DAT_0001b73e;
-        DAT_0001b73e = uVar3;
-        if ((short)iVar5 != 0) {
-          DAT_0001b73e = DAT_0001b740._0_2_;
-          iVar5 = clip_polygon_y_max(aiStack_f54,(int)(short)iVar5,local_af4);
-          DAT_0001b73e = uVar3;
-          if ((short)iVar5 != 0) {
-            (**(code **)(DAT_0001b5a0 + 0x292))(local_af4,(int)(short)iVar5,*param_3);
+    work = clip_polygon_x_min(outline,(int)(short)(ushort)*(byte *)(face + 2),clip_buf);
+    if ((short)work != 0) {
+      work = clip_polygon_x_max(clip_buf,(int)(short)work,outline);
+      if ((short)work != 0) {
+        work = clip_polygon_y_min(outline,(int)(short)work,clip_buf);
+        saved_y_max = clip_y_max;
+        clip_y_max = saved_y_max;
+        if ((short)work != 0) {
+          clip_y_max = clip_y_max_alt._0_2_;
+          work = clip_polygon_y_max(clip_buf,(int)(short)work,outline);
+          clip_y_max = saved_y_max;
+          if ((short)work != 0) {
+            (**(code **)(host_world + 0x292))(outline,(int)(short)work,*face);
           }
         }
       }
@@ -1522,76 +1916,76 @@ void collect_map_features /* Original: FUN_000006ec */ (int *param_1,int param_2
  * Ghidra C reviewed (function at overlay offset 0x954).
  * Args: map scale, plot callback (host plot_map_symbol_callback, JT $72; this function is the target of the host pointer A5-0x1052 used by draw_map_view_item). Collects features with for_each_mission_scene_object(collect_map_features, context). Then for each first-list position (type-0x70 objects): symbol A, but C when a kind-0x12/0x13 facility is within range and the position y > 0, B when the nearest in-range facility is kind 0x13, none when it is kind 0x12; plots callback(symbol, (x - player x) / scale, (player z - z) / scale). Missions 3 and 4 (DAT_0001b5a0 + 0x90) also plot T (0x54) at fixed world positions (-0x3bcd3, 0x2b246a) / (-0xf2bf12, 0xb242d8). The letters match the DLOG 137 legend: A Airfield, B Friendly Base, C Friendly Carrier, T Primary Target [PROVEN letters, STRONG INFERENCE mapping].
  */
-void plot_mission_map_symbols /* Original: FUN_00000954 */ (int param_1,undefined *param_2)
+void plot_mission_map_symbols /* Original: FUN_00000954 */ (int scale /* param_1: map scale (world units per map unit) */,undefined *plot_symbol /* param_2: callback(symbol, map x, map y) */)
 
 {
-  int iVar1;
-  int iVar2;
-  short sVar3;
-  char cVar4;
-  short sVar5;
+  int player; /* iVar1: *player_object */
+  int dist; /* iVar2: approx_dist3_xyz result */
+  short site; /* sVar3: kind 0x12 / 0x13 site index */
+  char symbol; /* cVar4: legend letter A / B / C, 0 = none */
+  short i; /* sVar5: zone point index */
   int unaff_D6;
-  int iVar6;
+  int work_x; /* iVar6: point index, then the T marker x (1000000000 = none) */
   int aiStackY_60b5c [66161];
   int aiStackY_20198 [24551];
   char acStackY_81fc [30316];
-  int local_b60;
-  int local_b5c [600];
-  char local_1fc [100];
-  int local_198 [100];
-  short local_8;
-  short local_6;
-  
-  iVar1 = *DAT_0001b738;
-  local_b60 = param_1;
-  local_6 = 0;
-  local_8 = 0;
-  for_each_mission_scene_object(FUN_000006ec,&local_b60);
-  sVar5 = 0;
-  if (0 < local_8) {
+  int ctx_scale; /* local_b60, -$b60(A6): collect_map_features context, int[0] = scale */
+  int ctx_points [600]; /* local_b5c, -$b5c(A6): context +4: zone (x, y, z) triples, site triples from index 300 */
+  char site_kind [100]; /* local_1fc, -$1fc(A6): context +0x964 site kind bytes */
+  int site_range [100]; /* local_198, -$198(A6): context +0x9c8 site value +0xe, compared as the range */
+  short point_count; /* local_8, -8(A6): context +0xb58 zone point count */
+  short site_count; /* local_6, -6(A6): context +0xb5a site count */
+
+  player = *player_object;
+  ctx_scale = scale;
+  site_count = 0;
+  point_count = 0;
+  for_each_mission_scene_object(FUN_000006ec,&ctx_scale);
+  i = 0;
+  if (0 < point_count) {
     do {
-      iVar6 = (int)sVar5;
-      cVar4 = 'A';
-      sVar3 = 0;
-      if (0 < local_6) {
+      work_x = (int)i;
+      symbol = 'A';
+      site = 0;
+      if (0 < site_count) {
         do {
-          iVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */ /* dropped args (0x9ba..0x9ce): local_b5c[iVar6 * 3 .. + 2] (object x, y, z) and local_b5c[300 + sVar3 * 3 .. + 2] (zone x, y, z at -$6a8(a6)) */);
-          if (iVar2 < local_198[sVar3]) {
-            if (0 < local_b5c[iVar6 * 3 + 1]) {
-              cVar4 = 'C';
+          dist = approx_dist3_xyz( /* Original: FUN_00003c68 */ /* dropped args (0x9ba..0x9ce): local_b5c[iVar6 * 3 .. + 2] (object x, y, z) and local_b5c[300 + sVar3 * 3 .. + 2] (zone x, y, z at -$6a8(a6)) */);
+          if (dist < site_range[site]) {
+            if (0 < ctx_points[work_x * 3 + 1]) {
+              symbol = 'C';
               break;
             }
-            if (local_1fc[sVar3] == '\x13') {
-              cVar4 = 'B';
+            if (site_kind[site] == '\x13') {
+              symbol = 'B';
               break;
             }
-            if (local_1fc[sVar3] == '\x12') {
-              cVar4 = '\0';
+            if (site_kind[site] == '\x12') {
+              symbol = '\0';
               break;
             }
           }
-          sVar3 = sVar3 + 1;
-        } while (sVar3 < local_6);
+          site = site + 1;
+        } while (site < site_count);
       }
-      if (cVar4 != '\0') {
-        (*(code *)param_2)(cVar4,(local_b5c[iVar6 * 3] - *(int *)(iVar1 + 0x18)) / param_1,
-                           (*(int *)(iVar1 + 0x20) - local_b5c[iVar6 * 3 + 2]) / param_1);
+      if (symbol != '\0') {
+        (*(code *)plot_symbol)(symbol,(ctx_points[work_x * 3] - *(int *)(player + 0x18)) / scale,
+                           (*(int *)(player + 0x20) - ctx_points[work_x * 3 + 2]) / scale);
       }
-      sVar5 = sVar5 + 1;
-    } while (sVar5 < local_8);
+      i = i + 1;
+    } while (i < point_count);
   }
-  iVar6 = 1000000000;
-  if (*(short *)(DAT_0001b5a0 + 0x90) == 3) {
-    iVar6 = -0x3bcd3;
+  work_x = 1000000000;
+  if (*(short *)(host_world + 0x90) == 3) {
+    work_x = -0x3bcd3;
     unaff_D6 = 0x2b246a;
   }
-  else if (*(short *)(DAT_0001b5a0 + 0x90) == 4) {
-    iVar6 = -0xf2bf12;
+  else if (*(short *)(host_world + 0x90) == 4) {
+    work_x = -0xf2bf12;
     unaff_D6 = 0xb242d8;
   }
-  if (iVar6 != 1000000000) {
-    (*(code *)param_2)(0x54,(iVar6 - *(int *)(iVar1 + 0x18)) / param_1,
-                       (*(int *)(iVar1 + 0x20) - unaff_D6) / param_1);
+  if (work_x != 1000000000) {
+    (*(code *)plot_symbol)(0x54,(work_x - *(int *)(player + 0x18)) / scale,
+                       (*(int *)(player + 0x20) - unaff_D6) / scale);
   }
   return;
 }
@@ -1615,48 +2009,48 @@ void plot_mission_map_symbols /* Original: FUN_00000954 */ (int param_1,undefine
  * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
  * to the C with the FUN_00003be0 resolution.
  */
-void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *param_1,int param_2,int param_3,int *param_4,short param_5)
+void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *best /* param_1: context triple, nearest centroid so far */,int node /* param_2: scene node (+0x18 scale shift) */,int face /* param_3: face record (+8 vertex count, +9 type nibble, +0xe indices) */,int *path /* param_4: node path */,short depth /* param_5: path depth */)
 
 {
-  int iVar1;
-  int iVar2;
-  short sVar3;
+  int cand_metric; /* iVar1: face index list (+0xe), then this centroid's metric */
+  int best_metric; /* iVar2: vertex index i, then the current best's metric */
+  short i; /* sVar3: face vertex index */
   int aiStackY_60694 [98285];
-  undefined4 uStack_6ac;
-  undefined4 uStack_6a8;
-  undefined4 uStack_6a4;
-  int local_6a0;
-  int local_69c;
-  int local_698;
-  int aiStack_694 [420];
-  
-  if ((*(byte *)(param_3 + 9) & 0xf0) == 0x80) {
-    transform_through_node_chain(param_4,param_5,param_2,&uStack_6a4,&uStack_6a8,&uStack_6ac,(int)aiStack_694);
-    iVar1 = param_3 + 0xe;
-    local_698 = 0;
-    local_69c = 0;
-    local_6a0 = 0;
-    for (sVar3 = 0; (int)sVar3 < (int)(uint)*(byte *)(param_3 + 8); sVar3 = sVar3 + 1) {
-      iVar2 = (int)sVar3;
-      local_6a0 = (aiStack_694[*(short *)(iVar1 + iVar2 * 2) * 3] >>
-                  (*(ushort *)(param_2 + 0x18) & 0x3f)) + local_6a0;
-      local_69c = (aiStack_694[*(short *)(iVar1 + iVar2 * 2) * 3 + 1] >>
-                  (*(ushort *)(param_2 + 0x18) & 0x3f)) + local_69c;
-      local_698 = (aiStack_694[*(short *)(iVar1 + iVar2 * 2) * 3 + 2] >>
-                  (*(ushort *)(param_2 + 0x18) & 0x3f)) + local_698;
+  undefined4 origin_z; /* uStack_6ac: node origin z (unused) */
+  undefined4 origin_y; /* uStack_6a8: node origin y (unused) */
+  undefined4 origin_x; /* uStack_6a4: node origin x (unused) */
+  int sum_x; /* local_6a0, -$6a0(A6): centroid x */
+  int sum_y; /* local_69c, -$69c(A6): centroid y (+100) */
+  int sum_z; /* local_698, -$698(A6): centroid z */
+  int verts [420]; /* aiStack_694, -$694(A6): transformed vertices (x, y, z) */
+
+  if ((*(byte *)(face + 9) & 0xf0) == 0x80) {
+    transform_through_node_chain(path,depth,node,&origin_x,&origin_y,&origin_z,(int)verts);
+    cand_metric = face + 0xe;
+    sum_z = 0;
+    sum_y = 0;
+    sum_x = 0;
+    for (i = 0; (int)i < (int)(uint)*(byte *)(face + 8); i = i + 1) {
+      best_metric = (int)i;
+      sum_x = (verts[*(short *)(cand_metric + best_metric * 2) * 3] >>
+                  (*(ushort *)(node + 0x18) & 0x3f)) + sum_x;
+      sum_y = (verts[*(short *)(cand_metric + best_metric * 2) * 3 + 1] >>
+                  (*(ushort *)(node + 0x18) & 0x3f)) + sum_y;
+      sum_z = (verts[*(short *)(cand_metric + best_metric * 2) * 3 + 2] >>
+                  (*(ushort *)(node + 0x18) & 0x3f)) + sum_z;
     }
-    local_6a0 = local_6a0 / (int)(uint)*(byte *)(param_3 + 8);
-    local_69c = local_69c / (int)(uint)*(byte *)(param_3 + 8) + 100;
-    local_698 = local_698 / (int)(uint)*(byte *)(param_3 + 8);
+    sum_x = sum_x / (int)(uint)*(byte *)(face + 8);
+    sum_y = sum_y / (int)(uint)*(byte *)(face + 8) + 100;
+    sum_z = sum_z / (int)(uint)*(byte *)(face + 8);
     /* FUN_00003be0 = compute_camera_abs_metric (lea.l $3be0.l is a runtime address = file
      * 0x3c00) [PROVEN, 0xbb2..0xbcc]: iVar1 = metric(this centroid), iVar2 = metric(current
      * best param_1[0..2]); the nearer one (strictly) replaces the best. */
-    iVar1 = FUN_00003be0();
-    iVar2 = FUN_00003be0();
-    if (iVar1 < iVar2) {
-      *param_1 = local_6a0;
-      param_1[1] = local_69c;
-      param_1[2] = local_698;
+    cand_metric = FUN_00003be0();
+    best_metric = FUN_00003be0();
+    if (cand_metric < best_metric) {
+      *best = sum_x;
+      best[1] = sum_y;
+      best[2] = sum_z;
     }
   }
   return;
@@ -1680,27 +2074,27 @@ void nearest_type80_centroid_visitor /* Original: FUN_00000aba */ (int *param_1,
  * cmpi.l #$3b9aca00, cmpi.l #$40740 / ble, moveq #1 / clr.l d0); identical to the C with
  * the call-argument correction.
  */
-undefined4 point_near_camera_or_type80_object /* Original: FUN_00000bea */ (int *param_1)
+undefined4 point_near_camera_or_type80_object /* Original: FUN_00000bea */ (int *point /* param_1: camera point record (DAT_0001d824), x / y / z */)
 
 {
-  int iVar1;
-  undefined4 uVar2;
+  int metric; /* iVar1: compute_camera_abs_metric result */
+  undefined4 result; /* uVar2: 1 = a point is available */
   
-  iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00; args dropped by Ghidra = (param_1[0], param_1[1], param_1[2]) [PROVEN] */);
-  if (iVar1 < 0x33900) {
+  metric = compute_camera_abs_metric( /* Original: FUN_00003c00; args dropped by Ghidra = (param_1[0], param_1[1], param_1[2]) [PROVEN] */);
+  if (metric < 0x33900) {
 LAB_00000c46:
-    uVar2 = 1;
+    result = 1;
   }
   else {
-    *param_1 = 1000000000;
-    for_each_mission_scene_object(FUN_00000aba,param_1);
-    if (*param_1 != 1000000000) {
-      iVar1 = compute_camera_abs_metric( /* Original: FUN_00003c00; args dropped by Ghidra = (param_1[0], param_1[1], param_1[2]) [PROVEN] */);
-      if (iVar1 < 0x40741) goto LAB_00000c46;
+    *point = 1000000000;
+    for_each_mission_scene_object(FUN_00000aba,point);
+    if (*point != 1000000000) {
+      metric = compute_camera_abs_metric( /* Original: FUN_00003c00; args dropped by Ghidra = (param_1[0], param_1[1], param_1[2]) [PROVEN] */);
+      if (metric < 0x40741) goto LAB_00000c46;
     }
-    uVar2 = 0;
+    result = 0;
   }
-  return uVar2;
+  return result;
 }
 
 
@@ -1719,54 +2113,54 @@ LAB_00000c46:
  * depth than ctx +0x20: the chain transform without a buffer, result (x, y, z) plus the
  * record's words +2 / +4 / +6 (record = path[-1], movea.l -(a3)) sign-extended into +0xc / +0x10
  * / +0x14. Both set result word +0x18 = 1. */
-void anchor_point_visitor /* Original: FUN_00000c4c */ (int *param_1,int param_2,int param_3,int *param_4,short param_5)
+void anchor_point_visitor /* Original: FUN_00000c4c */ (int *ctx /* param_1: find_anchor_point context ([0] result, [1..3] reference point, word +0x1e mode, [8] best key) */,int node /* param_2: scene node (byte +1 kind) */,int face /* param_3: face record (+9 type nibble, +0xe vertex index) */,int *path /* param_4: node path, path[-1] = parent record */,short depth /* param_5: path depth */)
 
 {
-  int iVar1;
+  int work; /* iVar1: parent record path[-1], then the distance */
   int aiStackY_60690 [98285];
-  undefined4 local_6ac;
-  undefined4 local_6a8;
-  undefined4 local_6a4 [4];
-  undefined1 auStack_694 [4];
-  int aiStack_690 [419];
-  
-  if (*(short *)((int)param_1 + 0x1e) == 0) {
-    if (*(char *)(param_2 + 1) != '\x01') {
+  undefined4 pos_z; /* local_6ac, -$6ac(A6): node origin z */
+  undefined4 pos_y; /* local_6a8, -$6a8(A6): node origin y */
+  undefined4 pos_x [4]; /* local_6a4, -$6a4(A6): node origin x (array form is Ghidra's) */
+  undefined1 verts [4]; /* auStack_694, -$694(A6): transformed vertex buffer (x, y, z) */
+  int verts_y [419]; /* aiStack_690, -$690(A6): verts + 4, so [3 i] is vertex i's y */
+
+  if (*(short *)((int)ctx + 0x1e) == 0) {
+    if (*(char *)(node + 1) != '\x01') {
       return;
     }
-    if (param_1[8] <= (int)param_5) {
+    if (ctx[8] <= (int)depth) {
       return;
     }
-    param_1[8] = (int)param_5;
-    transform_through_node_chain(param_4,param_5,param_2,local_6a4,&local_6a8,&local_6ac,0);
-    *(undefined4 *)*param_1 = local_6a4[0];
-    *(undefined4 *)(*param_1 + 4) = local_6a8;
-    *(undefined4 *)(*param_1 + 8) = local_6ac;
-    iVar1 = param_4[-1];
-    *(int *)(*param_1 + 0xc) = (int)*(short *)(iVar1 + 2);
-    *(int *)(*param_1 + 0x10) = (int)*(short *)(iVar1 + 4);
-    *(int *)(*param_1 + 0x14) = (int)*(short *)(iVar1 + 6);
+    ctx[8] = (int)depth;
+    transform_through_node_chain(path,depth,node,pos_x,&pos_y,&pos_z,0);
+    *(undefined4 *)*ctx = pos_x[0];
+    *(undefined4 *)(*ctx + 4) = pos_y;
+    *(undefined4 *)(*ctx + 8) = pos_z;
+    work = path[-1];
+    *(int *)(*ctx + 0xc) = (int)*(short *)(work + 2);
+    *(int *)(*ctx + 0x10) = (int)*(short *)(work + 4);
+    *(int *)(*ctx + 0x14) = (int)*(short *)(work + 6);
   }
   else {
-    if ((*(byte *)(param_3 + 9) & 0xf0) != 0x70) {
+    if ((*(byte *)(face + 9) & 0xf0) != 0x70) {
       return;
     }
-    transform_through_node_chain(param_4,param_5,param_2,local_6a4,&local_6a8,&local_6ac,(int)auStack_694);
-    if (0 < aiStack_690[*(short *)(param_3 + 0xe) * 3]) {
+    transform_through_node_chain(path,depth,node,pos_x,&pos_y,&pos_z,(int)verts);
+    if (0 < verts_y[*(short *)(face + 0xe) * 3]) {
       return;
     }
     /* Dropped call arguments [PROVEN, 0xcb4..0xccc]: approx_dist3_xyz(ctx +4, ctx +8, ctx
      * +0xc, local_6a4[0], local_6a8, local_6ac) (the reference point, then the found point). */
-    iVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
-    if (param_1[8] <= iVar1) {
+    work = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+    if (ctx[8] <= work) {
       return;
     }
-    param_1[8] = iVar1;
-    *(undefined4 *)*param_1 = local_6a4[0];
-    *(undefined4 *)(*param_1 + 4) = 0x43;
-    *(undefined4 *)(*param_1 + 8) = local_6ac;
+    ctx[8] = work;
+    *(undefined4 *)*ctx = pos_x[0];
+    *(undefined4 *)(*ctx + 4) = 0x43;
+    *(undefined4 *)(*ctx + 8) = pos_z;
   }
-  *(undefined2 *)(*param_1 + 0x18) = 1;
+  *(undefined2 *)(*ctx + 0x18) = 1;
   return;
 }
 
@@ -1781,31 +2175,31 @@ void anchor_point_visitor /* Original: FUN_00000c4c */ (int *param_1,int param_2
  * and one word (a6 - 0x20 .. - 0x7), word a6 - 6 = param_2 (low word $e), long a6 - 4 =
  * 1000000000 (best distance); bsr.w 0x6a6 for_each_mission_scene_object(pea $c4c(pc) = the
  * visitor anchor_point_visitor, Ghidra's FUN_00000c4c symbol, &context). */
-void find_anchor_point /* Original: FUN_00000d6a */ (undefined4 *param_1,undefined2 param_2)
+void find_anchor_point /* Original: FUN_00000d6a */ (undefined4 *result /* param_1: output record (x, y, z, three angles, found word +0x18) */,undefined2 mode /* param_2: 0 = kind-1 node, 1 = nearest type-0x70 ground point */)
 
 {
-  undefined4 *local_28;
-  undefined4 uStack_24;
-  undefined4 uStack_20;
-  undefined4 uStack_1c;
-  undefined4 uStack_18;
-  undefined4 uStack_14;
-  undefined4 uStack_10;
-  undefined2 local_c;
-  undefined2 local_a;
-  undefined4 local_8;
-  
-  local_a = param_2;
-  local_8 = 1000000000;
-  local_28 = param_1;
-  uStack_24 = *param_1;
-  uStack_20 = param_1[1];
-  uStack_1c = param_1[2];
-  uStack_18 = param_1[3];
-  uStack_14 = param_1[4];
-  uStack_10 = param_1[5];
-  local_c = *(undefined2 *)(param_1 + 6);
-  for_each_mission_scene_object(FUN_00000c4c,&local_28);
+  undefined4 *ctx_result; /* local_28, -$28(A6): context [0] = result pointer */
+  undefined4 ref_x; /* uStack_24: copy of result[0], the reference x */
+  undefined4 ref_y; /* uStack_20: copy of result[1] */
+  undefined4 ref_z; /* uStack_1c: copy of result[2] */
+  undefined4 ref_angle_a; /* uStack_18: copy of result[3] */
+  undefined4 ref_angle_b; /* uStack_14: copy of result[4] */
+  undefined4 ref_angle_c; /* uStack_10: copy of result[5] */
+  undefined2 ref_found; /* local_c, -$c(A6): copy of the found word +0x18 */
+  undefined2 ctx_mode; /* local_a, -$a(A6): context word +0x1e = mode */
+  undefined4 ctx_best; /* local_8, -8(A6): context [8] best key, 1000000000 */
+
+  ctx_mode = mode;
+  ctx_best = 1000000000;
+  ctx_result = result;
+  ref_x = *result;
+  ref_y = result[1];
+  ref_z = result[2];
+  ref_angle_a = result[3];
+  ref_angle_b = result[4];
+  ref_angle_c = result[5];
+  ref_found = *(undefined2 *)(result + 6);
+  for_each_mission_scene_object(FUN_00000c4c,&ctx_result);
   return;
 }
 
@@ -1819,24 +2213,24 @@ void find_anchor_point /* Original: FUN_00000d6a */ (undefined4 *param_1,undefin
  * found identical to the C: no handle (*p == 0) -> host hook +0x2c6(size) stored in *p, flag = 1;
  * empty handle (**p == 0) -> hook +0x2ce(*p, size), flag = 1; then hook +0x2de(*p); returns
  * the sign-extended word flag (0 / 1) = the C's bVar3 || iVar1 == 0. */
-bool ensure_handle_allocated /* Original: FUN_00000db0 */ (int *param_1,undefined4 param_2)
+bool ensure_handle_allocated /* Original: FUN_00000db0 */ (int *slot /* param_1: Handle *slot */,undefined4 size /* param_2: block size in bytes */)
 
 {
-  int iVar1;
-  int iVar2;
-  bool bVar3;
+  int old_handle; /* iVar1: *slot on entry, 0 = none yet */
+  int new_handle; /* iVar2: new_handle_clear_or_die (service +0x2c6) result */
+  bool was_purged; /* bVar3: the handle was empty (purged) */
   
-  iVar1 = *param_1;
-  if (iVar1 == 0) {
-    iVar2 = (**(code **)(DAT_0001b5a0 + 0x2c6))(param_2);
-    *param_1 = iVar2;
+  old_handle = *slot;
+  if (old_handle == 0) {
+    new_handle = (**(code **)(host_world + 0x2c6))(size);
+    *slot = new_handle;
   }
-  bVar3 = *(int *)*param_1 == 0;
-  if (bVar3) {
-    (**(code **)(DAT_0001b5a0 + 0x2ce))((int *)*param_1,param_2);
+  was_purged = *(int *)*slot == 0;
+  if (was_purged) {
+    (**(code **)(host_world + 0x2ce))((int *)*slot,size);
   }
-  (**(code **)(DAT_0001b5a0 + 0x2de))(*param_1);
-  return bVar3 || iVar1 == 0;
+  (**(code **)(host_world + 0x2de))(*slot);
+  return was_purged || old_handle == 0;
 }
 
 
@@ -1847,11 +2241,11 @@ bool ensure_handle_allocated /* Original: FUN_00000db0 */ (int *param_1,undefine
  */
 /* VERIFIED (FUN_00000e0a): 0xe0a..0xe30 checked against an independent capstone disassembly and
  * found identical to the C: host hooks +0x2d2 then +0x2de, each with the handle (d2). */
-void lock_handle_nopurge /* Original: FUN_00000e0a */ (undefined4 param_1)
+void lock_handle_nopurge /* Original: FUN_00000e0a */ (undefined4 handle /* param_1: handle to hlock / hnopurge */)
 
 {
-  (**(code **)(DAT_0001b5a0 + 0x2d2))(param_1);
-  (**(code **)(DAT_0001b5a0 + 0x2de))(param_1);
+  (**(code **)(host_world + 0x2d2))(handle);
+  (**(code **)(host_world + 0x2de))(handle);
   return;
 }
 
@@ -1863,11 +2257,11 @@ void lock_handle_nopurge /* Original: FUN_00000e0a */ (undefined4 param_1)
  */
 /* VERIFIED (FUN_00000e32): 0xe32..0xe58 checked against an independent capstone disassembly and
  * found identical to the C: host hooks +0x2d6 then +0x2da, each with the handle (d2). */
-void unlock_handle_purgeable /* Original: FUN_00000e32 */ (undefined4 param_1)
+void unlock_handle_purgeable /* Original: FUN_00000e32 */ (undefined4 handle /* param_1: handle to hunlock / hpurge */)
 
 {
-  (**(code **)(DAT_0001b5a0 + 0x2d6))(param_1);
-  (**(code **)(DAT_0001b5a0 + 0x2da))(param_1);
+  (**(code **)(host_world + 0x2d6))(handle);
+  (**(code **)(host_world + 0x2da))(handle);
   return;
 }
 
@@ -1883,10 +2277,10 @@ void unlock_handle_purgeable /* Original: FUN_00000e32 */ (undefined4 param_1)
 void lock_overlay_buffers /* Original: FUN_00000e5a */ (void)
 
 {
-  (**(code **)(DAT_0001b5a0 + 0x2d2))(*(undefined4 *)(DAT_0001b5a0 + 0x192));
-  (**(code **)(DAT_0001b5a0 + 0x2d2))(*(undefined4 *)(DAT_0001b5a0 + 0x1ac));
-  (**(code **)(DAT_0001b5a0 + 0x2d2))(*(undefined4 *)(DAT_0001b5a0 + 0x1b4));
-  (**(code **)(DAT_0001b5a0 + 0x2d2))(*(undefined4 *)(DAT_0001b5a0 + 0xd8));
+  (**(code **)(host_world + 0x2d2))(*(undefined4 *)(host_world + 0x192));
+  (**(code **)(host_world + 0x2d2))(*(undefined4 *)(host_world + 0x1ac));
+  (**(code **)(host_world + 0x2d2))(*(undefined4 *)(host_world + 0x1b4));
+  (**(code **)(host_world + 0x2d2))(*(undefined4 *)(host_world + 0xd8));
   return;
 }
 
@@ -1907,45 +2301,45 @@ void lock_overlay_buffers /* Original: FUN_00000e5a */ (void)
 void allocate_session_buffers /* Original: FUN_00000ea0 */ (void)
 
 {
-  undefined3 extraout_var;
-  undefined3 extraout_var_00;
-  int iVar1;
-  short sVar2;
-  bool bVar3;
-  short sVar4;
+  undefined3 ret_hi_a; /* extraout_var: D0 upper bytes after the bool return */
+  undefined3 ret_hi_b; /* extraout_var_00: D0 upper bytes after the bool return */
+  int free_bytes; /* iVar1: freemem (service +0x2e2) result */
+  short count_or_slot; /* sVar2: entry count 550 / 800, then handle slot 1..3 */
+  bool reallocated; /* bVar3: ensure_handle_allocated result */
+  short rows; /* sVar4: 20 or 30 rows */
   
-  _DAT_00020c4c = 0;
-  iVar1 = (**(code **)(DAT_0001b5a0 + 0x2e2))();
-  if (iVar1 < 0x7d001) {
-    sVar2 = 0x226;
-    sVar4 = 0x14;
+  session_buffers_rebuilt = 0;
+  free_bytes = (**(code **)(host_world + 0x2e2))();
+  if (free_bytes < 0x7d001) {
+    count_or_slot = 0x226;
+    rows = 0x14;
   }
   else {
-    sVar2 = 800;
-    sVar4 = 0x1e;
+    count_or_slot = 800;
+    rows = 0x1e;
   }
-  if (*DAT_0001b5a0 != '\0') {
-    ensure_handle_allocated(&DAT_0001b744,sVar2 * 0x1c);
+  if (*host_world != '\0') {
+    ensure_handle_allocated(&session_entry_handle,count_or_slot * 0x1c);
   }
-  if (*(short *)(DAT_0001b5a0 + 0xe) != 1) {
-    sVar2 = 1;
+  if (*(short *)(host_world + 0xe) != 1) {
+    count_or_slot = 1;
     do {
-      if ((sVar2 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-        bVar3 = ensure_handle_allocated((int *)(&DAT_0001b74c + sVar2 * 4),
-                             (int)sVar4 * (int)*(short *)(DAT_0001b5a0 + 0xc) * 4);
-        if (CONCAT31(extraout_var,bVar3) != 0) {
-          _DAT_00020c4c = 1;
+      if ((count_or_slot == 1) || (*(short *)(host_world + 0xb4) != 0)) {
+        reallocated = ensure_handle_allocated((int *)(&session_handles_a + count_or_slot * 4),
+                             (int)rows * (int)*(short *)(host_world + 0xc) * 4);
+        if (CONCAT31(ret_hi_a,reallocated) != 0) {
+          session_buffers_rebuilt = 1;
         }
       }
-      if ((sVar2 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-        bVar3 = ensure_handle_allocated((int *)(&DAT_0001b75c + sVar2 * 2),
-                             (int)sVar4 * (int)*(short *)(DAT_0001b5a0 + 0xc) * 4);
-        if (CONCAT31(extraout_var_00,bVar3) != 0) {
-          _DAT_00020c4c = 1;
+      if ((count_or_slot == 1) || (*(short *)(host_world + 0xb4) != 0)) {
+        reallocated = ensure_handle_allocated((int *)(&session_handles_b + count_or_slot * 2),
+                             (int)rows * (int)*(short *)(host_world + 0xc) * 4);
+        if (CONCAT31(ret_hi_b,reallocated) != 0) {
+          session_buffers_rebuilt = 1;
         }
       }
-      sVar2 = sVar2 + 1;
-    } while (sVar2 < 4);
+      count_or_slot = count_or_slot + 1;
+    } while (count_or_slot < 4);
   }
   return;
 }
@@ -1966,39 +2360,39 @@ void allocate_session_buffers /* Original: FUN_00000ea0 */ (void)
 void lock_session_buffers /* Original: FUN_00000f92 */ (void)
 
 {
-  short sVar1;
-  int iVar2;
+  short slot; /* sVar1: handle slot 1..3 */
+  int i; /* iVar2: slot as a long index */
   
-  if (*DAT_0001b5a0 != '\0') {
-    lock_handle_nopurge(DAT_0001b744);
-    DAT_0001b76c = *DAT_0001b744;
-    if (*(short *)(DAT_0001b5a0 + 0x76) != 0) {
-      DAT_0001b76c = DAT_0001b76c & 0xffffff;
+  if (*host_world != '\0') {
+    lock_handle_nopurge(session_entry_handle);
+    session_entry_ptr = *session_entry_handle;
+    if (*(short *)(host_world + 0x76) != 0) {
+      session_entry_ptr = session_entry_ptr & 0xffffff;
     }
   }
-  if (*(short *)(DAT_0001b5a0 + 0xe) != 1) {
-    sVar1 = 1;
+  if (*(short *)(host_world + 0xe) != 1) {
+    slot = 1;
     do {
-      if ((sVar1 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-        iVar2 = (int)sVar1;
-        lock_handle_nopurge(*(undefined4 *)(&DAT_0001b74c + iVar2 * 4));
-        *(undefined4 *)(&DAT_0001b774 + iVar2 * 4) = **(undefined4 **)(&DAT_0001b74c + iVar2 * 4);
-        if (*(short *)(DAT_0001b5a0 + 0x76) != 0) {
-          *(uint *)(&DAT_0001b774 + iVar2 * 4) = *(uint *)(&DAT_0001b774 + iVar2 * 4) & 0xffffff;
+      if ((slot == 1) || (*(short *)(host_world + 0xb4) != 0)) {
+        i = (int)slot;
+        lock_handle_nopurge(*(undefined4 *)(&session_handles_a + i * 4));
+        *(undefined4 *)(&session_ptrs_a + i * 4) = **(undefined4 **)(&session_handles_a + i * 4);
+        if (*(short *)(host_world + 0x76) != 0) {
+          *(uint *)(&session_ptrs_a + i * 4) = *(uint *)(&session_ptrs_a + i * 4) & 0xffffff;
         }
       }
-      if ((sVar1 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-        iVar2 = (int)sVar1;
-        lock_handle_nopurge(*(undefined4 *)(&DAT_0001b75c + iVar2 * 2));
-        *(undefined4 *)(&DAT_0001b784 + iVar2 * 2) = **(undefined4 **)(&DAT_0001b75c + iVar2 * 2);
-        if (*(short *)(DAT_0001b5a0 + 0x76) != 0) {
-          *(uint *)(&DAT_0001b784 + iVar2 * 2) = *(uint *)(&DAT_0001b784 + iVar2 * 2) & 0xffffff;
+      if ((slot == 1) || (*(short *)(host_world + 0xb4) != 0)) {
+        i = (int)slot;
+        lock_handle_nopurge(*(undefined4 *)(&session_handles_b + i * 2));
+        *(undefined4 *)(&session_ptrs_b + i * 2) = **(undefined4 **)(&session_handles_b + i * 2);
+        if (*(short *)(host_world + 0x76) != 0) {
+          *(uint *)(&session_ptrs_b + i * 2) = *(uint *)(&session_ptrs_b + i * 2) & 0xffffff;
         }
       }
-      sVar1 = sVar1 + 1;
-    } while (sVar1 < 4);
-    DAT_0001b794 = DAT_0001b788;
-    DAT_0001b798 = DAT_0001b778;
+      slot = slot + 1;
+    } while (slot < 4);
+    session_cur_b = session_ptr_b_slot1;
+    session_cur_a = session_ptr_a_slot1;
   }
   update_view_clip_bounds();
   return;
@@ -2018,29 +2412,29 @@ void lock_session_buffers /* Original: FUN_00000f92 */ (void)
 void unlock_session_buffers /* Original: FUN_00001094 */ (void)
 
 {
-  short sVar1;
-  int iVar2;
+  short slot; /* sVar1: handle slot 1..3 */
+  int i; /* iVar2: slot as a long index */
   
-  if (DAT_0001b744 != 0) {
-    unlock_handle_purgeable(DAT_0001b744);
-    DAT_0001b76c = 0;
+  if (session_entry_handle != 0) {
+    unlock_handle_purgeable(session_entry_handle);
+    session_entry_ptr = 0;
   }
-  sVar1 = 1;
+  slot = 1;
   do {
-    iVar2 = (int)sVar1;
-    if (*(int *)(&DAT_0001b74c + iVar2 * 4) != 0) {
-      unlock_handle_purgeable(*(undefined4 *)(&DAT_0001b74c + iVar2 * 4));
-      *(undefined4 *)(&DAT_0001b774 + iVar2 * 4) = 0;
+    i = (int)slot;
+    if (*(int *)(&session_handles_a + i * 4) != 0) {
+      unlock_handle_purgeable(*(undefined4 *)(&session_handles_a + i * 4));
+      *(undefined4 *)(&session_ptrs_a + i * 4) = 0;
     }
-    iVar2 = (int)sVar1;
-    if (*(int *)(&DAT_0001b75c + iVar2 * 2) != 0) {
-      unlock_handle_purgeable(*(undefined4 *)(&DAT_0001b75c + iVar2 * 2));
-      *(undefined4 *)(&DAT_0001b784 + iVar2 * 2) = 0;
+    i = (int)slot;
+    if (*(int *)(&session_handles_b + i * 2) != 0) {
+      unlock_handle_purgeable(*(undefined4 *)(&session_handles_b + i * 2));
+      *(undefined4 *)(&session_ptrs_b + i * 2) = 0;
     }
-    sVar1 = sVar1 + 1;
-  } while (sVar1 < 4);
-  DAT_0001b794 = 0;
-  DAT_0001b798 = 0;
+    slot = slot + 1;
+  } while (slot < 4);
+  session_cur_b = 0;
+  session_cur_a = 0;
   return;
 }
 
@@ -2066,37 +2460,37 @@ void unlock_session_buffers /* Original: FUN_00001094 */ (void)
  * same numbers), +0x32a 0x28a6 rotate_int3_vecs_by_3ang, +0x32e 0xe372 isqrt_floor (Ghidra's
  * LAB_0000e350_2), +0x332 0x1f22 attitude_from_velocity, +0x336 0x954 plot_mission_map_symbols,
  * +0x33a 0x640c spawn_cloud_layer. */
-void overlay_main_entry /* Original: FUN_00001112 */ (int param_1,undefined4 param_2)
+void overlay_main_entry /* Original: FUN_00001112 */ (int host_globals /* param_1: host A5 - 0x1388 */,undefined4 ticks /* param_2: TickCount, passed to overlay_initialise */)
 
 {
-  int iVar1;
-  
-  DAT_0001b5a0 = param_1;
-  overlay_initialise(param_2);
-  iVar1 = DAT_0001b5a0;
-  *(undefined2 *)(DAT_0001b5a0 + 0x92) = 9;
-  *(undefined4 *)(iVar1 + 0x2e6) = 0x6fd6;
-  *(undefined4 *)(iVar1 + 0x2ea) = 0x6eb6;
-  *(undefined4 *)(iVar1 + 0x2ee) = 0x3aa4;
-  *(undefined4 *)(iVar1 + 0x2f2) = 0x41f0;
-  *(undefined4 *)(iVar1 + 0x2f6) = 0x44c8;
-  *(undefined4 *)(iVar1 + 0x2fa) = 0x3da;
-  *(undefined4 *)(iVar1 + 0x2fe) = 0x38d4;
-  *(undefined4 *)(iVar1 + 0x302) = 0x4b0;
-  *(undefined4 *)(iVar1 + 0x306) = 0xe80;
-  *(undefined4 *)(iVar1 + 0x30a) = 0xf72;
-  *(undefined4 *)(iVar1 + 0x30e) = 0x6578;
-  *(undefined4 *)(iVar1 + 0x312) = 0x1074;
-  *(undefined4 *)(iVar1 + 0x316) = 0xd23a;
-  *(undefined4 *)(iVar1 + 0x31a) = 0x72f0;
-  *(undefined4 *)(iVar1 + 0x31e) = 0x73ea;
-  *(code **)(iVar1 + 0x322) = FUN_00001d56;
-  *(code **)(iVar1 + 0x326) = FUN_00001db8;
-  *(undefined4 *)(iVar1 + 0x32a) = 0x2886;
-  *(undefined1 **)(iVar1 + 0x32e) = &LAB_0000e350_2;
-  *(undefined4 *)(iVar1 + 0x332) = 0x1f02;
-  *(undefined4 *)(iVar1 + 0x336) = 0x934;
-  *(undefined4 *)(iVar1 + 0x33a) = 0x63ec;
+  int host; /* iVar1: host_world copy */
+
+  host_world = host_globals;
+  overlay_initialise(ticks);
+  host = host_world;
+  *(undefined2 *)(host_world + 0x92) = 9;
+  *(undefined4 *)(host + 0x2e6) = 0x6fd6;
+  *(undefined4 *)(host + 0x2ea) = 0x6eb6;
+  *(undefined4 *)(host + 0x2ee) = 0x3aa4;
+  *(undefined4 *)(host + 0x2f2) = 0x41f0;
+  *(undefined4 *)(host + 0x2f6) = 0x44c8;
+  *(undefined4 *)(host + 0x2fa) = 0x3da;
+  *(undefined4 *)(host + 0x2fe) = 0x38d4;
+  *(undefined4 *)(host + 0x302) = 0x4b0;
+  *(undefined4 *)(host + 0x306) = 0xe80;
+  *(undefined4 *)(host + 0x30a) = 0xf72;
+  *(undefined4 *)(host + 0x30e) = 0x6578;
+  *(undefined4 *)(host + 0x312) = 0x1074;
+  *(undefined4 *)(host + 0x316) = 0xd23a;
+  *(undefined4 *)(host + 0x31a) = 0x72f0;
+  *(undefined4 *)(host + 0x31e) = 0x73ea;
+  *(code **)(host + 0x322) = FUN_00001d56;
+  *(code **)(host + 0x326) = FUN_00001db8;
+  *(undefined4 *)(host + 0x32a) = 0x2886;
+  *(undefined1 **)(host + 0x32e) = &LAB_0000e350_2;
+  *(undefined4 *)(host + 0x332) = 0x1f02;
+  *(undefined4 *)(host + 0x336) = 0x934;
+  *(undefined4 *)(host + 0x33a) = 0x63ec;
   return;
 }
 
@@ -2110,35 +2504,35 @@ void overlay_main_entry /* Original: FUN_00001112 */ (int param_1,undefined4 par
  * found identical to the C: copies the string into DAT_00020b4c rewriting "%d" as "%ld" and
  * "%x" as "%lx" (two-byte matches, cmpi.b #$25 / #$64 / #$78), NUL-terminates, returns
  * &DAT_00020b4c. */
-undefined1 * widen_printf_format /* Original: FUN_000011e6 */ (char *param_1)
+undefined1 * widen_printf_format /* Original: FUN_000011e6 */ (char *format /* param_1: source format string */)
 
 {
-  char *pcVar1;
+  char *out; /* pcVar1: write cursor in widened_format_buf */
   
-  pcVar1 = &DAT_00020b4c;
-  while (*param_1 != '\0') {
-    if ((*param_1 == '%') && (param_1[1] == 'd')) {
-      *pcVar1 = '%';
-      pcVar1[1] = 'l';
-      pcVar1[2] = 'd';
-      pcVar1 = pcVar1 + 3;
-      param_1 = param_1 + 2;
+  out = &widened_format_buf;
+  while (*format != '\0') {
+    if ((*format == '%') && (format[1] == 'd')) {
+      *out = '%';
+      out[1] = 'l';
+      out[2] = 'd';
+      out = out + 3;
+      format = format + 2;
     }
-    else if ((*param_1 == '%') && (param_1[1] == 'x')) {
-      *pcVar1 = '%';
-      pcVar1[1] = 'l';
-      pcVar1[2] = 'x';
-      pcVar1 = pcVar1 + 3;
-      param_1 = param_1 + 2;
+    else if ((*format == '%') && (format[1] == 'x')) {
+      *out = '%';
+      out[1] = 'l';
+      out[2] = 'x';
+      out = out + 3;
+      format = format + 2;
     }
     else {
-      *pcVar1 = *param_1;
-      pcVar1 = pcVar1 + 1;
-      param_1 = param_1 + 1;
+      *out = *format;
+      out = out + 1;
+      format = format + 1;
     }
   }
-  *pcVar1 = '\0';
-  return &DAT_00020b4c;
+  *out = '\0';
+  return &widened_format_buf;
 }
 
 
@@ -2151,16 +2545,16 @@ undefined1 * widen_printf_format /* Original: FUN_000011e6 */ (char *param_1)
  * found identical to the C: all six arguments are pushed, bsr.w 0x11e6 widen_printf_format, only
  * the format slot is popped (addq.w #4) and the result pushed in its place, so host hook
  * +0x262(widened, p2..p6) reuses the other five slots. */
-void overlay_printf /* Original: FUN_00001254 */ (char *param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,
-                 undefined4 param_5,undefined4 param_6)
+void overlay_printf /* Original: FUN_00001254 */ (char *format /* param_1: format string */,undefined4 arg1 /* param_2: format argument 1 */,undefined4 arg2 /* param_3: format argument 2 */,undefined4 arg3 /* param_4: format argument 3 */,
+                 undefined4 arg4 /* param_5: format argument 4 */,undefined4 arg5 /* param_6: format argument 5 */)
 
 {
-  int iVar1;
-  undefined1 *puVar2;
+  int host; /* iVar1: host_world copy */
+  undefined1 *widened; /* puVar2: widen_printf_format result */
   
-  iVar1 = DAT_0001b5a0;
-  puVar2 = widen_printf_format(param_1);
-  (**(code **)(iVar1 + 0x262))(puVar2,param_2,param_3,param_4,param_5,param_6);
+  host = host_world;
+  widened = widen_printf_format(format);
+  (**(code **)(host + 0x262))(widened,arg1,arg2,arg3,arg4,arg5);
   return;
 }
 
@@ -2177,32 +2571,32 @@ void overlay_printf /* Original: FUN_00001254 */ (char *param_1,undefined4 param
 void reset_palette_owner_tables /* Original: FUN_00001294 */ (void)
 
 {
-  uint *puVar1;
-  int iVar2;
-  int *piVar3;
-  undefined4 *puVar4;
+  uint *table; /* puVar1: heap_alloc_cleared(0x400) result */
+  int slot; /* iVar2: slot 1..3 */
+  int *free_cursor; /* piVar3: table pointer being freed */
+  undefined4 *alloc_cursor; /* puVar4: table pointer being allocated */
   
-  iVar2 = 1;
-  piVar3 = &DAT_0001da70;
+  slot = 1;
+  free_cursor = &palette_owner_tables;
   do {
-    if (*piVar3 != 0) {
-      heap_free_coalesce(*piVar3);
-      *piVar3 = 0;
+    if (*free_cursor != 0) {
+      heap_free_coalesce(*free_cursor);
+      *free_cursor = 0;
     }
-    piVar3 = piVar3 + 1;
-    iVar2 = iVar2 + 1;
-  } while (iVar2 < 4);
-  iVar2 = 1;
-  puVar4 = &DAT_0001da70;
+    free_cursor = free_cursor + 1;
+    slot = slot + 1;
+  } while (slot < 4);
+  slot = 1;
+  alloc_cursor = &palette_owner_tables;
   do {
-    if ((iVar2 == 1) || (*(short *)(DAT_0001b5a0 + 0xb4) != 0)) {
-      puVar1 = heap_alloc_cleared(0x400);
-      *puVar4 = puVar1;
+    if ((slot == 1) || (*(short *)(host_world + 0xb4) != 0)) {
+      table = heap_alloc_cleared(0x400);
+      *alloc_cursor = table;
     }
-    puVar4 = puVar4 + 1;
-    iVar2 = iVar2 + 1;
-  } while (iVar2 < 4);
-  DAT_0001da7c = DAT_0001da70;
+    alloc_cursor = alloc_cursor + 1;
+    slot = slot + 1;
+  } while (slot < 4);
+  palette_owner_current = palette_owner_tables;
   return;
 }
 
@@ -2219,8 +2613,8 @@ void init_depth8_colour_state /* Original: FUN_00001300 */ (void)
 
 {
   reset_palette_owner_tables();
-  DAT_0001da8a = 0;
-  DAT_0001daa0 = *(undefined2 *)(*(int *)(DAT_0001b5a0 + 0x34) + 0x1a0);
+  colour_tally_index = 0;
+  fill_colour = *(undefined2 *)(*(int *)(host_world + 0x34) + 0x1a0);
   return;
 }
 
@@ -2242,55 +2636,55 @@ void init_depth8_colour_state /* Original: FUN_00001300 */ (void)
 void init_depth4_colour_state /* Original: FUN_0000131c */ (void)
 
 {
-  int iVar1;
-  int iVar2;
-  int iVar3;
-  int iVar4;
-  int iVar5;
-  int iVar6;
-  int iVar7;
-  uint local_8;
+  int colour_list; /* iVar1: device colour word list, host +0x1e + 0x16 * slot */
+  int table; /* iVar2: owner table of the slot */
+  int c; /* iVar3: inner level 0..4 */
+  int b; /* iVar4: middle level 0..4 */
+  int a; /* iVar5: outer level 0..4 */
+  int entry; /* iVar6: table entry 0..124 */
+  int slot; /* iVar7: device slot 1..3 */
+  uint a_gt3; /* local_8, -8(A6): (a > 3) flag for nibble 3 */
   
   reset_palette_owner_tables();
-  iVar7 = 1;
+  slot = 1;
   do {
-    iVar2 = *(int *)(&DAT_0001da6c + iVar7 * 4);
-    iVar1 = *(int *)(iVar7 * 0x16 + DAT_0001b5a0 + 0x1e);
-    if ((iVar1 != 0) && (iVar2 != 0)) {
-      iVar6 = 0;
-      iVar5 = 0;
+    table = *(int *)(&palette_owner_slots + slot * 4);
+    colour_list = *(int *)(slot * 0x16 + host_world + 0x1e);
+    if ((colour_list != 0) && (table != 0)) {
+      entry = 0;
+      a = 0;
       do {
-        iVar4 = 0;
+        b = 0;
         do {
-          iVar3 = 0;
+          c = 0;
           do {
-            local_8 = (uint)(byte)-(3 < iVar5);
-            *(int *)(iVar2 + iVar6 * 4) =
-                 (int)*(short *)(iVar1 + (((byte)-(2 < iVar3) & 1) +
-                                         ((byte)-(2 < iVar5) & 1) * 4 + ((byte)-(2 < iVar4) & 1) * 2
+            a_gt3 = (uint)(byte)-(3 < a);
+            *(int *)(table + entry * 4) =
+                 (int)*(short *)(colour_list + (((byte)-(2 < c) & 1) +
+                                         ((byte)-(2 < a) & 1) * 4 + ((byte)-(2 < b) & 1) * 2
                                          ) * 2) |
-                 (int)*(short *)(iVar1 + (((byte)-(0 < iVar3) & 1) +
-                                         ((byte)-(0 < iVar5) & 1) * 4 + ((byte)-(0 < iVar4) & 1) * 2
+                 (int)*(short *)(colour_list + (((byte)-(0 < c) & 1) +
+                                         ((byte)-(0 < a) & 1) * 4 + ((byte)-(0 < b) & 1) * 2
                                          ) * 2) << 4 |
-                 (int)*(short *)(iVar1 + (((byte)-(1 < iVar3) & 1) +
-                                         ((byte)-(1 < iVar5) & 1) * 4 + ((byte)-(1 < iVar4) & 1) * 2
+                 (int)*(short *)(colour_list + (((byte)-(1 < c) & 1) +
+                                         ((byte)-(1 < a) & 1) * 4 + ((byte)-(1 < b) & 1) * 2
                                          ) * 2) << 8 |
-                 (int)*(short *)(iVar1 + (((byte)-(3 < iVar3) & 1) +
-                                         (local_8 & 1) * 4 + ((byte)-(3 < iVar4) & 1) * 2) * 2) <<
+                 (int)*(short *)(colour_list + (((byte)-(3 < c) & 1) +
+                                         (a_gt3 & 1) * 4 + ((byte)-(3 < b) & 1) * 2) * 2) <<
                  0xc;
-            iVar6 = iVar6 + 1;
-            iVar3 = iVar3 + 1;
-          } while (iVar3 < 5);
-          iVar4 = iVar4 + 1;
-        } while (iVar4 < 5);
-        iVar5 = iVar5 + 1;
-      } while (iVar5 < 5);
+            entry = entry + 1;
+            c = c + 1;
+          } while (c < 5);
+          b = b + 1;
+        } while (b < 5);
+        a = a + 1;
+      } while (a < 5);
     }
-    iVar7 = iVar7 + 1;
-  } while (iVar7 < 4);
-  DAT_0001da7c = DAT_0001da70;
-  DAT_0001da8a = 0;
-  DAT_0001daa0 = *(undefined2 *)(*(int *)(DAT_0001b5a0 + 0x34) + 0x10);
+    slot = slot + 1;
+  } while (slot < 4);
+  palette_owner_current = palette_owner_tables;
+  colour_tally_index = 0;
+  fill_colour = *(undefined2 *)(*(int *)(host_world + 0x34) + 0x10);
   return;
 }
 
@@ -2311,57 +2705,57 @@ void init_depth4_colour_state /* Original: FUN_0000131c */ (void)
  * VERIFIED: checked against an independent capstone disassembly of the bytes
  * 0x147a..0x1546; identical to the C.
  */
-void queue_face_palette_entry /* Original: FUN_0000147a */ (int param_1)
+void queue_face_palette_entry /* Original: FUN_0000147a */ (int face /* param_1: face record (+4 colour, +0xc/+0xd/+0xe r g b, +0xf palette slot) */)
 
 {
-  byte bVar1;
-  short *psVar2;
-  int iVar3;
-  short sVar4;
-  uint uVar5;
-  short *psVar6;
-  
-  bVar1 = *(byte *)(param_1 + 0xf);
-  *(int *)(DAT_0001da7c + (uint)bVar1 * 4) = param_1;
-  if (_DAT_0001d85a == 0) {
-    sVar4 = *(short *)(DAT_0001d85c + (uint)bVar1 * 2);
-    *(int *)(param_1 + 4) = (int)sVar4 | (int)sVar4 << 8;
-    psVar6 = (short *)(*(int *)(DAT_0001b5a0 + 0x72) + 6);
-    psVar2 = (short *)(*(int *)(DAT_0001b5a0 + 0x72) + *psVar6 * 8 + 8);
-    *psVar6 = *psVar6 + 1;
-    *psVar2 = sVar4;
-    iVar3 = (uint)*(byte *)(param_1 + 0xc) * 0x100 + -1;
-    if (iVar3 < 0) {
-      sVar4 = 0;
+  byte slot; /* bVar1: face byte +0xf palette slot */
+  short *spec; /* psVar2: new ColorSpec entry {index, r, g, b} */
+  int component; /* iVar3: colour byte * 256 - 1 */
+  short value; /* sVar4: pixel index, then each clamped component */
+  uint direct; /* uVar5: r + g + b / 3, at least 1 */
+  short *spec_count; /* psVar6: count word +6 of the pending table at host +0x72 */
+
+  slot = *(byte *)(face + 0xf);
+  *(int *)(palette_owner_current + (uint)slot * 4) = face;
+  if (palette_direct_mode == 0) {
+    value = *(short *)(slot_to_index_map + (uint)slot * 2);
+    *(int *)(face + 4) = (int)value | (int)value << 8;
+    spec_count = (short *)(*(int *)(host_world + 0x72) + 6);
+    spec = (short *)(*(int *)(host_world + 0x72) + *spec_count * 8 + 8);
+    *spec_count = *spec_count + 1;
+    *spec = value;
+    component = (uint)*(byte *)(face + 0xc) * 0x100 + -1;
+    if (component < 0) {
+      value = 0;
     }
     else {
-      sVar4 = (short)iVar3;
+      value = (short)component;
     }
-    psVar2[1] = sVar4;
-    iVar3 = (uint)*(byte *)(param_1 + 0xd) * 0x100 + -1;
-    if (iVar3 < 0) {
-      sVar4 = 0;
-    }
-    else {
-      sVar4 = (short)iVar3;
-    }
-    psVar2[2] = sVar4;
-    iVar3 = (uint)*(byte *)(param_1 + 0xe) * 0x100 + -1;
-    if (iVar3 < 0) {
-      sVar4 = 0;
+    spec[1] = value;
+    component = (uint)*(byte *)(face + 0xd) * 0x100 + -1;
+    if (component < 0) {
+      value = 0;
     }
     else {
-      sVar4 = (short)iVar3;
+      value = (short)component;
     }
-    psVar2[3] = sVar4;
+    spec[2] = value;
+    component = (uint)*(byte *)(face + 0xe) * 0x100 + -1;
+    if (component < 0) {
+      value = 0;
+    }
+    else {
+      value = (short)component;
+    }
+    spec[3] = value;
   }
   else {
-    uVar5 = (uint)(int)(short)(ushort)*(byte *)(param_1 + 0xe) / 3 +
-            (uint)*(byte *)(param_1 + 0xd) + (uint)*(byte *)(param_1 + 0xc);
-    if (uVar5 == 0) {
-      uVar5 = 1;
+    direct = (uint)(int)(short)(ushort)*(byte *)(face + 0xe) / 3 +
+            (uint)*(byte *)(face + 0xd) + (uint)*(byte *)(face + 0xc);
+    if (direct == 0) {
+      direct = 1;
     }
-    *(uint *)(param_1 + 4) = uVar5 | uVar5 << 8;
+    *(uint *)(face + 4) = direct | direct << 8;
   }
   return;
 }
@@ -2377,28 +2771,28 @@ void queue_face_palette_entry /* Original: FUN_0000147a */ (int param_1)
  * (DAT_0001da7c), table[byte +0xf] = -face (neg.l). The return value is only what is left
  * in d0. Identical to the C.
  */
-uint write_face_palette_slot /* Original: FUN_00001548 */ (int param_1)
+uint write_face_palette_slot /* Original: FUN_00001548 */ (int face /* param_1: face record */)
 
 {
-  uint uVar1;
-  int iVar2;
-  int *piVar3;
+  uint result; /* uVar1: d0 residue, the slot when written */
+  int n; /* iVar2: table counter 1..3 */
+  int *table; /* piVar3: owner table pointer cursor */
   
-  uVar1 = queue_face_palette_entry(param_1);
-  if (*(short *)(DAT_0001b5a0 + 0xb4) != 0) {
-    iVar2 = 1;
-    uVar1 = 0;
-    piVar3 = &DAT_0001da70;
+  result = queue_face_palette_entry(face);
+  if (*(short *)(host_world + 0xb4) != 0) {
+    n = 1;
+    result = 0;
+    table = &palette_owner_tables;
     do {
-      if ((*piVar3 != 0) && (DAT_0001da7c != *piVar3)) {
-        uVar1 = (uint)*(byte *)(param_1 + 0xf);
-        *(int *)(*piVar3 + uVar1 * 4) = -param_1;
+      if ((*table != 0) && (palette_owner_current != *table)) {
+        result = (uint)*(byte *)(face + 0xf);
+        *(int *)(*table + result * 4) = -face;
       }
-      piVar3 = piVar3 + 1;
-      iVar2 = iVar2 + 1;
-    } while (iVar2 < 4);
+      table = table + 1;
+      n = n + 1;
+    } while (n < 4);
   }
-  return uVar1;
+  return result;
 }
 
 
@@ -2421,56 +2815,56 @@ uint write_face_palette_slot /* Original: FUN_00001548 */ (int param_1)
  * VERIFIED: checked against an independent capstone disassembly of the bytes
  * 0x159e..0x16e0; identical to the C.
  */
-undefined4 assign_face_colour /* Original: FUN_0000159e */ (int param_1)
+undefined4 assign_face_colour /* Original: FUN_0000159e */ (int face /* param_1: face record (+4 colour, +0xc..+0xe r g b, +0xf palette slot) */)
 
 {
-  int iVar1;
+  int work; /* iVar1: stretched luminance (depth 1), then slots tried (depth 8) */
   
-  if (DAT_0001b826 == 1) {
-    iVar1 = ((((int)((uint)*(byte *)(param_1 + 0xe) * 7 +
-                    (uint)*(byte *)(param_1 + 0xd) * 0x26 + (uint)*(byte *)(param_1 + 0xc) * 0x13)
+  if (view_depth == 1) {
+    work = ((((int)((uint)*(byte *)(face + 0xe) * 7 +
+                    (uint)*(byte *)(face + 0xd) * 0x26 + (uint)*(byte *)(face + 0xc) * 0x13)
               >> 6) + -0x80) * 0x10) / 0xc + 0x80;
-    if (iVar1 < 0x100) {
-      if (iVar1 < 0) {
-        iVar1 = 0;
+    if (work < 0x100) {
+      if (work < 0) {
+        work = 0;
       }
     }
     else {
-      iVar1 = 0xff;
+      work = 0xff;
     }
-    *(int *)(param_1 + 4) = (int)*(short *)(*(int *)(DAT_0001b5a0 + 0x88) + iVar1 * 2);
+    *(int *)(face + 4) = (int)*(short *)(*(int *)(host_world + 0x88) + work * 2);
   }
   else {
-    if (DAT_0001b826 != 4) {
-      if (-*(int *)(DAT_0001da7c + (uint)*(byte *)(param_1 + 0xf) * 4) == param_1) {
-        queue_face_palette_entry(param_1);
+    if (view_depth != 4) {
+      if (-*(int *)(palette_owner_current + (uint)*(byte *)(face + 0xf) * 4) == face) {
+        queue_face_palette_entry(face);
       }
       else {
-        iVar1 = 0;
-        while ((*(char *)(DAT_0001d860 + DAT_0001bd80) != '\0' ||
-               (*(char *)(DAT_0001d864 + DAT_0001bd80) != '\0'))) {
-          DAT_0001bd80 = DAT_0001bd80 + 1;
-          if (DAT_0001bd80 == 200) {
-            DAT_0001bd80 = 0;
+        work = 0;
+        while ((*(char *)(slot_usage_prev + palette_search_cursor) != '\0' ||
+               (*(char *)(slot_usage_cur + palette_search_cursor) != '\0'))) {
+          palette_search_cursor = palette_search_cursor + 1;
+          if (palette_search_cursor == 200) {
+            palette_search_cursor = 0;
           }
-          iVar1 = iVar1 + 1;
-          if (199 < iVar1) {
+          work = work + 1;
+          if (199 < work) {
             return 1;
           }
         }
-        *(undefined1 *)(param_1 + 0xf) = (undefined1)DAT_0001bd80;
-        write_face_palette_slot(param_1);
-        _DAT_0001daa2 = 1;
+        *(undefined1 *)(face + 0xf) = (undefined1)palette_search_cursor;
+        write_face_palette_slot(face);
+        palette_changed = 1;
       }
       return 0;
     }
-    *(undefined4 *)(param_1 + 4) =
+    *(undefined4 *)(face + 4) =
          *(undefined4 *)
-          (DAT_0001da7c +
-          ((uint)*(byte *)(param_1 + 0xe) +
-          (uint)*(byte *)(param_1 + 0xd) * 5 + (uint)*(byte *)(param_1 + 0xc) * 0x19) * 4);
+          (palette_owner_current +
+          ((uint)*(byte *)(face + 0xe) +
+          (uint)*(byte *)(face + 0xd) * 5 + (uint)*(byte *)(face + 0xc) * 0x19) * 4);
   }
-  *(undefined1 *)(param_1 + 0xf) = 0xff;
+  *(undefined1 *)(face + 0xf) = 0xff;
   return 0;
 }
 
@@ -2511,75 +2905,75 @@ undefined4 assign_face_colour /* Original: FUN_0000159e */ (int param_1)
  * - identical to the C. */
 void init_mission_object_tables(void) /* Original: FUN_000016e2 */
 {
-  int *piVar1;
-  uint *puVar2; /* root object from FUN_00004690 */
-  uint *puVar3;
-  int iVar4;
-  int iVar5;
-  undefined4 *puVar6;
-  undefined4 *puVar7; /* source child-record walk: *(root+0x28) + 0x1A */
+  int *name_field; /* piVar1: child record +0x14 name / offset field being relocated */
+  uint *root; /* puVar2: root object */ /* root object from FUN_00004690 */
+  uint *obj; /* puVar3: child table, then each instantiated child */
+  int rec_off; /* iVar4: child record byte offset (i * 0x18), then root word +0x2c */
+  int i; /* iVar5: child index */
+  undefined4 *dst_rec; /* puVar6: destination 0x18-byte record */
+  undefined4 *src_rec; /* puVar7: source child record walk */ /* source child-record walk: *(root+0x28) + 0x1A */
   
   overlay_init_template_pointer_tables(); /* Original: FUN_00000054 */
   /* Instantiate root from mission base string/pointer at +0x8C. */
-  puVar2 = instantiate_object_from_desc(*(char **)(DAT_0001b5a0 + 0x8c));
-  puVar7 = (undefined4 *)(puVar2[10] + 0x1a); /* binary: *(A2+0x28) + 0x1A */
-  DAT_0001d6fc = puVar2; /* published root object */
+  root = instantiate_object_from_desc(*(char **)(host_world + 0x8c));
+  src_rec = (undefined4 *)(root[10] + 0x1a); /* binary: *(A2+0x28) + 0x1A */
+  scene_root = root; /* published root object */
   /* Child table: count = *(short*)(root+0x2E); stride 0x18; ptr at root+0x30. */
-  puVar3 = heap_alloc(*(short *)((int)puVar2 + 0x2e) * 0x18);
-  puVar2[0xc] = (uint)puVar3; /* +0x30 */
-  iVar4 = 0;
-  for (iVar5 = 0; iVar5 < *(short *)((int)puVar2 + 0x2e); iVar5 = iVar5 + 1) {
+  obj = heap_alloc(*(short *)((int)root + 0x2e) * 0x18);
+  root[0xc] = (uint)obj; /* +0x30 */
+  rec_off = 0;
+  for (i = 0; i < *(short *)((int)root + 0x2e); i = i + 1) {
     /* Copy six longs (0x18 bytes) from embedded table into allocated slot. */
-    puVar6 = (undefined4 *)(iVar4 + puVar2[0xc]);
-    *puVar6 = *puVar7;
-    puVar6[1] = puVar7[1];
-    puVar6[2] = puVar7[2];
-    puVar6[3] = puVar7[3];
-    puVar6[4] = puVar7[4];
-    puVar6[5] = puVar7[5];
-    puVar7 = puVar7 + 6;
+    dst_rec = (undefined4 *)(rec_off + root[0xc]);
+    *dst_rec = *src_rec;
+    dst_rec[1] = src_rec[1];
+    dst_rec[2] = src_rec[2];
+    dst_rec[3] = src_rec[3];
+    dst_rec[4] = src_rec[4];
+    dst_rec[5] = src_rec[5];
+    src_rec = src_rec + 6;
     /* Relocate name/offset field at record+0x14 by mission base (DAT_0001b5a0+0x8c). */
-    piVar1 = (int *)(puVar2[0xc] + 0x14 + iVar4);
-    *piVar1 = *(int *)(DAT_0001b5a0 + 0x8c) + *piVar1;
-    iVar4 = iVar4 + 0x18;
+    name_field = (int *)(root[0xc] + 0x14 + rec_off);
+    *name_field = *(int *)(host_world + 0x8c) + *name_field;
+    rec_off = rec_off + 0x18;
   }
-  iVar4 = 0;
-  for (iVar5 = 0; iVar5 < *(short *)((int)puVar2 + 0x2e); iVar5 = iVar5 + 1) {
+  rec_off = 0;
+  for (i = 0; i < *(short *)((int)root + 0x2e); i = i + 1) {
     /* Resolve each relocated name into a live object; stitch parent + indices. */
-    puVar3 = instantiate_object_from_desc(*(char **)(puVar2[0xc] + 0x14 + iVar4));
-    *(uint **)(puVar2[0xc] + 0x14 + iVar4) = puVar3;
-    puVar3[9] = (uint)puVar2; /* back-pointer to root at obj+0x24 */
-    *(char *)((int)puVar3 + 1) = (char)iVar5;
-    *(char *)((int)puVar3 + 2) = (char)iVar5;
-    iVar4 = iVar4 + 0x18;
+    obj = instantiate_object_from_desc(*(char **)(root[0xc] + 0x14 + rec_off));
+    *(uint **)(root[0xc] + 0x14 + rec_off) = obj;
+    obj[9] = (uint)root; /* back-pointer to root at obj+0x24 */
+    *(char *)((int)obj + 1) = (char)i;
+    *(char *)((int)obj + 2) = (char)i;
+    rec_off = rec_off + 0x18;
   }
   /* Publish selected child object pointers as globals, then run setup hooks. */
-  DAT_0001bdb4 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x14); /* child[0] */
+  mission_child0 = *(undefined4 *)(scene_root[0xc] + 0x14); /* child[0] */
   activate_near_range_object( /* args dropped by Ghidra; lea.l $4e4e.l at 0x17ba = runtime -> file 0x4e6e * arg DAT_0001bdb4 (0x17b4) */);
   copy_object_vertex_buffer( /* args dropped by Ghidra; lea.l $1be4.l at 0x17c8 = runtime -> file 0x1c04 * arg DAT_0001bdb4 (0x17c2) */);
-  DAT_0001bdb0 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x2c); /* child[1] @ +0x18+0x14 */
+  mission_child1 = *(undefined4 *)(scene_root[0xc] + 0x2c); /* child[1] @ +0x18+0x14 */
   activate_near_range_object( /* args dropped by Ghidra; lea.l $4e4e.l at 0x17ba = runtime -> file 0x4e6e * arg DAT_0001bdb0 (0x17e2) */);
   copy_object_vertex_buffer( /* args dropped by Ghidra; lea.l $1be4.l at 0x17c8 = runtime -> file 0x1c04 * arg DAT_0001bdb4 AGAIN (move.l $1bdb4.l at 0x17ea, not bdb0) */);
-  if (*(short *)(DAT_0001b5a0 + 0x90) == 2) {
-    DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x5c); /* child[3] */
+  if (*(short *)(host_world + 0x90) == 2) {
+    mission_child2or3 = *(char **)(scene_root[0xc] + 0x5c); /* child[3] */
     activate_near_range_object( /* args dropped by Ghidra; lea.l $4e4e.l at 0x17ba = runtime -> file 0x4e6e * arg DAT_0001bdac (0x1816) */);
   }
   else {
-    DAT_0001bdac = *(char **)(DAT_0001d6fc[0xc] + 0x44); /* child[2] */
-    activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001bdac);
+    mission_child2or3 = *(char **)(scene_root[0xc] + 0x44); /* child[2] */
+    activate_near_range_object( /* Original: FUN_00004e6e */mission_child2or3);
   }
-  DAT_0001bda8 = *(undefined4 *)(DAT_0001bdac + 0x48);
-  DAT_0001bda4 = *(char **)(DAT_0001d6fc[0xc] + 0x74); /* child[4] */
-  activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001bda4);
-  copy_object_vertex_buffer((int)DAT_0001bda4);
-  DAT_0001b734 = 0;
+  default_surface_face = *(undefined4 *)(mission_child2or3 + 0x48);
+  mission_child4 = *(char **)(scene_root[0xc] + 0x74); /* child[4] */
+  activate_near_range_object( /* Original: FUN_00004e6e */mission_child4);
+  copy_object_vertex_buffer((int)mission_child4);
+  object_count = 0;
   /* Index window around *(short*)(root+0x2C): publish three neighboring child objs. */
-  iVar4 = (int)*(short *)(DAT_0001d6fc + 0xb); /* Ghidra: uint*+0xB ⇒ +0x2C */
-  DAT_0001b88e = (short)(iVar4 + -1);
-  DAT_0001bc28 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x14 + (iVar4 + -1) * 0x18);
-  DAT_0001bc34 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x14 + iVar4 * 0x18);
-  DAT_0001bc38 = *(undefined4 *)(DAT_0001d6fc[0xc] + 0x14 + (iVar4 + 1) * 0x18);
-  DAT_0001b88c = DAT_0001b88e + 2;
+  rec_off = (int)*(short *)(scene_root + 0xb); /* Ghidra: uint*+0xB ⇒ +0x2C */
+  child_window_lo = (short)(rec_off + -1);
+  child_window_prev = *(undefined4 *)(scene_root[0xc] + 0x14 + (rec_off + -1) * 0x18);
+  child_window_cur = *(undefined4 *)(scene_root[0xc] + 0x14 + rec_off * 0x18);
+  child_window_next = *(undefined4 *)(scene_root[0xc] + 0x14 + (rec_off + 1) * 0x18);
+  child_window_hi = child_window_lo + 2;
   return;
 }
 
@@ -2597,24 +2991,24 @@ void init_mission_object_tables(void) /* Original: FUN_000016e2 */
  * twice, 0x3266 / 0x3412 / 0x35b4 span tables; words DAT_0001bd8c / 8a / 88 = 0xd983 / 0x69d8 /
  * 0xc330, longs DAT_0001bd84 = 1, DAT_0001bd80 = 0, DAT_0001b838 = 0x4c; 0x1771a
  * set_view_distance(0xc15c0). */
-void overlay_initialise /* Original: FUN_000018d6 */ (undefined4 param_1)
+void overlay_initialise /* Original: FUN_000018d6 */ (undefined4 ticks /* param_1: host TickCount, the RNG seed */)
 
 {
-  overlay_rng_init(param_1); /* Original: FUN_0001150a */
-  DAT_0001d864 = &DAT_0001d96c;
-  DAT_0001d860 = &DAT_0001d86c;
+  overlay_rng_init(ticks); /* Original: FUN_0001150a */
+  slot_usage_cur = &slot_usage_buf_b;
+  slot_usage_prev = &slot_usage_buf_a;
   init_code_pointer_tables();
   overlay_init_noop();
   overlay_init_noop();
   init_span_table_32ba();
   init_span_table_3466();
   init_span_table_3608();
-  DAT_0001bd8c = 0xd983;
-  DAT_0001bd8a = 0x69d8;
-  DAT_0001bd88 = 0xc330;
-  _DAT_0001bd84 = 1;
-  DAT_0001bd80 = 0;
-  DAT_0001b838 = 0x4c;
+  light_x = 0xd983;
+  light_y = 0x69d8;
+  light_z = 0xc330;
+  init_flag_bd84 = 1;
+  palette_search_cursor = 0;
+  frame_counter = 0x4c;
   set_view_distance(0xc15c0);
   return;
 }
@@ -2632,14 +3026,14 @@ void overlay_initialise /* Original: FUN_000018d6 */ (undefined4 param_1)
  * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
  * read-before-write order and the returned sum identical to the C.
  */
-int heap_sbrk /* Original: FUN_00001958 */ (int param_1)
+int heap_sbrk /* Original: FUN_00001958 */ (int nbytes /* param_1: bytes to take */)
 
 {
-  int iVar1;
+  int old_break; /* iVar1: arena base + break before the update */
   
-  iVar1 = DAT_00020c50 + *(int *)(DAT_0001b5a0 + 0x348);
-  DAT_00020c50 = param_1 + DAT_00020c50;
-  return iVar1;
+  old_break = heap_break + *(int *)(host_world + 0x348);
+  heap_break = nbytes + heap_break;
+  return old_break;
 }
 
 
@@ -2656,20 +3050,20 @@ int heap_sbrk /* Original: FUN_00001958 */ (int param_1)
  * VERIFIED: checked against an independent capstone disassembly of the bytes; widths,
  * the -1 compare, call target and argument identical to the C.
  */
-undefined1 * heap_new_size_class_block /* Original: FUN_00001974 */ (uint param_1)
+undefined1 * heap_new_size_class_block /* Original: FUN_00001974 */ (uint size_class /* param_1: log2 of the block size */)
 
 {
-  undefined1 *puVar1;
+  undefined1 *block; /* puVar1: heap_sbrk block, then the payload after the class byte */
   
-  puVar1 = (undefined1 *)heap_sbrk(1 << (param_1 & 0x3f));
-  if (puVar1 == (undefined1 *)0xffffffff) {
-    puVar1 = (undefined1 *)0xffffffff;
+  block = (undefined1 *)heap_sbrk(1 << (size_class & 0x3f));
+  if (block == (undefined1 *)0xffffffff) {
+    block = (undefined1 *)0xffffffff;
   }
   else {
-    *puVar1 = (char)param_1;
-    puVar1 = puVar1 + 4;
+    *block = (char)size_class;
+    block = block + 4;
   }
-  return puVar1;
+  return block;
 }
 
 
@@ -2688,23 +3082,23 @@ undefined1 * heap_new_size_class_block /* Original: FUN_00001974 */ (uint param_
  * 0x199a..0x19ce; widths, the -1 compare, call targets, arguments and the returned
  * global identical to the C.
  */
-undefined4 heap_add_large_block /* Original: FUN_0000199a */ (int param_1)
+undefined4 heap_add_large_block /* Original: FUN_0000199a */ (int units /* param_1: size in 8-byte units */)
 
 {
-  int *piVar1;
-  undefined4 uVar2;
+  int *header; /* piVar1: block header (units, tag 0xff) */
+  undefined4 result; /* uVar2: heap_roving_cursor after the free, 0 on failure */
   
-  piVar1 = (int *)heap_sbrk(param_1 << 3);
-  if (piVar1 == (int *)0xffffffff) {
-    uVar2 = 0;
+  header = (int *)heap_sbrk(units << 3);
+  if (header == (int *)0xffffffff) {
+    result = 0;
   }
   else {
-    *piVar1 = param_1;
-    *(undefined1 *)(piVar1 + 1) = 0xff;
-    heap_free_coalesce((int)(piVar1 + 2));
-    uVar2 = DAT_00020c60;
+    *header = units;
+    *(undefined1 *)(header + 1) = 0xff;
+    heap_free_coalesce((int)(header + 2));
+    result = heap_roving_cursor;
   }
-  return uVar2;
+  return result;
 }
 
 
@@ -2723,21 +3117,21 @@ undefined4 heap_add_large_block /* Original: FUN_0000199a */ (int param_1)
 undefined4 heap_add_large_block_tail /* Original: FUN_000019b0 */ (void)
 
 {
-  undefined4 uVar1;
-  undefined4 unaff_D2;
-  undefined4 *in_A0;
-  bool in_ZF;
+  undefined4 result; /* uVar1: heap_roving_cursor after the free, 0 on failure */
+  undefined4 units; /* unaff_D2: size in 8-byte units (D2) */
+  undefined4 *header; /* in_A0: block header (A0) */
+  bool sbrk_failed; /* in_ZF: Z flag of the -1 test */
   
-  if (in_ZF) {
-    uVar1 = 0;
+  if (sbrk_failed) {
+    result = 0;
   }
   else {
-    *in_A0 = unaff_D2;
-    *(undefined1 *)(in_A0 + 1) = 0xff;
-    heap_free_coalesce((int)(in_A0 + 2));
-    uVar1 = DAT_00020c60;
+    *header = units;
+    *(undefined1 *)(header + 1) = 0xff;
+    heap_free_coalesce((int)(header + 2));
+    result = heap_roving_cursor;
   }
-  return uVar1;
+  return result;
 }
 
 
@@ -2771,42 +3165,42 @@ undefined4 heap_add_large_block_tail /* Original: FUN_000019b0 */ (void)
  * 0x19d0..0x1a66 (including the fragment 0x1a44..0x1a66 outside Ghidra's split);
  * widths, unsigned compares and stores identical to the C. No calls.
  */
-void heap_free_coalesce(int param_1) /* Original: FUN_000019d0 */
+void heap_free_coalesce(int payload /* param_1: payload pointer; header at payload - 8 / - 4 */) /* Original: FUN_000019d0 */
 {
-  byte bVar1;
-  int *piVar2;
-  byte *pbVar3;
-  int *piVar4;
+  byte size_class; /* bVar1: class byte at payload - 4 */
+  int *block; /* piVar2: large block header {size in 8-byte units, next} */
+  byte *link; /* pbVar3: payload - 4, reused as the free-list link */
+  int *cur; /* piVar4: address-ordered ring walk from heap_roving_cursor */
   
-  if (*(char *)(param_1 + -4) == -1) {
-    piVar2 = (int *)(param_1 + -8);
-    for (piVar4 = DAT_00020c60;
-        ((piVar2 <= piVar4 || ((int *)piVar4[1] <= piVar2)) &&
-        ((piVar4 < (int *)piVar4[1] || ((piVar2 <= piVar4 && ((int *)piVar4[1] <= piVar2))))));
-        piVar4 = (int *)piVar4[1]) {
+  if (*(char *)(payload + -4) == -1) {
+    block = (int *)(payload + -8);
+    for (cur = heap_roving_cursor;
+        ((block <= cur || ((int *)cur[1] <= block)) &&
+        ((cur < (int *)cur[1] || ((block <= cur && ((int *)cur[1] <= block))))));
+        cur = (int *)cur[1]) {
     }
-    if (piVar2 + *piVar2 * 2 == (int *)piVar4[1]) {
-      *piVar2 = *(int *)piVar4[1] + *piVar2;
-      *(undefined4 *)(param_1 + -4) = *(undefined4 *)(piVar4[1] + 4);
+    if (block + *block * 2 == (int *)cur[1]) {
+      *block = *(int *)cur[1] + *block;
+      *(undefined4 *)(payload + -4) = *(undefined4 *)(cur[1] + 4);
     }
     else {
-      *(int *)(param_1 + -4) = piVar4[1];
+      *(int *)(payload + -4) = cur[1];
     }
-    if (piVar2 == piVar4 + *piVar4 * 2) {
-      *piVar4 = *piVar2 + *piVar4;
-      piVar4[1] = *(int *)(param_1 + -4);
+    if (block == cur + *cur * 2) {
+      *cur = *block + *cur;
+      cur[1] = *(int *)(payload + -4);
       /* [PROVEN] Fall-through to mid-label 0x1A48 — not a real subroutine call. */
       heap_roving_cursor_store(); /* Original: FUN_00001a48 (false entry); effect: DAT_00020c60 = piVar4 (A1) [PROVEN] */
       return;
     }
-    piVar4[1] = (int)piVar2;
-    DAT_00020c60 = piVar4;
+    cur[1] = (int)block;
+    heap_roving_cursor = cur;
   }
   else {
-    pbVar3 = (byte *)(param_1 + -4);
-    bVar1 = *pbVar3;
-    *(undefined4 *)pbVar3 = *(undefined4 *)(&DAT_00020c64 + (uint)bVar1 * 4);
-    *(byte **)(&DAT_00020c64 + (uint)bVar1 * 4) = pbVar3;
+    link = (byte *)(payload + -4);
+    size_class = *link;
+    *(undefined4 *)link = *(undefined4 *)(&heap_class_lists + (uint)size_class * 4);
+    *(byte **)(&heap_class_lists + (uint)size_class * 4) = link;
   }
   return;
 }
@@ -2852,9 +3246,9 @@ void heap_free_coalesce(int param_1) /* Original: FUN_000019d0 */
  */
 void heap_roving_cursor_store(void) /* Original: FUN_00001a48 */
 {
-  undefined4 in_A1;
+  undefined4 cursor; /* in_A1: ring block left in A1 by heap_free_coalesce */
   
-  DAT_00020c60 = in_A1; /* roving large-block cursor */
+  heap_roving_cursor = cursor; /* roving large-block cursor */
   return;
 }
 
@@ -2888,59 +3282,59 @@ void heap_roving_cursor_store(void) /* Original: FUN_00001a48 */
  * 0x1a68..0x1b36; widths, unsigned compares, both call targets and arguments, and the
  * NULL return identical to the C.
  */
-uint * heap_alloc(int param_1) /* Original: FUN_00001a68 */
+uint * heap_alloc(int nbytes /* param_1: requested size in bytes */) /* Original: FUN_00001a68 */
 {
-  undefined1 *puVar1;
-  uint uVar2;
-  uint *puVar3;
-  uint *puVar4;
-  uint uVar5;
+  undefined1 *head; /* puVar1: first free block of the size class */
+  uint bits; /* uVar2: (rounded size - 1) >> 2, shifted down to find the class */
+  uint *block; /* puVar3: candidate / allocated block, then the payload */
+  uint *prev; /* puVar4: ring block before block */
+  uint class_or_units; /* uVar5: size class (< 6), else size in 8-byte units + 1 */
   
-  uVar5 = 2;
-  for (uVar2 = (param_1 + 7U & 0xfffffffc) - 1 >> 2; uVar2 != 0; uVar2 = uVar2 >> 1) {
-    uVar5 = uVar5 + 1;
+  class_or_units = 2;
+  for (bits = (nbytes + 7U & 0xfffffffc) - 1 >> 2; bits != 0; bits = bits >> 1) {
+    class_or_units = class_or_units + 1;
   }
-  if (uVar5 < 6) {
-    puVar1 = *(undefined1 **)(&DAT_00020c64 + uVar5 * 4);
-    if (puVar1 == (undefined1 *)0x0) {
-      puVar3 = (uint *)heap_new_size_class_block(uVar5);
+  if (class_or_units < 6) {
+    head = *(undefined1 **)(&heap_class_lists + class_or_units * 4);
+    if (head == (undefined1 *)0x0) {
+      block = (uint *)heap_new_size_class_block(class_or_units);
     }
     else {
-      *(undefined4 *)(&DAT_00020c64 + uVar5 * 4) = **(undefined4 **)(&DAT_00020c64 + uVar5 * 4);
-      *puVar1 = (char)uVar5;
-      puVar3 = (uint *)(puVar1 + 4);
+      *(undefined4 *)(&heap_class_lists + class_or_units * 4) = **(undefined4 **)(&heap_class_lists + class_or_units * 4);
+      *head = (char)class_or_units;
+      block = (uint *)(head + 4);
     }
   }
   else {
-    uVar5 = (param_1 + 7U >> 3) + 1;
-    if (DAT_00020c60 == (uint *)0x0) {
-      DAT_00020c60 = &DAT_00020c58;
-      DAT_00020c5c = &DAT_00020c58;
-      DAT_00020c58 = 0;
+    class_or_units = (nbytes + 7U >> 3) + 1;
+    if (heap_roving_cursor == (uint *)0x0) {
+      heap_roving_cursor = &heap_ring_sentinel;
+      heap_ring_sentinel_next = &heap_ring_sentinel;
+      heap_ring_sentinel = 0;
     }
-    puVar3 = (uint *)DAT_00020c60[1];
-    puVar4 = DAT_00020c60;
-    while (*puVar3 < uVar5) {
-      puVar4 = puVar3;
-      if ((puVar3 == DAT_00020c60) && (puVar4 = (uint *)heap_add_large_block(uVar5), puVar4 == (uint *)0x0))
+    block = (uint *)heap_roving_cursor[1];
+    prev = heap_roving_cursor;
+    while (*block < class_or_units) {
+      prev = block;
+      if ((block == heap_roving_cursor) && (prev = (uint *)heap_add_large_block(class_or_units), prev == (uint *)0x0))
       {
         return (uint *)0x0;
       }
-      puVar3 = (uint *)puVar4[1];
+      block = (uint *)prev[1];
     }
-    if (uVar5 == *puVar3) {
-      puVar4[1] = puVar3[1];
+    if (class_or_units == *block) {
+      prev[1] = block[1];
     }
     else {
-      *puVar3 = *puVar3 - uVar5;
-      puVar3 = puVar3 + *puVar3 * 2;
-      *puVar3 = uVar5;
+      *block = *block - class_or_units;
+      block = block + *block * 2;
+      *block = class_or_units;
     }
-    DAT_00020c60 = puVar4;
-    *(undefined1 *)(puVar3 + 1) = 0xff;
-    puVar3 = puVar3 + 2;
+    heap_roving_cursor = prev;
+    *(undefined1 *)(block + 1) = 0xff;
+    block = block + 2;
   }
-  return puVar3;
+  return block;
 }
 
 
@@ -2992,10 +3386,10 @@ void heap_zero_payload(undefined4 *payload) /* Original: FUN_00001b38 */
 void heap_zero_payload_tail /* Original: FUN_00001b4c */ (void)
 
 {
-  int in_D0;
-  undefined4 *in_A0;
+  int units; /* in_D0: size in 8-byte units (D0) */
+  undefined4 *start; /* in_A0: first byte to clear (A0) */
   
-  memzero(in_A0,in_D0 << 3);
+  memzero(start,units << 3);
   return;
 }
 
@@ -3015,11 +3409,11 @@ void heap_zero_payload_tail /* Original: FUN_00001b4c */ (void)
  * returns the block (d2). */
 uint * heap_alloc_cleared(int nbytes) /* Original: FUN_00001b6c */
 {
-  uint *puVar1;
+  uint *block; /* puVar1: heap_alloc result */
   
-  puVar1 = heap_alloc(nbytes);
-  heap_zero_payload(puVar1); /* Original: FUN_00001b38 */
-  return puVar1;
+  block = heap_alloc(nbytes);
+  heap_zero_payload(block); /* Original: FUN_00001b38 */
+  return block;
 }
 
 
@@ -3036,15 +3430,15 @@ uint * heap_alloc_cleared(int nbytes) /* Original: FUN_00001b6c */
  * found identical to the C: heap_alloc (0x1a68) of n * size (muls.l, 32-bit), heap_zero_payload
  * (0x1b38) only when non-null (the beq takes its flags from move.l d0,d2; addq.w to a7 leaves
  * them), returns the block. */
-uint * heap_calloc(int param_1,int param_2) /* Original: FUN_00001b84 */
+uint * heap_calloc(int count /* param_1: element count */,int elem_size /* param_2: element size */) /* Original: FUN_00001b84 */
 {
-  uint *puVar1;
+  uint *block; /* puVar1: heap_alloc result */
   
-  puVar1 = heap_alloc(param_2 * param_1);
-  if (puVar1 != (uint *)0x0) {
-    heap_zero_payload(puVar1);
+  block = heap_alloc(elem_size * count);
+  if (block != (uint *)0x0) {
+    heap_zero_payload(block);
   }
-  return puVar1;
+  return block;
 }
 
 
@@ -3067,24 +3461,24 @@ uint * heap_calloc(int param_1,int param_2) /* Original: FUN_00001b84 */
  * test; grow path = bsr 0x1b84 heap_calloc(request, 1), bsr.l 0x1a63e memmove_block(old,
  * new, old capacity), bsr.w 0x19d0 heap_free_coalesce(old), returns new; else returns old.
  */
-uint * heap_realloc_grow_only(uint *param_1,undefined4 *param_2) /* Original: FUN_00001ba8 */
+uint * heap_realloc_grow_only(uint *payload /* param_1: current payload */,undefined4 *new_size /* param_2: requested size in bytes */) /* Original: FUN_00001ba8 */
 {
-  uint *puVar1;
-  undefined4 *puVar2;
+  uint *grown; /* puVar1: heap_calloc(new_size, 1) block */
+  undefined4 *old_size; /* puVar2: usable size of payload (large: (units - 1) * 8, small: (1 << class) - 4) */
   
-  if (*(char *)(param_1 + -1) == -1) {
-    puVar2 = (undefined4 *)((param_1[-2] - 1) * 8);
+  if (*(char *)(payload + -1) == -1) {
+    old_size = (undefined4 *)((payload[-2] - 1) * 8);
   }
   else {
-    puVar2 = (undefined4 *)((1 << (*(byte *)(param_1 + -1) & 0x3f)) + -4);
+    old_size = (undefined4 *)((1 << (*(byte *)(payload + -1) & 0x3f)) + -4);
   }
-  if (puVar2 < param_2) {
-    puVar1 = heap_calloc((int)param_2,1); /* Original: FUN_00001b84 */
-    memmove_block( /* Original: FUN_0001a63e */param_1,puVar1,puVar2);
-    heap_free_coalesce((int)param_1);
-    param_1 = puVar1;
+  if (old_size < new_size) {
+    grown = heap_calloc((int)new_size,1); /* Original: FUN_00001b84 */
+    memmove_block( /* Original: FUN_0001a63e */payload,grown,old_size);
+    heap_free_coalesce((int)payload);
+    payload = grown;
   }
-  return param_1;
+  return payload;
 }
 
 
@@ -3105,12 +3499,12 @@ uint * heap_realloc_grow_only(uint *param_1,undefined4 *param_2) /* Original: FU
 void heap_realloc_grow_only_tail /* Original: FUN_00001be4 */ (void)
 
 {
-  undefined4 *unaff_D2;
-  undefined4 *unaff_D3;
-  undefined4 *unaff_A2;
+  undefined4 *grown; /* unaff_D2: new block (D2) */
+  undefined4 *old_size; /* unaff_D3: bytes to copy (D3) */
+  undefined4 *payload; /* unaff_A2: old payload (A2) */
   
-  memmove_block( /* Original: FUN_0001a63e */unaff_A2,unaff_D2,unaff_D3);
-  heap_free_coalesce((int)unaff_A2);
+  memmove_block( /* Original: FUN_0001a63e */payload,grown,old_size);
+  heap_free_coalesce((int)payload);
   return;
 }
 
@@ -3123,24 +3517,24 @@ void heap_realloc_grow_only_tail /* Original: FUN_00001be4 */ (void)
 /* VERIFIED (FUN_00001c04): 0x1c04..0x1c5a checked against an independent capstone disassembly and
  * found identical to the C: n = sext word +0x36 + sext word +0x3a; when n > 0, copies n 12-byte
  * vertices from +0x44 to +0x4c (offset < n * 12, signed). */
-void copy_object_vertex_buffer /* Original: FUN_00001c04 */ (int param_1)
+void copy_object_vertex_buffer /* Original: FUN_00001c04 */ (int object /* param_1: object (vertex counts +0x36 / +0x3a, arrays +0x44 -> +0x4c) */)
 
 {
-  int iVar1;
-  int iVar2;
+  int off; /* iVar1: byte offset, 12 per vertex */
+  int count; /* iVar2: vertex count +0x3a + +0x36 */
   
-  iVar2 = (int)*(short *)(param_1 + 0x3a) + (int)*(short *)(param_1 + 0x36);
-  if (0 < iVar2) {
-    iVar1 = 0;
+  count = (int)*(short *)(object + 0x3a) + (int)*(short *)(object + 0x36);
+  if (0 < count) {
+    off = 0;
     do {
-      *(undefined4 *)(*(int *)(param_1 + 0x4c) + iVar1) =
-           *(undefined4 *)(*(int *)(param_1 + 0x44) + iVar1);
-      *(undefined4 *)(*(int *)(param_1 + 0x4c) + 4 + iVar1) =
-           *(undefined4 *)(*(int *)(param_1 + 0x44) + 4 + iVar1);
-      *(undefined4 *)(*(int *)(param_1 + 0x4c) + 8 + iVar1) =
-           *(undefined4 *)(*(int *)(param_1 + 0x44) + 8 + iVar1);
-      iVar1 = iVar1 + 0xc;
-    } while (iVar1 < iVar2 * 0xc);
+      *(undefined4 *)(*(int *)(object + 0x4c) + off) =
+           *(undefined4 *)(*(int *)(object + 0x44) + off);
+      *(undefined4 *)(*(int *)(object + 0x4c) + 4 + off) =
+           *(undefined4 *)(*(int *)(object + 0x44) + 4 + off);
+      *(undefined4 *)(*(int *)(object + 0x4c) + 8 + off) =
+           *(undefined4 *)(*(int *)(object + 0x44) + 8 + off);
+      off = off + 0xc;
+    } while (off < count * 0xc);
   }
   return;
 }
@@ -3168,21 +3562,21 @@ void copy_object_vertex_buffer /* Original: FUN_00001c04 */ (int param_1)
  * unsigned 32-bit count; three add.l of the stacked offsets; stride 0xc); identical to
  * the C.
  */
-void translate_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6) /* Original: FUN_00001c5c */
+void translate_int3_vecs(uint count /* param_1: vector count; low word is the dbra counter, high word extends it */,int *src /* param_2: source int3 vectors */,int *dst /* param_3: destination int3 vectors (may equal src) */,int dx /* param_4: x offset */,int dy /* param_5: y offset */,int dz /* param_6: z offset */) /* Original: FUN_00001c5c */
 {
-  ushort uVar1;
-  short sVar2;
+  ushort count_hi; /* uVar1: count high word */
+  short count_lo; /* sVar2: count low word after the decrement */
   
   while( true ) {
-    uVar1 = (ushort)(param_1 >> 0x10);
-    sVar2 = (short)param_1 + -1;
-    param_1 = CONCAT22(uVar1,sVar2);
-    if ((sVar2 == -1) && (param_1 = (uint)uVar1 * 0x10000 - 1, uVar1 == 0)) break;
-    *param_3 = *param_2 + param_4;
-    param_3[1] = param_2[1] + param_5;
-    param_3[2] = param_2[2] + param_6;
-    param_3 = param_3 + 3;
-    param_2 = param_2 + 3;
+    count_hi = (ushort)(count >> 0x10);
+    count_lo = (short)count + -1;
+    count = CONCAT22(count_hi,count_lo);
+    if ((count_lo == -1) && (count = (uint)count_hi * 0x10000 - 1, count_hi == 0)) break;
+    *dst = *src + dx;
+    dst[1] = src[1] + dy;
+    dst[2] = src[2] + dz;
+    dst = dst + 3;
+    src = src + 3;
   }
   return;
 }
@@ -3203,21 +3597,21 @@ void translate_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int 
 /* VERIFIED (FUN_00001cac): 0x1cac..0x1d00 checked against an independent capstone disassembly and
  * found identical to the C: 32-bit count (dbra, then clr.w / subq.l / bcc = Ghidra's CONCAT22
  * loop); out = (in x * sx, in y * sy, in z * sz) with muls.l, 12 bytes per vector. */
-void scale_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int param_5,int param_6) /* Original: FUN_00001cac */
+void scale_int3_vecs(uint count /* param_1: vector count; low word is the dbra counter, high word extends it */,int *src /* param_2: source int3 vectors */,int *dst /* param_3: destination int3 vectors (may equal src) */,int sx /* param_4: x factor */,int sy /* param_5: y factor */,int sz /* param_6: z factor */) /* Original: FUN_00001cac */
 {
-  ushort uVar1;
-  short sVar2;
+  ushort count_hi; /* uVar1: count high word */
+  short count_lo; /* sVar2: count low word after the decrement */
   
   while( true ) {
-    uVar1 = (ushort)(param_1 >> 0x10);
-    sVar2 = (short)param_1 + -1;
-    param_1 = CONCAT22(uVar1,sVar2);
-    if ((sVar2 == -1) && (param_1 = (uint)uVar1 * 0x10000 - 1, uVar1 == 0)) break;
-    *param_3 = *param_2 * param_4;
-    param_3[1] = param_2[1] * param_5;
-    param_3[2] = param_2[2] * param_6;
-    param_3 = param_3 + 3;
-    param_2 = param_2 + 3;
+    count_hi = (ushort)(count >> 0x10);
+    count_lo = (short)count + -1;
+    count = CONCAT22(count_hi,count_lo);
+    if ((count_lo == -1) && (count = (uint)count_hi * 0x10000 - 1, count_hi == 0)) break;
+    *dst = *src * sx;
+    dst[1] = src[1] * sy;
+    dst[2] = src[2] * sz;
+    dst = dst + 3;
+    src = src + 3;
   }
   return;
 }
@@ -3251,33 +3645,33 @@ void scale_int3_vecs(uint param_1,int *param_2,int *param_3,int param_4,int para
  * 0x1d02..0x1d74 (rows a2 = 0..2 and columns d2 = 0..2 with signed bge against 2);
  * identical to the C.
  */
-short * matmul3x3_s16(int param_1,short *param_2,int param_3) /* Original: FUN_00001d02 */
+short * matmul3x3_s16(int a /* param_1: left 3x3 s16 matrix (4.12) */,short *b /* param_2: right 3x3 s16 matrix (4.12) */,int dst /* param_3: output matrix a * b, must not alias a or b */) /* Original: FUN_00001d02 */
 {
-  int iVar1;
-  int iVar2;
-  short *psVar3;
-  short *psVar4;
-  undefined2 *puVar5;
-  int iVar6;
+  int row_off; /* iVar1: row byte offset 6 * i */
+  int j; /* iVar2: column */
+  short *b_col; /* psVar3: b[0][j] cursor */
+  short *b_next; /* psVar4: b_col + 1, returned */
+  undefined2 *out; /* puVar5: dst[i][j] cursor */
+  int i; /* iVar6: row */
   
-  iVar6 = 0;
+  i = 0;
   do {
-    iVar2 = 0;
-    iVar1 = iVar6 * 6;
-    psVar3 = param_2;
-    puVar5 = (undefined2 *)(iVar1 + param_3);
+    j = 0;
+    row_off = i * 6;
+    b_col = b;
+    out = (undefined2 *)(row_off + dst);
     do {
-      psVar4 = psVar3 + 1;
-      *puVar5 = (short)((int)*(short *)(iVar1 + param_1 + 4) * (int)param_2[iVar2 + 6] +
-                        (int)*(short *)(iVar1 + param_1 + 2) * (int)param_2[iVar2 + 3] +
-                        (int)*(short *)(param_1 + iVar1) * (int)*psVar3 >> 0xc);
-      iVar2 = iVar2 + 1;
-      psVar3 = psVar4;
-      puVar5 = puVar5 + 1;
-    } while (iVar2 < 3);
-    iVar6 = iVar6 + 1;
-  } while (iVar6 < 3);
-  return psVar4;
+      b_next = b_col + 1;
+      *out = (short)((int)*(short *)(row_off + a + 4) * (int)b[j + 6] +
+                        (int)*(short *)(row_off + a + 2) * (int)b[j + 3] +
+                        (int)*(short *)(a + row_off) * (int)*b_col >> 0xc);
+      j = j + 1;
+      b_col = b_next;
+      out = out + 1;
+    } while (j < 3);
+    i = i + 1;
+  } while (i < 3);
+  return b_next;
 }
 
 
@@ -3297,44 +3691,44 @@ short * matmul3x3_s16(int param_1,short *param_2,int param_3) /* Original: FUN_0
  * sites are RUNTIME file 0x1d76 sin_fixed14. */
 short * FUN_00001d56(void) /* Original: FUN_00001d56 — false entry; see header */
 {
-  int in_D0;
-  int unaff_D2;
-  int unaff_D3;
-  int unaff_D4;
-  uint unaff_D5;
-  int unaff_D6;
-  short *psVar1;
-  short *in_A0;
-  undefined2 *puVar2;
-  undefined2 *in_A1;
-  int unaff_A2;
-  int unaff_A3;
-  short *unaff_A5;
-  int unaff_A6;
+  int sum; /* in_D0: dot product for the next element (D0) */
+  int col; /* unaff_D2: column 0..2 (D2) */
+  int row_off; /* unaff_D3: 6 * row (D3) */
+  int c; /* unaff_D4: output matrix C (D4) */
+  uint shift; /* unaff_D5: 12 (D5) */
+  int a; /* unaff_D6: left matrix A (D6) */
+  short *b_elem; /* psVar1: B element pointer for this column */
+  short *b_col; /* in_A0: B column cursor (A0), returned */
+  undefined2 *next_out; /* puVar2: next output word */
+  undefined2 *out; /* in_A1: output word cursor (A1) */
+  int row; /* unaff_A2: row 0..2 (A2) */
+  int a_row; /* unaff_A3: A + row_off (A3) */
+  short *b; /* unaff_A5: right matrix B (A5) */
+  int frame; /* unaff_A6: matmul3x3_s16 frame (A6); -4 holds A + row_off + 4 */
   
   do {
-    puVar2 = in_A1 + 1;
-    *in_A1 = (short)(in_D0 >> (unaff_D5 & 0x3f));
-    unaff_D2 = unaff_D2 + 1;
-    psVar1 = in_A0;
-    if (2 < unaff_D2) {
-      unaff_A2 = unaff_A2 + 1;
-      if (2 < unaff_A2) {
-        return in_A0;
+    next_out = out + 1;
+    *out = (short)(sum >> (shift & 0x3f));
+    col = col + 1;
+    b_elem = b_col;
+    if (2 < col) {
+      row = row + 1;
+      if (2 < row) {
+        return b_col;
       }
-      unaff_D2 = 0;
-      unaff_D3 = unaff_A2 * 6;
-      unaff_A3 = unaff_D3 + unaff_D6;
-      *(int *)(unaff_A6 + -4) = unaff_A3 + 4;
-      puVar2 = (undefined2 *)(unaff_D3 + unaff_D4);
-      psVar1 = unaff_A5;
+      col = 0;
+      row_off = row * 6;
+      a_row = row_off + a;
+      *(int *)(frame + -4) = a_row + 4;
+      next_out = (undefined2 *)(row_off + c);
+      b_elem = b;
     }
-    in_A0 = psVar1 + 1;
-    in_D0 = (int)**(short **)(unaff_A6 + -4) * (int)unaff_A5[unaff_D2 + 6] +
-            (int)*(short *)(unaff_A3 + 2) * (int)unaff_A5[unaff_D2 + 3] +
-            (int)*(short *)(unaff_D6 + unaff_D3) * (int)*psVar1;
-    unaff_D5 = 0xc;
-    in_A1 = puVar2;
+    b_col = b_elem + 1;
+    sum = (int)**(short **)(frame + -4) * (int)b[col + 6] +
+            (int)*(short *)(a_row + 2) * (int)b[col + 3] +
+            (int)*(short *)(a + row_off) * (int)*b_elem;
+    shift = 0xc;
+    out = next_out;
   } while( true );
 }
 
@@ -3357,32 +3751,32 @@ short * FUN_00001d56(void) /* Original: FUN_00001d56 — false entry; see header
 /* VERIFIED: bytes 0x1d76..0x1dd6 match (no calls). DAT_0001ab6c[i] = round(4096*sin(i*pi/128)), 256 words,
  * exact over a full turn. i = angle >> 6 (C truncation); only i + 1 is masked & 0xff, so the
  * angle must be 0..0x3fff (callers mask it). Result = 4.12 value as a sign-extended word. */
-int sin_fixed14(uint param_1) /* Original: FUN_00001d76 */
+int sin_fixed14(uint angle /* param_1: angle 0..0x3fff (0x4000 = full turn) */) /* Original: FUN_00001d76 */
 {
-  uint uVar1;
-  uint uVar2;
-  uint uVar3;
-  int iVar4;
+  uint idx_src; /* uVar1: angle rounded toward 0 for >> 6, the table index */
+  uint next_src; /* uVar2: same value, for the next index */
+  uint frac_src; /* uVar3: same value, for the 6-bit fraction */
+  int delta; /* iVar4: (next - this) * fraction */
   
-  uVar1 = param_1;
-  if ((int)param_1 < 0) {
-    uVar1 = param_1 + 0x3f;
+  idx_src = angle;
+  if ((int)angle < 0) {
+    idx_src = angle + 0x3f;
   }
-  uVar2 = param_1;
-  if ((int)param_1 < 0) {
-    uVar2 = param_1 + 0x3f;
+  next_src = angle;
+  if ((int)angle < 0) {
+    next_src = angle + 0x3f;
   }
-  uVar3 = param_1;
-  if ((int)param_1 < 0) {
-    uVar3 = param_1 + 0x3f;
+  frac_src = angle;
+  if ((int)angle < 0) {
+    frac_src = angle + 0x3f;
   }
-  iVar4 = ((int)*(short *)(&DAT_0001ab6c + (((int)uVar2 >> 6) + 1U & 0xff) * 2) -
-          (int)*(short *)(&DAT_0001ab6c + ((int)uVar1 >> 6) * 2)) *
-          -((uVar3 & 0xffffffc0) - param_1);
-  if (iVar4 < 0) {
-    iVar4 = iVar4 + 0x3f;
+  delta = ((int)*(short *)(&sin_table + (((int)next_src >> 6) + 1U & 0xff) * 2) -
+          (int)*(short *)(&sin_table + ((int)idx_src >> 6) * 2)) *
+          -((frac_src & 0xffffffc0) - angle);
+  if (delta < 0) {
+    delta = delta + 0x3f;
   }
-  return (int)(short)(*(short *)(&DAT_0001ab6c + ((int)uVar1 >> 6) * 2) + (short)(iVar4 >> 6));
+  return (int)(short)(*(short *)(&sin_table + ((int)idx_src >> 6) * 2) + (short)(delta >> 6));
 }
 
 
@@ -3398,18 +3792,18 @@ int sin_fixed14(uint param_1) /* Original: FUN_00001d76 */
  * ((D4 + D0) & ~0x3f)) (muls.l), +0x3f when negative, asr.l #6, add.w D3, ext.l. */
 int FUN_00001db8(void) /* Original: FUN_00001db8 — false entry; see header */
 {
-  int in_D0;
-  int iVar1;
-  int in_D1;
-  int unaff_D2;
-  short unaff_D3w;
-  int unaff_D4;
+  int round_add; /* in_D0: added to unaff_D4 before & ~0x3f (D0) [HYPOTHESIS: 0 or 0x3f as in sin_fixed14] */
+  int delta; /* iVar1: interpolation term */
+  int angle; /* in_D1: angle (D1) */
+  int table_step; /* unaff_D2: next - this table entry (D2) */
+  short base_value; /* unaff_D3w: this table entry (D3.w) */
+  int angle_base; /* unaff_D4: angle term rounded with round_add (D4) [HYPOTHESIS] */
   
-  iVar1 = unaff_D2 * -((unaff_D4 + in_D0 & 0xffffffc0U) - in_D1);
-  if (iVar1 < 0) {
-    iVar1 = iVar1 + 0x3f;
+  delta = table_step * -((angle_base + round_add & 0xffffffc0U) - angle);
+  if (delta < 0) {
+    delta = delta + 0x3f;
   }
-  return (int)(short)(unaff_D3w + (short)(iVar1 >> 6));
+  return (int)(short)(base_value + (short)(delta >> 6));
 }
 
 
@@ -3426,32 +3820,32 @@ int FUN_00001db8(void) /* Original: FUN_00001db8 — false entry; see header */
 /* VERIFIED: bytes 0x1dd8..0x1e38 match (no calls). DAT_0001ad6c[i] = round(4096*cos(i*pi/128)), 256 words,
  * exact over a full turn. i = angle >> 6 (C truncation); only i + 1 is masked & 0xff, so the
  * angle must be 0..0x3fff (callers mask it). Result = 4.12 value as a sign-extended word. */
-int cos_fixed14(uint param_1) /* Original: FUN_00001dd8 */
+int cos_fixed14(uint angle /* param_1: angle 0..0x3fff (0x4000 = full turn) */) /* Original: FUN_00001dd8 */
 {
-  uint uVar1;
-  uint uVar2;
-  uint uVar3;
-  int iVar4;
+  uint idx_src; /* uVar1: angle rounded toward 0 for >> 6, the table index */
+  uint next_src; /* uVar2: same value, for the next index */
+  uint frac_src; /* uVar3: same value, for the 6-bit fraction */
+  int delta; /* iVar4: (next - this) * fraction */
   
-  uVar1 = param_1;
-  if ((int)param_1 < 0) {
-    uVar1 = param_1 + 0x3f;
+  idx_src = angle;
+  if ((int)angle < 0) {
+    idx_src = angle + 0x3f;
   }
-  uVar2 = param_1;
-  if ((int)param_1 < 0) {
-    uVar2 = param_1 + 0x3f;
+  next_src = angle;
+  if ((int)angle < 0) {
+    next_src = angle + 0x3f;
   }
-  uVar3 = param_1;
-  if ((int)param_1 < 0) {
-    uVar3 = param_1 + 0x3f;
+  frac_src = angle;
+  if ((int)angle < 0) {
+    frac_src = angle + 0x3f;
   }
-  iVar4 = ((int)*(short *)(&DAT_0001ad6c + (((int)uVar2 >> 6) + 1U & 0xff) * 2) -
-          (int)*(short *)(&DAT_0001ad6c + ((int)uVar1 >> 6) * 2)) *
-          -((uVar3 & 0xffffffc0) - param_1);
-  if (iVar4 < 0) {
-    iVar4 = iVar4 + 0x3f;
+  delta = ((int)*(short *)(&cos_table + (((int)next_src >> 6) + 1U & 0xff) * 2) -
+          (int)*(short *)(&cos_table + ((int)idx_src >> 6) * 2)) *
+          -((frac_src & 0xffffffc0) - angle);
+  if (delta < 0) {
+    delta = delta + 0x3f;
   }
-  return (int)(short)(*(short *)(&DAT_0001ad6c + ((int)uVar1 >> 6) * 2) + (short)(iVar4 >> 6));
+  return (int)(short)(*(short *)(&cos_table + ((int)idx_src >> 6) * 2) + (short)(delta >> 6));
 }
 
 
@@ -3474,39 +3868,39 @@ int cos_fixed14(uint param_1) /* Original: FUN_00001dd8 */
  * cos(i * pi / 128)) for i = 0..0x80 exactly (4096 .. 0 at 0x40 .. -4096). Index i is angle
  * i << 6 in 0x4000-per-turn units, so the result is 0..0x2000 (0..pi).
  */
-int acos_fixed14(int param_1) /* Original: FUN_00001e3a */
+int acos_fixed14(int x /* param_1: cosine value in 4.12, clamped to +-0x1000 */) /* Original: FUN_00001e3a */
 {
-  short sVar1;
-  short sVar2;
-  int iVar3;
-  short sVar4;
-  short sVar5;
+  short new_hi; /* sVar1: next upper bound */
+  short mid; /* sVar2: (lo + hi) / 2 */
+  int work; /* iVar3: lo + hi, then lo as a long */
+  short hi; /* sVar4: upper index, starts at 0x80 */
+  short lo; /* sVar5: lower index, starts at 0 */
   
-  if (0x1000 < param_1) {
-    param_1 = 0x1000;
+  if (0x1000 < x) {
+    x = 0x1000;
   }
-  if (param_1 < -0x1000) {
-    param_1 = -0x1000;
+  if (x < -0x1000) {
+    x = -0x1000;
   }
-  sVar5 = 0;
-  sVar4 = 0x80;
+  lo = 0;
+  hi = 0x80;
   do {
-    iVar3 = (int)sVar4 + (int)sVar5;
-    if (iVar3 < 0) {
-      iVar3 = iVar3 + 1;
+    work = (int)hi + (int)lo;
+    if (work < 0) {
+      work = work + 1;
     }
-    sVar2 = (short)(iVar3 >> 1);
-    sVar1 = sVar2;
-    if (param_1 <= *(short *)(&DAT_0001ad6c + sVar2 * 2)) {
-      sVar1 = sVar4;
-      sVar5 = sVar2;
+    mid = (short)(work >> 1);
+    new_hi = mid;
+    if (x <= *(short *)(&cos_table + mid * 2)) {
+      new_hi = hi;
+      lo = mid;
     }
-    sVar4 = sVar1;
-    iVar3 = (int)sVar5;
-  } while (iVar3 < sVar4 + -1);
-  return (int)(short)((short)(((param_1 - *(short *)(&DAT_0001ad6c + iVar3 * 2)) * -0x40) /
-                             ((int)*(short *)(&DAT_0001ad6c + iVar3 * 2) -
-                             (int)*(short *)(iVar3 * 2 + 0x1ad6e))) + (short)(iVar3 << 6));
+    hi = new_hi;
+    work = (int)lo;
+  } while (work < hi + -1);
+  return (int)(short)((short)(((x - *(short *)(&cos_table + work * 2)) * -0x40) /
+                             ((int)*(short *)(&cos_table + work * 2) -
+                             (int)*(short *)(work * 2 + 0x1ad6e))) + (short)(work << 6));
 }
 
 
@@ -3535,33 +3929,33 @@ int acos_fixed14(int param_1) /* Original: FUN_00001e3a */
  * entry 126 give a wrong, decreasing fraction. attitude_from_velocity only passes
  * ratios within +-0x1000 (|angle| <= 45 deg, indices 31..95), so it never reaches this.
  */
-ushort atan_fixed14(int param_1) /* Original: FUN_00001ebc */
+ushort atan_fixed14(int ratio /* param_1: tangent value in 4.12 */) /* Original: FUN_00001ebc */
 {
-  short sVar1;
-  short sVar2;
-  short sVar3;
-  int iVar4;
-  short sVar5;
+  short new_hi; /* sVar1: next upper bound */
+  short mid; /* sVar2: (lo + hi) / 2 */
+  short hi; /* sVar3: upper index, starts at 0x7f */
+  int work; /* iVar4: lo + hi, then lo as a long */
+  short lo; /* sVar5: lower index, starts at 0 */
   
-  sVar5 = 0;
-  sVar3 = 0x7f;
+  lo = 0;
+  hi = 0x7f;
   do {
-    iVar4 = (int)sVar3 + (int)sVar5;
-    if (iVar4 < 0) {
-      iVar4 = iVar4 + 1;
+    work = (int)hi + (int)lo;
+    if (work < 0) {
+      work = work + 1;
     }
-    sVar2 = (short)(iVar4 >> 1);
-    sVar1 = sVar2;
-    if (*(int *)(&DAT_0001af6c + sVar2 * 4) <= param_1) {
-      sVar1 = sVar3;
-      sVar5 = sVar2;
+    mid = (short)(work >> 1);
+    new_hi = mid;
+    if (*(int *)(&tan_table + mid * 4) <= ratio) {
+      new_hi = hi;
+      lo = mid;
     }
-    sVar3 = sVar1;
-    iVar4 = (int)sVar5;
-  } while (iVar4 < sVar3 + -1);
-  return (short)(((*(int *)(&DAT_0001af6c + iVar4 * 4) - param_1) * 0x40) /
-                (*(int *)(&DAT_0001af6c + iVar4 * 4) - *(int *)(iVar4 * 4 + 0x1af70))) +
-         (sVar5 + -0x3f) * 0x40 & 0x3fff;
+    hi = new_hi;
+    work = (int)lo;
+  } while (work < hi + -1);
+  return (short)(((*(int *)(&tan_table + work * 4) - ratio) * 0x40) /
+                (*(int *)(&tan_table + work * 4) - *(int *)(work * 4 + 0x1af70))) +
+         (lo + -0x3f) * 0x40 & 0x3fff;
 }
 
 
@@ -3588,50 +3982,50 @@ ushort atan_fixed14(int param_1) /* Original: FUN_00001ebc */
  *     ((y << 12) / speed) as 0x1000 - a, or, when |y| > |x| + |z|, acos of the horizontal
  *     length isqrt_floor(speed^2 - y*y) (negated when y < 0); left unwritten when speed == 0.
  */
-void attitude_from_velocity(short param_1,short param_2,short param_3,int param_4,int param_5,
-                 ushort *param_6,ushort *param_7) /* Original: FUN_00001f22 */
+void attitude_from_velocity(short vx /* param_1: velocity x */,short vy /* param_2: velocity y (vertical) */,short vz /* param_3: velocity z */,int speed /* param_4: speed, 0 = leave the pitch unwritten */,int speed_sq /* param_5: speed squared */,
+                 ushort *pitch /* param_6: out, pitch angle (0x4000 per turn) */,ushort *heading /* param_7: out, heading angle (0x4000 per turn) */) /* Original: FUN_00001f22 */
 {
-  short sVar2;
-  short sVar3;
-  ushort uVar4;
-  int iVar1;
+  short abs_x; /* sVar2: abs_int(vx) */
+  short abs_z; /* sVar3: abs_int(vz) */
+  ushort angle; /* uVar4: heading, then pitch */
+  int work; /* iVar1: abs_int(vy), horizontal length, then acos_fixed14 result */
   
-  sVar2 = FUN_00002de8();
-  sVar3 = FUN_00002de8();
-  if (sVar3 < sVar2) {
-    uVar4 = atan_fixed14( /* Original: FUN_00001ebc */((int)param_3 << 0xc) / (int)sVar2);
-    uVar4 = 0x1000 - uVar4;
-    if (0 < param_1) {
-      uVar4 = -uVar4;
+  abs_x = FUN_00002de8();
+  abs_z = FUN_00002de8();
+  if (abs_z < abs_x) {
+    angle = atan_fixed14( /* Original: FUN_00001ebc */((int)vz << 0xc) / (int)abs_x);
+    angle = 0x1000 - angle;
+    if (0 < vx) {
+      angle = -angle;
     }
 LAB_00001faa:
-    uVar4 = uVar4 & 0x3fff;
+    angle = angle & 0x3fff;
   }
   else {
-    if (param_3 == 0) goto LAB_00001fb0;
-    uVar4 = atan_fixed14( /* Original: FUN_00001ebc */(param_1 * -0x1000) / (int)sVar3);
-    if (param_3 < 0) {
-      uVar4 = 0x2000 - uVar4;
+    if (vz == 0) goto LAB_00001fb0;
+    angle = atan_fixed14( /* Original: FUN_00001ebc */(vx * -0x1000) / (int)abs_z);
+    if (vz < 0) {
+      angle = 0x2000 - angle;
       goto LAB_00001faa;
     }
   }
-  *param_7 = uVar4;
+  *heading = angle;
 LAB_00001fb0:
-  if (param_4 != 0) {
-    iVar1 = abs_int( /* Original: FUN_00002e08 */(int)param_2);
-    if ((int)sVar3 + (int)sVar2 < iVar1) {
-      iVar1 = isqrt_floor(param_5 - (int)param_2 * (int)param_2); /* Original: FUN_0000e372 */
-      iVar1 = acos_fixed14( /* Original: FUN_00001e3a */((int)(short)iVar1 << 0xc) / param_4);
-      uVar4 = (ushort)iVar1;
-      if (param_2 < 0) {
-        uVar4 = -uVar4 & 0x3fff;
+  if (speed != 0) {
+    work = abs_int( /* Original: FUN_00002e08 */(int)vy);
+    if ((int)abs_z + (int)abs_x < work) {
+      work = isqrt_floor(speed_sq - (int)vy * (int)vy); /* Original: FUN_0000e372 */
+      work = acos_fixed14( /* Original: FUN_00001e3a */((int)(short)work << 0xc) / speed);
+      angle = (ushort)work;
+      if (vy < 0) {
+        angle = -angle & 0x3fff;
       }
     }
     else {
-      iVar1 = acos_fixed14( /* Original: FUN_00001e3a */((int)param_2 << 0xc) / param_4);
-      uVar4 = 0x1000U - (short)iVar1 & 0x3fff;
+      work = acos_fixed14( /* Original: FUN_00001e3a */((int)vy << 0xc) / speed);
+      angle = 0x1000U - (short)work & 0x3fff;
     }
-    *param_6 = uVar4;
+    *pitch = angle;
   }
   return;
 }
@@ -3666,26 +4060,26 @@ LAB_00001fb0:
  * (lea $1dd8(pc) / lea $1d76(pc), file addresses), each result stored as a word in the
  * order above, one adda.w #$20 for the eight one-long pushes; identical to the C.
  */
-void load_attitude_angle_sincos(uint param_1,uint param_2,uint param_3,uint param_4) /* Original: FUN_0000202a */
+void load_attitude_angle_sincos(uint angle1 /* param_1: first angle */,uint angle2 /* param_2: second angle */,uint angle3 /* param_3: third angle */,uint angle4 /* param_4: fourth angle */) /* Original: FUN_0000202a */
 {
-  int iVar1;
-  
-  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_1);
-  DAT_0001d7fa = (short)iVar1;
-  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_1);
-  DAT_0001d7fc = (short)iVar1;
-  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_2);
-  DAT_0001d7f6 = (short)iVar1;
-  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_2);
-  DAT_0001d7f8 = (short)iVar1;
-  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_3);
-  DAT_0001d7f2 = (short)iVar1;
-  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_3);
-  DAT_0001d7f4 = (short)iVar1;
-  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_4);
-  DAT_0001d7ee = (short)iVar1;
-  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_4);
-  DAT_0001d7f0 = (short)iVar1;
+  int value; /* iVar1: cos_fixed14 / sin_fixed14 result */
+
+  value = cos_fixed14( /* Original: FUN_00001dd8 */angle1);
+  angle1_cos = (short)value;
+  value = sin_fixed14( /* Original: FUN_00001d76 */angle1);
+  angle1_sin = (short)value;
+  value = cos_fixed14( /* Original: FUN_00001dd8 */angle2);
+  angle2_cos = (short)value;
+  value = sin_fixed14( /* Original: FUN_00001d76 */angle2);
+  angle2_sin = (short)value;
+  value = cos_fixed14( /* Original: FUN_00001dd8 */angle3);
+  angle3_cos = (short)value;
+  value = sin_fixed14( /* Original: FUN_00001d76 */angle3);
+  angle3_sin = (short)value;
+  value = cos_fixed14( /* Original: FUN_00001dd8 */angle4);
+  angle4_cos = (short)value;
+  value = sin_fixed14( /* Original: FUN_00001d76 */angle4);
+  angle4_sin = (short)value;
   return;
 }
 
@@ -3710,18 +4104,18 @@ void load_attitude_angle_sincos(uint param_1,uint param_2,uint param_3,uint para
 /* VERIFIED (FUN_000020a0): 0x20a0..0x20e4 checked against an independent capstone disassembly and
  * found identical to the C: words DAT_0001d7ea / d7ec = cos / sin(p5), DAT_0001d7e6 / d7e8 = cos
  * / sin(p6) (lea $1dd8(pc) cos_fixed14, lea $1d76(pc) sin_fixed14; move.w of each D0). */
-void load_attitude_angle_sincos_5_6(uint param_1,uint param_2) /* Original: FUN_000020a0 */
+void load_attitude_angle_sincos_5_6(uint angle5 /* param_1: fifth angle */,uint angle6 /* param_2: sixth angle */) /* Original: FUN_000020a0 */
 {
-  int iVar1;
+  int value; /* iVar1: cos_fixed14 / sin_fixed14 result */
   
-  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_1);
-  DAT_0001d7ea = (short)iVar1;
-  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_1);
-  DAT_0001d7ec = (short)iVar1;
-  iVar1 = cos_fixed14( /* Original: FUN_00001dd8 */param_2);
-  DAT_0001d7e6 = (short)iVar1;
-  iVar1 = sin_fixed14( /* Original: FUN_00001d76 */param_2);
-  DAT_0001d7e8 = (short)iVar1;
+  value = cos_fixed14( /* Original: FUN_00001dd8 */angle5);
+  angle5_cos = (short)value;
+  value = sin_fixed14( /* Original: FUN_00001d76 */angle5);
+  angle5_sin = (short)value;
+  value = cos_fixed14( /* Original: FUN_00001dd8 */angle6);
+  angle6_cos = (short)value;
+  value = sin_fixed14( /* Original: FUN_00001d76 */angle6);
+  angle6_sin = (short)value;
   return;
 }
 
@@ -3754,35 +4148,35 @@ void load_attitude_angle_sincos_5_6(uint param_1,uint param_2) /* Original: FUN_
 void fill_attitude_rotation_bases(void) /* Original: FUN_000020e6 */
 {
   /* ~Rx from angle1 cos/sin */
-  DAT_0001d7d4 = 0x1000;
-  DAT_0001d7d6 = 0;
-  DAT_0001d7d8 = 0;
-  DAT_0001d7da = 0;
-  DAT_0001d7dc = DAT_0001d7fa;
-  DAT_0001d7de = -DAT_0001d7fc;
-  DAT_0001d7e0 = 0;
-  DAT_0001d7e2 = DAT_0001d7fc;
-  DAT_0001d7e4 = DAT_0001d7fa;
+  basis1_m00 = 0x1000;
+  basis1_m01 = 0;
+  basis1_m02 = 0;
+  basis1_m10 = 0;
+  basis1_m11 = angle1_cos;
+  basis1_m12 = -angle1_sin;
+  basis1_m20 = 0;
+  basis1_m21 = angle1_sin;
+  basis1_m22 = angle1_cos;
   /* ~Ry from angle2 */
-  DAT_0001d7bc = DAT_0001d7f6;
-  DAT_0001d7be = 0;
-  DAT_0001d7c0 = DAT_0001d7f8;
-  DAT_0001d7c2 = 0;
-  DAT_0001d7c4 = 0x1000;
-  DAT_0001d7c6 = 0;
-  DAT_0001d7c8 = -DAT_0001d7f8;
-  DAT_0001d7ca = 0;
-  DAT_0001d7cc = DAT_0001d7f6;
+  basis2_m00 = angle2_cos;
+  basis2_m01 = 0;
+  basis2_m02 = angle2_sin;
+  basis2_m10 = 0;
+  basis2_m11 = 0x1000;
+  basis2_m12 = 0;
+  basis2_m20 = -angle2_sin;
+  basis2_m21 = 0;
+  basis2_m22 = angle2_cos;
   /* ~Rz from angle3 */
-  DAT_0001d7a4 = DAT_0001d7f2;
-  DAT_0001d7a6 = DAT_0001d7f4;
-  DAT_0001d7a8 = 0;
-  DAT_0001d7aa = -DAT_0001d7f4;
-  DAT_0001d7ac = DAT_0001d7f2;
-  DAT_0001d7ae = 0;
-  DAT_0001d7b0 = 0;
-  DAT_0001d7b2 = 0;
-  DAT_0001d7b4 = 0x1000;
+  basis3_m00 = angle3_cos;
+  basis3_m01 = angle3_sin;
+  basis3_m02 = 0;
+  basis3_m10 = -angle3_sin;
+  basis3_m11 = angle3_cos;
+  basis3_m12 = 0;
+  basis3_m20 = 0;
+  basis3_m21 = 0;
+  basis3_m22 = 0x1000;
   return;
 }
 
@@ -3811,15 +4205,15 @@ void fill_attitude_rotation_bases(void) /* Original: FUN_000020e6 */
  */
 void fill_attitude_rotation_basis_4(void) /* Original: FUN_000021a0 */
 {
-  DAT_0001d78c = DAT_0001d7ee;
-  DAT_0001d78e = 0;
-  DAT_0001d790 = DAT_0001d7f0;
-  DAT_0001d792 = 0;
-  DAT_0001d794 = 0x1000;
-  DAT_0001d796 = 0;
-  DAT_0001d798 = -DAT_0001d7f0;
-  DAT_0001d79a = 0;
-  DAT_0001d79c = DAT_0001d7ee;
+  basis4_m00 = angle4_cos;
+  basis4_m01 = 0;
+  basis4_m02 = angle4_sin;
+  basis4_m10 = 0;
+  basis4_m11 = 0x1000;
+  basis4_m12 = 0;
+  basis4_m20 = -angle4_sin;
+  basis4_m21 = 0;
+  basis4_m22 = angle4_cos;
   return;
 }
 
@@ -3843,15 +4237,15 @@ void fill_attitude_rotation_basis_4(void) /* Original: FUN_000021a0 */
  * with cos = DAT_0001d7ee, sin = DAT_0001d7f0 (neg.w). */
 void fill_attitude_rotation_basis_4_rx(void) /* Original: FUN_000021e0 */
 {
-  DAT_0001d78c = 0x1000;
-  DAT_0001d78e = 0;
-  DAT_0001d790 = 0;
-  DAT_0001d792 = 0;
-  DAT_0001d794 = DAT_0001d7ee;
-  DAT_0001d796 = -DAT_0001d7f0;
-  DAT_0001d798 = 0;
-  DAT_0001d79a = DAT_0001d7f0;
-  DAT_0001d79c = DAT_0001d7ee;
+  basis4_m00 = 0x1000;
+  basis4_m01 = 0;
+  basis4_m02 = 0;
+  basis4_m10 = 0;
+  basis4_m11 = angle4_cos;
+  basis4_m12 = -angle4_sin;
+  basis4_m20 = 0;
+  basis4_m21 = angle4_sin;
+  basis4_m22 = angle4_cos;
   return;
 }
 
@@ -3879,24 +4273,24 @@ void fill_attitude_rotation_basis_4_rx(void) /* Original: FUN_000021e0 */
  * d7e8 (16-bit words, neg.w). */
 void fill_attitude_rotation_bases_5_6(void) /* Original: FUN_00002220 */
 {
-  DAT_0001d774 = 0x1000;
-  DAT_0001d776 = 0;
-  DAT_0001d778 = 0;
-  DAT_0001d77a = 0;
-  DAT_0001d77c = DAT_0001d7ea;
-  DAT_0001d77e = -DAT_0001d7ec;
-  DAT_0001d780 = 0;
-  DAT_0001d782 = DAT_0001d7ec;
-  DAT_0001d784 = DAT_0001d7ea;
-  DAT_0001d75c = DAT_0001d7e6;
-  DAT_0001d75e = 0;
-  DAT_0001d760 = DAT_0001d7e8;
-  DAT_0001d762 = 0;
-  DAT_0001d764 = 0x1000;
-  DAT_0001d766 = 0;
-  DAT_0001d768 = -DAT_0001d7e8;
-  DAT_0001d76a = 0;
-  DAT_0001d76c = DAT_0001d7e6;
+  basis5_m00 = 0x1000;
+  basis5_m01 = 0;
+  basis5_m02 = 0;
+  basis5_m10 = 0;
+  basis5_m11 = angle5_cos;
+  basis5_m12 = -angle5_sin;
+  basis5_m20 = 0;
+  basis5_m21 = angle5_sin;
+  basis5_m22 = angle5_cos;
+  basis6_m00 = angle6_cos;
+  basis6_m01 = 0;
+  basis6_m02 = angle6_sin;
+  basis6_m10 = 0;
+  basis6_m11 = 0x1000;
+  basis6_m12 = 0;
+  basis6_m20 = -angle6_sin;
+  basis6_m21 = 0;
+  basis6_m22 = angle6_cos;
   return;
 }
 
@@ -3930,83 +4324,83 @@ void fill_attitude_rotation_bases_5_6(void) /* Original: FUN_00002220 */
  * -y << 12 / len), heading cos / sin (DAT_0001d7f6 / 7f8, or 0x1000 / 0 when param_6), roll cos / sin of
  * param_4 (DAT_0001d7f2 / 7f4), the three 3x3 s16 matrices at -$12 / -$24 / -$36(a6) word for word, and
  * matmul3x3_s16 0x1d02 (heading x pitch -> -$48 temp, x roll -> param_5) - identical to the C. */
-void build_attitude_matrix_from_dir_roll(int param_1,int param_2,int param_3,uint param_4,int param_5,int param_6) /* Original: FUN_0000229e */
+void build_attitude_matrix_from_dir_roll(int x /* param_1: direction x */,int y /* param_2: direction y */,int z /* param_3: direction z */,uint roll /* param_4: roll angle */,int out /* param_5: output 3x3 s16 matrix */,int no_heading /* param_6: nonzero forces the heading pair to (0x1000, 0) */) /* Original: FUN_0000229e */
 {
-  short sVar1;
-  int iVar2;
-  undefined1 auStack_4c [18];
-  short local_3a;
-  short local_38;
-  undefined2 local_36;
-  short local_34;
-  short local_32;
-  undefined2 local_30;
-  undefined2 local_2e;
-  undefined2 local_2c;
-  undefined2 local_2a;
-  undefined2 local_28;
-  undefined2 local_26;
-  short local_24;
-  undefined2 local_22;
-  undefined2 local_20;
-  undefined2 local_1e;
-  short local_1c;
-  undefined2 local_1a;
-  undefined2 local_18;
-  short local_16 [5];
-  short local_c;
-  undefined2 local_a;
-  short local_8;
-  undefined2 local_6;
+  short len; /* sVar1: isqrt_floor result */
+  int work; /* iVar2: horizontal length, then cos / sin of roll */
+  undefined1 temp [18]; /* auStack_4c: heading x pitch product */
+  short roll_m00; /* local_3a: roll matrix [0][0] */
+  short roll_m01; /* local_38: roll matrix [0][1] */
+  undefined2 roll_m02; /* local_36: roll matrix [0][2] */
+  short roll_m10; /* local_34: roll matrix [1][0] */
+  short roll_m11; /* local_32: roll matrix [1][1] */
+  undefined2 roll_m12; /* local_30: roll matrix [1][2] */
+  undefined2 roll_m20; /* local_2e: roll matrix [2][0] */
+  undefined2 roll_m21; /* local_2c: roll matrix [2][1] */
+  undefined2 roll_m22; /* local_2a: roll matrix [2][2] */
+  undefined2 heading_m00; /* local_28: heading matrix [0][0] */
+  undefined2 heading_m01; /* local_26: heading matrix [0][1] */
+  short heading_m02; /* local_24: heading matrix [0][2] */
+  undefined2 heading_m10; /* local_22: heading matrix [1][0] */
+  undefined2 heading_m11; /* local_20: heading matrix [1][1] */
+  undefined2 heading_m12; /* local_1e: heading matrix [1][2] */
+  short heading_m20; /* local_1c: heading matrix [2][0] */
+  undefined2 heading_m21; /* local_1a: heading matrix [2][1] */
+  undefined2 heading_m22; /* local_18: heading matrix [2][2] */
+  short pitch_m [5]; /* local_16: pitch matrix elements [0][0]..[1][1] */
+  short pitch_m12; /* local_c: pitch matrix [1][2] */
+  undefined2 pitch_m20; /* local_a: pitch matrix [2][0] */
+  short pitch_m21; /* local_8: pitch matrix [2][1] */
+  undefined2 pitch_m22; /* local_6: pitch matrix [2][2] */
   
   /* Ghidra LAB_0000e350_2: LEA $E352 = isqrt_floor @0xE372 − 0x20 [INFERRED] */
-  sVar1 = (*(code *)&LAB_0000e350_2)(param_1 * param_1 + param_3 * param_3);
-  iVar2 = (int)sVar1;
-  sVar1 = (*(code *)&LAB_0000e350_2)(param_2 * param_2 + param_1 * param_1 + param_3 * param_3);
-  DAT_0001d7fa = (undefined2)((iVar2 << 0xc) / (int)sVar1);
-  DAT_0001d7fc = (short)((param_2 * -0x1000) / (int)sVar1);
-  if (param_6 == 0) {
-    DAT_0001d7f6 = (undefined2)((param_3 << 0xc) / iVar2);
-    DAT_0001d7f8 = (short)((param_1 << 0xc) / iVar2);
+  len = (*(code *)&LAB_0000e350_2)(x * x + z * z);
+  work = (int)len;
+  len = (*(code *)&LAB_0000e350_2)(y * y + x * x + z * z);
+  angle1_cos = (undefined2)((work << 0xc) / (int)len);
+  angle1_sin = (short)((y * -0x1000) / (int)len);
+  if (no_heading == 0) {
+    angle2_cos = (undefined2)((z << 0xc) / work);
+    angle2_sin = (short)((x << 0xc) / work);
   }
   else {
-    DAT_0001d7f6 = 0x1000;
-    DAT_0001d7f8 = 0;
+    angle2_cos = 0x1000;
+    angle2_sin = 0;
   }
-  iVar2 = cos_fixed14( /* Original: FUN_00001dd8 */param_4);
-  DAT_0001d7f2 = (short)iVar2;
-  iVar2 = sin_fixed14( /* Original: FUN_00001d76 */param_4);
-  DAT_0001d7f4 = (short)iVar2;
-  local_16[0] = 0x1000;
-  local_16[1] = 0;
-  local_16[2] = 0;
-  local_16[3] = 0;
-  local_16[4] = DAT_0001d7fa;
-  local_c = -DAT_0001d7fc;
-  local_a = 0;
-  local_8 = DAT_0001d7fc;
-  local_6 = DAT_0001d7fa;
-  local_28 = DAT_0001d7f6;
-  local_26 = 0;
-  local_24 = DAT_0001d7f8;
-  local_22 = 0;
-  local_20 = 0x1000;
-  local_1e = 0;
-  local_1c = -DAT_0001d7f8;
-  local_1a = 0;
-  local_18 = DAT_0001d7f6;
-  local_3a = DAT_0001d7f2;
-  local_36 = 0;
-  local_34 = -DAT_0001d7f4;
-  local_32 = DAT_0001d7f2;
-  local_30 = 0;
-  local_2e = 0;
-  local_2c = 0;
-  local_2a = 0x1000;
-  local_38 = DAT_0001d7f4;
+  work = cos_fixed14( /* Original: FUN_00001dd8 */roll);
+  angle3_cos = (short)work;
+  work = sin_fixed14( /* Original: FUN_00001d76 */roll);
+  angle3_sin = (short)work;
+  pitch_m[0] = 0x1000;
+  pitch_m[1] = 0;
+  pitch_m[2] = 0;
+  pitch_m[3] = 0;
+  pitch_m[4] = angle1_cos;
+  pitch_m12 = -angle1_sin;
+  pitch_m20 = 0;
+  pitch_m21 = angle1_sin;
+  pitch_m22 = angle1_cos;
+  heading_m00 = angle2_cos;
+  heading_m01 = 0;
+  heading_m02 = angle2_sin;
+  heading_m10 = 0;
+  heading_m11 = 0x1000;
+  heading_m12 = 0;
+  heading_m20 = -angle2_sin;
+  heading_m21 = 0;
+  heading_m22 = angle2_cos;
+  roll_m00 = angle3_cos;
+  roll_m02 = 0;
+  roll_m10 = -angle3_sin;
+  roll_m11 = angle3_cos;
+  roll_m12 = 0;
+  roll_m20 = 0;
+  roll_m21 = 0;
+  roll_m22 = 0x1000;
+  roll_m01 = angle3_sin;
   /* $2408 tag lands at the next PEA — matmul-only continuation mid-frame */
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)&local_28,local_16,(int)auStack_4c);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_4c,&local_3a,param_5);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)&heading_m00,pitch_m,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&roll_m00,out);
   return;
 }
 
@@ -4032,13 +4426,13 @@ void build_attitude_matrix_from_dir_roll(int param_1,int param_2,int param_3,uin
  * 0x2428..0x2462 (bsr $20e6; (0x1d7bc, 0x1d7d4, temp) then (temp, 0x1d7a4, param_1) via
  * lea $1d02(pc) / jsr); identical to the C.
  */
-void finalize_attitude_matrix_3ang_alt(int param_1) /* Original: FUN_00002428 */
+void finalize_attitude_matrix_3ang_alt(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_00002428 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&DAT_0001d7d4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7a4,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&basis1_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis3_m00,out);
   return;
 }
 
@@ -4063,10 +4457,10 @@ void finalize_attitude_matrix_3ang_alt(int param_1) /* Original: FUN_00002428 */
  * VERIFIED: checked against an independent capstone disassembly of the bytes
  * 0x2464..0x2486; identical to the C.
  */
-void build_attitude_matrix_3ang_alt(uint param_1,uint param_2,uint param_3,int param_4) /* Original: FUN_00002464 */
+void build_attitude_matrix_3ang_alt(uint angle1 /* param_1: angle 1 of load_attitude_angle_sincos */,uint angle2 /* param_2: angle 2 of load_attitude_angle_sincos */,uint angle3 /* param_3: angle 3 of load_attitude_angle_sincos */,int out /* param_4: output 3x3 s16 matrix */) /* Original: FUN_00002464 */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,0);
-  finalize_attitude_matrix_3ang_alt( /* Original: FUN_00002428 */param_4);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,0);
+  finalize_attitude_matrix_3ang_alt( /* Original: FUN_00002428 */out);
   return;
 }
 
@@ -4092,15 +4486,15 @@ void build_attitude_matrix_3ang_alt(uint param_1,uint param_2,uint param_3,int p
  * found identical to the C: bsr.w 0x20e6 fill_attitude_rotation_bases, bsr.w 0x21e0
  * fill_attitude_rotation_basis_4_rx, then matmul3x3_s16 (lea $1d02(pc)): (0x1d7bc, 0x1d7d4,
  * out), (out, 0x1d7a4, tmp at a6 - 0x12), (tmp, 0x1d78c, out); arguments dropped by unlk. */
-void compose_attitude_matrix_x_alt(int param_1) /* Original: FUN_00002488 */
+void compose_attitude_matrix_x_alt(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_00002488 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
   fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&DAT_0001d7d4,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7a4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d78c,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&basis1_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis3_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis4_m00,out);
   return;
 }
 
@@ -4126,10 +4520,10 @@ void compose_attitude_matrix_x_alt(int param_1) /* Original: FUN_00002488 */
  * load_attitude_angle_sincos(p1, p2, p3, p4) (pushed p4..p1), bsr.b 0x2488
  * compose_attitude_matrix_x_alt(p5). link #-0x24 reserves an unused frame and unlk drops the
  * pushed arguments (no adda). */
-void build_attitude_matrix_x_alt(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_000024d6 */
+void build_attitude_matrix_x_alt(uint angle1 /* param_1: angle 1 of load_attitude_angle_sincos */,uint angle2 /* param_2: angle 2 of load_attitude_angle_sincos */,uint angle3 /* param_3: angle 3 of load_attitude_angle_sincos */,uint angle4 /* param_4: angle 4 of load_attitude_angle_sincos */,int out /* param_5: output 3x3 s16 matrix */) /* Original: FUN_000024d6 */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,param_4);
-  compose_attitude_matrix_x_alt( /* Original: FUN_00002488 */param_5);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,angle4);
+  compose_attitude_matrix_x_alt( /* Original: FUN_00002488 */out);
   return;
 }
 
@@ -4155,14 +4549,14 @@ void build_attitude_matrix_x_alt(uint param_1,uint param_2,uint param_3,uint par
  * 0x24f8..0x253c (move.l #$2408 $20ce4, bsr $20e6, pea $1d7d4 / $1d7a4 + lea $1d02(pc) /
  * jsr, then (temp, $1d7bc, param_1)); identical to the C.
  */
-void finalize_attitude_matrix_3ang(int param_1) /* Original: FUN_000024f8 */
+void finalize_attitude_matrix_3ang(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_000024f8 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
-  DAT_00020ce4 = 0x2408;
+  attitude_compose_tag = 0x2408;
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7a4,&DAT_0001d7d4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7a4,&basis1_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis2_m00,out);
   return;
 }
 
@@ -4194,10 +4588,10 @@ void finalize_attitude_matrix_3ang(int param_1) /* Original: FUN_000024f8 */
  * 0x253e..0x2560 (clr.l + pushes $10 / $c / $8 (a6), bsr $202a, push $14 (a6), bsr $24f8,
  * adda.w #$14); identical to the C.
  */
-void build_attitude_matrix_3ang(uint param_1,uint param_2,uint param_3,int param_4) /* Original: FUN_0000253e */
+void build_attitude_matrix_3ang(uint angle1 /* param_1: angle 1 of load_attitude_angle_sincos */,uint angle2 /* param_2: angle 2 of load_attitude_angle_sincos */,uint angle3 /* param_3: angle 3 of load_attitude_angle_sincos */,int out /* param_4: output 3x3 s16 matrix */) /* Original: FUN_0000253e */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,0);
-  finalize_attitude_matrix_3ang( /* Original: FUN_000024f8 */param_4);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,0);
+  finalize_attitude_matrix_3ang( /* Original: FUN_000024f8 */out);
   return;
 }
 
@@ -4227,13 +4621,13 @@ void build_attitude_matrix_3ang(uint param_1,uint param_2,uint param_3,int param
  * 0x2562..0x25a6 (link #-0x14; lea $1d02(pc) / jsr (a2) x3; d3 = a6 - 0x12); identical
  * to the C.
  */
-void finalize_attitude_matrix_4ang(int param_1) /* Original: FUN_00002562 */
+void finalize_attitude_matrix_4ang(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_00002562 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d78c,&DAT_0001d7a4,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7d4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d78c,&basis3_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis1_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis2_m00,out);
   return;
 }
 
@@ -4257,12 +4651,12 @@ void finalize_attitude_matrix_4ang(int param_1) /* Original: FUN_00002562 */
  * adda.w #$14 pops all five longs. Identical to the C. The matrix contents (axis
  * order) depend on the four callees, which are verified separately.
  */
-void build_attitude_matrix(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_000025a8 */
+void build_attitude_matrix(uint angle4 /* param_1: angle 4 of load_attitude_angle_sincos */,uint angle1 /* param_2: angle 1 of load_attitude_angle_sincos */,uint angle2 /* param_3: angle 2 of load_attitude_angle_sincos */,uint angle3 /* param_4: angle 3 of load_attitude_angle_sincos */,int out /* param_5: output 3x3 s16 matrix */) /* Original: FUN_000025a8 */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_2,param_3,param_4,param_1);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,angle4);
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
   fill_attitude_rotation_basis_4( /* Original: FUN_000021a0 */);
-  finalize_attitude_matrix_4ang( /* Original: FUN_00002562 */param_5);
+  finalize_attitude_matrix_4ang( /* Original: FUN_00002562 */out);
   return;
 }
 
@@ -4292,16 +4686,16 @@ void build_attitude_matrix(uint param_1,uint param_2,uint param_3,uint param_4,i
  * compose_attitude_matrix_x_alt, the composer the neg_sins hooks then reach; bsr.w 0x20e6,
  * bsr.w 0x21e0, then matmul3x3_s16 (0x1d78c, 0x1d7a4, out), (out, 0x1d7d4, tmp a6 - 0x12),
  * (tmp, 0x1d7bc, out). */
-void compose_attitude_matrix_x(int param_1) /* Original: FUN_000025d6 */
+void compose_attitude_matrix_x(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_000025d6 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
-  DAT_00020ce4 = 0x2468;
+  attitude_compose_tag = 0x2468;
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
   fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d78c,&DAT_0001d7a4,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7d4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d78c,&basis3_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis1_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis2_m00,out);
   return;
 }
 
@@ -4321,10 +4715,10 @@ void compose_attitude_matrix_x(int param_1) /* Original: FUN_000025d6 */
  * independent capstone disassembly and found identical to the C: pushes p1, p4, p3, p2, so
  * bsr.w 0x202a load_attitude_angle_sincos(p2, p3, p4, p1) (the first angle moves last
  * compared with the _alt wrapper), then bsr.b 0x25d6 compose_attitude_matrix_x(p5). */
-void build_attitude_matrix_x(uint param_1,uint param_2,uint param_3,uint param_4,int param_5) /* Original: FUN_0000262e */
+void build_attitude_matrix_x(uint angle4 /* param_1: angle 4 of load_attitude_angle_sincos */,uint angle1 /* param_2: angle 1 of load_attitude_angle_sincos */,uint angle2 /* param_3: angle 2 of load_attitude_angle_sincos */,uint angle3 /* param_4: angle 3 of load_attitude_angle_sincos */,int out /* param_5: output 3x3 s16 matrix */) /* Original: FUN_0000262e */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_2,param_3,param_4,param_1);
-  compose_attitude_matrix_x( /* Original: FUN_000025d6 */param_5);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,angle4);
+  compose_attitude_matrix_x( /* Original: FUN_000025d6 */out);
   return;
 }
 
@@ -4351,19 +4745,19 @@ void build_attitude_matrix_x(uint param_1,uint param_2,uint param_3,uint param_4
  * compose_attitude_matrix_6ang_alt; bsr.w 0x20e6 / 0x21e0 / 0x2220; matmul3x3_s16 (0x1d774,
  * 0x1d75c, out), (out, 0x1d78c, tmp), (tmp, 0x1d7a4, out), (out, 0x1d7d4, tmp), (tmp, 0x1d7bc,
  * out). */
-void compose_attitude_matrix_6ang(int param_1) /* Original: FUN_00002654 */
+void compose_attitude_matrix_6ang(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_00002654 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
-  DAT_00020ce4 = 0x26e0;
+  attitude_compose_tag = 0x26e0;
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
   fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
   fill_attitude_rotation_bases_5_6( /* Original: FUN_00002220 */); /* fills 1d774 + 1d75c from extra sincos */
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d774,&DAT_0001d75c,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d78c,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7a4,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7d4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d7bc,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d774,&basis6_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis4_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis3_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis1_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis2_m00,out);
   return;
 }
 
@@ -4387,12 +4781,12 @@ void compose_attitude_matrix_6ang(int param_1) /* Original: FUN_00002654 */
 /* VERIFIED (FUN_000026cc): 0x26cc..0x26fe checked against an independent capstone disassembly and
  * found identical to the C: 0x202a load_attitude_angle_sincos(p1..p4), 0x20a0
  * load_attitude_angle_sincos_5_6(p5, p6), 0x2654 compose_attitude_matrix_6ang(p7). */
-void build_attitude_matrix_6ang(uint param_1,uint param_2,uint param_3,uint param_4,uint param_5,
-                 uint param_6,int param_7) /* Original: FUN_000026cc */
+void build_attitude_matrix_6ang(uint angle1 /* param_1: angle 1 */,uint angle2 /* param_2: angle 2 */,uint angle3 /* param_3: angle 3 */,uint angle4 /* param_4: angle 4 */,uint angle5 /* param_5: angle 5 */,
+                 uint angle6 /* param_6: angle 6 */,int out /* param_7: output 3x3 s16 matrix */) /* Original: FUN_000026cc */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,param_4);
-  load_attitude_angle_sincos_5_6( /* Original: FUN_000020a0 */param_5,param_6);
-  compose_attitude_matrix_6ang( /* Original: FUN_00002654 */param_7);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,angle4);
+  load_attitude_angle_sincos_5_6( /* Original: FUN_000020a0 */angle5,angle6);
+  compose_attitude_matrix_6ang( /* Original: FUN_00002654 */out);
   return;
 }
 
@@ -4416,18 +4810,18 @@ void build_attitude_matrix_6ang(uint param_1,uint param_2,uint param_3,uint para
  * found identical to the C: bsr.w 0x20e6 / 0x21e0 / 0x2220, then five matmul3x3_s16 calls: (0x1d7bc,
  * 0x1d7d4, out), (out, 0x1d7a4, tmp a6 - 0x12), (tmp, 0x1d78c, out), (out, 0x1d75c, tmp),
  * (tmp, 0x1d774, out). */
-void compose_attitude_matrix_6ang_alt(int param_1) /* Original: FUN_00002700 */
+void compose_attitude_matrix_6ang_alt(int out /* param_1: output 3x3 s16 matrix */) /* Original: FUN_00002700 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 temp [18]; /* auStack_16: intermediate matrix product */
   
   fill_attitude_rotation_bases( /* Original: FUN_000020e6 */);
   fill_attitude_rotation_basis_4_rx( /* Original: FUN_000021e0 */);
   fill_attitude_rotation_bases_5_6( /* Original: FUN_00002220 */);
-  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&DAT_0001d7d4,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d7a4,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d78c,param_1);
-  matmul3x3_s16( /* Original: FUN_00001d02 */param_1,&DAT_0001d75c,(int)auStack_16);
-  matmul3x3_s16( /* Original: FUN_00001d02 */(int)auStack_16,&DAT_0001d774,param_1);
+  matmul3x3_s16( /* Original: FUN_00001d02 */0x1d7bc,&basis1_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis3_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis4_m00,out);
+  matmul3x3_s16( /* Original: FUN_00001d02 */out,&basis6_m00,(int)temp);
+  matmul3x3_s16( /* Original: FUN_00001d02 */(int)temp,&basis5_m00,out);
   return;
 }
 
@@ -4451,12 +4845,12 @@ void compose_attitude_matrix_6ang_alt(int param_1) /* Original: FUN_00002700 */
 /* VERIFIED (FUN_0000276e): 0x276e..0x27a0 checked against an independent capstone disassembly and
  * found identical to the C: 0x202a load_attitude_angle_sincos(p1..p4), 0x20a0
  * load_attitude_angle_sincos_5_6(p5, p6), 0x2700 compose_attitude_matrix_6ang_alt(p7). */
-void build_attitude_matrix_6ang_alt(uint param_1,uint param_2,uint param_3,uint param_4,uint param_5,
-                 uint param_6,int param_7) /* Original: FUN_0000276e */
+void build_attitude_matrix_6ang_alt(uint angle1 /* param_1: angle 1 */,uint angle2 /* param_2: angle 2 */,uint angle3 /* param_3: angle 3 */,uint angle4 /* param_4: angle 4 */,uint angle5 /* param_5: angle 5 */,
+                 uint angle6 /* param_6: angle 6 */,int out /* param_7: output 3x3 s16 matrix */) /* Original: FUN_0000276e */
 {
-  load_attitude_angle_sincos( /* Original: FUN_0000202a */param_1,param_2,param_3,param_4);
-  load_attitude_angle_sincos_5_6( /* Original: FUN_000020a0 */param_5,param_6);
-  compose_attitude_matrix_6ang_alt( /* Original: FUN_00002700 */param_7);
+  load_attitude_angle_sincos( /* Original: FUN_0000202a */angle1,angle2,angle3,angle4);
+  load_attitude_angle_sincos_5_6( /* Original: FUN_000020a0 */angle5,angle6);
+  compose_attitude_matrix_6ang_alt( /* Original: FUN_00002700 */out);
   return;
 }
 
@@ -4500,13 +4894,13 @@ void build_attitude_matrix_6ang_alt(uint param_1,uint param_2,uint param_3,uint 
 /* VERIFIED (FUN_000027a2): 0x27a2..0x27ca checked against an independent capstone disassembly and
  * found identical to the C: neg.w on the words DAT_0001d7fc / d7f8 / d7f4 / d7f0 (16-bit, as
  * declared), then the hook DAT_00020ce4(param_1). */
-void invoke_tagged_attitude_compose_neg_sins4(undefined4 param_1) /* Original: FUN_000027a2 */
+void invoke_tagged_attitude_compose_neg_sins4(undefined4 out /* param_1: output matrix passed to the tagged composer */) /* Original: FUN_000027a2 */
 {
-  DAT_0001d7fc = -DAT_0001d7fc;
-  DAT_0001d7f8 = -DAT_0001d7f8;
-  DAT_0001d7f4 = -DAT_0001d7f4;
-  DAT_0001d7f0 = -DAT_0001d7f0;
-  (*DAT_00020ce4)(param_1);
+  angle1_sin = -angle1_sin;
+  angle2_sin = -angle2_sin;
+  angle3_sin = -angle3_sin;
+  angle4_sin = -angle4_sin;
+  (*attitude_compose_tag)(out);
   return;
 }
 
@@ -4527,15 +4921,15 @@ void invoke_tagged_attitude_compose_neg_sins4(undefined4 param_1) /* Original: F
 /* VERIFIED (FUN_000027cc): 0x27cc..0x2800 checked against an independent capstone disassembly and
  * found identical to the C: neg.w on the six 16-bit words DAT_0001d7fc / d7f8 / d7f4 / d7f0 /
  * d7ec / d7e8, then the hook DAT_00020ce4(param_1). */
-void invoke_tagged_attitude_compose_neg_sins6(undefined4 param_1) /* Original: FUN_000027cc */
+void invoke_tagged_attitude_compose_neg_sins6(undefined4 out /* param_1: output matrix passed to the tagged composer */) /* Original: FUN_000027cc */
 {
-  DAT_0001d7fc = -DAT_0001d7fc;
-  DAT_0001d7f8 = -DAT_0001d7f8;
-  DAT_0001d7f4 = -DAT_0001d7f4;
-  DAT_0001d7f0 = -DAT_0001d7f0;
-  DAT_0001d7ec = -DAT_0001d7ec;
-  DAT_0001d7e8 = -DAT_0001d7e8;
-  (*DAT_00020ce4)(param_1);
+  angle1_sin = -angle1_sin;
+  angle2_sin = -angle2_sin;
+  angle3_sin = -angle3_sin;
+  angle4_sin = -angle4_sin;
+  angle5_sin = -angle5_sin;
+  angle6_sin = -angle6_sin;
+  (*attitude_compose_tag)(out);
   return;
 }
 
@@ -4564,29 +4958,29 @@ void invoke_tagged_attitude_compose_neg_sins6(undefined4 param_1) /* Original: F
  * found identical to the C: 32-bit count (dbra, then clr.w / subq.l / bcc); x / y / z longs asr.l
  * by the shift, then taken as words; out[n] = (x * m[n] + y * m[n + 3] + z * m[n + 6] + 0x800)
  * >> 12 over the nine words at DAT_0001d744 (muls.w, asr.l), long stores, 12 bytes per vector. */
-void transform_int3_vecs_asr_by_1d744(uint param_1,int *param_2,int *param_3,uint param_4) /* Original: FUN_00002802 */
+void transform_int3_vecs_asr_by_1d744(uint count /* param_1: vector count; low word is the dbra counter, high word extends it */,int *src /* param_2: source int3 vectors */,int *dst /* param_3: destination int3 vectors */,uint shift /* param_4: arithmetic right shift applied to each source component */) /* Original: FUN_00002802 */
 {
-  short sVar1;
-  short sVar2;
-  ushort uVar3;
-  short sVar4;
+  short y; /* sVar1: shifted source y */
+  short z; /* sVar2: shifted source z */
+  ushort count_hi; /* uVar3: count high word */
+  short x; /* sVar4: count low word in the loop test, then the shifted source x */
   
   while( true ) {
-    uVar3 = (ushort)(param_1 >> 0x10);
-    sVar4 = (short)param_1 + -1;
-    param_1 = CONCAT22(uVar3,sVar4);
-    if ((sVar4 == -1) && (param_1 = (uint)uVar3 * 0x10000 - 1, uVar3 == 0)) break;
-    sVar4 = (short)(*param_2 >> (param_4 & 0x3f));
-    sVar1 = (short)(param_2[1] >> (param_4 & 0x3f));
-    sVar2 = (short)(param_2[2] >> (param_4 & 0x3f));
-    *param_3 = (int)sVar2 * (int)DAT_0001d750 +
-               (int)sVar1 * (int)DAT_0001d74a + (int)sVar4 * (int)DAT_0001d744 + 0x800 >> 0xc;
-    param_3[1] = (int)sVar2 * (int)DAT_0001d752 +
-                 (int)sVar1 * (int)DAT_0001d74c + (int)sVar4 * (int)DAT_0001d746 + 0x800 >> 0xc;
-    param_3[2] = (int)sVar2 * (int)DAT_0001d754 +
-                 (int)sVar1 * (int)DAT_0001d74e + (int)sVar4 * (int)DAT_0001d748 + 0x800 >> 0xc;
-    param_2 = param_2 + 3;
-    param_3 = param_3 + 3;
+    count_hi = (ushort)(count >> 0x10);
+    x = (short)count + -1;
+    count = CONCAT22(count_hi,x);
+    if ((x == -1) && (count = (uint)count_hi * 0x10000 - 1, count_hi == 0)) break;
+    x = (short)(*src >> (shift & 0x3f));
+    y = (short)(src[1] >> (shift & 0x3f));
+    z = (short)(src[2] >> (shift & 0x3f));
+    *dst = (int)z * (int)camera_m20 +
+               (int)y * (int)camera_m10 + (int)x * (int)camera_m00 + 0x800 >> 0xc;
+    dst[1] = (int)z * (int)camera_m21 +
+                 (int)y * (int)camera_m11 + (int)x * (int)camera_m01 + 0x800 >> 0xc;
+    dst[2] = (int)z * (int)camera_m22 +
+                 (int)y * (int)camera_m12 + (int)x * (int)camera_m02 + 0x800 >> 0xc;
+    src = src + 3;
+    dst = dst + 3;
   }
   return;
 }
@@ -4610,12 +5004,12 @@ void transform_int3_vecs_asr_by_1d744(uint param_1,int *param_2,int *param_3,uin
 /* VERIFIED (FUN_000028a6): 0x28a6..0x28da checked against an independent capstone disassembly and
  * found identical to the C: bsr.w 0x253e build_attitude_matrix_3ang(p1, p2, p3, a6 - 0x12), then
  * bsr.w 0x2ada transform_int3_vecs_by_matrix3(p4, p5, p6, same matrix). */
-void rotate_int3_vecs_by_3ang(uint param_1,uint param_2,uint param_3,int param_4,int *param_5,uint *param_6) /* Original: FUN_000028a6 */
+void rotate_int3_vecs_by_3ang(uint angle1 /* param_1: angle 1 */,uint angle2 /* param_2: angle 2 */,uint angle3 /* param_3: angle 3 */,int count /* param_4: vector count */,int *src /* param_5: source int3 vectors */,uint *dst /* param_6: destination int3 vectors */) /* Original: FUN_000028a6 */
 {
-  undefined1 auStack_16 [18];
+  undefined1 matrix [18]; /* auStack_16: 3x3 s16 matrix from build_attitude_matrix_3ang */
   
-  build_attitude_matrix_3ang( /* Original: FUN_0000253e */param_1,param_2,param_3,(int)auStack_16);
-  transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */param_4,param_5,param_6,(int)auStack_16);
+  build_attitude_matrix_3ang( /* Original: FUN_0000253e */angle1,angle2,angle3,(int)matrix);
+  transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */count,src,dst,(int)matrix);
   return;
 }
 
@@ -4642,32 +5036,32 @@ void rotate_int3_vecs_by_3ang(uint param_1,uint param_2,uint param_3,int param_4
  * VERIFIED: checked against an independent capstone disassembly of the bytes
  * 0x28dc..0x2974; identical to the C.
  */
-void transform_vecs12_by_matrix3(uint param_1,int param_2,int param_3,short *param_4) /* Original: FUN_000028dc */
+void transform_vecs12_by_matrix3(uint count /* param_1: vector count; low word is the dbra counter, high word extends it */,int src /* param_2: source 12-byte vectors (words at +2 / +6 / +0xa) */,int dst /* param_3: destination 12-byte vectors (words at +2 / +6 / +0xa; may equal src) */,short *matrix /* param_4: 3x3 s16 matrix (4.12), v' = v * M */) /* Original: FUN_000028dc */
 {
-  short sVar1;
-  short sVar2;
-  ushort uVar3;
-  short sVar4;
+  short y; /* sVar1: source y word */
+  short z; /* sVar2: source z word */
+  ushort count_hi; /* uVar3: count high word */
+  short x; /* sVar4: count low word in the loop test, then the source x word */
   
   while( true ) {
-    uVar3 = (ushort)(param_1 >> 0x10);
-    sVar4 = (short)param_1 + -1;
-    param_1 = CONCAT22(uVar3,sVar4);
-    if ((sVar4 == -1) && (param_1 = (uint)uVar3 * 0x10000 - 1, uVar3 == 0)) break;
-    sVar4 = *(short *)(param_2 + 2);
-    sVar1 = *(short *)(param_2 + 6);
-    sVar2 = *(short *)(param_2 + 10);
-    *(short *)(param_3 + 2) =
-         (short)((int)sVar2 * (int)param_4[6] +
-                 (int)sVar1 * (int)param_4[3] + (int)sVar4 * (int)*param_4 + 0x800 >> 0xc);
-    *(short *)(param_3 + 6) =
-         (short)((int)sVar2 * (int)param_4[7] +
-                 (int)sVar1 * (int)param_4[4] + (int)sVar4 * (int)param_4[1] + 0x800 >> 0xc);
-    *(short *)(param_3 + 10) =
-         (short)((int)sVar2 * (int)param_4[8] +
-                 (int)sVar1 * (int)param_4[5] + (int)sVar4 * (int)param_4[2] + 0x800 >> 0xc);
-    param_2 = param_2 + 0xc;
-    param_3 = param_3 + 0xc;
+    count_hi = (ushort)(count >> 0x10);
+    x = (short)count + -1;
+    count = CONCAT22(count_hi,x);
+    if ((x == -1) && (count = (uint)count_hi * 0x10000 - 1, count_hi == 0)) break;
+    x = *(short *)(src + 2);
+    y = *(short *)(src + 6);
+    z = *(short *)(src + 10);
+    *(short *)(dst + 2) =
+         (short)((int)z * (int)matrix[6] +
+                 (int)y * (int)matrix[3] + (int)x * (int)*matrix + 0x800 >> 0xc);
+    *(short *)(dst + 6) =
+         (short)((int)z * (int)matrix[7] +
+                 (int)y * (int)matrix[4] + (int)x * (int)matrix[1] + 0x800 >> 0xc);
+    *(short *)(dst + 10) =
+         (short)((int)z * (int)matrix[8] +
+                 (int)y * (int)matrix[5] + (int)x * (int)matrix[2] + 0x800 >> 0xc);
+    src = src + 0xc;
+    dst = dst + 0xc;
   }
   return;
 }
@@ -4691,29 +5085,29 @@ void transform_vecs12_by_matrix3(uint param_1,int param_2,int param_3,short *par
  * loop (dbra, then clr.w / subq.l / bcc for the high word), which is Ghidra's CONCAT22
  * form; out[n] = (x * m[n] + y * m[n + 3] + z * m[n + 6] + 0x800) >> 12 with muls.w
  * (16 x 16 -> 32), add.l, asr.l #12; move.l stores (int32 x 3), src += 12, dst += 12. */
-void transform_vecs12_to_int3_by_matrix3(uint param_1,int param_2,int *param_3,short *param_4) /* Original: FUN_00002976 */
+void transform_vecs12_to_int3_by_matrix3(uint count /* param_1: vector count; low word is the dbra counter, high word extends it */,int src /* param_2: source 12-byte vectors (words at +2 / +6 / +0xa) */,int *dst /* param_3: destination int3 vectors */,short *matrix /* param_4: 3x3 s16 matrix (4.12), v' = v * M */) /* Original: FUN_00002976 */
 {
-  short sVar1;
-  short sVar2;
-  ushort uVar3;
-  short sVar4;
+  short y; /* sVar1: source y word */
+  short z; /* sVar2: source z word */
+  ushort count_hi; /* uVar3: count high word */
+  short x; /* sVar4: count low word in the loop test, then the source x word */
   
   while( true ) {
-    uVar3 = (ushort)(param_1 >> 0x10);
-    sVar4 = (short)param_1 + -1;
-    param_1 = CONCAT22(uVar3,sVar4);
-    if ((sVar4 == -1) && (param_1 = (uint)uVar3 * 0x10000 - 1, uVar3 == 0)) break;
-    sVar4 = *(short *)(param_2 + 2);
-    sVar1 = *(short *)(param_2 + 6);
-    sVar2 = *(short *)(param_2 + 10);
-    *param_3 = (int)sVar2 * (int)param_4[6] +
-               (int)sVar1 * (int)param_4[3] + (int)sVar4 * (int)*param_4 + 0x800 >> 0xc;
-    param_3[1] = (int)sVar2 * (int)param_4[7] +
-                 (int)sVar1 * (int)param_4[4] + (int)sVar4 * (int)param_4[1] + 0x800 >> 0xc;
-    param_3[2] = (int)sVar2 * (int)param_4[8] +
-                 (int)sVar1 * (int)param_4[5] + (int)sVar4 * (int)param_4[2] + 0x800 >> 0xc;
-    param_2 = param_2 + 0xc;
-    param_3 = param_3 + 3;
+    count_hi = (ushort)(count >> 0x10);
+    x = (short)count + -1;
+    count = CONCAT22(count_hi,x);
+    if ((x == -1) && (count = (uint)count_hi * 0x10000 - 1, count_hi == 0)) break;
+    x = *(short *)(src + 2);
+    y = *(short *)(src + 6);
+    z = *(short *)(src + 10);
+    *dst = (int)z * (int)matrix[6] +
+               (int)y * (int)matrix[3] + (int)x * (int)*matrix + 0x800 >> 0xc;
+    dst[1] = (int)z * (int)matrix[7] +
+                 (int)y * (int)matrix[4] + (int)x * (int)matrix[1] + 0x800 >> 0xc;
+    dst[2] = (int)z * (int)matrix[8] +
+                 (int)y * (int)matrix[5] + (int)x * (int)matrix[2] + 0x800 >> 0xc;
+    src = src + 0xc;
+    dst = dst + 3;
   }
   return;
 }
@@ -4745,42 +5139,42 @@ void transform_vecs12_to_int3_by_matrix3(uint param_1,int param_2,int *param_3,s
  * (+0x800, asr.l #12) and written back IN PLACE as words +2 / +6 / +0xa over the source longs. */
 void transform_listed_object_vecs12_by_1d744(void) /* Original: FUN_00002a0e */
 {
-  int iVar1;
-  short sVar2;
-  short sVar3;
-  short sVar4;
-  uint uVar5;
-  short sVar6;
-  int *piVar7;
-  int *piVar8;
-  int *piVar9;
-  int *piVar10;
-  int iVar11;
-  
-  iVar11 = (int)DAT_0001c1d4._2_2_ - (int)DAT_0001bdb8._2_2_;
-  piVar10 = &DAT_0001c9dc + DAT_0001bdb8;
-  while (iVar11 = iVar11 + -1, iVar11 != -1) {
-    piVar9 = piVar10 + 1;
-    iVar1 = *piVar10;
-    piVar7 = *(int **)(iVar1 + 0x4c);
-    sVar6 = *(short *)(iVar1 + 0x36);
-    uVar5 = (uint)*(short *)(iVar1 + 0x32);
-    piVar8 = piVar7;
-    while (sVar6 = sVar6 + -1, piVar10 = piVar9, sVar6 != -1) {
-      sVar2 = (short)(*piVar8 >> (uVar5 & 0x3f));
-      sVar3 = (short)(piVar8[1] >> (uVar5 & 0x3f));
-      sVar4 = (short)(piVar8[2] >> (uVar5 & 0x3f));
-      *(short *)((int)piVar7 + 2) =
-           (short)((int)sVar4 * (int)DAT_0001d750 +
-                   (int)sVar3 * (int)DAT_0001d74a + (int)sVar2 * (int)DAT_0001d744 + 0x800 >> 0xc);
-      *(short *)((int)piVar7 + 6) =
-           (short)((int)sVar4 * (int)DAT_0001d752 +
-                   (int)sVar3 * (int)DAT_0001d74c + (int)sVar2 * (int)DAT_0001d746 + 0x800 >> 0xc);
-      *(short *)((int)piVar7 + 10) =
-           (short)((int)sVar4 * (int)DAT_0001d754 +
-                   (int)sVar3 * (int)DAT_0001d74e + (int)sVar2 * (int)DAT_0001d748 + 0x800 >> 0xc);
-      piVar8 = piVar8 + 3;
-      piVar7 = piVar7 + 3;
+  int obj; /* iVar1: listed object (+0x32 shift, +0x36 count, +0x4c vertices) */
+  short x; /* sVar2: shifted x */
+  short y; /* sVar3: shifted y */
+  short z; /* sVar4: shifted z */
+  uint shift; /* uVar5: object word +0x32 */
+  short verts_left; /* sVar6: vertex countdown */
+  int *dst; /* piVar7: 12-byte record written in place */
+  int *src; /* piVar8: int3 vertex read */
+  int *next_slot; /* piVar9: next list slot */
+  int *slot; /* piVar10: visible_list cursor */
+  int objs_left; /* iVar11: object countdown */
+
+  objs_left = (int)visible_count._2_2_ - (int)visible_list_split._2_2_;
+  slot = &visible_list + visible_list_split;
+  while (objs_left = objs_left + -1, objs_left != -1) {
+    next_slot = slot + 1;
+    obj = *slot;
+    dst = *(int **)(obj + 0x4c);
+    verts_left = *(short *)(obj + 0x36);
+    shift = (uint)*(short *)(obj + 0x32);
+    src = dst;
+    while (verts_left = verts_left + -1, slot = next_slot, verts_left != -1) {
+      x = (short)(*src >> (shift & 0x3f));
+      y = (short)(src[1] >> (shift & 0x3f));
+      z = (short)(src[2] >> (shift & 0x3f));
+      *(short *)((int)dst + 2) =
+           (short)((int)z * (int)camera_m20 +
+                   (int)y * (int)camera_m10 + (int)x * (int)camera_m00 + 0x800 >> 0xc);
+      *(short *)((int)dst + 6) =
+           (short)((int)z * (int)camera_m21 +
+                   (int)y * (int)camera_m11 + (int)x * (int)camera_m01 + 0x800 >> 0xc);
+      *(short *)((int)dst + 10) =
+           (short)((int)z * (int)camera_m22 +
+                   (int)y * (int)camera_m12 + (int)x * (int)camera_m02 + 0x800 >> 0xc);
+      src = src + 3;
+      dst = dst + 3;
     }
   }
   return;
@@ -4805,47 +5199,47 @@ void transform_listed_object_vecs12_by_1d744(void) /* Original: FUN_00002a0e */
 void FUN_00002aba(void) /* false mid-label; do not rename call sites */
 
 {
-  int iVar1;
-  short sVar2;
-  short sVar3;
-  short sVar4;
-  int in_D0;
-  uint unaff_D5;
-  short unaff_D6w;
-  int *in_A1;
-  int *unaff_A2;
-  short *unaff_A3;
-  int *unaff_A4;
-  short *unaff_A5;
-  int unaff_A6;
+  int obj; /* iVar1: next listed object (+0x32 shift, +0x36 count, +0x4c vertices) */
+  short x; /* sVar2: shifted x */
+  short y; /* sVar3: shifted y */
+  short z; /* sVar4: shifted z */
+  int out_z; /* in_D0: third transformed component, stored at +0xa (D0) */
+  uint shift; /* unaff_D5: object word +0x32 (D5) */
+  short verts_left; /* unaff_D6w: vertex countdown (D6.w) */
+  int *dst; /* in_A1: 12-byte record written in place (A1) */
+  int *src; /* unaff_A2: int3 vertex read (A2) */
+  short *matrix; /* unaff_A3: camera matrix at 0x1d744 (A3) */
+  int *slot; /* unaff_A4: visible_list cursor (A4) */
+  short *matrix_m22; /* unaff_A5: A3 + 0x10, the [2][2] word (A5) */
+  int objs_left; /* unaff_A6: object countdown (A6) */
   
   do {
-    *(short *)((int)in_A1 + 10) = (short)in_D0;
-    in_A1 = in_A1 + 3;
-    unaff_A2 = unaff_A2 + 3;
-    while (unaff_D6w = unaff_D6w + -1, unaff_D6w == -1) {
-      unaff_A6 = unaff_A6 + -1;
-      if (unaff_A6 == -1) {
+    *(short *)((int)dst + 10) = (short)out_z;
+    dst = dst + 3;
+    src = src + 3;
+    while (verts_left = verts_left + -1, verts_left == -1) {
+      objs_left = objs_left + -1;
+      if (objs_left == -1) {
         return;
       }
-      iVar1 = *unaff_A4;
-      in_A1 = *(int **)(iVar1 + 0x4c);
-      unaff_D5 = (uint)*(short *)(iVar1 + 0x32);
-      unaff_A2 = in_A1;
-      unaff_A4 = unaff_A4 + 1;
-      unaff_D6w = *(short *)(iVar1 + 0x36);
+      obj = *slot;
+      dst = *(int **)(obj + 0x4c);
+      shift = (uint)*(short *)(obj + 0x32);
+      src = dst;
+      slot = slot + 1;
+      verts_left = *(short *)(obj + 0x36);
     }
-    sVar2 = (short)(*unaff_A2 >> (unaff_D5 & 0x3f));
-    sVar3 = (short)(unaff_A2[1] >> (unaff_D5 & 0x3f));
-    sVar4 = (short)(unaff_A2[2] >> (unaff_D5 & 0x3f));
-    *(short *)((int)in_A1 + 2) =
-         (short)((int)sVar4 * (int)unaff_A3[6] +
-                 (int)sVar3 * (int)unaff_A3[3] + (int)sVar2 * (int)*unaff_A3 + 0x800 >> 0xc);
-    *(short *)((int)in_A1 + 6) =
-         (short)((int)sVar4 * (int)unaff_A3[7] +
-                 (int)sVar3 * (int)unaff_A3[4] + (int)sVar2 * (int)unaff_A3[1] + 0x800 >> 0xc);
-    in_D0 = (int)sVar4 * (int)*unaff_A5 +
-            (int)sVar3 * (int)unaff_A3[5] + (int)sVar2 * (int)unaff_A3[2] + 0x800 >> 0xc;
+    x = (short)(*src >> (shift & 0x3f));
+    y = (short)(src[1] >> (shift & 0x3f));
+    z = (short)(src[2] >> (shift & 0x3f));
+    *(short *)((int)dst + 2) =
+         (short)((int)z * (int)matrix[6] +
+                 (int)y * (int)matrix[3] + (int)x * (int)*matrix + 0x800 >> 0xc);
+    *(short *)((int)dst + 6) =
+         (short)((int)z * (int)matrix[7] +
+                 (int)y * (int)matrix[4] + (int)x * (int)matrix[1] + 0x800 >> 0xc);
+    out_z = (int)z * (int)*matrix_m22 +
+            (int)y * (int)matrix[5] + (int)x * (int)matrix[2] + 0x800 >> 0xc;
   } while( true );
 }
 
@@ -4879,58 +5273,58 @@ void FUN_00002aba(void) /* false mid-label; do not rename call sites */
  * VERIFIED: checked against an independent capstone disassembly of the bytes
  * 0x2ada..0x2bd6; identical to the C.
  */
-short * transform_int3_vecs_by_matrix3(int param_1,int *param_2,uint *param_3,int param_4) /* Original: FUN_00002ada */
+short * transform_int3_vecs_by_matrix3(int count /* param_1: vector count */,int *src /* param_2: source int3 vectors */,uint *dst /* param_3: destination int3 vectors (may equal src) */,int matrix /* param_4: 3x3 s16 matrix (4.12), v' = v * M */) /* Original: FUN_00002ada */
 {
-  int iVar1;
-  longlong lVar2;
-  short *psVar3;
-  int iVar4;
-  short *psVar5;
-  int *piVar6;
-  int iVar7;
-  bool bVar8;
-  int local_2c;
-  int local_28 [4];
-  int local_18;
-  int local_14;
-  int local_10;
-  int local_c;
-  int local_8;
+  int z; /* iVar1: source z */
+  longlong acc; /* lVar2: 64-bit dot product, >> 12 */
+  short *result; /* psVar3: row cursor, then the last stored component (returned) */
+  int work; /* iVar4: column index, then source y */
+  short *m_src; /* psVar5: matrix word cursor */
+  int *m_dst; /* piVar6: int matrix cursor */
+  int work2; /* iVar7: row index, then source x */
+  bool more; /* bVar8: count was nonzero */
+  int left; /* local_2c, -$2c(A6): vectors left */
+  int m [4]; /* local_28, -$28(A6): int matrix [0][0], [0][1], [0][2], [1][0] */
+  int m11; /* local_18, -$18(A6): int matrix [1][1] */
+  int m12; /* local_14, -$14(A6): int matrix [1][2] */
+  int m20; /* local_10, -$10(A6): int matrix [2][0] */
+  int m21; /* local_c, -$c(A6): int matrix [2][1] */
+  int m22; /* local_8, -8(A6): int matrix [2][2] */
   
   /* Expand 3×3 s16 matrix into int locals */
-  local_2c = param_1;
-  iVar7 = 0;
+  left = count;
+  work2 = 0;
   do {
-    iVar4 = 0;
-    psVar5 = (short *)(param_4 + iVar7 * 6);
-    piVar6 = local_28 + iVar7 * 3;
+    work = 0;
+    m_src = (short *)(matrix + work2 * 6);
+    m_dst = m + work2 * 3;
     do {
-      psVar3 = psVar5 + 1;
-      *piVar6 = (int)*psVar5;
-      iVar4 = iVar4 + 1;
-      psVar5 = psVar3;
-      piVar6 = piVar6 + 1;
-    } while (iVar4 < 3);
-    iVar7 = iVar7 + 1;
-  } while (iVar7 < 3);
-  while (bVar8 = local_2c != 0, local_2c = local_2c + -1, bVar8) {
-    iVar7 = *param_2;
-    iVar4 = param_2[1];
-    iVar1 = param_2[2];
-    lVar2 = (longlong)local_10 * (longlong)iVar1 +
-            (longlong)local_28[3] * (longlong)iVar4 + (longlong)local_28[0] * (longlong)iVar7;
-    *param_3 = (int)((ulonglong)lVar2 >> 0x20) << 0x14 | (uint)lVar2 >> 0xc;
-    lVar2 = (longlong)local_c * (longlong)iVar1 +
-            (longlong)local_18 * (longlong)iVar4 + (longlong)local_28[1] * (longlong)iVar7;
-    param_3[1] = (int)((ulonglong)lVar2 >> 0x20) << 0x14 | (uint)lVar2 >> 0xc;
-    lVar2 = (longlong)local_8 * (longlong)iVar1 +
-            (longlong)local_14 * (longlong)iVar4 + (longlong)local_28[2] * (longlong)iVar7;
-    psVar3 = (short *)((int)((ulonglong)lVar2 >> 0x20) << 0x14 | (uint)lVar2 >> 0xc);
-    param_3[2] = (uint)psVar3;
-    param_2 = param_2 + 3;
-    param_3 = param_3 + 3;
+      result = m_src + 1;
+      *m_dst = (int)*m_src;
+      work = work + 1;
+      m_src = result;
+      m_dst = m_dst + 1;
+    } while (work < 3);
+    work2 = work2 + 1;
+  } while (work2 < 3);
+  while (more = left != 0, left = left + -1, more) {
+    work2 = *src;
+    work = src[1];
+    z = src[2];
+    acc = (longlong)m20 * (longlong)z +
+            (longlong)m[3] * (longlong)work + (longlong)m[0] * (longlong)work2;
+    *dst = (int)((ulonglong)acc >> 0x20) << 0x14 | (uint)acc >> 0xc;
+    acc = (longlong)m21 * (longlong)z +
+            (longlong)m11 * (longlong)work + (longlong)m[1] * (longlong)work2;
+    dst[1] = (int)((ulonglong)acc >> 0x20) << 0x14 | (uint)acc >> 0xc;
+    acc = (longlong)m22 * (longlong)z +
+            (longlong)m12 * (longlong)work + (longlong)m[2] * (longlong)work2;
+    result = (short *)((int)((ulonglong)acc >> 0x20) << 0x14 | (uint)acc >> 0xc);
+    dst[2] = (uint)result;
+    src = src + 3;
+    dst = dst + 3;
   }
-  return psVar3;
+  return result;
 }
 
 
@@ -4974,64 +5368,64 @@ short * transform_int3_vecs_by_matrix3(int param_1,int *param_2,uint *param_3,in
  * VERIFIED: checked against an independent capstone disassembly of the bytes; identical
  * to the C.
  */
-void apply_template_chain_xform(int param_1,uint param_2,uint *param_3,uint *param_4) /* Original: FUN_00002bd8 */
+void apply_template_chain_xform(int obj /* param_1: object (+2 slot index, +0x18..+0x20 position, +0x24 parent, +0x34 scale shift) */,uint vert_count /* param_2: vertex count for the mesh path */,uint *src /* param_3: source vertices, or 0 */,uint *dst /* param_4: destination vertices, or 0 */) /* Original: FUN_00002bd8 */
 {
-  byte bVar1;
-  bool bVar2;
-  uint uVar3;
-  int iVar4;
-  int iVar5;
-  int local_22;
-  undefined4 local_1e;
-  undefined4 local_1a;
-  undefined1 auStack_16 [18];
-  
-  local_22 = *(int *)(param_1 + 0x18);
-  local_1e = *(undefined4 *)(param_1 + 0x1c);
-  local_1a = *(undefined4 *)(param_1 + 0x20);
-  iVar5 = *(int *)(param_1 + 0x24);
-  bVar1 = *(byte *)(param_1 + 2);
-  if (iVar5 != 0) {
+  byte slot_index; /* bVar1: child byte +2, the slot index in the parent's table */
+  bool rotates; /* bVar2: slot has a non-zero angle */
+  uint shift; /* uVar3: obj word +0x34 */
+  int slot; /* iVar4: parent +0x30 + 0x18 * slot_index */
+  int parent; /* iVar5: parent object, walked through +0x24 */
+  int pos_x; /* local_22, -$22(A6): copy of obj +0x18 */
+  undefined4 pos_y; /* local_1e, -$1e(A6): copy of obj +0x1c */
+  undefined4 pos_z; /* local_1a, -$1a(A6): copy of obj +0x20 */
+  undefined1 matrix [18]; /* auStack_16: slot attitude matrix */
+
+  pos_x = *(int *)(obj + 0x18);
+  pos_y = *(undefined4 *)(obj + 0x1c);
+  pos_z = *(undefined4 *)(obj + 0x20);
+  parent = *(int *)(obj + 0x24);
+  slot_index = *(byte *)(obj + 2);
+  if (parent != 0) {
     do {
-      iVar4 = *(int *)(iVar5 + 0x30) + (uint)bVar1 * 0x18;
-      bVar2 = false;
-      if (((*(short *)(iVar4 + 2) != 0) || (*(short *)(iVar4 + 4) != 0)) ||
-         (*(short *)(iVar4 + 6) != 0)) {
-        bVar2 = true;
+      slot = *(int *)(parent + 0x30) + (uint)slot_index * 0x18;
+      rotates = false;
+      if (((*(short *)(slot + 2) != 0) || (*(short *)(slot + 4) != 0)) ||
+         (*(short *)(slot + 6) != 0)) {
+        rotates = true;
       }
-      if (bVar2) {
-        build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar4 + 2),(int)*(short *)(iVar4 + 4),
-                     (int)*(short *)(iVar4 + 6),(int)auStack_16);
+      if (rotates) {
+        build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(slot + 2),(int)*(short *)(slot + 4),
+                     (int)*(short *)(slot + 6),(int)matrix);
       }
-      if ((param_3 == (uint *)0x0) || (param_4 == (uint *)0x0)) {
+      if ((src == (uint *)0x0) || (dst == (uint *)0x0)) {
         /* Null-aux: transform local xyz trio */
-        if (bVar2) {
-          transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,&local_22,(uint *)&local_22,(int)auStack_16);
+        if (rotates) {
+          transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,&pos_x,(uint *)&pos_x,(int)matrix);
         }
-        translate_int3_vecs( /* Original: FUN_00001c5c */1,&local_22,&local_22,*(int *)(iVar4 + 8),*(int *)(iVar4 + 0xc),
-                     *(int *)(iVar4 + 0x10));
+        translate_int3_vecs( /* Original: FUN_00001c5c */1,&pos_x,&pos_x,*(int *)(slot + 8),*(int *)(slot + 0xc),
+                     *(int *)(slot + 0x10));
       }
       else {
         /* Mesh path: rotate/translate param_2 verts param_3 → param_4 */
-        if (bVar2) {
-          transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */param_2,(int *)param_3,param_4,(int)auStack_16);
-          param_3 = param_4;
+        if (rotates) {
+          transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */vert_count,(int *)src,dst,(int)matrix);
+          src = dst;
         }
-        uVar3 = (uint)*(short *)(param_1 + 0x34);
-        translate_int3_vecs( /* Original: FUN_00001c5c */param_2,(int *)param_3,(int *)param_4,*(int *)(iVar4 + 8) << (uVar3 & 0x3f),
-                     *(int *)(iVar4 + 0xc) << (uVar3 & 0x3f),
-                     *(int *)(iVar4 + 0x10) << (uVar3 & 0x3f));
-        param_3 = param_4;
+        shift = (uint)*(short *)(obj + 0x34);
+        translate_int3_vecs( /* Original: FUN_00001c5c */vert_count,(int *)src,(int *)dst,*(int *)(slot + 8) << (shift & 0x3f),
+                     *(int *)(slot + 0xc) << (shift & 0x3f),
+                     *(int *)(slot + 0x10) << (shift & 0x3f));
+        src = dst;
       }
-      bVar1 = *(byte *)(iVar5 + 2);
-      iVar5 = *(int *)(iVar5 + 0x24);
-    } while (iVar5 != 0);
+      slot_index = *(byte *)(parent + 2);
+      parent = *(int *)(parent + 0x24);
+    } while (parent != 0);
   }
-  if ((param_3 == (uint *)0x0) && (param_4 == (uint *)0x0)) {
+  if ((src == (uint *)0x0) && (dst == (uint *)0x0)) {
     /* Commit stacked xyz only on fully null-aux calls */
-    *(int *)(param_1 + 0x18) = local_22;
-    *(undefined4 *)(param_1 + 0x1c) = local_1e;
-    *(undefined4 *)(param_1 + 0x20) = local_1a;
+    *(int *)(obj + 0x18) = pos_x;
+    *(undefined4 *)(obj + 0x1c) = pos_y;
+    *(undefined4 *)(obj + 0x20) = pos_z;
   }
   return;
 }
@@ -5064,57 +5458,57 @@ void apply_template_chain_xform(int param_1,uint param_2,uint *param_3,uint *par
  * path (1, d2, d2); shared adda.w #$28; commit only when d3 == d4 == 0); identical to the
  * C.
  */
-void apply_template_chain_xform_always(int param_1,uint param_2,uint *param_3,uint *param_4) /* Original: FUN_00002d10 */
+void apply_template_chain_xform_always(int obj /* param_1: object (+2 slot index, +0x18..+0x20 position, +0x24 parent, +0x34 scale shift) */,uint vert_count /* param_2: vertex count for the mesh path */,uint *src /* param_3: source vertices, or 0 */,uint *dst /* param_4: destination vertices, or 0 */) /* Original: FUN_00002d10 */
 {
-  byte bVar1;
-  int iVar2;
-  int iVar3;
-  uint uVar4;
-  uint *puVar5;
-  int iVar6;
-  int iVar7;
-  uint local_22;
-  undefined4 local_1e;
-  undefined4 local_1a;
-  undefined1 auStack_16 [18];
-  
-  local_22 = *(uint *)(param_1 + 0x18);
-  local_1e = *(undefined4 *)(param_1 + 0x1c);
-  local_1a = *(undefined4 *)(param_1 + 0x20);
-  iVar3 = *(int *)(param_1 + 0x24);
-  bVar1 = *(byte *)(param_1 + 2);
-  if (iVar3 != 0) {
+  byte slot_index; /* bVar1: child byte +2, the slot index in the parent's table */
+  int slot; /* iVar2: parent +0x30 + 0x18 * slot_index, then the slot offset x */
+  int parent; /* iVar3: parent object, walked through +0x24 */
+  uint count; /* uVar4: vectors to translate (1 or vert_count) */
+  uint *vecs; /* puVar5: vectors to translate */
+  int off_y; /* iVar6: slot offset y (+0xc) */
+  int off_z; /* iVar7: slot offset z (+0x10) */
+  uint pos_x; /* local_22, -$22(A6): copy of obj +0x18 */
+  undefined4 pos_y; /* local_1e, -$1e(A6): copy of obj +0x1c */
+  undefined4 pos_z; /* local_1a, -$1a(A6): copy of obj +0x20 */
+  undefined1 matrix [18]; /* auStack_16: slot attitude matrix */
+
+  pos_x = *(uint *)(obj + 0x18);
+  pos_y = *(undefined4 *)(obj + 0x1c);
+  pos_z = *(undefined4 *)(obj + 0x20);
+  parent = *(int *)(obj + 0x24);
+  slot_index = *(byte *)(obj + 2);
+  if (parent != 0) {
     do {
-      iVar2 = *(int *)(iVar3 + 0x30) + (uint)bVar1 * 0x18;
+      slot = *(int *)(parent + 0x30) + (uint)slot_index * 0x18;
       /* Always rotate — unlike apply_template_chain_xform */
-      build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(iVar2 + 2),(int)*(short *)(iVar2 + 4),(int)*(short *)(iVar2 + 6),
-                   (int)auStack_16);
-      if ((param_3 == (uint *)0x0) || (param_4 == (uint *)0x0)) {
-        transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,(int *)&local_22,&local_22,(int)auStack_16);
-        iVar7 = *(int *)(iVar2 + 0x10);
-        iVar6 = *(int *)(iVar2 + 0xc);
-        iVar2 = *(int *)(iVar2 + 8);
-        uVar4 = 1;
-        puVar5 = &local_22;
+      build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(slot + 2),(int)*(short *)(slot + 4),(int)*(short *)(slot + 6),
+                   (int)matrix);
+      if ((src == (uint *)0x0) || (dst == (uint *)0x0)) {
+        transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */1,(int *)&pos_x,&pos_x,(int)matrix);
+        off_z = *(int *)(slot + 0x10);
+        off_y = *(int *)(slot + 0xc);
+        slot = *(int *)(slot + 8);
+        count = 1;
+        vecs = &pos_x;
       }
       else {
-        transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */param_2,(int *)param_3,param_4,(int)auStack_16);
-        iVar7 = *(int *)(iVar2 + 0x10);
-        iVar6 = *(int *)(iVar2 + 0xc);
-        iVar2 = *(int *)(iVar2 + 8);
-        param_3 = param_4;
-        uVar4 = param_2;
-        puVar5 = param_4;
+        transform_int3_vecs_by_matrix3( /* Original: FUN_00002ada */vert_count,(int *)src,dst,(int)matrix);
+        off_z = *(int *)(slot + 0x10);
+        off_y = *(int *)(slot + 0xc);
+        slot = *(int *)(slot + 8);
+        src = dst;
+        count = vert_count;
+        vecs = dst;
       }
-      translate_int3_vecs( /* Original: FUN_00001c5c */uVar4,(int *)puVar5,(int *)puVar5,iVar2,iVar6,iVar7);
-      bVar1 = *(byte *)(iVar3 + 2);
-      iVar3 = *(int *)(iVar3 + 0x24);
-    } while (iVar3 != 0);
+      translate_int3_vecs( /* Original: FUN_00001c5c */count,(int *)vecs,(int *)vecs,slot,off_y,off_z);
+      slot_index = *(byte *)(parent + 2);
+      parent = *(int *)(parent + 0x24);
+    } while (parent != 0);
   }
-  if ((param_3 == (uint *)0x0) && (param_4 == (uint *)0x0)) {
-    *(uint *)(param_1 + 0x18) = local_22;
-    *(undefined4 *)(param_1 + 0x1c) = local_1e;
-    *(undefined4 *)(param_1 + 0x20) = local_1a;
+  if ((src == (uint *)0x0) && (dst == (uint *)0x0)) {
+    *(uint *)(obj + 0x18) = pos_x;
+    *(undefined4 *)(obj + 0x1c) = pos_y;
+    *(undefined4 *)(obj + 0x20) = pos_z;
   }
   return;
 }
@@ -5159,15 +5553,15 @@ void apply_template_chain_xform_always(int param_1,uint param_2,uint *param_3,ui
  * lea.l $2de8.l elsewhere is a RUNTIME address = file 0x2e08 abs_int. */
 void FUN_00002de8(void) /* Original: FUN_00002de8 — false entry; see header */
 {
-  int unaff_A4;
-  int unaff_A6;
-  bool in_ZF;
+  int obj; /* unaff_A4: the 0x2d10 object (A4) */
+  int frame; /* unaff_A6: 0x2d10 frame pointer (A6); -$1e / -$1a / -$16 hold the position copy */
+  bool both_null; /* in_ZF: Z flag, set when both buffers were null */
   
   /* Ghidra: ZF stands in for (D3==0 && D4==0) after the preceding TSTs in 02d10. */
-  if (in_ZF) {
-    *(undefined4 *)(unaff_A4 + 0x18) = *(undefined4 *)(unaff_A6 + -0x1e);
-    *(undefined4 *)(unaff_A4 + 0x1c) = *(undefined4 *)(unaff_A6 + -0x1a);
-    *(undefined4 *)(unaff_A4 + 0x20) = *(undefined4 *)(unaff_A6 + -0x16);
+  if (both_null) {
+    *(undefined4 *)(obj + 0x18) = *(undefined4 *)(frame + -0x1e);
+    *(undefined4 *)(obj + 0x1c) = *(undefined4 *)(frame + -0x1a);
+    *(undefined4 *)(obj + 0x20) = *(undefined4 *)(frame + -0x16);
   }
   return;
 }
@@ -5199,12 +5593,12 @@ void FUN_00002de8(void) /* Original: FUN_00002de8 — false entry; see header */
  * VERIFIED: checked against an independent capstone disassembly of the bytes
  * 0x2e08..0x2e10 (move.l 4(a7),d0; bge; neg.l d0; rts); identical to the C.
  */
-int abs_int(int param_1) /* Original: FUN_00002e08 */
+int abs_int(int value /* param_1: signed value */) /* Original: FUN_00002e08 */
 {
-  if (param_1 < 0) {
-    param_1 = -param_1;
+  if (value < 0) {
+    value = -value;
   }
-  return param_1;
+  return value;
 }
 
 
@@ -5243,375 +5637,375 @@ void noop_stub_2e12 /* Original: FUN_00002e12 */ (void)
 void scan_convert_edge_rows /* Original: FUN_00002e14 */ (void)
 
 {
-  byte bVar2;
-  ushort uVar1;
-  ushort ****ppppuVar3;
-  uint uVar4;
-  uint uVar5;
-  undefined2 uVar6;
-  int iVar7;
-  ushort uVar8;
-  ushort *****pppppuVar9;
-  ushort uVar10;
-  ushort uVar11;
-  ushort ****ppppuVar12;
-  ushort ******ppppppuVar13;
-  ushort ******ppppppuVar14;
-  short sVar15;
-  ushort ******ppppppuVar16;
-  short sVar17;
-  ushort uVar18;
-  ushort *****pppppuVar19;
-  ushort *****pppppuVar20;
-  ushort *****pppppuVar21;
-  ushort ******ppppppuVar22;
-  ushort ******unaff_A3;
-  ushort ******ppppppuVar23;
-  ushort ******ppppppuVar24;
-  ushort *****pppppuVar25;
-  ushort ******unaff_A5;
-  ushort ******ppppppuVar26;
-  bool bVar27;
-  int local_4a8;
-  ushort *****local_468;
-  ushort *****local_464 [7];
-  ushort *****local_448;
-  ushort *****local_444;
-  ushort ****local_440 [128];
-  ushort ****local_240;
-  undefined4 local_23c;
-  ushort *****local_38;
-  ushort *****local_34;
-  ushort *****local_30;
-  undefined4 local_2c;
-  short *local_24;
-  ushort *****local_20;
-  
-  local_444 = &local_240;
-  local_448 = local_440;
-  local_20 = (ushort *****)&DAT_0001eaac;
-  DAT_0001b174 = (int)DAT_0001b82a << 0x10 | 0x8000;
-  PTR_PTR_0001b188 = (undefined *)((int)DAT_0001daa0 | 0xffff0000);
-  local_240 = (ushort ****)&DAT_0001b174;
-  local_23c = 0;
-  local_464[0] = (ushort *****)0x1;
-  local_4a8 = (int)DAT_00020ae6;
-  if (DAT_0001b834 != 0) {
-    local_4a8 = local_4a8 >> 1;
+  byte front_change; /* bVar2: 0xff = front face left, bit 0 = new front face [register reused; role from the VERIFIED note] */
+  ushort face_colour; /* uVar1: edge colour word +8 [register reused; role from the VERIFIED note] */
+  ushort ****x; /* ppppuVar3: edge x (16.16), also the previous / bound x [register reused; role from the VERIFIED note] */
+  uint run_state; /* uVar4: low word = top priority, high word = rows in the current run [register reused; role from the VERIFIED note] */
+  uint run_swap; /* uVar5: run_state with its halves swapped [register reused; role from the VERIFIED note] */
+  undefined2 row_hi; /* uVar6: high word of the row counter [register reused; role from the VERIFIED note] */
+  int row; /* iVar7: current row [register reused; role from the VERIFIED note] */
+  ushort row_lo; /* uVar8: low word of the row, then the run length [register reused; role from the VERIFIED note] */
+  ushort *****cursor; /* pppppuVar9: active list / current colour / edge cursor [register reused; role from the VERIFIED note] */
+  ushort colour_b; /* uVar10: span colour, then the run length bound [register reused; role from the VERIFIED note] */
+  ushort colour_a; /* uVar11: inside word / first span colour [register reused; role from the VERIFIED note] */
+  ushort ****prev_x; /* ppppuVar12: previous edge x / slope [register reused; role from the VERIFIED note] */
+  ushort ******face_link; /* ppppppuVar13: covering-face list walk [register reused; role from the VERIFIED note] */
+  ushort ******span_ptr; /* ppppppuVar14: span write cursor in the run path [register reused; role from the VERIFIED note] */
+  short row_s; /* sVar15: row (short), then the span stride [register reused; role from the VERIFIED note] */
+  ushort ******walk; /* ppppppuVar16: list / face walk [register reused; role from the VERIFIED note] */
+  short count; /* sVar17: countdown [register reused; role from the VERIFIED note] */
+  ushort rows_left; /* uVar18: rows left in the run [register reused; role from the VERIFIED note] */
+  ushort *****next_new_edge; /* pppppuVar19: next bucket edge [register reused; role from the VERIFIED note] */
+  ushort *****new_edge; /* pppppuVar20: bucket edge being merged [register reused; role from the VERIFIED note] */
+  ushort *****edge; /* pppppuVar21: current edge record / bucket [register reused; role from the VERIFIED note] */
+  ushort ******list_out; /* ppppppuVar22: active list write cursor [register reused; role from the VERIFIED note] */
+  ushort ******a3; /* unaff_A3: A3 scratch pointer [register reused; role from the VERIFIED note] */
+  ushort ******shift_ptr; /* ppppppuVar23: insertion-sort shift cursor [register reused; role from the VERIFIED note] */
+  ushort ******list_in; /* ppppppuVar24: active list read cursor [register reused; role from the VERIFIED note] */
+  ushort *****active_edge; /* pppppuVar25: active edge being merged [register reused; role from the VERIFIED note] */
+  ushort ******front_face; /* unaff_A5: current front face [register reused; role from the VERIFIED note] */
+  ushort ******span_out; /* ppppppuVar26: span buffer write cursor [register reused; role from the VERIFIED note] */
+  bool negative; /* bVar27: sign of row_lo << 16 [register reused; role from the VERIFIED note] */
+  int end_row; /* local_4a8: scan_last_row, halved in half_rows_mode */
+  ushort *****face_clear; /* local_468: touched-face chain walk for the final clear */
+  ushort *****face_chain [7]; /* local_464: [0] = head of the touched-face chain (1 = end) */
+  ushort *****list_next; /* local_448: active list being built */
+  ushort *****list_cur; /* local_444: active list being read */
+  ushort ****list_a [128]; /* local_440: first 128-entry active edge list */
+  ushort ****list_b; /* local_240: second active edge list, starts with &edge_sentinel */
+  undefined4 list_b_end; /* local_23c: terminator after the sentinel */
+  ushort *****span_first; /* local_38: span buffer start */
+  ushort *****row_header; /* local_34: span row header (entry count written at row end) */
+  ushort *****span_base; /* local_30: span buffer (session_cur_b) */
+  undefined4 span_other; /* local_2c: session_cur_a */
+  short *row_flag; /* local_24: row_has_edges cursor */
+  ushort *****bucket; /* local_20: row_edge_buckets cursor */
+
+  list_cur = &list_b;
+  list_next = list_a;
+  bucket = (ushort *****)&row_edge_buckets;
+  edge_sentinel = (int)view_width << 0x10 | 0x8000;
+  edge_sentinel_colour = (undefined *)((int)fill_colour | 0xffff0000);
+  list_b = (ushort ****)&edge_sentinel;
+  list_b_end = 0;
+  face_chain[0] = (ushort *****)0x1;
+  end_row = (int)scan_last_row;
+  if (half_rows_mode != 0) {
+    end_row = end_row >> 1;
   }
-  local_24 = &DAT_0001daa4;
-  (&DAT_0001daa4)[local_4a8] = 1;
-  local_2c = DAT_0001b798;
-  local_30 = (ushort *****)DAT_0001b794;
-  local_38 = (ushort *****)DAT_0001b794;
-  uVar4 = 0;
-  iVar7 = 0;
-  ppppppuVar26 = DAT_0001b794;
+  row_flag = &row_has_edges;
+  (&row_has_edges)[end_row] = 1;
+  span_other = session_cur_a;
+  span_base = (ushort *****)session_cur_b;
+  span_first = (ushort *****)session_cur_b;
+  run_state = 0;
+  row = 0;
+  span_out = session_cur_b;
   do {
-    pppppuVar21 = local_20;
-    ppppppuVar24 = (ushort ******)local_444;
-    pppppuVar9 = local_448;
-    local_34 = (ushort *****)ppppppuVar26;
-    uVar8 = (ushort)iVar7;
-    if ((short)uVar4 == 0) {
-      *local_24 = 0;
-      ppppppuVar22 = (ushort ******)(local_20 + 1);
+    edge = bucket;
+    list_in = (ushort ******)list_cur;
+    cursor = list_next;
+    row_header = (ushort *****)span_out;
+    row_lo = (ushort)row;
+    if ((short)run_state == 0) {
+      *row_flag = 0;
+      list_out = (ushort ******)(bucket + 1);
       do {
-        ppppppuVar16 = ppppppuVar22;
-        local_24 = local_24 + 1;
-        if (*ppppppuVar16 != (ushort *****)0x0) break;
-        ppppppuVar22 = ppppppuVar16 + 1;
-      } while (*local_24 == 0);
-      uVar4 = (uint)-((int)(local_20 + 1) - (int)(ppppppuVar16 + 1)) >> 2;
-      local_20 = (ushort *****)ppppppuVar16;
-      local_444 = local_448;
-      local_448 = (ushort *****)ppppppuVar24;
-      ppppppuVar22 = (ushort ******)pppppuVar9;
-      if ((ushort *****)*pppppuVar21 == (ushort *****)0x0) goto LAB_00002f66;
-      pppppuVar20 = (ushort *****)(*pppppuVar21 + 3);
-      ppppuVar3 = *pppppuVar20;
+        walk = list_out;
+        row_flag = row_flag + 1;
+        if (*walk != (ushort *****)0x0) break;
+        list_out = walk + 1;
+      } while (*row_flag == 0);
+      run_state = (uint)-((int)(bucket + 1) - (int)(walk + 1)) >> 2;
+      bucket = (ushort *****)walk;
+      list_cur = list_next;
+      list_next = (ushort *****)list_in;
+      list_out = (ushort ******)cursor;
+      if ((ushort *****)*edge == (ushort *****)0x0) goto LAB_00002f66;
+      new_edge = (ushort *****)(*edge + 3);
+      x = *new_edge;
       while( true ) {
-        ppppppuVar16 = ppppppuVar24;
-        pppppuVar25 = *ppppppuVar16;
-        if (pppppuVar25 == (ushort *****)0x0) break;
-        ppppppuVar24 = ppppppuVar16 + 1;
-        if (uVar8 != *(ushort *)((int)pppppuVar25 + 10)) {
-          pppppuVar19 = pppppuVar20;
-          if ((int)ppppuVar3 < (int)*pppppuVar25) {
-            if (pppppuVar20[3] == (ushort ****)0x0) {
+        walk = list_in;
+        active_edge = *walk;
+        if (active_edge == (ushort *****)0x0) break;
+        list_in = walk + 1;
+        if (row_lo != *(ushort *)((int)active_edge + 10)) {
+          next_new_edge = new_edge;
+          if ((int)x < (int)*active_edge) {
+            if (new_edge[3] == (ushort ****)0x0) {
               do {
-                *ppppppuVar22 = pppppuVar20;
-                ppppppuVar24 = ppppppuVar16;
-                ppppppuVar22 = ppppppuVar22 + 1;
+                *list_out = new_edge;
+                list_in = walk;
+                list_out = list_out + 1;
 LAB_00002f66:
                 do {
-                  ppppppuVar16 = ppppppuVar24 + 1;
-                  pppppuVar20 = *ppppppuVar24;
-                  if (pppppuVar20 == (ushort *****)0x0) goto LAB_00002f6c;
-                  ppppppuVar24 = ppppppuVar16;
-                } while (uVar8 == *(ushort *)((int)pppppuVar20 + 10));
+                  walk = list_in + 1;
+                  new_edge = *list_in;
+                  if (new_edge == (ushort *****)0x0) goto LAB_00002f6c;
+                  list_in = walk;
+                } while (row_lo == *(ushort *)((int)new_edge + 10));
               } while( true );
             }
-            pppppuVar19 = (ushort *****)(pppppuVar20[3] + 3);
-            ppppuVar3 = *pppppuVar19;
-            ppppppuVar24 = ppppppuVar16;
-            pppppuVar25 = pppppuVar20;
+            next_new_edge = (ushort *****)(new_edge[3] + 3);
+            x = *next_new_edge;
+            list_in = walk;
+            active_edge = new_edge;
           }
-          *ppppppuVar22 = pppppuVar25;
-          pppppuVar20 = pppppuVar19;
-          ppppppuVar22 = ppppppuVar22 + 1;
+          *list_out = active_edge;
+          new_edge = next_new_edge;
+          list_out = list_out + 1;
         }
       }
 LAB_00002f6c:
-      *pppppuVar21 = (ushort ****)0x0;
-      *ppppppuVar22 = (ushort *****)0x0;
-      unaff_A3 = (ushort ******)pppppuVar9;
-      unaff_A5 = (ushort ******)pppppuVar21;
+      *edge = (ushort ****)0x0;
+      *list_out = (ushort *****)0x0;
+      a3 = (ushort ******)cursor;
+      front_face = (ushort ******)edge;
     }
-    pppppuVar9 = (ushort *****)0xffffffff;
-    uVar4 = uVar4 << 0x10;
-    ppppuVar3 = (ushort ****)0xffffffff;
-    ppppppuVar26 = ppppppuVar26 + 1;
-    ppppppuVar24 = (ushort ******)local_444;
+    cursor = (ushort *****)0xffffffff;
+    run_state = run_state << 0x10;
+    x = (ushort ****)0xffffffff;
+    span_out = span_out + 1;
+    list_in = (ushort ******)list_cur;
     while( true ) {
-      ppppppuVar22 = ppppppuVar24;
-      ppppuVar12 = ppppuVar3;
-      ppppppuVar24 = ppppppuVar22 + 1;
-      pppppuVar21 = *ppppppuVar22;
-      if (pppppuVar21 == (ushort *****)0x0) break;
-      bVar2 = 0;
-      ppppppuVar16 = (ushort ******)pppppuVar21[-3];
-      ppppppuVar13 = (ushort ******)(pppppuVar21 + -2);
+      list_out = list_in;
+      prev_x = x;
+      list_in = list_out + 1;
+      edge = *list_out;
+      if (edge == (ushort *****)0x0) break;
+      front_change = 0;
+      walk = (ushort ******)edge[-3];
+      face_link = (ushort ******)(edge + -2);
       do {
-        uVar11 = *(ushort *)ppppppuVar16;
-        *(ushort *)ppppppuVar16 = uVar11 ^ 0x8000;
-        if ((uVar11 ^ 0x8000) == 0) {
-          if (unaff_A5 == ppppppuVar16) {
-            bVar2 = 0xff;
+        colour_a = *(ushort *)walk;
+        *(ushort *)walk = colour_a ^ 0x8000;
+        if ((colour_a ^ 0x8000) == 0) {
+          if (front_face == walk) {
+            front_change = 0xff;
           }
         }
         else {
-          if (ppppppuVar16[2] == (ushort *****)0x0) {
-            ppppppuVar16[2] = local_464[0];
-            local_464[0] = (ushort *****)ppppppuVar16;
+          if (walk[2] == (ushort *****)0x0) {
+            walk[2] = face_chain[0];
+            face_chain[0] = (ushort *****)walk;
           }
-          if ((short)uVar4 < (short)*ppppppuVar16) {
-            uVar4 = CONCAT22((short)(uVar4 >> 0x10),(short)*ppppppuVar16);
-            bVar2 = bVar2 | 1;
-            unaff_A5 = ppppppuVar16;
+          if ((short)run_state < (short)*walk) {
+            run_state = CONCAT22((short)(run_state >> 0x10),(short)*walk);
+            front_change = front_change | 1;
+            front_face = walk;
           }
         }
-        unaff_A3 = ppppppuVar13 + 1;
-        ppppppuVar16 = (ushort ******)*ppppppuVar13;
-        ppppppuVar13 = unaff_A3;
-      } while (ppppppuVar16 != (ushort ******)0x0);
-      ppppuVar3 = *pppppuVar21;
-      ppppppuVar16 = ppppppuVar26;
-      if (bVar2 != 0) {
-        if ((char)bVar2 < '\x01') {
-          uVar4 = uVar4 & 0xffff0000;
-          unaff_A3 = local_464;
-          ppppppuVar13 = (ushort ******)local_464[0];
+        a3 = face_link + 1;
+        walk = (ushort ******)*face_link;
+        face_link = a3;
+      } while (walk != (ushort ******)0x0);
+      x = *edge;
+      walk = span_out;
+      if (front_change != 0) {
+        if ((char)front_change < '\x01') {
+          run_state = run_state & 0xffff0000;
+          a3 = face_chain;
+          face_link = (ushort ******)face_chain[0];
           do {
-            if ((int)*ppppppuVar13 < 0) {
-              sVar17 = (short)*ppppppuVar13;
-              if ((short)uVar4 < sVar17) {
-                uVar4 = CONCAT22((short)(uVar4 >> 0x10),sVar17);
-                unaff_A5 = ppppppuVar13;
+            if ((int)*face_link < 0) {
+              count = (short)*face_link;
+              if ((short)run_state < count) {
+                run_state = CONCAT22((short)(run_state >> 0x10),count);
+                front_face = face_link;
               }
-              unaff_A3 = ppppppuVar13 + 2;
+              a3 = face_link + 2;
             }
             else {
-              *unaff_A3 = ppppppuVar13[2];
-              ppppppuVar13[2] = (ushort *****)0x0;
+              *a3 = face_link[2];
+              face_link[2] = (ushort *****)0x0;
             }
-            ppppppuVar13 = (ushort ******)*unaff_A3;
-          } while (ppppppuVar13 != (ushort ******)0x1);
+            face_link = (ushort ******)*a3;
+          } while (face_link != (ushort ******)0x1);
         }
-        pppppuVar20 = unaff_A5[1];
-        if (pppppuVar9 != pppppuVar20) {
-          ppppppuVar16 = ppppppuVar26 + 1;
-          *ppppppuVar26 = (ushort *****)CONCAT22((short)((uint)ppppuVar3 >> 0x10),(short)pppppuVar9)
+        new_edge = front_face[1];
+        if (cursor != new_edge) {
+          walk = span_out + 1;
+          *span_out = (ushort *****)CONCAT22((short)((uint)x >> 0x10),(short)cursor)
           ;
-          pppppuVar9 = pppppuVar20;
+          cursor = new_edge;
         }
       }
-      ppppuVar3 = (ushort ****)((int)pppppuVar21[1] + (int)ppppuVar3);
-      *pppppuVar21 = ppppuVar3;
-      *(short *)(pppppuVar21 + 2) = (short)pppppuVar9;
-      ppppppuVar26 = ppppppuVar16;
-      if ((int)ppppuVar3 < (int)ppppuVar12) {
-        if ((ushort)(*(short *)((int)pppppuVar21 + 10) - uVar8) == 1) {
-          *pppppuVar21 = (ushort ****)0x7fff0000;
-          ppppuVar3 = ppppuVar12;
+      x = (ushort ****)((int)edge[1] + (int)x);
+      *edge = x;
+      *(short *)(edge + 2) = (short)cursor;
+      span_out = walk;
+      if ((int)x < (int)prev_x) {
+        if ((ushort)(*(short *)((int)edge + 10) - row_lo) == 1) {
+          *edge = (ushort ****)0x7fff0000;
+          x = prev_x;
         }
         else {
-          ppppppuVar22 = ppppppuVar22 + -1;
+          list_out = list_out + -1;
           do {
-            unaff_A3 = ppppppuVar22;
-            unaff_A3[1] = *unaff_A3;
-            ppppppuVar22 = unaff_A3 + -1;
-          } while ((int)ppppuVar3 < (int)*unaff_A3[-1]);
-          *unaff_A3 = pppppuVar21;
-          uVar5 = uVar4 << 0x10 | uVar4 >> 0x10;
-          sVar17 = (short)(uVar4 >> 0x10);
-          if (sVar17 != 0 && -1 < (int)uVar4) {
-            uVar5 = CONCAT22((short)uVar4,2 - sVar17);
+            a3 = list_out;
+            a3[1] = *a3;
+            list_out = a3 + -1;
+          } while ((int)x < (int)*a3[-1]);
+          *a3 = edge;
+          run_swap = run_state << 0x10 | run_state >> 0x10;
+          count = (short)(run_state >> 0x10);
+          if (count != 0 && -1 < (int)run_state) {
+            run_swap = CONCAT22((short)run_state,2 - count);
           }
-          uVar4 = uVar5 << 0x10 | uVar5 >> 0x10;
-          ppppuVar3 = ppppuVar12;
+          run_state = run_swap << 0x10 | run_swap >> 0x10;
+          x = prev_x;
         }
       }
     }
-    *local_34 = (ushort ****)(((uint)((int)ppppppuVar26 - (int)local_34) >> 2) - 1);
-    for (ppppppuVar24 = (ushort ******)local_464[0]; ppppppuVar24 != (ushort ******)0x1;
-        ppppppuVar24 = (ushort ******)ppppppuVar24[2]) {
-      *(ushort *)ppppppuVar24 = 0;
+    *row_header = (ushort ****)(((uint)((int)span_out - (int)row_header) >> 2) - 1);
+    for (list_in = (ushort ******)face_chain[0]; list_in != (ushort ******)0x1;
+        list_in = (ushort ******)list_in[2]) {
+      *(ushort *)list_in = 0;
     }
-    iVar7 = iVar7 + 1;
-    sVar17 = (short)(uVar4 >> 0x10);
-    uVar8 = sVar17 - 1;
-    uVar4 = (uint)uVar8;
-    bVar27 = (int)((uint)uVar8 << 0x10) < 0;
-    ppppppuVar24 = (ushort ******)local_444;
-    if (uVar8 == 0 || SBORROW2(sVar17,1) != bVar27) {
-      if (SBORROW2(sVar17,1) != bVar27) {
-        uVar4 = (uint)(ushort)-uVar8;
+    row = row + 1;
+    count = (short)(run_state >> 0x10);
+    row_lo = count - 1;
+    run_state = (uint)row_lo;
+    negative = (int)((uint)row_lo << 0x10) < 0;
+    list_in = (ushort ******)list_cur;
+    if (row_lo == 0 || SBORROW2(count,1) != negative) {
+      if (SBORROW2(count,1) != negative) {
+        run_state = (uint)(ushort)-row_lo;
       }
     }
     else {
       do {
-        ppppppuVar22 = ppppppuVar24;
-        ppppppuVar24 = ppppppuVar22 + 1;
-      } while ((*ppppppuVar22)[1] == (ushort ****)0x0 && (uint)**ppppppuVar22 >> 0x10 == 0);
-      uVar11 = *(ushort *)(ppppppuVar22[-1] + 2);
-      sVar15 = (short)iVar7;
-      uVar6 = (undefined2)((uint)iVar7 >> 0x10);
-      if ((short)uVar8 < 4) {
+        list_out = list_in;
+        list_in = list_out + 1;
+      } while ((*list_out)[1] == (ushort ****)0x0 && (uint)**list_out >> 0x10 == 0);
+      colour_a = *(ushort *)(list_out[-1] + 2);
+      row_s = (short)row;
+      row_hi = (undefined2)((uint)row >> 0x10);
+      if ((short)row_lo < 4) {
 LAB_000030e4:
-        sVar17 = sVar17 + -2;
-        ppppppuVar24 = ppppppuVar26;
-        uVar18 = uVar8;
+        count = count + -2;
+        list_in = span_out;
+        rows_left = row_lo;
         do {
-          pppppuVar9 = *ppppppuVar22;
-          ppppppuVar13 = (ushort ******)0xffffffff;
-          ppppppuVar14 = ppppppuVar24 + 1;
-          uVar10 = uVar11;
-          ppppppuVar16 = ppppppuVar22;
+          cursor = *list_out;
+          face_link = (ushort ******)0xffffffff;
+          span_ptr = list_in + 1;
+          colour_b = colour_a;
+          walk = list_out;
           do {
-            unaff_A3 = (ushort ******)((int)pppppuVar9[1] + (int)*pppppuVar9);
-            ppppppuVar26 = ppppppuVar14 + 1;
-            *ppppppuVar14 = (ushort *****)CONCAT22((short)((uint)*pppppuVar9 >> 0x10),uVar10);
-            uVar10 = *(ushort *)(pppppuVar9 + 2);
-            *pppppuVar9 = (ushort ****)unaff_A3;
-            ppppppuVar14 = unaff_A3;
-            if ((int)unaff_A3 < (int)ppppppuVar13) {
-              uVar18 = uVar18 - sVar17;
-              ppppppuVar14 = ppppppuVar13;
-              if ((short)(*(short *)((int)pppppuVar9 + 10) - sVar15) == 1) {
-                *pppppuVar9 = (ushort ****)0x7fff0000;
-                sVar17 = 0;
+            a3 = (ushort ******)((int)cursor[1] + (int)*cursor);
+            span_out = span_ptr + 1;
+            *span_ptr = (ushort *****)CONCAT22((short)((uint)*cursor >> 0x10),colour_b);
+            colour_b = *(ushort *)(cursor + 2);
+            *cursor = (ushort ****)a3;
+            span_ptr = a3;
+            if ((int)a3 < (int)face_link) {
+              rows_left = rows_left - count;
+              span_ptr = face_link;
+              if ((short)(*(short *)((int)cursor + 10) - row_s) == 1) {
+                *cursor = (ushort ****)0x7fff0000;
+                count = 0;
               }
               else {
-                ppppppuVar13 = ppppppuVar16 + -1;
+                face_link = walk + -1;
                 do {
-                  ppppppuVar23 = ppppppuVar13;
-                  ppppppuVar23[1] = *ppppppuVar23;
-                  ppppppuVar13 = ppppppuVar23 + -1;
-                  if ((int)ppppppuVar13 < (int)ppppppuVar22) break;
-                } while ((int)unaff_A3 < (int)**ppppppuVar13);
-                *ppppppuVar23 = pppppuVar9;
-                sVar17 = 0;
-                unaff_A3 = ppppppuVar23;
+                  shift_ptr = face_link;
+                  shift_ptr[1] = *shift_ptr;
+                  face_link = shift_ptr + -1;
+                  if ((int)face_link < (int)list_out) break;
+                } while ((int)a3 < (int)**face_link);
+                *shift_ptr = cursor;
+                count = 0;
+                a3 = shift_ptr;
               }
             }
-            pppppuVar9 = ppppppuVar16[1];
-            ppppppuVar13 = ppppppuVar14;
-            ppppppuVar14 = ppppppuVar26;
-            ppppppuVar16 = ppppppuVar16 + 1;
-          } while (pppppuVar9 != (ushort *****)0x0);
-          *ppppppuVar24 = (ushort *****)(((uint)((int)ppppppuVar26 - (int)ppppppuVar24) >> 2) - 1);
-          sVar17 = sVar17 + -1;
-          ppppppuVar24 = ppppppuVar26;
-        } while (sVar17 != -1);
-        iVar7 = CONCAT22(uVar6,uVar18 + sVar15);
-        uVar4 = (uint)(ushort)(uVar8 - uVar18);
-        unaff_A5 = ppppppuVar26;
+            cursor = walk[1];
+            face_link = span_ptr;
+            span_ptr = span_out;
+            walk = walk + 1;
+          } while (cursor != (ushort *****)0x0);
+          *list_in = (ushort *****)(((uint)((int)span_out - (int)list_in) >> 2) - 1);
+          count = count + -1;
+          list_in = span_out;
+        } while (count != -1);
+        row = CONCAT22(row_hi,rows_left + row_s);
+        run_state = (uint)(ushort)(row_lo - rows_left);
+        front_face = span_out;
       }
       else {
-        pppppuVar21 = (ushort *****)0x0;
-        pppppuVar9 = *ppppppuVar22;
-        ppppuVar3 = (ushort ****)0x80000000;
-        uVar18 = uVar11;
-        uVar10 = uVar8;
-        ppppppuVar24 = ppppppuVar22;
+        edge = (ushort *****)0x0;
+        cursor = *list_out;
+        x = (ushort ****)0x80000000;
+        rows_left = colour_a;
+        colour_b = row_lo;
+        list_in = list_out;
         do {
-          ppppppuVar24 = ppppppuVar24 + 1;
-          ppppppuVar16 = (ushort ******)(pppppuVar9 + 2);
-          ppppuVar12 = pppppuVar9[1];
-          uVar1 = *(ushort *)ppppppuVar16;
-          if (uVar18 != uVar1) {
-            pppppuVar21 = (ushort *****)((int)pppppuVar21 + 1);
-            uVar18 = uVar1;
+          list_in = list_in + 1;
+          walk = (ushort ******)(cursor + 2);
+          prev_x = cursor[1];
+          face_colour = *(ushort *)walk;
+          if (rows_left != face_colour) {
+            edge = (ushort *****)((int)edge + 1);
+            rows_left = face_colour;
           }
-          if ((((int)ppppuVar12 < (int)ppppuVar3) &&
-              (uVar1 = (ushort)((uint)((int)*pppppuVar9 - (int)unaff_A3[-2]) /
-                               (uint)((int)ppppuVar3 - (int)ppppuVar12)),
-              (short)uVar1 < (short)uVar10)) && (uVar10 = uVar1, (short)uVar1 < 2))
+          if ((((int)prev_x < (int)x) &&
+              (face_colour = (ushort)((uint)((int)*cursor - (int)a3[-2]) /
+                               (uint)((int)x - (int)prev_x)),
+              (short)face_colour < (short)colour_b)) && (colour_b = face_colour, (short)face_colour < 2))
           goto LAB_000030e4;
-          pppppuVar9 = *ppppppuVar24;
-          ppppuVar3 = ppppuVar12;
-          unaff_A3 = ppppppuVar16;
-        } while (pppppuVar9 != (ushort *****)0x0);
-        uVar4 = (uint)(ushort)(uVar8 - uVar10);
-        iVar7 = CONCAT22(uVar6,uVar10 + sVar15);
-        sVar15 = (short)pppppuVar21 << 2;
-        sVar17 = uVar10 - 1;
-        ppppppuVar24 = ppppppuVar26;
+          cursor = *list_in;
+          x = prev_x;
+          a3 = walk;
+        } while (cursor != (ushort *****)0x0);
+        run_state = (uint)(ushort)(row_lo - colour_b);
+        row = CONCAT22(row_hi,colour_b + row_s);
+        row_s = (short)edge << 2;
+        count = colour_b - 1;
+        list_in = span_out;
         do {
-          *ppppppuVar24 = pppppuVar21;
-          ppppppuVar24 = (ushort ******)((int)ppppppuVar24 + sVar15 + 4);
-          sVar17 = sVar17 + -1;
-        } while (sVar17 != -1);
-        unaff_A3 = ppppppuVar26 + 1;
-        pppppuVar9 = *ppppppuVar22;
+          *list_in = edge;
+          list_in = (ushort ******)((int)list_in + row_s + 4);
+          count = count + -1;
+        } while (count != -1);
+        a3 = span_out + 1;
+        cursor = *list_out;
         do {
-          ppppppuVar22 = ppppppuVar22 + 1;
-          ppppuVar3 = *pppppuVar9;
-          ppppuVar12 = pppppuVar9[1];
-          uVar8 = *(ushort *)(pppppuVar9 + 2);
-          if (uVar11 == uVar8) {
-            *pppppuVar9 = (ushort ****)((int)ppppuVar12 * (int)(short)uVar10 + (int)ppppuVar3);
+          list_out = list_out + 1;
+          x = *cursor;
+          prev_x = cursor[1];
+          row_lo = *(ushort *)(cursor + 2);
+          if (colour_a == row_lo) {
+            *cursor = (ushort ****)((int)prev_x * (int)(short)colour_b + (int)x);
           }
           else {
-            uVar5 = (int)(short)uVar10 - 1;
-            ppppppuVar26 = unaff_A3;
+            run_swap = (int)(short)colour_b - 1;
+            span_out = a3;
             do {
-              *ppppppuVar26 = (ushort *****)CONCAT22((short)((uint)ppppuVar3 >> 0x10),uVar11);
-              ppppuVar3 = (ushort ****)((int)ppppuVar12 + (int)ppppuVar3);
-              ppppppuVar26 = (ushort ******)((int)ppppppuVar26 + sVar15 + 4);
-              uVar18 = (short)uVar5 - 1;
-              uVar5 = (uint)uVar18;
-            } while (uVar18 != 0xffff);
-            *pppppuVar9 = ppppuVar3;
-            unaff_A3 = unaff_A3 + 1;
-            uVar11 = uVar8;
+              *span_out = (ushort *****)CONCAT22((short)((uint)x >> 0x10),colour_a);
+              x = (ushort ****)((int)prev_x + (int)x);
+              span_out = (ushort ******)((int)span_out + row_s + 4);
+              rows_left = (short)run_swap - 1;
+              run_swap = (uint)rows_left;
+            } while (rows_left != 0xffff);
+            *cursor = x;
+            a3 = a3 + 1;
+            colour_a = row_lo;
           }
-          pppppuVar9 = *ppppppuVar22;
-        } while (pppppuVar9 != (ushort *****)0x0);
-        ppppppuVar26 = (ushort ******)((int)ppppppuVar26 - (int)sVar15);
-        unaff_A5 = ppppppuVar26;
+          cursor = *list_out;
+        } while (cursor != (ushort *****)0x0);
+        span_out = (ushort ******)((int)span_out - (int)row_s);
+        front_face = span_out;
       }
     }
-    if (local_4a8 <= iVar7) {
-      local_468 = local_464[0];
-      while ((ushort ******)local_468 != (ushort ******)0x1) {
-        *(ushort *)local_468 = 0;
-        ppppppuVar26 = (ushort ******)local_468[2];
-        local_468[2] = (ushort ****)0x0;
-        local_468 = (ushort *****)ppppppuVar26;
+    if (end_row <= row) {
+      face_clear = face_chain[0];
+      while ((ushort ******)face_clear != (ushort ******)0x1) {
+        *(ushort *)face_clear = 0;
+        span_out = (ushort ******)face_clear[2];
+        face_clear[2] = (ushort ****)0x0;
+        face_clear = (ushort *****)span_out;
       }
-      DAT_00020ab0 = 0;
+      edge_pool_count = 0;
       return;
     }
   } while( true );
@@ -5630,15 +6024,15 @@ LAB_000030e4:
 void init_span_table_32ba /* Original: FUN_00003266 */ (void)
 
 {
-  DAT_00003242 = 0x3354;
-  DAT_00003246 = &DAT_0000335a;
-  DAT_0000324a = &DAT_0000336c;
-  DAT_0000324e = &DAT_00003374;
-  DAT_00003252 = &DAT_00003378;
-  DAT_00003256 = &DAT_000033a4;
-  DAT_0000325a = &DAT_000033a4;
-  DAT_0000325e = &DAT_000033a4;
-  DAT_00003262 = &DAT_000033a4;
+  spans32ba_slot0 = 0x3354;
+  spans32ba_slot1 = &spans32ba_code_335a;
+  spans32ba_slot2 = &spans32ba_code_336c;
+  spans32ba_slot3 = &spans32ba_code_3374;
+  spans32ba_slot4 = &spans32ba_code_3378;
+  spans32ba_slot5 = &spans32ba_code_33a4;
+  spans32ba_slot6 = &spans32ba_code_33a4;
+  spans32ba_slot7 = &spans32ba_code_33a4;
+  spans32ba_slot8 = &spans32ba_code_33a4;
   return;
 }
 
@@ -5789,15 +6183,15 @@ void fill_span_rows_4bit_a /* Original: FUN_000032ba */
 void init_span_table_3466 /* Original: FUN_00003412 */ (void)
 
 {
-  DAT_000033ee = 0x34f6;
-  DAT_000033f2 = &DAT_000034fc;
-  DAT_000033f6 = &DAT_0000350e;
-  DAT_000033fa = &DAT_00003516;
-  DAT_000033fe = &DAT_0000351a;
-  DAT_00003402 = &DAT_00003546;
-  DAT_00003406 = &DAT_00003546;
-  DAT_0000340a = &DAT_00003546;
-  DAT_0000340e = &DAT_00003546;
+  spans3466_slot0 = 0x34f6;
+  spans3466_slot1 = &spans3466_code_34fc;
+  spans3466_slot2 = &spans3466_code_350e;
+  spans3466_slot3 = &spans3466_code_3516;
+  spans3466_slot4 = &spans3466_code_351a;
+  spans3466_slot5 = &spans3466_code_3546;
+  spans3466_slot6 = &spans3466_code_3546;
+  spans3466_slot7 = &spans3466_code_3546;
+  spans3466_slot8 = &spans3466_code_3546;
   return;
 }
 
@@ -5950,15 +6344,15 @@ void fill_span_rows_4bit_b /* Original: FUN_00003466 */
 void init_span_table_3608 /* Original: FUN_000035b4 */ (void)
 
 {
-  DAT_00003590 = 0x3698;
-  DAT_00003594 = &DAT_0000369e;
-  DAT_00003598 = &DAT_000036b0;
-  DAT_0000359c = &DAT_000036b8;
-  DAT_000035a0 = &DAT_000036bc;
-  DAT_000035a4 = &DAT_000036e8;
-  DAT_000035a8 = &DAT_000036e8;
-  DAT_000035ac = &DAT_000036e8;
-  DAT_000035b0 = &DAT_000036e8;
+  spans3608_slot0 = 0x3698;
+  spans3608_slot1 = &spans3608_code_369e;
+  spans3608_slot2 = &spans3608_code_36b0;
+  spans3608_slot3 = &spans3608_code_36b8;
+  spans3608_slot4 = &spans3608_code_36bc;
+  spans3608_slot5 = &spans3608_code_36e8;
+  spans3608_slot6 = &spans3608_code_36e8;
+  spans3608_slot7 = &spans3608_code_36e8;
+  spans3608_slot8 = &spans3608_code_36e8;
   return;
 }
 
@@ -6123,36 +6517,36 @@ void overlay_init_noop /* Original: FUN_00003732 */ (void)
 void init_code_pointer_tables /* Original: FUN_00003734 */ (void)
 
 {
-  short sVar1;
-  undefined4 *puVar2;
-  
-  DAT_00020cec = &DAT_00003836;
-  DAT_00020cf0 = &DAT_00003842;
-  DAT_00020cf4 = &DAT_00003850;
-  DAT_00020cf8 = &DAT_00003840;
-  DAT_00020cfc = &DAT_0000384e;
-  DAT_00020d00 = &DAT_0000383e;
-  sVar1 = 0x7f9;
-  puVar2 = &DAT_00020d04;
+  short left; /* sVar1: dbra count of default entries */
+  undefined4 *entry; /* puVar2: table entry cursor */
+
+  span8_entries_a = &span8_code_3836;
+  span8_entries_a_1 = &span8_code_3842;
+  span8_entries_a_2 = &span8_code_3850;
+  span8_entries_a_3 = &span8_code_3840;
+  span8_entries_a_4 = &span8_code_384e;
+  span8_entries_a_5 = &span8_code_383e;
+  left = 0x7f9;
+  entry = &span8_entries_a_rest;
   do {
-    *puVar2 = &DAT_00003858;
-    sVar1 = sVar1 + -1;
-    puVar2 = puVar2 + 1;
-  } while (sVar1 != -1);
-  DAT_00022cec = &DAT_00003836;
-  DAT_00022cf0 = &DAT_00003842;
-  DAT_00022cf4 = &DAT_00003882;
-  DAT_00022cf8 = &DAT_0000388c;
-  DAT_00022cfc = &DAT_0000389c;
-  DAT_00022d00 = &DAT_000038a8;
-  DAT_00022d04 = &DAT_00003898;
-  sVar1 = 0x7f8;
-  puVar2 = &DAT_00022d08;
+    *entry = &span8_code_3858;
+    left = left + -1;
+    entry = entry + 1;
+  } while (left != -1);
+  span8_entries_b = &span8_code_3836;
+  span8_entries_b_1 = &span8_code_3842;
+  span8_entries_b_2 = &span8_code_3882;
+  span8_entries_b_3 = &span8_code_388c;
+  span8_entries_b_4 = &span8_code_389c;
+  span8_entries_b_5 = &span8_code_38a8;
+  span8_entries_b_6 = &span8_code_3898;
+  left = 0x7f8;
+  entry = &span8_entries_b_rest;
   do {
-    *puVar2 = &DAT_000038b6;
-    sVar1 = sVar1 + -1;
-    puVar2 = puVar2 + 1;
-  } while (sVar1 != -1);
+    *entry = &span8_code_38b6;
+    left = left + -1;
+    entry = entry + 1;
+  } while (left != -1);
   return;
 }
 
@@ -6353,69 +6747,69 @@ long_fill:
 void respawn_player_at_anchor /* Original: FUN_000038f4 */ (void)
 
 {
-  int iVar1;
-  uint *puVar2;
-  int *piVar3;
-  
-  if ((DAT_0001b738 != (int *)0x0) && (iVar1 = *DAT_0001b738, iVar1 != 0)) {
-    if (DAT_0001d854 == 0) {
-      find_anchor_point(&DAT_0001d83c,1);
+  int obj; /* iVar1: *player_object, the player's world object */
+  uint *flags; /* puVar2: object flag long +4 */
+  int *ctl; /* piVar3: player_object controller */
+
+  if ((player_object != (int *)0x0) && (obj = *player_object, obj != 0)) {
+    if (anchor_found == 0) {
+      find_anchor_point(&anchor_x,1);
     }
-    *(undefined4 *)(iVar1 + 0x18) = DAT_0001d83c;
-    *(undefined4 *)(iVar1 + 0x1c) = DAT_0001d840;
-    *(undefined4 *)(iVar1 + 0x20) = DAT_0001d844;
-    piVar3 = DAT_0001b738;
-    *(undefined2 *)(DAT_0001b738 + 8) = DAT_0001d84a;
-    *(undefined2 *)((int)piVar3 + 0x22) = DAT_0001d84e;
-    *(undefined2 *)(piVar3 + 9) = DAT_0001d852;
-    *(undefined2 *)((int)piVar3 + 0x626) = *(undefined2 *)(piVar3[1] + 0x42);
-    fill_pose_history_angles((int)DAT_0001b738 + 0x36,*(undefined2 *)(piVar3 + 8),
-                 *(undefined2 *)((int)piVar3 + 0x22),*(undefined2 *)(piVar3 + 9));
-    fill_pose_history((int)DAT_0001b738 + 0x36,*(undefined4 *)(iVar1 + 0x18),
-                 *(undefined4 *)(iVar1 + 0x1c),*(undefined4 *)(iVar1 + 0x20));
+    *(undefined4 *)(obj + 0x18) = anchor_x;
+    *(undefined4 *)(obj + 0x1c) = anchor_y;
+    *(undefined4 *)(obj + 0x20) = anchor_z;
+    ctl = player_object;
+    *(undefined2 *)(player_object + 8) = anchor_angle1;
+    *(undefined2 *)((int)ctl + 0x22) = anchor_angle2;
+    *(undefined2 *)(ctl + 9) = anchor_angle3;
+    *(undefined2 *)((int)ctl + 0x626) = *(undefined2 *)(ctl[1] + 0x42);
+    fill_pose_history_angles((int)player_object + 0x36,*(undefined2 *)(ctl + 8),
+                 *(undefined2 *)((int)ctl + 0x22),*(undefined2 *)(ctl + 9));
+    fill_pose_history((int)player_object + 0x36,*(undefined4 *)(obj + 0x18),
+                 *(undefined4 *)(obj + 0x1c),*(undefined4 *)(obj + 0x20));
     copy_player_pose_to_camera();
-    piVar3 = DAT_0001b738;
-    *(undefined1 *)((int)DAT_0001b738 + 0x679) = 0x2d;
-    *(byte *)((int)piVar3 + 0x67a) = *(byte *)((int)piVar3 + 0x67a) | 2;
-    *(undefined1 *)((int)piVar3 + 0x67b) = 0;
-    *(undefined1 *)((int)piVar3 + 0x63e) = 1;
-    *(int *)((int)piVar3 + 0x2e) = *(int *)(iVar1 + 0x1c) - (int)*(short *)(piVar3[1] + 0x40);
-    *(undefined1 *)(piVar3 + 0xb) = 0x30;
-    *(undefined1 *)(piVar3 + 400) = 0;
-    *(undefined1 *)((int)piVar3 + 0x641) = 0;
-    *(undefined1 *)(piVar3 + 0x19d) = 0;
-    *(undefined1 *)((int)piVar3 + 0x676) = 0;
-    *(undefined1 *)((int)piVar3 + 0x677) = 0;
-    piVar3[4] = 0;
-    piVar3[3] = 0;
-    piVar3[2] = 0;
-    *(undefined2 *)(piVar3 + 0x1a1) = 0x4000;
-    fill_pose_history_flags((int)DAT_0001b738 + 0x36,*(undefined2 *)(piVar3 + 0x1a1));
-    piVar3 = DAT_0001b738;
-    *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;
-    *(undefined4 *)((int)piVar3 + 0x66e) = 0;
-    *(undefined4 *)((int)piVar3 + 0x66a) = 0;
-    *(undefined4 *)((int)piVar3 + 0x62a) = 0;
-    *(undefined2 *)((int)piVar3 + 0x636) = 0;
-    *(undefined2 *)(piVar3 + 0x18e) = 0;
-    DAT_0001b868 = 0;
-    *(undefined2 *)(DAT_0001b5a0 + 0xd6) = 0;
-    _DAT_0001b874 = 0;
-    _DAT_0001b872 = 0;
-    DAT_0001b86c = 0;
-    if ((DAT_0001b87c != (int *)0x0) && (*DAT_0001b87c != 0)) {
-      dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)*DAT_0001b87c);
-      DAT_0001b87c = (int *)0x0;
+    ctl = player_object;
+    *(undefined1 *)((int)player_object + 0x679) = 0x2d;
+    *(byte *)((int)ctl + 0x67a) = *(byte *)((int)ctl + 0x67a) | 2;
+    *(undefined1 *)((int)ctl + 0x67b) = 0;
+    *(undefined1 *)((int)ctl + 0x63e) = 1;
+    *(int *)((int)ctl + 0x2e) = *(int *)(obj + 0x1c) - (int)*(short *)(ctl[1] + 0x40);
+    *(undefined1 *)(ctl + 0xb) = 0x30;
+    *(undefined1 *)(ctl + 400) = 0;
+    *(undefined1 *)((int)ctl + 0x641) = 0;
+    *(undefined1 *)(ctl + 0x19d) = 0;
+    *(undefined1 *)((int)ctl + 0x676) = 0;
+    *(undefined1 *)((int)ctl + 0x677) = 0;
+    ctl[4] = 0;
+    ctl[3] = 0;
+    ctl[2] = 0;
+    *(undefined2 *)(ctl + 0x1a1) = 0x4000;
+    fill_pose_history_flags((int)player_object + 0x36,*(undefined2 *)(ctl + 0x1a1));
+    ctl = player_object;
+    *(undefined1 *)(player_object + 0x19a) = 0;
+    *(undefined4 *)((int)ctl + 0x66e) = 0;
+    *(undefined4 *)((int)ctl + 0x66a) = 0;
+    *(undefined4 *)((int)ctl + 0x62a) = 0;
+    *(undefined2 *)((int)ctl + 0x636) = 0;
+    *(undefined2 *)(ctl + 0x18e) = 0;
+    player_landing_state = 0;
+    *(undefined2 *)(host_world + 0xd6) = 0;
+    state_flag_b874 = 0;
+    state_flag_b872 = 0;
+    replay_request = 0;
+    if ((parachute_object != (int *)0x0) && (*parachute_object != 0)) {
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)*parachute_object);
+      parachute_object = (int *)0x0;
     }
-    *(uint *)(iVar1 + 4) = *(uint *)(iVar1 + 4) & 0xfffffffd;
-    *(undefined4 *)(iVar1 + 0x3c) = 0;
-    DAT_0001b838 = DAT_0001b838 + 0x4b;
-    DAT_0001d858 = 1;
-    if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) == 0) {
-      puVar2 = (uint *)(*DAT_0001b738 + 4);
-      *puVar2 = *puVar2 | 0x40;
+    *(uint *)(obj + 4) = *(uint *)(obj + 4) & 0xfffffffd;
+    *(undefined4 *)(obj + 0x3c) = 0;
+    frame_counter = frame_counter + 0x4b;
+    view_mode = 1;
+    if ((*(byte *)(*player_object + 7) & 0x40) == 0) {
+      flags = (uint *)(*player_object + 4);
+      *flags = *flags | 0x40;
     }
-    drop_contact_records_for_object(*DAT_0001b738);
+    drop_contact_records_for_object(*player_object);
     reset_distance_base_globals();
   }
   return;
@@ -6436,29 +6830,29 @@ void respawn_player_at_anchor /* Original: FUN_000038f4 */ (void)
  * DAT_0001b73c = 1, DAT_0001d824 = 1000000000; 0x6fb8, 0x4e6e(DAT_0001d700), DAT_0001b838 +=
  * 0x4b; 0xdf98 fill_pose_history_angles(player ctl + 0x36, sext words +0x20 / +0x22 / +0x24)
  * (casts added below); 0x739a, 0x640c, 0x9550. */
-void start_mission_scene /* Original: FUN_00003ac4 */ (int param_1)
+void start_mission_scene /* Original: FUN_00003ac4 */ (int mission /* param_1: mission number */)
 
 {
-  if (DAT_0001d700 != (char *)0x0) {
-    deactivate_object(DAT_0001d700);
+  if (mission_scene_object != (char *)0x0) {
+    deactivate_object(mission_scene_object);
   }
-  DAT_0001d700 = *(char **)(*(int *)(DAT_0001d6fc + 0x30) + param_1 * 0x18 + 0x74);
-  find_anchor_point(&DAT_0001d83c,0);
-  DAT_0001d838 = DAT_0001d83c;
-  DAT_0001d834 = DAT_0001d840;
-  DAT_0001d830 = DAT_0001d844;
-  DAT_0001d858 = 1;
-  _DAT_0001d856 = 1;
-  _DAT_0001b73c = 1;
-  DAT_0001d824 = 1000000000;
+  mission_scene_object = *(char **)(*(int *)(scene_root + 0x30) + mission * 0x18 + 0x74);
+  find_anchor_point(&anchor_x,0);
+  camera_x = anchor_x;
+  camera_y = anchor_y;
+  camera_z = anchor_z;
+  view_mode = 1;
+  view_flag_d856 = 1;
+  loadout_synced = 1;
+  ext_camera_point = 1000000000;
   reset_distance_base_globals();
-  activate_near_range_object( /* Original: FUN_00004e6e */DAT_0001d700);
-  DAT_0001b838 = DAT_0001b838 + 0x4b;
+  activate_near_range_object( /* Original: FUN_00004e6e */mission_scene_object);
+  frame_counter = frame_counter + 0x4b;
   /* Byte offsets made explicit [PROVEN, 0x3b5c..0x3b7a]: $36 / $20 / $22 / $24(a0) on the player
    * controller; DAT_0001b738 has conflicting global declarations (int / int *), and only the
    * int reading of the uncast form matched the bytes. */
-  fill_pose_history_angles((int)DAT_0001b738 + 0x36,*(undefined2 *)((int)DAT_0001b738 + 0x20),
-               *(undefined2 *)((int)DAT_0001b738 + 0x22),*(undefined2 *)((int)DAT_0001b738 + 0x24));
+  fill_pose_history_angles((int)player_object + 0x36,*(undefined2 *)((int)player_object + 0x20),
+               *(undefined2 *)((int)player_object + 0x22),*(undefined2 *)((int)player_object + 0x24));
   copy_player_pose_to_camera();
   spawn_cloud_layer();
   stop_all_sound_channels();
@@ -6493,28 +6887,28 @@ void start_mission_scene /* Original: FUN_00003ac4 */ (int param_1)
  * add.l / asr.l #2 / add.l, move.l d0,$10(a3)); identical to the C apart from the
  * documented D0 return.
  */
-void update_object_camera_metric(int param_1) /* Original: FUN_00003b98 */
+void update_object_camera_metric(int obj /* param_1: object; +0x10 receives the camera metric */) /* Original: FUN_00003b98 */
 {
-  int iVar1;
-  int iVar2;
-  int iVar3;
-  int iVar4;
+  int d1; /* iVar1: |first component|, then the middle value */
+  int d2; /* iVar2: |second component|, then the smallest */
+  int d3; /* iVar3: |third component| */
+  int dmax; /* iVar4: largest component */
   
   /* Ghidra lost stack args; binary pushes (pos − camera) then abs_int */
-  iVar1 = FUN_00002de8(); /* callsite≡abs_int [INFERRED]; LEA $2DE8 */
-  iVar2 = FUN_00002de8();
-  iVar3 = FUN_00002de8();
-  iVar4 = iVar1;
-  if (iVar1 < iVar2) {
-    iVar4 = iVar2;
-    iVar2 = iVar1;
+  d1 = FUN_00002de8(); /* callsite≡abs_int [INFERRED]; LEA $2DE8 */
+  d2 = FUN_00002de8();
+  d3 = FUN_00002de8();
+  dmax = d1;
+  if (d1 < d2) {
+    dmax = d2;
+    d2 = d1;
   }
-  iVar1 = iVar3;
-  if (iVar4 < iVar3) {
-    iVar1 = iVar4;
-    iVar4 = iVar3;
+  d1 = d3;
+  if (dmax < d3) {
+    d1 = dmax;
+    dmax = d3;
   }
-  *(int *)(param_1 + 0x10) = iVar4 + (iVar1 + iVar2 >> 2);
+  *(int *)(obj + 0x10) = dmax + (d1 + d2 >> 2);
   return;
 }
 
@@ -6537,18 +6931,18 @@ void update_object_camera_metric(int param_1) /* Original: FUN_00003b98 */
  * epilogue. References are lea.l $3be0.l = RUNTIME file 0x3c00 compute_camera_abs_metric. */
 void FUN_00003be0(void) /* false mid-label; do not rename call sites yet */
 {
-  int in_D0;
-  int in_D1;
-  int iVar1;
-  int unaff_D3;
-  int unaff_A3;
+  int d_other; /* in_D0: the third |component| (D0) */
+  int d_a; /* in_D1: one |component| (D1) */
+  int d_min; /* iVar1: min(d_a, d_b) */
+  int d_b; /* unaff_D3: the other |component|, then max(d_a, d_b) (D3) */
+  int obj; /* unaff_A3: object receiving the metric at +0x10 (A3) */
   
-  iVar1 = in_D1;
-  if (unaff_D3 < in_D1) {
-    iVar1 = unaff_D3;
-    unaff_D3 = in_D1;
+  d_min = d_a;
+  if (d_b < d_a) {
+    d_min = d_b;
+    d_b = d_a;
   }
-  *(int *)(unaff_A3 + 0x10) = unaff_D3 + (iVar1 + in_D0 >> 2);
+  *(int *)(obj + 0x10) = d_b + (d_min + d_other >> 2);
   return;
 }
 
@@ -6579,26 +6973,26 @@ void FUN_00003be0(void) /* false mid-label; do not rename call sites yet */
  */
 int compute_camera_abs_metric(void) /* Original: FUN_00003c00; args lost by Ghidra */
 {
-  int iVar1;
-  int iVar2;
-  int iVar3;
-  int iVar4;
+  int d1; /* iVar1: |first component|, then the middle value */
+  int d2; /* iVar2: |second component|, then the smallest */
+  int d3; /* iVar3: |third component| */
+  int dmax; /* iVar4: largest component */
   
   /* Binary: abs(arg0−d838), abs(arg1−d834), abs(arg2−d830) */
-  iVar1 = FUN_00002de8(); /* callsite≡abs_int [INFERRED]; LEA $2DE8 */
-  iVar2 = FUN_00002de8();
-  iVar3 = FUN_00002de8();
-  iVar4 = iVar1;
-  if (iVar1 < iVar2) {
-    iVar4 = iVar2;
-    iVar2 = iVar1;
+  d1 = FUN_00002de8(); /* callsite≡abs_int [INFERRED]; LEA $2DE8 */
+  d2 = FUN_00002de8();
+  d3 = FUN_00002de8();
+  dmax = d1;
+  if (d1 < d2) {
+    dmax = d2;
+    d2 = d1;
   }
-  iVar1 = iVar3;
-  if (iVar4 < iVar3) {
-    iVar1 = iVar4;
-    iVar4 = iVar3;
+  d1 = d3;
+  if (dmax < d3) {
+    d1 = dmax;
+    dmax = d3;
   }
-  return iVar4 + (iVar1 + iVar2 >> 2);
+  return dmax + (d1 + d2 >> 2);
 }
 
 
@@ -6624,17 +7018,17 @@ int compute_camera_abs_metric(void) /* Original: FUN_00003c00; args lost by Ghid
  * asr.l #2), then the 0x3c00 epilogue. */
 int FUN_00003c48(void) /* Original: FUN_00003c48 */
 {
-  int in_D0;
-  int in_D1;
-  int iVar1;
-  int unaff_D3;
+  int d_other; /* in_D0: the third |component| (D0) */
+  int d_a; /* in_D1: one |component| (D1) */
+  int d_min; /* iVar1: min(d_a, d_b) */
+  int d_b; /* unaff_D3: the other |component|, then max(d_a, d_b) (D3) */
   
-  iVar1 = in_D1;
-  if (unaff_D3 < in_D1) {
-    iVar1 = unaff_D3;
-    unaff_D3 = in_D1;
+  d_min = d_a;
+  if (d_b < d_a) {
+    d_min = d_b;
+    d_b = d_a;
   }
-  return unaff_D3 + (iVar1 + in_D0 >> 2);
+  return d_b + (d_min + d_other >> 2);
 }
 
 
@@ -6659,25 +7053,25 @@ int FUN_00003c48(void) /* Original: FUN_00003c48 */
  */
 int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 {
-  int iVar1;
-  int iVar2;
-  int iVar3;
-  int iVar4;
+  int d1; /* iVar1: |first component|, then the middle value */
+  int d2; /* iVar2: |second component|, then the smallest */
+  int d3; /* iVar3: |third component| */
+  int dmax; /* iVar4: largest component */
   
-  iVar1 = FUN_00002de8();
-  iVar2 = FUN_00002de8();
-  iVar3 = FUN_00002de8();
-  iVar4 = iVar1;
-  if (iVar1 < iVar2) {
-    iVar4 = iVar2;
-    iVar2 = iVar1;
+  d1 = FUN_00002de8();
+  d2 = FUN_00002de8();
+  d3 = FUN_00002de8();
+  dmax = d1;
+  if (d1 < d2) {
+    dmax = d2;
+    d2 = d1;
   }
-  iVar1 = iVar3;
-  if (iVar4 < iVar3) {
-    iVar1 = iVar4;
-    iVar4 = iVar3;
+  d1 = d3;
+  if (dmax < d3) {
+    d1 = dmax;
+    dmax = d3;
   }
-  return iVar4 + (iVar1 + iVar2 >> 2);
+  return dmax + (d1 + d2 >> 2);
 }
 
 
@@ -6705,35 +7099,35 @@ int approx_dist3_xyz(void) /* Original: FUN_00003c68 */
 int segment_point_min_distance /* Original: FUN_00003cca */ (void)
 
 {
-  uint uVar1;
-  uint uVar2;
-  uint uVar3;
-  short sVar4;
-  short sVar5;
-  short sVar6;
+  uint dist_start; /* uVar1: distance to the start end (word) */
+  uint dist_end; /* uVar2: distance to the far end (word) */
+  uint dist_mid; /* uVar3: distance to the midpoint */
+  short steps; /* sVar4: bisection countdown from 4 (5 steps) */
+  short end_w; /* sVar5: dist_end as a signed word */
+  short start_w; /* sVar6: dist_start as a signed word */
   
-  uVar1 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
-  uVar1 = uVar1 & 0xffff;
-  uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
-  uVar2 = uVar2 & 0xffff;
-  sVar4 = 4;
+  dist_start = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+  dist_start = dist_start & 0xffff;
+  dist_end = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+  dist_end = dist_end & 0xffff;
+  steps = 4;
   while( true ) {
-    sVar6 = (short)uVar1;
-    sVar5 = (short)uVar2;
-    sVar4 = sVar4 + -1;
-    if (sVar4 == -1) break;
-    uVar3 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
-    if (sVar5 < sVar6) {
-      uVar1 = uVar3 & 0xffff;
+    start_w = (short)dist_start;
+    end_w = (short)dist_end;
+    steps = steps + -1;
+    if (steps == -1) break;
+    dist_mid = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+    if (end_w < start_w) {
+      dist_start = dist_mid & 0xffff;
     }
     else {
-      uVar2 = uVar3 & 0xffff;
+      dist_end = dist_mid & 0xffff;
     }
   }
-  if (sVar6 < sVar5) {
-    sVar5 = sVar6;
+  if (start_w < end_w) {
+    end_w = start_w;
   }
-  return (int)sVar5;
+  return (int)end_w;
 }
 
 
@@ -6751,28 +7145,28 @@ int segment_point_min_distance /* Original: FUN_00003cca */ (void)
  * extension words 0x8c00 / 0x8cfc, scale x4 that capstone omits; addi.w #-2 / subq.w loop;
  * addq.w loop with bge; signed long compares; move.w band, d0 = 1 or 0); identical to the C.
  */
-undefined4 update_object_distance_band /* Original: FUN_00003da8 */ (int param_1,int param_2)
+undefined4 update_object_distance_band /* Original: FUN_00003da8 */ (int obj /* param_1: object (band word +0x30) */,int dist /* param_2: distance (object +0x10 camera metric) */)
 
 {
-  short sVar1;
+  short band; /* sVar1: band index */
   
-  sVar1 = *(short *)(param_1 + 0x30);
-  if (param_2 < *(int *)(&DAT_0001b190 + sVar1 * 4)) {
-    if (*(int *)(&DAT_0001b18c + sVar1 * 4) <= param_2) {
+  band = *(short *)(obj + 0x30);
+  if (dist < *(int *)(&band_limits + band * 4)) {
+    if (*(int *)(&band_limits_lo + band * 4) <= dist) {
       return 0;
     }
-    sVar1 = sVar1 + -2;
-    while (param_2 < *(int *)(&DAT_0001b190 + sVar1 * 4)) {
-      sVar1 = sVar1 + -1;
+    band = band + -2;
+    while (dist < *(int *)(&band_limits + band * 4)) {
+      band = band + -1;
     }
-    sVar1 = sVar1 + 1;
+    band = band + 1;
   }
   else {
     do {
-      sVar1 = sVar1 + 1;
-    } while (*(int *)(&DAT_0001b190 + sVar1 * 4) <= param_2);
+      band = band + 1;
+    } while (*(int *)(&band_limits + band * 4) <= dist);
   }
-  *(short *)(param_1 + 0x30) = sVar1;
+  *(short *)(obj + 0x30) = band;
   return 1;
 }
 
@@ -6787,28 +7181,28 @@ undefined4 update_object_distance_band /* Original: FUN_00003da8 */ (int param_1
  * DAT_0001b190[b] > d; else d >= DAT_0001b190[b - 1] (-$4(a1,a0.l*4) = DAT_0001b18c[b]) ->
  * return 0, otherwise b - 2 scanned down while d < DAT_0001b190[b] (word index *4), then b + 1;
  * word +4 = b and return 1 (scales decoded by hand). */
-undefined4 update_record_distance_band /* Original: FUN_00003e02 */ (int param_1,int param_2)
+undefined4 update_record_distance_band /* Original: FUN_00003e02 */ (int rec /* param_1: record (band word +4) */,int dist /* param_2: distance */)
 
 {
-  short sVar1;
+  short band; /* sVar1: band index */
   
-  sVar1 = *(short *)(param_1 + 4);
-  if (param_2 < *(int *)(&DAT_0001b190 + sVar1 * 4)) {
-    if (*(int *)(&DAT_0001b18c + sVar1 * 4) <= param_2) {
+  band = *(short *)(rec + 4);
+  if (dist < *(int *)(&band_limits + band * 4)) {
+    if (*(int *)(&band_limits_lo + band * 4) <= dist) {
       return 0;
     }
-    sVar1 = sVar1 + -2;
-    while (param_2 < *(int *)(&DAT_0001b190 + sVar1 * 4)) {
-      sVar1 = sVar1 + -1;
+    band = band + -2;
+    while (dist < *(int *)(&band_limits + band * 4)) {
+      band = band + -1;
     }
-    sVar1 = sVar1 + 1;
+    band = band + 1;
   }
   else {
     do {
-      sVar1 = sVar1 + 1;
-    } while (*(int *)(&DAT_0001b190 + sVar1 * 4) <= param_2);
+      band = band + 1;
+    } while (*(int *)(&band_limits + band * 4) <= dist);
   }
-  *(short *)(param_1 + 4) = sVar1;
+  *(short *)(rec + 4) = band;
   return 1;
 }
 
@@ -6822,22 +7216,22 @@ undefined4 update_record_distance_band /* Original: FUN_00003e02 */ (int param_1
  * and the index trailer); per face a 6-byte record {long face +0xc, word 0}; identical to
  * the C.
  */
-void snapshot_face_colours /* Original: FUN_00003e5c */ (int param_1)
+void snapshot_face_colours /* Original: FUN_00003e5c */ (int obj /* param_1: object (face count +0x3a, faces at *(+0x48), +0x38 word count) */)
 
 {
-  int iVar1;
-  undefined4 *puVar2;
-  int iVar3;
+  int i; /* iVar1: face index */
+  undefined4 *snap; /* puVar2: 6-byte snapshot entry after the faces */
+  int face; /* iVar3: 0x20-byte face record */
   
-  iVar3 = *(int *)(param_1 + 0x48);
-  puVar2 = (undefined4 *)
-           (*(int *)(param_1 + 0x48) + *(short *)(param_1 + 0x3a) * 0x20 +
-           *(short *)(param_1 + 0x38) * 2);
-  for (iVar1 = 0; iVar1 < *(short *)(param_1 + 0x3a); iVar1 = iVar1 + 1) {
-    *puVar2 = *(undefined4 *)(iVar3 + 0xc);
-    *(undefined2 *)(puVar2 + 1) = 0;
-    iVar3 = iVar3 + 0x20;
-    puVar2 = (undefined4 *)((int)puVar2 + 6);
+  face = *(int *)(obj + 0x48);
+  snap = (undefined4 *)
+           (*(int *)(obj + 0x48) + *(short *)(obj + 0x3a) * 0x20 +
+           *(short *)(obj + 0x38) * 2);
+  for (i = 0; i < *(short *)(obj + 0x3a); i = i + 1) {
+    *snap = *(undefined4 *)(face + 0xc);
+    *(undefined2 *)(snap + 1) = 0;
+    face = face + 0x20;
+    snap = (undefined4 *)((int)snap + 6);
   }
   return;
 }
@@ -6864,82 +7258,82 @@ void snapshot_face_colours /* Original: FUN_00003e5c */ (int param_1)
  * VERIFIED: both parts 0x3ea0..0x41ea were checked against an independent capstone
  * disassembly; identical to the C (in_D1w resolved as above).
  */
-void shade_object_faces /* Original: FUN_00003ea0 */ (char *param_1)
+void shade_object_faces /* Original: FUN_00003ea0 */ (char *obj /* param_1: kind-2 object */)
 
 {
-  undefined4 uVar1;
-  undefined4 uVar2;
-  undefined4 uVar3;
-  undefined4 *puVar4;
-  int iVar5;
-  short sVar6;
-  short sVar7;
-  short sVar8;
-  byte bVar9;
-  undefined1 uVar12;
-  int iVar10;
-  int iVar11;
-  byte bVar13;
-  byte bVar14;
-  short in_D1w;
-  ushort uVar15;
-  uint uVar16;
-  int iVar17;
-  byte *pbVar18;
-  int iVar19;
-  int local_42;
-  int local_38;
-  int local_34;
-  int local_30;
-  short local_2a;
-  short local_1a;
-  short local_16;
-  short sStack_12;
-  short local_e;
-  short local_a;
-  short sStack_6;
-  
-  if (((param_1[7] & 2U) == 0) && (*param_1 == '\x02')) {
-    sVar6 = *(short *)(DAT_0001b5a0 + 0xaa);
-    local_2a = sVar6;
-    if (sVar6 != 0) {
-      in_D1w = *(short *)(param_1 + 0x30);
-      local_30 = in_D1w * 0x7d;
-      local_34 = in_D1w * 0x84;
-      local_38 = in_D1w * 0xa8;
-      if ((*(uint *)(param_1 + 4) & 0x1280) != 0) {
-        local_2a = 0;
+  undefined4 v0_x; /* uVar1: first vertex long +0 */
+  undefined4 v0_z; /* uVar2: first vertex long +8 */
+  undefined4 v0_y; /* uVar3: first vertex long +4 */
+  undefined4 *vec; /* puVar4: +0x44 vertex buffer, then the face's normal point */
+  int verts; /* iVar5: +0x44 vertex buffer */
+  short haze_option; /* sVar6: host word +0xaa (haze option) */
+  short depth; /* sVar7: host word +0xe pixel depth */
+  short vert_count; /* sVar8: word +0x36 vertex count */
+  byte r; /* bVar9: shaded red */
+  undefined1 last; /* uVar12: shaded blue byte (depth 1 / 4) */
+  int intensity; /* iVar10: normal . light >> 13, 0xffff when unlit */
+  int adj; /* iVar11: intensity + 0x10000 (turned-away faces) */
+  byte g; /* bVar13: shaded green */
+  byte b; /* bVar14: shaded blue */
+  short band; /* in_D1w: object word +0x30 distance band (D1) */
+  ushort factor; /* uVar15: 16-bit light factor 0x4000..0xffff */
+  uint factor32; /* uVar16: factor zero-extended */
+  int face; /* iVar17: template record, then the 0x20-byte face */
+  byte *base_rgb; /* pbVar18: face's base RGB bytes in the template */
+  int inv_band; /* iVar19: 32 - band */
+  int i; /* local_42: face index */
+  int haze_b; /* local_38: band * 0xa8 */
+  int haze_g; /* local_34: band * 0x84 */
+  int haze_r; /* local_30: band * 0x7d */
+  short haze; /* local_2a: haze on for this object */
+  short nx; /* local_1a: normal point x word */
+  short ny; /* local_16: normal point y word */
+  short nz; /* sStack_12: normal point z word */
+  short x0; /* local_e: first vertex x word */
+  short y0; /* local_a: first vertex y word */
+  short z0; /* sStack_6: first vertex z word */
+
+  if (((obj[7] & 2U) == 0) && (*obj == '\x02')) {
+    haze_option = *(short *)(host_world + 0xaa);
+    haze = haze_option;
+    if (haze_option != 0) {
+      band = *(short *)(obj + 0x30);
+      haze_r = band * 0x7d;
+      haze_g = band * 0x84;
+      haze_b = band * 0xa8;
+      if ((*(uint *)(obj + 4) & 0x1280) != 0) {
+        haze = 0;
       }
     }
-    sVar7 = *(short *)(DAT_0001b5a0 + 0xe);
-    puVar4 = *(undefined4 **)(param_1 + 0x44);
-    uVar1 = *puVar4;
-    uVar3 = puVar4[1];
-    uVar2 = puVar4[2];
-    sVar8 = *(short *)(param_1 + 0x36);
-    iVar5 = *(int *)(param_1 + 0x44);
-    iVar17 = *(int *)(DAT_0001b5a0 + 0x8c) +
-             *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
-                     (uint)(byte)param_1[1] * 0x18);
-    pbVar18 = (byte *)(iVar17 + 0x22 + *(short *)(iVar17 + 0x1a) * 0xc +
-                      *(short *)(iVar17 + 0x1e) * 0xc);
-    iVar17 = *(int *)(param_1 + 0x48);
-    iVar19 = 0x20 - in_D1w;
-    for (local_42 = 0; local_42 < *(short *)(param_1 + 0x3a); local_42 = local_42 + 1) {
-      if ((*(byte *)(iVar17 + 0x13) & 4) == 0) {
-        puVar4 = (undefined4 *)(iVar5 + sVar8 * 0xc + local_42 * 0xc);
-        local_1a = (short)*puVar4;
-        local_e = (short)uVar1;
-        local_16 = (short)puVar4[1];
-        local_a = (short)uVar3;
-        sStack_12 = (short)puVar4[2];
-        sStack_6 = (short)uVar2;
-        iVar10 = (int)(short)(sStack_12 - sStack_6) * (int)DAT_0001bd88 +
-                 (int)(short)(local_16 - local_a) * (int)DAT_0001bd8a +
-                 (int)(short)(local_1a - local_e) * (int)DAT_0001bd8c >> 0xd;
+    depth = *(short *)(host_world + 0xe);
+    vec = *(undefined4 **)(obj + 0x44);
+    v0_x = *vec;
+    v0_y = vec[1];
+    v0_z = vec[2];
+    vert_count = *(short *)(obj + 0x36);
+    verts = *(int *)(obj + 0x44);
+    face = *(int *)(host_world + 0x8c) +
+             *(int *)(*(int *)(*(int *)(obj + 0x24) + 0x28) + 0x2e +
+                     (uint)(byte)obj[1] * 0x18);
+    base_rgb = (byte *)(face + 0x22 + *(short *)(face + 0x1a) * 0xc +
+                      *(short *)(face + 0x1e) * 0xc);
+    face = *(int *)(obj + 0x48);
+    inv_band = 0x20 - band;
+    for (i = 0; i < *(short *)(obj + 0x3a); i = i + 1) {
+      if ((*(byte *)(face + 0x13) & 4) == 0) {
+        vec = (undefined4 *)(verts + vert_count * 0xc + i * 0xc);
+        nx = (short)*vec;
+        x0 = (short)v0_x;
+        ny = (short)vec[1];
+        y0 = (short)v0_y;
+        nz = (short)vec[2];
+        z0 = (short)v0_z;
+        intensity = (int)(short)(nz - z0) * (int)light_z +
+                 (int)(short)(ny - y0) * (int)light_y +
+                 (int)(short)(nx - x0) * (int)light_x >> 0xd;
       }
       else {
-        iVar10 = 0xffff;
+        intensity = 0xffff;
       }
       /* Section check 0x3ea0..0x4000 (part 1 of 2) [PROVEN, matches the C; independent
        * capstone disassembly]: only for kind 2 objects without the retired bit (btst #1 of
@@ -6954,88 +7348,88 @@ void shade_object_faces /* Original: FUN_00003ea0 */ (char *param_1)
        * points being the +0x44 buffer entries after the word +0x36 vertices. Colour source =
        * template + 0x22 + 12 * (word +0x1a + word +0x1e) (extension words 0x9c22 / 0x8c00,
        * scale x4 that capstone omits), 3 bytes per face. */
-      if (sVar7 == 1) {
-        if (iVar10 < 0) {
-          iVar11 = iVar10 + 0x10000;
-          if (iVar11 < 0) {
-            iVar11 = iVar10 + 0x10003;
+      if (depth == 1) {
+        if (intensity < 0) {
+          adj = intensity + 0x10000;
+          if (adj < 0) {
+            adj = intensity + 0x10003;
           }
-          uVar15 = (short)(iVar11 >> 2) + 0x4000;
+          factor = (short)(adj >> 2) + 0x4000;
         }
         else {
-          if (iVar10 < 0) {
-            iVar10 = iVar10 + 1;
+          if (intensity < 0) {
+            intensity = intensity + 1;
           }
-          uVar15 = (short)(iVar10 >> 1) + 0x8000;
+          factor = (short)(intensity >> 1) + 0x8000;
         }
-        uVar16 = (uint)uVar15;
-        *(char *)(iVar17 + 0xc) = (char)(*pbVar18 * uVar16 >> 0x10);
-        *(char *)(iVar17 + 0xd) = (char)(pbVar18[1] * uVar16 >> 0x10);
-        uVar12 = (undefined1)(pbVar18[2] * uVar16 >> 0x10);
+        factor32 = (uint)factor;
+        *(char *)(face + 0xc) = (char)(*base_rgb * factor32 >> 0x10);
+        *(char *)(face + 0xd) = (char)(base_rgb[1] * factor32 >> 0x10);
+        last = (undefined1)(base_rgb[2] * factor32 >> 0x10);
 LAB_000040ea:
-        *(undefined1 *)(iVar17 + 0xe) = uVar12;
-        assign_face_colour(iVar17);
+        *(undefined1 *)(face + 0xe) = last;
+        assign_face_colour(face);
       }
       else {
-        if (sVar7 == 4) {
-          if (iVar10 < 0) {
-            iVar11 = iVar10 + 0x10000;
-            if (iVar11 < 0) {
-              iVar11 = iVar10 + 0x10003;
+        if (depth == 4) {
+          if (intensity < 0) {
+            adj = intensity + 0x10000;
+            if (adj < 0) {
+              adj = intensity + 0x10003;
             }
-            uVar15 = (short)(iVar11 >> 2) + 0x4000;
+            factor = (short)(adj >> 2) + 0x4000;
           }
           else {
-            if (iVar10 < 0) {
-              iVar10 = iVar10 + 1;
+            if (intensity < 0) {
+              intensity = intensity + 1;
             }
-            uVar15 = (short)(iVar10 >> 1) + 0x8000;
+            factor = (short)(intensity >> 1) + 0x8000;
           }
-          *(char *)(iVar17 + 0xc) =
-               (char)((uint)(((int)((uint)*pbVar18 * (uint)uVar15) >> 6) + 0x2000) >> 0x10);
-          *(char *)(iVar17 + 0xd) =
-               (char)((uint)(((int)((uint)pbVar18[1] * (uint)uVar15) >> 6) + 0x2000) >> 0x10);
-          uVar12 = (undefined1)
-                   ((uint)(((int)((uint)pbVar18[2] * (uint)uVar15) >> 6) + 0x2000) >> 0x10);
+          *(char *)(face + 0xc) =
+               (char)((uint)(((int)((uint)*base_rgb * (uint)factor) >> 6) + 0x2000) >> 0x10);
+          *(char *)(face + 0xd) =
+               (char)((uint)(((int)((uint)base_rgb[1] * (uint)factor) >> 6) + 0x2000) >> 0x10);
+          last = (undefined1)
+                   ((uint)(((int)((uint)base_rgb[2] * (uint)factor) >> 6) + 0x2000) >> 0x10);
           goto LAB_000040ea;
         }
-        if (iVar10 < 0) {
-          iVar11 = iVar10 + 0x10000;
-          if (iVar11 < 0) {
-            iVar11 = iVar10 + 0x10003;
+        if (intensity < 0) {
+          adj = intensity + 0x10000;
+          if (adj < 0) {
+            adj = intensity + 0x10003;
           }
-          uVar15 = (short)(iVar11 >> 2) + 0x4000;
+          factor = (short)(adj >> 2) + 0x4000;
         }
         else {
-          if (iVar10 < 0) {
-            iVar10 = iVar10 + 1;
+          if (intensity < 0) {
+            intensity = intensity + 1;
           }
-          uVar15 = (short)(iVar10 >> 1) + 0x8000;
+          factor = (short)(intensity >> 1) + 0x8000;
         }
-        uVar16 = (uint)uVar15;
-        bVar9 = (byte)(*pbVar18 * uVar16 >> 0x10);
-        bVar13 = (byte)(pbVar18[1] * uVar16 >> 0x10);
-        bVar14 = (byte)(pbVar18[2] * uVar16 >> 0x10);
-        if (local_2a != 0) {
-          bVar9 = (byte)(local_30 + iVar19 * (uint)bVar9 >> 5);
-          bVar13 = (byte)(local_34 + iVar19 * (uint)bVar13 >> 5);
-          bVar14 = (byte)(local_38 + iVar19 * (uint)bVar14 >> 5);
+        factor32 = (uint)factor;
+        r = (byte)(*base_rgb * factor32 >> 0x10);
+        g = (byte)(base_rgb[1] * factor32 >> 0x10);
+        b = (byte)(base_rgb[2] * factor32 >> 0x10);
+        if (haze != 0) {
+          r = (byte)(haze_r + inv_band * (uint)r >> 5);
+          g = (byte)(haze_g + inv_band * (uint)g >> 5);
+          b = (byte)(haze_b + inv_band * (uint)b >> 5);
         }
-        *(byte *)(iVar17 + 0xc) = bVar9;
-        *(byte *)(iVar17 + 0xd) = bVar13;
-        *(byte *)(iVar17 + 0xe) = bVar14;
-        if (iVar17 == *(int *)(DAT_0001da7c + (uint)*(byte *)(iVar17 + 0xf) * 4)) {
-          write_face_palette_slot(iVar17);
+        *(byte *)(face + 0xc) = r;
+        *(byte *)(face + 0xd) = g;
+        *(byte *)(face + 0xe) = b;
+        if (face == *(int *)(palette_owner_current + (uint)*(byte *)(face + 0xf) * 4)) {
+          write_face_palette_slot(face);
         }
         else {
-          *(undefined1 *)(iVar17 + 0xf) = 0;
+          *(undefined1 *)(face + 0xf) = 0;
         }
       }
-      pbVar18 = pbVar18 + (uint)pbVar18[8] * 2 + 0xe;
-      iVar17 = iVar17 + 0x20;
+      base_rgb = base_rgb + (uint)base_rgb[8] * 2 + 0xe;
+      face = face + 0x20;
     }
-    if ((sVar6 != 0) && ((param_1[6] & 2U) != 0)) {
-      snapshot_face_colours((int)param_1);
+    if ((haze_option != 0) && ((obj[6] & 2U) != 0)) {
+      snapshot_face_colours((int)obj);
     }
   }
   return;
@@ -7050,12 +7444,12 @@ LAB_000040ea:
 /* VERIFIED (FUN_000041ec): 0x41ec..0x420e checked against an independent capstone disassembly and
  * found identical to the C: for kind-2 objects (cmpi.b #2): bsr.w 0x3da8
  * update_object_distance_band(obj, +0x10), bsr.w 0x3ea0 shade_object_faces(obj). */
-void recolour_kind2_object /* Original: FUN_000041ec */ (char *param_1)
+void recolour_kind2_object /* Original: FUN_000041ec */ (char *obj /* param_1: object (kind byte +0) */)
 
 {
-  if (*param_1 == '\x02') {
-    update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
-    shade_object_faces(param_1);
+  if (*obj == '\x02') {
+    update_object_distance_band((int)obj,*(int *)(obj + 0x10));
+    shade_object_faces(obj);
   }
   return;
 }
@@ -7075,72 +7469,72 @@ void recolour_kind2_object /* Original: FUN_000041ec */ (char *param_1)
 void refresh_object_colours_for_depth /* Original: FUN_00004210 */ (void)
 
 {
-  int iVar1;
-  short *psVar2;
-  int iVar3;
-  undefined1 *puVar4;
-  undefined4 *puVar5;
-  int *piVar6;
+  int work; /* iVar1: host_world copy, then the object's controller (+8) */
+  short *ctl_type; /* psVar2: controller type word */
+  int i; /* iVar3: table index, then entity index */
+  undefined1 *usage; /* puVar4: slot_usage_buf_b byte cursor */
+  undefined4 *owner; /* puVar5: palette_owner_current entry cursor */
+  int *slot; /* piVar6: entity array cursor */
   
-  if (DAT_0001b826 == 4) {
+  if (view_depth == 4) {
     init_depth4_colour_state();
   }
-  iVar3 = 0;
-  puVar4 = &DAT_0001d96c;
-  puVar5 = DAT_0001da7c;
+  i = 0;
+  usage = &slot_usage_buf_b;
+  owner = palette_owner_current;
   do {
-    *puVar4 = 0;
-    *puVar4 = 0;
-    if (DAT_0001b826 == 8) {
-      *puVar5 = 0;
+    *usage = 0;
+    *usage = 0;
+    if (view_depth == 8) {
+      *owner = 0;
     }
-    iVar1 = DAT_0001b5a0;
-    puVar5 = puVar5 + 1;
-    puVar4 = puVar4 + 1;
-    iVar3 = iVar3 + 1;
-  } while (iVar3 < 0x100);
-  if (DAT_0001b826 == 1) {
-    *(int *)(*(int *)(DAT_0001bdb4 + 0x48) + 4) =
-         (int)*(short *)(*(int *)(DAT_0001b5a0 + 0x88) + 0x180);
-    *(int *)(*(int *)(DAT_0001bdac + 0x48) + 4) = (int)*(short *)(*(int *)(iVar1 + 0x88) + 0x80);
+    work = host_world;
+    owner = owner + 1;
+    usage = usage + 1;
+    i = i + 1;
+  } while (i < 0x100);
+  if (view_depth == 1) {
+    *(int *)(*(int *)(mission_child0 + 0x48) + 4) =
+         (int)*(short *)(*(int *)(host_world + 0x88) + 0x180);
+    *(int *)(*(int *)(mission_child2or3 + 0x48) + 4) = (int)*(short *)(*(int *)(work + 0x88) + 0x80);
   }
   else {
-    recolour_kind2_object(DAT_0001bdb4);
-    recolour_kind2_object(DAT_0001bdac);
+    recolour_kind2_object(mission_child0);
+    recolour_kind2_object(mission_child2or3);
   }
-  recolour_kind2_object(DAT_0001bdb0);
-  recolour_kind2_object(DAT_0001bda4);
-  iVar3 = 0;
-  if (0 < DAT_0001c1e0) {
-    piVar6 = &DAT_0001d4a4;
+  recolour_kind2_object(mission_child1);
+  recolour_kind2_object(mission_child4);
+  i = 0;
+  if (0 < entity_array_1_count) {
+    slot = &entity_array_1;
     do {
-      if ((DAT_0001b826 == 1) && ((*(byte *)(*piVar6 + 6) & 0x10) != 0)) {
-        set_object_faces_bw_pattern(*piVar6,0x80);
+      if ((view_depth == 1) && ((*(byte *)(*slot + 6) & 0x10) != 0)) {
+        set_object_faces_bw_pattern(*slot,0x80);
       }
       else {
-        recolour_kind2_object((char *)*piVar6);
+        recolour_kind2_object((char *)*slot);
       }
-      piVar6 = piVar6 + 1;
-      iVar3 = iVar3 + 1;
-    } while (iVar3 < DAT_0001c1e0);
+      slot = slot + 1;
+      i = i + 1;
+    } while (i < entity_array_1_count);
   }
-  iVar3 = 0;
-  if (0 < DAT_0001b734) {
-    piVar6 = &DAT_0001b5a4;
+  i = 0;
+  if (0 < object_count) {
+    slot = &object_pool;
     do {
-      if (DAT_0001b826 == 1) {
-        iVar1 = *(int *)(*piVar6 + 8);
-        if (((iVar1 == 0) || (psVar2 = *(short **)(iVar1 + 4), *psVar2 < 3)) || (4 < *psVar2))
+      if (view_depth == 1) {
+        work = *(int *)(*slot + 8);
+        if (((work == 0) || (ctl_type = *(short **)(work + 4), *ctl_type < 3)) || (4 < *ctl_type))
         goto LAB_00004340;
-        set_object_faces_bw_pattern(*piVar6,0);
+        set_object_faces_bw_pattern(*slot,0);
       }
       else {
 LAB_00004340:
-        recolour_kind2_object((char *)*piVar6);
+        recolour_kind2_object((char *)*slot);
       }
-      piVar6 = piVar6 + 1;
-      iVar3 = iVar3 + 1;
-    } while (iVar3 < DAT_0001b734);
+      slot = slot + 1;
+      i = i + 1;
+    } while (i < object_count);
   }
   return;
 }
@@ -7182,35 +7576,35 @@ LAB_00004340:
  */
 void apply_entity_mission_rates(char *entity, int path) /* Original: FUN_0000435a */
 {
-  bool bVar1;
-  int iVar2;
-  int iVar3;
-  int iVar4; /* scale */
-  int iVar5; /* mission table cursor */
-  int *piVar6;
+  bool is_player; /* bVar1: entity +8 is player_object (faces x 5) */
+  int half; /* iVar2: record +0xa, halved */
+  int i; /* iVar3: entity +0xc halving temp, then the face index */
+  int scale; /* iVar4: host +0xa8 - 1, or 1 for flagged entities */ /* scale */
+  int rec; /* iVar5: mission table record, then its face records */ /* mission table cursor */
+  int *face_value; /* piVar6: face +0x1c cursor */
   
-  if ((((entity[7] & 2U) == 0) && (0 < *(short *)(DAT_0001b5a0 + 0xa8))) &&
-     (*(short *)(DAT_0001b5a0 + 0xa8) < 6)) {
+  if ((((entity[7] & 2U) == 0) && (0 < *(short *)(host_world + 0xa8))) &&
+     (*(short *)(host_world + 0xa8) < 6)) {
     /* Mission base + relocated child-record field → rate table row. */
-    iVar5 = *(int *)(DAT_0001b5a0 + 0x8c) +
+    rec = *(int *)(host_world + 0x8c) +
             *(int *)(*(int *)(*(int *)(entity + 0x24) + 0x28) + 0x2e +
                     (uint)(byte)entity[1] * 0x18);
     if ((entity[5] & 2U) == 0) {
-      iVar4 = *(short *)(DAT_0001b5a0 + 0xa8) + -1; /* phase-based scale */
+      scale = *(short *)(host_world + 0xa8) + -1; /* phase-based scale */
     }
     else {
-      iVar4 = 1;
+      scale = 1;
     }
     if (*(int *)(entity + 0xc) != 1000000000) {
-      if (iVar4 == 0) {
-        iVar3 = *(int *)(iVar5 + 0xe);
-        if (iVar3 < 0) {
-          iVar3 = iVar3 + 1;
+      if (scale == 0) {
+        i = *(int *)(rec + 0xe);
+        if (i < 0) {
+          i = i + 1;
         }
-        *(int *)(entity + 0xc) = iVar3 >> 1;
+        *(int *)(entity + 0xc) = i >> 1;
       }
       else {
-        *(int *)(entity + 0xc) = *(int *)(iVar5 + 0xe) * iVar4;
+        *(int *)(entity + 0xc) = *(int *)(rec + 0xe) * scale;
       }
       /* Kind-2 clamp to 0x0042B209 when over threshold and flag bit4 clear. */
       if (((*entity == '\x02') && (0x42b209 < *(int *)(entity + 0xc))) &&
@@ -7223,28 +7617,28 @@ void apply_entity_mission_rates(char *entity, int path) /* Original: FUN_0000435
     }
     /* Path-0 only: refresh kind-2 sub-slot rates (skipped on tick passes 3–4). */
     if ((*entity == '\x02') && (path == 0)) {
-      iVar5 = iVar5 + 0x22 + *(short *)(iVar5 + 0x1a) * 0xc + *(short *)(iVar5 + 0x1e) * 0xc;
-      bVar1 = false;
-      if ((*(int *)(entity + 8) != 0) && (DAT_0001b738 == *(int *)(entity + 8))) {
-        bVar1 = true; /* linked to DAT_0001b738 — use ×5 scale of table[+0xA] */
+      rec = rec + 0x22 + *(short *)(rec + 0x1a) * 0xc + *(short *)(rec + 0x1e) * 0xc;
+      is_player = false;
+      if ((*(int *)(entity + 8) != 0) && (player_object == *(int *)(entity + 8))) {
+        is_player = true; /* linked to DAT_0001b738 — use ×5 scale of table[+0xA] */
       }
-      piVar6 = (int *)(*(int *)(entity + 0x48) + 0x1c);
-      for (iVar3 = 0; iVar3 < *(short *)(entity + 0x3a); iVar3 = iVar3 + 1) {
-        if (bVar1) {
-          *piVar6 = *(int *)(iVar5 + 10) + *(int *)(iVar5 + 10) * 4;
+      face_value = (int *)(*(int *)(entity + 0x48) + 0x1c);
+      for (i = 0; i < *(short *)(entity + 0x3a); i = i + 1) {
+        if (is_player) {
+          *face_value = *(int *)(rec + 10) + *(int *)(rec + 10) * 4;
         }
-        else if (iVar4 == 0) {
-          iVar2 = *(int *)(iVar5 + 10);
-          if (iVar2 < 0) {
-            iVar2 = iVar2 + 1;
+        else if (scale == 0) {
+          half = *(int *)(rec + 10);
+          if (half < 0) {
+            half = half + 1;
           }
-          *piVar6 = iVar2 >> 1;
+          *face_value = half >> 1;
         }
         else {
-          *piVar6 = *(int *)(iVar5 + 10) * iVar4;
+          *face_value = *(int *)(rec + 10) * scale;
         }
-        iVar5 = iVar5 + 0xe + (uint)*(byte *)(iVar5 + 8) * 2;
-        piVar6 = piVar6 + 8;
+        rec = rec + 0xe + (uint)*(byte *)(rec + 8) * 2;
+        face_value = face_value + 8;
       }
     }
   }
@@ -7275,7 +7669,7 @@ void dispatch_entity_tick(char *entity, int path) /* Original: FUN_000044a4 */
 {
   apply_entity_mission_rates(entity, path); /* Original: FUN_0000435a */
   if ((*(int *)(entity + 8) != 0) && (**(short **)(*(int *)(entity + 8) + 4) == 5)) {
-    if (*(short *)(DAT_0001b5a0 + 0xb0) == 0) {
+    if (*(short *)(host_world + 0xb0) == 0) {
       *(uint *)(entity + 4) = *(uint *)(entity + 4) | 0x40;
     }
     else {
@@ -7321,54 +7715,54 @@ void dispatch_entity_tick(char *entity, int path) /* Original: FUN_000044a4 */
  * reset_distance_base_globals. */
 void run_simulation_tick(void) /* Original: FUN_000044e8 */
 {
-  int iVar1;
-  undefined4 *puVar2;
+  int i; /* iVar1: entity index */
+  undefined4 *slot; /* puVar2: entity array cursor */
   
   /* Mission flag +0xAC: zero triggers pre-pass hook. */
-  if (*(short *)(DAT_0001b5a0 + 0xac) == 0) {
+  if (*(short *)(host_world + 0xac) == 0) {
     clear_pending_entity_slots();
   }
   /* Mission phase +0xA8 must be in 1..5 to run entity passes. */
-  if ((0 < *(short *)(DAT_0001b5a0 + 0xa8)) && (*(short *)(DAT_0001b5a0 + 0xa8) < 6)) {
+  if ((0 < *(short *)(host_world + 0xa8)) && (*(short *)(host_world + 0xa8) < 6)) {
     /* Pass 1 — entity_array_1, path 0 */
-    iVar1 = 0;
-    if (0 < DAT_0001c1e0) {
-      puVar2 = &DAT_0001d4a4;
+    i = 0;
+    if (0 < entity_array_1_count) {
+      slot = &entity_array_1;
       do {
-        dispatch_entity_tick((char *)*puVar2,0);
-        iVar1 = iVar1 + 1;
-        puVar2 = puVar2 + 1;
-      } while (iVar1 < DAT_0001c1e0);
+        dispatch_entity_tick((char *)*slot,0);
+        i = i + 1;
+        slot = slot + 1;
+      } while (i < entity_array_1_count);
     }
     /* Pass 2 — entity_array_2, path 0 */
-    iVar1 = 0;
-    if (0 < DAT_0001b734) {
-      puVar2 = &DAT_0001b5a4;
+    i = 0;
+    if (0 < object_count) {
+      slot = &object_pool;
       do {
-        dispatch_entity_tick((char *)*puVar2,0);
-        iVar1 = iVar1 + 1;
-        puVar2 = puVar2 + 1;
-      } while (iVar1 < DAT_0001b734);
+        dispatch_entity_tick((char *)*slot,0);
+        i = i + 1;
+        slot = slot + 1;
+      } while (i < object_count);
     }
     /* Pass 3 — entity_array_3, path 1 */
-    iVar1 = 0;
-    if (0 < DAT_0001c1dc) {
-      puVar2 = &DAT_0001d0e4;
+    i = 0;
+    if (0 < entity_array_3_count) {
+      slot = &entity_array_3;
       do {
-        dispatch_entity_tick((char *)*puVar2,1);
-        iVar1 = iVar1 + 1;
-        puVar2 = puVar2 + 1;
-      } while (iVar1 < DAT_0001c1dc);
+        dispatch_entity_tick((char *)*slot,1);
+        i = i + 1;
+        slot = slot + 1;
+      } while (i < entity_array_3_count);
     }
     /* Pass 4 — entity_array_4, path 1 */
-    iVar1 = 0;
-    if (0 < DAT_0001c1d8) {
-      puVar2 = &DAT_0001cbe4;
+    i = 0;
+    if (0 < entity_array_4_count) {
+      slot = &entity_array_4;
       do {
-        dispatch_entity_tick((char *)*puVar2,1);
-        iVar1 = iVar1 + 1;
-        puVar2 = puVar2 + 1;
-      } while (iVar1 < DAT_0001c1d8);
+        dispatch_entity_tick((char *)*slot,1);
+        i = i + 1;
+        slot = slot + 1;
+      } while (i < entity_array_4_count);
     }
     reset_distance_base_globals(); /* post-pass: reset distance/base globals to 100000000 */
   }
@@ -7410,45 +7804,45 @@ void run_simulation_tick(void) /* Original: FUN_000044e8 */
  */
 uint * alloc_object_from_desc(char *desc) /* Original: FUN_000045ba */
 {
-  short sVar1;
-  uint *in_D1;
+  short word_38; /* sVar1: desc +0x1c, stored at obj +0x38 (0 -> 1) */
+  uint *obj; /* in_D1: new object; returned unchanged from D1 when the tag is neither 2 nor 3 */
   
   if (*desc == '\x02') {
-    in_D1 = heap_alloc_cleared(0x52); /* Original: FUN_00001b6c */
-    *(char *)in_D1 = *desc;
-    in_D1[1] = (uint)*(ushort *)(desc + 0x16);
-    if ((*(byte *)((int)in_D1 + 6) & 0x20) != 0) {
-      *(byte *)((int)in_D1 + 5) = *(byte *)((int)in_D1 + 5) | 0x10;
+    obj = heap_alloc_cleared(0x52); /* Original: FUN_00001b6c */
+    *(char *)obj = *desc;
+    obj[1] = (uint)*(ushort *)(desc + 0x16);
+    if ((*(byte *)((int)obj + 6) & 0x20) != 0) {
+      *(byte *)((int)obj + 5) = *(byte *)((int)obj + 5) | 0x10;
     }
-    in_D1[6] = *(uint *)(desc + 2);
-    in_D1[7] = *(uint *)(desc + 6);
-    in_D1[8] = *(uint *)(desc + 10);
-    in_D1[3] = *(uint *)(desc + 0xe);
-    in_D1[5] = *(uint *)(desc + 0x12);
-    *(undefined2 *)(in_D1 + 0xd) = *(undefined2 *)(desc + 0x18);
-    *(undefined2 *)((int)in_D1 + 0x36) = *(undefined2 *)(desc + 0x1a);
-    sVar1 = *(short *)(desc + 0x1c);
-    *(short *)(in_D1 + 0xe) = sVar1;
-    if (sVar1 == 0) {
-      *(undefined2 *)(in_D1 + 0xe) = 1;
+    obj[6] = *(uint *)(desc + 2);
+    obj[7] = *(uint *)(desc + 6);
+    obj[8] = *(uint *)(desc + 10);
+    obj[3] = *(uint *)(desc + 0xe);
+    obj[5] = *(uint *)(desc + 0x12);
+    *(undefined2 *)(obj + 0xd) = *(undefined2 *)(desc + 0x18);
+    *(undefined2 *)((int)obj + 0x36) = *(undefined2 *)(desc + 0x1a);
+    word_38 = *(short *)(desc + 0x1c);
+    *(short *)(obj + 0xe) = word_38;
+    if (word_38 == 0) {
+      *(undefined2 *)(obj + 0xe) = 1;
     }
-    *(undefined2 *)((int)in_D1 + 0x3a) = *(undefined2 *)(desc + 0x1e);
-    *(undefined2 *)(in_D1 + 0x14) = *(undefined2 *)(desc + 0x20);
-    in_D1[0x10] = DAT_0001b838;
+    *(undefined2 *)((int)obj + 0x3a) = *(undefined2 *)(desc + 0x1e);
+    *(undefined2 *)(obj + 0x14) = *(undefined2 *)(desc + 0x20);
+    obj[0x10] = frame_counter;
   }
   else if (*desc == '\x03') {
-    in_D1 = heap_alloc_cleared(0x34); /* Original: FUN_00001b6c */
-    *(char *)in_D1 = *desc;
-    in_D1[6] = *(uint *)(desc + 2);
-    in_D1[7] = *(uint *)(desc + 6);
-    in_D1[8] = *(uint *)(desc + 10);
-    in_D1[3] = *(uint *)(desc + 0xe);
-    in_D1[5] = *(uint *)(desc + 0x12);
-    *(undefined2 *)(in_D1 + 0xb) = *(undefined2 *)(desc + 0x16);
-    in_D1[10] = (uint)desc; /* back-pointer to source descriptor */
-    *(undefined2 *)((int)in_D1 + 0x2e) = *(undefined2 *)(desc + 0x18);
+    obj = heap_alloc_cleared(0x34); /* Original: FUN_00001b6c */
+    *(char *)obj = *desc;
+    obj[6] = *(uint *)(desc + 2);
+    obj[7] = *(uint *)(desc + 6);
+    obj[8] = *(uint *)(desc + 10);
+    obj[3] = *(uint *)(desc + 0xe);
+    obj[5] = *(uint *)(desc + 0x12);
+    *(undefined2 *)(obj + 0xb) = *(undefined2 *)(desc + 0x16);
+    obj[10] = (uint)desc; /* back-pointer to source descriptor */
+    *(undefined2 *)((int)obj + 0x2e) = *(undefined2 *)(desc + 0x18);
   }
-  return in_D1;
+  return obj;
 }
 
 
@@ -7482,20 +7876,20 @@ uint * alloc_object_from_desc(char *desc) /* Original: FUN_000045ba */
  */
 uint * instantiate_object_from_desc(char *desc) /* Original: FUN_00004690 */
 {
-  uint *puVar1;
-  undefined4 *puVar2;
+  uint *obj; /* puVar1: alloc_object_from_desc result */
+  undefined4 *ctl; /* puVar2: controller from the definition factory (+6), stored at obj +8 */
   
-  puVar1 = alloc_object_from_desc(desc); /* Original: FUN_000045ba */
+  obj = alloc_object_from_desc(desc); /* Original: FUN_000045ba */
   if (desc[1] != '\0') {
     /* Call template factory at DAT_0001b524[type]+6 */
-    puVar2 = (undefined4 *)
-             (**(code **)(*(int *)(&DAT_0001b524 + desc[1] * 4) + 6))(puVar1,(int)desc[1],0);
-    puVar1[2] = (uint)puVar2; /* obj+8 */
-    if (puVar2 != (undefined4 *)0x0) {
-      *puVar2 = 0;
+    ctl = (undefined4 *)
+             (**(code **)(*(int *)(&template_ptr_table_base + desc[1] * 4) + 6))(obj,(int)desc[1],0);
+    obj[2] = (uint)ctl; /* obj+8 */
+    if (ctl != (undefined4 *)0x0) {
+      *ctl = 0;
     }
   }
-  return puVar1;
+  return obj;
 }
 
 
@@ -7535,49 +7929,49 @@ uint * instantiate_object_from_desc(char *desc) /* Original: FUN_00004690 */
  * CCR alone), so a non-null handle gets *handle = 0 and words +0x20 / +0x22 / +0x24 = record
  * words +2 / +4 / +6. Then 0x435a apply_entity_mission_rates(obj, 1); metric (0x3b98) - long
  * +0xc <= 0x19c7f -> 0x4e6e activate_near_range_object, else DAT_0001d0e4[DAT_0001c1dc++]. */
-void instantiate_mission_pool_slot(uint param_1,int param_2,int param_3) /* Original: FUN_000046da */
+void instantiate_mission_pool_slot(uint root /* param_1: root object (+0x28 template, +0x2c word, +0x30 slot table) */,int type /* param_2: template record index */,int slot /* param_3: slot index in the root's +0x30 table */) /* Original: FUN_000046da */
 {
-  uint *puVar1;
-  undefined4 *puVar2;
-  int iVar3;
-  char *pcVar4;
-  
-  pcVar4 = (char *)(*(int *)(DAT_0001b5a0 + 0x8c) +
-                   *(int *)(*(int *)(param_1 + 0x28) + param_2 * 0x18 + 0x2e));
-  puVar1 = alloc_object_from_desc(pcVar4); /* Original: FUN_000045ba */
-  *(uint **)(*(int *)(param_1 + 0x30) + 0x14 + param_3 * 0x18) = puVar1;
-  puVar1[9] = param_1; /* +0x24 = mission root */
-  *(char *)((int)puVar1 + 1) = (char)param_2;
-  *(char *)((int)puVar1 + 2) = (char)param_3;
-  if (param_3 == param_2) {
-    *(char *)((int)puVar1 + 3) = *(char *)((int)puVar1 + 3) + '\x01';
+  uint *obj; /* puVar1: new object */
+  undefined4 *ctl; /* puVar2: controller from the class factory (+6) */
+  int work; /* iVar3: slot record, then the camera metric */
+  char *desc; /* pcVar4: object descriptor */
+
+  desc = (char *)(*(int *)(host_world + 0x8c) +
+                   *(int *)(*(int *)(root + 0x28) + type * 0x18 + 0x2e));
+  obj = alloc_object_from_desc(desc); /* Original: FUN_000045ba */
+  *(uint **)(*(int *)(root + 0x30) + 0x14 + slot * 0x18) = obj;
+  obj[9] = root; /* +0x24 = mission root */
+  *(char *)((int)obj + 1) = (char)type;
+  *(char *)((int)obj + 2) = (char)slot;
+  if (slot == type) {
+    *(char *)((int)obj + 3) = *(char *)((int)obj + 3) + '\x01';
   }
-  if (param_2 < *(short *)(param_1 + 0x2c)) {
-    puVar1[1] = puVar1[1] | 1;
+  if (type < *(short *)(root + 0x2c)) {
+    obj[1] = obj[1] | 1;
   }
-  apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)puVar1,1,(uint *)0x0,(uint *)0x0);
-  if (pcVar4[1] != '\0') {
-    puVar2 = (undefined4 *)
-             (**(code **)(*(int *)(&DAT_0001b524 + pcVar4[1] * 4) + 6))
-                       (puVar1,(int)pcVar4[1],
-                        (int)*(short *)(*(int *)(param_1 + 0x30) + param_3 * 0x18));
-    puVar1[2] = (uint)puVar2; /* entity handle at +8 */
-    iVar3 = *(int *)(param_1 + 0x30) + param_3 * 0x18;
-    if (puVar2 != (undefined4 *)0x0) {
-      *puVar2 = 0;
-      *(undefined2 *)(puVar1[2] + 0x20) = *(undefined2 *)(iVar3 + 2);
-      *(undefined2 *)(puVar1[2] + 0x22) = *(undefined2 *)(iVar3 + 4);
-      *(undefined2 *)(puVar1[2] + 0x24) = *(undefined2 *)(iVar3 + 6);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)obj,1,(uint *)0x0,(uint *)0x0);
+  if (desc[1] != '\0') {
+    ctl = (undefined4 *)
+             (**(code **)(*(int *)(&template_ptr_table_base + desc[1] * 4) + 6))
+                       (obj,(int)desc[1],
+                        (int)*(short *)(*(int *)(root + 0x30) + slot * 0x18));
+    obj[2] = (uint)ctl; /* entity handle at +8 */
+    work = *(int *)(root + 0x30) + slot * 0x18;
+    if (ctl != (undefined4 *)0x0) {
+      *ctl = 0;
+      *(undefined2 *)(obj[2] + 0x20) = *(undefined2 *)(work + 2);
+      *(undefined2 *)(obj[2] + 0x22) = *(undefined2 *)(work + 4);
+      *(undefined2 *)(obj[2] + 0x24) = *(undefined2 *)(work + 6);
     }
   }
-  apply_entity_mission_rates((char *)puVar1,1); /* Original: FUN_0000435a */
-  iVar3 = update_object_camera_metric( /* Original: FUN_00003b98 */(int)puVar1);
-  if ((int)(iVar3 - puVar1[3]) < 0x19c80) {
-    activate_near_range_object( /* Original: FUN_00004e6e */(char *)puVar1);
+  apply_entity_mission_rates((char *)obj,1); /* Original: FUN_0000435a */
+  work = update_object_camera_metric( /* Original: FUN_00003b98 */(int)obj);
+  if ((int)(work - obj[3]) < 0x19c80) {
+    activate_near_range_object( /* Original: FUN_00004e6e */(char *)obj);
   }
   else {
-    (&DAT_0001d0e4)[DAT_0001c1dc] = puVar1;
-    DAT_0001c1dc = DAT_0001c1dc + 1;
+    (&entity_array_3)[entity_array_3_count] = obj;
+    entity_array_3_count = entity_array_3_count + 1;
   }
   return;
 }
@@ -7633,54 +8027,54 @@ void instantiate_mission_pool_slot(uint param_1,int param_2,int param_3) /* Orig
  * source += 0xe + 2 * count; trailer words 0..word +0x38 - 1; move.w #1 $1daa2); identical
  * to the C.
  */
-void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004808 */
+void build_object_poly_buffers(int obj /* param_1: object (face count +0x3a, +0x38 count, flags +6) */,uint *src /* param_2: packed face stream */) /* Original: FUN_00004808 */
 {
-  uint *puVar1;
-  uint *puVar2;
-  int iVar3;
-  int iVar4;
-  undefined2 *puVar5;
-  uint *puVar6;
+  uint *face; /* puVar1: 0x20-byte face record */
+  uint *indices; /* puVar2: heap_alloc(count * 2) index array, face +0x18 */
+  int k; /* iVar3: index position */
+  int i; /* iVar4: buffer size, then face index / snapshot index */
+  undefined2 *idx_src; /* puVar5: index word cursor (source, then the snapshot list) */
+  uint *count_field; /* puVar6: face +0x14 index count word */
   
   /* Size primary poly table; optional flag-bit1 trailer space */
-  iVar4 = *(short *)(param_1 + 0x3a) * 0x20;
-  if ((*(byte *)(param_1 + 6) & 2) != 0) {
-    iVar4 = *(short *)(param_1 + 0x3a) * 6 + *(short *)(param_1 + 0x38) * 2 + iVar4;
+  i = *(short *)(obj + 0x3a) * 0x20;
+  if ((*(byte *)(obj + 6) & 2) != 0) {
+    i = *(short *)(obj + 0x3a) * 6 + *(short *)(obj + 0x38) * 2 + i;
   }
-  puVar1 = heap_alloc(iVar4); /* Original: FUN_00001a68 */
-  *(uint **)(param_1 + 0x48) = puVar1;
-  puVar6 = puVar1 + 5; /* → record +0x14 (index count) */
-  for (iVar4 = 0; iVar4 < *(short *)(param_1 + 0x3a); iVar4 = iVar4 + 1) {
-    puVar1[2] = 0;
-    puVar1[3] = *param_2;
-    *(undefined1 *)(puVar1 + 4) = *(undefined1 *)(param_2 + 1);
-    *(undefined1 *)((int)puVar1 + 0x11) = *(undefined1 *)((int)param_2 + 5);
-    *(undefined1 *)((int)puVar1 + 0x12) = *(undefined1 *)((int)param_2 + 6);
-    *(undefined1 *)((int)puVar1 + 0x13) = *(undefined1 *)((int)param_2 + 7);
-    *(ushort *)puVar6 = (ushort)*(byte *)(param_2 + 2);
-    *(byte *)((int)puVar1 + 0x16) = *(byte *)((int)param_2 + 9) & 0xf0;
-    *(byte *)((int)puVar1 + 0x17) = *(byte *)((int)param_2 + 9) & 0xf;
-    puVar1[7] = *(uint *)((int)param_2 + 10);
-    puVar2 = heap_alloc((int)*(short *)puVar6 << 1);
-    puVar1[6] = (uint)puVar2; /* poly +0x18 index array */
-    puVar5 = (undefined2 *)((int)param_2 + 0xe);
-    for (iVar3 = 0; iVar3 < *(short *)puVar6; iVar3 = iVar3 + 1) {
-      *(undefined2 *)(puVar1[6] + iVar3 * 2) = *puVar5;
-      puVar5 = puVar5 + 1;
+  face = heap_alloc(i); /* Original: FUN_00001a68 */
+  *(uint **)(obj + 0x48) = face;
+  count_field = face + 5; /* → record +0x14 (index count) */
+  for (i = 0; i < *(short *)(obj + 0x3a); i = i + 1) {
+    face[2] = 0;
+    face[3] = *src;
+    *(undefined1 *)(face + 4) = *(undefined1 *)(src + 1);
+    *(undefined1 *)((int)face + 0x11) = *(undefined1 *)((int)src + 5);
+    *(undefined1 *)((int)face + 0x12) = *(undefined1 *)((int)src + 6);
+    *(undefined1 *)((int)face + 0x13) = *(undefined1 *)((int)src + 7);
+    *(ushort *)count_field = (ushort)*(byte *)(src + 2);
+    *(byte *)((int)face + 0x16) = *(byte *)((int)src + 9) & 0xf0;
+    *(byte *)((int)face + 0x17) = *(byte *)((int)src + 9) & 0xf;
+    face[7] = *(uint *)((int)src + 10);
+    indices = heap_alloc((int)*(short *)count_field << 1);
+    face[6] = (uint)indices; /* poly +0x18 index array */
+    idx_src = (undefined2 *)((int)src + 0xe);
+    for (k = 0; k < *(short *)count_field; k = k + 1) {
+      *(undefined2 *)(face[6] + k * 2) = *idx_src;
+      idx_src = idx_src + 1;
     }
-    param_2 = (uint *)((undefined2 *)((int)param_2 + 0xe) + *(short *)puVar6);
-    puVar6 = puVar6 + 8; /* +0x20 */
-    puVar1 = puVar1 + 8;
+    src = (uint *)((undefined2 *)((int)src + 0xe) + *(short *)count_field);
+    count_field = count_field + 8; /* +0x20 */
+    face = face + 8;
   }
-  if ((*(byte *)(param_1 + 6) & 2) != 0) {
+  if ((*(byte *)(obj + 6) & 2) != 0) {
     /* Trailer: sequential u16 0..field_38-1 after poly records */
-    puVar5 = (undefined2 *)(*(int *)(param_1 + 0x48) + *(short *)(param_1 + 0x3a) * 0x20);
-    for (iVar4 = 0; iVar4 < *(short *)(param_1 + 0x38); iVar4 = iVar4 + 1) {
-      *puVar5 = (short)iVar4;
-      puVar5 = puVar5 + 1;
+    idx_src = (undefined2 *)(*(int *)(obj + 0x48) + *(short *)(obj + 0x3a) * 0x20);
+    for (i = 0; i < *(short *)(obj + 0x38); i = i + 1) {
+      *idx_src = (short)i;
+      idx_src = idx_src + 1;
     }
   }
-  _DAT_0001daa2 = 1;
+  palette_changed = 1;
   return;
 }
 
@@ -7694,23 +8088,23 @@ void build_object_poly_buffers(int param_1,uint *param_2) /* Original: FUN_00004
  * count) face +4 = sext word host +0x88 table [param_2] and byte +0xf = 0xff; identical to
  * the C.
  */
-void set_object_faces_bw_pattern /* Original: FUN_00004916 */ (int param_1,int param_2)
+void set_object_faces_bw_pattern /* Original: FUN_00004916 */ (int obj /* param_1: object (faces at *(+0x48), count +0x3a) */,int level /* param_2: index into the host pattern table (+0x88) */)
 
 {
-  int iVar1;
-  short sVar2;
-  int iVar3;
+  int host; /* iVar1: host_world copy */
+  short i; /* sVar2: face index */
+  int face; /* iVar3: 0x20-byte face record */
   
-  iVar1 = DAT_0001b5a0;
-  iVar3 = *(int *)(param_1 + 0x48);
-  sVar2 = 0;
-  if (0 < *(short *)(param_1 + 0x3a)) {
+  host = host_world;
+  face = *(int *)(obj + 0x48);
+  i = 0;
+  if (0 < *(short *)(obj + 0x3a)) {
     do {
-      *(int *)(iVar3 + 4) = (int)*(short *)(*(int *)(iVar1 + 0x88) + param_2 * 2);
-      *(undefined1 *)(iVar3 + 0xf) = 0xff;
-      iVar3 = iVar3 + 0x20;
-      sVar2 = sVar2 + 1;
-    } while (sVar2 < *(short *)(param_1 + 0x3a));
+      *(int *)(face + 4) = (int)*(short *)(*(int *)(host + 0x88) + level * 2);
+      *(undefined1 *)(face + 0xf) = 0xff;
+      face = face + 0x20;
+      i = i + 1;
+    } while (i < *(short *)(obj + 0x3a));
   }
   return;
 }
@@ -7724,61 +8118,61 @@ void set_object_faces_bw_pattern /* Original: FUN_00004916 */ (int param_1,int p
  * disassembly (section checks in the body); identical to the C with the reconstructed
  * approx_dist3_xyz arguments and the LAB_00001b86_2 = heap_realloc_grow_only resolution.
  */
-void build_land_outline_at_detail /* Original: FUN_00004958 */ (int param_1,undefined4 param_2,short param_3,short param_4)
+void build_land_outline_at_detail /* Original: FUN_00004958 */ (int obj /* param_1: land object */,undefined4 range /* param_2: stored at obj +0x14 */,short shift /* param_3: outline coordinate shift */,short limit /* param_4: clip rectangle half-size */)
 
 {
-  uint uVar1;
-  uint uVar2;
-  int iVar3;
-  undefined2 uVar4;
-  undefined2 uVar5;
-  uint *puVar6;
-  short sVar8;
-  undefined4 uVar7;
-  short sVar9;
-  short sVar10;
-  uint uVar11;
-  short sVar12;
-  short sVar13;
-  short sVar14;
-  int iVar15;
-  int iVar16;
-  int *piVar17;
-  int *piVar18;
-  int iVar19;
+  uint vx; /* uVar1: vertex x */
+  uint vz; /* uVar2: vertex z */
+  int pz; /* iVar3: clipped point z, scaled back */
+  undefined2 saved_bound; /* uVar4: clip bound saved around a clip */
+  undefined2 saved_bound2; /* uVar5: clip bound saved around a clip */
+  uint *indices; /* puVar6: grown face index array (+0x18) */
+  short left; /* sVar8: unique-vertex search countdown */
+  undefined4 grown; /* uVar7: heap_realloc_grow_only result */
+  short count; /* sVar9: face vertex index, then the outline point count */
+  short k; /* sVar10: clipped point index */
+  uint shift_u; /* uVar11: param_3, then the detail size value */
+  short work; /* sVar12: vertex index / host +0xa8 level / detail shift */
+  short face_i; /* sVar13: face index */
+  short unique; /* sVar14: unique vertex count */
+  int u; /* iVar15: new unique index */
+  int work2; /* iVar16: vertex index / distance / clipped point x */
+  int *vert; /* piVar17: object vertex */
+  int *cursor; /* piVar18: point cursor */
+  int work3; /* iVar19: template record / skipped distance sum / face record / buffer size */
   int aiStackY_61be4 [804];
   int aiStackY_60f54 [33468];
   int aiStackY_40464 [64008];
-  uint *local_1bf0;
-  int local_1be4 [384];
-  uint auStack_15e4 [420];
-  int local_f54 [420];
-  int aiStack_8c4 [280];
-  int local_464 [280];
-  
-  iVar19 = *(int *)(DAT_0001b5a0 + 0x8c) +
-           *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
-                   (uint)*(byte *)(param_1 + 1) * 0x18);
-  sVar12 = 0;
-  if (0 < *(short *)(param_1 + 0x3a)) {
+  uint *face_src; /* local_1bf0: template face record */
+  int rel_pts [384]; /* local_1be4: normal points relative to vertex 0 */
+  uint xf_verts [420]; /* auStack_15e4: chain-transformed template vertices */
+  int unique_pts [420]; /* local_f54: unique outline vertices (x, 0, z) */
+  int clip_buf [280]; /* aiStack_8c4: clipper scratch */
+  int outline [280]; /* local_464: face outline (x, z) pairs */
+
+  work3 = *(int *)(host_world + 0x8c) +
+           *(int *)(*(int *)(*(int *)(obj + 0x24) + 0x28) + 0x2e +
+                   (uint)*(byte *)(obj + 1) * 0x18);
+  work = 0;
+  if (0 < *(short *)(obj + 0x3a)) {
     do {
-      iVar16 = (int)sVar12;
-      piVar18 = local_1be4 + iVar16 * 3;
-      piVar17 = (int *)((iVar16 + *(short *)(param_1 + 0x36)) * 0xc + *(int *)(param_1 + 0x44));
-      *piVar18 = *piVar17;
-      local_1be4[iVar16 * 3 + 1] = piVar17[1];
-      local_1be4[iVar16 * 3 + 2] = piVar17[2];
-      *piVar18 = *piVar18 - **(int **)(param_1 + 0x44);
-      local_1be4[iVar16 * 3 + 1] =
-           local_1be4[iVar16 * 3 + 1] - *(int *)(*(int *)(param_1 + 0x44) + 4);
-      local_1be4[iVar16 * 3 + 2] =
-           local_1be4[iVar16 * 3 + 2] - *(int *)(*(int *)(param_1 + 0x44) + 8);
-      sVar12 = sVar12 + 1;
-    } while (sVar12 < *(short *)(param_1 + 0x3a));
+      work2 = (int)work;
+      cursor = rel_pts + work2 * 3;
+      vert = (int *)((work2 + *(short *)(obj + 0x36)) * 0xc + *(int *)(obj + 0x44));
+      *cursor = *vert;
+      rel_pts[work2 * 3 + 1] = vert[1];
+      rel_pts[work2 * 3 + 2] = vert[2];
+      *cursor = *cursor - **(int **)(obj + 0x44);
+      rel_pts[work2 * 3 + 1] =
+           rel_pts[work2 * 3 + 1] - *(int *)(*(int *)(obj + 0x44) + 4);
+      rel_pts[work2 * 3 + 2] =
+           rel_pts[work2 * 3 + 2] - *(int *)(*(int *)(obj + 0x44) + 8);
+      work = work + 1;
+    } while (work < *(short *)(obj + 0x3a));
   }
-  local_1bf0 = (uint *)(iVar19 + 0x22) +
-               *(short *)(iVar19 + 0x1a) * 3 + *(short *)(iVar19 + 0x1e) * 3;
-  apply_template_chain_xform( /* Original: FUN_00002bd8 */param_1,(int)*(short *)(iVar19 + 0x1a),(uint *)(iVar19 + 0x22),auStack_15e4);
+  face_src = (uint *)(work3 + 0x22) +
+               *(short *)(work3 + 0x1a) * 3 + *(short *)(work3 + 0x1e) * 3;
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */obj,(int)*(short *)(work3 + 0x1a),(uint *)(work3 + 0x22),xf_verts);
   /* Section check 0x4958..0x4a44 (part 1) [PROVEN, matches the C]: template record =
    * long (*(obj +0x24) +0x28) + 0x2e + 24 * byte obj +1 (movea.l $14(a0,a1.l*8) after
    * a0 = .. + 0x1a, a1 = 3 * byte; index scale decoded by hand) + long (DAT_0001b5a0 +0x8c).
@@ -7787,25 +8181,25 @@ void build_land_outline_at_detail /* Original: FUN_00004958 */ (int param_1,unde
    * 12 * word rec +0x1a + 12 * word rec +0x1e; bsr.l 0x2bd8 apply_template_chain_xform(obj,
    * sext word rec +0x1a, rec + 0x22, auStack_15e4). sVar12 + 3 is precomputed as a word
    * (addq.w) from word DAT_0001b5a0 +0xa8; param_4 is kept at a6 - 0x1be2. */
-  sVar14 = 0;
-  sVar12 = *(short *)(DAT_0001b5a0 + 0xa8);
-  sVar13 = 0;
-  if (0 < *(short *)(param_1 + 0x3a)) {
-    uVar11 = (uint)param_3;
+  unique = 0;
+  work = *(short *)(host_world + 0xa8);
+  face_i = 0;
+  if (0 < *(short *)(obj + 0x3a)) {
+    shift_u = (uint)shift;
     do {
-      piVar18 = local_464;
-      iVar19 = 0;
-      for (sVar9 = 0; uVar5 = DAT_00020aee, sVar9 < (short)(ushort)*(byte *)(local_1bf0 + 2);
-          sVar9 = sVar9 + 1) {
-        iVar16 = (int)*(short *)((int)local_1bf0 + sVar9 * 2 + 0xe);
-        uVar1 = auStack_15e4[iVar16 * 3];
-        uVar2 = auStack_15e4[iVar16 * 3 + 2];
-        if (sVar9 == 0) {
+      cursor = outline;
+      work3 = 0;
+      for (count = 0; saved_bound2 = clip_x_min, count < (short)(ushort)*(byte *)(face_src + 2);
+          count = count + 1) {
+        work2 = (int)*(short *)((int)face_src + count * 2 + 0xe);
+        vx = xf_verts[work2 * 3];
+        vz = xf_verts[work2 * 3 + 2];
+        if (count == 0) {
 LAB_00004aee:
-          iVar19 = 0;
-          *piVar18 = (int)(uVar1 - DAT_0001d724) >> (uVar11 & 0x3f);
-          piVar18[1] = (int)(uVar2 - DAT_0001d71c) >> (uVar11 & 0x3f);
-          piVar18 = piVar18 + 2;
+          work3 = 0;
+          *cursor = (int)(vx - detail_ref_x) >> (shift_u & 0x3f);
+          cursor[1] = (int)(vz - detail_ref_z) >> (shift_u & 0x3f);
+          cursor = cursor + 2;
         }
         else {
           /* Dropped call arguments [PROVEN, 0x4aae..0x4ada]: the first call is
@@ -7815,43 +8209,43 @@ LAB_00004aee:
            * kept vertex. The second is approx_dist3_xyz(DAT_0001d838, 0, DAT_0001d830, uVar1, 0,
            * uVar2): horizontal distance to the camera; the vertex is kept when
            * camera_distance / (sVar12 + 3) <= iVar19 (divs.l, signed). */
-          iVar16 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
-          iVar19 = iVar16 + iVar19;
-          iVar16 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
-          if (iVar16 / (int)(short)(sVar12 + 3) <= iVar19) goto LAB_00004aee;
+          work2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+          work3 = work2 + work3;
+          work2 = approx_dist3_xyz( /* Original: FUN_00003c68 */);
+          if (work2 / (int)(short)(work + 3) <= work3) goto LAB_00004aee;
         }
       }
-      sVar9 = (short)((int)piVar18 - (int)local_464 >> 3);
-      if (sVar9 < 3) {
-        sVar9 = 0;
-        DAT_00020aee = uVar5;
+      count = (short)((int)cursor - (int)outline >> 3);
+      if (count < 3) {
+        count = 0;
+        clip_x_min = saved_bound2;
       }
       else {
-        DAT_00020aee = -param_4;
-        iVar19 = clip_polygon_x_min(local_464,(int)sVar9,aiStack_8c4);
-        uVar4 = DAT_00020aec;
-        sVar9 = 0;
-        DAT_00020aec = uVar4;
-        DAT_00020aee = uVar5;
-        if ((short)iVar19 != 0) {
-          DAT_00020aec = param_4;
-          iVar19 = clip_polygon_x_max(aiStack_8c4,(int)(short)iVar19,local_464);
-          uVar5 = DAT_00020aea;
-          sVar9 = 0;
-          DAT_00020aea = uVar5;
-          DAT_00020aec = uVar4;
-          if ((short)iVar19 != 0) {
-            DAT_00020aea = -param_4;
-            iVar19 = clip_polygon_y_min(local_464,(int)(short)iVar19,aiStack_8c4);
-            uVar4 = DAT_0001b73e;
-            sVar9 = 0;
-            DAT_0001b73e = uVar4;
-            DAT_00020aea = uVar5;
-            if ((short)iVar19 != 0) {
-              DAT_0001b73e = param_4;
-              iVar19 = clip_polygon_y_max(aiStack_8c4,(int)(short)iVar19,local_464);
-              sVar9 = (short)iVar19;
-              DAT_0001b73e = uVar4;
+        clip_x_min = -limit;
+        work3 = clip_polygon_x_min(outline,(int)count,clip_buf);
+        saved_bound = clip_x_max;
+        count = 0;
+        clip_x_max = saved_bound;
+        clip_x_min = saved_bound2;
+        if ((short)work3 != 0) {
+          clip_x_max = limit;
+          work3 = clip_polygon_x_max(clip_buf,(int)(short)work3,outline);
+          saved_bound2 = clip_y_min;
+          count = 0;
+          clip_y_min = saved_bound2;
+          clip_x_max = saved_bound;
+          if ((short)work3 != 0) {
+            clip_y_min = -limit;
+            work3 = clip_polygon_y_min(outline,(int)(short)work3,clip_buf);
+            saved_bound = clip_y_max;
+            count = 0;
+            clip_y_max = saved_bound;
+            clip_y_min = saved_bound2;
+            if ((short)work3 != 0) {
+              clip_y_max = limit;
+              work3 = clip_polygon_y_max(clip_buf,(int)(short)work3,outline);
+              count = (short)work3;
+              clip_y_max = saved_bound;
             }
           }
         }
@@ -7866,38 +8260,38 @@ LAB_00004aee:
        * DAT_00020aec = param_4 for clip_polygon_x_max (0xb242, back to local_464),
        * DAT_00020aea = -param_4 for clip_polygon_y_min (0xb2f4); a zero count skips the rest.
        * Ghidra's uVar4 / uVar5 shuffles are exactly this save / restore. */
-      iVar19 = *(int *)(param_1 + 0x48) + sVar13 * 0x20;
-      if (sVar9 == 0) {
-        *(byte *)(iVar19 + 0x13) = *(byte *)(iVar19 + 0x13) | 2;
+      work3 = *(int *)(obj + 0x48) + face_i * 0x20;
+      if (count == 0) {
+        *(byte *)(work3 + 0x13) = *(byte *)(work3 + 0x13) | 2;
       }
       else {
-        *(short *)(iVar19 + 0x14) = sVar9;
-        *(byte *)(iVar19 + 0x13) = *(byte *)(iVar19 + 0x13) & 0xfd;
-        puVar6 = heap_realloc_grow_only( /* Original: FUN_00001ba8 */*(uint **)(iVar19 + 0x18),(undefined4 *)((int)sVar9 << 1));
-        *(uint **)(iVar19 + 0x18) = puVar6;
-        sVar10 = 0;
-        if (0 < sVar9) {
+        *(short *)(work3 + 0x14) = count;
+        *(byte *)(work3 + 0x13) = *(byte *)(work3 + 0x13) & 0xfd;
+        indices = heap_realloc_grow_only( /* Original: FUN_00001ba8 */*(uint **)(work3 + 0x18),(undefined4 *)((int)count << 1));
+        *(uint **)(work3 + 0x18) = indices;
+        k = 0;
+        if (0 < count) {
           do {
-            iVar16 = DAT_0001d724 + (local_464[sVar10 * 2] << (uVar11 & 0x3f));
-            iVar3 = DAT_0001d71c + (local_464[sVar10 * 2 + 1] << (uVar11 & 0x3f));
-            piVar18 = local_f54;
-            sVar8 = sVar14;
-            while (sVar8 = sVar8 + -1, sVar8 != -1) {
-              if ((iVar16 == *piVar18) && (iVar3 == piVar18[2])) {
-                *(short *)(*(int *)(iVar19 + 0x18) + sVar10 * 2) = (sVar14 - sVar8) + -1;
+            work2 = detail_ref_x + (outline[k * 2] << (shift_u & 0x3f));
+            pz = detail_ref_z + (outline[k * 2 + 1] << (shift_u & 0x3f));
+            cursor = unique_pts;
+            left = unique;
+            while (left = left + -1, left != -1) {
+              if ((work2 == *cursor) && (pz == cursor[2])) {
+                *(short *)(*(int *)(work3 + 0x18) + k * 2) = (unique - left) + -1;
                 goto LAB_00004cb8;
               }
-              piVar18 = piVar18 + 3;
+              cursor = cursor + 3;
             }
-            iVar15 = (int)sVar14;
-            local_f54[iVar15 * 3] = iVar16;
-            local_f54[iVar15 * 3 + 1] = 0;
-            local_f54[iVar15 * 3 + 2] = iVar3;
-            *(short *)(*(int *)(iVar19 + 0x18) + sVar10 * 2) = sVar14;
-            sVar14 = sVar14 + 1;
+            u = (int)unique;
+            unique_pts[u * 3] = work2;
+            unique_pts[u * 3 + 1] = 0;
+            unique_pts[u * 3 + 2] = pz;
+            *(short *)(*(int *)(work3 + 0x18) + k * 2) = unique;
+            unique = unique + 1;
 LAB_00004cb8:
-            sVar10 = sVar10 + 1;
-          } while (sVar10 < sVar9);
+            k = k + 1;
+          } while (k < count);
         }
       }
       /* Section check 0x4bd0..0x4cbc (part 3) [PROVEN, matches the C]: DAT_0001b73e = param_4
@@ -7909,62 +8303,62 @@ LAB_00004cb8:
        * stores sVar14 - remaining - 1, a miss appends (x, 0, z) and stores the new index.
        * There is no bound check on sVar14 against the local_f54 frame array (UNRESOLVED
        * whether real data can exceed it). */
-      local_1bf0 = (uint *)((int)local_1bf0 + (uint)*(byte *)(local_1bf0 + 2) * 2 + 0xe);
-      sVar13 = sVar13 + 1;
-    } while (sVar13 < *(short *)(param_1 + 0x3a));
+      face_src = (uint *)((int)face_src + (uint)*(byte *)(face_src + 2) * 2 + 0xe);
+      face_i = face_i + 1;
+    } while (face_i < *(short *)(obj + 0x3a));
   }
-  if (sVar14 == 0) {
-    *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x40;
+  if (unique == 0) {
+    *(uint *)(obj + 4) = *(uint *)(obj + 4) | 0x40;
   }
   else {
-    *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) & 0xffffffbf;
-    *(short *)(param_1 + 0x36) = sVar14;
-    iVar19 = (short)(*(short *)(param_1 + 0x3a) + sVar14) * 0xc;
+    *(uint *)(obj + 4) = *(uint *)(obj + 4) & 0xffffffbf;
+    *(short *)(obj + 0x36) = unique;
+    work3 = (short)(*(short *)(obj + 0x3a) + unique) * 0xc;
     /* LAB_00001b86_2 = heap_realloc_grow_only (lea.l $1b88.l is a RUNTIME address = file
      * 0x1ba8) [PROVEN, 0x4d0c]; size = sext word (sVar14 + word +0x3a) * 12. */
-    uVar7 = (*(code *)&LAB_00001b86_2)(*(undefined4 *)(param_1 + 0x4c),iVar19);
-    *(undefined4 *)(param_1 + 0x4c) = uVar7;
-    uVar7 = (*(code *)&LAB_00001b86_2)(*(undefined4 *)(param_1 + 0x44),iVar19);
-    *(undefined4 *)(param_1 + 0x44) = uVar7;
-    sVar12 = 0;
-    if (0 < sVar14) {
+    grown = (*(code *)&LAB_00001b86_2)(*(undefined4 *)(obj + 0x4c),work3);
+    *(undefined4 *)(obj + 0x4c) = grown;
+    grown = (*(code *)&LAB_00001b86_2)(*(undefined4 *)(obj + 0x44),work3);
+    *(undefined4 *)(obj + 0x44) = grown;
+    work = 0;
+    if (0 < unique) {
       do {
-        iVar19 = (int)sVar12;
-        piVar18 = (int *)(iVar19 * 0xc + *(int *)(param_1 + 0x44));
-        *piVar18 = local_f54[iVar19 * 3];
-        piVar18[1] = local_f54[iVar19 * 3 + 1];
-        piVar18[2] = local_f54[iVar19 * 3 + 2];
-        sVar12 = sVar12 + 1;
-      } while (sVar12 < sVar14);
+        work3 = (int)work;
+        cursor = (int *)(work3 * 0xc + *(int *)(obj + 0x44));
+        *cursor = unique_pts[work3 * 3];
+        cursor[1] = unique_pts[work3 * 3 + 1];
+        cursor[2] = unique_pts[work3 * 3 + 2];
+        work = work + 1;
+      } while (work < unique);
     }
-    sVar12 = 0;
-    if (0 < *(short *)(param_1 + 0x3a)) {
+    work = 0;
+    if (0 < *(short *)(obj + 0x3a)) {
       do {
-        iVar19 = (int)sVar12;
-        piVar18 = local_1be4 + iVar19 * 3;
-        *piVar18 = **(int **)(param_1 + 0x44) + *piVar18;
-        local_1be4[iVar19 * 3 + 1] =
-             *(int *)(*(int *)(param_1 + 0x44) + 4) + local_1be4[iVar19 * 3 + 1];
-        local_1be4[iVar19 * 3 + 2] =
-             *(int *)(*(int *)(param_1 + 0x44) + 8) + local_1be4[iVar19 * 3 + 2];
-        piVar17 = (int *)((iVar19 + *(short *)(param_1 + 0x36)) * 0xc + *(int *)(param_1 + 0x44));
-        *piVar17 = *piVar18;
-        piVar17[1] = local_1be4[iVar19 * 3 + 1];
-        piVar17[2] = local_1be4[iVar19 * 3 + 2];
-        sVar12 = sVar12 + 1;
-      } while (sVar12 < *(short *)(param_1 + 0x3a));
+        work3 = (int)work;
+        cursor = rel_pts + work3 * 3;
+        *cursor = **(int **)(obj + 0x44) + *cursor;
+        rel_pts[work3 * 3 + 1] =
+             *(int *)(*(int *)(obj + 0x44) + 4) + rel_pts[work3 * 3 + 1];
+        rel_pts[work3 * 3 + 2] =
+             *(int *)(*(int *)(obj + 0x44) + 8) + rel_pts[work3 * 3 + 2];
+        vert = (int *)((work3 + *(short *)(obj + 0x36)) * 0xc + *(int *)(obj + 0x44));
+        *vert = *cursor;
+        vert[1] = rel_pts[work3 * 3 + 1];
+        vert[2] = rel_pts[work3 * 3 + 2];
+        work = work + 1;
+      } while (work < *(short *)(obj + 0x3a));
     }
   }
-  *(int *)(param_1 + 0x18) = DAT_0001d724;
-  *(int *)(param_1 + 0x20) = DAT_0001d71c;
-  *(undefined4 *)(param_1 + 0x14) = param_2;
-  update_object_camera_metric( /* Original: FUN_00003b98 */param_1);
-  sVar12 = 0;
-  for (uVar11 = *(int *)(param_1 + 0x14) +
-                *(int *)(param_1 + 0x10) + (*(int *)(param_1 + 0x10) >> 2) <<
-                ((int)*(short *)(param_1 + 0x34) & 0x3fU); (uVar11 & 0xffff8000) != 0;
-      uVar11 = (int)uVar11 >> 1) {
-    sVar12 = sVar12 + 1;
+  *(int *)(obj + 0x18) = detail_ref_x;
+  *(int *)(obj + 0x20) = detail_ref_z;
+  *(undefined4 *)(obj + 0x14) = range;
+  update_object_camera_metric( /* Original: FUN_00003b98 */obj);
+  work = 0;
+  for (shift_u = *(int *)(obj + 0x14) +
+                *(int *)(obj + 0x10) + (*(int *)(obj + 0x10) >> 2) <<
+                ((int)*(short *)(obj + 0x34) & 0x3fU); (shift_u & 0xffff8000) != 0;
+      shift_u = (int)shift_u >> 1) {
+    work = work + 1;
   }
   /* Section check 0x4cbe..0x4e04 (part 4) [PROVEN, matches the C]: next face record =
    * (rec + 0xe) + 2 * byte rec +8; no unique vertex -> long +4 |= 0x40 (hidden); else long
@@ -7974,7 +8368,7 @@ LAB_00004cb8:
    * update_object_camera_metric. Detail shift: andi.w #$8000 leaves the high word, so the
    * tst.l is exactly (v & 0xffff8000) != 0; asr.l is arithmetic, so a negative v would never
    * reach 0 (same in the C; UNRESOLVED whether +0x10 / +0x14 can be negative here). */
-  *(short *)(param_1 + 0x32) = sVar12;
+  *(short *)(obj + 0x32) = work;
   return;
 }
 
@@ -7989,20 +8383,20 @@ LAB_00004cb8:
  * decoded by hand) + long (DAT_0001b5a0 +0x8c); longs +2 / +6 / +0xa / +0x12 copied to
  * +0x18 / +0x1c / +0x20 / +0x14; bsr.l 0x2bd8 apply_template_chain_xform(obj, 1, 0, 0).
  */
-void reset_object_to_template_pose /* Original: FUN_00004e06 */ (int param_1)
+void reset_object_to_template_pose /* Original: FUN_00004e06 */ (int obj /* param_1: object */)
 
 {
-  int iVar1;
+  int desc; /* iVar1: object's template descriptor (position +2..+0xa, range +0x12) */
   
-  if ((*(byte *)(param_1 + 7) & 2) == 0) {
-    iVar1 = *(int *)(DAT_0001b5a0 + 0x8c) +
-            *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
-                    (uint)*(byte *)(param_1 + 1) * 0x18);
-    *(undefined4 *)(param_1 + 0x18) = *(undefined4 *)(iVar1 + 2);
-    *(undefined4 *)(param_1 + 0x1c) = *(undefined4 *)(iVar1 + 6);
-    *(undefined4 *)(param_1 + 0x20) = *(undefined4 *)(iVar1 + 10);
-    *(undefined4 *)(param_1 + 0x14) = *(undefined4 *)(iVar1 + 0x12);
-    apply_template_chain_xform( /* Original: FUN_00002bd8 */param_1,1,(uint *)0x0,(uint *)0x0);
+  if ((*(byte *)(obj + 7) & 2) == 0) {
+    desc = *(int *)(host_world + 0x8c) +
+            *(int *)(*(int *)(*(int *)(obj + 0x24) + 0x28) + 0x2e +
+                    (uint)*(byte *)(obj + 1) * 0x18);
+    *(undefined4 *)(obj + 0x18) = *(undefined4 *)(desc + 2);
+    *(undefined4 *)(obj + 0x1c) = *(undefined4 *)(desc + 6);
+    *(undefined4 *)(obj + 0x20) = *(undefined4 *)(desc + 10);
+    *(undefined4 *)(obj + 0x14) = *(undefined4 *)(desc + 0x12);
+    apply_template_chain_xform( /* Original: FUN_00002bd8 */obj,1,(uint *)0x0,(uint *)0x0);
   }
   return;
 }
@@ -8025,11 +8419,11 @@ void reset_object_to_template_pose /* Original: FUN_00004e06 */ (int param_1)
 void reset_object_to_template_pose_tail /* Original: FUN_00004e4e */ (void)
 
 {
-  int in_A0;
-  int unaff_A3;
+  int desc; /* in_A0: template descriptor (A0) */
+  int obj; /* unaff_A3: object (A3) */
   
-  *(undefined4 *)(unaff_A3 + 0x14) = *(undefined4 *)(in_A0 + 0x12);
-  apply_template_chain_xform( /* Original: FUN_00002bd8 */unaff_A3,1,(uint *)0x0,(uint *)0x0);
+  *(undefined4 *)(obj + 0x14) = *(undefined4 *)(desc + 0x12);
+  apply_template_chain_xform( /* Original: FUN_00002bd8 */obj,1,(uint *)0x0,(uint *)0x0);
   return;
 }
 
@@ -8075,73 +8469,73 @@ void reset_object_to_template_pose_tail /* Original: FUN_00004e4e */ (void)
  * recorded. The flag-branch callees 435a / 3da8 / 3ea0 / 4958 / 4916 / 15762 are not
  * verified themselves.
  */
-void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
+void activate_near_range_object(char *obj /* param_1: object (kind byte +0: 2 shape, 3 group) */) /* Original: FUN_00004e6e */
 {
-  int *piVar1;
-  char cVar2;
-  undefined4 uVar3;
-  uint *puVar4;
-  int iVar5;
-  int iVar6;
-  undefined4 *puVar7;
-  undefined4 *puVar8;
-  short sVar9;
-  short sVar10;
-  short sVar11;
-  short sVar12;
-  
-  cVar2 = *param_1;
-  if (cVar2 != '\x02') {
-    if (('\x02' < cVar2) && (cVar2 == '\x03')) {
+  int *name_field; /* piVar1: child record +0x14 being relocated */
+  char kind; /* cVar2: kind byte */
+  undefined4 buf; /* uVar3: heap_alloc(n * 12) result */
+  uint *work; /* puVar4: child table, then the template vertex source */
+  int off; /* iVar5: child record offset, then child index / controller */
+  int i; /* iVar6: child index */
+  undefined4 *dst_rec; /* puVar7: destination child record */
+  undefined4 *src_rec; /* puVar8: source child record walk */
+  short sink_34; /* sVar9: controller word +0x34 for sink_object_shape_at_waterline [role UNKNOWN] */
+  short sink_36; /* sVar10: controller word +0x36 */
+  short sink_38; /* sVar11: controller word +0x38 */
+  short n; /* sVar12: vertex + normal-point count, then controller word +0x40 */
+
+  kind = *obj;
+  if (kind != '\x02') {
+    if (('\x02' < kind) && (kind == '\x03')) {
       /* Kind 3: deferred/near list + child slot table */
-      (&DAT_0001d4a4)[DAT_0001c1e0] = param_1;
-      DAT_0001c1e0 = DAT_0001c1e0 + 1;
-      puVar8 = (undefined4 *)(*(int *)(param_1 + 0x28) + 0x1a);
-      puVar4 = heap_alloc(*(short *)(param_1 + 0x2e) * 0x18);
-      *(uint **)(param_1 + 0x30) = puVar4;
-      iVar5 = 0;
-      for (iVar6 = 0; iVar6 < *(short *)(param_1 + 0x2e); iVar6 = iVar6 + 1) {
-        puVar7 = (undefined4 *)(iVar5 + *(int *)(param_1 + 0x30));
-        *puVar7 = *puVar8;
-        puVar7[1] = puVar8[1];
-        puVar7[2] = puVar8[2];
-        puVar7[3] = puVar8[3];
-        puVar7[4] = puVar8[4];
-        puVar7[5] = puVar8[5];
-        puVar8 = puVar8 + 6;
-        piVar1 = (int *)(*(int *)(param_1 + 0x30) + 0x14 + iVar5);
-        *piVar1 = *(int *)(DAT_0001b5a0 + 0x8c) + *piVar1;
-        iVar5 = iVar5 + 0x18;
+      (&entity_array_1)[entity_array_1_count] = obj;
+      entity_array_1_count = entity_array_1_count + 1;
+      src_rec = (undefined4 *)(*(int *)(obj + 0x28) + 0x1a);
+      work = heap_alloc(*(short *)(obj + 0x2e) * 0x18);
+      *(uint **)(obj + 0x30) = work;
+      off = 0;
+      for (i = 0; i < *(short *)(obj + 0x2e); i = i + 1) {
+        dst_rec = (undefined4 *)(off + *(int *)(obj + 0x30));
+        *dst_rec = *src_rec;
+        dst_rec[1] = src_rec[1];
+        dst_rec[2] = src_rec[2];
+        dst_rec[3] = src_rec[3];
+        dst_rec[4] = src_rec[4];
+        dst_rec[5] = src_rec[5];
+        src_rec = src_rec + 6;
+        name_field = (int *)(*(int *)(obj + 0x30) + 0x14 + off);
+        *name_field = *(int *)(host_world + 0x8c) + *name_field;
+        off = off + 0x18;
       }
-      for (iVar5 = 0; iVar5 < *(short *)(param_1 + 0x2e); iVar5 = iVar5 + 1) {
-        instantiate_mission_pool_slot( /* Original: FUN_000046da */(uint)param_1,iVar5,iVar5);
+      for (off = 0; off < *(short *)(obj + 0x2e); off = off + 1) {
+        instantiate_mission_pool_slot( /* Original: FUN_000046da */(uint)obj,off,off);
       }
     }
     goto LAB_00005108;
   }
   /* Kind 2: near-list publish */
-  if ((param_1[7] & 1U) == 0) {
-    (&DAT_0001b5a4)[DAT_0001b734] = param_1;
-    DAT_0001b734 = DAT_0001b734 + 1;
+  if ((obj[7] & 1U) == 0) {
+    (&object_pool)[object_count] = obj;
+    object_count = object_count + 1;
   }
   else {
-    (&DAT_0001d4a4)[DAT_0001c1e0] = param_1;
-    DAT_0001c1e0 = DAT_0001c1e0 + 1;
+    (&entity_array_1)[entity_array_1_count] = obj;
+    entity_array_1_count = entity_array_1_count + 1;
   }
-  sVar12 = *(short *)(param_1 + 0x3a) + *(short *)(param_1 + 0x36);
+  n = *(short *)(obj + 0x3a) + *(short *)(obj + 0x36);
   /* Capstone: push (sVar12 * 0xC), JSR $1A48 → D0; Ghidra dropped the size arg. */
-  uVar3 = heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */); /*: heap_alloc PROVEN (lea.l $1a48.l = runtime -> file 0x1a68) */
-  *(undefined4 *)(param_1 + 0x4c) = uVar3;
-  uVar3 = heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */); /* same size → +0x44 (spawn gate) */
-  *(undefined4 *)(param_1 + 0x44) = uVar3;
-  puVar4 = (uint *)(*(int *)(DAT_0001b5a0 + 0x8c) +
-                    *(int *)(*(int *)(*(int *)(param_1 + 0x24) + 0x28) + 0x2e +
-                            (uint)(byte)param_1[1] * 0x18) + 0x22);
-  build_object_poly_buffers( /* Original: FUN_00004808 */(int)param_1,puVar4 + sVar12 * 3);
-  if (*(int *)(param_1 + 8) != 0) {
-    **(undefined4 **)(param_1 + 8) = param_1;
-    (&DAT_0001c25c)[DAT_0001c1cc] = *(undefined4 *)(param_1 + 8);
-    DAT_0001c1cc = DAT_0001c1cc + 1;
+  buf = heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */); /*: heap_alloc PROVEN (lea.l $1a48.l = runtime -> file 0x1a68) */
+  *(undefined4 *)(obj + 0x4c) = buf;
+  buf = heap_alloc( /* size dropped by Ghidra; JSR via lea.l $1a48.l = runtime -> file 0x1a68 = heap_alloc */); /* same size → +0x44 (spawn gate) */
+  *(undefined4 *)(obj + 0x44) = buf;
+  work = (uint *)(*(int *)(host_world + 0x8c) +
+                    *(int *)(*(int *)(*(int *)(obj + 0x24) + 0x28) + 0x2e +
+                            (uint)(byte)obj[1] * 0x18) + 0x22);
+  build_object_poly_buffers( /* Original: FUN_00004808 */(int)obj,work + n * 3);
+  if (*(int *)(obj + 8) != 0) {
+    **(undefined4 **)(obj + 8) = obj;
+    (&controller_list)[controller_count] = *(undefined4 *)(obj + 8);
+    controller_count = controller_count + 1;
   }
   /* Section check 0x4e6e..0x4f86 (part 1 of 2) [PROVEN, matches the C; independent capstone
    * disassembly]: signed byte dispatch on +0 (2 = shape here, 3 = group at 0x5072, other ->
@@ -8155,53 +8549,53 @@ void activate_near_range_object(char *param_1) /* Original: FUN_00004e6e */
    * Flag 0x1000 of word +6 (btst #4 of byte +6) -> FUN_00004958(object, 0xb4e1, 0, 0x7fe4),
    * then host word +0xe == 1 ? FUN_00004916(object, 0x80) : FUN_00003ea0(object). The other
    * flag branches and the kind-3 path are part 2. */
-  if ((param_1[6] & 0x10U) == 0) {
-    if ((param_1[7] & 0x10U) == 0) {
-      if ((param_1[5] & 0x10U) == 0) {
-        apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)param_1,(int)sVar12,puVar4,*(uint **)(param_1 + 0x44));
-        apply_entity_mission_rates(param_1,0);
-        update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
+  if ((obj[6] & 0x10U) == 0) {
+    if ((obj[7] & 0x10U) == 0) {
+      if ((obj[5] & 0x10U) == 0) {
+        apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)obj,(int)n,work,*(uint **)(obj + 0x44));
+        apply_entity_mission_rates(obj,0);
+        update_object_distance_band((int)obj,*(int *)(obj + 0x10));
         goto LAB_00005056;
       }
-      translate_int3_vecs( /* Original: FUN_00001c5c */(int)sVar12,(int *)puVar4,*(int **)(param_1 + 0x44),0,0,0);
-      apply_entity_mission_rates(param_1,0);
-      update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
-      shade_object_faces(param_1);
+      translate_int3_vecs( /* Original: FUN_00001c5c */(int)n,(int *)work,*(int **)(obj + 0x44),0,0,0);
+      apply_entity_mission_rates(obj,0);
+      update_object_distance_band((int)obj,*(int *)(obj + 0x10));
+      shade_object_faces(obj);
     }
     else {
-      apply_entity_mission_rates(param_1,0);
-      update_object_distance_band((int)param_1,*(int *)(param_1 + 0x10));
-      iVar5 = *(int *)(param_1 + 8);
-      if (((iVar5 == 0) || (**(short **)(iVar5 + 4) < 0x15)) || (0x19 < **(short **)(iVar5 + 4))) {
-        sVar12 = 0;
-        sVar11 = 0;
-        sVar10 = 0;
-        sVar9 = 0;
+      apply_entity_mission_rates(obj,0);
+      update_object_distance_band((int)obj,*(int *)(obj + 0x10));
+      off = *(int *)(obj + 8);
+      if (((off == 0) || (**(short **)(off + 4) < 0x15)) || (0x19 < **(short **)(off + 4))) {
+        n = 0;
+        sink_38 = 0;
+        sink_36 = 0;
+        sink_34 = 0;
       }
       else {
-        sVar12 = *(short *)(iVar5 + 0x40);
-        sVar11 = *(short *)(iVar5 + 0x38);
-        sVar10 = *(short *)(iVar5 + 0x36);
-        sVar9 = *(short *)(iVar5 + 0x34);
+        n = *(short *)(off + 0x40);
+        sink_38 = *(short *)(off + 0x38);
+        sink_36 = *(short *)(off + 0x36);
+        sink_34 = *(short *)(off + 0x34);
       }
-      sink_object_shape_at_waterline(param_1,sVar9,sVar10,sVar11,sVar12);
+      sink_object_shape_at_waterline(obj,sink_34,sink_36,sink_38,n);
     }
   }
   else {
-    build_land_outline_at_detail((int)param_1,0xb4e1,0,0x7fe4);
-    if (*(short *)(DAT_0001b5a0 + 0xe) == 1) {
-      set_object_faces_bw_pattern((int)param_1,0x80);
+    build_land_outline_at_detail((int)obj,0xb4e1,0,0x7fe4);
+    if (*(short *)(host_world + 0xe) == 1) {
+      set_object_faces_bw_pattern((int)obj,0x80);
     }
     else {
 LAB_00005056:
-      shade_object_faces(param_1);
+      shade_object_faces(obj);
     }
   }
-  if ((param_1[6] & 2U) == 0) {
-    *(ushort *)(param_1 + 6) = *(ushort *)(param_1 + 6) | 0x800;
+  if ((obj[6] & 2U) == 0) {
+    *(ushort *)(obj + 6) = *(ushort *)(obj + 6) | 0x800;
   }
 LAB_00005108:
-  update_object_camera_metric( /* Original: FUN_00003b98 */(int)param_1);
+  update_object_camera_metric( /* Original: FUN_00003b98 */(int)obj);
   return;
 }
 
@@ -8229,47 +8623,47 @@ LAB_00005108:
  * instantiate_mission_pool_slot(DAT_0001d6fc, byte param_1 +1, index); the object at record
  * +0x14 is returned, unless its long +0x44 is 0: then bsr.b 0x51ec retire_entity(object)
  * and 0 is returned. */
-int spawn_mission_pool_object(int param_1,uint param_2,uint param_3,uint param_4,undefined2 param_5,
-                undefined2 param_6,undefined2 param_7,undefined2 param_8) /* Original: FUN_00005116 */
+int spawn_mission_pool_object(int tmpl_obj /* param_1: object whose byte +1 gives the template record index */,uint off_x /* param_2: slot offset x (+8) */,uint off_y /* param_3: slot offset y (+0xc) */,uint off_z /* param_4: slot offset z (+0x10) */,undefined2 angle1 /* param_5: slot angle word +2 */,
+                undefined2 angle2 /* param_6: slot angle word +4 */,undefined2 angle3 /* param_7: slot angle word +6 */,undefined2 factory_arg /* param_8: slot word +0, passed to the class factory */) /* Original: FUN_00005116 */
 {
-  uint uVar1;
-  int iVar2;
-  uint *puVar3;
-  int iVar4;
-  int iVar5;
-  
-  puVar3 = *(uint **)(DAT_0001d6fc + 0x30);
-  iVar4 = (int)*(short *)(DAT_0001d6fc + 0x2e);
-  iVar5 = 0;
-  if (0 < iVar4) {
-    iVar2 = 0;
+  uint root; /* uVar1: scene_root */
+  int off; /* iVar2: slot byte offset */
+  uint *table; /* puVar3: slot table, then the chosen slot */
+  int count_or_obj; /* iVar4: slot count, then the new object */
+  int slot; /* iVar5: free slot index */
+
+  table = *(uint **)(scene_root + 0x30);
+  count_or_obj = (int)*(short *)(scene_root + 0x2e);
+  slot = 0;
+  if (0 < count_or_obj) {
+    off = 0;
     do {
-      if (*(int *)((int)puVar3 + iVar2 + 0x14) == 0) break;
-      iVar2 = iVar2 + 0x18;
-      iVar5 = iVar5 + 1;
-    } while (iVar5 < iVar4);
+      if (*(int *)((int)table + off + 0x14) == 0) break;
+      off = off + 0x18;
+      slot = slot + 1;
+    } while (slot < count_or_obj);
   }
-  if (iVar4 == iVar5) {
-    puVar3 = heap_realloc_grow_only( /* Original: FUN_00001ba8 */puVar3,(undefined4 *)((iVar4 + 10) * 0x18));
-    uVar1 = DAT_0001d6fc;
-    *(uint **)(DAT_0001d6fc + 0x30) = puVar3;
-    *(short *)(uVar1 + 0x2e) = *(short *)(uVar1 + 0x2e) + 10;
+  if (count_or_obj == slot) {
+    table = heap_realloc_grow_only( /* Original: FUN_00001ba8 */table,(undefined4 *)((count_or_obj + 10) * 0x18));
+    root = scene_root;
+    *(uint **)(scene_root + 0x30) = table;
+    *(short *)(root + 0x2e) = *(short *)(root + 0x2e) + 10;
   }
-  puVar3 = puVar3 + iVar5 * 6;
-  *(undefined2 *)puVar3 = param_8;
-  puVar3[2] = param_2;
-  puVar3[3] = param_3;
-  puVar3[4] = param_4;
-  *(undefined2 *)((int)puVar3 + 2) = param_5;
-  *(undefined2 *)(puVar3 + 1) = param_6;
-  *(undefined2 *)((int)puVar3 + 6) = param_7;
-  instantiate_mission_pool_slot( /* Original: FUN_000046da */DAT_0001d6fc,(uint)*(byte *)(param_1 + 1),iVar5);
-  iVar4 = *(int *)(*(int *)(DAT_0001d6fc + 0x30) + iVar5 * 0x18 + 0x14);
-  if (*(int *)(iVar4 + 0x44) == 0) {
-    retire_entity( /* Original: FUN_000051ec */iVar4);
-    iVar4 = 0;
+  table = table + slot * 6;
+  *(undefined2 *)table = factory_arg;
+  table[2] = off_x;
+  table[3] = off_y;
+  table[4] = off_z;
+  *(undefined2 *)((int)table + 2) = angle1;
+  *(undefined2 *)(table + 1) = angle2;
+  *(undefined2 *)((int)table + 6) = angle3;
+  instantiate_mission_pool_slot( /* Original: FUN_000046da */scene_root,(uint)*(byte *)(tmpl_obj + 1),slot);
+  count_or_obj = *(int *)(*(int *)(scene_root + 0x30) + slot * 0x18 + 0x14);
+  if (*(int *)(count_or_obj + 0x44) == 0) {
+    retire_entity( /* Original: FUN_000051ec */count_or_obj);
+    count_or_obj = 0;
   }
-  return iVar4;
+  return count_or_obj;
 }
 
 
@@ -8297,33 +8691,33 @@ int spawn_mission_pool_object(int param_1,uint param_2,uint param_3,uint param_4
  * 0x51ec..0x5288 (raw extension words decoded by hand where noted); widths, signed
  * compares and stores identical to the C. The name keeps [STRONG INFERENCE].
  */
-void retire_entity(int param_1) /* Original: FUN_000051ec */
+void retire_entity(int obj /* param_1: entity to retire */) /* Original: FUN_000051ec */
 {
-  short sVar1;
+  short k; /* sVar1: scatter slot index 0..6 */
   
-  if (*(int *)(param_1 + 8) == DAT_0001b880) {
-    DAT_0001b880 = 0;
+  if (*(int *)(obj + 8) == player_shot_ctl) {
+    player_shot_ctl = 0;
   }
-  if (*(char *)(param_1 + 1) != *(char *)(param_1 + 2)) {
-    *(undefined4 *)(*(int *)(DAT_0001d6fc + 0x30) + 0x14 + (uint)*(byte *)(param_1 + 2) * 0x18) = 0;
-    if ((DAT_0001b88e <= (short)(ushort)*(byte *)(param_1 + 1)) &&
-       ((short)(ushort)*(byte *)(param_1 + 1) <= DAT_0001b88c)) {
-      sVar1 = 0;
+  if (*(char *)(obj + 1) != *(char *)(obj + 2)) {
+    *(undefined4 *)(*(int *)(scene_root + 0x30) + 0x14 + (uint)*(byte *)(obj + 2) * 0x18) = 0;
+    if ((child_window_lo <= (short)(ushort)*(byte *)(obj + 1)) &&
+       ((short)(ushort)*(byte *)(obj + 1) <= child_window_hi)) {
+      k = 0;
       do {
-        if (param_1 == (&DAT_0001bc64)[sVar1]) {
-          (&DAT_0001bc64)[sVar1] = 0;
+        if (obj == (&scatter_slots)[k]) {
+          (&scatter_slots)[k] = 0;
         }
-        sVar1 = sVar1 + 1;
-      } while (sVar1 < 7);
+        k = k + 1;
+      } while (k < 7);
     }
   }
-  *(undefined4 *)(param_1 + 0x18) = 1000000000;
-  *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 2;
-  *(undefined4 *)(param_1 + 0x3c) = 0;
-  if (*(int *)(param_1 + 8) != 0) {
-    **(undefined4 **)(param_1 + 8) = 0;
+  *(undefined4 *)(obj + 0x18) = 1000000000;
+  *(uint *)(obj + 4) = *(uint *)(obj + 4) | 2;
+  *(undefined4 *)(obj + 0x3c) = 0;
+  if (*(int *)(obj + 8) != 0) {
+    **(undefined4 **)(obj + 8) = 0;
   }
-  DAT_00024cf0 = DAT_00024cf0 + 1;
+  retire_count = retire_count + 1;
   return;
 }
 
@@ -8350,17 +8744,17 @@ void retire_entity(int param_1) /* Original: FUN_000051ec */
  * 0x528a..0x52da; widths, signed compares, the short-circuit order and the single
  * retire_entity(param_1) call identical to the C. The name keeps [STRONG INFERENCE].
  */
-void dispatch_entity_cleanup(char *param_1) /* Original: FUN_0000528a */
+void dispatch_entity_cleanup(char *obj /* param_1: entity */) /* Original: FUN_0000528a */
 {
-  if ((param_1[7] & 2U) == 0) {
-    if ((((*(int *)(param_1 + 0x24) == DAT_0001d6fc) &&
-         (DAT_0001b88e <= (short)(ushort)(byte)param_1[1])) &&
-        ((short)(ushort)(byte)param_1[1] <= DAT_0001b88c)) || (*param_1 != '\x02')) {
-      retire_entity((int)param_1); /* Original: FUN_000051ec */
+  if ((obj[7] & 2U) == 0) {
+    if ((((*(int *)(obj + 0x24) == scene_root) &&
+         (child_window_lo <= (short)(ushort)(byte)obj[1])) &&
+        ((short)(ushort)(byte)obj[1] <= child_window_hi)) || (*obj != '\x02')) {
+      retire_entity((int)obj); /* Original: FUN_000051ec */
     }
     else {
-      *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) | 0x42;
-      *(undefined4 *)(param_1 + 0x3c) = DAT_0001b838;
+      *(uint *)(obj + 4) = *(uint *)(obj + 4) | 0x42;
+      *(undefined4 *)(obj + 0x3c) = frame_counter;
     }
   }
   return;
@@ -8384,63 +8778,63 @@ void dispatch_entity_cleanup(char *param_1) /* Original: FUN_0000528a */
  * call-argument correction above (also in DECOMPILATION_SYMBOLS.md). The name keeps
  * [STRONG INFERENCE]; release_fractal_reference (FUN_00014af2) is still only RENAMED.
  */
-void deactivate_object /* Original: FUN_000052dc */ (char *param_1)
+void deactivate_object /* Original: FUN_000052dc */ (char *obj /* param_1: object (kind 2 shape or 3 group) */)
 
 {
-  char *pcVar1;
-  char cVar2;
-  int iVar3;
-  int iVar4;
+  char *child; /* pcVar1: group child object */
+  char kind; /* cVar2: kind byte */
+  int off; /* iVar3: face / child record byte offset */
+  int i; /* iVar4: face / child index */
   
-  cVar2 = *param_1;
-  if (cVar2 == '\x02') {
-    if ((param_1[6] & 0x10U) != 0) {
-      reset_object_to_template_pose((int)param_1);
+  kind = *obj;
+  if (kind == '\x02') {
+    if ((obj[6] & 0x10U) != 0) {
+      reset_object_to_template_pose((int)obj);
     }
     heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0; real arg *(int *)(param_1 + 0x4c) [PROVEN, 0x530c] */);
     heap_free_coalesce( /* arg dropped by Ghidra; lea.l $19b0.l at 0x5310 = runtime -> file 0x19d0; real arg *(int *)(param_1 + 0x44) [PROVEN, 0x5318] */);
-    param_1[0x44] = '\0';
-    param_1[0x45] = '\0';
-    param_1[0x46] = '\0';
-    param_1[0x47] = '\0';
-    iVar3 = 0;
-    for (iVar4 = 0; iVar4 < *(short *)(param_1 + 0x3a); iVar4 = iVar4 + 1) {
-      heap_free_coalesce(*(int *)(*(int *)(param_1 + 0x48) + 0x18 + iVar3));
-      iVar3 = iVar3 + 0x20;
+    obj[0x44] = '\0';
+    obj[0x45] = '\0';
+    obj[0x46] = '\0';
+    obj[0x47] = '\0';
+    off = 0;
+    for (i = 0; i < *(short *)(obj + 0x3a); i = i + 1) {
+      heap_free_coalesce(*(int *)(*(int *)(obj + 0x48) + 0x18 + off));
+      off = off + 0x20;
     }
-    heap_free_coalesce(*(int *)(param_1 + 0x48));
-    if (*(int *)(param_1 + 8) != 0) {
-      **(undefined4 **)(param_1 + 8) = 0;
+    heap_free_coalesce(*(int *)(obj + 0x48));
+    if (*(int *)(obj + 8) != 0) {
+      **(undefined4 **)(obj + 8) = 0;
     }
-    if (param_1[1] != param_1[2]) {
-      dispatch_entity_cleanup( /* Original: FUN_0000528a */param_1);
+    if (obj[1] != obj[2]) {
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */obj);
     }
-    if (*(int *)(param_1 + 0x2c) != 0) {
-      release_fractal_reference((int)param_1);
+    if (*(int *)(obj + 0x2c) != 0) {
+      release_fractal_reference((int)obj);
     }
-    *(uint *)(param_1 + 4) = *(uint *)(param_1 + 4) & 0xfff7ffff;
+    *(uint *)(obj + 4) = *(uint *)(obj + 4) & 0xfff7ffff;
   }
-  else if (('\x02' < cVar2) && (cVar2 == '\x03')) {
-    iVar3 = 0;
-    for (iVar4 = 0; iVar4 < *(short *)(param_1 + 0x2e); iVar4 = iVar4 + 1) {
-      pcVar1 = *(char **)(*(int *)(param_1 + 0x30) + 0x14 + iVar3);
-      if ((*pcVar1 == '\x02') && (*(int *)(pcVar1 + 0x2c) != 0)) {
-        release_fractal_reference((int)pcVar1);
+  else if (('\x02' < kind) && (kind == '\x03')) {
+    off = 0;
+    for (i = 0; i < *(short *)(obj + 0x2e); i = i + 1) {
+      child = *(char **)(*(int *)(obj + 0x30) + 0x14 + off);
+      if ((*child == '\x02') && (*(int *)(child + 0x2c) != 0)) {
+        release_fractal_reference((int)child);
       }
-      *(uint *)(pcVar1 + 4) = *(uint *)(pcVar1 + 4) | 2;
-      pcVar1[3] = pcVar1[3] + -1;
-      if (*(int *)(pcVar1 + 8) != 0) {
-        **(undefined4 **)(pcVar1 + 8) = 0;
+      *(uint *)(child + 4) = *(uint *)(child + 4) | 2;
+      child[3] = child[3] + -1;
+      if (*(int *)(child + 8) != 0) {
+        **(undefined4 **)(child + 8) = 0;
       }
-      iVar3 = iVar3 + 0x18;
+      off = off + 0x18;
     }
-    heap_free_coalesce(*(int *)(param_1 + 0x30));
-    param_1[0x30] = '\0';
-    param_1[0x31] = '\0';
-    param_1[0x32] = '\0';
-    param_1[0x33] = '\0';
-    if (*(int *)(param_1 + 8) != 0) {
-      **(undefined4 **)(param_1 + 8) = 0;
+    heap_free_coalesce(*(int *)(obj + 0x30));
+    obj[0x30] = '\0';
+    obj[0x31] = '\0';
+    obj[0x32] = '\0';
+    obj[0x33] = '\0';
+    if (*(int *)(obj + 8) != 0) {
+      **(undefined4 **)(obj + 8) = 0;
     }
   }
   return;
@@ -8464,67 +8858,67 @@ void deactivate_object /* Original: FUN_000052dc */ (char *param_1)
  * and dropped. piVar6 + -0x710f is int pointer arithmetic: DAT_0001c1d0 = ((int)piVar6 -
  * 0x1c43c) / 12 (divs.l); *param_2 = (end - param_1) >> 2.
  */
-void collect_near_objects /* Original: FUN_000053f8 */ (undefined4 *param_1,int *param_2)
+void collect_near_objects /* Original: FUN_000053f8 */ (undefined4 *list /* param_1: object pointer list, compacted in place */,int *count /* param_2: in / out entry count */)
 
 {
-  char *pcVar1;
-  uint uVar2;
-  short sVar3;
-  short sVar4;
-  undefined4 *puVar5;
-  int *piVar6;
-  undefined4 *puVar7;
+  char *obj; /* pcVar1: current object */
+  uint size_bits; /* uVar2: detail size value, then the detail shift */
+  short detail; /* sVar3: detail shift (+0x32) */
+  short left; /* sVar4: entries left */
+  undefined4 *keep; /* puVar5: write cursor of kept entries */
+  int *point; /* piVar6: view_points write cursor */
+  undefined4 *read; /* puVar7: read cursor */
   
-  piVar6 = &DAT_0001c43c + DAT_0001c1d0 * 3;
-  sVar4 = (short)*param_2;
-  puVar5 = param_1;
-  puVar7 = param_1;
+  point = &view_points + view_point_count * 3;
+  left = (short)*count;
+  keep = list;
+  read = list;
   do {
     while( true ) {
-      sVar4 = sVar4 + -1;
-      if (sVar4 == -1) {
-        DAT_0001c1d0 = (int)(piVar6 + -0x710f) / 0xc;
-        *param_2 = (int)puVar5 - (int)param_1 >> 2;
+      left = left + -1;
+      if (left == -1) {
+        view_point_count = (int)(point + -0x710f) / 0xc;
+        *count = (int)keep - (int)list >> 2;
         return;
       }
-      pcVar1 = (char *)*puVar7;
-      if ((*(int *)(pcVar1 + 0xc) < *(int *)(pcVar1 + 0x10)) || ((pcVar1[7] & 2U) != 0)) break;
-      if ((*pcVar1 == '\x02') && ((*(uint *)(pcVar1 + 4) & 0x40) == 0)) {
-        sVar3 = 0;
-        for (uVar2 = *(int *)(pcVar1 + 0x14) +
-                     *(int *)(pcVar1 + 0x10) + (*(int *)(pcVar1 + 0x10) >> 2) <<
-                     ((int)*(short *)(pcVar1 + 0x34) & 0x3fU); (uVar2 & 0xffff8000) != 0;
-            uVar2 = (int)uVar2 >> 1) {
-          sVar3 = sVar3 + 1;
+      obj = (char *)*read;
+      if ((*(int *)(obj + 0xc) < *(int *)(obj + 0x10)) || ((obj[7] & 2U) != 0)) break;
+      if ((*obj == '\x02') && ((*(uint *)(obj + 4) & 0x40) == 0)) {
+        detail = 0;
+        for (size_bits = *(int *)(obj + 0x14) +
+                     *(int *)(obj + 0x10) + (*(int *)(obj + 0x10) >> 2) <<
+                     ((int)*(short *)(obj + 0x34) & 0x3fU); (size_bits & 0xffff8000) != 0;
+            size_bits = (int)size_bits >> 1) {
+          detail = detail + 1;
         }
-        *(short *)(pcVar1 + 0x32) = sVar3;
-        if ((*(uint *)(pcVar1 + 4) & 4) == 0) {
-          uVar2 = (uint)sVar3;
-          *piVar6 = *(int *)(pcVar1 + 0x18) - DAT_0001d838 >> (uVar2 & 0x3f);
-          piVar6[1] = *(int *)(pcVar1 + 0x1c) - DAT_0001d834 >> (uVar2 & 0x3f);
-          piVar6[2] = *(int *)(pcVar1 + 0x20) - DAT_0001d830 >> (uVar2 & 0x3f);
-          piVar6 = piVar6 + 3;
+        *(short *)(obj + 0x32) = detail;
+        if ((*(uint *)(obj + 4) & 4) == 0) {
+          size_bits = (uint)detail;
+          *point = *(int *)(obj + 0x18) - camera_x >> (size_bits & 0x3f);
+          point[1] = *(int *)(obj + 0x1c) - camera_y >> (size_bits & 0x3f);
+          point[2] = *(int *)(obj + 0x20) - camera_z >> (size_bits & 0x3f);
+          point = point + 3;
         }
-        (&DAT_0001c9dc)[DAT_0001c1d4] = pcVar1;
-        DAT_0001c1d4 = DAT_0001c1d4 + 1;
+        (&visible_list)[visible_count] = obj;
+        visible_count = visible_count + 1;
       }
 LAB_00005532:
-      *puVar5 = pcVar1;
-      puVar5 = puVar5 + 1;
-      puVar7 = puVar7 + 1;
+      *keep = obj;
+      keep = keep + 1;
+      read = read + 1;
     }
-    if ((*(int *)(pcVar1 + 0x10) - *(int *)(pcVar1 + 0xc) < 0x19c80) && ((pcVar1[7] & 2U) == 0))
+    if ((*(int *)(obj + 0x10) - *(int *)(obj + 0xc) < 0x19c80) && ((obj[7] & 2U) == 0))
     goto LAB_00005532;
-    if (*pcVar1 == '\x02') {
-      if (DAT_0001b838 - *(int *)(pcVar1 + 0x3c) < 0x4c) goto LAB_00005532;
-      if (*(int *)(pcVar1 + 0x3c) != 0) {
-        retire_entity( /* Original: FUN_000051ec */(int)pcVar1);
+    if (*obj == '\x02') {
+      if (frame_counter - *(int *)(obj + 0x3c) < 0x4c) goto LAB_00005532;
+      if (*(int *)(obj + 0x3c) != 0) {
+        retire_entity( /* Original: FUN_000051ec */(int)obj);
       }
     }
-    deactivate_object(pcVar1);
-    (&DAT_0001d0e4)[DAT_0001c1dc] = pcVar1;
-    DAT_0001c1dc = DAT_0001c1dc + 1;
-    puVar7 = puVar7 + 1;
+    deactivate_object(obj);
+    (&entity_array_3)[entity_array_3_count] = obj;
+    entity_array_3_count = entity_array_3_count + 1;
+    read = read + 1;
   } while( true );
 }
 
@@ -8572,156 +8966,156 @@ LAB_00005532:
  * loop counters (dbra), shift counts (register asl/asr, mod 64), argument
  * order and list updates are identical to the C.
  */
-void collect_far_objects /* Original: FUN_0000555a */ (uint *param_1,int *param_2)
+void collect_far_objects /* Original: FUN_0000555a */ (uint *list /* param_1: metric-sorted object list, compacted in place */,int *count /* param_2: in / out entry count */)
 
 {
-  char *pcVar1;
-  uint uVar2;
-  uint uVar3;
-  int iVar4;
-  uint uVar5;
-  ushort uVar6;
-  short sVar7;
-  int iVar8;
-  short sVar9;
-  uint *puVar10;
-  uint *puVar11;
-  int *piVar12;
-  short local_37e;
-  uint *local_37c;
-  uint *local_378;
-  uint local_374 [220];
-  
-  local_378 = param_1;
-  piVar12 = &DAT_0001c43c + DAT_0001c1d0 * 3;
-  sVar9 = (short)*param_2;
-  iVar8 = 0x7fffffff;
-  local_37c = local_374;
-  local_37e = 0;
-  puVar11 = param_1;
+  char *obj; /* pcVar1: current object */
+  uint other; /* uVar2: earlier kept object tested against obj */
+  uint flags; /* uVar3: obj flag long +4 */
+  int reach; /* iVar4: obj metric +0x10 + radius +0x14 */
+  uint work; /* uVar5: detail size value / earlier active object / kept-entry countdown */
+  ushort left16; /* uVar6: kept-entry countdown word */
+  short work_s; /* sVar7: detail shift, then the active-entry countdown */
+  int min_start; /* iVar8: smallest metric - radius so far (0x7fffffff at start) */
+  short left; /* sVar9: entries left */
+  uint *scan; /* puVar10: backward scan cursor */
+  uint *keep; /* puVar11: write cursor of kept entries */
+  int *point; /* piVar12: view_points write cursor */
+  short active_count; /* local_37e, -$37e(A6): entries in active */
+  uint *active_end; /* local_37c, -$37c(A6): end of active */
+  uint *read; /* local_378, -$378(A6): read cursor */
+  uint active [220]; /* local_374, -$374(A6): objects with flags 0x2800 kept for later collision tests */
+
+  read = list;
+  point = &view_points + view_point_count * 3;
+  left = (short)*count;
+  min_start = 0x7fffffff;
+  active_end = active;
+  active_count = 0;
+  keep = list;
   do {
     while( true ) {
-      sVar9 = sVar9 + -1;
-      if (sVar9 == -1) {
-        DAT_0001c1d0 = (int)(piVar12 + -0x710f) / 0xc;
-        *param_2 = (int)puVar11 - (int)param_1 >> 2;
+      left = left + -1;
+      if (left == -1) {
+        view_point_count = (int)(point + -0x710f) / 0xc;
+        *count = (int)keep - (int)list >> 2;
         return;
       }
-      pcVar1 = (char *)*local_378;
-      uVar3 = *(uint *)(pcVar1 + 4);
-      if ((*(int *)(pcVar1 + 0xc) < *(int *)(pcVar1 + 0x10)) || ((uVar3 & 2) != 0)) break;
-      if ((uVar3 & 0x40) == 0) {
-        sVar7 = 0;
-        for (uVar5 = *(int *)(pcVar1 + 0x14) +
-                     *(int *)(pcVar1 + 0x10) + (*(int *)(pcVar1 + 0x10) >> 2) <<
-                     ((int)*(short *)(pcVar1 + 0x34) & 0x3fU); (uVar5 & 0xffff8000) != 0;
-            uVar5 = (int)uVar5 >> 1) {
-          sVar7 = sVar7 + 1;
+      obj = (char *)*read;
+      flags = *(uint *)(obj + 4);
+      if ((*(int *)(obj + 0xc) < *(int *)(obj + 0x10)) || ((flags & 2) != 0)) break;
+      if ((flags & 0x40) == 0) {
+        work_s = 0;
+        for (work = *(int *)(obj + 0x14) +
+                     *(int *)(obj + 0x10) + (*(int *)(obj + 0x10) >> 2) <<
+                     ((int)*(short *)(obj + 0x34) & 0x3fU); (work & 0xffff8000) != 0;
+            work = (int)work >> 1) {
+          work_s = work_s + 1;
         }
-        *(short *)(pcVar1 + 0x32) = sVar7;
-        if ((uVar3 & 4) == 0) {
-          uVar5 = (uint)sVar7;
-          *piVar12 = *(int *)(pcVar1 + 0x18) - DAT_0001d838 >> (uVar5 & 0x3f);
-          piVar12[1] = *(int *)(pcVar1 + 0x1c) - DAT_0001d834 >> (uVar5 & 0x3f);
-          piVar12[2] = *(int *)(pcVar1 + 0x20) - DAT_0001d830 >> (uVar5 & 0x3f);
-          piVar12 = piVar12 + 3;
+        *(short *)(obj + 0x32) = work_s;
+        if ((flags & 4) == 0) {
+          work = (uint)work_s;
+          *point = *(int *)(obj + 0x18) - camera_x >> (work & 0x3f);
+          point[1] = *(int *)(obj + 0x1c) - camera_y >> (work & 0x3f);
+          point[2] = *(int *)(obj + 0x20) - camera_z >> (work & 0x3f);
+          point = point + 3;
         }
-        (&DAT_0001c9dc)[DAT_0001c1d4] = pcVar1;
-        DAT_0001c1d4 = DAT_0001c1d4 + 1;
+        (&visible_list)[visible_count] = obj;
+        visible_count = visible_count + 1;
       }
 LAB_000056ac:
-      if ((short)uVar3 < 0) {
-        *(char **)(&DAT_0001c1e4 + DAT_0001c1c4 * 4) = pcVar1;
-        DAT_0001c1c4 = DAT_0001c1c4 + 1;
+      if ((short)flags < 0) {
+        *(char **)(&overlap_list + overlap_count * 4) = obj;
+        overlap_count = overlap_count + 1;
       }
-      if ((uVar3 & 0x2800) == 0) {
-        iVar4 = *(int *)(pcVar1 + 0x14) + *(int *)(pcVar1 + 0x10);
-        puVar10 = local_37c;
-        sVar7 = local_37e;
-        if (iVar8 < iVar4) {
+      if ((flags & 0x2800) == 0) {
+        reach = *(int *)(obj + 0x14) + *(int *)(obj + 0x10);
+        scan = active_end;
+        work_s = active_count;
+        if (min_start < reach) {
           do {
             while( true ) {
-              sVar7 = sVar7 + -1;
-              if (sVar7 == -1) goto LAB_000057ee;
-              puVar10 = puVar10 + -1;
-              uVar5 = *puVar10;
-              if (iVar4 <= *(int *)(uVar5 + 0x10) - *(int *)(uVar5 + 0x14)) break;
-              if ((uVar3 & 0x100000) == 0) {
-                if ((*(byte *)(uVar5 + 7) & 0x40) == 0) {
-                  test_object_collision(uVar5,(uint)pcVar1);
+              work_s = work_s + -1;
+              if (work_s == -1) goto LAB_000057ee;
+              scan = scan + -1;
+              work = *scan;
+              if (reach <= *(int *)(work + 0x10) - *(int *)(work + 0x14)) break;
+              if ((flags & 0x100000) == 0) {
+                if ((*(byte *)(work + 7) & 0x40) == 0) {
+                  test_object_collision(work,(uint)obj);
                 }
                 else {
-                  handle_player_contact(uVar5,(uint)pcVar1);
+                  handle_player_contact(work,(uint)obj);
                 }
               }
-              else if ((*(byte *)(uVar5 + 7) & 0x40) == 0) {
-                test_proximity_collision(uVar5,(int)pcVar1);
+              else if ((*(byte *)(work + 7) & 0x40) == 0) {
+                test_proximity_collision(work,(int)obj);
               }
               else {
-                test_player_vs_type0e_proximity(uVar5,(int)pcVar1);
+                test_player_vs_type0e_proximity(work,(int)obj);
               }
             }
-          } while (*(int *)(uVar5 + 0x28) <= iVar4);
+          } while (*(int *)(work + 0x28) <= reach);
         }
       }
       else {
-        *(ushort *)(pcVar1 + 6) = *(ushort *)(pcVar1 + 6) & 0xf7ff;
-        iVar4 = *(int *)(pcVar1 + 0x14) + *(int *)(pcVar1 + 0x10);
-        if (iVar8 < iVar4) {
-          uVar5 = (int)puVar11 - (int)param_1 >> 2 & 0xffff;
-          puVar10 = puVar11;
+        *(ushort *)(obj + 6) = *(ushort *)(obj + 6) & 0xf7ff;
+        reach = *(int *)(obj + 0x14) + *(int *)(obj + 0x10);
+        if (min_start < reach) {
+          work = (int)keep - (int)list >> 2 & 0xffff;
+          scan = keep;
           do {
             while( true ) {
               do {
-                uVar6 = (short)uVar5 - 1;
-                uVar5 = (uint)uVar6;
-                if (uVar6 == 0xffff) goto LAB_0000575e;
-                puVar10 = puVar10 + -1;
-                uVar2 = *puVar10;
-              } while ((*(byte *)(uVar2 + 7) & 2) != 0);
-              if (iVar4 <= *(int *)(uVar2 + 0x10) - *(int *)(uVar2 + 0x14)) break;
-              if ((*(byte *)(uVar2 + 5) & 0x10) == 0) {
-                if ((uVar3 & 0x40) == 0) {
-                  test_object_collision((uint)pcVar1,uVar2);
+                left16 = (short)work - 1;
+                work = (uint)left16;
+                if (left16 == 0xffff) goto LAB_0000575e;
+                scan = scan + -1;
+                other = *scan;
+              } while ((*(byte *)(other + 7) & 2) != 0);
+              if (reach <= *(int *)(other + 0x10) - *(int *)(other + 0x14)) break;
+              if ((*(byte *)(other + 5) & 0x10) == 0) {
+                if ((flags & 0x40) == 0) {
+                  test_object_collision((uint)obj,other);
                 }
                 else {
-                  handle_player_contact((uint)pcVar1,uVar2);
+                  handle_player_contact((uint)obj,other);
                 }
               }
-              else if ((uVar3 & 0x40) == 0) {
-                test_proximity_collision((int)pcVar1,uVar2);
+              else if ((flags & 0x40) == 0) {
+                test_proximity_collision((int)obj,other);
               }
               else {
-                test_player_vs_type0e_proximity((int)pcVar1,uVar2);
+                test_player_vs_type0e_proximity((int)obj,other);
               }
             }
-          } while (*(int *)(uVar2 + 0x28) <= iVar4);
+          } while (*(int *)(other + 0x28) <= reach);
         }
 LAB_0000575e:
-        *local_37c = (uint)pcVar1;
-        local_37e = local_37e + 1;
-        local_37c = local_37c + 1;
+        *active_end = (uint)obj;
+        active_count = active_count + 1;
+        active_end = active_end + 1;
       }
 LAB_000057ee:
-      if (*(int *)(pcVar1 + 0x10) - *(int *)(pcVar1 + 0x14) < iVar8) {
-        iVar8 = *(int *)(pcVar1 + 0x10) - *(int *)(pcVar1 + 0x14);
+      if (*(int *)(obj + 0x10) - *(int *)(obj + 0x14) < min_start) {
+        min_start = *(int *)(obj + 0x10) - *(int *)(obj + 0x14);
       }
-      *(int *)(pcVar1 + 0x28) = iVar8;
+      *(int *)(obj + 0x28) = min_start;
 LAB_00005800:
-      *puVar11 = (uint)pcVar1;
-      puVar11 = puVar11 + 1;
-      local_378 = local_378 + 1;
+      *keep = (uint)obj;
+      keep = keep + 1;
+      read = read + 1;
     }
-    if ((*(int *)(pcVar1 + 0x10) - *(int *)(pcVar1 + 0xc) < 0x19c80) && ((uVar3 & 2) == 0))
+    if ((*(int *)(obj + 0x10) - *(int *)(obj + 0xc) < 0x19c80) && ((flags & 2) == 0))
     goto LAB_000056ac;
-    if (DAT_0001b838 - *(int *)(pcVar1 + 0x3c) < 0x4c) goto LAB_00005800;
-    if (*(int *)(pcVar1 + 0x3c) != 0) {
-      retire_entity( /* Original: FUN_000051ec */(int)pcVar1);
+    if (frame_counter - *(int *)(obj + 0x3c) < 0x4c) goto LAB_00005800;
+    if (*(int *)(obj + 0x3c) != 0) {
+      retire_entity( /* Original: FUN_000051ec */(int)obj);
     }
-    deactivate_object(pcVar1);
-    (&DAT_0001d0e4)[DAT_0001c1dc] = pcVar1;
-    DAT_0001c1dc = DAT_0001c1dc + 1;
-    local_378 = local_378 + 1;
+    deactivate_object(obj);
+    (&entity_array_3)[entity_array_3_count] = obj;
+    entity_array_3_count = entity_array_3_count + 1;
+    read = read + 1;
   } while( true );
 }
 
@@ -8746,64 +9140,64 @@ LAB_00005800:
  *   is above metric + range.
  * - Word loop counters (dbra) for both the list count and the backward scan.
  */
-void dispatch_overlap_collisions /* Original: FUN_00005832 */ (int *param_1,int param_2)
+void dispatch_overlap_collisions /* Original: FUN_00005832 */ (int *list /* param_1: overlap_list */,int header /* param_2: list header, count word +2 */)
 
 {
-  int iVar1;
-  int iVar2;
-  code *pcVar3;
-  int iVar4;
-  uint uVar5;
-  ushort uVar6;
-  int iVar7;
-  short sVar8;
-  int *piVar9;
-  int *piVar10;
+  int obj; /* iVar1: current object */
+  int other; /* iVar2: earlier object */
+  code *notice; /* pcVar3: definition +0x16 notice handler */
+  int reach; /* iVar4: metric + radius, then metric - radius */
+  uint back_left; /* uVar5: earlier entries left */
+  ushort back_left16; /* uVar6: back_left as a word */
+  int min_start; /* iVar7: smallest metric - radius so far */
+  short left; /* sVar8: entries left */
+  int *cursor; /* piVar9: list cursor (also scans backwards) */
+  int *next; /* piVar10: next list entry */
   
-  if (DAT_0001b870 != 3) {
-    DAT_0001b888 = 0;
+  if (replay_state != 3) {
+    designated_entity_2 = 0;
   }
-  sVar8 = *(short *)(param_2 + 2);
-  iVar7 = 0x7fffffff;
-  piVar9 = param_1;
+  left = *(short *)(header + 2);
+  min_start = 0x7fffffff;
+  cursor = list;
   do {
-    sVar8 = sVar8 + -1;
-    if (sVar8 == -1) {
+    left = left + -1;
+    if (left == -1) {
       return;
     }
-    piVar10 = piVar9 + 1;
-    iVar1 = *piVar9;
-    iVar4 = *(int *)(iVar1 + 0xc) + *(int *)(iVar1 + 0x10);
-    if (iVar7 < iVar4) {
-      uVar5 = (int)piVar9 - (int)param_1 >> 2 & 0xffff;
+    next = cursor + 1;
+    obj = *cursor;
+    reach = *(int *)(obj + 0xc) + *(int *)(obj + 0x10);
+    if (min_start < reach) {
+      back_left = (int)cursor - (int)list >> 2 & 0xffff;
       do {
         while( true ) {
-          uVar6 = (short)uVar5 - 1;
-          uVar5 = (uint)uVar6;
-          if (uVar6 == 0xffff) goto LAB_000058d0;
-          piVar9 = piVar9 + -1;
-          iVar2 = *piVar9;
-          if (iVar4 <= *(int *)(iVar2 + 0x10) - *(int *)(iVar2 + 0xc)) break;
-          if ((*(int *)(iVar1 + 8) != 0) &&
-             (pcVar3 = *(code **)(*(int *)(*(int *)(iVar1 + 8) + 4) + 0x16), pcVar3 != (code *)0x0))
+          back_left16 = (short)back_left - 1;
+          back_left = (uint)back_left16;
+          if (back_left16 == 0xffff) goto LAB_000058d0;
+          cursor = cursor + -1;
+          other = *cursor;
+          if (reach <= *(int *)(other + 0x10) - *(int *)(other + 0xc)) break;
+          if ((*(int *)(obj + 8) != 0) &&
+             (notice = *(code **)(*(int *)(*(int *)(obj + 8) + 4) + 0x16), notice != (code *)0x0))
           {
-            (*pcVar3)(iVar1,iVar2);
+            (*notice)(obj,other);
           }
-          if ((*(int *)(iVar2 + 8) != 0) &&
-             (pcVar3 = *(code **)(*(int *)(*(int *)(iVar2 + 8) + 4) + 0x16), pcVar3 != (code *)0x0))
+          if ((*(int *)(other + 8) != 0) &&
+             (notice = *(code **)(*(int *)(*(int *)(other + 8) + 4) + 0x16), notice != (code *)0x0))
           {
-            (*pcVar3)(iVar2,iVar1);
+            (*notice)(other,obj);
           }
         }
-      } while (*(int *)(iVar2 + 0x28) <= iVar4);
+      } while (*(int *)(other + 0x28) <= reach);
     }
 LAB_000058d0:
-    iVar4 = *(int *)(iVar1 + 0x10) - *(int *)(iVar1 + 0xc);
-    if (iVar4 < iVar7) {
-      iVar7 = iVar4;
+    reach = *(int *)(obj + 0x10) - *(int *)(obj + 0xc);
+    if (reach < min_start) {
+      min_start = reach;
     }
-    *(int *)(iVar1 + 0x28) = iVar7;
-    piVar9 = piVar10;
+    *(int *)(obj + 0x28) = min_start;
+    cursor = next;
   } while( true );
 }
 
@@ -8827,74 +9221,74 @@ LAB_000058d0:
 void build_visible_object_list /* Original: FUN_000058ec */ (void)
 
 {
-  int iVar1;
-  short sVar2;
-  short sVar3;
-  int iVar4;
-  int iVar5;
-  short sVar6;
-  short sVar7;
-  int *piVar8;
-  int *piVar9;
-  int *piVar10;
-  int *piVar11;
-  int *local_8;
-  
-  transform_int3_vecs_asr_by_1d744( /* Original: FUN_00002802 */DAT_0001c1d0,&DAT_0001c43c,&DAT_0001c43c,0);
-  piVar9 = &DAT_0001c9dc;
-  local_8 = &DAT_0001c9dc;
-  piVar8 = &DAT_0001c43c;
-  sVar7 = 0;
+  int obj; /* iVar1: candidate object */
+  short edge; /* sVar2: max(|x|, |y|) - scaled radius */
+  short radius; /* sVar3: radius +0x14 >> detail +0x32 */
+  int ax; /* iVar4: |view x|, then 1.5 * edge */
+  int ay; /* iVar5: |view y| */
+  short left; /* sVar6: candidates left in this pass */
+  short pass; /* sVar7: pass 0 / 1 */
+  int *point; /* piVar8: view-space point (x, y, z) */
+  int *keep; /* piVar9: write cursor of kept objects */
+  int *next_keep; /* piVar10: keep after this candidate */
+  int *point_z; /* piVar11: point z */
+  int *read; /* local_8, -8(A6): visible_list read cursor */
+
+  transform_int3_vecs_asr_by_1d744( /* Original: FUN_00002802 */view_point_count,&view_points,&view_points,0);
+  keep = &visible_list;
+  read = &visible_list;
+  point = &view_points;
+  pass = 0;
   do {
-    sVar6 = DAT_0001c1c0;
-    if (sVar7 != 0) {
-      sVar6 = DAT_0001c1d4._2_2_ - DAT_0001c1c0;
-      DAT_0001c1c0 = (short)((int)(piVar9 + -0x7277) >> 2);
+    left = visible_first_pass;
+    if (pass != 0) {
+      left = visible_count._2_2_ - visible_first_pass;
+      visible_first_pass = (short)((int)(keep + -0x7277) >> 2);
     }
-    piVar11 = piVar8 + 2;
-    while (sVar6 = sVar6 + -1, sVar6 != -1) {
-      iVar1 = *local_8;
-      if ((*(byte *)(iVar1 + 7) & 4) == 0) {
-        if (-((*(int *)(iVar1 + 0x10) >> 2) - *(int *)(iVar1 + 0x10)) < *(int *)(iVar1 + 0x14)) {
-          *piVar9 = iVar1;
-          *(uint *)(iVar1 + 4) = *(uint *)(iVar1 + 4) | 8;
-          piVar10 = piVar9 + 1;
+    point_z = point + 2;
+    while (left = left + -1, left != -1) {
+      obj = *read;
+      if ((*(byte *)(obj + 7) & 4) == 0) {
+        if (-((*(int *)(obj + 0x10) >> 2) - *(int *)(obj + 0x10)) < *(int *)(obj + 0x14)) {
+          *keep = obj;
+          *(uint *)(obj + 4) = *(uint *)(obj + 4) | 8;
+          next_keep = keep + 1;
         }
         else {
-          piVar10 = piVar9;
-          if (0 < *piVar11) {
-            iVar4 = abs_int( /* Original: FUN_00002e08 */*piVar8);
-            iVar5 = abs_int( /* Original: FUN_00002e08 */piVar8[1]);
-            sVar3 = (short)(*(int *)(iVar1 + 0x14) >> (*(ushort *)(iVar1 + 0x32) & 0x3f));
-            if ((short)iVar5 < (short)iVar4) {
-              sVar2 = (short)iVar4 - sVar3;
-              iVar4 = (int)(sVar2 >> 1) + (int)sVar2;
+          next_keep = keep;
+          if (0 < *point_z) {
+            ax = abs_int( /* Original: FUN_00002e08 */*point);
+            ay = abs_int( /* Original: FUN_00002e08 */point[1]);
+            radius = (short)(*(int *)(obj + 0x14) >> (*(ushort *)(obj + 0x32) & 0x3f));
+            if ((short)ay < (short)ax) {
+              edge = (short)ax - radius;
+              ax = (int)(edge >> 1) + (int)edge;
             }
             else {
-              sVar2 = (short)iVar5 - sVar3;
-              iVar4 = (int)(sVar2 >> 1) + (int)sVar2;
+              edge = (short)ay - radius;
+              ax = (int)(edge >> 1) + (int)edge;
             }
-            if (iVar4 < *piVar11 + (int)sVar3) {
-              piVar10 = piVar9 + 1;
-              *piVar9 = iVar1;
+            if (ax < *point_z + (int)radius) {
+              next_keep = keep + 1;
+              *keep = obj;
             }
           }
         }
-        piVar11 = piVar11 + 3;
-        piVar8 = piVar8 + 3;
-        piVar9 = piVar10;
-        local_8 = local_8 + 1;
+        point_z = point_z + 3;
+        point = point + 3;
+        keep = next_keep;
+        read = read + 1;
       }
       else {
-        *piVar9 = iVar1;
-        piVar9 = piVar9 + 1;
-        local_8 = local_8 + 1;
+        *keep = obj;
+        keep = keep + 1;
+        read = read + 1;
       }
     }
-    sVar7 = sVar7 + 1;
-  } while (sVar7 < 2);
-  DAT_0001c1d4 = (int)(piVar9 + -0x7277) >> 2;
-  DAT_0001c1d0 = 0;
+    pass = pass + 1;
+  } while (pass < 2);
+  visible_count = (int)(keep + -0x7277) >> 2;
+  view_point_count = 0;
   return;
 }
 
@@ -8910,71 +9304,71 @@ void build_visible_object_list /* Original: FUN_000058ec */ (void)
 void update_altitude_detail_bands /* Original: FUN_00005a14 */ (void)
 
 {
-  int iVar1;
-  bool bVar2;
-  int iVar3;
-  int iVar4;
-  ushort uVar5;
-  ushort uVar6;
-  short sVar8;
-  int iVar9;
-  int iVar10;
-  undefined4 *puVar11;
-  int *piVar12;
-  undefined4 *puVar13;
-  undefined4 *puVar14;
-  int *piVar15;
-  int iVar7;
-  
-  iVar4 = DAT_0001d70c;
-  iVar3 = DAT_0001bdac;
-  bVar2 = false;
-  if ((DAT_0001d834 < DAT_0001d70c) || (DAT_0001d70c * 2 <= DAT_0001d834)) {
-    iVar9 = 0;
-    for (iVar10 = DAT_0001d834; iVar10 != 0; iVar10 = iVar10 >> 1) {
-      iVar9 = iVar9 + 1;
+  int obj; /* iVar1: land object */
+  bool rebuild; /* bVar2: rebuild needed / controllers dropped */
+  int work_a; /* iVar3: mission_child2or3, then the near metric, then the near count */
+  int work_b; /* iVar4: old band, then the band value, the far metric and an index */
+  ushort count_hi; /* uVar5: count high word */
+  ushort halvings; /* uVar6: tolerance halving count, then a count high word */
+  short count_lo; /* sVar8: count low word */
+  int work_c; /* iVar9: bit count / tolerance product / object metric */
+  int work_d; /* iVar10: shifted camera_y / halved tolerance */
+  undefined4 *out; /* puVar11: dropped controller, then the controller_list write cursor */
+  int *read; /* piVar12: array read cursor */
+  undefined4 *next; /* puVar13: next controller slot */
+  undefined4 *ctl_read; /* puVar14: controller_list read cursor */
+  int *write; /* piVar15: array write cursor / entity_array_1 cursor */
+  int work_e; /* iVar7: mission_child1, then the entity_array_1 count */
+
+  work_b = alt_band;
+  work_a = mission_child2or3;
+  rebuild = false;
+  if ((camera_y < alt_band) || (alt_band * 2 <= camera_y)) {
+    work_c = 0;
+    for (work_d = camera_y; work_d != 0; work_d = work_d >> 1) {
+      work_c = work_c + 1;
     }
-    if (iVar9 == 0) {
-      DAT_0001d70c = 0;
-      DAT_0001d704 = 0;
+    if (work_c == 0) {
+      alt_band = 0;
+      alt_band_log2 = 0;
     }
     else {
-      DAT_0001d70c = 1 << (iVar9 - 1U & 0x3f);
-      DAT_0001d704 = (short)iVar9 + -1;
+      alt_band = 1 << (work_c - 1U & 0x3f);
+      alt_band_log2 = (short)work_c + -1;
     }
-    if ((0xff < DAT_0001d70c) || (0xff < iVar4)) {
-      bVar2 = true;
+    if ((0xff < alt_band) || (0xff < work_b)) {
+      rebuild = true;
     }
   }
-  iVar4 = (&DAT_0001b214)[DAT_0001d704];
-  if (DAT_0001d70c != 0) {
-    iVar4 = (iVar4 * (DAT_0001d834 - DAT_0001d70c) >> ((int)DAT_0001d704 & 0x3fU)) + iVar4;
+  work_b = (&alt_value_table)[alt_band_log2];
+  if (alt_band != 0) {
+    work_b = (work_b * (camera_y - alt_band) >> ((int)alt_band_log2 & 0x3fU)) + work_b;
   }
-  iVar10 = 0;
-  iVar9 = 0;
+  work_d = 0;
+  work_c = 0;
   do {
-    *(int *)(*(int *)(iVar3 + 0x44) + 4 + iVar9) = iVar4;
-    iVar7 = DAT_0001bdb0;
-    iVar9 = iVar9 + 0xc;
-    iVar10 = iVar10 + 1;
-  } while (iVar10 < 4);
-  *(int *)(*(int *)(DAT_0001bdb0 + 0x44) + 100) = iVar4;
-  *(int *)(*(int *)(iVar7 + 0x44) + 0x70) = iVar4;
+    *(int *)(*(int *)(work_a + 0x44) + 4 + work_c) = work_b;
+    work_e = mission_child1;
+    work_c = work_c + 0xc;
+    work_d = work_d + 1;
+  } while (work_d < 4);
+  *(int *)(*(int *)(mission_child1 + 0x44) + 100) = work_b;
+  *(int *)(*(int *)(work_e + 0x44) + 0x70) = work_b;
   /* Dropped call arguments [PROVEN, 0x5af8..0x5b54]: the first call is
    * compute_camera_abs_metric(DAT_0001d724, DAT_0001d720, DAT_0001d71c) (last near-range
    * rebuild position x / y / z), the second compute_camera_abs_metric(DAT_0001d718,
    * DAT_0001d714, DAT_0001d710) (last far-range rebuild position). Each result m is
    * compared as m + (m >> 3) (asr.l #3, signed cmpi.l). */
-  iVar3 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
-  iVar3 = (iVar3 >> 3) + iVar3;
-  if (0xce40 < iVar3) {
-    bVar2 = true;
-    DAT_0001d724 = DAT_0001d838;
-    DAT_0001d720 = DAT_0001d834;
-    DAT_0001d71c = DAT_0001d830;
+  work_a = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
+  work_a = (work_a >> 3) + work_a;
+  if (0xce40 < work_a) {
+    rebuild = true;
+    detail_ref_x = camera_x;
+    detail_ref_y = camera_y;
+    detail_ref_z = camera_z;
   }
-  iVar4 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
-  iVar4 = (iVar4 >> 3) + iVar4;
+  work_b = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
+  work_b = (work_b >> 3) + work_b;
   /* Section check 0x5a14..0x5b68 (part 1) [PROVEN, matches the C]: band test y < band ||
    * band * 2 <= y (signed cmp.l); bit length by asr.l #1 until 0 (a negative camera y would
    * never reach 0, same in the C; UNRESOLVED whether y can be negative here); band =
@@ -8985,39 +9379,39 @@ void update_altitude_detail_bands /* Original: FUN_00005a14 */ (void)
    * +0x70 (y of vertices 8 / 9) of DAT_0001bdb0. The asm keeps three flags: d6 (near
    * moved), d7 (far moved), d4 (rebuild); the C's later re-tests of iVar3 / iVar4 are
    * equivalent because neither is reassigned in between. */
-  if (0x80e80 < iVar4) {
-    bVar2 = true;
-    DAT_0001d724 = DAT_0001d838;
-    DAT_0001d718 = DAT_0001d838;
-    DAT_0001d720 = DAT_0001d834;
-    DAT_0001d714 = DAT_0001d834;
-    DAT_0001d71c = DAT_0001d830;
-    DAT_0001d710 = DAT_0001d830;
+  if (0x80e80 < work_b) {
+    rebuild = true;
+    detail_ref_x = camera_x;
+    far_ref_x = camera_x;
+    detail_ref_y = camera_y;
+    far_ref_y = camera_y;
+    detail_ref_z = camera_z;
+    far_ref_z = camera_z;
   }
-  if (bVar2) {
-    uVar6 = 0;
-    for (iVar9 = *(int *)(&DAT_0001b264 + DAT_0001d704 * 4); 0x7fff < iVar9; iVar9 = iVar9 >> 1) {
-      uVar6 = uVar6 + 1;
+  if (rebuild) {
+    halvings = 0;
+    for (work_c = *(int *)(&alt_tolerance_table + alt_band_log2 * 4); 0x7fff < work_c; work_c = work_c >> 1) {
+      halvings = halvings + 1;
     }
-    iVar10 = *(int *)(&DAT_0001b264 + DAT_0001d704 * 4) >> (uVar6 & 0x3f);
-    iVar9 = iVar10 * 0x16a1;
-    if (iVar9 < 0) {
-      iVar9 = iVar9 + 0xfff;
+    work_d = *(int *)(&alt_tolerance_table + alt_band_log2 * 4) >> (halvings & 0x3f);
+    work_c = work_d * 0x16a1;
+    if (work_c < 0) {
+      work_c = work_c + 0xfff;
     }
-    iVar7 = DAT_0001c1e0;
-    piVar15 = &DAT_0001d4a4;
+    work_e = entity_array_1_count;
+    write = &entity_array_1;
     while( true ) {
-      uVar5 = (ushort)((uint)iVar7 >> 0x10);
-      sVar8 = (short)iVar7 + -1;
-      iVar7 = CONCAT22(uVar5,sVar8);
-      if ((sVar8 == -1) && (iVar7 = (uint)uVar5 * 0x10000 + -1, uVar5 == 0)) break;
-      piVar12 = piVar15 + 1;
-      iVar1 = *piVar15;
-      piVar15 = piVar12;
-      if ((*(byte *)(iVar1 + 6) & 0x10) != 0) {
-        reset_object_to_template_pose(iVar1);
-        build_land_outline_at_detail(iVar1,(iVar9 >> 0xc) << ((int)(short)uVar6 & 0x3fU),uVar6,
-                     (short)((iVar10 * 9) / 10));
+      count_hi = (ushort)((uint)work_e >> 0x10);
+      count_lo = (short)work_e + -1;
+      work_e = CONCAT22(count_hi,count_lo);
+      if ((count_lo == -1) && (work_e = (uint)count_hi * 0x10000 + -1, count_hi == 0)) break;
+      read = write + 1;
+      obj = *write;
+      write = read;
+      if ((*(byte *)(obj + 6) & 0x10) != 0) {
+        reset_object_to_template_pose(obj);
+        build_land_outline_at_detail(obj,(work_c >> 0xc) << ((int)(short)halvings & 0x3fU),halvings,
+                     (short)((work_d * 9) / 10));
       }
     }
   }
@@ -9031,46 +9425,46 @@ void update_altitude_detail_bands /* Original: FUN_00005a14 */ (void)
    * bsr.w 0x4958 build_land_outline_at_detail(obj, tolerance, sext uVar6, sext limit). The
    * next test is d6, set by either range branch, so it equals this condition; bVar2 = d4 is
    * cleared at 0x5c48. */
-  if (0x80e80 < iVar4 || 0xce40 < iVar3) {
-    bVar2 = false;
-    if (0x80e80 < iVar4) {
-      piVar15 = &DAT_0001cbe4;
-      piVar12 = &DAT_0001cbe4;
-      iVar4 = 0;
-      iVar3 = DAT_0001c1dc;
-      if (0 < DAT_0001c1d8) {
+  if (0x80e80 < work_b || 0xce40 < work_a) {
+    rebuild = false;
+    if (0x80e80 < work_b) {
+      write = &entity_array_4;
+      read = &entity_array_4;
+      work_b = 0;
+      work_a = entity_array_3_count;
+      if (0 < entity_array_4_count) {
         do {
-          iVar9 = *piVar12;
-          if ((*(byte *)(iVar9 + 7) & 2) == 0) {
-            iVar9 = update_object_camera_metric( /* Original: FUN_00003b98 */*piVar12);
-            if (iVar9 - *(int *)(*piVar12 + 0xc) < 0x80e80) {
-              (&DAT_0001d0e4)[iVar3] = *piVar12;
-              iVar3 = iVar3 + 1;
+          work_c = *read;
+          if ((*(byte *)(work_c + 7) & 2) == 0) {
+            work_c = update_object_camera_metric( /* Original: FUN_00003b98 */*read);
+            if (work_c - *(int *)(*read + 0xc) < 0x80e80) {
+              (&entity_array_3)[work_a] = *read;
+              work_a = work_a + 1;
             }
             else {
-              *piVar15 = *piVar12;
-              piVar15 = piVar15 + 1;
+              *write = *read;
+              write = write + 1;
             }
           }
-          else if (*(char *)(iVar9 + 3) == '\0') {
-            if (*(int *)(iVar9 + 8) != 0) {
-              puVar11 = *(undefined4 **)(iVar9 + 8);
-              *puVar11 = 0;
-              if (*(int *)(puVar11[1] + 10) != 0) {
-                (**(code **)(puVar11[1] + 10))(puVar11);
+          else if (*(char *)(work_c + 3) == '\0') {
+            if (*(int *)(work_c + 8) != 0) {
+              out = *(undefined4 **)(work_c + 8);
+              *out = 0;
+              if (*(int *)(out[1] + 10) != 0) {
+                (**(code **)(out[1] + 10))(out);
               }
-              heap_free_coalesce((int)puVar11);
-              bVar2 = true;
+              heap_free_coalesce((int)out);
+              rebuild = true;
             }
-            heap_free_coalesce(*piVar12);
+            heap_free_coalesce(*read);
           }
           else {
-            *piVar15 = *piVar12;
-            piVar15 = piVar15 + 1;
+            *write = *read;
+            write = write + 1;
           }
-          piVar12 = piVar12 + 1;
-          iVar4 = iVar4 + 1;
-        } while (iVar4 < DAT_0001c1d8);
+          read = read + 1;
+          work_b = work_b + 1;
+        } while (work_b < entity_array_4_count);
       }
       /* Section check 0x5c4a..0x5cfa (part 3) [PROVEN, matches the C]: far branch only (d7).
        * For each of DAT_0001c1d8 active entries (DAT_0001cbe4): byte +7 & 2 clear ->
@@ -9082,47 +9476,47 @@ void update_altitude_detail_bands /* Original: FUN_00005a14 */ (void)
        * heap_free_coalesce) and bVar2 (d4) = 1; then the object itself is freed.
        * piVar15 + -0x72f9 is int pointer arithmetic: ((int)piVar15 - 0x1cbe4) >> 2 = the
        * new active count (subi.l #$1cbe4, asr.l #2). No bound check on the near index. */
-      DAT_0001c1d8 = (int)(piVar15 + -0x72f9) >> 2;
-      DAT_0001c1dc = iVar3;
+      entity_array_4_count = (int)(write + -0x72f9) >> 2;
+      entity_array_3_count = work_a;
     }
-    piVar15 = &DAT_0001d0e4;
-    piVar12 = &DAT_0001d0e4;
-    iVar3 = 0;
-    if (0 < DAT_0001c1dc) {
+    write = &entity_array_3;
+    read = &entity_array_3;
+    work_a = 0;
+    if (0 < entity_array_3_count) {
       do {
-        iVar4 = *piVar12;
-        if ((*(byte *)(iVar4 + 7) & 2) == 0) {
-          iVar4 = update_object_camera_metric( /* Original: FUN_00003b98 */*piVar12);
-          iVar4 = iVar4 - *(int *)(*piVar12 + 0xc);
-          if (iVar4 < 0x80e80) {
-            if (0xce3f < iVar4) goto LAB_00005d94;
-            activate_near_range_object( /* Original: FUN_00004e6e */(char *)*piVar12);
+        work_b = *read;
+        if ((*(byte *)(work_b + 7) & 2) == 0) {
+          work_b = update_object_camera_metric( /* Original: FUN_00003b98 */*read);
+          work_b = work_b - *(int *)(*read + 0xc);
+          if (work_b < 0x80e80) {
+            if (0xce3f < work_b) goto LAB_00005d94;
+            activate_near_range_object( /* Original: FUN_00004e6e */(char *)*read);
           }
           else {
-            (&DAT_0001cbe4)[DAT_0001c1d8] = *piVar12;
-            DAT_0001c1d8 = DAT_0001c1d8 + 1;
+            (&entity_array_4)[entity_array_4_count] = *read;
+            entity_array_4_count = entity_array_4_count + 1;
           }
         }
-        else if (*(char *)(iVar4 + 3) == '\0') {
-          if (*(int *)(iVar4 + 8) != 0) {
-            puVar11 = *(undefined4 **)(iVar4 + 8);
-            *puVar11 = 0;
-            if (*(int *)(puVar11[1] + 10) != 0) {
-              (**(code **)(puVar11[1] + 10))(puVar11);
+        else if (*(char *)(work_b + 3) == '\0') {
+          if (*(int *)(work_b + 8) != 0) {
+            out = *(undefined4 **)(work_b + 8);
+            *out = 0;
+            if (*(int *)(out[1] + 10) != 0) {
+              (**(code **)(out[1] + 10))(out);
             }
-            heap_free_coalesce((int)puVar11);
-            bVar2 = true;
+            heap_free_coalesce((int)out);
+            rebuild = true;
           }
-          heap_free_coalesce(*piVar12);
+          heap_free_coalesce(*read);
         }
         else {
 LAB_00005d94:
-          *piVar15 = *piVar12;
-          piVar15 = piVar15 + 1;
+          *write = *read;
+          write = write + 1;
         }
-        piVar12 = piVar12 + 1;
-        iVar3 = iVar3 + 1;
-      } while (iVar3 < DAT_0001c1dc);
+        read = read + 1;
+        work_a = work_a + 1;
+      } while (work_a < entity_array_3_count);
     }
     /* Section check 0x5d00..0x5df6 (part 4) [PROVEN, matches the C]: near-array pass over
      * DAT_0001c1dc entries (count as updated by the far branch). Normal object: delta =
@@ -9136,24 +9530,24 @@ LAB_00005d94:
      * The asm counts in d2 (32-bit dbra) instead of the global DAT_0001c1cc that Ghidra
      * decrements; nothing is called in the loop, so the final value
      * ((int)puVar11 - 0x1c25c) >> 2 (puVar11 + -0x7097) is the same. */
-    DAT_0001c1dc = (int)(piVar15 + -0x7439) >> 2;
-    if (bVar2) {
-      puVar11 = &DAT_0001c25c;
-      puVar14 = &DAT_0001c25c;
+    entity_array_3_count = (int)(write + -0x7439) >> 2;
+    if (rebuild) {
+      out = &controller_list;
+      ctl_read = &controller_list;
       while( true ) {
-        uVar6 = (ushort)((uint)DAT_0001c1cc >> 0x10);
-        sVar8 = (short)DAT_0001c1cc + -1;
-        DAT_0001c1cc = CONCAT22(uVar6,sVar8);
-        if ((sVar8 == -1) && (DAT_0001c1cc = (uint)uVar6 * 0x10000 + -1, uVar6 == 0)) break;
-        puVar13 = puVar14 + 1;
-        piVar15 = (int *)*puVar14;
-        puVar14 = puVar13;
-        if (*piVar15 != 0) {
-          *puVar11 = piVar15;
-          puVar11 = puVar11 + 1;
+        halvings = (ushort)((uint)controller_count >> 0x10);
+        count_lo = (short)controller_count + -1;
+        controller_count = CONCAT22(halvings,count_lo);
+        if ((count_lo == -1) && (controller_count = (uint)halvings * 0x10000 + -1, halvings == 0)) break;
+        next = ctl_read + 1;
+        write = (int *)*ctl_read;
+        ctl_read = next;
+        if (*write != 0) {
+          *out = write;
+          out = out + 1;
         }
       }
-      DAT_0001c1cc = (int)(puVar11 + -0x7097) >> 2;
+      controller_count = (int)(out + -0x7097) >> 2;
     }
   }
   return;
@@ -9176,16 +9570,16 @@ LAB_00005d94:
  */
 void clear_pending_entity_slots(void) /* Original: FUN_00005df8 */
 {
-  short sVar1;
+  short k; /* sVar1: scatter slot 0..6 */
   
-  sVar1 = 0;
+  k = 0;
   do {
-    if ((&DAT_0001bc64)[sVar1] != 0) {
-      dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)(&DAT_0001bc64)[sVar1]);
-      (&DAT_0001bc64)[sVar1] = 0;
+    if ((&scatter_slots)[k] != 0) {
+      dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)(&scatter_slots)[k]);
+      (&scatter_slots)[k] = 0;
     }
-    sVar1 = sVar1 + 1;
-  } while (sVar1 < 7);
+    k = k + 1;
+  } while (k < 7);
   return;
 }
 
@@ -9207,97 +9601,97 @@ void clear_pending_entity_slots(void) /* Original: FUN_00005df8 */
 void update_ground_scatter_objects /* Original: FUN_00005e28 */ (void)
 
 {
-  char *pcVar1;
-  int iVar2;
-  int iVar3;
-  uint uVar4;
-  int iVar5;
-  int iVar6;
-  ushort uVar7;
-  undefined2 uVar8;
-  short *psVar9;
-  undefined4 *puVar10;
-  int *piVar11;
-  uint *puVar12;
-  short sVar13;
-  short sVar14;
-  ushort uVar15;
+  char *obj; /* pcVar1: object in scatter slot k */
+  int scene_tmpl; /* iVar2: scene_root +0x28 template table */
+  int work; /* iVar3: |dx|/|dz|, sin, screen x, surface result, template, scene record */
+  uint rnd; /* uVar4: overlay_rng_next result / bearing */
+  int cos_v; /* iVar5: cos_fixed14 of the bearing */
+  int work2; /* iVar6: height above ground, screen y, then the point index */
+  ushort surface; /* uVar7: surface type */
+  undefined2 heading; /* uVar8: spawn heading */
+  short *view_z; /* psVar9: view-space z word cursor */
+  undefined4 *init; /* puVar10: point reset cursor */
+  int *pt; /* piVar11: point / view buffer cursor */
+  uint *ptr; /* puVar12: object flag long or point x */
+  short n_visible; /* sVar13: loop index, then the count of newly visible points */
+  short i; /* sVar14: point index */
+  ushort k; /* uVar15: scatter slot 0..6 */
   short asStackY_10384 [32726];
-  undefined4 *local_388;
-  short local_384 [64];
-  int aiStack_304 [2];
-  short local_2fa [379];
-  
-  if (*(short *)(DAT_0001b5a0 + 0xac) != 0) {
-    iVar6 = DAT_0001d834;
-    if (DAT_0001d858 < 6) {
-      iVar6 = DAT_0001d834 - *(int *)(DAT_0001b738 + 0x2e);
+  undefined4 *slot_ptr; /* local_388, -$388(A6): scatter_slots cursor */
+  short visible_points [64]; /* local_384, -$384(A6): newly visible point indices */
+  int view_buf [2]; /* aiStack_304, -$304(A6): camera-relative points */
+  short view_buf_z [379]; /* local_2fa, -$2fa(A6): view_buf + 0xa, the z words */
+
+  if (*(short *)(host_world + 0xac) != 0) {
+    work2 = camera_y;
+    if (view_mode < 6) {
+      work2 = camera_y - *(int *)(player_object + 0x2e);
     }
-    if (iVar6 < 0x26ad) {
-      if (_DAT_00024cec == 0) {
-        _DAT_0001d856 = 1;
-        _DAT_00024cec = 1;
+    if (work2 < 0x26ad) {
+      if (scatter_started == 0) {
+        view_flag_d856 = 1;
+        scatter_started = 1;
       }
-      if (_DAT_0001d856 != 0) {
-        puVar10 = &DAT_0001b924;
-        sVar13 = 0;
+      if (view_flag_d856 != 0) {
+        init = &scatter_point_x;
+        n_visible = 0;
         do {
-          *puVar10 = 1000000000;
-          puVar10[2] = 1000000000;
-          puVar10 = puVar10 + 3;
-          sVar13 = sVar13 + 1;
-        } while (sVar13 < 0x40);
-        sVar13 = 0;
+          *init = 1000000000;
+          init[2] = 1000000000;
+          init = init + 3;
+          n_visible = n_visible + 1;
+        } while (n_visible < 0x40);
+        n_visible = 0;
         do {
-          if ((&DAT_0001bc64)[sVar13] != 0) {
-            puVar12 = (uint *)((&DAT_0001bc64)[sVar13] + 4);
-            *puVar12 = *puVar12 & 0xfffffffb;
+          if ((&scatter_slots)[n_visible] != 0) {
+            ptr = (uint *)((&scatter_slots)[n_visible] + 4);
+            *ptr = *ptr & 0xfffffffb;
           }
-          sVar13 = sVar13 + 1;
-        } while (sVar13 < 7);
+          n_visible = n_visible + 1;
+        } while (n_visible < 7);
       }
-      iVar2 = *(int *)(DAT_0001d6fc + 0x28);
-      piVar11 = &DAT_0001b924;
-      sVar13 = 0;
+      scene_tmpl = *(int *)(scene_root + 0x28);
+      pt = &scatter_point_x;
+      n_visible = 0;
       do {
         /* FUN_00002de8 = abs_int (lea.l $2de8.l is a RUNTIME address = file 0x2e08) with
          * dropped arguments [PROVEN, 0x5ef6..0x5f28]: abs_int(piVar11[0] - DAT_0001d838) and
          * abs_int(piVar11[2] - DAT_0001d830); a slot farther than 0x4d58 from the camera on
          * x or z is re-placed. */
-        iVar3 = FUN_00002de8();
-        if ((0x4d58 < iVar3) || (iVar3 = FUN_00002de8(), 0x4d58 < iVar3)) {
-          if ((DAT_0001d858 < 6) && (_DAT_0001d856 == 0)) {
-            uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
-            uVar4 = (ushort)((*(short *)(DAT_0001b738 + 0x22) +
-                             (short)((int)((uint)((ushort)uVar4 & 0xfff) * 0xc00) >> 0xc)) - 0x600)
+        work = FUN_00002de8();
+        if ((0x4d58 < work) || (work = FUN_00002de8(), 0x4d58 < work)) {
+          if ((view_mode < 6) && (view_flag_d856 == 0)) {
+            rnd = overlay_rng_next( /* Original: FUN_00011564 */);
+            rnd = (ushort)((*(short *)(player_object + 0x22) +
+                             (short)((int)((uint)((ushort)rnd & 0xfff) * 0xc00) >> 0xc)) - 0x600)
                     & 0x3fff;
-            iVar3 = sin_fixed14( /* Original: FUN_00001d76 */uVar4);
-            iVar5 = cos_fixed14( /* Original: FUN_00001dd8 */uVar4);
-            *piVar11 = DAT_0001d838 + ((short)iVar3 * -0x4d58 >> 0xc);
-            piVar11[1] = 0;
-            piVar11[2] = DAT_0001d830 + ((short)iVar5 * 0x4d58 >> 0xc);
+            work = sin_fixed14( /* Original: FUN_00001d76 */rnd);
+            cos_v = cos_fixed14( /* Original: FUN_00001dd8 */rnd);
+            *pt = camera_x + ((short)work * -0x4d58 >> 0xc);
+            pt[1] = 0;
+            pt[2] = camera_z + ((short)cos_v * 0x4d58 >> 0xc);
           }
           else {
-            uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
-            *piVar11 = DAT_0001d838 + -0x4d58 +
-                       ((int)((uint)((ushort)uVar4 & 0xfff) * 0x9ab0) >> 0xc);
-            piVar11[1] = 0;
-            uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
-            piVar11[2] = DAT_0001d830 + -0x4d58 +
-                         ((int)((uint)((ushort)uVar4 & 0xfff) * 0x9ab0) >> 0xc);
+            rnd = overlay_rng_next( /* Original: FUN_00011564 */);
+            *pt = camera_x + -0x4d58 +
+                       ((int)((uint)((ushort)rnd & 0xfff) * 0x9ab0) >> 0xc);
+            pt[1] = 0;
+            rnd = overlay_rng_next( /* Original: FUN_00011564 */);
+            pt[2] = camera_z + -0x4d58 +
+                         ((int)((uint)((ushort)rnd & 0xfff) * 0x9ab0) >> 0xc);
           }
-          if (((((&DAT_0001b8e4)[sVar13] & 0xc0) == 0xc0) &&
-              (((byte)(&DAT_0001b8e4)[sVar13] & 0xff3f) != 0x3f)) &&
-             ((&DAT_0001bc64)[(short)((byte)(&DAT_0001b8e4)[sVar13] & 0xff3f)] != 0)) {
-            puVar12 = (uint *)((&DAT_0001bc64)[(short)((byte)(&DAT_0001b8e4)[sVar13] & 0xff3f)] + 4)
+          if (((((&scatter_state)[n_visible] & 0xc0) == 0xc0) &&
+              (((byte)(&scatter_state)[n_visible] & 0xff3f) != 0x3f)) &&
+             ((&scatter_slots)[(short)((byte)(&scatter_state)[n_visible] & 0xff3f)] != 0)) {
+            ptr = (uint *)((&scatter_slots)[(short)((byte)(&scatter_state)[n_visible] & 0xff3f)] + 4)
             ;
-            *puVar12 = *puVar12 & 0xfffffffb;
+            *ptr = *ptr & 0xfffffffb;
           }
-          (&DAT_0001b8e4)[sVar13] = 0x3f;
+          (&scatter_state)[n_visible] = 0x3f;
         }
-        piVar11 = piVar11 + 3;
-        sVar13 = sVar13 + 1;
-      } while (sVar13 < 0x40);
+        pt = pt + 3;
+        n_visible = n_visible + 1;
+      } while (n_visible < 0x40);
       /* Section check 0x5e28..0x605a (part 1) [PROVEN, matches the C]: word DAT_0001b5a0
        * +0xac == 0 -> DAT_00024cec = 0 and return. h = camera y (minus long DAT_0001b738
        * +0x2e when mode <= 5); h > 0x26ac -> bsr.b 0x5df8 clear_pending_entity_slots and
@@ -9314,32 +9708,32 @@ void update_ground_scatter_objects /* Original: FUN_00005e28 */ (void)
        * byte DAT_0001b8e4[i] has both top bits and a low-6-bit object index != 0x3f clears
        * long +4 bit 2 of DAT_0001bc64[index] (index not bounded to the 7 entries,
        * UNRESOLVED), and the byte becomes 0x3f. */
-      piVar11 = aiStack_304;
-      translate_int3_vecs( /* Original: FUN_00001c5c */0x40,&DAT_0001b924,piVar11,-DAT_0001d838,-iVar6,-DAT_0001d830);
-      transform_vecs12_by_matrix3(0x40,(int)piVar11,(int)piVar11,&DAT_0001d744);
-      sVar13 = 0;
-      sVar14 = 0;
-      psVar9 = local_2fa;
+      pt = view_buf;
+      translate_int3_vecs( /* Original: FUN_00001c5c */0x40,&scatter_point_x,pt,-camera_x,-work2,-camera_z);
+      transform_vecs12_by_matrix3(0x40,(int)pt,(int)pt,&camera_m00);
+      n_visible = 0;
+      i = 0;
+      view_z = view_buf_z;
       do {
-        if (*psVar9 < 5) {
+        if (*view_z < 5) {
 LAB_0000612e:
-          (&DAT_0001b8e4)[sVar14] = (&DAT_0001b8e4)[sVar14] & 0x7f;
+          (&scatter_state)[i] = (&scatter_state)[i] & 0x7f;
         }
         else {
-          iVar3 = ((int)(short)*piVar11 * (int)DAT_00020b28) / (int)*psVar9;
-          iVar6 = ((int)DAT_00020b26 * -(int)*(short *)((int)piVar11 + 6)) / (int)*psVar9;
-          if (((iVar3 < DAT_00020aee) || (DAT_00020aec < iVar3)) ||
-             ((iVar6 < DAT_00020aea || (DAT_0001b73e < iVar6)))) goto LAB_0000612e;
-          if (-1 < (char)(&DAT_0001b8e4)[sVar14]) {
-            (&DAT_0001b8e4)[sVar14] = (&DAT_0001b8e4)[sVar14] | 0x80;
-            local_384[sVar13] = sVar14;
-            sVar13 = sVar13 + 1;
+          work = ((int)(short)*pt * (int)proj_scale_x) / (int)*view_z;
+          work2 = ((int)proj_scale_y * -(int)*(short *)((int)pt + 6)) / (int)*view_z;
+          if (((work < clip_x_min) || (clip_x_max < work)) ||
+             ((work2 < clip_y_min || (clip_y_max < work2)))) goto LAB_0000612e;
+          if (-1 < (char)(&scatter_state)[i]) {
+            (&scatter_state)[i] = (&scatter_state)[i] | 0x80;
+            visible_points[n_visible] = i;
+            n_visible = n_visible + 1;
           }
         }
-        psVar9 = psVar9 + 6;
-        piVar11 = piVar11 + 3;
-        sVar14 = sVar14 + 1;
-      } while (sVar14 < 0x40);
+        view_z = view_z + 6;
+        pt = pt + 3;
+        i = i + 1;
+      } while (i < 0x40);
       /* Section check 0x605c..0x6144 (part 2) [PROVEN, matches the C]: bsr.l 0x1c5c
        * translate_int3_vecs(0x40, &DAT_0001b924, aiStack_304 (a6 - 0x300), -cam x, -h,
        * -cam z), then bsr.l 0x28dc transform_vecs12_by_matrix3(0x40, buf, buf, &DAT_0001d744)
@@ -9351,91 +9745,91 @@ LAB_0000612e:
        * [DAT_00020aee, DAT_00020aec] x [DAT_00020aea, DAT_0001b73e] (signed) -> &= 0x7f;
        * inside and bit 7 clear -> bit 7 set and i appended to local_384 (a6 - 0x380); already
        * set -> unchanged. local_388 (a6 - 0x384) then walks the 7 DAT_0001bc64 objects. */
-      local_388 = &DAT_0001bc64;
-      uVar15 = 0;
+      slot_ptr = &scatter_slots;
+      k = 0;
       do {
-        pcVar1 = (char *)*local_388;
-        if (pcVar1 == (char *)0x0) {
-          if (sVar13 != 0) {
+        obj = (char *)*slot_ptr;
+        if (obj == (char *)0x0) {
+          if (n_visible != 0) {
 joined_r0x000061c6:
             do {
-              if (sVar13 == 0) goto LAB_000063f0;
-              sVar13 = sVar13 + -1;
-              sVar14 = local_384[sVar13];
-              iVar6 = (int)sVar14;
-              puVar12 = &DAT_0001b924 + iVar6 * 3;
-              if (((&DAT_0001b8e4)[iVar6] & 0x40) == 0) {
-                iVar3 = surface_type_at_point(*puVar12,0,(&DAT_0001b92c)[iVar6 * 3]);
-                uVar7 = (ushort)iVar3;
-                (&DAT_0001b8a4)[sVar14] = (char)iVar3;
-                (&DAT_0001b8e4)[sVar14] = (&DAT_0001b8e4)[sVar14] | 0x40;
+              if (n_visible == 0) goto LAB_000063f0;
+              n_visible = n_visible + -1;
+              i = visible_points[n_visible];
+              work2 = (int)i;
+              ptr = &scatter_point_x + work2 * 3;
+              if (((&scatter_state)[work2] & 0x40) == 0) {
+                work = surface_type_at_point(*ptr,0,(&scatter_point_z)[work2 * 3]);
+                surface = (ushort)work;
+                (&scatter_surface)[i] = (char)work;
+                (&scatter_state)[i] = (&scatter_state)[i] | 0x40;
               }
               else {
-                uVar7 = (ushort)(byte)(&DAT_0001b8a4)[iVar6];
+                surface = (ushort)(byte)(&scatter_surface)[work2];
               }
-              iVar3 = *(int *)(&DAT_0001bc24 + ((short)uVar7 >> 4) * 4);
-            } while (iVar3 == 0);
-            (&DAT_0001b8e4)[sVar14] = (byte)uVar15 | (&DAT_0001b8e4)[sVar14] & 0xc0;
-            (&DAT_0001b894)[(short)uVar15] = sVar14;
-            if (uVar7 == 0x10) {
-              uVar8 = 0x540;
+              work = *(int *)(&scatter_templates + ((short)surface >> 4) * 4);
+            } while (work == 0);
+            (&scatter_state)[i] = (byte)k | (&scatter_state)[i] & 0xc0;
+            (&scatter_slot_point)[(short)k] = i;
+            if (surface == 0x10) {
+              heading = 0x540;
             }
             else {
-              uVar4 = overlay_rng_next( /* Original: FUN_00011564 */);
-              uVar8 = (undefined2)((int)((uint)((ushort)uVar4 & 0xfff) * 0x40) >> 4);
+              rnd = overlay_rng_next( /* Original: FUN_00011564 */);
+              heading = (undefined2)((int)((uint)((ushort)rnd & 0xfff) * 0x40) >> 4);
             }
-            if (pcVar1 == (char *)0x0) {
-              iVar6 = spawn_mission_pool_object( /* Original: FUN_00005116 */iVar3,*puVar12,(&DAT_0001b928)[iVar6 * 3],
-                                   (&DAT_0001b92c)[iVar6 * 3],0,uVar8,0,0);
-              (&DAT_0001bc64)[(short)uVar15] = iVar6;
+            if (obj == (char *)0x0) {
+              work2 = spawn_mission_pool_object( /* Original: FUN_00005116 */work,*ptr,(&scatter_point_y)[work2 * 3],
+                                   (&scatter_point_z)[work2 * 3],0,heading,0,0);
+              (&scatter_slots)[(short)k] = work2;
             }
-            else if ((pcVar1[1] == *(char *)(iVar3 + 1)) && (*(int *)(pcVar1 + 0x44) != 0)) {
-              if (*(int *)(pcVar1 + 0x2c) != 0) {
-                release_fractal_reference((int)pcVar1);
+            else if ((obj[1] == *(char *)(work + 1)) && (*(int *)(obj + 0x44) != 0)) {
+              if (*(int *)(obj + 0x2c) != 0) {
+                release_fractal_reference((int)obj);
               }
-              *(ushort *)(pcVar1 + 6) = *(ushort *)(pcVar1 + 6) | 0x800;
-              iVar3 = *(int *)(DAT_0001d6fc + 0x30) + (uint)(byte)pcVar1[2] * 0x18;
-              *(uint *)(iVar3 + 8) = *puVar12;
-              *(undefined4 *)(iVar3 + 0xc) = 0;
-              *(undefined4 *)(iVar3 + 0x10) = (&DAT_0001b92c)[iVar6 * 3];
-              *(undefined2 *)(iVar3 + 4) = uVar8;
-              iVar3 = *(int *)(DAT_0001b5a0 + 0x8c) +
-                      *(int *)(iVar2 + 0x2e + (uint)(byte)pcVar1[1] * 0x18);
-              *(uint *)(pcVar1 + 0x18) = *(int *)(iVar3 + 2) + *puVar12;
-              *(undefined4 *)(pcVar1 + 0x1c) = *(undefined4 *)(iVar3 + 6);
-              *(int *)(pcVar1 + 0x20) = *(int *)(iVar3 + 10) + (&DAT_0001b92c)[iVar6 * 3];
-              if ((pcVar1[5] & 0x10U) == 0) {
-                apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)pcVar1,
-                             (int)*(short *)(pcVar1 + 0x3a) + (int)*(short *)(pcVar1 + 0x36),
-                             (uint *)(iVar3 + 0x22),*(uint **)(pcVar1 + 0x44));
+              *(ushort *)(obj + 6) = *(ushort *)(obj + 6) | 0x800;
+              work = *(int *)(scene_root + 0x30) + (uint)(byte)obj[2] * 0x18;
+              *(uint *)(work + 8) = *ptr;
+              *(undefined4 *)(work + 0xc) = 0;
+              *(undefined4 *)(work + 0x10) = (&scatter_point_z)[work2 * 3];
+              *(undefined2 *)(work + 4) = heading;
+              work = *(int *)(host_world + 0x8c) +
+                      *(int *)(scene_tmpl + 0x2e + (uint)(byte)obj[1] * 0x18);
+              *(uint *)(obj + 0x18) = *(int *)(work + 2) + *ptr;
+              *(undefined4 *)(obj + 0x1c) = *(undefined4 *)(work + 6);
+              *(int *)(obj + 0x20) = *(int *)(work + 10) + (&scatter_point_z)[work2 * 3];
+              if ((obj[5] & 0x10U) == 0) {
+                apply_template_chain_xform( /* Original: FUN_00002bd8 */(int)obj,
+                             (int)*(short *)(obj + 0x3a) + (int)*(short *)(obj + 0x36),
+                             (uint *)(work + 0x22),*(uint **)(obj + 0x44));
               }
               else {
-                translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(pcVar1 + 0x3a) + (int)*(short *)(pcVar1 + 0x36),
-                             (int *)(iVar3 + 0x22),*(int **)(pcVar1 + 0x44),0,0,0);
+                translate_int3_vecs( /* Original: FUN_00001c5c */(int)*(short *)(obj + 0x3a) + (int)*(short *)(obj + 0x36),
+                             (int *)(work + 0x22),*(int **)(obj + 0x44),0,0,0);
               }
-              update_object_camera_metric( /* Original: FUN_00003b98 */(int)pcVar1);
-              update_object_distance_band((int)pcVar1,*(int *)(pcVar1 + 0x10));
-              shade_object_faces(pcVar1);
+              update_object_camera_metric( /* Original: FUN_00003b98 */(int)obj);
+              update_object_distance_band((int)obj,*(int *)(obj + 0x10));
+              shade_object_faces(obj);
             }
             else {
-              dispatch_entity_cleanup( /* Original: FUN_0000528a */pcVar1);
-              iVar6 = spawn_mission_pool_object( /* Original: FUN_00005116 */iVar3,*puVar12,(&DAT_0001b928)[iVar6 * 3],
-                                   (&DAT_0001b92c)[iVar6 * 3],0,uVar8,0,0);
-              (&DAT_0001bc64)[(short)uVar15] = iVar6;
+              dispatch_entity_cleanup( /* Original: FUN_0000528a */obj);
+              work2 = spawn_mission_pool_object( /* Original: FUN_00005116 */work,*ptr,(&scatter_point_y)[work2 * 3],
+                                   (&scatter_point_z)[work2 * 3],0,heading,0,0);
+              (&scatter_slots)[(short)k] = work2;
             }
           }
         }
-        else if ((*(uint *)(pcVar1 + 4) & 6) == 0) {
-          sVar14 = (&DAT_0001b894)[(short)uVar15];
-          if ((uVar15 | 0xc0) != (ushort)(byte)(&DAT_0001b8e4)[sVar14]) {
-            if ((int)(short)uVar15 == ((byte)(&DAT_0001b8e4)[sVar14] & 0xffffff3f)) {
-              (&DAT_0001b8e4)[sVar14] = (&DAT_0001b8e4)[sVar14] | 0x3f;
+        else if ((*(uint *)(obj + 4) & 6) == 0) {
+          i = (&scatter_slot_point)[(short)k];
+          if ((k | 0xc0) != (ushort)(byte)(&scatter_state)[i]) {
+            if ((int)(short)k == ((byte)(&scatter_state)[i] & 0xffffff3f)) {
+              (&scatter_state)[i] = (&scatter_state)[i] | 0x3f;
             }
-            if (sVar13 != 0) {
-              *(uint *)(pcVar1 + 4) = *(uint *)(pcVar1 + 4) & 0xffffffbf;
+            if (n_visible != 0) {
+              *(uint *)(obj + 4) = *(uint *)(obj + 4) & 0xffffffbf;
               goto joined_r0x000061c6;
             }
-            *(uint *)(pcVar1 + 4) = *(uint *)(pcVar1 + 4) | 0x40;
+            *(uint *)(obj + 4) = *(uint *)(obj + 4) | 0x40;
           }
         }
         /* Section check 0x6146..0x6400 (part 3) [PROVEN, matches the C]: for object k of the 7
@@ -9457,19 +9851,19 @@ joined_r0x000061c6:
          * present object) 0x5116 spawn_mission_pool_object(template, x, y, z, 0, sext heading,
          * 0, 0) into DAT_0001bc64[k]. Loop k <= 6, then return. */
 LAB_000063f0:
-        uVar15 = uVar15 + 1;
-        local_388 = local_388 + 1;
-        if (6 < (short)uVar15) {
+        k = k + 1;
+        slot_ptr = slot_ptr + 1;
+        if (6 < (short)k) {
           return;
         }
       } while( true );
     }
-    if (_DAT_00024cec == 0) {
+    if (scatter_started == 0) {
       return;
     }
     clear_pending_entity_slots();
   }
-  _DAT_00024cec = 0;
+  scatter_started = 0;
   return;
 }
 
@@ -9489,67 +9883,67 @@ LAB_000063f0:
 void spawn_cloud_layer /* Original: FUN_0000640c */ (void)
 
 {
-  uint uVar1;
-  uint uVar2;
-  int iVar3;
-  ushort uVar6;
-  int iVar4;
-  int iVar5;
-  short sVar7;
-  short sVar8;
-  short sVar9;
-  short sVar10;
+  uint rnd; /* uVar1: overlay_rng_next result (class / factor / height draws) */
+  uint rnd_bearing; /* uVar2: overlay_rng_next for the bearing */
+  int work; /* iVar3: controller, angle difference, then the height */
+  ushort rnd_word; /* uVar6: overlay_rng_next low word for the class-4 height */
+  int sin_v; /* iVar4: sin_fixed14(bearing) */
+  int cos_v; /* iVar5: cos_fixed14(bearing) */
+  short factor; /* sVar7: distance factor (15..24 or 35..44) */
+  short n; /* sVar8: entity / cloud index */
+  short bearing; /* sVar9: bearing (random byte << 6), then 0 for class 4 */
+  short j; /* sVar10: earlier bearing index, then the class 0..4 */
   short asStackY_10018 [32738];
-  short local_18 [10];
+  short bearings [10]; /* local_18, -$18(A6): bearings already placed */
   
-  if (*(short *)(DAT_0001b5a0 + 0xae) == 0) {
-    for (sVar8 = 0; sVar8 < DAT_0001c1e0; sVar8 = sVar8 + 1) {
-      iVar3 = *(int *)((&DAT_0001d4a4)[sVar8] + 8);
-      if ((iVar3 != 0) && (**(short **)(iVar3 + 4) == 0x1d)) {
-        retire_entity( /* Original: FUN_000051ec */(&DAT_0001d4a4)[sVar8]);
+  if (*(short *)(host_world + 0xae) == 0) {
+    for (n = 0; n < entity_array_1_count; n = n + 1) {
+      work = *(int *)((&entity_array_1)[n] + 8);
+      if ((work != 0) && (**(short **)(work + 4) == 0x1d)) {
+        retire_entity( /* Original: FUN_000051ec */(&entity_array_1)[n]);
       }
     }
   }
   else {
-    sVar8 = 0;
+    n = 0;
     do {
-      uVar1 = overlay_rng_next( /* Original: FUN_00011564 */);
+      rnd = overlay_rng_next( /* Original: FUN_00011564 */);
       do {
-        uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
-        sVar10 = 0;
-        sVar9 = (short)((uVar2 & 0xff) << 6);
-        if (0 < sVar8) {
+        rnd_bearing = overlay_rng_next( /* Original: FUN_00011564 */);
+        j = 0;
+        bearing = (short)((rnd_bearing & 0xff) << 6);
+        if (0 < n) {
           do {
-            iVar3 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */sVar9 - local_18[sVar10]);
-            iVar3 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar3);
-            if (iVar3 < 0x280) break;
-            sVar10 = sVar10 + 1;
-          } while (sVar10 < sVar8);
+            work = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */bearing - bearings[j]);
+            work = abs_int( /* Original: FUN_00002e08 */(int)(short)work);
+            if (work < 0x280) break;
+            j = j + 1;
+          } while (j < n);
         }
-      } while (sVar8 != sVar10);
-      local_18[sVar8] = sVar9;
-      sVar10 = (short)((uVar1 & 0xffff) % 5);
-      if (sVar10 == 4) {
-        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
-        sVar7 = (short)((uVar1 & 0xffff) % 10) + 0xf;
-        uVar6 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
-        iVar3 = (uint)(uVar6 & 0xfff) * 10 + 300000;
+      } while (n != j);
+      bearings[n] = bearing;
+      j = (short)((rnd & 0xffff) % 5);
+      if (j == 4) {
+        rnd = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
+        factor = (short)((rnd & 0xffff) % 10) + 0xf;
+        rnd_word = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
+        work = (uint)(rnd_word & 0xfff) * 10 + 300000;
       }
       else {
-        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
-        sVar7 = (short)((uVar1 & 0xffff) % 10) + 0x23;
-        uVar1 = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
-        iVar3 = (uVar1 & 0xffff) % 1000 + 0xcc4c;
+        rnd = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
+        factor = (short)((rnd & 0xffff) % 10) + 0x23;
+        rnd = overlay_rng_next( /* Ghidra FUN_00011544 callsite = overlay_rng_next [PROVEN: lea.l $11544.l = runtime -> file 0x11564] */);
+        work = (rnd & 0xffff) % 1000 + 0xcc4c;
       }
-      iVar4 = sin_fixed14( /* Original: FUN_00001d76 */(int)sVar9);
-      iVar5 = cos_fixed14( /* Original: FUN_00001dd8 */(int)sVar9);
-      if (sVar10 == 4) {
-        sVar9 = 0;
+      sin_v = sin_fixed14( /* Original: FUN_00001d76 */(int)bearing);
+      cos_v = cos_fixed14( /* Original: FUN_00001dd8 */(int)bearing);
+      if (j == 4) {
+        bearing = 0;
       }
-      spawn_camera_relative_object((int)sVar10,(int)sVar7 * (short)iVar4 * 0x339 >> 6,iVar3,
-                   (short)iVar5 * 0x339 * (int)sVar7 >> 6,0,0x4000U - sVar9 & 0x3fff,0);
-      sVar8 = sVar8 + 1;
-    } while (sVar8 < 10);
+      spawn_camera_relative_object((int)j,(int)factor * (short)sin_v * 0x339 >> 6,work,
+                   (short)cos_v * 0x339 * (int)factor >> 6,0,0x4000U - bearing & 0x3fff,0);
+      n = n + 1;
+    } while (n < 10);
   }
   return;
 }
@@ -9594,76 +9988,76 @@ void spawn_cloud_layer /* Original: FUN_0000640c */ (void)
  * disassembly (section checks in the body); identical to the C, every PC-relative callee
  * resolved to its named function.
  */
-void overlay_frame_step /* Original: FUN_00006598 */ (int param_1,int param_2)
+void overlay_frame_step /* Original: FUN_00006598 */ (int step_mode /* param_1: 0 re-creates the session buffers and redraws the panels [role HYPOTHESIS] */,int new_frame /* param_2: 1 swaps the slot usage maps and draws the distant dots */)
 
 {
-  undefined4 uVar1;
-  char *pcVar2;
-  undefined4 *puVar3;
-  ushort uVar4;
-  short sVar8;
-  int iVar5;
-  short sVar9;
-  int iVar6;
-  int iVar7;
-  int *piVar10;
-  undefined4 *puVar11;
-  int iVar12;
-  int *piVar13;
-  int iVar14;
-  bool bVar15;
-  undefined4 local_2a;
-  undefined4 local_26;
-  short asStack_22 [9];
-  undefined1 auStack_10 [2];
-  undefined2 local_e;
-  undefined2 local_a;
-  undefined2 local_6;
-  
-  puVar3 = DAT_0001d864;
-  puVar11 = DAT_0001d860;
-  sVar8 = 0;
-  if ((*(short *)(DAT_0001b5a0 + 0x76) != 0) && (*(short *)(DAT_0001b5a0 + 0x9e) == 0)) {
-    sVar8 = 1;
+  undefined4 swap; /* uVar1: span buffer swap temporary */
+  char *child; /* pcVar2: mission_child2or3 */
+  undefined4 *old_cur; /* puVar3: slot_usage_cur before the swap */
+  ushort idx_hi; /* uVar4: sort index high word */
+  short host_hooks; /* sVar8: host word +0x76 set and +0x9e clear (calls the host +0x2c2 hook) */
+  int work_a; /* iVar5: object / sin / rider */
+  short idx_lo; /* sVar9: sort index low word, then a clip bound */
+  int work_b; /* iVar6: metric / sort index / carrier controller */
+  int work_c; /* iVar7: sort index / rider / metric */
+  int *cursor; /* piVar10: array cursor */
+  undefined4 *clear; /* puVar11: usage-map clear cursor */
+  int level; /* iVar12: carrier controller word +0x54 */
+  int *scan; /* piVar13: insertion-sort scan */
+  int work_d; /* iVar14: counters, fold result, x offset */
+  bool keep_panels; /* bVar15: host +0x26a cleared panels_drawn */
+  undefined4 span_a; /* local_2a, -$2a(A6): session_cur_a for the span filler */
+  undefined4 span_b; /* local_26, -$26(A6): session_cur_b for the span filler */
+  short matrix [9]; /* asStack_22: mode-2 attitude matrix */
+  undefined1 vec [2]; /* auStack_10: 12-byte vector (0, 0, 0x1000) */
+  undefined2 vec_x; /* local_e, -$e(A6): vec x word */
+  undefined2 vec_y; /* local_a, -$a(A6): vec y word */
+  undefined2 vec_z; /* local_6, -6(A6): vec z word */
+
+  old_cur = slot_usage_cur;
+  clear = slot_usage_prev;
+  host_hooks = 0;
+  if ((*(short *)(host_world + 0x76) != 0) && (*(short *)(host_world + 0x9e) == 0)) {
+    host_hooks = 1;
   }
-  if (param_2 == 1) {
-    DAT_0001d864 = DAT_0001d860;
-    DAT_0001d860 = puVar3;
-    iVar14 = 0x40;
-    while (iVar14 = iVar14 + -1, iVar14 != -1) {
-      *puVar11 = 0;
-      puVar11 = puVar11 + 1;
+  if (new_frame == 1) {
+    slot_usage_cur = slot_usage_prev;
+    slot_usage_prev = old_cur;
+    work_d = 0x40;
+    while (work_d = work_d + -1, work_d != -1) {
+      *clear = 0;
+      clear = clear + 1;
     }
-    *(char *)((int)DAT_0001da8a + (int)DAT_0001d864) =
-         *(char *)((int)DAT_0001da8a + (int)DAT_0001d864) + '\x01';
+    *(char *)((int)colour_tally_index + (int)slot_usage_cur) =
+         *(char *)((int)colour_tally_index + (int)slot_usage_cur) + '\x01';
   }
-  if (0x13 < DAT_00024cf0) {
+  if (0x13 < retire_count) {
     reset_distance_base_globals();
-    DAT_00024cf0 = 0;
+    retire_count = 0;
   }
   update_altitude_detail_bands();
-  if (DAT_0001b826 == 8) {
-    DAT_0001daa0 = *(undefined2 *)(DAT_0001d85c + 0x1a0);
+  if (view_depth == 8) {
+    fill_colour = *(undefined2 *)(slot_to_index_map + 0x1a0);
   }
-  else if (DAT_0001b826 == 4) {
-    DAT_0001daa0 = *(undefined2 *)(DAT_0001d85c + 0x10);
+  else if (view_depth == 4) {
+    fill_colour = *(undefined2 *)(slot_to_index_map + 0x10);
   }
-  if (DAT_0001d858 == 2) {
-    build_attitude_matrix_6ang( /* Original: FUN_000026cc */-(int)DAT_0001d810 & 0x3fff,0,-(int)DAT_0001d80c & 0x3fff,-DAT_0001d808 & 0x3fff,
-                 -DAT_0001d804 & 0x3fff,-DAT_0001d800 & 0x3fff,(int)asStack_22);
-    local_a = 0;
-    local_e = 0;
-    local_6 = 0x1000;
-    transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
-    DAT_0001d7f8 = local_e;
-    DAT_0001d7f6 = local_6;
-    invoke_tagged_attitude_compose_neg_sins6( /* Original: FUN_000027cc */&DAT_0001d744);
+  if (view_mode == 2) {
+    build_attitude_matrix_6ang( /* Original: FUN_000026cc */-(int)neg_camera_pitch & 0x3fff,0,-(int)camera_angle3 & 0x3fff,-camera_angle4 & 0x3fff,
+                 -camera_angle5 & 0x3fff,-camera_angle6 & 0x3fff,(int)matrix);
+    vec_y = 0;
+    vec_x = 0;
+    vec_z = 0x1000;
+    transform_vecs12_by_matrix3(1,(int)vec,(int)vec,matrix);
+    angle2_sin = vec_x;
+    angle2_cos = vec_z;
+    invoke_tagged_attitude_compose_neg_sins6( /* Original: FUN_000027cc */&camera_m00);
   }
   else {
-    iVar14 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)DAT_0001d808);
-    iVar5 = sin_fixed14( /* Original: FUN_00001d76 */(int)DAT_0001d80c);
-    build_attitude_matrix_x_alt( /* Original: FUN_000024d6 */(int)DAT_0001d810,(int)(short)iVar14 * (int)(short)iVar5 >> 0xc & 0x3fff,
-                 (int)DAT_0001d80c,DAT_0001d808,0x1d744);
+    work_d = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)camera_angle4);
+    work_a = sin_fixed14( /* Original: FUN_00001d76 */(int)camera_angle3);
+    build_attitude_matrix_x_alt( /* Original: FUN_000024d6 */(int)neg_camera_pitch,(int)(short)work_d * (int)(short)work_a >> 0xc & 0x3fff,
+                 (int)camera_angle3,camera_angle4,0x1d744);
   }
   /* Section check 0x6598..0x674e (part 1) [PROVEN, matches the C]: sVar8 (d3) = word
    * DAT_0001b5a0 +0x76 != 0 && word +0x9e == 0. param_2 == 1: DAT_0001d860 / DAT_0001d864
@@ -9679,30 +10073,30 @@ void overlay_frame_step /* Original: FUN_00006598 */ (int param_1,int param_2)
    * sin_fixed14(sext DAT_0001d80c) as muls.w, asr.l #12, & 0x3fff, passed to
    * build_attitude_matrix_x_alt(sext DAT_0001d810, that, sext DAT_0001d80c, DAT_0001d808,
    * &DAT_0001d744). */
-  if (*(short *)(DAT_0001b5a0 + 0xaa) == 0) {
-    (&DAT_0001c9dc)[DAT_0001c1d4] = DAT_0001bdb4;
-    DAT_0001c1d4 = DAT_0001c1d4 + 1;
-    *(uint *)(DAT_0001bdb4 + 4) = *(uint *)(DAT_0001bdb4 + 4) | 4;
-    (&DAT_0001c9dc)[DAT_0001c1d4] = DAT_0001bdac;
+  if (*(short *)(host_world + 0xaa) == 0) {
+    (&visible_list)[visible_count] = mission_child0;
+    visible_count = visible_count + 1;
+    *(uint *)(mission_child0 + 4) = *(uint *)(mission_child0 + 4) | 4;
+    (&visible_list)[visible_count] = mission_child2or3;
   }
   else {
-    (&DAT_0001c9dc)[DAT_0001c1d4] = DAT_0001bdb0;
-    iVar14 = DAT_0001bdb0;
-    DAT_0001c1d4 = DAT_0001c1d4 + 1;
-    *(uint *)(DAT_0001bdb0 + 4) = *(uint *)(DAT_0001bdb0 + 4) | 4;
-    transform_vecs12_by_matrix3((int)*(short *)(iVar14 + 0x36),*(int *)(iVar14 + 0x44),*(int *)(iVar14 + 0x4c),
-                 &DAT_0001d744);
-    iVar14 = update_object_distance_band((int)DAT_0001bdac,DAT_0001d834 << 1);
-    if (iVar14 != 0) {
-      shade_object_faces(DAT_0001bdac);
+    (&visible_list)[visible_count] = mission_child1;
+    work_d = mission_child1;
+    visible_count = visible_count + 1;
+    *(uint *)(mission_child1 + 4) = *(uint *)(mission_child1 + 4) | 4;
+    transform_vecs12_by_matrix3((int)*(short *)(work_d + 0x36),*(int *)(work_d + 0x44),*(int *)(work_d + 0x4c),
+                 &camera_m00);
+    work_d = update_object_distance_band((int)mission_child2or3,camera_y << 1);
+    if (work_d != 0) {
+      shade_object_faces(mission_child2or3);
     }
-    (&DAT_0001c9dc)[DAT_0001c1d4] = DAT_0001bdac;
+    (&visible_list)[visible_count] = mission_child2or3;
   }
-  pcVar2 = DAT_0001bdac;
-  DAT_0001c1d4 = DAT_0001c1d4 + 1;
-  *(uint *)(DAT_0001bdac + 4) = *(uint *)(DAT_0001bdac + 4) | 4;
-  transform_vecs12_by_matrix3((int)*(short *)(pcVar2 + 0x36),*(int *)(pcVar2 + 0x44),*(int *)(pcVar2 + 0x4c),
-               &DAT_0001d744);
+  child = mission_child2or3;
+  visible_count = visible_count + 1;
+  *(uint *)(mission_child2or3 + 4) = *(uint *)(mission_child2or3 + 4) | 4;
+  transform_vecs12_by_matrix3((int)*(short *)(child + 0x36),*(int *)(child + 0x44),*(int *)(child + 0x4c),
+               &camera_m00);
   /* Section check 0x6750..0x684a (part 2) [PROVEN, matches the C]: word DAT_0001b5a0 +0xaa
    * == 0 (beq 0x67ea) queues DAT_0001bdb4 into DAT_0001c9dc[DAT_0001c1d4++] with long +4 |=
    * 4; otherwise DAT_0001bdb0 is queued, flagged and transformed (0x28dc: sext word +0x36
@@ -9710,18 +10104,18 @@ void overlay_frame_step /* Original: FUN_00006598 */ (int param_1,int param_2)
    * update_object_distance_band(DAT_0001bdac, DAT_0001d834 << 1) and on non-zero bsr.w
    * 0x3ea0 shade_object_faces(DAT_0001bdac). Both arms then queue DAT_0001bdac, set its
    * long +4 |= 4 and transform it the same way (shared tail at 0x682a). */
-  if (DAT_0001d858 == 2) {
-    build_attitude_matrix_6ang_alt( /* Original: FUN_0000276e */(int)DAT_0001d810,(int)DAT_0001d80e,(int)DAT_0001d80c,DAT_0001d808,DAT_0001d804,
-                 DAT_0001d800,0x1d744);
+  if (view_mode == 2) {
+    build_attitude_matrix_6ang_alt( /* Original: FUN_0000276e */(int)neg_camera_pitch,(int)neg_camera_heading,(int)camera_angle3,camera_angle4,camera_angle5,
+                 camera_angle6,0x1d744);
   }
   else {
-    build_attitude_matrix_x_alt( /* Original: FUN_000024d6 */(int)DAT_0001d810,(int)DAT_0001d80e,(int)DAT_0001d80c,DAT_0001d808,0x1d744);
+    build_attitude_matrix_x_alt( /* Original: FUN_000024d6 */(int)neg_camera_pitch,(int)neg_camera_heading,(int)camera_angle3,camera_angle4,0x1d744);
   }
-  piVar10 = &DAT_0001d4a4;
-  iVar14 = DAT_0001c1e0;
-  while (iVar14 = iVar14 + -1, iVar14 != -1) {
-    update_object_camera_metric( /* Original: FUN_00003b98 */*piVar10);
-    piVar10 = piVar10 + 1;
+  cursor = &entity_array_1;
+  work_d = entity_array_1_count;
+  while (work_d = work_d + -1, work_d != -1) {
+    update_object_camera_metric( /* Original: FUN_00003b98 */*cursor);
+    cursor = cursor + 1;
   }
   /* Section check 0x684c..0x68f4 (part 3) [PROVEN, matches the C]: mode 2 ->
    * bsr.l 0x276e build_attitude_matrix_6ang_alt(sext DAT_0001d810, sext DAT_0001d80e, sext
@@ -9733,90 +10127,90 @@ void overlay_frame_step /* Original: FUN_00006598 */ (int param_1,int param_2)
    * update_ground_scatter_objects, DAT_0001bdb8 = DAT_0001c1d4, then tst.w DAT_0001b85c;
    * beq 0x69f2 selects the sorted (== 0) arm. */
   update_ground_scatter_objects();
-  DAT_0001bdb8 = DAT_0001c1d4;
-  if (DAT_0001b85c == 0) {
-    iVar14 = 0;
-    if (0 < DAT_0001b734) {
+  visible_list_split = visible_count;
+  if (carried_pair_count == 0) {
+    work_d = 0;
+    if (0 < object_count) {
       do {
-        iVar5 = (&DAT_0001b5a4)[iVar14];
-        iVar6 = update_object_camera_metric( /* Original: FUN_00003b98 */iVar5);
-        iVar7 = iVar14 + -1;
-        if (-1 < iVar7) {
-          piVar10 = &DAT_0001b5a4 + iVar7;
+        work_a = (&object_pool)[work_d];
+        work_b = update_object_camera_metric( /* Original: FUN_00003b98 */work_a);
+        work_c = work_d + -1;
+        if (-1 < work_c) {
+          cursor = &object_pool + work_c;
           do {
-            if (iVar6 <= *(int *)(*piVar10 + 0x10)) break;
-            (&DAT_0001b5a8)[iVar7] = *piVar10;
-            piVar10 = piVar10 + -1;
-            uVar4 = (ushort)((uint)iVar7 >> 0x10);
-            sVar9 = (short)iVar7 + -1;
-            iVar7 = CONCAT22(uVar4,sVar9);
-          } while ((sVar9 != -1) || (iVar7 = (uint)uVar4 * 0x10000 + -1, uVar4 != 0));
+            if (work_b <= *(int *)(*cursor + 0x10)) break;
+            (&object_pool_next)[work_c] = *cursor;
+            cursor = cursor + -1;
+            idx_hi = (ushort)((uint)work_c >> 0x10);
+            idx_lo = (short)work_c + -1;
+            work_c = CONCAT22(idx_hi,idx_lo);
+          } while ((idx_lo != -1) || (work_c = (uint)idx_hi * 0x10000 + -1, idx_hi != 0));
         }
-        (&DAT_0001b5a8)[iVar7] = iVar5;
-        iVar14 = iVar14 + 1;
-      } while (iVar14 < DAT_0001b734);
+        (&object_pool_next)[work_c] = work_a;
+        work_d = work_d + 1;
+      } while (work_d < object_count);
     }
   }
   else {
-    iVar14 = 0;
-    if (0 < DAT_0001b734) {
-      piVar10 = &DAT_0001b5a4;
+    work_d = 0;
+    if (0 < object_count) {
+      cursor = &object_pool;
       do {
-        update_object_camera_metric( /* Original: FUN_00003b98 */*piVar10);
-        iVar14 = iVar14 + 1;
-        piVar10 = piVar10 + 1;
-      } while (iVar14 < DAT_0001b734);
+        update_object_camera_metric( /* Original: FUN_00003b98 */*cursor);
+        work_d = work_d + 1;
+        cursor = cursor + 1;
+      } while (work_d < object_count);
     }
-    iVar14 = (int)DAT_0001b85c;
-    piVar10 = DAT_0001b860;
-    while (iVar14 = iVar14 + -1, iVar14 != -1) {
-      iVar5 = *piVar10;
-      iVar7 = piVar10[1];
-      iVar6 = *(int *)(iVar5 + 8);
-      *(undefined4 *)(iVar7 + 0x28) = *(undefined4 *)(iVar7 + 0x10);
-      iVar12 = (int)*(short *)(iVar6 + 0x54);
-      if (iVar12 < DAT_0001d834) {
-        if (*(int *)(iVar7 + 0x1c) < iVar12) {
+    work_d = (int)carried_pair_count;
+    cursor = carried_pairs;
+    while (work_d = work_d + -1, work_d != -1) {
+      work_a = *cursor;
+      work_c = cursor[1];
+      work_b = *(int *)(work_a + 8);
+      *(undefined4 *)(work_c + 0x28) = *(undefined4 *)(work_c + 0x10);
+      level = (int)*(short *)(work_b + 0x54);
+      if (level < camera_y) {
+        if (*(int *)(work_c + 0x1c) < level) {
 LAB_00006964:
-          *(int *)(iVar7 + 0x10) = *(int *)(iVar5 + 0x14) + *(int *)(iVar7 + 0x10);
+          *(int *)(work_c + 0x10) = *(int *)(work_a + 0x14) + *(int *)(work_c + 0x10);
         }
         else {
-          *(int *)(iVar7 + 0x10) = *(int *)(iVar7 + 0x10) - *(int *)(iVar5 + 0x14);
+          *(int *)(work_c + 0x10) = *(int *)(work_c + 0x10) - *(int *)(work_a + 0x14);
         }
       }
-      else if ((int)*(short *)(iVar6 + 0x54) <= *(int *)(iVar7 + 0x1c)) goto LAB_00006964;
-      piVar10 = piVar10 + 2;
+      else if ((int)*(short *)(work_b + 0x54) <= *(int *)(work_c + 0x1c)) goto LAB_00006964;
+      cursor = cursor + 2;
     }
-    iVar14 = 0;
-    if (0 < DAT_0001b734) {
-      piVar10 = &DAT_0001b5a4;
+    work_d = 0;
+    if (0 < object_count) {
+      cursor = &object_pool;
       do {
-        iVar5 = *piVar10;
-        iVar7 = *(int *)(iVar5 + 0x10);
-        iVar6 = iVar14 + -1;
-        if (-1 < iVar6) {
-          piVar13 = &DAT_0001b5a4 + iVar6;
+        work_a = *cursor;
+        work_c = *(int *)(work_a + 0x10);
+        work_b = work_d + -1;
+        if (-1 < work_b) {
+          scan = &object_pool + work_b;
           do {
-            if (iVar7 <= *(int *)(*piVar13 + 0x10)) break;
-            (&DAT_0001b5a8)[iVar6] = *piVar13;
-            piVar13 = piVar13 + -1;
-            uVar4 = (ushort)((uint)iVar6 >> 0x10);
-            sVar9 = (short)iVar6 + -1;
-            iVar6 = CONCAT22(uVar4,sVar9);
-          } while ((sVar9 != -1) || (iVar6 = (uint)uVar4 * 0x10000 + -1, uVar4 != 0));
+            if (work_c <= *(int *)(*scan + 0x10)) break;
+            (&object_pool_next)[work_b] = *scan;
+            scan = scan + -1;
+            idx_hi = (ushort)((uint)work_b >> 0x10);
+            idx_lo = (short)work_b + -1;
+            work_b = CONCAT22(idx_hi,idx_lo);
+          } while ((idx_lo != -1) || (work_b = (uint)idx_hi * 0x10000 + -1, idx_hi != 0));
         }
-        (&DAT_0001b5a8)[iVar6] = iVar5;
-        piVar10 = piVar10 + 1;
-        iVar14 = iVar14 + 1;
-      } while (iVar14 < DAT_0001b734);
+        (&object_pool_next)[work_b] = work_a;
+        cursor = cursor + 1;
+        work_d = work_d + 1;
+      } while (work_d < object_count);
     }
-    iVar14 = (int)DAT_0001b85c;
-    piVar10 = DAT_0001b860;
-    while (iVar14 = iVar14 + -1, iVar14 != -1) {
-      *(undefined4 *)(piVar10[1] + 0x10) = *(undefined4 *)(piVar10[1] + 0x28);
-      piVar10 = piVar10 + 2;
+    work_d = (int)carried_pair_count;
+    cursor = carried_pairs;
+    while (work_d = work_d + -1, work_d != -1) {
+      *(undefined4 *)(cursor[1] + 0x10) = *(undefined4 *)(cursor[1] + 0x28);
+      cursor = cursor + 2;
     }
-    DAT_0001b85c = 0;
+    carried_pair_count = 0;
   }
   /* Section check 0x68f8..0x6a3e (part 4) [PROVEN, matches the C]. DAT_0001b85c != 0 arm:
    * update_object_camera_metric on each of DAT_0001b734 far objects (DAT_0001b5a4); for each
@@ -9830,67 +10224,67 @@ LAB_00006964:
    * 32-bit dbra index (clr.w / subq.l / bcc), Ghidra's CONCAT22 loops, and the
    * $4(a3,d0.l*4) stores (index scale decoded by hand) are DAT_0001b5a8[j] =
    * DAT_0001b5a4[j + 1]. */
-  collect_near_objects(&DAT_0001d4a4,&DAT_0001c1e0);
-  DAT_0001c1c4 = 0;
-  DAT_0001c1c0 = DAT_0001c1d4._2_2_;
-  collect_far_objects(&DAT_0001b5a4,&DAT_0001b734);
-  dispatch_overlap_collisions((int *)&DAT_0001c1e4,0x1c1c4);
+  collect_near_objects(&entity_array_1,&entity_array_1_count);
+  overlap_count = 0;
+  visible_first_pass = visible_count._2_2_;
+  collect_far_objects(&object_pool,&object_count);
+  dispatch_overlap_collisions((int *)&overlap_list,0x1c1c4);
   age_contact_records();
   build_visible_object_list();
-  if (DAT_0001b826 == 1) {
-    sVar9 = DAT_0001b73e;
-    if (_DAT_00020ae4 != 0) {
-      sVar9 = DAT_00020ae8;
+  if (view_depth == 1) {
+    idx_lo = clip_y_max;
+    if (panels_drawn != 0) {
+      idx_lo = view_half_height;
     }
-    (**(code **)(DAT_0001b5a0 + 0x84))((int)sVar9 - (int)DAT_00020aea);
+    (**(code **)(host_world + 0x84))((int)idx_lo - (int)clip_y_min);
   }
   render_visible_objects();
-  if (_DAT_0001daa2 != 0) {
+  if (palette_changed != 0) {
     noop_stub_2e12();
-    _DAT_0001daa2 = 0;
+    palette_changed = 0;
   }
-  if (DAT_0001b826 != 1) {
+  if (view_depth != 1) {
     scan_convert_edge_rows();
   }
-  DAT_0001c1d4 = 0;
-  _DAT_0001c1bc = 0;
-  _DAT_0001d856 = 0;
-  if (*(short *)(*(int *)(DAT_0001b5a0 + 0x72) + 6) != 0) {
-    (**(code **)(DAT_0001b5a0 + 0x266))();
+  visible_count = 0;
+  deferred_free_flag = 0;
+  view_flag_d856 = 0;
+  if (*(short *)(*(int *)(host_world + 0x72) + 6) != 0) {
+    (**(code **)(host_world + 0x266))();
   }
-  if (sVar8 != 0) {
-    (**(code **)(DAT_0001b5a0 + 0x2c2))();
+  if (host_hooks != 0) {
+    (**(code **)(host_world + 0x2c2))();
   }
-  if (param_2 == 1) {
+  if (new_frame == 1) {
     draw_distant_object_dots();
   }
-  if (DAT_0001b826 == 1) {
-    if (*(short *)(DAT_0001b5a0 + 0x9e) == 0) {
-      (**(code **)(DAT_0001b5a0 + 0x80))(0);
+  if (view_depth == 1) {
+    if (*(short *)(host_world + 0x9e) == 0) {
+      (**(code **)(host_world + 0x80))(0);
     }
     else {
-      present_bw_frame(param_2);
+      present_bw_frame(new_frame);
     }
-    (**(code **)(DAT_0001b5a0 + 0x78))();
+    (**(code **)(host_world + 0x78))();
   }
   else {
-    iVar14 = (int)*(short *)(DAT_0001b5a0 + 0x10) - (int)(short)(DAT_0001b82a / (8 / DAT_0001b826));
-    if (DAT_0001b834 != 0) {
-      iVar14 = *(short *)(DAT_0001b5a0 + 0x10) + iVar14;
+    work_d = (int)*(short *)(host_world + 0x10) - (int)(short)(view_width / (8 / view_depth));
+    if (half_rows_mode != 0) {
+      work_d = *(short *)(host_world + 0x10) + work_d;
     }
-    if (*(short *)(DAT_0001b5a0 + 0x9e) == 0) {
-      local_26 = DAT_0001b794;
-      local_2a = DAT_0001b798;
-      (*DAT_00020ac0)(&local_26,&local_2a,(int)DAT_00020ae6,*(undefined4 *)(DAT_0001b5a0 + 6),iVar14
+    if (*(short *)(host_world + 0x9e) == 0) {
+      span_b = session_cur_b;
+      span_a = session_cur_a;
+      (*span_filler)(&span_b,&span_a,(int)scan_last_row,*(undefined4 *)(host_world + 6),work_d
                      );
     }
     else {
-      present_spans_to_window(DAT_0001b794,DAT_0001b798,(int)DAT_00020ae6,*(undefined4 *)(DAT_0001b5a0 + 6),
-                   iVar14,param_2);
+      present_spans_to_window(session_cur_b,session_cur_a,(int)scan_last_row,*(undefined4 *)(host_world + 6),
+                   work_d,new_frame);
     }
-    uVar1 = DAT_0001b794;
-    DAT_0001b794 = DAT_0001b798;
-    DAT_0001b798 = uVar1;
+    swap = session_cur_b;
+    session_cur_b = session_cur_a;
+    session_cur_a = swap;
   }
   /* Section check 0x6a40..0x6c26 (part 5) [PROVEN, matches the C]: bsr.w 0x53f8
    * collect_near_objects, DAT_0001c1c4 = 0, DAT_0001c1c0 = low word of DAT_0001c1d4 (move.w
@@ -9908,83 +10302,83 @@ LAB_00006964:
    * param_2), else (*DAT_00020ac0)(&local_26, &local_2a, sext DAT_00020ae6, long +6, iVar14)
    * with local_26 / local_2a (a6 - 0x22 / - 0x26) = DAT_0001b794 / DAT_0001b798; then the two
    * buffers are swapped. */
-  if ((_DAT_00020ae4 == 0) && (DAT_0001d858 == 1)) {
+  if ((panels_drawn == 0) && (view_mode == 1)) {
     reset_overlay_display_state();
-    DAT_0001b73e = (short)((DAT_00020b26 * 0x78) / 0x1e0);
-    DAT_00020ae8 = (short)((DAT_00020b26 * 0x43) / 0x1e0);
-    sVar9 = DAT_0001b828;
-    if (DAT_0001b828 < 0) {
-      sVar9 = DAT_0001b828 + 1;
+    clip_y_max = (short)((proj_scale_y * 0x78) / 0x1e0);
+    view_half_height = (short)((proj_scale_y * 0x43) / 0x1e0);
+    idx_lo = view_rows;
+    if (view_rows < 0) {
+      idx_lo = view_rows + 1;
     }
-    DAT_00020ae6 = DAT_0001b73e + (sVar9 >> 1);
-    bVar15 = false;
-    if (param_1 == 0) {
-      if (sVar8 != 0) {
-        (**(code **)(DAT_0001b5a0 + 0x2c2))();
+    scan_last_row = clip_y_max + (idx_lo >> 1);
+    keep_panels = false;
+    if (step_mode == 0) {
+      if (host_hooks != 0) {
+        (**(code **)(host_world + 0x2c2))();
       }
       unlock_session_buffers();
-      _DAT_00020ae4 = 1;
-      (**(code **)(DAT_0001b5a0 + 0x26a))();
-      bVar15 = _DAT_00020ae4 == 0;
-      _DAT_00020ae4 = 0;
+      panels_drawn = 1;
+      (**(code **)(host_world + 0x26a))();
+      keep_panels = panels_drawn == 0;
+      panels_drawn = 0;
       allocate_session_buffers();
       lock_session_buffers();
       lock_overlay_buffers();
-      if (sVar8 != 0) {
-        (**(code **)(DAT_0001b5a0 + 0x2c2))();
+      if (host_hooks != 0) {
+        (**(code **)(host_world + 0x2c2))();
       }
     }
-    iVar14 = DAT_0001b5a0;
-    if (param_2 == 1) {
-      if (*(short *)(DAT_0001b5a0 + 0x76) == 0) {
-        *(undefined4 *)(DAT_0001b5a0 + 0x196) = **(undefined4 **)(DAT_0001b5a0 + 0x192);
-        *(undefined4 *)(iVar14 + 0x1b0) = **(undefined4 **)(iVar14 + 0x1ac);
-        *(undefined4 *)(iVar14 + 0x1b8) = **(undefined4 **)(iVar14 + 0x1b4);
-        *(undefined4 *)(iVar14 + 0xdc) = **(undefined4 **)(iVar14 + 0xd8);
+    work_d = host_world;
+    if (new_frame == 1) {
+      if (*(short *)(host_world + 0x76) == 0) {
+        *(undefined4 *)(host_world + 0x196) = **(undefined4 **)(host_world + 0x192);
+        *(undefined4 *)(work_d + 0x1b0) = **(undefined4 **)(work_d + 0x1ac);
+        *(undefined4 *)(work_d + 0x1b8) = **(undefined4 **)(work_d + 0x1b4);
+        *(undefined4 *)(work_d + 0xdc) = **(undefined4 **)(work_d + 0xd8);
       }
       else {
-        *(uint *)(DAT_0001b5a0 + 0x196) = **(uint **)(DAT_0001b5a0 + 0x192) & 0xffffff;
-        *(uint *)(iVar14 + 0x1b0) = **(uint **)(iVar14 + 0x1ac) & 0xffffff;
-        *(uint *)(iVar14 + 0x1b8) = **(uint **)(iVar14 + 0x1b4) & 0xffffff;
-        *(uint *)(iVar14 + 0xdc) = **(uint **)(iVar14 + 0xd8) & 0xffffff;
+        *(uint *)(host_world + 0x196) = **(uint **)(host_world + 0x192) & 0xffffff;
+        *(uint *)(work_d + 0x1b0) = **(uint **)(work_d + 0x1ac) & 0xffffff;
+        *(uint *)(work_d + 0x1b8) = **(uint **)(work_d + 0x1b4) & 0xffffff;
+        *(uint *)(work_d + 0xdc) = **(uint **)(work_d + 0xd8) & 0xffffff;
       }
     }
-    draw_sky_and_ground((int)sVar8);
-    update_heading_tape((int)sVar8);
-    if (sVar8 != 0) {
-      (**(code **)(DAT_0001b5a0 + 0x2c2))();
+    draw_sky_and_ground((int)host_hooks);
+    update_heading_tape((int)host_hooks);
+    if (host_hooks != 0) {
+      (**(code **)(host_world + 0x2c2))();
     }
-    (**(code **)(DAT_0001b5a0 + 0x26e))();
+    (**(code **)(host_world + 0x26e))();
     update_radar_range_buttons();
-    if (sVar8 != 0) {
-      (**(code **)(DAT_0001b5a0 + 0x2c2))();
+    if (host_hooks != 0) {
+      (**(code **)(host_world + 0x2c2))();
     }
-    if (!bVar15) {
-      _DAT_00020ae4 = 1;
-    }
-  }
-  if (param_1 == 0) {
-    if (sVar8 != 0) {
-      (**(code **)(DAT_0001b5a0 + 0x2c2))();
+    if (!keep_panels) {
+      panels_drawn = 1;
     }
   }
-  else if (_DAT_00020ae4 == 0) {
-    if (sVar8 != 0) {
-      (**(code **)(DAT_0001b5a0 + 0x2c2))();
+  if (step_mode == 0) {
+    if (host_hooks != 0) {
+      (**(code **)(host_world + 0x2c2))();
+    }
+  }
+  else if (panels_drawn == 0) {
+    if (host_hooks != 0) {
+      (**(code **)(host_world + 0x2c2))();
     }
     update_view_readouts_and_overlays(0);
   }
   else {
-    if (DAT_0001b826 == 1) {
-      if (sVar8 != 0) {
-        (**(code **)(DAT_0001b5a0 + 0x2c2))();
+    if (view_depth == 1) {
+      if (host_hooks != 0) {
+        (**(code **)(host_world + 0x2c2))();
       }
       update_view_readouts_and_overlays(0);
     }
     else {
-      update_view_readouts_and_overlays((int)sVar8);
-      if (sVar8 != 0) {
-        (**(code **)(DAT_0001b5a0 + 0x2c2))();
+      update_view_readouts_and_overlays((int)host_hooks);
+      if (host_hooks != 0) {
+        (**(code **)(host_world + 0x2c2))();
       }
     }
     update_throttle_gauge();
@@ -10007,8 +10401,8 @@ LAB_00006964:
    * 0xd27c in the full case. Final stores: DAT_0001b784 is undefined2 and DAT_0001b774
    * undefined, so both are long slots at byte offset param_2 * 4 (d4.l*4, scale decoded by
    * hand). */
-  *(undefined4 *)(&DAT_0001b784 + param_2 * 2) = DAT_0001b794;
-  *(undefined4 *)(&DAT_0001b774 + param_2 * 4) = DAT_0001b798;
+  *(undefined4 *)(&session_ptrs_b + new_frame * 2) = session_cur_b;
+  *(undefined4 *)(&session_ptrs_a + new_frame * 4) = session_cur_a;
   return;
 }
 
@@ -10022,30 +10416,30 @@ LAB_00006964:
  * found identical to the C: for slot i = 1..3 the buffer long DAT_0001b774 + 4i (0x1b778 / 77c /
  * 780): when non-null and (param == 0 or i == param), rows < sext word DAT_0001b828 get the
  * 4-word run (0, 1, word DAT_0001b82a, word DAT_0001daa0). */
-void reset_span_row_lists /* Original: FUN_00006e74 */ (int param_1)
+void reset_span_row_lists /* Original: FUN_00006e74 */ (int slot /* param_1: device slot 1..3, 0 = all */)
 
 {
-  int iVar1;
-  int iVar2;
-  undefined2 *puVar3;
-  undefined4 *puVar4;
+  int row; /* iVar1: view row */
+  int i; /* iVar2: slot 1..3 */
+  undefined2 *run; /* puVar3: 8-byte span run (start, 1, width, colour) */
+  undefined4 *buf; /* puVar4: session_ptrs_a slot cursor */
   
-  iVar2 = 1;
-  puVar4 = &DAT_0001b778;
+  i = 1;
+  buf = &session_ptr_a_slot1;
   do {
-    puVar3 = (undefined2 *)*puVar4;
-    if ((puVar3 != (undefined2 *)0x0) && ((param_1 == 0 || (iVar2 == param_1)))) {
-      for (iVar1 = 0; iVar1 < DAT_0001b828; iVar1 = iVar1 + 1) {
-        *puVar3 = 0;
-        puVar3[1] = 1;
-        puVar3[2] = DAT_0001b82a;
-        puVar3[3] = DAT_0001daa0;
-        puVar3 = puVar3 + 4;
+    run = (undefined2 *)*buf;
+    if ((run != (undefined2 *)0x0) && ((slot == 0 || (i == slot)))) {
+      for (row = 0; row < view_rows; row = row + 1) {
+        *run = 0;
+        run[1] = 1;
+        run[2] = view_width;
+        run[3] = fill_colour;
+        run = run + 4;
       }
     }
-    puVar4 = puVar4 + 1;
-    iVar2 = iVar2 + 1;
-  } while (iVar2 < 4);
+    buf = buf + 1;
+    i = i + 1;
+  } while (i < 4);
   return;
 }
 
@@ -10062,7 +10456,7 @@ void reset_span_row_lists /* Original: FUN_00006e74 */ (int param_1)
 void clear_flag_00020ae4 /* Original: FUN_00006ece */ (void)
 
 {
-  _DAT_00020ae4 = 0;
+  panels_drawn = 0;
   return;
 }
 
@@ -10086,37 +10480,37 @@ void clear_flag_00020ae4 /* Original: FUN_00006ece */ (void)
 void update_view_clip_bounds /* Original: FUN_00006ed6 */ (void)
 
 {
-  short sVar1;
+  short rows; /* sVar1: view_rows rounded toward zero for / 2 */
   
   reset_span_row_lists(0);
-  _DAT_0001daa2 = 1;
-  DAT_0001da8c = 0;
-  sVar1 = DAT_0001b828;
-  if (DAT_0001b828 < 0) {
-    sVar1 = DAT_0001b828 + 1;
+  palette_changed = 1;
+  flag_da8c = 0;
+  rows = view_rows;
+  if (view_rows < 0) {
+    rows = view_rows + 1;
   }
-  DAT_00020ae8 = sVar1 >> 1;
-  DAT_00020ae6 = DAT_0001b828;
-  if (((DAT_0001d858 == 1) || (DAT_0001d858 == 8)) || (*(short *)(DAT_0001b5a0 + 0xa2) == 0)) {
-    DAT_00020ae2 = 0;
-  }
-  else {
-    DAT_00020ae8 = DAT_00020ae8 + -0x14;
-    DAT_00020ae6 = DAT_0001b828 + -0x14;
-    DAT_00020ae2 = 4;
-  }
-  _DAT_00020ae4 = 0;
-  _DAT_00020ae0 = 0;
-  if ((DAT_0001d858 == 6) && (DAT_00020af4 != 0)) {
-    DAT_00020b28 = (&DAT_00020b14)[DAT_00020af4];
-    DAT_00020b26 = (&DAT_00020afc)[DAT_00020af4];
+  view_half_height = rows >> 1;
+  scan_last_row = view_rows;
+  if (((view_mode == 1) || (view_mode == 8)) || (*(short *)(host_world + 0xa2) == 0)) {
+    view_inset = 0;
   }
   else {
-    DAT_00020b28 = DAT_00020b14;
-    DAT_00020b26 = DAT_00020afc;
+    view_half_height = view_half_height + -0x14;
+    scan_last_row = view_rows + -0x14;
+    view_inset = 4;
   }
-  DAT_0001da8a = 0;
-  DAT_0001b73e = DAT_00020ae8;
+  panels_drawn = 0;
+  flag_20ae0 = 0;
+  if ((view_mode == 6) && (scale_table_index != 0)) {
+    proj_scale_x = (&proj_scale_x_table)[scale_table_index];
+    proj_scale_y = (&proj_scale_y_table)[scale_table_index];
+  }
+  else {
+    proj_scale_x = proj_scale_x_table;
+    proj_scale_y = proj_scale_y_table;
+  }
+  colour_tally_index = 0;
+  clip_y_max = view_half_height;
   return;
 }
 
@@ -10141,12 +10535,12 @@ void update_view_clip_bounds /* Original: FUN_00006ed6 */ (void)
  * 100000000 (0x5f5e100) in that order. */
 void reset_distance_base_globals(void) /* Original: FUN_00006fb8 */
 {
-  DAT_0001d718 = 100000000;
-  DAT_0001d724 = 100000000;
-  DAT_0001d714 = 100000000;
-  DAT_0001d720 = 100000000;
-  DAT_0001d710 = 100000000;
-  DAT_0001d71c = 100000000;
+  far_ref_x = 100000000;
+  detail_ref_x = 100000000;
+  far_ref_y = 100000000;
+  detail_ref_y = 100000000;
+  far_ref_z = 100000000;
+  detail_ref_z = 100000000;
   return;
 }
 
@@ -10173,127 +10567,127 @@ void reset_distance_base_globals(void) /* Original: FUN_00006fb8 */
 void configure_renderer_for_display /* Original: FUN_00006ff6 */ (void)
 
 {
-  byte *pbVar1;
-  int iVar2;
-  short sVar3;
-  int iVar4;
-  int iVar5;
-  
-  DAT_0001b828 = *(short *)(DAT_0001b5a0 + 0x18);
-  DAT_0001b82a = *(short *)(DAT_0001b5a0 + 0x16);
-  _DAT_0001b82e = *(undefined2 *)(DAT_0001b5a0 + 0x12);
-  _DAT_0001b82c = *(undefined2 *)(DAT_0001b5a0 + 0x14);
-  DAT_00020b2c = DAT_0001b828 >> 1;
-  DAT_00020b2a = *(short *)(DAT_0001b5a0 + 0x16) >> 1;
-  DAT_00020af0 = (DAT_00020b2a * 2 + -1) * 0x10000 | 0x8000;
-  sVar3 = *(short *)(DAT_0001b5a0 + 0x16);
-  if (sVar3 < 0) {
-    sVar3 = sVar3 + 1;
+  byte *face_flags; /* pbVar1: face +0x13 flag byte of mission_child4 (computed, unused) */
+  int child4; /* iVar2: mission_child4 */
+  short half; /* sVar3: size rounded toward zero for / 2 */
+  int k; /* iVar4: face 1..4 */
+  int work; /* iVar5: horizon sum, face offset, then a negated size */
+
+  view_rows = *(short *)(host_world + 0x18);
+  view_width = *(short *)(host_world + 0x16);
+  view_param_12 = *(undefined2 *)(host_world + 0x12);
+  view_param_14 = *(undefined2 *)(host_world + 0x14);
+  view_half_rows = view_rows >> 1;
+  view_half_width = *(short *)(host_world + 0x16) >> 1;
+  view_centre_fixed = (view_half_width * 2 + -1) * 0x10000 | 0x8000;
+  half = *(short *)(host_world + 0x16);
+  if (half < 0) {
+    half = half + 1;
   }
-  iVar5 = (int)(sVar3 >> 1) + (int)*(short *)(DAT_0001b5a0 + 0x16);
-  if (iVar5 < 0) {
-    iVar5 = iVar5 + 1;
+  work = (int)(half >> 1) + (int)*(short *)(host_world + 0x16);
+  if (work < 0) {
+    work = work + 1;
   }
-  DAT_00020afc = (undefined2)(iVar5 >> 1);
-  DAT_00020ae6 = DAT_0001b828;
-  DAT_00020b14 = DAT_00020afc;
-  DAT_00020b26 = DAT_00020afc;
-  DAT_00020b28 = DAT_00020afc;
-  if ((DAT_0001b826 != *(short *)(DAT_0001b5a0 + 0xe)) ||
-     (DAT_0001b824 != *(short *)(DAT_0001b5a0 + 0xb4))) {
-    if (*(short *)(DAT_0001b5a0 + 0xe) == 8) {
+  proj_scale_y_table = (undefined2)(work >> 1);
+  scan_last_row = view_rows;
+  proj_scale_x_table = proj_scale_y_table;
+  proj_scale_y = proj_scale_y_table;
+  proj_scale_x = proj_scale_y_table;
+  if ((view_depth != *(short *)(host_world + 0xe)) ||
+     (view_multi_flag != *(short *)(host_world + 0xb4))) {
+    if (*(short *)(host_world + 0xe) == 8) {
       init_depth8_colour_state();
-      DAT_00020ac0 = 0x3794;
-      _DAT_00020abc = 0x3794;
-      _DAT_00020ab8 = 0x3794;
-      DAT_0001da9c = 0xd39c;
-      DAT_0001da98 = 0xd8fa;
-      DAT_0001da80 = 0x15f1e;
-      DAT_0001da84 = 0x15e9e;
-      DAT_0001da94 = 0x177f0;
-      DAT_0001da90 = (undefined1 *)0x17760;
-      DAT_00020ab4 = 0xa14e;
+      span_filler = 0x3794;
+      span_filler_2 = 0x3794;
+      span_filler_3 = 0x3794;
+      depth_routine_da9c = 0xd39c;
+      depth_routine_da98 = 0xd8fa;
+      depth_routine_da80 = 0x15f1e;
+      depth_routine_da84 = 0x15e9e;
+      depth_routine_da94 = 0x177f0;
+      depth_routine_da90 = (undefined1 *)0x17760;
+      depth_routine_ab4 = 0xa14e;
     }
-    if (*(short *)(DAT_0001b5a0 + 0xe) == 4) {
+    if (*(short *)(host_world + 0xe) == 4) {
       init_depth4_colour_state();
-      DAT_00020ac0 = 0x329a;
-      _DAT_00020abc = 0x3446;
-      _DAT_00020ab8 = 0x35e8;
-      DAT_0001da9c = 0xd590;
-      DAT_0001da98 = 0xdb40;
-      DAT_0001da80 = 0x16108;
-      DAT_0001da84 = 0x15f98;
-      DAT_0001da94 = 0x17928;
-      DAT_0001da90 = (undefined1 *)0x17848; /* stored runtime value (move.l #$17848 at 0x7182) = erase_radar_blip_depth4 at file 0x17868; Ghidra's &LAB_00017848 pointed at the wrong (file) address */
-      DAT_00020ab4 = 0xa14e;
+      span_filler = 0x329a;
+      span_filler_2 = 0x3446;
+      span_filler_3 = 0x35e8;
+      depth_routine_da9c = 0xd590;
+      depth_routine_da98 = 0xdb40;
+      depth_routine_da80 = 0x16108;
+      depth_routine_da84 = 0x15f98;
+      depth_routine_da94 = 0x17928;
+      depth_routine_da90 = (undefined1 *)0x17848; /* stored runtime value (move.l #$17848 at 0x7182) = erase_radar_blip_depth4 at file 0x17868; Ghidra's &LAB_00017848 pointed at the wrong (file) address */
+      depth_routine_ab4 = 0xa14e;
     }
-    if (*(short *)(DAT_0001b5a0 + 0xe) == 1) {
-      DAT_00020ab4 = 0xa200;
-      DAT_0001da9c = *(undefined4 *)(DAT_0001b5a0 + 0x276);
-      DAT_0001da98 = *(undefined4 *)(DAT_0001b5a0 + 0x276);
-      DAT_0001da80 = 0x16210;
-      DAT_0001da84 = 0x16208;
-      DAT_0001da94 = 0x17a40;
-      DAT_0001da90 = (undefined1 *)0x17a14;
+    if (*(short *)(host_world + 0xe) == 1) {
+      depth_routine_ab4 = 0xa200;
+      depth_routine_da9c = *(undefined4 *)(host_world + 0x276);
+      depth_routine_da98 = *(undefined4 *)(host_world + 0x276);
+      depth_routine_da80 = 0x16210;
+      depth_routine_da84 = 0x16208;
+      depth_routine_da94 = 0x17a40;
+      depth_routine_da90 = (undefined1 *)0x17a14;
     }
-    DAT_0001b826 = *(short *)(DAT_0001b5a0 + 0xe);
-    DAT_0001b824 = *(short *)(DAT_0001b5a0 + 0xb4);
-    DAT_0001d85c = *(undefined4 *)(DAT_0001b5a0 + 0x34);
-    _DAT_0001d85a = *(undefined2 *)(DAT_0001b5a0 + 0x38);
-    if (DAT_0001bdb4 == 0) {
+    view_depth = *(short *)(host_world + 0xe);
+    view_multi_flag = *(short *)(host_world + 0xb4);
+    slot_to_index_map = *(undefined4 *)(host_world + 0x34);
+    palette_direct_mode = *(undefined2 *)(host_world + 0x38);
+    if (mission_child0 == 0) {
       init_mission_object_tables(); /* Original: FUN_000016e2 */ /* 0x721e also pushes host +0x8c, which the callee does not read */
     }
-    if (*(short *)(DAT_0001b5a0 + 0xe) == 1) {
+    if (*(short *)(host_world + 0xe) == 1) {
       /* Mission mode == 1: patch template u16 pair with 0x195, clear flag bit 1. */
       overlay_patch_template_u16_pair(0x195); /* Original: FUN_00000020 */
-      iVar2 = DAT_0001bda4;
-      iVar4 = 1;
-      iVar5 = 0x20;
+      child4 = mission_child4;
+      k = 1;
+      work = 0x20;
       do {
-        pbVar1 = (byte *)(*(int *)(iVar2 + 0x48) + 0x13 + iVar5);
-        *pbVar1 = *pbVar1 & 0xfd;
-        iVar5 = iVar5 + 0x20;
-        iVar4 = iVar4 + 1;
-      } while (iVar4 < 5);
+        face_flags = (byte *)(*(int *)(child4 + 0x48) + 0x13 + work);
+        *face_flags = *face_flags & 0xfd;
+        work = work + 0x20;
+        k = k + 1;
+      } while (k < 5);
     }
     else {
       /* Other mission mode: patch template u16 pair with 0x1d5, set flag bit 1. */
       overlay_patch_template_u16_pair(0x1d5); /* Original: FUN_00000020 */
-      iVar2 = DAT_0001bda4;
-      iVar4 = 1;
-      iVar5 = 0x20;
+      child4 = mission_child4;
+      k = 1;
+      work = 0x20;
       do {
-        pbVar1 = (byte *)(*(int *)(iVar2 + 0x48) + 0x13 + iVar5);
-        *pbVar1 = *pbVar1 | 2;
-        iVar5 = iVar5 + 0x20;
-        iVar4 = iVar4 + 1;
-      } while (iVar4 < 5);
+        face_flags = (byte *)(*(int *)(child4 + 0x48) + 0x13 + work);
+        *face_flags = *face_flags | 2;
+        work = work + 0x20;
+        k = k + 1;
+      } while (k < 5);
     }
   }
-  DAT_0001d85c = *(undefined4 *)(DAT_0001b5a0 + 0x34);
-  _DAT_0001d85a = *(undefined2 *)(DAT_0001b5a0 + 0x38);
-  iVar5 = -(int)DAT_0001b82a;
-  if (iVar5 < 0) {
-    iVar5 = iVar5 + 1;
+  slot_to_index_map = *(undefined4 *)(host_world + 0x34);
+  palette_direct_mode = *(undefined2 *)(host_world + 0x38);
+  work = -(int)view_width;
+  if (work < 0) {
+    work = work + 1;
   }
-  DAT_00020aee = (undefined2)(iVar5 >> 1);
-  sVar3 = DAT_0001b82a;
-  if (DAT_0001b82a < 0) {
-    sVar3 = DAT_0001b82a + 1;
+  clip_x_min = (undefined2)(work >> 1);
+  half = view_width;
+  if (view_width < 0) {
+    half = view_width + 1;
   }
-  DAT_00020aec = (sVar3 >> 1) + -1;
-  sVar3 = DAT_0001b828;
-  if (DAT_0001b828 < 0) {
-    sVar3 = DAT_0001b828 + 1;
+  clip_x_max = (half >> 1) + -1;
+  half = view_rows;
+  if (view_rows < 0) {
+    half = view_rows + 1;
   }
-  DAT_0001b73e = sVar3 >> 1;
-  iVar5 = -(int)DAT_0001b828;
-  if (iVar5 < 0) {
-    iVar5 = iVar5 + 1;
+  clip_y_max = half >> 1;
+  work = -(int)view_rows;
+  if (work < 0) {
+    work = work + 1;
   }
-  DAT_00020aea = (undefined2)(iVar5 >> 1);
-  DAT_0001b740._0_2_ = DAT_0001b73e;
-  DAT_00020ae8 = DAT_0001b73e;
+  clip_y_min = (undefined2)(work >> 1);
+  clip_y_max_alt._0_2_ = clip_y_max;
+  view_half_height = clip_y_max;
   update_view_clip_bounds();
   return;
 }
@@ -10313,24 +10707,24 @@ void configure_renderer_for_display /* Original: FUN_00006ff6 */ (void)
  * bsr.l 0x4210 refresh_object_colours_for_depth and DAT_0001da88 = word *(+0x88); clr.w on
  * 0x24d2c / 0x24d2e / 0x1b858 (16-bit stores); word DAT_00024d34 != 0 -> DAT_00024d32 / d30 =
  * words +0x33e / +0x340. */
-void begin_flight_for_rank /* Original: FUN_00007310 */ (int param_1)
+void begin_flight_for_rank /* Original: FUN_00007310 */ (int rank /* param_1: pilot rank */)
 
 {
-  DAT_0001b878 = *(undefined2 *)(&DAT_0001b2b4 + param_1 * 2);
-  DAT_0001b876 = *(undefined2 *)(&DAT_0001b2b4 + param_1 * 2);
-  if (*(short *)(DAT_0001b5a0 + 0xa4) == 0) {
-    *(undefined4 *)(DAT_0001b738 + 0x32) = 0xe772;
+  ai_aim_lag = *(undefined2 *)(&rank_aim_lag_table + rank * 2);
+  ai_aim_lag_key1 = *(undefined2 *)(&rank_aim_lag_table + rank * 2);
+  if (*(short *)(host_world + 0xa4) == 0) {
+    *(undefined4 *)(player_object + 0x32) = 0xe772;
   }
-  if (*(short *)(DAT_0001b5a0 + 0xe) == 1) {
+  if (*(short *)(host_world + 0xe) == 1) {
     refresh_object_colours_for_depth();
-    DAT_0001da88 = **(undefined2 **)(DAT_0001b5a0 + 0x88);
+    bw_pattern_first = **(undefined2 **)(host_world + 0x88);
   }
-  _DAT_00024d2c = 0;
-  _DAT_00024d2e = 0;
-  DAT_0001b858 = 0;
-  if (_DAT_00024d34 != 0) {
-    DAT_00024d32 = *(undefined2 *)(DAT_0001b5a0 + 0x33e);
-    DAT_00024d30 = *(undefined2 *)(DAT_0001b5a0 + 0x340);
+  flight_word_24d2c = 0;
+  flight_word_24d2e = 0;
+  rudder_key = 0;
+  if (host_words_valid != 0) {
+    host_word_33e = *(undefined2 *)(host_world + 0x33e);
+    host_word_340 = *(undefined2 *)(host_world + 0x340);
   }
   return;
 }
@@ -10352,14 +10746,14 @@ void begin_flight_for_rank /* Original: FUN_00007310 */ (int param_1)
 void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
 
 {
-  DAT_0001d838 = *(undefined4 *)(*DAT_0001b738 + 0x18);
-  DAT_0001d834 = *(undefined4 *)(*DAT_0001b738 + 0x1c);
-  DAT_0001d830 = *(undefined4 *)(*DAT_0001b738 + 0x20);
-  DAT_0001d810 = -*(short *)(DAT_0001b738 + 8) & 0x3fff;
-  DAT_0001d80e = -*(short *)((int)DAT_0001b738 + 0x22) & 0x3fff;
-  DAT_0001d80c = -*(short *)(DAT_0001b738 + 9) & 0x3fff;
-  DAT_0001d808 = (int)*(short *)(DAT_0001b738[1] + 0x44) -
-                 (int)*(short *)((int)DAT_0001b738 + 0x626) & 0x3fff;
+  camera_x = *(undefined4 *)(*player_object + 0x18);
+  camera_y = *(undefined4 *)(*player_object + 0x1c);
+  camera_z = *(undefined4 *)(*player_object + 0x20);
+  neg_camera_pitch = -*(short *)(player_object + 8) & 0x3fff;
+  neg_camera_heading = -*(short *)((int)player_object + 0x22) & 0x3fff;
+  camera_angle3 = -*(short *)(player_object + 9) & 0x3fff;
+  camera_angle4 = (int)*(short *)(player_object[1] + 0x44) -
+                 (int)*(short *)((int)player_object + 0x626) & 0x3fff;
   return;
 }
 
@@ -10417,108 +10811,108 @@ void copy_player_pose_to_camera /* Original: FUN_0000739a */ (void)
  * the C with the recorded call-argument corrections (probe_nearest_facility_kind, and the
  * fold_angle_pm_0x2000 / abs_int calls of view 6).
  */
-uint process_flight_input_and_outcome /* Original: FUN_0000740a */ (int param_1,int param_2)
+uint process_flight_input_and_outcome /* Original: FUN_0000740a */ (int key /* param_1: key character (0 between frames) */,int event_kind /* param_2: 3 keyDown, 4 keyUp, 0 between frames */)
 
 {
-  uint *puVar1;
-  uint uVar2;
-  int iVar3;
-  short sVar4;
-  int iVar5;
-  uint uVar6;
-  uint uVar7;
-  int iVar8;
-  int iVar9;
-  short sVar10;
-  int iVar11;
-  short sVar12;
-  short sVar13;
-  int *piVar14;
-  ushort uStack_26;
-  ushort uStack_24;
-  short asStack_22 [9];
-  undefined1 auStack_10 [2];
-  short local_e;
-  short local_a;
-  short local_6;
-  
-  sVar4 = DAT_0001d858;
-  piVar14 = DAT_0001b738;
-  if (DAT_0001b870 == 0) {
+  uint *obj_flags; /* puVar1: player object flag long +4 */
+  uint new_heading; /* uVar2: next track_heading */
+  int dz; /* iVar3: player z - camera z, shifted */
+  short old_view_mode; /* sVar4: view_mode on entry */
+  int work; /* iVar5: host_world copy / table index / object / squared distance / pitch delta */
+  uint result; /* uVar6: outcome code returned (also used as an angle temporary) */
+  uint work_u; /* uVar7: random draw / shift / next track_pitch */
+  int dy; /* iVar8: camera metric, then player y - camera y, then |delta| */
+  int dist; /* iVar9: isqrt_floor distance */
+  short work_s; /* sVar10: view_half_width / scale / pitch word */
+  int dx; /* iVar11: shift count, then player x - camera x, then the heading delta */
+  short offset; /* sVar12: view offset step */
+  short work_s2; /* sVar13: scale index / view offset / heading word */
+  int *player; /* piVar14: player_object controller */
+  ushort seen_heading; /* uStack_26: heading from attitude_from_velocity */
+  ushort seen_pitch; /* uStack_24: pitch from attitude_from_velocity */
+  short matrix [9]; /* asStack_22: heading matrix */
+  undefined1 vec [2]; /* auStack_10: 12-byte offset vector */
+  short vec_x; /* local_e, -$e(A6): vec x word (-0x2ee) */
+  short vec_y; /* local_a, -$a(A6): vec y word (0x183) */
+  short vec_z; /* local_6, -6(A6): vec z word (-0x513) */
+
+  old_view_mode = view_mode;
+  player = player_object;
+  if (replay_state == 0) {
 LAB_0000744c:
-    if (DAT_0001d858 == 8) {
-      if (DAT_0001b87c == 0) {
-        DAT_0001d858 = 1;
-        if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) == 0) {
-          puVar1 = (uint *)(*DAT_0001b738 + 4);
-          *puVar1 = *puVar1 | 0x40;
-          drop_contact_records_for_object(*piVar14);
+    if (view_mode == 8) {
+      if (parachute_object == 0) {
+        view_mode = 1;
+        if ((*(byte *)(*player_object + 7) & 0x40) == 0) {
+          obj_flags = (uint *)(*player_object + 4);
+          *obj_flags = *obj_flags | 0x40;
+          drop_contact_records_for_object(*player);
         }
       }
       else {
-        DAT_0001d858 = 9;
+        view_mode = 9;
       }
       update_view_clip_bounds();
-      DAT_0001b884 = 0;
+      view_follow_target = 0;
     }
   }
   else {
-    if (DAT_0001b86e == 0) {
-      DAT_0001b870 = 0;
+    if (replay_frames_left == 0) {
+      replay_state = 0;
       goto LAB_0000744c;
     }
-    if (DAT_0001b870 == 1) {
-      DAT_0001b870 = 2;
+    if (replay_state == 1) {
+      replay_state = 2;
     }
   }
-  if (*(short *)(DAT_0001b5a0 + 0x98) != 0) { /* host +0x98 = A5-0x12f0 instant-replay state: 1 = File menu "Instant Replay" (MENU 2 item 8) or begin_replay_view, 2 = live crash end sequence, 0 = idle */
-    if ((*(short *)(DAT_0001b5a0 + 0x98) == 2) && (DAT_0001b870 == 0)) {
-      if ((*(int *)(DAT_0001b5a0 + 0x25e) != 0) &&
-         (iVar5 = (**(code **)(DAT_0001b5a0 + 0x2b6))(0), iVar5 != 0)) {
-        (**(code **)(DAT_0001b5a0 + 0x2be))(0);
+  if (*(short *)(host_world + 0x98) != 0) { /* host +0x98 = A5-0x12f0 instant-replay state: 1 = File menu "Instant Replay" (MENU 2 item 8) or begin_replay_view, 2 = live crash end sequence, 0 = idle */
+    if ((*(short *)(host_world + 0x98) == 2) && (replay_state == 0)) {
+      if ((*(int *)(host_world + 0x25e) != 0) &&
+         (work = (**(code **)(host_world + 0x2b6))(0), work != 0)) {
+        (**(code **)(host_world + 0x2be))(0);
       }
       update_view_clip_bounds();
-      DAT_0001d858 = 8;
-      DAT_0001b870 = 3;
-      DAT_0001b86e = 0x1e;
-      local_a = 0x183;
-      local_e = -0x2ee;
-      local_6 = -0x513;
-      build_attitude_matrix_3ang( /* Original: FUN_0000253e */0,(int)*(short *)((int)DAT_0001b738 + 0x22),0,(int)asStack_22);
-      transform_vecs12_by_matrix3(1,(int)auStack_10,(int)auStack_10,asStack_22);
-      DAT_0001d838 = *(int *)(*DAT_0001b738 + 0x18) + (int)local_e;
-      DAT_0001d834 = *(int *)(*DAT_0001b738 + 0x1c) + (int)local_a;
-      DAT_0001d830 = *(int *)(*DAT_0001b738 + 0x20) + (int)local_6;
+      view_mode = 8;
+      replay_state = 3;
+      replay_frames_left = 0x1e;
+      vec_y = 0x183;
+      vec_x = -0x2ee;
+      vec_z = -0x513;
+      build_attitude_matrix_3ang( /* Original: FUN_0000253e */0,(int)*(short *)((int)player_object + 0x22),0,(int)matrix);
+      transform_vecs12_by_matrix3(1,(int)vec,(int)vec,matrix);
+      camera_x = *(int *)(*player_object + 0x18) + (int)vec_x;
+      camera_y = *(int *)(*player_object + 0x1c) + (int)vec_y;
+      camera_z = *(int *)(*player_object + 0x20) + (int)vec_z;
     }
-    if ((DAT_0001b86c == 0) && (DAT_0001b86e == 0)) {
-      request_instant_replay((uint)(*(char *)((int)DAT_0001b738 + 0x63e) == '\0'));
+    if ((replay_request == 0) && (replay_frames_left == 0)) {
+      request_instant_replay((uint)(*(char *)((int)player_object + 0x63e) == '\0'));
     }
   }
-  if ((DAT_0001b86c != 0) && (DAT_0001b86e == 0)) {
+  if ((replay_request != 0) && (replay_frames_left == 0)) {
     begin_replay_view();
   }
-  sVar10 = DAT_00020b2a;
-  piVar14 = DAT_0001b738;
-  iVar5 = DAT_0001b5a0;
-  if ((DAT_0001d858 == 7) &&
-     ((DAT_0001b888 == (int *)0x0 || (*(char *)((int)DAT_0001b738 + 0x63e) != '\0'))))
+  work_s = view_half_width;
+  player = player_object;
+  work = host_world;
+  if ((view_mode == 7) &&
+     ((designated_entity_2 == (int *)0x0 || (*(char *)((int)player_object + 0x63e) != '\0'))))
   goto switchD_00007684_caseD_56;
-  if ((DAT_0001d858 == 8) || (DAT_0001d858 == 9)) {
-    if ((param_2 == 3) && (((param_1 == 0x22 || (param_1 == 0x60)) || (param_1 == 0x1b)))) {
+  if ((view_mode == 8) || (view_mode == 9)) {
+    if ((event_kind == 3) && (((key == 0x22 || (key == 0x60)) || (key == 0x1b)))) {
 switchD_00007684_caseD_1b:
-      uVar6 = 3;
+      result = 3;
       goto switchD_0000833a_caseD_3;
     }
     goto LAB_00008000;
   }
-  if ((param_2 != 3) &&
-     ((((((param_2 != 4 || (param_1 != 0x20)) &&
-         ((param_1 != 0x61 && ((param_1 != 0x41 && (param_1 != 0x2b)))))) && (param_1 != 0x2d)) &&
-       ((((((param_1 != 0x3d && (param_1 != 0x5f)) && (param_1 != 0x32)) &&
-          ((param_1 != 0x34 && (param_1 != 0x36)))) && (param_1 != 0x38)) &&
-        ((param_1 != 0x5a && (param_1 != 0x7a)))))) &&
-      (((param_1 != 0x3e && (((param_1 != 0x2e && (param_1 != 0x58)) && (param_1 != 0x78)))) &&
-       ((param_1 != 0x3f && (param_1 != 0x2f)))))))) goto switchD_00007684_caseD_a;
+  if ((event_kind != 3) &&
+     ((((((event_kind != 4 || (key != 0x20)) &&
+         ((key != 0x61 && ((key != 0x41 && (key != 0x2b)))))) && (key != 0x2d)) &&
+       ((((((key != 0x3d && (key != 0x5f)) && (key != 0x32)) &&
+          ((key != 0x34 && (key != 0x36)))) && (key != 0x38)) &&
+        ((key != 0x5a && (key != 0x7a)))))) &&
+      (((key != 0x3e && (((key != 0x2e && (key != 0x58)) && (key != 0x78)))) &&
+       ((key != 0x3f && (key != 0x2f)))))))) goto switchD_00007684_caseD_a;
   /* Section check 0x740a..0x7686 (prologue, replay control, view exits, key filter,
    * dispatch) [PROVEN, matches the C above; independent capstone disassembly]: sVar4 = old
    * view mode word DAT_0001d858; replay words 0x1b870 / 0x1b86e / 0x1b86c as in the C;
@@ -10568,25 +10962,25 @@ switchD_00007684_caseD_1b:
    * toggles +0x32 between 0xe772 and 0xf7f0 (slew); Tab cycle_view_distance; space: on
    * the ground brakes +0x641 = key-down, in the air (keyboard steering 0x24d34 on) fire
    * word 0x24cf4 = key-down; 'P' -> result 4 (0x8704). */
-  switch(param_1) {
+  switch(key) {
   case 9:
     cycle_view_distance();
     break;
   case 0x13:
-    *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;
-    *(undefined1 *)(piVar14 + 0x19e) = 0;
-    *(undefined4 *)((int)piVar14 + 0x62a) = 0;
-    if (*(int *)((int)piVar14 + 0x32) == 0xe772) {
-      *(undefined4 *)((int)piVar14 + 0x32) = 0xf7f0;
+    *(undefined1 *)(player_object + 0x19a) = 0;
+    *(undefined1 *)(player + 0x19e) = 0;
+    *(undefined4 *)((int)player + 0x62a) = 0;
+    if (*(int *)((int)player + 0x32) == 0xe772) {
+      *(undefined4 *)((int)player + 0x32) = 0xf7f0;
     }
     else {
 LAB_00007d52:
-      *(undefined4 *)((int)DAT_0001b738 + 0x32) = 0xe772;
+      *(undefined4 *)((int)player_object + 0x32) = 0xe772;
     }
     break;
   case 0x18:
-    if (DAT_0001b888 != (int *)0x0) {
-      *(ushort *)(DAT_0001b888 + 0x1a1) = *(ushort *)(DAT_0001b888 + 0x1a1) | 0x100;
+    if (designated_entity_2 != (int *)0x0) {
+      *(ushort *)(designated_entity_2 + 0x1a1) = *(ushort *)(designated_entity_2 + 0x1a1) | 0x100;
     }
     break;
   case 0x1b:
@@ -10594,393 +10988,393 @@ LAB_00007d52:
   case 0x7e:
     goto switchD_00007684_caseD_1b;
   case 0x1c:
-    if (DAT_0001d858 < 3) {
-      uVar6 = DAT_00024cfc - 0x800;
+    if (view_mode < 3) {
+      result = view_key_angle_a - 0x800;
 LAB_00007b16:
-      DAT_00024cfc = uVar6 & 0x3fff;
+      view_key_angle_a = result & 0x3fff;
     }
     break;
   case 0x1d:
-    if (DAT_0001d858 < 3) {
-      uVar6 = DAT_00024cfc + 0x800;
+    if (view_mode < 3) {
+      result = view_key_angle_a + 0x800;
       goto LAB_00007b16;
     }
     break;
   case 0x1e:
-    if ((DAT_0001d858 < 3) && (DAT_00024cf8 != 0x3040)) {
-      uVar6 = DAT_00024cf8 - 0x540;
+    if ((view_mode < 3) && (view_key_angle_b != 0x3040)) {
+      result = view_key_angle_b - 0x540;
 LAB_00007adc:
-      DAT_00024cf8 = uVar6 & 0x3fff;
+      view_key_angle_b = result & 0x3fff;
     }
     break;
   case 0x1f:
-    if ((DAT_0001d858 < 3) && (DAT_00024cf8 != 0xa80)) {
-      uVar6 = DAT_00024cf8 + 0x540;
+    if ((view_mode < 3) && (view_key_angle_b != 0xa80)) {
+      result = view_key_angle_b + 0x540;
       goto LAB_00007adc;
     }
     break;
   case 0x20:
-    if (_DAT_0001b874 == 0) {
-      if (*(char *)((int)DAT_0001b738 + 0x63e) == '\0') {
-        if (_DAT_00024d34 != 0) {
-          if (param_2 == 3) {
-            _DAT_00024cf4 = 1;
+    if (state_flag_b874 == 0) {
+      if (*(char *)((int)player_object + 0x63e) == '\0') {
+        if (host_words_valid != 0) {
+          if (event_kind == 3) {
+            fire_button = 1;
           }
           else {
-            _DAT_00024cf4 = 0;
+            fire_button = 0;
           }
         }
       }
-      else if (param_2 == 3) {
-        *(undefined1 *)((int)DAT_0001b738 + 0x641) = 1;
+      else if (event_kind == 3) {
+        *(undefined1 *)((int)player_object + 0x641) = 1;
       }
       else {
-        *(undefined1 *)((int)DAT_0001b738 + 0x641) = 0;
+        *(undefined1 *)((int)player_object + 0x641) = 0;
       }
     }
     break;
   case 0x2b:
   case 0x3d:
-    if ((DAT_0001d858 == 6) && (DAT_00020af4 < 8)) {
-      if (param_2 == 3) {
-        iVar5 = (int)DAT_00020af4;
-        (&DAT_00020b14)[iVar5] = DAT_00020b28;
-        (&DAT_00020afc)[iVar5] = DAT_00020b26;
-        DAT_00020b28 = DAT_00020b28 + (DAT_00020b28 >> 1);
-        sVar10 = DAT_00020b26 + (DAT_00020b26 >> 1);
-        sVar13 = DAT_00020af4 + 1;
-        DAT_00020af4 = sVar13;
-        DAT_00020b26 = sVar10;
-        (&DAT_00020b14)[sVar13] = DAT_00020b28;
-        (&DAT_00020afc)[sVar13] = sVar10;
+    if ((view_mode == 6) && (scale_table_index < 8)) {
+      if (event_kind == 3) {
+        work = (int)scale_table_index;
+        (&proj_scale_x_table)[work] = proj_scale_x;
+        (&proj_scale_y_table)[work] = proj_scale_y;
+        proj_scale_x = proj_scale_x + (proj_scale_x >> 1);
+        work_s = proj_scale_y + (proj_scale_y >> 1);
+        work_s2 = scale_table_index + 1;
+        scale_table_index = work_s2;
+        proj_scale_y = work_s;
+        (&proj_scale_x_table)[work_s2] = proj_scale_x;
+        (&proj_scale_y_table)[work_s2] = work_s;
       }
     }
-    else if ((DAT_0001d858 < 6) && (_DAT_0001b874 == 0)) {
-      if (param_2 == 3) {
-        DAT_00024cf6 = 1;
+    else if ((view_mode < 6) && (state_flag_b874 == 0)) {
+      if (event_kind == 3) {
+        throttle_step = 1;
       }
       else {
 LAB_0000788a:
-        DAT_00024cf6 = 0;
+        throttle_step = 0;
       }
     }
     break;
   case 0x2d:
   case 0x5f:
-    if ((DAT_0001d858 == 6) && (DAT_00020af4 != 0)) {
-      if (param_2 == 3) {
-        DAT_00020af4 = DAT_00020af4 + -1;
-        DAT_00020b28 = (&DAT_00020b14)[DAT_00020af4];
-        DAT_00020b26 = (&DAT_00020afc)[DAT_00020af4];
+    if ((view_mode == 6) && (scale_table_index != 0)) {
+      if (event_kind == 3) {
+        scale_table_index = scale_table_index + -1;
+        proj_scale_x = (&proj_scale_x_table)[scale_table_index];
+        proj_scale_y = (&proj_scale_y_table)[scale_table_index];
       }
     }
-    else if ((DAT_0001d858 < 6) && (_DAT_0001b874 == 0)) {
-      if (param_2 != 3) goto LAB_0000788a;
-      DAT_00024cf6 = -1;
+    else if ((view_mode < 6) && (state_flag_b874 == 0)) {
+      if (event_kind != 3) goto LAB_0000788a;
+      throttle_step = -1;
     }
     break;
   case 0x2e:
   case 0x3e:
   case 0x5a:
   case 0x7a:
-    if ((param_2 == 3) && ((param_1 == 0x5a || (param_1 == 0x3e)))) {
-      DAT_0001b858 = 0x40;
+    if ((event_kind == 3) && ((key == 0x5a || (key == 0x3e)))) {
+      rudder_key = 0x40;
     }
     else {
 LAB_00007c12:
-      DAT_0001b858 = 0;
+      rudder_key = 0;
     }
     break;
   case 0x2f:
   case 0x3f:
   case 0x58:
   case 0x78:
-    if ((param_2 != 3) || ((param_1 != 0x58 && (param_1 != 0x3f)))) goto LAB_00007c12;
-    DAT_0001b858 = 0xffc0;
+    if ((event_kind != 3) || ((key != 0x58 && (key != 0x3f)))) goto LAB_00007c12;
+    rudder_key = 0xffc0;
     break;
   case 0x30:
   case 0x31:
   case 0x33:
   case 0x37:
   case 0x39:
-    if (*(int *)((int)DAT_0001b738 + 0x32) == 0xf7f0) goto LAB_00007992;
+    if (*(int *)((int)player_object + 0x32) == 0xf7f0) goto LAB_00007992;
     break;
   case 0x32:
-    if (*(int *)((int)DAT_0001b738 + 0x32) == 0xf7f0) goto LAB_00007992;
-    if (param_2 == 3) {
-      _DAT_00024d2c = 1;
+    if (*(int *)((int)player_object + 0x32) == 0xf7f0) goto LAB_00007992;
+    if (event_kind == 3) {
+      flight_word_24d2c = 1;
     }
     else {
-      _DAT_00024d2c = 0;
+      flight_word_24d2c = 0;
     }
 LAB_00007974:
-    _DAT_00024d34 = 1;
+    host_words_valid = 1;
     break;
   case 0x34:
-    if (*(int *)((int)DAT_0001b738 + 0x32) != 0xf7f0) {
-      if (param_2 != 3) goto LAB_0000796e;
-      _DAT_00024d2e = -1;
+    if (*(int *)((int)player_object + 0x32) != 0xf7f0) {
+      if (event_kind != 3) goto LAB_0000796e;
+      flight_word_24d2e = -1;
       goto LAB_00007974;
     }
     goto LAB_00007992;
   case 0x35:
-    if (*(int *)((int)DAT_0001b738 + 0x32) != 0xf7f0) {
-      *(short *)(DAT_0001b5a0 + 0x33e) = DAT_00020b2a;
-      DAT_00024d30 = DAT_00020b2c;
-      DAT_00024d32 = sVar10;
-      *(short *)(iVar5 + 0x340) = DAT_00020b2c;
-      _DAT_00024d2c = 0;
+    if (*(int *)((int)player_object + 0x32) != 0xf7f0) {
+      *(short *)(host_world + 0x33e) = view_half_width;
+      host_word_340 = view_half_rows;
+      host_word_33e = work_s;
+      *(short *)(work + 0x340) = view_half_rows;
+      flight_word_24d2c = 0;
 LAB_0000796e:
-      _DAT_00024d2e = 0;
+      flight_word_24d2e = 0;
       goto LAB_00007974;
     }
     goto LAB_00007992;
   case 0x36:
-    if (*(int *)((int)DAT_0001b738 + 0x32) != 0xf7f0) {
-      if (param_2 != 3) goto LAB_0000796e;
-      _DAT_00024d2e = 1;
+    if (*(int *)((int)player_object + 0x32) != 0xf7f0) {
+      if (event_kind != 3) goto LAB_0000796e;
+      flight_word_24d2e = 1;
       goto LAB_00007974;
     }
     goto LAB_00007992;
   case 0x38:
-    if (*(int *)((int)DAT_0001b738 + 0x32) != 0xf7f0) {
-      if (param_2 == 3) {
-        _DAT_00024d2c = -1;
+    if (*(int *)((int)player_object + 0x32) != 0xf7f0) {
+      if (event_kind == 3) {
+        flight_word_24d2c = -1;
       }
       else {
-        _DAT_00024d2c = 0;
+        flight_word_24d2c = 0;
       }
       goto LAB_00007974;
     }
 LAB_00007992:
-    _DAT_00024d34 = 0;
-    *(char *)(DAT_0001b738 + 0x19a) = (char)param_1 + -0x30; /* keys '0'..'9': throttle byte +0x668 - reached only in slew mode (+0x32 == 0xf7f0) [PROVEN, 0x7980 / 0x789a] */
-    *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) & 0xbfff; /* engine switched on: clear +0x684 bit 14 (0x79a6) */
+    host_words_valid = 0;
+    *(char *)(player_object + 0x19a) = (char)key + -0x30; /* keys '0'..'9': throttle byte +0x668 - reached only in slew mode (+0x32 == 0xf7f0) [PROVEN, 0x7980 / 0x789a] */
+    *(ushort *)(player + 0x1a1) = *(ushort *)(player + 0x1a1) & 0xbfff; /* engine switched on: clear +0x684 bit 14 (0x79a6) */
     break;
   case 0x41:
   case 0x61:
-    if ((DAT_0001b888 == (int *)0x0) || (param_2 != 3)) {
-      _DAT_0001b872 = 0;
+    if ((designated_entity_2 == (int *)0x0) || (event_kind != 3)) {
+      state_flag_b872 = 0;
     }
     else {
-      _DAT_0001b872 = 1;
+      state_flag_b872 = 1;
     }
     break;
   case 0x42:
   case 0x62:
-    if ((_DAT_0001b874 == 0) &&
-       (0x43 < *(int *)(*DAT_0001b738 + 0x1c) - *(int *)((int)DAT_0001b738 + 0x2e))) {
-      *(undefined1 *)(DAT_0001b738 + 0x19d) = 1;
+    if ((state_flag_b874 == 0) &&
+       (0x43 < *(int *)(*player_object + 0x1c) - *(int *)((int)player_object + 0x2e))) {
+      *(undefined1 *)(player_object + 0x19d) = 1;
     }
     break;
   case 0x43:
   case 99:
-    if (DAT_0001d858 == 5) goto switchD_00007684_caseD_56;
-    DAT_0001d858 = 5;
+    if (view_mode == 5) goto switchD_00007684_caseD_56;
+    view_mode = 5;
 LAB_00007b8e:
-    piVar14 = DAT_0001b738;
-    if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) != 0) {
-      puVar1 = (uint *)(*DAT_0001b738 + 4);
-      *puVar1 = *puVar1 & 0xffffffbf;
+    player = player_object;
+    if ((*(byte *)(*player_object + 7) & 0x40) != 0) {
+      obj_flags = (uint *)(*player_object + 4);
+      *obj_flags = *obj_flags & 0xffffffbf;
       goto LAB_00007b9e;
     }
     goto LAB_00007ba8;
   case 0x45:
   case 0x65:
-    if (((DAT_0001b888 != (int *)0x0) && (DAT_0001d858 != 7)) &&
-       (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) {
-      DAT_0001d858 = 7;
+    if (((designated_entity_2 != (int *)0x0) && (view_mode != 7)) &&
+       (*(char *)((int)player_object + 0x63e) == '\0')) {
+      view_mode = 7;
       goto LAB_00007b8e;
     }
   case 0x56:
   case 0x76:
 switchD_00007684_caseD_56:
-    DAT_0001d858 = 1;
-    DAT_00024cf8 = 0;
-    DAT_0001d804 = 0;
-    DAT_00024cfc = 0;
-    DAT_0001d800 = 0;
-    DAT_0001d838 = *(int *)(*DAT_0001b738 + 0x18);
-    DAT_0001d834 = *(int *)(*DAT_0001b738 + 0x1c);
-    DAT_0001d830 = *(int *)(*DAT_0001b738 + 0x20);
-    if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) == 0) {
-      puVar1 = (uint *)(*DAT_0001b738 + 4);
-      *puVar1 = *puVar1 | 0x40;
+    view_mode = 1;
+    view_key_angle_b = 0;
+    camera_angle5 = 0;
+    view_key_angle_a = 0;
+    camera_angle6 = 0;
+    camera_x = *(int *)(*player_object + 0x18);
+    camera_y = *(int *)(*player_object + 0x1c);
+    camera_z = *(int *)(*player_object + 0x20);
+    if ((*(byte *)(*player_object + 7) & 0x40) == 0) {
+      obj_flags = (uint *)(*player_object + 4);
+      *obj_flags = *obj_flags | 0x40;
 LAB_00007b9e:
-      drop_contact_records_for_object(*piVar14);
+      drop_contact_records_for_object(*player);
     }
 LAB_00007ba8:
     update_view_clip_bounds();
     break;
   case 0x46:
   case 0x66:
-    if (_DAT_0001b874 == 0) {
-      if (*(char *)((int)DAT_0001b738 + 0x67b) == '\0') {
-        *(undefined1 *)((int)DAT_0001b738 + 0x67b) = 1;
+    if (state_flag_b874 == 0) {
+      if (*(char *)((int)player_object + 0x67b) == '\0') {
+        *(undefined1 *)((int)player_object + 0x67b) = 1;
       }
       else {
-        *(char *)((int)DAT_0001b738 + 0x67b) = -*(char *)((int)DAT_0001b738 + 0x67b);
+        *(char *)((int)player_object + 0x67b) = -*(char *)((int)player_object + 0x67b);
       }
     }
     break;
   case 0x47:
   case 0x67:
-    if ((_DAT_0001b874 == 0) && (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) {
-      if (*(char *)((int)DAT_0001b738 + 0x679) == '\0') {
-        *(undefined1 *)((int)DAT_0001b738 + 0x679) = 1;
+    if ((state_flag_b874 == 0) && (*(char *)((int)player_object + 0x63e) == '\0')) {
+      if (*(char *)((int)player_object + 0x679) == '\0') {
+        *(undefined1 *)((int)player_object + 0x679) = 1;
       }
       else {
-        *(char *)((int)DAT_0001b738 + 0x679) = -*(char *)((int)DAT_0001b738 + 0x679);
+        *(char *)((int)player_object + 0x679) = -*(char *)((int)player_object + 0x679);
       }
-      if ((*(char *)((int)DAT_0001b738 + 0x679) < '\x01') || (*(short *)(DAT_0001b5a0 + 0xa4) == 0))
+      if ((*(char *)((int)player_object + 0x679) < '\x01') || (*(short *)(host_world + 0xa4) == 0))
       goto LAB_00007d52;
-      iVar5 = try_begin_landing_approach( /* Original: FUN_00019fba */DAT_0001b738);
-      if (iVar5 == 0) {
-        _DAT_0001b83e = 1;
+      work = try_begin_landing_approach( /* Original: FUN_00019fba */player_object);
+      if (work == 0) {
+        snd_approach_refused = 1;
       }
       else {
-        _DAT_0001b83c = 1;
+        snd_approach_ok = 1;
       }
     }
     break;
   case 0x4a:
   case 0x6a:
-    if (((_DAT_0001b874 == 0) && (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) &&
-       (*(char *)((int)DAT_0001b738 + 0x677) == '\0')) {
-      *(undefined1 *)((int)DAT_0001b738 + 0x677) = 1; /* 'J' / 'j' = bail out (, 0x7d08) */
+    if (((state_flag_b874 == 0) && (*(char *)((int)player_object + 0x63e) == '\0')) &&
+       (*(char *)((int)player_object + 0x677) == '\0')) {
+      *(undefined1 *)((int)player_object + 0x677) = 1; /* 'J' / 'j' = bail out (, 0x7d08) */
     }
     break;
   case 0x4d:
   case 0x6d:
-    *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;  /* 'M' / 'm': throttle 0... */
-    *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) | 0x4000; /*... and engine switched OFF (+0x684 bit 14, 0x7af6; ) */
+    *(undefined1 *)(player_object + 0x19a) = 0;  /* 'M' / 'm': throttle 0... */
+    *(ushort *)(player + 0x1a1) = *(ushort *)(player + 0x1a1) | 0x4000; /*... and engine switched OFF (+0x684 bit 14, 0x7af6; ) */
     break;
   case 0x50:
   case 0x70:
-    uVar6 = 4;
+    result = 4;
     goto switchD_0000833a_caseD_3;
   case 0x52:
   case 0x72:
-    if (DAT_0001d858 < 3) {
-      uVar6 = DAT_00024cfc + 0x2000;
+    if (view_mode < 3) {
+      result = view_key_angle_a + 0x2000;
       goto LAB_00007b16;
     }
-    DAT_00024cfc = 0x2000;
-    DAT_0001d800 = 0x2000;
-    DAT_0001d858 = 1;
+    view_key_angle_a = 0x2000;
+    camera_angle6 = 0x2000;
+    view_mode = 1;
     break;
   case 0x54:
   case 0x74:
-    if (DAT_0001d858 == 6) goto switchD_00007684_caseD_56;
-    iVar5 = point_near_camera_or_type80_object(&DAT_0001d824);
-    if (iVar5 != 0) {
-      DAT_0001d858 = 6;
-      DAT_0001d838 = DAT_0001d824;
-      DAT_0001d834 = DAT_0001d828;
-      DAT_0001d830 = DAT_0001d82c;
+    if (view_mode == 6) goto switchD_00007684_caseD_56;
+    work = point_near_camera_or_type80_object(&ext_camera_point);
+    if (work != 0) {
+      view_mode = 6;
+      camera_x = ext_camera_point;
+      camera_y = ext_camera_point_y;
+      camera_z = ext_camera_point_z;
       goto LAB_00007b8e;
     }
   }
 switchD_00007684_caseD_a:
-  if (DAT_00024cf6 != 0) {
-    iVar5 = abs_int( /* Original: FUN_00002e08 */(int)DAT_00024cf6);
-    piVar14 = DAT_0001b738;
-    if (iVar5 == 1) {
-      if ((*(byte *)(DAT_0001b738 + 0x1a1) & 0x40) == 0) {
-        *(char *)(DAT_0001b738 + 0x19a) = (char)DAT_00024cf6 + *(char *)(DAT_0001b738 + 0x19a);
-        if ('\t' < *(char *)(piVar14 + 0x19a)) {
-          *(undefined1 *)(piVar14 + 0x19a) = 9;
+  if (throttle_step != 0) {
+    work = abs_int( /* Original: FUN_00002e08 */(int)throttle_step);
+    player = player_object;
+    if (work == 1) {
+      if ((*(byte *)(player_object + 0x1a1) & 0x40) == 0) {
+        *(char *)(player_object + 0x19a) = (char)throttle_step + *(char *)(player_object + 0x19a);
+        if ('\t' < *(char *)(player + 0x19a)) {
+          *(undefined1 *)(player + 0x19a) = 9;
         }
-        if (*(char *)(DAT_0001b738 + 0x19a) < '\0') {
-          *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;
+        if (*(char *)(player_object + 0x19a) < '\0') {
+          *(undefined1 *)(player_object + 0x19a) = 0;
         }
       }
       else {
-        *(undefined1 *)(DAT_0001b738 + 0x19a) = 0;
-        *(ushort *)(piVar14 + 0x1a1) = *(ushort *)(piVar14 + 0x1a1) & 0xbfff;
+        *(undefined1 *)(player_object + 0x19a) = 0;
+        *(ushort *)(player + 0x1a1) = *(ushort *)(player + 0x1a1) & 0xbfff;
       }
-      DAT_00024cf6 = DAT_00024cf6 << 1;
+      throttle_step = throttle_step << 1;
     }
-    else if (DAT_00024cf6 < 1) {
-      DAT_00024cf6 = DAT_00024cf6 + 1;
+    else if (throttle_step < 1) {
+      throttle_step = throttle_step + 1;
     }
     else {
-      DAT_00024cf6 = DAT_00024cf6 + -1;
+      throttle_step = throttle_step + -1;
     }
   }
-  if ((DAT_00024d32 != *(short *)(DAT_0001b5a0 + 0x33e)) ||
-     (DAT_00024d30 != *(short *)(DAT_0001b5a0 + 0x340))) {
-    _DAT_00024d34 = 0;
+  if ((host_word_33e != *(short *)(host_world + 0x33e)) ||
+     (host_word_340 != *(short *)(host_world + 0x340))) {
+    host_words_valid = 0;
   }
-  if (_DAT_00024d34 == 0) {
-    _DAT_00024cf4 = *(short *)(DAT_0001b5a0 + 0x342);
+  if (host_words_valid == 0) {
+    fire_button = *(short *)(host_world + 0x342);
   }
   else {
-    sVar10 = DAT_00020b2a - *(short *)(DAT_0001b5a0 + 0x33e);
-    sVar13 = *(short *)(DAT_0001b5a0 + 0x340) - DAT_00020b2c;
-    if (_DAT_00024d2e == 0) {
-      iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar10);
-      sVar12 = sVar10;
-      if (0x1e < iVar5) {
-        if (0 < sVar10) goto LAB_00007eb8;
+    work_s = view_half_width - *(short *)(host_world + 0x33e);
+    work_s2 = *(short *)(host_world + 0x340) - view_half_rows;
+    if (flight_word_24d2e == 0) {
+      work = abs_int( /* Original: FUN_00002e08 */(int)work_s);
+      offset = work_s;
+      if (0x1e < work) {
+        if (0 < work_s) goto LAB_00007eb8;
         goto LAB_00007ebc;
       }
     }
-    else if (_DAT_00024d2e < 0) {
+    else if (flight_word_24d2e < 0) {
 LAB_00007ebc:
-      sVar12 = -0x1e;
+      offset = -0x1e;
     }
     else {
 LAB_00007eb8:
-      sVar12 = 0x1e;
+      offset = 0x1e;
     }
-    iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar10);
-    if (0xd5 < iVar5) {
-      if (sVar10 < 1) {
-        sVar10 = DAT_00020b2a + 0xd5;
+    work = abs_int( /* Original: FUN_00002e08 */(int)work_s);
+    if (0xd5 < work) {
+      if (work_s < 1) {
+        work_s = view_half_width + 0xd5;
       }
       else {
-        sVar10 = DAT_00020b2a + -0xd5;
+        work_s = view_half_width + -0xd5;
       }
-      *(short *)(DAT_0001b5a0 + 0x33e) = sVar10;
+      *(short *)(host_world + 0x33e) = work_s;
     }
-    DAT_00024d32 = *(short *)(DAT_0001b5a0 + 0x33e) + sVar12;
-    *(short *)(DAT_0001b5a0 + 0x33e) = DAT_00024d32;
-    if (_DAT_00024d2c == 0) {
-      iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar13);
-      if (0x18 < iVar5) {
-        if (0 < sVar13) goto LAB_00007f3a;
+    host_word_33e = *(short *)(host_world + 0x33e) + offset;
+    *(short *)(host_world + 0x33e) = host_word_33e;
+    if (flight_word_24d2c == 0) {
+      work = abs_int( /* Original: FUN_00002e08 */(int)work_s2);
+      if (0x18 < work) {
+        if (0 < work_s2) goto LAB_00007f3a;
         goto LAB_00007f20;
       }
-      sVar10 = -sVar13;
+      work_s = -work_s2;
     }
-    else if (_DAT_00024d2c < 0) {
+    else if (flight_word_24d2c < 0) {
 LAB_00007f3a:
-      sVar10 = -0x18;
+      work_s = -0x18;
     }
     else {
 LAB_00007f20:
-      sVar10 = 0x18;
+      work_s = 0x18;
     }
-    iVar5 = abs_int( /* Original: FUN_00002e08 */(int)sVar13);
-    if (0xab < iVar5) {
-      if (sVar13 < 1) {
-        sVar13 = DAT_00020b2c + -0xab;
+    work = abs_int( /* Original: FUN_00002e08 */(int)work_s2);
+    if (0xab < work) {
+      if (work_s2 < 1) {
+        work_s2 = view_half_rows + -0xab;
       }
       else {
-        sVar13 = DAT_00020b2c + 0xab;
+        work_s2 = view_half_rows + 0xab;
       }
-      *(short *)(DAT_0001b5a0 + 0x340) = sVar13;
+      *(short *)(host_world + 0x340) = work_s2;
     }
-    DAT_00024d30 = *(short *)(DAT_0001b5a0 + 0x340) + sVar10;
-    *(short *)(DAT_0001b5a0 + 0x340) = DAT_00024d30;
+    host_word_340 = *(short *)(host_world + 0x340) + work_s;
+    *(short *)(host_world + 0x340) = host_word_340;
   }
-  if ((((_DAT_00024cf4 != 0) && (1 < *(short *)((int)DAT_0001b738 + 0x682))) &&
-      ((*(byte *)((int)DAT_0001b738 + 0x685) & 0x10) == 0)) && (_DAT_0001b874 == 0)) {
-    if (*(char *)((int)DAT_0001b738 + 0x676) == '\0') {
-      *(undefined1 *)((int)DAT_0001b738 + 0x676) = 1;
+  if ((((fire_button != 0) && (1 < *(short *)((int)player_object + 0x682))) &&
+      ((*(byte *)((int)player_object + 0x685) & 0x10) == 0)) && (state_flag_b874 == 0)) {
+    if (*(char *)((int)player_object + 0x676) == '\0') {
+      *(undefined1 *)((int)player_object + 0x676) = 1;
     }
-    _DAT_0001b852 = 1;
+    snd_gun = 1;
   }
   /* Section check 0x7dbe..0x7ffe (throttle ramp, keyboard steering, gun trigger, view 8 / 9
    * exit) [PROVEN, matches the C; independent capstone disassembly]: throttle ramp word
@@ -10999,137 +11393,137 @@ LAB_00007f20:
    * key-down '"' / '`' / ESC -> result 3. */
 LAB_00008000:
   apply_player_mouse_controls();
-  if (DAT_0001b870 == 3) {
+  if (replay_state == 3) {
     tick_flagged_object_controllers();
   }
   else {
     advance_frame_and_tick_controllers();
   }
   update_game_sounds();
-  if (((7 < DAT_0001d858) || (*(int *)((int)DAT_0001b738 + 0x62a) != 0)) ||
-     (*(char *)((int)DAT_0001b738 + 0x63e) == '\0')) goto LAB_00008324;
-  uVar6 = probe_nearest_facility_kind( /* Original: FUN_00000354 */*(int *)DAT_0001b738 /* [PROVEN, move.l (a0) at 0x803e] */);
-  if (*(short *)(DAT_0001b5a0 + 0xd4) == 1) {
-    uVar6 = uVar6 | 1;
+  if (((7 < view_mode) || (*(int *)((int)player_object + 0x62a) != 0)) ||
+     (*(char *)((int)player_object + 0x63e) == '\0')) goto LAB_00008324;
+  result = probe_nearest_facility_kind( /* Original: FUN_00000354 */*(int *)player_object /* [PROVEN, move.l (a0) at 0x803e] */);
+  if (*(short *)(host_world + 0xd4) == 1) {
+    result = result | 1;
     goto switchD_0000833a_caseD_3;
   }
-  if ((*(byte *)(DAT_0001b738 + 0x1a1) & 0x10) != 0) {
-    if (((*(ushort *)(DAT_0001b738 + 0x1a1) & 0x3fe) == 0) &&
-       ((*(char *)((int)DAT_0001b738 + 0x67d) != '\0' ||
-        (*(char *)((int)DAT_0001b738 + 0x67e) != '\0')))) {
-      *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 4;
+  if ((*(byte *)(player_object + 0x1a1) & 0x10) != 0) {
+    if (((*(ushort *)(player_object + 0x1a1) & 0x3fe) == 0) &&
+       ((*(char *)((int)player_object + 0x67d) != '\0' ||
+        (*(char *)((int)player_object + 0x67e) != '\0')))) {
+      *(undefined2 *)(host_world + 0xd4) = 4;
     }
-    else if ((uVar6 & 0x100) == 0) {
-      if ((uVar6 & 0x200) != 0) {
-        uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-        uVar7 = uVar7 & 7;
+    else if ((result & 0x100) == 0) {
+      if ((result & 0x200) != 0) {
+        work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+        work_u = work_u & 7;
         goto joined_r0x000080c4;
       }
-      uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-      if ((uVar7 & 3) != 0) {
-        uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-        if ((uVar7 & 3) == 0) goto LAB_000080ee;
+      work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+      if ((work_u & 3) != 0) {
+        work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+        if ((work_u & 3) == 0) goto LAB_000080ee;
         goto LAB_000080fa;
       }
 LAB_000080d4:
-      *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 1;
+      *(undefined2 *)(host_world + 0xd4) = 1;
     }
     else {
-      uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-      if ((uVar7 & 1) == 0) {
+      work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+      if ((work_u & 1) == 0) {
 LAB_000080ee:
-        *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
+        *(undefined2 *)(host_world + 0xd4) = 3;
       }
       else {
-        uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-        uVar7 = uVar7 & 3;
+        work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+        work_u = work_u & 3;
 joined_r0x000080c4:
-        if (uVar7 == 0) goto LAB_000080d4;
+        if (work_u == 0) goto LAB_000080d4;
       }
     }
 LAB_000080fa:
-    uVar6 = uVar6 | 6;
+    result = result | 6;
     goto switchD_0000833a_caseD_3;
   }
-  if (*(int *)((int)DAT_0001b738 + 0x66a) == 0) {
-    if (DAT_0001b868 == 2) {
-      DAT_0001b868 = 0;
-      _DAT_0001b73c = 0;
-      if (((0 < *(short *)(DAT_0001b5a0 + 0xce)) && (uVar6 == 0x200)) &&
-         (((*(char *)(DAT_0001b738 + 0xb) == '0' ||
-           ((*(char *)(DAT_0001b738 + 0xb) == '`' || (*(char *)(DAT_0001b738 + 0xb) == 'p')))) &&
-          (_DAT_0001b86a == 0)))) {
-        _DAT_0001b86a = 1;
-        uVar6 = 0x201;
+  if (*(int *)((int)player_object + 0x66a) == 0) {
+    if (player_landing_state == 2) {
+      player_landing_state = 0;
+      loadout_synced = 0;
+      if (((0 < *(short *)(host_world + 0xce)) && (result == 0x200)) &&
+         (((*(char *)(player_object + 0xb) == '0' ||
+           ((*(char *)(player_object + 0xb) == '`' || (*(char *)(player_object + 0xb) == 'p')))) &&
+          (friendly_landing_scored == 0)))) {
+        friendly_landing_scored = 1;
+        result = 0x201;
         goto switchD_0000833a_caseD_3;
       }
-      if ((((*(char *)(DAT_0001b738 + 0xb) == '0') || (*(char *)(DAT_0001b738 + 0xb) == '`')) ||
-          (*(char *)(DAT_0001b738 + 0xb) == 'p')) && (uVar6 == 0x100)) {
-        *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
-        uVar6 = 0x10a;
+      if ((((*(char *)(player_object + 0xb) == '0') || (*(char *)(player_object + 0xb) == '`')) ||
+          (*(char *)(player_object + 0xb) == 'p')) && (result == 0x100)) {
+        *(undefined2 *)(host_world + 0xd4) = 3;
+        result = 0x10a;
         goto switchD_0000833a_caseD_3;
       }
-      if (((*(char *)(DAT_0001b738 + 0xb) != '0') && (*(char *)(DAT_0001b738 + 0xb) != '`')) &&
-         (*(char *)(DAT_0001b738 + 0xb) != 'p')) {
-        if (((*(ushort *)(DAT_0001b738 + 0x1a1) & 0x3fe) != 0) ||
-           ((*(char *)((int)DAT_0001b738 + 0x67d) == '\0' &&
-            (*(char *)((int)DAT_0001b738 + 0x67e) == '\0')))) {
-          if ((uVar6 & 0x100) == 0) {
-            if ((uVar6 & 0x200) != 0) {
-              uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-              uVar7 = uVar7 & 7;
+      if (((*(char *)(player_object + 0xb) != '0') && (*(char *)(player_object + 0xb) != '`')) &&
+         (*(char *)(player_object + 0xb) != 'p')) {
+        if (((*(ushort *)(player_object + 0x1a1) & 0x3fe) != 0) ||
+           ((*(char *)((int)player_object + 0x67d) == '\0' &&
+            (*(char *)((int)player_object + 0x67e) == '\0')))) {
+          if ((result & 0x100) == 0) {
+            if ((result & 0x200) != 0) {
+              work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+              work_u = work_u & 7;
               goto joined_r0x00008216;
             }
-            uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-            if ((uVar7 & 3) != 0) {
-              uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-              if ((uVar7 & 3) == 0) goto LAB_00008240;
+            work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+            if ((work_u & 3) != 0) {
+              work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+              if ((work_u & 3) == 0) goto LAB_00008240;
               goto LAB_0000824c;
             }
 LAB_00008226:
-            *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 5;
+            *(undefined2 *)(host_world + 0xd4) = 5;
           }
           else {
-            uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-            if ((uVar7 & 1) == 0) {
+            work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+            if ((work_u & 1) == 0) {
 LAB_00008240:
-              *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
+              *(undefined2 *)(host_world + 0xd4) = 3;
             }
             else {
-              uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-              uVar7 = uVar7 & 3;
+              work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+              work_u = work_u & 3;
 joined_r0x00008216:
-              if (uVar7 == 0) goto LAB_00008226;
+              if (work_u == 0) goto LAB_00008226;
             }
           }
 LAB_0000824c:
-          uVar6 = uVar6 | 8;
+          result = result | 8;
           goto switchD_0000833a_caseD_3;
         }
-        if (uVar6 == 0x100) {
-          uVar7 = overlay_rng_next( /* Original: FUN_00011564 */);
-          if ((uVar7 & 3) == 0) {
-            *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
+        if (result == 0x100) {
+          work_u = overlay_rng_next( /* Original: FUN_00011564 */);
+          if ((work_u & 3) == 0) {
+            *(undefined2 *)(host_world + 0xd4) = 3;
           }
         }
         else {
-          iVar5 = any_mission_kills_recorded();
-          if (iVar5 == 0) goto LAB_00008324;
+          work = any_mission_kills_recorded();
+          if (work == 0) goto LAB_00008324;
         }
       }
-      uVar6 = uVar6 | 9;
+      result = result | 9;
       goto switchD_0000833a_caseD_3;
     }
-    if ((((*(char *)(DAT_0001b738 + 0xb) == '0') || (*(char *)(DAT_0001b738 + 0xb) == '`')) ||
-        (*(char *)(DAT_0001b738 + 0xb) == 'p')) &&
-       ((_DAT_0001b73c == 0 && ((*(byte *)(DAT_0001b738 + 0x1a1) & 0x40) != 0)))) {
-      *(short *)(DAT_0001b5a0 + 0xb6) =
-           (short)((((int)*(char *)((int)DAT_0001b738 + 0x67d) +
-                    (int)*(char *)((int)DAT_0001b738 + 0x67e)) * 100) /
-                  (int)*(short *)(DAT_0001b738[1] + 0x1c));
-      *(short *)(DAT_0001b5a0 + 0xb8) = (short)*(char *)(DAT_0001b738 + 0x19f);
-      _DAT_0001b73c = 1;
-      uVar6 = uVar6 | 2;
+    if ((((*(char *)(player_object + 0xb) == '0') || (*(char *)(player_object + 0xb) == '`')) ||
+        (*(char *)(player_object + 0xb) == 'p')) &&
+       ((loadout_synced == 0 && ((*(byte *)(player_object + 0x1a1) & 0x40) != 0)))) {
+      *(short *)(host_world + 0xb6) =
+           (short)((((int)*(char *)((int)player_object + 0x67d) +
+                    (int)*(char *)((int)player_object + 0x67e)) * 100) /
+                  (int)*(short *)(player_object[1] + 0x1c));
+      *(short *)(host_world + 0xb8) = (short)*(char *)(player_object + 0x19f);
+      loadout_synced = 1;
+      result = result | 2;
       goto switchD_0000833a_caseD_3;
     }
   }
@@ -11158,153 +11552,153 @@ LAB_0000824c:
    * are POW / MIA per the STR# 129 reading above [STRONG INFERENCE]. Then the camera
    * switch below (view - 1, unsigned > 8 -> exit, table at 0x833e). */
 LAB_00008324:
-  uVar6 = 0;
-  switch(DAT_0001d858) {
+  result = 0;
+  switch(view_mode) {
   case 1:
   case 2:
     copy_player_pose_to_camera();
-    piVar14 = DAT_0001b738;
-    if ((DAT_0001d858 == 1) && ((DAT_00024cf8 != 0 || (DAT_00024cfc != 0)))) {
-      DAT_0001d858 = 2;
-      if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) == 0) {
-        puVar1 = (uint *)(*DAT_0001b738 + 4);
-        *puVar1 = *puVar1 | 0x40;
-        drop_contact_records_for_object(*piVar14);
+    player = player_object;
+    if ((view_mode == 1) && ((view_key_angle_b != 0 || (view_key_angle_a != 0)))) {
+      view_mode = 2;
+      if ((*(byte *)(*player_object + 7) & 0x40) == 0) {
+        obj_flags = (uint *)(*player_object + 4);
+        *obj_flags = *obj_flags | 0x40;
+        drop_contact_records_for_object(*player);
       }
       update_view_clip_bounds();
     }
-    if (DAT_0001d858 == 2) {
-      if (*(short *)(DAT_0001b5a0 + 0xa0) == 0) {
-        DAT_0001d804 = DAT_00024cf8;
-        DAT_0001d800 = DAT_00024cfc;
+    if (view_mode == 2) {
+      if (*(short *)(host_world + 0xa0) == 0) {
+        camera_angle5 = view_key_angle_b;
+        camera_angle6 = view_key_angle_a;
       }
       else {
-        iVar5 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)DAT_00024cf8 - (short)DAT_0001d804);
-        sVar10 = (short)iVar5;
-        if (sVar10 < 0) {
-          sVar10 = sVar10 + 3;
+        work = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)view_key_angle_b - (short)camera_angle5);
+        work_s = (short)work;
+        if (work_s < 0) {
+          work_s = work_s + 3;
         }
-        DAT_0001d804 = DAT_0001d804 + (int)(sVar10 >> 2) & 0x3fff;
-        iVar5 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)DAT_00024cfc - (short)DAT_0001d800);
-        sVar10 = (short)iVar5;
-        if (sVar10 < 0) {
-          sVar10 = sVar10 + 3;
+        camera_angle5 = camera_angle5 + (int)(work_s >> 2) & 0x3fff;
+        work = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */(short)view_key_angle_a - (short)camera_angle6);
+        work_s = (short)work;
+        if (work_s < 0) {
+          work_s = work_s + 3;
         }
-        DAT_0001d800 = DAT_0001d800 + (int)(sVar10 >> 2) & 0x3fff;
+        camera_angle6 = camera_angle6 + (int)(work_s >> 2) & 0x3fff;
       }
-      piVar14 = DAT_0001b738;
-      if ((((DAT_00024cf8 == 0) && (DAT_00024cfc == 0)) &&
-          (((int)DAT_0001d804 < 0x21 || (0x3fdf < (int)DAT_0001d804)))) &&
-         (((int)DAT_0001d800 < 0x21 || (0x3fdf < (int)DAT_0001d800)))) {
-        DAT_0001d858 = 1;
-        if ((*(byte *)(*DAT_0001b738 + 7) & 0x40) == 0) {
-          puVar1 = (uint *)(*DAT_0001b738 + 4);
-          *puVar1 = *puVar1 | 0x40;
-          drop_contact_records_for_object(*piVar14);
+      player = player_object;
+      if ((((view_key_angle_b == 0) && (view_key_angle_a == 0)) &&
+          (((int)camera_angle5 < 0x21 || (0x3fdf < (int)camera_angle5)))) &&
+         (((int)camera_angle6 < 0x21 || (0x3fdf < (int)camera_angle6)))) {
+        view_mode = 1;
+        if ((*(byte *)(*player_object + 7) & 0x40) == 0) {
+          obj_flags = (uint *)(*player_object + 4);
+          *obj_flags = *obj_flags | 0x40;
+          drop_contact_records_for_object(*player);
         }
         update_view_clip_bounds();
       }
     }
     break;
   case 5:
-    iVar5 = *(short *)((int)DAT_0001b738 + 0x612) + -7;
-    if (iVar5 < 0) {
-      iVar5 = *(short *)((int)DAT_0001b738 + 0x612) + 0x44;
+    work = *(short *)((int)player_object + 0x612) + -7;
+    if (work < 0) {
+      work = *(short *)((int)player_object + 0x612) + 0x44;
     }
-    piVar14 = (int *)((int)DAT_0001b738 + iVar5 * 0x14 + 0x36);
-    DAT_0001d838 = *piVar14;
-    DAT_0001d834 = piVar14[1];
-    DAT_0001d830 = piVar14[2];
-    sVar10 = *(short *)(piVar14 + 3);
-    sVar13 = *(short *)((int)piVar14 + 0xe);
-    DAT_0001d80c = -*(short *)(piVar14 + 4) & 0x3fff;
+    player = (int *)((int)player_object + work * 0x14 + 0x36);
+    camera_x = *player;
+    camera_y = player[1];
+    camera_z = player[2];
+    work_s = *(short *)(player + 3);
+    work_s2 = *(short *)((int)player + 0xe);
+    camera_angle3 = -*(short *)(player + 4) & 0x3fff;
     goto LAB_000086fe;
   case 6:
-    iVar5 = *DAT_0001b738;
-    iVar8 = update_object_camera_metric( /* Original: FUN_00003b98 */iVar5);
-    iVar11 = 0;
-    for (uVar7 = *(int *)(iVar5 + 0x14) + iVar8; (uVar7 & 0xffff8000) != 0; uVar7 = (int)uVar7 >> 1)
+    work = *player_object;
+    dy = update_object_camera_metric( /* Original: FUN_00003b98 */work);
+    dx = 0;
+    for (work_u = *(int *)(work + 0x14) + dy; (work_u & 0xffff8000) != 0; work_u = (int)work_u >> 1)
     {
-      iVar11 = iVar11 + 1;
+      dx = dx + 1;
     }
-    uVar7 = iVar11 + 1;
-    iVar11 = *(int *)(iVar5 + 0x18) - DAT_0001d838 >> (uVar7 & 0x3f);
-    iVar8 = *(int *)(iVar5 + 0x1c) - DAT_0001d834 >> (uVar7 & 0x3f);
-    iVar3 = *(int *)(iVar5 + 0x20) - DAT_0001d830 >> (uVar7 & 0x3f);
-    iVar5 = iVar3 * iVar3 + iVar8 * iVar8 + iVar11 * iVar11;
-    iVar9 = isqrt_floor( /* Original: FUN_0000e372 */iVar5);
-    attitude_from_velocity( /* Original: FUN_00001f22 */(short)iVar11,(short)iVar8,(short)iVar3,(int)(short)iVar9,iVar5,&uStack_24,
-                 &uStack_26);
+    work_u = dx + 1;
+    dx = *(int *)(work + 0x18) - camera_x >> (work_u & 0x3f);
+    dy = *(int *)(work + 0x1c) - camera_y >> (work_u & 0x3f);
+    dz = *(int *)(work + 0x20) - camera_z >> (work_u & 0x3f);
+    work = dz * dz + dy * dy + dx * dx;
+    dist = isqrt_floor( /* Original: FUN_0000e372 */work);
+    attitude_from_velocity( /* Original: FUN_00001f22 */(short)dx,(short)dy,(short)dz,(int)(short)dist,work,&seen_pitch,
+                 &seen_heading);
     /* LAB_0000e3e8_4 = fold_angle_pm_0x2000 (lea.l $e3ec.l = runtime -> file 0xe40c) and
      * FUN_00002de8 = abs_int (runtime $2de8 -> file 0x2e08) of the two folded deltas;
      * arguments dropped by Ghidra [PROVEN, 0x8632..0x8674]. */
-    sVar10 = (*(code *)&LAB_0000e3e8_4)((int)(short)uStack_24 - DAT_00024d00);
-    iVar5 = (int)sVar10;
-    sVar10 = (*(code *)&LAB_0000e3e8_4)((int)(short)uStack_26 - DAT_00024d04);
-    iVar11 = (int)sVar10;
-    iVar8 = FUN_00002de8( /* = abs_int(iVar5) */);
-    if ((iVar8 < 0x1001) && (iVar8 = FUN_00002de8( /* = abs_int(iVar11) */), iVar8 < 0x1001)) {
-      if (iVar5 < 0) {
-        iVar5 = iVar5 + 3;
+    work_s = (*(code *)&LAB_0000e3e8_4)((int)(short)seen_pitch - track_pitch);
+    work = (int)work_s;
+    work_s = (*(code *)&LAB_0000e3e8_4)((int)(short)seen_heading - track_heading);
+    dx = (int)work_s;
+    dy = FUN_00002de8( /* = abs_int(iVar5) */);
+    if ((dy < 0x1001) && (dy = FUN_00002de8( /* = abs_int(iVar11) */), dy < 0x1001)) {
+      if (work < 0) {
+        work = work + 3;
       }
-      uVar7 = DAT_00024d00 + (iVar5 >> 2);
-      if (iVar11 < 0) {
-        iVar11 = iVar11 + 3;
+      work_u = track_pitch + (work >> 2);
+      if (dx < 0) {
+        dx = dx + 3;
       }
-      uVar2 = DAT_00024d04 + (iVar11 >> 2);
+      new_heading = track_heading + (dx >> 2);
     }
     else {
-      uVar7 = (uint)uStack_24;
-      uVar2 = (uint)uStack_26;
+      work_u = (uint)seen_pitch;
+      new_heading = (uint)seen_heading;
     }
-    DAT_00024d04 = uVar2 & 0x3fff;
-    DAT_00024d00 = uVar7 & 0x3fff;
-    DAT_0001d80c = 0;
-    sVar13 = DAT_00024d04._2_2_;
-    sVar10 = DAT_00024d00._2_2_;
+    track_heading = new_heading & 0x3fff;
+    track_pitch = work_u & 0x3fff;
+    camera_angle3 = 0;
+    work_s2 = track_heading._2_2_;
+    work_s = track_pitch._2_2_;
 LAB_000086fe:
-    DAT_0001d810 = -sVar10 & 0x3fff;
-    DAT_0001d80e = -sVar13 & 0x3fff;
-    DAT_0001d808 = 0;
+    neg_camera_pitch = -work_s & 0x3fff;
+    neg_camera_heading = -work_s2 & 0x3fff;
+    camera_angle4 = 0;
     break;
   case 7:
-    DAT_0001d838 = *(int *)(*DAT_0001b888 + 0x18);
-    DAT_0001d834 = *(int *)(*DAT_0001b888 + 0x1c);
-    DAT_0001d830 = *(int *)(*DAT_0001b888 + 0x20);
-    DAT_0001d810 = -*(short *)(DAT_0001b888 + 8) & 0x3fff;
-    DAT_0001d80e = -*(short *)((int)DAT_0001b888 + 0x22) & 0x3fff;
-    DAT_0001d80c = -*(short *)(DAT_0001b888 + 9) & 0x3fff;
-    DAT_0001d808 = (int)*(short *)(DAT_0001b888[1] + 0x44) -
-                   (int)*(short *)((int)DAT_0001b888 + 0x626) & 0x3fff;
+    camera_x = *(int *)(*designated_entity_2 + 0x18);
+    camera_y = *(int *)(*designated_entity_2 + 0x1c);
+    camera_z = *(int *)(*designated_entity_2 + 0x20);
+    neg_camera_pitch = -*(short *)(designated_entity_2 + 8) & 0x3fff;
+    neg_camera_heading = -*(short *)((int)designated_entity_2 + 0x22) & 0x3fff;
+    camera_angle3 = -*(short *)(designated_entity_2 + 9) & 0x3fff;
+    camera_angle4 = (int)*(short *)(designated_entity_2[1] + 0x44) -
+                   (int)*(short *)((int)designated_entity_2 + 0x626) & 0x3fff;
     break;
   case 8:
-    uVar7 = update_tracking_camera();
+    work_u = update_tracking_camera();
     goto LAB_00008596;
   case 9:
-    uVar7 = update_bailout_view();
+    work_u = update_bailout_view();
 LAB_00008596:
-    if (uVar7 != 0) {
-      uVar6 = uVar7;
+    if (work_u != 0) {
+      result = work_u;
     }
   }
 switchD_0000833a_caseD_3:
-  if ((0x1000 < (short)DAT_0001d810) && ((short)DAT_0001d810 < 0x3000)) {
-    if ((short)DAT_0001d810 < 0x2001) {
-      sVar10 = 0x2000;
+  if ((0x1000 < (short)neg_camera_pitch) && ((short)neg_camera_pitch < 0x3000)) {
+    if ((short)neg_camera_pitch < 0x2001) {
+      work_s = 0x2000;
     }
     else {
-      sVar10 = 0x6000;
+      work_s = 0x6000;
     }
-    DAT_0001d810 = sVar10 - DAT_0001d810;
-    DAT_0001d80e = DAT_0001d80e + 0x2000 & 0x3fff;
+    neg_camera_pitch = work_s - neg_camera_pitch;
+    neg_camera_heading = neg_camera_heading + 0x2000 & 0x3fff;
   }
-  if (uVar6 != 0) {
-    *(undefined1 *)((int)DAT_0001b738 + 0x641) = 0;
-    _DAT_0001b872 = 0;
-    DAT_00024cf6 = 0;
+  if (result != 0) {
+    *(undefined1 *)((int)player_object + 0x641) = 0;
+    state_flag_b872 = 0;
+    throttle_step = 0;
   }
-  if (DAT_0001d858 != sVar4) {
-    _DAT_0001d856 = 1;
+  if (view_mode != old_view_mode) {
+    view_flag_d856 = 1;
   }
   /* Section check 0x8324..0x8782 (camera-mode switch + common tail) [PROVEN, matches the C;
    * table at 0x833e decoded by hand: views 1 / 2 -> 0x8350, 3 / 4 -> exit, 5 -> 0x84a6,
@@ -11325,7 +11719,7 @@ switchD_0000833a_caseD_3:
    * 0x6000 - pitch) and heading 0x1d80e += 0x2000; a non-zero result clears the brakes
    * +0x641, the target lock 0x1b872 and the throttle ramp 0x24cf6; a view change sets
    * 0x1d856 = 1; returns the result (d6). */
-  return uVar6;
+  return result;
 }
 
 
@@ -11346,33 +11740,33 @@ switchD_0000833a_caseD_3:
 uint process_flight_input_tail /* Original: FUN_0000823e */ (void)
 
 {
-  uint unaff_D6;
-  short sVar1;
-  short unaff_A4w;
-  bool in_ZF;
+  uint result; /* unaff_D6: outcome code (D6), |8 here */
+  short mirror; /* sVar1: 0x2000 or 0x6000 pitch mirror base */
+  short old_view_mode; /* unaff_A4w: view_mode on entry (A4.w) */
+  bool set_pow; /* in_ZF: Z flag; set -> host +0xd4 = 3 */
   
-  if (in_ZF) {
-    *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
+  if (set_pow) {
+    *(undefined2 *)(host_world + 0xd4) = 3;
   }
-  if ((0x1000 < DAT_0001d810) && (DAT_0001d810 < 0x3000)) {
-    if (DAT_0001d810 < 0x2001) {
-      sVar1 = 0x2000;
+  if ((0x1000 < neg_camera_pitch) && (neg_camera_pitch < 0x3000)) {
+    if (neg_camera_pitch < 0x2001) {
+      mirror = 0x2000;
     }
     else {
-      sVar1 = 0x6000;
+      mirror = 0x6000;
     }
-    DAT_0001d810 = sVar1 - DAT_0001d810;
-    DAT_0001d80e = DAT_0001d80e + 0x2000 & 0x3fff;
+    neg_camera_pitch = mirror - neg_camera_pitch;
+    neg_camera_heading = neg_camera_heading + 0x2000 & 0x3fff;
   }
-  if ((unaff_D6 | 8) != 0) {
-    *(undefined1 *)(DAT_0001b738 + 0x641) = 0;
-    _DAT_0001b872 = 0;
-    DAT_00024cf6 = 0;
+  if ((result | 8) != 0) {
+    *(undefined1 *)(player_object + 0x641) = 0;
+    state_flag_b872 = 0;
+    throttle_step = 0;
   }
-  if (DAT_0001d858 != unaff_A4w) {
-    _DAT_0001d856 = 1;
+  if (view_mode != old_view_mode) {
+    view_flag_d856 = 1;
   }
-  return unaff_D6 | 8;
+  return result | 8;
 }
 
 
@@ -11390,14 +11784,14 @@ uint process_flight_input_tail /* Original: FUN_0000823e */ (void)
  * VERIFIED: bytes 0x8784..0x879c = tst.l 4(a7); 1 when non-zero, else 2
  * (move.w to $1b86c) - identical to the C.
  */
-void request_instant_replay /* Original: FUN_00008784 */ (int param_1)
+void request_instant_replay /* Original: FUN_00008784 */ (int airborne /* param_1: nonzero = airborne (request 1), 0 = on the ground (request 2) */)
 
 {
-  if (param_1 == 0) {
-    DAT_0001b86c = 2;
+  if (airborne == 0) {
+    replay_request = 2;
   }
   else {
-    DAT_0001b86c = 1;
+    replay_request = 1;
   }
   return;
 }
@@ -11427,54 +11821,54 @@ void request_instant_replay /* Original: FUN_00008784 */ (int param_1)
 uint resolve_bailout_outcome /* Original: FUN_0000879e */ (void)
 
 {
-  int iVar1;
-  uint uVar2;
-  uint uVar3;
-  
-  uVar2 = probe_nearest_facility_kind( /* Original: FUN_00000354 */*(int *)DAT_0001b738 /* [PROVEN, move.l (a0) at 0x87a8] */);
-  iVar1 = DAT_0001b5a0;
-  uVar3 = uVar2 | 7;
-  *(undefined2 *)(DAT_0001b5a0 + 0xd6) = 1;
-  if (((DAT_0001b87c != (int *)0x0) && (*(int *)(*DAT_0001b87c + 0x1c) < 0x373)) &&
-     (0x5a0 < *(short *)(DAT_0001b87c + 0x185))) {
-    *(undefined2 *)(iVar1 + 0xd4) = 1;
-    uVar3 = uVar2 & 0xffffff00 | 1;
+  int host; /* iVar1: host_world copy */
+  uint work; /* uVar2: facility kind, then random draws */
+  uint result; /* uVar3: outcome code (facility kind | 7, or | 1 for a low late parachute) */
+
+  work = probe_nearest_facility_kind( /* Original: FUN_00000354 */*(int *)player_object /* [PROVEN, move.l (a0) at 0x87a8] */);
+  host = host_world;
+  result = work | 7;
+  *(undefined2 *)(host_world + 0xd6) = 1;
+  if (((parachute_object != (int *)0x0) && (*(int *)(*parachute_object + 0x1c) < 0x373)) &&
+     (0x5a0 < *(short *)(parachute_object + 0x185))) {
+    *(undefined2 *)(host + 0xd4) = 1;
+    result = work & 0xffffff00 | 1;
   }
-  if (*(short *)(DAT_0001b5a0 + 0xd4) != 0) goto LAB_00008866;
-  if ((uVar3 & 0x100) == 0) {
-    if ((uVar3 & 0x200) != 0) {
-      uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
-      uVar2 = uVar2 & 7;
+  if (*(short *)(host_world + 0xd4) != 0) goto LAB_00008866;
+  if ((result & 0x100) == 0) {
+    if ((result & 0x200) != 0) {
+      work = overlay_rng_next( /* Original: FUN_00011564 */);
+      work = work & 7;
       goto joined_r0x00008830;
     }
-    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
-    if ((uVar2 & 3) != 0) {
-      uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
-      if ((uVar2 & 3) != 0) goto LAB_00008866;
+    work = overlay_rng_next( /* Original: FUN_00011564 */);
+    if ((work & 3) != 0) {
+      work = overlay_rng_next( /* Original: FUN_00011564 */);
+      if ((work & 3) != 0) goto LAB_00008866;
       goto LAB_0000885a;
     }
   }
   else {
-    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
-    if ((uVar2 & 1) == 0) {
+    work = overlay_rng_next( /* Original: FUN_00011564 */);
+    if ((work & 1) == 0) {
 LAB_0000885a:
-      *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 3;
+      *(undefined2 *)(host_world + 0xd4) = 3;
       goto LAB_00008866;
     }
-    uVar2 = overlay_rng_next( /* Original: FUN_00011564 */);
-    uVar2 = uVar2 & 3;
+    work = overlay_rng_next( /* Original: FUN_00011564 */);
+    work = work & 3;
 joined_r0x00008830:
-    if (uVar2 != 0) goto LAB_00008866;
+    if (work != 0) goto LAB_00008866;
   }
-  *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 1;
+  *(undefined2 *)(host_world + 0xd4) = 1;
 LAB_00008866:
-  if (DAT_0001b87c != (int *)0x0) {
-    dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)*DAT_0001b87c);
+  if (parachute_object != (int *)0x0) {
+    dispatch_entity_cleanup( /* Original: FUN_0000528a */(char *)*parachute_object);
   }
-  if ((_DAT_0001b87a != 0) && (*(short *)(DAT_0001b5a0 + 0xd4) == 0)) {
-    *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 4;
+  if ((abandoned_intact_aircraft != 0) && (*(short *)(host_world + 0xd4) == 0)) {
+    *(undefined2 *)(host_world + 0xd4) = 4;
   }
-  return uVar3;
+  return result;
 }
 
 
@@ -11490,33 +11884,33 @@ LAB_00008866:
  * (muls.w #$3e8, divs.l), with -0xfa on x and +0xfa on y; length 0 -> camera = point;
  * y floored at 0xfa (cmpi.l #$f9 / bgt). The only call (isqrt_floor) has its argument.
  */
-void place_camera_behind_object /* Original: FUN_000088a0 */ (int param_1,int param_2,int param_3,int param_4,short param_5)
+void place_camera_behind_object /* Original: FUN_000088a0 */ (int obj /* param_1: object */,int px /* param_2: point x */,int py /* param_3: point y */,int pz /* param_4: point z */,short shift /* param_5: coordinate shift */)
 
 {
-  uint uVar1;
-  int iVar2;
-  short sVar3;
-  short sVar4;
-  short sVar5;
+  uint shift_u; /* uVar1: shift as unsigned */
+  int len; /* iVar2: isqrt_floor distance */
+  short dx; /* sVar3: (obj x - px) >> shift */
+  short dy; /* sVar4: (obj y - py) >> shift */
+  short dz; /* sVar5: (obj z - pz) >> shift */
   
-  uVar1 = (uint)param_5;
-  sVar3 = (short)(*(int *)(param_1 + 0x18) - param_2 >> (uVar1 & 0x3f));
-  sVar4 = (short)(*(int *)(param_1 + 0x1c) - param_3 >> (uVar1 & 0x3f));
-  sVar5 = (short)(*(int *)(param_1 + 0x20) - param_4 >> (uVar1 & 0x3f));
-  iVar2 = isqrt_floor( /* Original: FUN_0000e372 */(int)sVar4 * (int)sVar4 + (int)sVar3 * (int)sVar3 + (int)sVar5 * (int)sVar5);
-  if ((short)iVar2 == 0) {
-    DAT_0001d838 = param_2;
-    DAT_0001d834 = param_3;
-    DAT_0001d830 = param_4;
+  shift_u = (uint)shift;
+  dx = (short)(*(int *)(obj + 0x18) - px >> (shift_u & 0x3f));
+  dy = (short)(*(int *)(obj + 0x1c) - py >> (shift_u & 0x3f));
+  dz = (short)(*(int *)(obj + 0x20) - pz >> (shift_u & 0x3f));
+  len = isqrt_floor( /* Original: FUN_0000e372 */(int)dy * (int)dy + (int)dx * (int)dx + (int)dz * (int)dz);
+  if ((short)len == 0) {
+    camera_x = px;
+    camera_y = py;
+    camera_z = pz;
   }
   else {
-    iVar2 = (int)(short)iVar2;
-    DAT_0001d838 = *(int *)(param_1 + 0x18) + (sVar3 * 1000) / iVar2 + -0xfa;
-    DAT_0001d834 = *(int *)(param_1 + 0x1c) + (sVar4 * 1000) / iVar2 + 0xfa;
-    DAT_0001d830 = *(int *)(param_1 + 0x20) + (sVar5 * 1000) / iVar2;
+    len = (int)(short)len;
+    camera_x = *(int *)(obj + 0x18) + (dx * 1000) / len + -0xfa;
+    camera_y = *(int *)(obj + 0x1c) + (dy * 1000) / len + 0xfa;
+    camera_z = *(int *)(obj + 0x20) + (dz * 1000) / len;
   }
-  if (DAT_0001d834 < 0xfa) {
-    DAT_0001d834 = 0xfa;
+  if (camera_y < 0xfa) {
+    camera_y = 0xfa;
   }
   return;
 }
@@ -11552,63 +11946,63 @@ void place_camera_behind_object /* Original: FUN_000088a0 */ (int param_1,int pa
 uint update_bailout_view /* Original: FUN_00008972 */ (void)
 
 {
-  int iVar1;
-  uint uVar2;
-  short sVar3;
-  ushort uVar4;
-  int iVar5;
-  int iVar6;
-  int iVar7;
-  undefined4 *puVar8;
-  
-  if (((DAT_0001b87c == (int *)0x0) || ((*(byte *)(*DAT_0001b87c + 7) & 2) != 0)) ||
-     ((*(short *)((int)DAT_0001b87c + 0x61e) != 0 && (0x5a0 < *(short *)(DAT_0001b87c + 0x185))))) {
-    uVar2 = resolve_bailout_outcome();
-    return uVar2;
+  int chute; /* iVar1: parachute world object */
+  uint dist; /* uVar2: distance chute -> aircraft, then shifted for the detail shift */
+  short shift; /* sVar3: detail shift for place_camera_behind_object */
+  ushort slot; /* uVar4: pose history slot (0..0x4a) */
+  int work_z; /* iVar5: aircraft object, then the target z */
+  int ty; /* iVar6: target y */
+  int tx; /* iVar7: target x */
+  undefined4 *pose; /* puVar8: pose history entry (x, y, z) */
+
+  if (((parachute_object == (int *)0x0) || ((*(byte *)(*parachute_object + 7) & 2) != 0)) ||
+     ((*(short *)((int)parachute_object + 0x61e) != 0 && (0x5a0 < *(short *)(parachute_object + 0x185))))) {
+    dist = resolve_bailout_outcome();
+    return dist;
   }
-  iVar1 = *DAT_0001b87c;
-  if ((DAT_0001b738 != (int *)0x0) &&
-     ((DAT_0001b838 + -0x4b <= *(int *)(iVar1 + 0x40) ||
-      (0x373 < *(int *)(iVar1 + 0x1c) - *(int *)((int)DAT_0001b87c + 0x2e))))) {
-    iVar5 = *DAT_0001b738;
-    uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (player object pos, parachute object pos) [PROVEN, pushes 0x89de..0x89f2] */);
-    if ((int)uVar2 < 0x9ab1) {
-      iVar7 = *(int *)(iVar1 + 0x18) + *(int *)(iVar5 + 0x18);
-      if (iVar7 < 0) {
-        iVar7 = iVar7 + 1;
+  chute = *parachute_object;
+  if ((player_object != (int *)0x0) &&
+     ((frame_counter + -0x4b <= *(int *)(chute + 0x40) ||
+      (0x373 < *(int *)(chute + 0x1c) - *(int *)((int)parachute_object + 0x2e))))) {
+    work_z = *player_object;
+    dist = approx_dist3_xyz( /* Original: FUN_00003c68; args dropped by Ghidra = (player object pos, parachute object pos) [PROVEN, pushes 0x89de..0x89f2] */);
+    if ((int)dist < 0x9ab1) {
+      tx = *(int *)(chute + 0x18) + *(int *)(work_z + 0x18);
+      if (tx < 0) {
+        tx = tx + 1;
       }
-      iVar7 = iVar7 >> 1;
-      iVar6 = *(int *)(iVar1 + 0x1c) + *(int *)(iVar5 + 0x1c);
-      if (iVar6 < 0) {
-        iVar6 = iVar6 + 1;
+      tx = tx >> 1;
+      ty = *(int *)(chute + 0x1c) + *(int *)(work_z + 0x1c);
+      if (ty < 0) {
+        ty = ty + 1;
       }
-      iVar6 = iVar6 >> 1;
-      iVar5 = *(int *)(iVar1 + 0x20) + *(int *)(iVar5 + 0x20);
-      if (iVar5 < 0) {
-        iVar5 = iVar5 + 1;
+      ty = ty >> 1;
+      work_z = *(int *)(chute + 0x20) + *(int *)(work_z + 0x20);
+      if (work_z < 0) {
+        work_z = work_z + 1;
       }
-      iVar5 = iVar5 >> 1;
-      sVar3 = 0;
-      for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
-        sVar3 = sVar3 + 1;
+      work_z = work_z >> 1;
+      shift = 0;
+      for (; (dist & 0xffff8000) != 0; dist = (int)dist >> 1) {
+        shift = shift + 1;
       }
-      place_camera_behind_object(iVar1,iVar7,iVar6,iVar5,sVar3);
+      place_camera_behind_object(chute,tx,ty,work_z,shift);
       goto LAB_00008aaa;
     }
   }
-  iVar7 = *(int *)(iVar1 + 0x18);
-  iVar6 = *(int *)(iVar1 + 0x1c);
-  iVar5 = *(int *)(iVar1 + 0x20);
-  uVar4 = *(short *)((int)DAT_0001b87c + 0x60e) + 1;
-  if (0x4a < uVar4) {
-    uVar4 = *(short *)((int)DAT_0001b87c + 0x60e) - 0x4a;
+  tx = *(int *)(chute + 0x18);
+  ty = *(int *)(chute + 0x1c);
+  work_z = *(int *)(chute + 0x20);
+  slot = *(short *)((int)parachute_object + 0x60e) + 1;
+  if (0x4a < slot) {
+    slot = *(short *)((int)parachute_object + 0x60e) - 0x4a;
   }
-  puVar8 = (undefined4 *)((int)DAT_0001b87c + (short)uVar4 * 0x14 + 0x32);
-  DAT_0001d838 = *puVar8;
-  DAT_0001d834 = puVar8[1];
-  DAT_0001d830 = puVar8[2];
+  pose = (undefined4 *)((int)parachute_object + (short)slot * 0x14 + 0x32);
+  camera_x = *pose;
+  camera_y = pose[1];
+  camera_z = pose[2];
 LAB_00008aaa:
-  turn_camera_toward_point(iVar7,iVar6,iVar5);
+  turn_camera_toward_point(tx,ty,work_z);
   return 0;
 }
 
@@ -11632,52 +12026,52 @@ LAB_00008aaa:
  * while both differences are within 0x1000, else snap; then & 0x3fff; DAT_0001d80c =
  * DAT_0001d808 = 0.
  */
-void turn_camera_toward_point /* Original: FUN_00008abe */ (int param_1,int param_2,int param_3)
+void turn_camera_toward_point /* Original: FUN_00008abe */ (int x /* param_1: point x */,int y /* param_2: point y */,int z /* param_3: point z */)
 
 {
-  int iVar1;
-  uint uVar2;
-  int iVar3;
-  short sVar5;
-  int iVar4;
-  int iVar6;
-  int iVar7;
-  ushort local_8;
-  ushort local_6;
-  
-  uVar2 = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
-  sVar5 = 0;
-  for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
-    sVar5 = sVar5 + 1;
+  int dz; /* iVar1: (z - camera_z) >> shift */
+  uint work; /* uVar2: camera metric, then the shift */
+  int len; /* iVar3: isqrt_floor distance */
+  short work_s; /* sVar5: shift count, then folded angle deltas */
+  int dy; /* iVar4: (y - camera_y) >> shift, then |delta| */
+  int work2; /* iVar6: squared distance, then the pitch delta */
+  int dx; /* iVar7: (x - camera_x) >> shift, then the heading delta */
+  ushort new_heading; /* local_8, -8(A6): heading to the point */
+  ushort new_pitch; /* local_6, -6(A6): pitch to the point */
+
+  work = compute_camera_abs_metric( /* Original: FUN_00003c00 */);
+  work_s = 0;
+  for (; (work & 0xffff8000) != 0; work = (int)work >> 1) {
+    work_s = work_s + 1;
   }
-  uVar2 = (uint)(short)(sVar5 + 1);
-  iVar7 = param_1 - DAT_0001d838 >> (uVar2 & 0x3f);
-  iVar4 = param_2 - DAT_0001d834 >> (uVar2 & 0x3f);
-  iVar1 = param_3 - DAT_0001d830 >> (uVar2 & 0x3f);
-  iVar6 = iVar1 * iVar1 + iVar4 * iVar4 + iVar7 * iVar7;
-  iVar3 = isqrt_floor( /* Original: FUN_0000e372 */iVar6);
-  attitude_from_velocity( /* Original: FUN_00001f22 */(short)iVar7,(short)iVar4,(short)iVar1,(int)(short)iVar3,iVar6,&local_6,&local_8);
-  sVar5 = (*(code *)&LAB_0000e3e8_4)((int)(short)local_6 - (int)(short)DAT_00024d1a);
-  iVar6 = (int)sVar5;
-  sVar5 = (*(code *)&LAB_0000e3e8_4)((int)(short)local_8 - (int)(short)DAT_00024d18);
-  iVar7 = (int)sVar5;
-  iVar4 = FUN_00002de8();
-  if ((iVar4 < 0x1001) && (iVar4 = FUN_00002de8(), iVar4 < 0x1001)) {
-    if (iVar6 < 0) {
-      iVar6 = iVar6 + 3;
+  work = (uint)(short)(work_s + 1);
+  dx = x - camera_x >> (work & 0x3f);
+  dy = y - camera_y >> (work & 0x3f);
+  dz = z - camera_z >> (work & 0x3f);
+  work2 = dz * dz + dy * dy + dx * dx;
+  len = isqrt_floor( /* Original: FUN_0000e372 */work2);
+  attitude_from_velocity( /* Original: FUN_00001f22 */(short)dx,(short)dy,(short)dz,(int)(short)len,work2,&new_pitch,&new_heading);
+  work_s = (*(code *)&LAB_0000e3e8_4)((int)(short)new_pitch - (int)(short)camera_pitch);
+  work2 = (int)work_s;
+  work_s = (*(code *)&LAB_0000e3e8_4)((int)(short)new_heading - (int)(short)camera_heading);
+  dx = (int)work_s;
+  dy = FUN_00002de8();
+  if ((dy < 0x1001) && (dy = FUN_00002de8(), dy < 0x1001)) {
+    if (work2 < 0) {
+      work2 = work2 + 3;
     }
-    local_6 = DAT_00024d1a + (short)(iVar6 >> 2);
-    if (iVar7 < 0) {
-      iVar7 = iVar7 + 3;
+    new_pitch = camera_pitch + (short)(work2 >> 2);
+    if (dx < 0) {
+      dx = dx + 3;
     }
-    local_8 = DAT_00024d18 + (short)(iVar7 >> 2);
+    new_heading = camera_heading + (short)(dx >> 2);
   }
-  DAT_00024d1a = local_6 & 0x3fff;
-  DAT_00024d18 = local_8 & 0x3fff;
-  DAT_0001d810 = -DAT_00024d1a & 0x3fff;
-  DAT_0001d80e = -DAT_00024d18 & 0x3fff;
-  DAT_0001d80c = 0;
-  DAT_0001d808 = 0;
+  camera_pitch = new_pitch & 0x3fff;
+  camera_heading = new_heading & 0x3fff;
+  neg_camera_pitch = -camera_pitch & 0x3fff;
+  neg_camera_heading = -camera_heading & 0x3fff;
+  camera_angle3 = 0;
+  camera_angle4 = 0;
   return;
 }
 
@@ -11712,124 +12106,124 @@ void turn_camera_toward_point /* Original: FUN_00008abe */ (int param_1,int para
 int update_tracking_camera /* Original: FUN_00008c30 */ (void)
 
 {
-  int iVar1;
-  uint uVar2;
-  int iVar3;
-  int iVar4;
-  short sVar5;
-  int iVar6;
-  int iVar7;
-  int iVar8;
-  int iVar9;
-  int local_28;
-  short local_24;
-  undefined1 auStack_22 [18];
-  undefined1 auStack_10 [2];
-  undefined2 local_e;
-  undefined2 local_a;
-  undefined2 local_6;
-  
-  local_24 = 0;
-  if ((DAT_0001b880 == (int *)0x0) ||
-     (iVar8 = *DAT_0001b880, DAT_0001b838 <= *(int *)(iVar8 + 0x40))) {
-    if (((DAT_0001b888 != (int *)0x0) || (DAT_00024d1c != 0)) && (DAT_0001b870 != 3)) {
-      if (DAT_00024d1c == 0) {
-        DAT_0001b884 = DAT_0001b888;
-        DAT_00024d1c = 0x14;
+  int target; /* iVar1: target world object */
+  uint dist; /* uVar2: player -> target distance, then shifted / bail-out outcome */
+  int work; /* iVar3: heading difference, then the player-ahead distance */
+  int target_ahead; /* iVar4: target-ahead distance */
+  short shift; /* sVar5: detail shift */
+  int tz; /* iVar6: look-at z */
+  int ty; /* iVar7: look-at y */
+  int work2; /* iVar8: weapon object, player object, then the glide frame count */
+  int anchor; /* iVar9: object the camera is placed behind */
+  int tx; /* local_28, -$28(A6): look-at x */
+  short result; /* local_24, -$24(A6): result (-1, 1 or the bail-out outcome) */
+  undefined1 matrix [18]; /* auStack_22: attitude matrix */
+  undefined1 vec [2]; /* auStack_10: 12-byte forward vector */
+  undefined2 vec_x; /* local_e, -$e(A6): vec x word */
+  undefined2 vec_y; /* local_a, -$a(A6): vec y word */
+  undefined2 vec_z; /* local_6, -6(A6): vec z word (0x4000) */
+
+  result = 0;
+  if ((player_shot_ctl == (int *)0x0) ||
+     (work2 = *player_shot_ctl, frame_counter <= *(int *)(work2 + 0x40))) {
+    if (((designated_entity_2 != (int *)0x0) || (target_hold_frames != 0)) && (replay_state != 3)) {
+      if (target_hold_frames == 0) {
+        view_follow_target = designated_entity_2;
+        target_hold_frames = 0x14;
       }
-      if (DAT_0001b884 != (int *)0x0) {
-        iVar8 = *DAT_0001b738;
-        iVar1 = *DAT_0001b884;
-        if ((iVar1 != 0) && (uVar2 = approx_dist3_xyz( /* Original: FUN_00003c68 */), (int)uVar2 < 0x9ab1)) {
-          local_28 = *(int *)(iVar8 + 0x18) + *(int *)(iVar1 + 0x18);
-          if (local_28 < 0) {
-            local_28 = local_28 + 1;
+      if (view_follow_target != (int *)0x0) {
+        work2 = *player_object;
+        target = *view_follow_target;
+        if ((target != 0) && (dist = approx_dist3_xyz( /* Original: FUN_00003c68 */), (int)dist < 0x9ab1)) {
+          tx = *(int *)(work2 + 0x18) + *(int *)(target + 0x18);
+          if (tx < 0) {
+            tx = tx + 1;
           }
-          local_28 = local_28 >> 1;
-          iVar7 = *(int *)(iVar8 + 0x1c) + *(int *)(iVar1 + 0x1c);
-          if (iVar7 < 0) {
-            iVar7 = iVar7 + 1;
+          tx = tx >> 1;
+          ty = *(int *)(work2 + 0x1c) + *(int *)(target + 0x1c);
+          if (ty < 0) {
+            ty = ty + 1;
           }
-          iVar7 = iVar7 >> 1;
-          iVar6 = *(int *)(iVar8 + 0x20) + *(int *)(iVar1 + 0x20);
-          if (iVar6 < 0) {
-            iVar6 = iVar6 + 1;
+          ty = ty >> 1;
+          tz = *(int *)(work2 + 0x20) + *(int *)(target + 0x20);
+          if (tz < 0) {
+            tz = tz + 1;
           }
-          iVar6 = iVar6 >> 1;
-          sVar5 = 0;
-          for (; (uVar2 & 0xffff8000) != 0; uVar2 = (int)uVar2 >> 1) {
-            sVar5 = sVar5 + 1;
+          tz = tz >> 1;
+          shift = 0;
+          for (; (dist & 0xffff8000) != 0; dist = (int)dist >> 1) {
+            shift = shift + 1;
           }
-          iVar3 = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)((int)DAT_0001b884 + 0x22) -
-                               *(short *)((int)DAT_0001b738 + 0x22));
-          iVar9 = iVar8;
-          if ((DAT_0001b888 != (int *)0x0) &&
-             (iVar3 = abs_int( /* Original: FUN_00002e08 */(int)(short)iVar3), iVar3 < 0x1001)) {
-            local_e = 0;
-            local_a = 0;
-            local_6 = 0x4000;
-            build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b738 + 8),(int)*(short *)((int)DAT_0001b738 + 0x22)
-                         ,(int)*(short *)(DAT_0001b738 + 9),(int)auStack_22);
-            (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
-            iVar3 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 */);
-            local_e = 0;
-            local_a = 0;
-            local_6 = 0x4000;
-            build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(DAT_0001b884 + 8),(int)*(short *)((int)DAT_0001b884 + 0x22)
-                         ,(int)*(short *)(DAT_0001b884 + 9),(int)auStack_22);
-            (*(code *)&LAB_000028ba_2)(1,auStack_10,auStack_10,auStack_22);
-            iVar4 = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 */);
-            iVar9 = iVar1;
-            if (iVar3 <= iVar4) {
-              iVar9 = iVar8;
+          work = fold_angle_pm_0x2000( /* Original: FUN_0000e40c */*(short *)((int)view_follow_target + 0x22) -
+                               *(short *)((int)player_object + 0x22));
+          anchor = work2;
+          if ((designated_entity_2 != (int *)0x0) &&
+             (work = abs_int( /* Original: FUN_00002e08 */(int)(short)work), work < 0x1001)) {
+            vec_x = 0;
+            vec_y = 0;
+            vec_z = 0x4000;
+            build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(player_object + 8),(int)*(short *)((int)player_object + 0x22)
+                         ,(int)*(short *)(player_object + 9),(int)matrix);
+            (*(code *)&LAB_000028ba_2)(1,vec,vec,matrix);
+            work = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 */);
+            vec_x = 0;
+            vec_y = 0;
+            vec_z = 0x4000;
+            build_attitude_matrix_3ang( /* Original: FUN_0000253e */(int)*(short *)(view_follow_target + 8),(int)*(short *)((int)view_follow_target + 0x22)
+                         ,(int)*(short *)(view_follow_target + 9),(int)matrix);
+            (*(code *)&LAB_000028ba_2)(1,vec,vec,matrix);
+            target_ahead = approx_dist3_xyz( /* Original: FUN_00003c68; Ghidra showed FUN_00003c48 - lea.l $3c48.l is a runtime address = file 0x3c68 */);
+            anchor = target;
+            if (work <= target_ahead) {
+              anchor = work2;
             }
           }
-          place_camera_behind_object(iVar9,local_28,iVar7,iVar6,sVar5);
-          if (DAT_0001b888 != DAT_0001b884) {
-            DAT_00024d1c = DAT_00024d1c + -1;
+          place_camera_behind_object(anchor,tx,ty,tz,shift);
+          if (designated_entity_2 != view_follow_target) {
+            target_hold_frames = target_hold_frames + -1;
           }
           goto LAB_00008f6c;
         }
       }
     }
-    iVar8 = *DAT_0001b738;
+    work2 = *player_object;
   }
-  local_28 = *(int *)(iVar8 + 0x18);
-  iVar7 = *(int *)(iVar8 + 0x1c);
-  iVar6 = *(int *)(iVar8 + 0x20);
-  if (DAT_0001b870 != 3) {
-    if (DAT_0001b884 != (int *)0x0) {
-      iVar8 = DAT_0001b86e + -0x1e;
-      DAT_0001d81c = (DAT_00024d28 - DAT_0001d838) / iVar8;
-      DAT_0001d818 = (DAT_00024d24 - DAT_0001d834) / iVar8;
-      DAT_0001d814 = (DAT_00024d20 - DAT_0001d830) / iVar8;
-      DAT_0001b884 = (int *)0x0;
-      DAT_00024d1c = 0;
+  tx = *(int *)(work2 + 0x18);
+  ty = *(int *)(work2 + 0x1c);
+  tz = *(int *)(work2 + 0x20);
+  if (replay_state != 3) {
+    if (view_follow_target != (int *)0x0) {
+      work2 = replay_frames_left + -0x1e;
+      camera_step_x = (camera_goal_x - camera_x) / work2;
+      camera_step_y = (camera_goal_y - camera_y) / work2;
+      camera_step_z = (camera_goal_z - camera_z) / work2;
+      view_follow_target = (int *)0x0;
+      target_hold_frames = 0;
     }
-    DAT_0001d838 = DAT_0001d81c + DAT_0001d838;
-    DAT_0001d834 = DAT_0001d818 + DAT_0001d834;
-    DAT_0001d830 = DAT_0001d814 + DAT_0001d830;
+    camera_x = camera_step_x + camera_x;
+    camera_y = camera_step_y + camera_y;
+    camera_z = camera_step_z + camera_z;
   }
 LAB_00008f6c:
-  DAT_0001b86e = DAT_0001b86e + -1; /* replay / end-sequence countdown (; 0x69 from begin_replay_view, 0x1e for a crash end hold) */
-  if ((DAT_0001b86e < 0x1f) && (DAT_0001b870 = 3, DAT_0001b86e == 0)) {
-    if (*(short *)(DAT_0001b5a0 + 0x98) != 2) {
-      if ((*(byte *)(DAT_0001b738 + 0x1a1) & 4) == 0) { /* byte +0x684 & 4 = word bit 10 (0x400, crashed);  */
-        local_24 = -1;
+  replay_frames_left = replay_frames_left + -1; /* replay / end-sequence countdown (; 0x69 from begin_replay_view, 0x1e for a crash end hold) */
+  if ((replay_frames_left < 0x1f) && (replay_state = 3, replay_frames_left == 0)) {
+    if (*(short *)(host_world + 0x98) != 2) {
+      if ((*(byte *)(player_object + 0x1a1) & 4) == 0) { /* byte +0x684 & 4 = word bit 10 (0x400, crashed);  */
+        result = -1;
       }
-      else if (DAT_0001b87c == 0) {
-        *(undefined2 *)(DAT_0001b5a0 + 0xd4) = 1;
-        local_24 = 1;
+      else if (parachute_object == 0) {
+        *(undefined2 *)(host_world + 0xd4) = 1;
+        result = 1;
       }
       else {
-        uVar2 = resolve_bailout_outcome();
-        local_24 = (short)uVar2;
+        dist = resolve_bailout_outcome();
+        result = (short)dist;
       }
     }
-    *(undefined2 *)(DAT_0001b5a0 + 0x98) = 0;
+    *(undefined2 *)(host_world + 0x98) = 0;
   }
-  turn_camera_toward_point(local_28,iVar7,iVar6);
-  return (int)local_24;
+  turn_camera_toward_point(tx,ty,tz);
+  return (int)result;
 }
 
 
