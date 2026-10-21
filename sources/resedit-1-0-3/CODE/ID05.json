@@ -106,55 +106,67 @@
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 740,
+        "annotation_line": 718,
+        "kind": "known_function",
+        "original_symbol": "FUN_000008b8",
+        "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
+      },
+      {
+        "annotation_line": 747,
         "kind": "known_function",
         "original_symbol": "FUN_000008d6",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 768,
+        "annotation_line": 775,
         "kind": "known_function",
         "original_symbol": "FUN_00000934",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 817,
+        "annotation_line": 811,
+        "kind": "known_function",
+        "original_symbol": "FUN_00000964",
+        "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
+      },
+      {
+        "annotation_line": 859,
         "kind": "known_function",
         "original_symbol": "FUN_00000a62",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 843,
+        "annotation_line": 885,
         "kind": "known_function",
         "original_symbol": "FUN_00000a90",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 877,
+        "annotation_line": 919,
         "kind": "known_function",
         "original_symbol": "FUN_00000b10",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 904,
+        "annotation_line": 946,
         "kind": "known_function",
         "original_symbol": "FUN_00000b84",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 925,
+        "annotation_line": 967,
         "kind": "known_function",
         "original_symbol": "FUN_00000ba8",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 943,
+        "annotation_line": 985,
         "kind": "known_function",
         "original_symbol": "FUN_00000bc2",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
       },
       {
-        "annotation_line": 962,
+        "annotation_line": 1004,
         "kind": "known_function",
         "original_symbol": "FUN_00000bde",
         "source_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
@@ -166,7 +178,7 @@
       "decompilation_status": "see sibling .c and .decomp.c files",
       "first_u16_be": 1296,
       "ghidra_export_path": "sources/resedit-1-0-3/CODE/ID05.c",
-      "known_function_count": 24,
+      "known_function_count": 26,
       "second_u16_be": 11,
       "segment_size_bytes": 3064,
       "semantic_decompilation_path": "sources/resedit-1-0-3/CODE/ID05.decomp.c"
@@ -205,8 +217,8 @@
       {
         "kind": "C/decompilation export",
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "sha256": "2a76ec0e3ac8b8c8b8a412362f268b3a6c5346f905518421542127870a55f529",
-        "size": 48539
+        "sha256": "508248fee7914eb7eb6407ef28ce06eb39157d28c26a7c5b64735cff6a1f52ae",
+        "size": 50464
       }
     ],
     "resource_attributes": "0x38",

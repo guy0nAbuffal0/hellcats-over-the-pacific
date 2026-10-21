@@ -23,9 +23,9 @@ class StrictPortSyncTest(unittest.TestCase):
     def test_current_source_is_synchronized(self) -> None:
         report, errors = SYNC.check(MANIFEST, REPO_ROOT)
         self.assertEqual(errors, [])
-        self.assertEqual(report["decompiled_functions"], 736)
+        self.assertEqual(report["decompiled_functions"], 740)
         self.assertEqual(report["mapped_functions"], 3)
-        self.assertEqual(report["not_ported_functions"], 733)
+        self.assertEqual(report["not_ported_functions"], 737)
         self.assertEqual(report["behaviorally_verified"], 3)
 
     def test_changed_source_is_reported_without_rewriting_manifest(self) -> None:

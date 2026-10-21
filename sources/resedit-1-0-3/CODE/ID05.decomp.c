@@ -715,21 +715,28 @@ void restore_poisoned_overlay_bytes /* Original: FUN_0000085e */ (void)
 
 
 /*
- * FUN_000008b8: proposed name init_protection_table
- * [STRONG INFERENCE]. Not decompiled by Ghidra and not in the function
- * inventory; no C body exists to rename. Bytes file 0x8b8..0x8d4 [PROVEN]:
+ * Original: FUN_000008b8; source: ID05.c.
+ * Recovered name: init_protection_table [STRONG INFERENCE]. Ghidra did not
+ * decompile this entry. Bytes file 0x8b8..0x8d4 [PROVEN]:
  *   LINK; ansi_srand(long $e(A6)) (BSR 0x746); long A5-0xba = $8(A6);
  *   word A5-0xb6 = $c(A6); UNLK; RTS.
  * Caller [PROVEN]: ID08 file 0x25c via JT $542 with (A5-0x1cc4, 0x38,
  * TickCount) -> 56 twelve-byte challenge entries at A5-0x1cc4, RNG seeded
  * from TickCount. See docs/COPY_PROTECTION_FLOW.md.
  */
+/* VERIFIED (ID05::FUN_000008b8): ID05.bin 0x8b8..0x8d4 checked against an independent capstone disassembly:
+ * LINK #0; seed long at 0xe(A6) passed to BSR ansi_srand; table long at 8(A6) -> A5-0xba; count word at
+ * 0xc(A6) -> A5-0xb6; UNLK/RTS - identical to the C reconstructed below. */
+void init_protection_table /* Original: FUN_000008b8 */ (undefined1 *table,undefined2 count,undefined4 seed)
 
-/*
-Unable to decompile 'FUN_000008b8'
-Cause: 
-Low-level Error: Cannot properly adjust input varnodes
-*/
+{
+  int unaff_A5;
+
+  ansi_srand(seed);                            /* BSR 0x746 */
+  *(undefined1 **)(unaff_A5 + -0xba) = table;
+  *(undefined2 *)(unaff_A5 + -0xb6) = count;
+  return;
+}
 
 
 /* VERIFIED (ID05::FUN_000008d6): ID05.bin 0x8d6..0x932 checked against an independent capstone disassembly.
@@ -778,8 +785,7 @@ void pick_random_protection_challenge /* Original: FUN_000008d6 */ (undefined2 *
  * [HYPOTHESIS] n/rec come from the protection/code-lookup step; the 20 factor
  * suggests a (row, column) pair on a 20-wide grid.
  *
- * Unexported routine at file 0x964..0xa60 (called by JSR $964(PC) at file
- * 0x69c) [PROVEN, bytes; not represented in the Ghidra C]:
+ * The following routine at file 0x964..0xa60 (called by JSR $964(PC) at file 0x69c):
  *   args: word a1 = 8(A6), word a2 = $a(A6), word a3 = $c(A6), char *s = $e(A6)
  *   A5-0xc0 = 0;
  *   for i in 0.. word A5-0xb6 - 1: e = *(long A5-0xba) + 12*i
@@ -802,11 +808,47 @@ undefined4 record_code_index_equals /* Original: FUN_00000934 */ (int n /* param
 }
 
 
-/*
-Unable to decompile 'FUN_00000964'
-Cause: 
-Low-level Error: Cannot properly adjust input varnodes
-*/
+/* Original: FUN_00000964; source: ID05.c.
+ * Recovered name: validate_protection_response [STRONG INFERENCE].
+ * VERIFIED (ID05::FUN_00000964): ID05.bin 0x964..0xa60 checked against an independent capstone disassembly:
+ * the outer signed-word loop, reverse byte comparison, key mask/add, length check, three word comparisons,
+ * match-count increment and final A5-0xbe word return agree with the C reconstructed below. The 68020 EXTB.L
+ * opcodes at 0x9a8/0x9b0 are decoded explicitly because Capstone reports them as data in 68000 mode - identical
+ * to the C reconstructed below. */
+short validate_protection_response /* Original: FUN_00000964 */ (short word6,short word8,short word10,undefined1 *text)
+
+{
+  int unaff_A5;
+  undefined1 *entry;
+  undefined1 *key;
+  undefined1 *stored;
+  short index;
+  short pos;
+  short len;
+
+  index = 0;
+  *(int *)(unaff_A5 + -0xc0) = 0;
+  while (index < *(short *)(unaff_A5 + -0xb6)) {
+    key = (undefined1 *)(unaff_A5 + -0x2c);
+    entry = *(undefined1 **)(unaff_A5 + -0xba) + index * 0xc;
+    len = *(short *)(entry + 4);
+    pos = len - 1;
+    stored = *(undefined1 **)entry;
+    while (pos >= 0) {
+      if ((undefined1)((int)(char)text[pos] + ((int)(char)key[pos] & 0x7f)) != stored[pos]) {
+        break;
+      }
+      pos = pos - 1;
+    }
+    if (((pos < 0) && ((int)ansi_strlen((char *)text) == len)) &&
+       ((word6 == *(short *)(entry + 6)) &&
+       ((word8 == *(short *)(entry + 8)) && (word10 == *(short *)(entry + 10))))) {
+      *(int *)(unaff_A5 + -0xc0) = *(int *)(unaff_A5 + -0xc0) + 1;
+    }
+    index = index + 1;
+  }
+  return *(short *)(unaff_A5 + -0xbe);
+}
 
 
 /* VERIFIED (ID05::FUN_00000a62): ID05.bin 0xa62..0xa8e checked against an independent capstone disassembly.
@@ -973,5 +1015,3 @@ int decode_code_to_long_b /* Original: FUN_00000bde */ (int code /* param_1: 6-l
   decode_base26_6chars( /* Original: FUN_000007a8 */ code,&value);
   return value;
 }
-
-

@@ -24,6 +24,7 @@ FUN_RE = re.compile(
 ORIGINAL_RE = re.compile(r"\bFUN_[0-9A-Fa-f]+\b")
 ORIGINAL_LABEL_RE = re.compile(r"Original:\s*(FUN_[0-9A-Fa-f]+)\b")
 DOC_ORIGINAL_RE = re.compile(r"^\s*\*\s*Original:\s*(FUN_[0-9A-Fa-f]+)\b", re.MULTILINE)
+FAILED_DECOMPILE_RE = re.compile(r"Unable to decompile '(FUN_[0-9A-Fa-f]+)'")
 STATUS_VALUES = {"NOT_STARTED", "INVESTIGATING", "ANNOTATED", "RENAMED", "VERIFIED", "BLOCKED"}
 
 
@@ -96,7 +97,8 @@ def definitions(path: Path) -> list[dict[str, Any]]:
 
 
 def original_inventory(path: Path) -> list[dict[str, Any]]:
-    return [
+    text = path.read_text(encoding="utf-8", errors="replace")
+    rows = [
         {
             "original_function": row["name"],
             "return_type": row["return"],
@@ -104,6 +106,15 @@ def original_inventory(path: Path) -> list[dict[str, Any]]:
         }
         for row in definitions(path)
     ]
+    known = {row["original_function"] for row in rows}
+    for match in FAILED_DECOMPILE_RE.finditer(text):
+        if match.group(1) not in known:
+            rows.append({
+                "original_function": match.group(1),
+                "return_type": "unrecovered",
+                "original_line": text.count("\n", 0, match.start()) + 1,
+            })
+    return sorted(rows, key=lambda row: row["original_line"])
 
 
 def stable_technical_text(value: str) -> str:

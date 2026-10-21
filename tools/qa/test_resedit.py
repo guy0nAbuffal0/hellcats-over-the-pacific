@@ -114,7 +114,8 @@ class ResEditMetadataTests(unittest.TestCase):
         self.assertEqual(1, sound["channels"])
         self.assertEqual(8, sound["sample_width_bits"])
         self.assertGreater(sound["sample_rate_hz"], 22000)
-        self.assertEqual({"load_named_sound_into_slot", "play_named_sound_async"},
+        self.assertEqual({"release_sound_slots", "load_named_sound_into_slot",
+                          "show_mission_summary_dialog", "play_named_sound_async"},
                          {x["function_or_context"] for x in self.by_key["snds:19330"]["type_code_references"]})
         for rid in list(range(256, 262)) + list(range(512, 520)):
             comparison = self.by_key[f"cicn:{rid}"]["decoded"]["properties"]["png_pixel_comparison"]

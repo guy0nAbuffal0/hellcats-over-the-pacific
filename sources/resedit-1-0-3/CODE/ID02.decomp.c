@@ -385,11 +385,27 @@ undefined1 * ansi_memmove /* Original: FUN_0000024a */ (undefined1 *dst /* param
 }
 
 
-/*
-Unable to decompile 'FUN_000002b0'
-Cause: 
-Low-level Error: Cannot properly adjust input varnodes
-*/
+/* VERIFIED (ID02::FUN_000002b0): ID02.bin 0x2b0..0x2c6 checked against an independent capstone disassembly:
+ * D0 = dst; D1.W = value; D2.L = count; the initial BRA reaches DBNE-style pre-test logic, then MOVE.B D1,(A0)+ /
+ * SUBQ.L #1,D2 / BNE. A zero count performs no stores; the low byte of value is repeated exactly count times;
+ * D0 retains dst for the return - identical to the C reconstructed below. */
+/* Original: FUN_000002b0; source: ID02.c. Recovered name: ansi_memset [PROVEN].
+ * Ghidra failed to adjust the mixed word/long stack arguments. The actual ABI is dst long at 4(A7), value word
+ * at 8(A7), count long at 0xa(A7). Reached through local BSRs and used to clear overlay and handle storage.
+ */
+undefined1 * ansi_memset /* Original: FUN_000002b0 */ (undefined1 *dst,undefined2 value,uint count)
+
+{
+  undefined1 *out;
+
+  out = dst;
+  while (count != 0) {
+    *out = (undefined1)value;
+    out = out + 1;
+    count = count - 1;
+  }
+  return dst;
+}
 
 
 /* VERIFIED (ID02::FUN_000002c8): ID02.bin 0x2c8..0x2d6 checked against an independent capstone disassembly.
@@ -5506,9 +5522,9 @@ undefined4 lookup_palette_index_for_rgb_level /* Original: FUN_000049fe */ (unde
 
 
 /*
- * FUN_00004b62: proposed name init_standard_colour_indices
- * [STRONG INFERENCE]. Not decompiled by Ghidra, not in the inventory; no C
- * body. Bytes file 0x4b62..0x4c16 [PROVEN]: nine calls
+ * Original: FUN_00004b62; source: ID02.c.
+ * Recovered name: init_standard_colour_indices [STRONG INFERENCE].
+ * Ghidra did not decompile this entry. Bytes file 0x4b62..0x4c16 [PROVEN]: nine calls
  * lookup_palette_index_for_rgb_level(l, l, l) storing the word result:
  *   (3,3,3) -> A5-0x11ae   (0,0,0) -> A5-0x11ac   (0,0,0) -> A5-0x118c
  *   (3,3,3) -> A5-0x1188   (2,2,2) -> A5-0x118a   (3,3,3) -> A5-0x117c
@@ -5517,11 +5533,28 @@ undefined4 lookup_palette_index_for_rgb_level /* Original: FUN_000049fe */ (unde
  * for UI drawing. Callers: rebuild_all_palette_index_maps and
  * check_device_color_state_changed (B&W / mode-1 path).
  */
-/*
-Unable to decompile 'FUN_00004b62'
-Cause: 
-Low-level Error: Symbol $$undef00000003 extends beyond the end of the address space
-*/
+/* VERIFIED (ID02::FUN_00004b62): ID02.bin 0x4b62..0x4c16 checked against an independent capstone disassembly:
+ * each group pushes three identical word levels, BSR 0x49fe, drops six argument bytes and stores D0.W at the
+ * stated A5 offset; the nine level/destination pairs are 3/ee52, 0/ee54, 0/ee74, 3/ee78, 2/ee76,
+ * 3/ee84, 0/ee82, 3/ee06 and 1/ee08, followed by RTS - identical to the C reconstructed below. */
+void init_standard_colour_indices /* Original: FUN_00004b62 */ (void)
+
+{
+  int unaff_A5;
+
+  /* lookup's Ghidra prototype packs the three physical word arguments as
+     {r,g} and {b,padding}; CONCAT22 preserves that big-endian stack view. */
+  *(undefined2 *)(unaff_A5 + -0x11ae) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(3,3),CONCAT22(3,0));
+  *(undefined2 *)(unaff_A5 + -0x11ac) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(0,0),CONCAT22(0,0));
+  *(undefined2 *)(unaff_A5 + -0x118c) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(0,0),CONCAT22(0,0));
+  *(undefined2 *)(unaff_A5 + -0x1188) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(3,3),CONCAT22(3,0));
+  *(undefined2 *)(unaff_A5 + -0x118a) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(2,2),CONCAT22(2,0));
+  *(undefined2 *)(unaff_A5 + -0x117c) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(3,3),CONCAT22(3,0));
+  *(undefined2 *)(unaff_A5 + -0x117e) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(0,0),CONCAT22(0,0));
+  *(undefined2 *)(unaff_A5 + -0x11fa) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(3,3),CONCAT22(3,0));
+  *(undefined2 *)(unaff_A5 + -0x11f8) = (undefined2)lookup_palette_index_for_rgb_level(CONCAT22(1,1),CONCAT22(1,0));
+  return;
+}
 
 
 /* VERIFIED (ID02::FUN_00004c18): ID02.bin 0x4c18..0x4d22 checked against an independent capstone disassembly.
@@ -5712,5 +5745,4 @@ void redraw_main_window /* Original: FUN_00004db0 */ (void)
   }
   return;
 }
-
 

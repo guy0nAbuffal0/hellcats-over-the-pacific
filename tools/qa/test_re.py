@@ -67,6 +67,16 @@ def main() -> int:
     assert "func _test_fun_0000e468" not in test_case and len(test_case.splitlines()) < 60
     helper_case = run("tests", "test_replay", "--case", "run")
     assert "direct helpers: 1" in helper_case and "func _run_once" in helper_case
+    recovered_failures = {
+        ("ID02", "FUN_000002b0"): "ansi_memset",
+        ("ID02", "FUN_00004b62"): "init_standard_colour_indices",
+        ("ID05", "FUN_000008b8"): "init_protection_table",
+        ("ID05", "FUN_00000964"): "validate_protection_response",
+    }
+    for (segment, original), semantic in recovered_failures.items():
+        recovered = run("function", "--segment", segment, original)
+        recovered_status = run("status", "--segment", segment, original)
+        assert semantic in recovered and '"reconstruction_status": "VERIFIED"' in recovered_status
     assert "ambiguous function query" in run_failure("function", "FUN_00000006")
     assert "unsupported address mapping" in run_failure("function", "--segment", "Pacific Conflict", "0xdeadbeef")
     print("PASS targeted reverse-engineering retrieval")

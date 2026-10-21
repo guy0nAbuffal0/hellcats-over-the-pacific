@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
   "identity": "segment::original_function",
-  "total": 736,
+  "total": 740,
   "file_counts": {
     "ID01.c": 6,
-    "ID02.c": 125,
+    "ID02.c": 127,
     "ID03.c": 45,
     "ID04.c": 59,
-    "ID05.c": 24,
+    "ID05.c": 26,
     "ID06.c": 24,
     "ID07.c": 2,
     "ID08.c": 4,
@@ -20,7 +20,7 @@
     "INVESTIGATING": 0,
     "NOT_STARTED": 0,
     "RENAMED": 0,
-    "VERIFIED": 736
+    "VERIFIED": 740
   },
   "conflicts": [],
   "functions": [
@@ -781,6 +781,37 @@
       "strict_port": null
     },
     {
+      "identity": "ID02::FUN_000002b0",
+      "segment": "ID02",
+      "original_function": "FUN_000002b0",
+      "original_address": "0x2b0",
+      "original_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID02.c",
+        "line_start": 248,
+        "return_type": "unrecovered"
+      },
+      "semantic_name": "ansi_memset",
+      "semantic_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
+        "line_start": 396,
+        "line_end": 408,
+        "function_sha256": "9f941ef0d9da6c89dd5d7030e186dfaff929e6a748b32e2a5cfae666439f67a2"
+      },
+      "renaming_confidence": "UNRECORDED",
+      "reconstruction_status": "VERIFIED",
+      "name_verified": true,
+      "semantically_verified": true,
+      "behavioral_verification_status": "NOT_PORTED",
+      "evidence_references": [
+        "sources/resedit-1-0-3/CODE/ID02.c:248",
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:396-408"
+      ],
+      "known_blockers": [],
+      "technical_evidence": {},
+      "source_revision": "9f941ef0d9da6c89dd5d7030e186dfaff929e6a748b32e2a5cfae666439f67a2",
+      "strict_port": null
+    },
+    {
       "identity": "ID02::FUN_000002c8",
       "segment": "ID02",
       "original_function": "FUN_000002c8",
@@ -793,8 +824,8 @@
       "semantic_name": "ansi_strcpy",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 401,
-        "line_end": 415,
+        "line_start": 417,
+        "line_end": 431,
         "function_sha256": "e8eb08d48c964aa07abaf60e8762e27c5be816be3070b6937cb1df90a81852de"
       },
       "renaming_confidence": "UNRECORDED",
@@ -804,7 +835,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:254",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:401-415"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:417-431"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -824,8 +855,8 @@
       "semantic_name": "ansi_strcat",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 426,
-        "line_end": 445,
+        "line_start": 442,
+        "line_end": 461,
         "function_sha256": "37797c51b85dfb40055557158a3914efc2d53b1010d9109a6395e464e74793c3"
       },
       "renaming_confidence": "UNRECORDED",
@@ -835,7 +866,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:272",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:426-445"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:442-461"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -855,8 +886,8 @@
       "semantic_name": "ansi_strcmp",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 456,
-        "line_end": 475,
+        "line_start": 472,
+        "line_end": 491,
         "function_sha256": "058742a34239604a107acac48b1c82ecddee562df87ca496ee483e761afab3a7"
       },
       "renaming_confidence": "PROVEN (mem/str) / STRONG INFERENCE (ctype names)",
@@ -866,7 +897,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:295",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:456-475"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:472-491"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -889,8 +920,8 @@
       "semantic_name": "ansi_strchr",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 486,
-        "line_end": 499,
+        "line_start": 502,
+        "line_end": 515,
         "function_sha256": "e7e2317da9fad3f3a18f008f143eaff9ce806748d2ddfb008e40bcd056502737"
       },
       "renaming_confidence": "PROVEN",
@@ -900,7 +931,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:318",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:486-499"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:502-515"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -923,8 +954,8 @@
       "semantic_name": "ansi_strcspn",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 510,
-        "line_end": 538,
+        "line_start": 526,
+        "line_end": 554,
         "function_sha256": "e4ccb54cf8439d8dd115db24eac71bbc65fee98e2b20f4a974a837609fc0fa59"
       },
       "renaming_confidence": "UNRECORDED",
@@ -934,7 +965,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:335",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:510-538"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:526-554"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -954,8 +985,8 @@
       "semantic_name": "ansi_strpbrk",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 549,
-        "line_end": 572,
+        "line_start": 565,
+        "line_end": 588,
         "function_sha256": "f77d1ac4b384dc2ebc648cab991bbe8362d5bb085b5df3964bbc3848eae33310"
       },
       "renaming_confidence": "UNRECORDED",
@@ -965,7 +996,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:367",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:549-572"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:565-588"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -985,8 +1016,8 @@
       "semantic_name": "ansi_strrchr",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 583,
-        "line_end": 598,
+        "line_start": 599,
+        "line_end": 614,
         "function_sha256": "254079dfe5096338f615dd4bbf32896049f98edddedbc8c9e0446c6b12484a9a"
       },
       "renaming_confidence": "UNRECORDED",
@@ -996,7 +1027,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:394",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:583-598"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:599-614"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -1016,8 +1047,8 @@
       "semantic_name": "ansi_strspn",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 609,
-        "line_end": 632,
+        "line_start": 625,
+        "line_end": 648,
         "function_sha256": "2dd3469661f3dde06d0ff6ecf6776c69df18bdd00f0fd56bf653b3a99c58fd99"
       },
       "renaming_confidence": "UNRECORDED",
@@ -1027,7 +1058,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:413",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:609-632"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:625-648"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -1047,8 +1078,8 @@
       "semantic_name": "ansi_strstr",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 643,
-        "line_end": 669,
+        "line_start": 659,
+        "line_end": 685,
         "function_sha256": "32cba08d7e5bd0bbb1b8a16b502e4c264c6a51495b76b88a170d6c1205702319"
       },
       "renaming_confidence": "UNRECORDED",
@@ -1058,7 +1089,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:440",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:643-669"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:659-685"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -1078,8 +1109,8 @@
       "semantic_name": "ansi_strtok",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 682,
-        "line_end": 732,
+        "line_start": 698,
+        "line_end": 748,
         "function_sha256": "321777b57dc9e90a6d8ee11c64ab612e3609b74a27dd8e2acdb3c4aa03514d41"
       },
       "renaming_confidence": "UNRECORDED",
@@ -1089,7 +1120,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:470",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:682-732"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:698-748"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -1109,8 +1140,8 @@
       "semantic_name": "ansi_strncpy",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 743,
-        "line_end": 759,
+        "line_start": 759,
+        "line_end": 775,
         "function_sha256": "592e2ada83a006dda8d778b66d7447695a03c2388c9e12d571b856b3b559b204"
       },
       "renaming_confidence": "UNRECORDED",
@@ -1120,7 +1151,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:524",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:743-759"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:759-775"
       ],
       "known_blockers": [],
       "technical_evidence": {},
@@ -1140,8 +1171,8 @@
       "semantic_name": "ansi_strncat",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 770,
-        "line_end": 798,
+        "line_start": 786,
+        "line_end": 814,
         "function_sha256": "7ac754320a58d36192b72603d45ede7f0e930165710c6bc610f34b95471d9f41"
       },
       "renaming_confidence": "PROVEN",
@@ -1151,7 +1182,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:542",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:770-798"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:786-814"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1174,8 +1205,8 @@
       "semantic_name": "begin_overlay_session",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 813,
-        "line_end": 831,
+        "line_start": 829,
+        "line_end": 847,
         "function_sha256": "34400ff2ea08c76cc4b25824aa75f2bcc0b33b120323ba509ca9fb76c300348f"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics",
@@ -1185,7 +1216,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:574",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:813-831"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:829-847"
       ],
       "known_blockers": [
         "hook targets in the overlay"
@@ -1210,8 +1241,8 @@
       "semantic_name": "ensure_free_memory_and_init_sound",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 843,
-        "line_end": 857,
+        "line_start": 859,
+        "line_end": 873,
         "function_sha256": "724fa262b674cdef8a59e3add651987640011e85b77e85293daccfdf518b1d6c"
       },
       "renaming_confidence": "PROVEN",
@@ -1221,7 +1252,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:583",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:843-857"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:859-873"
       ],
       "known_blockers": [
         "hook targets in the overlay"
@@ -1246,8 +1277,8 @@
       "semantic_name": "run_flight_session",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 903,
-        "line_end": 1083,
+        "line_start": 919,
+        "line_end": 1099,
         "function_sha256": "a1f6d11feb8c40587d0a90f4d543c499fe8955d71ebc988b1e0d705f855ff603"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1257,7 +1288,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:615",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:903-1083"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:919-1099"
       ],
       "known_blockers": [
         "per-key table at 0x650"
@@ -1282,8 +1313,8 @@
       "semantic_name": "call_overlay_session_hooks",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1094,
-        "line_end": 1104,
+        "line_start": 1110,
+        "line_end": 1120,
         "function_sha256": "3879e1e27adb370390f975cd132ce7f44ebf98f31a4cc65a290bff1c15701784"
       },
       "renaming_confidence": "PROVEN",
@@ -1293,7 +1324,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:624",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1094-1104"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1110-1120"
       ],
       "known_blockers": [
         "hook targets in the overlay"
@@ -1318,8 +1349,8 @@
       "semantic_name": "draw_thick_line_pixel_index_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1126,
-        "line_end": 1138,
+        "line_start": 1142,
+        "line_end": 1154,
         "function_sha256": "0c38e76387c087b456a90f2b21546dcdafe9405d0aa9ff88899f51f3deaeeeb6"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1329,7 +1360,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:640",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1126-1138"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1142-1154"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1352,8 +1383,8 @@
       "semantic_name": "draw_thick_xor_line_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1158,
-        "line_end": 1168,
+        "line_start": 1174,
+        "line_end": 1184,
         "function_sha256": "6b7cf421ecc97ef2943674de1f54f9e796c88acfec1c713bf76f8454e4b53299"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1363,7 +1394,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:652",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1158-1168"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1174-1184"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1386,8 +1417,8 @@
       "semantic_name": "paint_view_horizon_bands_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1206,
-        "line_end": 1266,
+        "line_start": 1222,
+        "line_end": 1282,
         "function_sha256": "cb3fa90bf9fe60361ec3f2dc40abb5fa536cad263b41964a3e26169f7f0899bd"
       },
       "renaming_confidence": "STRONG INFERENCE (purpose HYPOTHESIS)",
@@ -1397,7 +1428,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:663",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1206-1266"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1222-1282"
       ],
       "known_blockers": [
         "Arg meanings"
@@ -1422,8 +1453,8 @@
       "semantic_name": "apply_pending_color_entries_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1287,
-        "line_end": 1297,
+        "line_start": 1303,
+        "line_end": 1313,
         "function_sha256": "cfedef7335482e11b5d1971087b9dc615d27563fd1d6deafd65cc31acc041ee3"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1433,7 +1464,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:674",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1287-1297"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1303-1313"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1456,8 +1487,8 @@
       "semantic_name": "new_offscreen_cport",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1322,
-        "line_end": 1339,
+        "line_start": 1338,
+        "line_end": 1355,
         "function_sha256": "967a66c2a5be7dfdcf29e2b7d456e58404404fa6cfda30999df6250a77519a93"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1467,7 +1498,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:685",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1322-1339"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1338-1355"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1490,8 +1521,8 @@
       "semantic_name": "close_and_dispose_port",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1359,
-        "line_end": 1365,
+        "line_start": 1375,
+        "line_end": 1381,
         "function_sha256": "fe58474422a6eb20066dcc40415567da2eae923856fd07f8a5bdabbc41a352a0"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1501,7 +1532,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:699",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1359-1365"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1375-1381"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1524,8 +1555,8 @@
       "semantic_name": "blit_offscreen_frame_to_window",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1400,
-        "line_end": 1438,
+        "line_start": 1416,
+        "line_end": 1454,
         "function_sha256": "ff922041ceaa288f79e5c8c345a5eb5f4b41964e57658cd9873e89bb3422d9a9"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1535,7 +1566,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:710",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1400-1438"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1416-1454"
       ],
       "known_blockers": [
         "Who receives LEA $322(A5) at ID02 0x1b6a; mode 2/3 meaning"
@@ -1560,8 +1591,8 @@
       "semantic_name": "blit_pixels_via_port_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1459,
-        "line_end": 1474,
+        "line_start": 1475,
+        "line_end": 1490,
         "function_sha256": "cf73db0713df1a1250f4f96f628f4a5afd050c07573ff0600ddd548333cdbbc8"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1571,7 +1602,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:749",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1459-1474"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1475-1490"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1594,8 +1625,8 @@
       "semantic_name": "open_offscreen_cport_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1498,
-        "line_end": 1519,
+        "line_start": 1514,
+        "line_end": 1535,
         "function_sha256": "5bc9cd7344c16d3f4e4da3766e5c8b9b4b5b0a5fe8ca7e262691421b84c1d8c5"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1605,7 +1636,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:761",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1498-1519"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1514-1535"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1628,8 +1659,8 @@
       "semantic_name": "close_port_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1534,
-        "line_end": 1539,
+        "line_start": 1550,
+        "line_end": 1555,
         "function_sha256": "5473af39fcd5738133eb41459dfa45160035f0afb74f93ba3896cbb8fd13c054"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1639,7 +1670,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:772",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1534-1539"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1550-1555"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1662,8 +1693,8 @@
       "semantic_name": "swap_port_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1556,
-        "line_end": 1566,
+        "line_start": 1572,
+        "line_end": 1582,
         "function_sha256": "1ee61992aed742f535b1d8213ddfb777d855e79020b670e582673b966eb38c3b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1673,7 +1704,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:783",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1556-1566"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1572-1582"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1696,8 +1727,8 @@
       "semantic_name": "paint_rect_color_index_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1584,
-        "line_end": 1594,
+        "line_start": 1600,
+        "line_end": 1610,
         "function_sha256": "e7f8ed31ab8c0c88159d60a223482cfe773666b02a58a9de9d568c20b212a065"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1707,7 +1738,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:794",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1584-1594"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1600-1610"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1730,8 +1761,8 @@
       "semantic_name": "paint_polygon_rgb_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1621,
-        "line_end": 1648,
+        "line_start": 1637,
+        "line_end": 1664,
         "function_sha256": "93c74b8e2ffe95bfd70a5eae1103a22dbd58b170405e0c147e35bd2de3fe021d"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1741,7 +1772,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:808",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1621-1648"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1637-1664"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1764,8 +1795,8 @@
       "semantic_name": "build_notched_frame_poly",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1675,
-        "line_end": 1703,
+        "line_start": 1691,
+        "line_end": 1719,
         "function_sha256": "7352aed94a28924468ab87576df964820a0ce9f018ec9d92f9425e9f45ebccc3"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics",
@@ -1775,7 +1806,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:819",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1675-1703"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1691-1719"
       ],
       "known_blockers": [
         "Tail not fully listed"
@@ -1800,8 +1831,8 @@
       "semantic_name": "draw_notched_frame_pair_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1734,
-        "line_end": 1775,
+        "line_start": 1750,
+        "line_end": 1791,
         "function_sha256": "3a309c15484a5841da7371536b75edcfbc5b2bc5b21b81156f43f86f815818b9"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics / UNKNOWN purpose",
@@ -1811,7 +1842,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:830",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1734-1775"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1750-1791"
       ],
       "known_blockers": [
         "Shape meaning"
@@ -1836,8 +1867,8 @@
       "semantic_name": "draw_text_in_columns_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1809,
-        "line_end": 1869,
+        "line_start": 1825,
+        "line_end": 1885,
         "function_sha256": "e6053cd186ab34bca363a062ad0840645a7fa65259a72bb41afb5f7afba9c8ab"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics / HYPOTHESIS purpose",
@@ -1847,7 +1878,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:841",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1809-1869"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1825-1885"
       ],
       "known_blockers": [
         "Arg layout"
@@ -1872,8 +1903,8 @@
       "semantic_name": "swap_mmu_mode_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1884,
-        "line_end": 1889,
+        "line_start": 1900,
+        "line_end": 1905,
         "function_sha256": "65226168ab7086c11f215c75434abcb19aae9d904a216d7f1791370e9930654e"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1883,7 +1914,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:856",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1884-1889"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1900-1905"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1906,8 +1937,8 @@
       "semantic_name": "get_blended_fill_pattern",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1902,
-        "line_end": 1933,
+        "line_start": 1918,
+        "line_end": 1949,
         "function_sha256": "47b20069cc3a2c475ea1c05825853091ea105a1168c0947ecae8ac335930f156"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1917,7 +1948,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:865",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1902-1933"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1918-1949"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -1940,8 +1971,8 @@
       "semantic_name": "set_draw_color_index",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1953,
-        "line_end": 1972,
+        "line_start": 1969,
+        "line_end": 1988,
         "function_sha256": "0792533fb28dfbb39fa35f5bd8e8cbeab98a2ce56d351da79c0df6fcad767943"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1951,7 +1982,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:884",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1953-1972"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1969-1988"
       ],
       "known_blockers": [
         "1-bit branch"
@@ -1976,8 +2007,8 @@
       "semantic_name": "set_back_color_index",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 1986,
-        "line_end": 1998,
+        "line_start": 2002,
+        "line_end": 2014,
         "function_sha256": "4024e68322e4cb616c4b18dd458529994bdd43e2ba9cc9f654c45c7007b8dae0"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -1987,7 +2018,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:901",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:1986-1998"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2002-2014"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2010,8 +2041,8 @@
       "semantic_name": "design_x_to_screen",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2014,
-        "line_end": 2021,
+        "line_start": 2030,
+        "line_end": 2037,
         "function_sha256": "f054c759da113a4f44b0fdd5ccb2cfd8cf2a3a2f29142e4e328ad82885c1d322"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2021,7 +2052,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:917",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2014-2021"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2030-2037"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2044,8 +2075,8 @@
       "semantic_name": "design_y_to_screen",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2033,
-        "line_end": 2040,
+        "line_start": 2049,
+        "line_end": 2056,
         "function_sha256": "596ca4a034869a3d7ff0076565e5df56acd6f359d18e8994c3d50bd607e1619d"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2055,7 +2086,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:928",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2033-2040"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2049-2056"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2078,8 +2109,8 @@
       "semantic_name": "draw_view_frame_outline",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2054,
-        "line_end": 2091,
+        "line_start": 2070,
+        "line_end": 2107,
         "function_sha256": "28aae937078b5bdff5a83b4c2d0a0edb9e7d826e88dcabbe512205daff39e802"
       },
       "renaming_confidence": "STRONG INFERENCE mechanics",
@@ -2089,7 +2120,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:941",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2054-2091"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2070-2107"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2112,8 +2143,8 @@
       "semantic_name": "blit_image_clipped_to_region",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2120,
-        "line_end": 2158,
+        "line_start": 2136,
+        "line_end": 2174,
         "function_sha256": "0072a757d0875f594465c8f5436841ca617259f9c131569435a06cdb3fe8f06c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2123,7 +2154,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:964",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2120-2158"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2136-2174"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2146,8 +2177,8 @@
       "semantic_name": "blit_image_clipped_to_region_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2170,
-        "line_end": 2175,
+        "line_start": 2186,
+        "line_end": 2191,
         "function_sha256": "d057b969a81cacca00ebdcbde5b6eb296b42f72c373425dd379a300c0084117c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2157,7 +2188,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:973",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2170-2175"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2186-2191"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2180,8 +2211,8 @@
       "semantic_name": "run_segment3_entry_and_unload_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2191,
-        "line_end": 2197,
+        "line_start": 2207,
+        "line_end": 2213,
         "function_sha256": "6dd3fe27bb3ef2940b19e389902f4ad9b8a266d3c90629926a4b9496ab876299"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2191,7 +2222,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:984",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2191-2197"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2207-2213"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2214,8 +2245,8 @@
       "semantic_name": "new_handle_clear_or_die_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2214,
-        "line_end": 2224,
+        "line_start": 2230,
+        "line_end": 2240,
         "function_sha256": "4abda77ca720be4f212d2f0bf53040005603c17435b91e5a443b1fa8ac66f291"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2225,7 +2256,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:994",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2214-2224"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2230-2240"
       ],
       "known_blockers": [
         "Ghidra return error noted"
@@ -2250,8 +2281,8 @@
       "semantic_name": "fatal_memory_error_exit",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2247,
-        "line_end": 2258,
+        "line_start": 2263,
+        "line_end": 2274,
         "function_sha256": "b14ad8743ca20b7039c48bbc73b014dbaa299fcc6441841945d781324ccc76c8"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2261,7 +2292,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1014",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2247-2258"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2263-2274"
       ],
       "known_blockers": [
         "FUN_00004318 / FUN_00001d48 roles"
@@ -2286,8 +2317,8 @@
       "semantic_name": "dispose_handle_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2271,
-        "line_end": 2276,
+        "line_start": 2287,
+        "line_end": 2292,
         "function_sha256": "4af216bce2c8df5a86f1a273d1f647710a017f369315ac1b6c52dd459e3f73c7"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2297,7 +2328,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1038",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2271-2276"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2287-2292"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2320,8 +2351,8 @@
       "semantic_name": "realloc_and_clear_handle_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2298,
-        "line_end": 2309,
+        "line_start": 2314,
+        "line_end": 2325,
         "function_sha256": "b7b298424b17e9c9ef9102167dc53340cf18e68bd2e384402cddc5ea658a6689"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2331,7 +2362,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1047",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2298-2309"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2314-2325"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2354,8 +2385,8 @@
       "semantic_name": "hlock_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2322,
-        "line_end": 2327,
+        "line_start": 2338,
+        "line_end": 2343,
         "function_sha256": "e42f9e22924f8d68a2912559f98d4ca064828fd2aecf878c8bfe41cb56cfdc64"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2365,7 +2396,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1070",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2322-2327"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2338-2343"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2388,8 +2419,8 @@
       "semantic_name": "hunlock_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2340,
-        "line_end": 2345,
+        "line_start": 2356,
+        "line_end": 2361,
         "function_sha256": "dc1b0e28c197f5439f804419fff06b87916f8da78f849f4e1a9621f732848546"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2399,7 +2430,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1079",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2340-2345"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2356-2361"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2422,8 +2453,8 @@
       "semantic_name": "hpurge_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2358,
-        "line_end": 2363,
+        "line_start": 2374,
+        "line_end": 2379,
         "function_sha256": "d80f9c65be7e2e8733e47b2e4416fff9898aef99f6ba378472c8482210d8d331"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2433,7 +2464,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1088",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2358-2363"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2374-2379"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2456,8 +2487,8 @@
       "semantic_name": "hnopurge_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2376,
-        "line_end": 2381,
+        "line_start": 2392,
+        "line_end": 2397,
         "function_sha256": "444499dce3af055bb599bccc9156f8d86f9bb257427c100ce86381cceffd67d9"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2467,7 +2498,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1097",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2376-2381"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2392-2397"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2490,8 +2521,8 @@
       "semantic_name": "freemem_a5safe",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2411,
-        "line_end": 2415,
+        "line_start": 2427,
+        "line_end": 2431,
         "function_sha256": "68ec7ca73441792b7760cb11f557017df4ed4d6158de9b558f5ab4447fb2ac4c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2501,7 +2532,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1106",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2411-2415"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2427-2431"
       ],
       "known_blockers": [
         "Ghidra return-value error noted"
@@ -2526,8 +2557,8 @@
       "semantic_name": "format_int_decimal_pstring",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2431,
-        "line_end": 2467,
+        "line_start": 2447,
+        "line_end": 2483,
         "function_sha256": "12bf64ea64f348a824992e4a89dbd42dea9a0fd79a4304e5f6b67f8ff1cfd5a6"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2537,7 +2568,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1115",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2431-2467"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2447-2483"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2559,8 +2590,8 @@
       "semantic_name": "show_caution_alert_with_number",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2494,
-        "line_end": 2518,
+        "line_start": 2510,
+        "line_end": 2534,
         "function_sha256": "9371d1d54afe66214d26c1a8e0c441b52c74ba24c7e99be0538452efa76bd219"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2570,7 +2601,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1157",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2494-2518"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2510-2534"
       ],
       "known_blockers": [
         "A5 empty-string words; FUN_0000442e"
@@ -2595,8 +2626,8 @@
       "semantic_name": "show_sound_error_dialog_once",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2532,
-        "line_end": 2553,
+        "line_start": 2548,
+        "line_end": 2569,
         "function_sha256": "e9be241cda328514b0b203b3ad959e036c0e65490e13f61371cbd3d7a9155c05"
       },
       "renaming_confidence": "PROVEN",
@@ -2606,7 +2637,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1181",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2532-2553"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2548-2569"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2629,8 +2660,8 @@
       "semantic_name": "show_creating_panel_dialog",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2565,
-        "line_end": 2575,
+        "line_start": 2581,
+        "line_end": 2591,
         "function_sha256": "aad84686c22bfb8b9bb8d1da2ef71dadda1c5284db1c5d6416c7713d32d9ff7a"
       },
       "renaming_confidence": "PROVEN",
@@ -2640,7 +2671,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1197",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2565-2575"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2581-2591"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2663,8 +2694,8 @@
       "semantic_name": "release_sound_slots",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2587,
-        "line_end": 2605,
+        "line_start": 2603,
+        "line_end": 2621,
         "function_sha256": "c4a806c453b44843303d130d4cfbfe939b25ca85166b6d53b0ce84d268e80e1c"
       },
       "renaming_confidence": "PROVEN",
@@ -2674,7 +2705,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1206",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2587-2605"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2603-2621"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2697,8 +2728,8 @@
       "semantic_name": "load_named_sound_into_slot",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2620,
-        "line_end": 2647,
+        "line_start": 2636,
+        "line_end": 2663,
         "function_sha256": "061a9d1c3cab21de46a17101754e9db80afb94f2545342dcc7dfaeba78f4b7d2"
       },
       "renaming_confidence": "PROVEN",
@@ -2708,7 +2739,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1245",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2620-2647"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2636-2663"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2731,8 +2762,8 @@
       "semantic_name": "load_game_sounds",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2660,
-        "line_end": 2695,
+        "line_start": 2676,
+        "line_end": 2711,
         "function_sha256": "cac0a39f5b96b600653a3fb4b90f6cc10ff723e0e8c7b7d9d00c75e642a6a594"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2742,7 +2773,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1254",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2660-2695"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2676-2711"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2765,8 +2796,8 @@
       "semantic_name": "lock_sound_slots",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2706,
-        "line_end": 2721,
+        "line_start": 2722,
+        "line_end": 2737,
         "function_sha256": "b9beca26a51b49f70cbf6a636de61be0ad036225faf8bfe071bd93aba205b3cd"
       },
       "renaming_confidence": "PROVEN",
@@ -2776,7 +2807,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1310",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2706-2721"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2722-2737"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2799,8 +2830,8 @@
       "semantic_name": "reset_overlay_state",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2736,
-        "line_end": 2751,
+        "line_start": 2752,
+        "line_end": 2767,
         "function_sha256": "d824935ca4e46056cf00da65995bdf57b6839afa957710a936b786402377b294"
       },
       "renaming_confidence": "HYPOTHESIS name",
@@ -2810,7 +2841,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1339",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2736-2751"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2752-2767"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2833,8 +2864,8 @@
       "semantic_name": "scan_display_devices",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2772,
-        "line_end": 2827,
+        "line_start": 2788,
+        "line_end": 2843,
         "function_sha256": "9c014e40b8a142631ef47454427dc055796f3fcbdc4f4b0aaf58bc8898f6038c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2844,7 +2875,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1359",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2772-2827"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2788-2843"
       ],
       "known_blockers": [
         "low-memory $0CB2 meaning"
@@ -2869,8 +2900,8 @@
       "semantic_name": "layout_game_window_and_view",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 2852,
-        "line_end": 2996,
+        "line_start": 2868,
+        "line_end": 3012,
         "function_sha256": "ba00460b5142ef09d32999eec606610ff681413488a36c5effcb155b2a791660"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2880,7 +2911,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1370",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2852-2996"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:2868-3012"
       ],
       "known_blockers": [
         "exact height arithmetic"
@@ -2905,8 +2936,8 @@
       "semantic_name": "configure_display_from_main_device",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3017,
-        "line_end": 3084,
+        "line_start": 3033,
+        "line_end": 3100,
         "function_sha256": "a6b5e1d3df29c9202a4e7a67150f56a166b13d3c34aa4195de8e129a4fa2c52b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2916,7 +2947,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1384",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3017-3084"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3033-3100"
       ],
       "known_blockers": [
         "layout routine 0x2334"
@@ -2941,8 +2972,8 @@
       "semantic_name": "refresh_display_if_changed",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3097,
-        "line_end": 3115,
+        "line_start": 3113,
+        "line_end": 3131,
         "function_sha256": "f9a0378de5f4ae8b81527f73203d98bcad84f2f5624057e428938a76d0e78b4b"
       },
       "renaming_confidence": "PROVEN",
@@ -2952,7 +2983,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1478",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3097-3115"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3113-3131"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -2975,8 +3006,8 @@
       "semantic_name": "apply_settings_to_live_options",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3162,
-        "line_end": 3221,
+        "line_start": 3178,
+        "line_end": 3237,
         "function_sha256": "002d0e25268b425a1b7daa0a6b6a6ac00d1398f980d300c9b1f7aeeaa3b5b457"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -2986,7 +3017,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1487",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3162-3221"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3178-3237"
       ],
       "known_blockers": [
         "Callback targets; gate meanings; option semantics"
@@ -3011,8 +3042,8 @@
       "semantic_name": "initialize_application",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3279,
-        "line_end": 3348,
+        "line_start": 3295,
+        "line_end": 3364,
         "function_sha256": "51a6cdc4b011e42c2f649d08d0413f3b37f8a43ed2a3a98ef1fb5f12e6715eb4"
       },
       "renaming_confidence": "PROVEN bytes / STRONG INFERENCE role",
@@ -3022,7 +3053,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1552",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3279-3348"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3295-3364"
       ],
       "known_blockers": [
         "seg4 file 0x3d42 check; $AA28; HEL1 record layouts; helpers 0x2192/0x27e4/0x2e36/0x2eaa"
@@ -3047,8 +3078,8 @@
       "semantic_name": "wait_for_click_or_key",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3374,
-        "line_end": 3404,
+        "line_start": 3390,
+        "line_end": 3420,
         "function_sha256": "665bd6131545aa7a3c08983eb37ff791001761334556f9d174003789fa2978b9"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3058,7 +3089,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1570",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3374-3404"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3390-3420"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3081,8 +3112,8 @@
       "semantic_name": "show_resource_file_error_box",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3437,
-        "line_end": 3455,
+        "line_start": 3453,
+        "line_end": 3471,
         "function_sha256": "aa519fdf192702bfb5d9a846b2da9feffd292b0f924a8bb2500801cdae83b356"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3092,7 +3123,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1581",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3437-3455"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3453-3471"
       ],
       "known_blockers": [
         "seg4 0x516 / 0x4f0 roles"
@@ -3117,8 +3148,8 @@
       "semantic_name": "copy_pascal_string",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3466,
-        "line_end": 3483,
+        "line_start": 3482,
+        "line_end": 3499,
         "function_sha256": "15fff03daf44e96a2c84f1b2c6e1fa85bc01f908a96303f943d4e527ded23875"
       },
       "renaming_confidence": "PROVEN",
@@ -3128,7 +3159,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1590",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3466-3483"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3482-3499"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3151,8 +3182,8 @@
       "semantic_name": "handle_mouse_down",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3508,
-        "line_end": 3531,
+        "line_start": 3524,
+        "line_end": 3547,
         "function_sha256": "ad2b47176e44fb2f8639cf321f51b4fe93d755edde5a23a023c0f98e15924e9a"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3162,7 +3193,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1613",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3508-3531"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3524-3547"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3185,8 +3216,8 @@
       "semantic_name": "handle_activate_event",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3555,
-        "line_end": 3565,
+        "line_start": 3571,
+        "line_end": 3581,
         "function_sha256": "3c1cc6cc1246ad8fd47e0b8c311f59d4fa2e4dc835621f8c554dc5208d944a38"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3196,7 +3227,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1624",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3555-3565"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3571-3581"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3219,8 +3250,8 @@
       "semantic_name": "poll_and_dispatch_event",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3606,
-        "line_end": 3645,
+        "line_start": 3622,
+        "line_end": 3661,
         "function_sha256": "3e385bc8bb091ee9a338833d87ecd678bdaccec198cf0631f0c70dcd8aa44196"
       },
       "renaming_confidence": "PROVEN bytes / STRONG INFERENCE role",
@@ -3230,7 +3261,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1641",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3606-3645"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3622-3661"
       ],
       "known_blockers": [
         "Callee semantics; A5−0x14c6 flag; 68020-only EXTB.L vs 68000 support"
@@ -3255,8 +3286,8 @@
       "semantic_name": "main",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3683,
-        "line_end": 3707,
+        "line_start": 3699,
+        "line_end": 3723,
         "function_sha256": "b3ffd88d5a83681e029e3e61e9e67bf564b922bdf9961793d92a55311a8ef1a0"
       },
       "renaming_confidence": "PROVEN entry chain / STRONG INFERENCE role",
@@ -3266,7 +3297,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1652",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3683-3707"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3699-3723"
       ],
       "known_blockers": [
         "Helpers 0x1b42, 0x30fa, 0x35e4; A5−0x13ae/−0x14c4/−0x102e meanings"
@@ -3291,8 +3322,8 @@
       "semantic_name": "install_menus",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3720,
-        "line_end": 3738,
+        "line_start": 3736,
+        "line_end": 3754,
         "function_sha256": "fd210a51b7b54ecbe5cbaae7431d54680f7c515e458dbe9e5dcede105ed60a5d"
       },
       "renaming_confidence": "PROVEN",
@@ -3302,7 +3333,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1667",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3720-3738"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3736-3754"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3325,8 +3356,8 @@
       "semantic_name": "update_menu_items",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3756,
-        "line_end": 3823,
+        "line_start": 3772,
+        "line_end": 3839,
         "function_sha256": "2ab3daac63cd0558b1b659c15f59931142ab80ee9587f58711902566356ca2ea"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3336,7 +3367,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1678",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3756-3823"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3772-3839"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3359,8 +3390,8 @@
       "semantic_name": "set_menu_item_enabled",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3836,
-        "line_end": 3849,
+        "line_start": 3852,
+        "line_end": 3865,
         "function_sha256": "b260642b42e0ddb970d9ad8c9ff955d43930128e3087ad47bd5212c0418d49a7"
       },
       "renaming_confidence": "PROVEN",
@@ -3370,7 +3401,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1689",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3836-3849"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3852-3865"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3393,8 +3424,8 @@
       "semantic_name": "set_view_size_option",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3859,
-        "line_end": 3869,
+        "line_start": 3875,
+        "line_end": 3885,
         "function_sha256": "f3b649796c6a075ac8e5bafbf410fae05256fe9c22a89f0ee2ee715b475a2a4d"
       },
       "renaming_confidence": "PROVEN",
@@ -3404,7 +3435,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1702",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3859-3869"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3875-3885"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3427,8 +3458,8 @@
       "semantic_name": "start_new_mission",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3884,
-        "line_end": 3922,
+        "line_start": 3900,
+        "line_end": 3938,
         "function_sha256": "9e3444a4fb203af6f23289149a7570738aa7ed0b13d9d074e370de613325ab31"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3438,7 +3469,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1718",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3884-3922"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3900-3938"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3461,8 +3492,8 @@
       "semantic_name": "do_menu_command",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 3993,
-        "line_end": 4144,
+        "line_start": 4009,
+        "line_end": 4160,
         "function_sha256": "8973fe0179fdc6c5efafb9fbe16818ef8aa70baa1f15b29edc57d06d6cc129ed"
       },
       "renaming_confidence": "PROVEN bytes / STRONG INFERENCE role",
@@ -3472,7 +3503,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1759",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:3993-4144"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4009-4160"
       ],
       "known_blockers": [
         "Option byte meanings; menu titles; 0x2a44/0x27e4 roles; seg4 callee roles"
@@ -3497,8 +3528,8 @@
       "semantic_name": "vbl_sound_handler_ch0_unrolled",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4177,
-        "line_end": 4276,
+        "line_start": 4193,
+        "line_end": 4292,
         "function_sha256": "85c0c6a808c2877a4eac95a9a41ed4e2ea10e83d37982f994f37d1de2707a1d0"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3508,7 +3539,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1768",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4177-4276"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4193-4292"
       ],
       "known_blockers": [
         "Variant differences; end-of-buffer logic"
@@ -3533,8 +3564,8 @@
       "semantic_name": "vbl_sound_handler_ch0_variant",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4307,
-        "line_end": 4425,
+        "line_start": 4323,
+        "line_end": 4441,
         "function_sha256": "ae914ef54212c2543d8e80710d395bcd25e19b9ff96f694e09d439a3039df916"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3544,7 +3575,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1868",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4307-4425"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4323-4441"
       ],
       "known_blockers": [
         "Variant differences; end-of-buffer logic"
@@ -3569,8 +3600,8 @@
       "semantic_name": "vbl_sound_handler_two_channel",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4460,
-        "line_end": 4577,
+        "line_start": 4476,
+        "line_end": 4593,
         "function_sha256": "9727ab94f2f00f1bcc65b1e4d7e964d95325b333cec790f93a50e6970091552b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3580,7 +3611,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:1990",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4460-4577"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4476-4593"
       ],
       "known_blockers": [
         "Variant differences; end-of-buffer logic"
@@ -3605,8 +3636,8 @@
       "semantic_name": "clear_sound_buffer_to_silence",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4596,
-        "line_end": 4610,
+        "line_start": 4612,
+        "line_end": 4626,
         "function_sha256": "f4e9bba9a9922aa09f9289500b5f0957d43251222726a36a4d265abda2779779"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3616,7 +3647,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2108",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4596-4610"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4612-4626"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3639,8 +3670,8 @@
       "semantic_name": "alloc_sound_buffer_node",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4630,
-        "line_end": 4652,
+        "line_start": 4646,
+        "line_end": 4668,
         "function_sha256": "48a905af22656d13b0fa56da7d6fe455b0c1f9863627204a98cc92af844b6ed1"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3650,7 +3681,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2126",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4630-4652"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4646-4668"
       ],
       "known_blockers": [
         "Node field semantics"
@@ -3675,8 +3706,8 @@
       "semantic_name": "select_two_channel_sound_handler",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4667,
-        "line_end": 4676,
+        "line_start": 4683,
+        "line_end": 4692,
         "function_sha256": "d14453992021f5bab6e5626b422f1054c141be22d9a57932a8acb1f67b8c2be3"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3686,7 +3717,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2154",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4667-4676"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4683-4692"
       ],
       "known_blockers": [
         "Variant differences; end-of-buffer logic"
@@ -3711,8 +3742,8 @@
       "semantic_name": "init_sound_system",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4712,
-        "line_end": 4769,
+        "line_start": 4728,
+        "line_end": 4785,
         "function_sha256": "ba092820f39441e77ff4c17be7cb946a7bfc6a86fbb9bc785b2d8399d0c84618"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3722,7 +3753,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2170",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4712-4769"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4728-4785"
       ],
       "known_blockers": [
         "$0196 vector identity; truncated tail"
@@ -3747,8 +3778,8 @@
       "semantic_name": "play_sample_on_channel",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4794,
-        "line_end": 4823,
+        "line_start": 4810,
+        "line_end": 4839,
         "function_sha256": "24655c96c5aa5e8f6ff53593276e817388497957989305aff40defb33dc1d0ec"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3758,7 +3789,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2231",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4794-4823"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4810-4839"
       ],
       "known_blockers": [
         "Release of sustain loop"
@@ -3783,8 +3814,8 @@
       "semantic_name": "enqueue_sample_on_channel",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4842,
-        "line_end": 4869,
+        "line_start": 4858,
+        "line_end": 4885,
         "function_sha256": "c0a7edfa76e127ccd643b360db01537acf1a27d869762a596b3fceadbd08163c"
       },
       "renaming_confidence": "STRONG INFERENCE (purpose HYPOTHESIS)",
@@ -3794,7 +3825,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2266",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4842-4869"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4858-4885"
       ],
       "known_blockers": [
         "Reachability of queued nodes"
@@ -3819,8 +3850,8 @@
       "semantic_name": "set_sound_playback_rate",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4889,
-        "line_end": 4907,
+        "line_start": 4905,
+        "line_end": 4923,
         "function_sha256": "e3c08547d029e879d23b352cf288ef7a544638af9c13d6a598cc7dd49cbc3fca"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3830,7 +3861,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2299",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4889-4907"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4905-4923"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3853,8 +3884,8 @@
       "semantic_name": "release_channel_loop",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4927,
-        "line_end": 4944,
+        "line_start": 4943,
+        "line_end": 4960,
         "function_sha256": "c8cb465d92b6600e533d2ff9aafb45e572c71e31c8b3a4c6187393266cd11a03"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3864,7 +3895,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2321",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4927-4944"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4943-4960"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3887,8 +3918,8 @@
       "semantic_name": "silence_sound_channel",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4961,
-        "line_end": 4973,
+        "line_start": 4977,
+        "line_end": 4989,
         "function_sha256": "8242bfde386f773350564729cdf16a1ee659c94d4469141d4c32d04b43669937"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3898,7 +3929,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2343",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4961-4973"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4977-4989"
       ],
       "known_blockers": [
         "Buffer content at A5−0xc26"
@@ -3923,8 +3954,8 @@
       "semantic_name": "is_channel_playing",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 4988,
-        "line_end": 4996,
+        "line_start": 5004,
+        "line_end": 5012,
         "function_sha256": "909005ff1edd21a95a54e66e866d0d06e37b72157242ea58dea4a640efdcbb04"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3934,7 +3965,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2360",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:4988-4996"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5004-5012"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -3957,8 +3988,8 @@
       "semantic_name": "shutdown_sound",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5017,
-        "line_end": 5032,
+        "line_start": 5033,
+        "line_end": 5048,
         "function_sha256": "c7b370b8a146c344420b5214687561e19a0e1a453e56f6363b07c8a0c5fca2de"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -3968,7 +3999,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2381",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5017-5032"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5033-5048"
       ],
       "known_blockers": [
         "$0196 identity"
@@ -3993,8 +4024,8 @@
       "semantic_name": "position_window_on_screen",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5046,
-        "line_end": 5067,
+        "line_start": 5062,
+        "line_end": 5083,
         "function_sha256": "5f9e36d108f9b6ec4abc394e7f935b46bd8830bb7bd3e8060180432ce81a43ba"
       },
       "renaming_confidence": "PROVEN",
@@ -4004,7 +4035,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2402",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5046-5067"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5062-5083"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4027,8 +4058,8 @@
       "semantic_name": "position_alert_template",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5080,
-        "line_end": 5104,
+        "line_start": 5096,
+        "line_end": 5120,
         "function_sha256": "20206461ce037c078ccdf5e106b988115e55ca615938ea3605ba978bb179026b"
       },
       "renaming_confidence": "PROVEN",
@@ -4038,7 +4069,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2420",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5080-5104"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5096-5120"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4061,8 +4092,8 @@
       "semantic_name": "centre_window_on_screen",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5116,
-        "line_end": 5132,
+        "line_start": 5132,
+        "line_end": 5148,
         "function_sha256": "e5970538003ac42d79cb02f130dafeed4cf728f9b10c4dee7eac3a48ce1abfea"
       },
       "renaming_confidence": "PROVEN",
@@ -4072,7 +4103,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2431",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5116-5132"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5132-5148"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4095,8 +4126,8 @@
       "semantic_name": "detach_window_palette",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5144,
-        "line_end": 5154,
+        "line_start": 5160,
+        "line_end": 5170,
         "function_sha256": "334a4813391b7ab27cf569f06b04d29e51f9a20b345161c6997bb9f51740c1e6"
       },
       "renaming_confidence": "PROVEN",
@@ -4106,7 +4137,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2442",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5144-5154"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5160-5170"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4129,8 +4160,8 @@
       "semantic_name": "select_palette_for_depth",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5168,
-        "line_end": 5194,
+        "line_start": 5184,
+        "line_end": 5210,
         "function_sha256": "2d3b1cbe9f37caf0d6ca1e2a1a018c29a3af40c114db00668d31ae55f7fe65ea"
       },
       "renaming_confidence": "PROVEN",
@@ -4140,7 +4171,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2458",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5168-5194"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5184-5210"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4163,8 +4194,8 @@
       "semantic_name": "rebuild_all_palette_index_maps",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5212,
-        "line_end": 5237,
+        "line_start": 5228,
+        "line_end": 5253,
         "function_sha256": "e082a1806c1498edc07ccde8ae5125eb73517bf96372d439e0ebafc4e25e2c2a"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4174,7 +4205,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2484",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5212-5237"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5228-5253"
       ],
       "known_blockers": [
         "A5−0x103a role"
@@ -4199,8 +4230,8 @@
       "semantic_name": "configure_palette_entries",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5269,
-        "line_end": 5299,
+        "line_start": 5285,
+        "line_end": 5315,
         "function_sha256": "8917a5ed5a12f363536d924e991440ba000abdf7ae5313c6cd97c4ce1f0d070b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4210,7 +4241,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2520",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5269-5299"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5285-5315"
       ],
       "known_blockers": [
         "Callers"
@@ -4235,8 +4266,8 @@
       "semantic_name": "clear_ctab_size_callback",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5317,
-        "line_end": 5322,
+        "line_start": 5333,
+        "line_end": 5338,
         "function_sha256": "b61eb913122ea0c059f27a6351e6bc2204433d77b02e55b52416e02425d1336f"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4246,7 +4277,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2536",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5317-5322"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5333-5338"
       ],
       "known_blockers": [
         "+6 field meaning"
@@ -4271,8 +4302,8 @@
       "semantic_name": "build_palette_index_map",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5361,
-        "line_end": 5409,
+        "line_start": 5377,
+        "line_end": 5425,
         "function_sha256": "b06c5e7c0bba867d3f70db36c595cc2d138871f03662cd968f3781ea25059f38"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4282,7 +4313,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2547",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5361-5409"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5377-5425"
       ],
       "known_blockers": [
         "Uninitialised limit for other depths; selected routines' roles"
@@ -4307,8 +4338,8 @@
       "semantic_name": "lookup_palette_index_for_rgb_level",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5433,
-        "line_end": 5505,
+        "line_start": 5449,
+        "line_end": 5521,
         "function_sha256": "f6e36b1a6332f0aa06b54fed23abefabad52b09d5e8ffb453fd992c26e98172b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4318,7 +4349,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2561",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5433-5505"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5449-5521"
       ],
       "known_blockers": [
         "Behaviour for modes ≠ 1/4/8"
@@ -4328,6 +4359,37 @@
         "validation": "C + prologue bytes; token diff = renames"
       },
       "source_revision": "f6e36b1a6332f0aa06b54fed23abefabad52b09d5e8ffb453fd992c26e98172b",
+      "strict_port": null
+    },
+    {
+      "identity": "ID02::FUN_00004b62",
+      "segment": "ID02",
+      "original_function": "FUN_00004b62",
+      "original_address": "0x4b62",
+      "original_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID02.c",
+        "line_start": 2637,
+        "return_type": "unrecovered"
+      },
+      "semantic_name": "init_standard_colour_indices",
+      "semantic_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
+        "line_start": 5540,
+        "line_end": 5557,
+        "function_sha256": "1b594c5ddb436307ec075c391ee460a4b32bce0217c321ba5435f5bd85934ef2"
+      },
+      "renaming_confidence": "UNRECORDED",
+      "reconstruction_status": "VERIFIED",
+      "name_verified": true,
+      "semantically_verified": true,
+      "behavioral_verification_status": "NOT_PORTED",
+      "evidence_references": [
+        "sources/resedit-1-0-3/CODE/ID02.c:2637",
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5540-5557"
+      ],
+      "known_blockers": [],
+      "technical_evidence": {},
+      "source_revision": "1b594c5ddb436307ec075c391ee460a4b32bce0217c321ba5435f5bd85934ef2",
       "strict_port": null
     },
     {
@@ -4343,8 +4405,8 @@
       "semantic_name": "check_device_color_state_changed",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5558,
-        "line_end": 5604,
+        "line_start": 5591,
+        "line_end": 5637,
         "function_sha256": "001e3dd1786249f496331335f5253938df186c6774fa367e18b6377c462c5da5"
       },
       "renaming_confidence": "STRONG INFERENCE (purpose confirmed )",
@@ -4354,7 +4416,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2643",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5558-5604"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5591-5637"
       ],
       "known_blockers": [
         "FUN_000048ae tail; JT $182 role"
@@ -4379,8 +4441,8 @@
       "semantic_name": "process_pending_update_events",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5623,
-        "line_end": 5636,
+        "line_start": 5656,
+        "line_end": 5669,
         "function_sha256": "7addda70290e5a056de27761ae7a516c4038458275ebefde4c66b71e679e0f4a"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4390,7 +4452,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2693",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5623-5636"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5656-5669"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4413,8 +4475,8 @@
       "semantic_name": "handle_update_event",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5649,
-        "line_end": 5661,
+        "line_start": 5682,
+        "line_end": 5694,
         "function_sha256": "ccf3cf120bf53c491b68757698a412d7ae4a4f6e81a8e230bb1f2c387e2af62e"
       },
       "renaming_confidence": "PROVEN",
@@ -4424,7 +4486,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2704",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5649-5661"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5682-5694"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -4447,8 +4509,8 @@
       "semantic_name": "redraw_main_window",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID02.decomp.c",
-        "line_start": 5691,
-        "line_end": 5714,
+        "line_start": 5724,
+        "line_end": 5747,
         "function_sha256": "f8386d8c2e5568e963806e44ab555c18c36c4376ffb432ef0a3f45bb7e14ee22"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -4458,7 +4520,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID02.c:2721",
-        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5691-5714"
+        "sources/resedit-1-0-3/CODE/ID02.decomp.c:5724-5747"
       ],
       "known_blockers": [
         "Callee roles; callback target"
@@ -8635,6 +8697,37 @@
       "strict_port": null
     },
     {
+      "identity": "ID05::FUN_000008b8",
+      "segment": "ID05",
+      "original_function": "FUN_000008b8",
+      "original_address": "0x8b8",
+      "original_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID05.c",
+        "line_start": 238,
+        "return_type": "unrecovered"
+      },
+      "semantic_name": "init_protection_table",
+      "semantic_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
+        "line_start": 730,
+        "line_end": 739,
+        "function_sha256": "8fe2bc1f36454b413381bd7ae058d3b011fbe11e4eb65abc0980be1b63134628"
+      },
+      "renaming_confidence": "UNRECORDED",
+      "reconstruction_status": "VERIFIED",
+      "name_verified": true,
+      "semantically_verified": true,
+      "behavioral_verification_status": "NOT_PORTED",
+      "evidence_references": [
+        "sources/resedit-1-0-3/CODE/ID05.c:238",
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:730-739"
+      ],
+      "known_blockers": [],
+      "technical_evidence": {},
+      "source_revision": "8fe2bc1f36454b413381bd7ae058d3b011fbe11e4eb65abc0980be1b63134628",
+      "strict_port": null
+    },
+    {
       "identity": "ID05::FUN_000008d6",
       "segment": "ID05",
       "original_function": "FUN_000008d6",
@@ -8647,8 +8740,8 @@
       "semantic_name": "pick_random_protection_challenge",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 747,
-        "line_end": 760,
+        "line_start": 754,
+        "line_end": 767,
         "function_sha256": "0f84daa99a9eea901fb6de0c5fa70fc135aab369dbe8bf8baaa7130521b2a5a7"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8658,7 +8751,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:244",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:747-760"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:754-767"
       ],
       "known_blockers": [],
       "technical_evidence": {
@@ -8681,8 +8774,8 @@
       "semantic_name": "record_code_index_equals",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 795,
-        "line_end": 802,
+        "line_start": 801,
+        "line_end": 808,
         "function_sha256": "99373b466b9c902f19c371b12fe07c2c5f266deb812629df41f1dff5d51dc499"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8692,7 +8785,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:261",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:795-802"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:801-808"
       ],
       "known_blockers": [
         "Table contents A5−0xba; key A5−0x2c; n/rec origin"
@@ -8702,6 +8795,37 @@
         "validation": "Bytes match C; token diff = renames; 32 hashes OK"
       },
       "source_revision": "99373b466b9c902f19c371b12fe07c2c5f266deb812629df41f1dff5d51dc499",
+      "strict_port": null
+    },
+    {
+      "identity": "ID05::FUN_00000964",
+      "segment": "ID05",
+      "original_function": "FUN_00000964",
+      "original_address": "0x964",
+      "original_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID05.c",
+        "line_start": 272,
+        "return_type": "unrecovered"
+      },
+      "semantic_name": "validate_protection_response",
+      "semantic_source": {
+        "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
+        "line_start": 818,
+        "line_end": 851,
+        "function_sha256": "3ba0067f8fbe44436e4426c88736be00a3dd50562ee4ddb3f3917aee293cb765"
+      },
+      "renaming_confidence": "UNRECORDED",
+      "reconstruction_status": "VERIFIED",
+      "name_verified": true,
+      "semantically_verified": true,
+      "behavioral_verification_status": "NOT_PORTED",
+      "evidence_references": [
+        "sources/resedit-1-0-3/CODE/ID05.c:272",
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:818-851"
+      ],
+      "known_blockers": [],
+      "technical_evidence": {},
+      "source_revision": "3ba0067f8fbe44436e4426c88736be00a3dd50562ee4ddb3f3917aee293cb765",
       "strict_port": null
     },
     {
@@ -8717,8 +8841,8 @@
       "semantic_name": "random_28bit_value",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 823,
-        "line_end": 832,
+        "line_start": 865,
+        "line_end": 874,
         "function_sha256": "19b87719eae973082aee18d2fca12e3179a3a471a05cddaea44e94588e07a496"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8728,7 +8852,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:278",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:823-832"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:865-874"
       ],
       "known_blockers": [
         "Field semantics"
@@ -8753,8 +8877,8 @@
       "semantic_name": "pack_fields_to_code_buf68",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 853,
-        "line_end": 868,
+        "line_start": 895,
+        "line_end": 910,
         "function_sha256": "d4dba10ba5860582fa925a7c0f028b5fb561c6f8bd9f7e7044ff902550a49e16"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8764,7 +8888,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:291",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:853-868"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:895-910"
       ],
       "known_blockers": [
         "Field semantics"
@@ -8789,8 +8913,8 @@
       "semantic_name": "unpack_fields_from_code",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 883,
-        "line_end": 896,
+        "line_start": 925,
+        "line_end": 938,
         "function_sha256": "7b8a20c930852250ca123110b02756d59ce5f2282370b7509d9151cecc7b4d46"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8800,7 +8924,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:310",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:883-896"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:925-938"
       ],
       "known_blockers": [
         "Field semantics"
@@ -8825,8 +8949,8 @@
       "semantic_name": "encode_code28_to_buf54",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 911,
-        "line_end": 918,
+        "line_start": 953,
+        "line_end": 960,
         "function_sha256": "676b0cd0d3b442722cb18f9dea6a24e8f098cbc0e054e561de8df4ff8309779c"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8836,7 +8960,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:327",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:911-918"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:953-960"
       ],
       "known_blockers": [
         "Field semantics"
@@ -8861,8 +8985,8 @@
       "semantic_name": "decode_code_to_long_a",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 929,
-        "line_end": 936,
+        "line_start": 971,
+        "line_end": 978,
         "function_sha256": "87717a7d817d06799965425b66fce9c5718519fbbebfc7ab72cae8b090a3373b"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8872,7 +8996,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:338",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:929-936"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:971-978"
       ],
       "known_blockers": [
         "Field semantics"
@@ -8897,8 +9021,8 @@
       "semantic_name": "encode_long_to_buf40",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 948,
-        "line_end": 955,
+        "line_start": 990,
+        "line_end": 997,
         "function_sha256": "e0b058ab27fe7ae504ad6b8854fa78f42e21233ace6f417f324bb67abf443eb1"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8908,7 +9032,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:349",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:948-955"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:990-997"
       ],
       "known_blockers": [
         "Field semantics"
@@ -8933,8 +9057,8 @@
       "semantic_name": "decode_code_to_long_b",
       "semantic_source": {
         "path": "sources/resedit-1-0-3/CODE/ID05.decomp.c",
-        "line_start": 968,
-        "line_end": 975,
+        "line_start": 1010,
+        "line_end": 1017,
         "function_sha256": "760adb51d652f61d9cd8ddfa78946e9aad1f3f265a1804133c2988653e937610"
       },
       "renaming_confidence": "STRONG INFERENCE",
@@ -8944,7 +9068,7 @@
       "behavioral_verification_status": "NOT_PORTED",
       "evidence_references": [
         "sources/resedit-1-0-3/CODE/ID05.c:360",
-        "sources/resedit-1-0-3/CODE/ID05.decomp.c:968-975"
+        "sources/resedit-1-0-3/CODE/ID05.decomp.c:1010-1017"
       ],
       "known_blockers": [
         "Field semantics"
